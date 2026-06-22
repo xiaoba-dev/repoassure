@@ -1,7 +1,18 @@
 import { redactSensitiveText as legacyRedactSensitiveText } from '../../src/shared/privacy-redaction.js';
 import { redactSensitiveText } from '../../packages/acceptance/src/index.js';
+import { redactSensitiveText as packageRedactSensitiveText } from '../../packages/shared/src/privacy-redaction.js';
 
 describe('redactSensitiveText', () => {
+  it('keeps package-owned and legacy shared redaction outputs aligned', () => {
+    const text = [
+      'Authorization: Bearer shared-secret',
+      'https://example.com/callback?token=query-secret&state=public'
+    ].join('\n');
+
+    expect(packageRedactSensitiveText(text)).toBe(legacyRedactSensitiveText(text));
+    expect(packageRedactSensitiveText(text)).toContain('[REDACTED]');
+  });
+
   it('keeps sensitive key names while redacting values', () => {
     const text = [
       'OPENAI_API_KEY=sk-live-secret',

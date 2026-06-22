@@ -1,5 +1,7 @@
 import { shellQuoteArg as legacyShellQuoteArg } from '../../src/shared/shell-quote.js';
 import { shellQuoteArg } from '../../packages/acceptance/src/index.js';
+import { shellQuoteArg as packageShellQuoteArg } from '../../packages/shared/src/shell-quote.js';
+import { parseShellWords as packageParseShellWords } from '../../packages/shared/src/shell-words.js';
 
 describe('shellQuoteArg', () => {
   it('keeps simple shell arguments unquoted', () => {
@@ -25,5 +27,12 @@ describe('shellQuoteArg', () => {
     for (const sample of samples) {
       expect(shellQuoteArg(sample)).toBe(legacyShellQuoteArg(sample));
     }
+  });
+
+  it('keeps package-owned and legacy shared shell helpers aligned', () => {
+    const quoted = packageShellQuoteArg("first line\nsecond 'line'\tend");
+
+    expect(quoted).toBe(legacyShellQuoteArg("first line\nsecond 'line'\tend"));
+    expect(packageParseShellWords(`cmd ${quoted}`)).toEqual(['cmd', "first line\nsecond 'line'\tend"]);
   });
 });

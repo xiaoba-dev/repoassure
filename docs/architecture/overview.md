@@ -44,7 +44,7 @@ flowchart LR
 | ADR | Decision | Cascaded architecture surface |
 | --- | --- | --- |
 | [ADR-0001](../adr/0001-local-first-mcp-cli.md) | Local-first MCP and CLI | 本文件的系统定位、本地优先与隐私边界、CLI/MCP 分层；README 的本地优先产品说明和脱敏约束 |
-| [ADR-0002](../adr/0002-shared-cli-mcp-core.md) | Shared core for CLI and MCP | CLI 与 MCP 共享 `src/tools/*`、`src/domain/*`、`src/shared/*`；README 的入口追踪说明 |
+| [ADR-0002](../adr/0002-shared-cli-mcp-core.md) | Shared core for CLI and MCP | CLI 与 MCP 共享 `src/tools/*`、`src/domain/*`、`@hardening-mcp/shared`；README 的入口追踪说明 |
 | [ADR-0003](../adr/0003-target-repo-hardening-artifacts.md) | Target repo hardening artifacts | `.hardening/runs/<run-id>/`、`.hardening/latest`、legacy paths、workspace output 和 manifest 消费规则 |
 | [ADR-0004](../adr/0004-repair-plan-and-task-package.md) | Repair plan and executable task package | `repair-plan.json`、`repair-plan.md`、`repair-task-package.json`、`repair-task-package.md`、repair handoff、repair execution 和 patch plan 物料链路 |
 | [ADR-0011](../adr/0011-private-github-engineering-baseline.md) | Private GitHub engineering baseline | `.github/workflows/ci.yml`、PR/issue templates、`pnpm repo:hygiene` 和 private pre-release merge boundary |
@@ -156,14 +156,14 @@ flowchart TB
 | MCP | `src/adapters/mcp/` | stdio MCP Server、tool registry、boot session store |
 | Tool Wrappers | `src/tools/` | 将核心能力封装成可调用工具，并写入 artifact |
 | Domain | `src/domain/` | 分析、启动、探索、测试生成、报告生成、repair plan 生成 |
-| Shared | `src/shared/` | 脱敏、shell quoting、shell word parsing 等共享 helper |
+| Shared | `@hardening-mcp/shared` / `packages/shared/` | 脱敏、shell quoting、shell word parsing 等共享 helper；`src/shared/` 与 `dist/shared/` 保留兼容 wrapper/output |
 | Internal | `src/internal/` | acceptance、goal audit、benchmark 等项目治理工具 |
 | Shared Types | `src/types/` | findings、repair plan 等共享契约 |
 | Benchmark | `src/internal/benchmark/`、`scripts/run-benchmark.mjs` | benchmark 汇总与 `docs/logs/spike-results.md` 生成 |
 
 ## CLI 与 MCP 共享实现
 
-CLI 和 MCP 不各自实现业务逻辑。它们都调用 `src/tools/*`，而 tool wrappers 再调用 `src/domain/*` 和 `src/shared/*`。
+CLI 和 MCP 不各自实现业务逻辑。它们都调用 `src/tools/*`，而 tool wrappers 再调用 `src/domain/*` 和 `@hardening-mcp/shared`；迁移窗口内的旧 `src/shared/*` import 会通过 wrapper 指向 `packages/shared/dist/*`。
 
 这样做的目的：
 

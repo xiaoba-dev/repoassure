@@ -10,6 +10,16 @@ import {
   legacyAcceptanceCompatibilityModules,
   legacyAcceptanceWrapperSourceEntries
 } from '../../packages/acceptance/src/index.js';
+import {
+  legacySharedCompatibilityModules,
+  legacySharedDistOutputEntries,
+  legacySharedWrapperSourceEntries,
+  sharedCompatibilityContract,
+  sharedPackageDistOutputEntries,
+  sharedPackageExportEntries,
+  sharedPackageSourceEntries,
+  sharedPackageSubpathSpecifiers
+} from '../../packages/shared/src/index.js';
 
 describe('project structure', () => {
   it('routes benchmark artifacts through the artifacts directory while excluding legacy output', async () => {
@@ -81,7 +91,7 @@ describe('project structure', () => {
     expect(monorepoSpec).toContain('Monorepo Structure Spec v0.1');
     expect(monorepoSpec).toContain('Phase 0: Scaffold and Contract');
     expect(monorepoSpec).toContain('Phase 0 status: completed');
-    expect(monorepoSpec).toContain('Phase 2 acceptance package pilot is part of the current acceptance criteria');
+    expect(monorepoSpec).toContain('Phase 2 acceptance package pilot and Phase 2c shared package extraction are part of the current acceptance criteria');
     expect(monorepoSpec).not.toContain('Status: In progress.');
     expect(monorepoSpec).not.toContain('Do not move runtime code yet');
     expect(monorepoSpec).not.toContain('Existing quality gates continue to pass after Phase 0.');
@@ -120,10 +130,12 @@ describe('project structure', () => {
       readFile('docs/adr/0006-package-build-strategy.md', 'utf8')
     ]);
 
-    expect(monorepoSpec).toContain('Phase 2 status: acceptance package pilot implemented; broader package extraction remains deferred');
+    expect(monorepoSpec).toContain('Phase 2 status: acceptance package pilot and Phase 2c shared package extraction implemented; broader package extraction remains deferred');
     expect(monorepoSpec).toContain('ADR-0006: Package Build Strategy');
-    expect(monorepoSpec).toContain('Keep `src/shared/*` as the canonical runtime source during Phase 1');
-    expect(monorepoSpec).toContain('preserve `dist/shared/*` compatibility outputs');
+    expect(monorepoSpec).toContain('Phase 2c shared package status: implemented with compatibility wrappers');
+    expect(monorepoSpec).toContain('`packages/shared/src` owns shared utility implementation modules');
+    expect(monorepoSpec).toContain('`src/shared/*` remains as compatibility wrappers');
+    expect(monorepoSpec).toContain('`dist/shared/*` remains as compatibility output wrappers');
     expect(monorepoSpec).toContain('Extract `packages/acceptance` first as the Phase 2 pilot');
     expect(monorepoSpec).toContain('Phase 2 acceptance package pilot status: implemented as package-owned runner entrypoints with compatibility outputs');
     expect(phasedMonorepoAdr).toContain('Phase 2 acceptance package pilot is implemented');
@@ -429,9 +441,13 @@ describe('project structure', () => {
 
     expect(rootPackageJson).toContain('"build": "pnpm build:packages && pnpm build:src"');
     expect(rootPackageJson).toContain('"build:src": "tsc -p tsconfig.build.json"');
-    expect(rootPackageJson).toContain('"build:packages": "tsc -p packages/acceptance/tsconfig.build.json"');
+    expect(rootPackageJson).toContain('"build:packages": "pnpm build:shared && pnpm build:acceptance"');
+    expect(rootPackageJson).toContain('"build:shared": "tsc -p packages/shared/tsconfig.build.json"');
+    expect(rootPackageJson).toContain('"build:acceptance": "tsc -p packages/acceptance/tsconfig.build.json"');
     expect(rootPackageJson).toContain('"typecheck": "pnpm build:packages && tsc --noEmit && pnpm typecheck:packages"');
-    expect(rootPackageJson).toContain('"typecheck:packages": "tsc -p packages/acceptance/tsconfig.json --noEmit"');
+    expect(rootPackageJson).toContain('"typecheck:packages": "pnpm typecheck:shared && pnpm typecheck:acceptance"');
+    expect(rootPackageJson).toContain('"typecheck:shared": "tsc -p packages/shared/tsconfig.json --noEmit"');
+    expect(rootPackageJson).toContain('"typecheck:acceptance": "tsc -p packages/acceptance/tsconfig.json --noEmit"');
     expect(rootPackageJson).toContain('"@hardening-mcp/acceptance": "workspace:*"');
     expect(rootPackageJson).toContain('"acceptance": "node packages/acceptance/dist/run-acceptance.js"');
     expect(rootPackageJson).toContain('"goal:audit": "node packages/acceptance/dist/run-goal-audit.js"');
@@ -741,11 +757,12 @@ describe('project structure', () => {
     expect(activeMigrationGoal).toContain('`pnpm goal:audit` 显示自动可验证项 0 missing');
     expect(activeMigrationGoal).not.toContain('仍未完成：');
     expect(activeMigrationGoal).not.toContain('通过 15/15');
-    expect(readme).toContain('monorepo 迁移已进入 Phase 2 acceptance package pilot');
+    expect(readme).toContain('monorepo 迁移已进入 Phase 2 package extraction');
     expect(readme).toContain('`packages/acceptance/` 已承载验收实现模块');
+    expect(readme).toContain('`@hardening-mcp/shared` / `packages/shared/` 已承载脱敏、shell quoting 和 shell word parsing 共享工具实现');
     expect(readme).not.toContain('当前代码仍保持单包运行结构，monorepo 迁移处于 Phase 0 scaffold 阶段');
     expect(monorepoSpec).toContain('The current implementation is a phased monorepo workspace');
-    expect(monorepoSpec).toContain('Remaining non-acceptance runtime code still has useful internal boundaries');
+    expect(monorepoSpec).toContain('Remaining runtime code still has useful internal boundaries');
     expect(monorepoSpec).toContain('Acceptance runners already live under `packages/acceptance`');
     expect(monorepoSpec).not.toContain('The current implementation is still a single TypeScript package');
     expect(monorepoSpec).not.toContain('internal acceptance tooling, and future package boundaries are still coupled inside one package');
@@ -773,24 +790,26 @@ describe('project structure', () => {
     );
   });
 
-  it('records current acceptance package evidence gates in the latest dev log entry', async () => {
+  it('records current shared package extraction evidence gates in the latest dev log entry', async () => {
     const devLog = await readFile('docs/logs/dev-log.md', 'utf8');
-    const latestEntryStart = devLog.indexOf('## 2026年6月21日 - Acceptance Package Phase 2de Auto Patch Plan Prototype');
-    const latestEntryEnd = devLog.indexOf('\n## 2026年6月21日 - Acceptance Package Phase 2dd Auto Repair Execution Prototype');
+    const latestEntryStart = devLog.indexOf('## 2026年6月23日 - Shared Package Phase 2c Extraction');
+    const latestEntryEnd = devLog.indexOf('\n## 2026年6月21日 - Acceptance Package Phase 2de Auto Patch Plan Prototype');
     const latestEntry = devLog.slice(latestEntryStart, latestEntryEnd);
 
     expect(latestEntryStart).toBe(devLog.indexOf('## '));
     expect(latestEntryEnd).toBeGreaterThan(latestEntryStart);
-    expect(latestEntry).toContain('pnpm vitest run tests/unit/repair-patch-plan.test.ts');
-    expect(latestEntry).toContain('1 个测试文件、3 个测试');
-    expect(latestEntry).toContain('pnpm vitest run tests/unit/acceptance-package.test.ts tests/unit/project-structure.test.ts');
-    expect(latestEntry).toContain('run-repair-patch-plan');
-    expect(latestEntry).toContain('patch-plan.json');
-    expect(latestEntry).toContain('18');
-    expect(latestEntry).toContain('4');
-    expect(latestEntry).toContain('Panniantong/Agent-Reach');
-    expect(latestEntry).toContain('ruff check .');
-    expect(latestEntry).toContain('mypy');
+    expect(latestEntry).toContain('@hardening-mcp/shared');
+    expect(latestEntry).toContain('Phase 2c shared package');
+    expect(latestEntry).toContain('src/shared/*');
+    expect(latestEntry).toContain('packages/shared/dist');
+    expect(latestEntry).toContain('Red：`pnpm vitest run tests/unit/project-structure.test.ts tests/unit/privacy-redaction.test.ts tests/unit/shell-quote.test.ts tests/unit/shell-words.test.ts`');
+    expect(latestEntry).toContain('4 个测试文件、69 个测试');
+    expect(latestEntry).toContain('pnpm test:unit');
+    expect(latestEntry).toContain('33 个测试文件、505 个测试');
+    expect(latestEntry).toContain('pnpm test:integration');
+    expect(latestEntry).toContain('11 个测试文件、27 个测试');
+    expect(latestEntry).toContain('pnpm goal:audit');
+    expect(latestEntry).toContain('29 项检查、28 项已通过、0 missing、1 项需要人工确认');
   });
 
   it('keeps legacy acceptance markdown as a package compatibility wrapper', async () => {
@@ -1306,6 +1325,189 @@ describe('project structure', () => {
       expect(jsOutput).not.toContain('../../domain/');
       expect(declarationOutput).toContain('../../../packages/acceptance/dist/');
       expect(sourceMapOutput).toContain(`"file":"${entry.moduleName}.js"`);
+    }
+  });
+
+  it('extracts shared utility ownership into a workspace package while preserving compatibility outputs', async () => {
+    const [
+      rootPackageJsonText,
+      sharedPackageJsonText,
+      sharedCompatibility,
+      sharedReadme,
+      packageIndex,
+      packageSubpathTypeSmoke,
+      monorepoSpec,
+      packageBuildAdr,
+      readme,
+      architecture,
+      decisionLog,
+      packageSourceFiles,
+      legacySourceFiles
+    ] = await Promise.all([
+      readFile('package.json', 'utf8'),
+      readFile('packages/shared/package.json', 'utf8'),
+      readFile('packages/shared/src/compatibility.ts', 'utf8'),
+      readFile('packages/shared/README.md', 'utf8'),
+      readFile('packages/shared/src/index.ts', 'utf8'),
+      readFile('tests/type-smoke/shared-package-subpaths.ts', 'utf8'),
+      readFile('docs/architecture/specs/monorepo-structure-spec-v0.1.md', 'utf8'),
+      readFile('docs/adr/0006-package-build-strategy.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      listFiles('packages/shared/src'),
+      listFiles('src/shared')
+    ]);
+    const rootPackageJson = JSON.parse(rootPackageJsonText) as {
+      scripts?: Record<string, string>;
+      dependencies?: Record<string, string>;
+    };
+    const sharedPackageJson = JSON.parse(sharedPackageJsonText) as {
+      name?: string;
+      main?: string;
+      exports?: Record<string, { types?: string; default?: string } | string>;
+    };
+    const packageModuleNames = packageSourceFiles
+      .filter((path) => path.endsWith('.ts'))
+      .map((path) => path.replace('packages/shared/src/', '').replace(/\.ts$/u, ''))
+      .filter((moduleName) => moduleName !== 'index')
+      .sort();
+    const legacyModules = legacySourceFiles
+      .filter((path) => path.endsWith('.ts'))
+      .map((path) => path.replace('src/shared/', '').replace(/\.ts$/u, ''))
+      .sort();
+
+    expect(rootPackageJson.scripts?.['build:packages']).toBe('pnpm build:shared && pnpm build:acceptance');
+    expect(rootPackageJson.scripts?.['build:shared']).toBe('tsc -p packages/shared/tsconfig.build.json');
+    expect(rootPackageJson.scripts?.['build:acceptance']).toBe('tsc -p packages/acceptance/tsconfig.build.json');
+    expect(rootPackageJson.scripts?.['typecheck:packages']).toBe('pnpm typecheck:shared && pnpm typecheck:acceptance');
+    expect(rootPackageJson.scripts?.['typecheck:shared']).toBe('tsc -p packages/shared/tsconfig.json --noEmit');
+    expect(rootPackageJson.scripts?.['typecheck:acceptance']).toBe('tsc -p packages/acceptance/tsconfig.json --noEmit');
+    expect(rootPackageJson.dependencies?.['@hardening-mcp/shared']).toBe('workspace:*');
+
+    expect(sharedPackageJson.name).toBe('@hardening-mcp/shared');
+    expect(sharedPackageJson.main).toBe('dist/index.js');
+    expectPackageExport(sharedPackageJsonText, '.', './dist/index.d.ts', './dist/index.js');
+    expectPackageExport(sharedPackageJsonText, './compatibility', './dist/compatibility.d.ts', './dist/compatibility.js');
+    expectPackageExport(sharedPackageJsonText, './privacy-redaction', './dist/privacy-redaction.d.ts', './dist/privacy-redaction.js');
+    expectPackageExport(sharedPackageJsonText, './shell-quote', './dist/shell-quote.d.ts', './dist/shell-quote.js');
+    expectPackageExport(sharedPackageJsonText, './shell-words', './dist/shell-words.d.ts', './dist/shell-words.js');
+    expect(Object.entries(sharedPackageJson.exports ?? {}).sort(([left], [right]) => left.localeCompare(right))).toEqual(
+      [...sharedPackageExportEntries]
+        .map((entry) => [entry.exportPath, { types: entry.types, default: entry.default }])
+        .sort(([left], [right]) => String(left).localeCompare(String(right)))
+    );
+
+    expect(sharedCompatibility).toContain('sharedCompatibilityContract');
+    expect(sharedCompatibility).toContain('legacySharedWrapperSourceEntries');
+    expect(sharedCompatibility).toContain('sharedPackageDistOutputEntries');
+    expect(packageModuleNames).toEqual(['compatibility', 'privacy-redaction', 'shell-quote', 'shell-words']);
+    expect([...sharedCompatibilityContract.packageOwnedModules].sort()).toEqual(packageModuleNames);
+    expect(sharedPackageSourceEntries.map((entry) => entry.path).sort()).toEqual(
+      packageModuleNames.map((moduleName) => `packages/shared/src/${moduleName}.ts`).sort()
+    );
+    expect(legacyModules).toEqual(['privacy-redaction', 'shell-quote', 'shell-words']);
+    expect([...legacySharedCompatibilityModules].sort()).toEqual(legacyModules);
+    expect(legacySharedWrapperSourceEntries.map((entry) => entry.path).sort()).toEqual(
+      legacyModules.map((moduleName) => `src/shared/${moduleName}.ts`).sort()
+    );
+
+    for (const moduleName of packageModuleNames) {
+      expect(packageIndex).toContain(`from './${moduleName}.js'`);
+      expect(packageSubpathTypeSmoke).toContain(`from '@hardening-mcp/shared/${moduleName}'`);
+      expect(sharedPackageSubpathSpecifiers).toContain(`@hardening-mcp/shared/${moduleName}`);
+    }
+    expect(packageSubpathTypeSmoke).toContain("from '@hardening-mcp/shared'");
+    expect(packageSubpathTypeSmoke).toContain('shared.sharedPackageExportEntries');
+    expect(packageSubpathTypeSmoke).toContain('compatibility.sharedPackageExportEntries');
+    expect(packageSubpathTypeSmoke).toContain('shared.SharedPackageExportEntry');
+    expect(packageSubpathTypeSmoke).toContain('compatibility.SharedPackageExportEntry');
+    expect(packageSubpathTypeSmoke).toContain('sharedPackageExportEntryContracts');
+    expect(packageSubpathTypeSmoke).toContain('shared.SharedPackageDistOutputEntry');
+    expect(packageSubpathTypeSmoke).toContain('compatibility.SharedPackageDistOutputEntry');
+    expect(packageSubpathTypeSmoke).toContain('sharedPackageDistOutputEntryContracts');
+    expect(packageSubpathTypeSmoke).toContain('shared.SharedPackageSourceEntry');
+    expect(packageSubpathTypeSmoke).toContain('compatibility.SharedPackageSourceEntry');
+    expect(packageSubpathTypeSmoke).toContain('sharedPackageSourceEntryContracts');
+    expect(packageSubpathTypeSmoke).toContain('shared.LegacySharedDistOutputEntry');
+    expect(packageSubpathTypeSmoke).toContain('compatibility.LegacySharedDistOutputEntry');
+    expect(packageSubpathTypeSmoke).toContain('legacySharedDistOutputEntryContracts');
+    expect(packageSubpathTypeSmoke).toContain('shared.LegacySharedWrapperSourceEntry');
+    expect(packageSubpathTypeSmoke).toContain('compatibility.LegacySharedWrapperSourceEntry');
+    expect(packageSubpathTypeSmoke).toContain('legacySharedWrapperSourceEntryContracts');
+
+    expect(sharedReadme).toContain('Phase 2c shared package extraction');
+    expect(sharedReadme).toContain('This package owns shared utility implementation modules');
+    expect(sharedReadme).toContain('`src/shared/*` compatibility wrappers');
+    expect(monorepoSpec).toContain('Phase 2c shared package status: implemented with compatibility wrappers');
+    expect(monorepoSpec).toContain('`packages/shared/src` owns shared utility implementation modules');
+    expect(monorepoSpec).toContain('`src/shared/*` remains as compatibility wrappers');
+    expect(packageBuildAdr).toContain('Phase 2c');
+    expect(packageBuildAdr).toContain('`packages/shared`');
+    expect(packageBuildAdr).toContain('shared package extraction');
+    expect(readme).toContain('@hardening-mcp/shared');
+    expect(architecture).toContain('@hardening-mcp/shared');
+    expect(decisionLog).toContain('shared package 抽取');
+
+    await expectPath('packages/shared/package.json');
+    await expectPath('packages/shared/tsconfig.json');
+    await expectPath('packages/shared/tsconfig.build.json');
+    await expectPath('packages/shared/src/index.ts');
+    await expectPath('packages/shared/src/compatibility.ts');
+    await expectPath('packages/shared/src/privacy-redaction.ts');
+    await expectPath('packages/shared/src/shell-quote.ts');
+    await expectPath('packages/shared/src/shell-words.ts');
+  });
+
+  it('keeps generated shared package dist outputs described by the package compatibility contract', async () => {
+    const packageDistFiles = await listFiles('packages/shared/dist');
+    const expectedDistPaths = sharedPackageDistOutputEntries.flatMap((entry) => [
+      entry.jsPath,
+      entry.declarationPath,
+      entry.sourceMapPath
+    ]).sort();
+
+    expect(sharedPackageDistOutputEntries.map((entry) => entry.exportPath).sort()).toEqual(
+      sharedPackageExportEntries.map((entry) => entry.exportPath).sort()
+    );
+    expect(packageDistFiles.filter((path) => path.endsWith('.js') || path.endsWith('.d.ts') || path.endsWith('.js.map')).sort()).toEqual(expectedDistPaths);
+  });
+
+  it('keeps generated legacy shared dist outputs as package compatibility wrappers', async () => {
+    const distFiles = await listFiles(sharedCompatibilityContract.legacyDistRoot);
+    const expectedDistPaths = legacySharedDistOutputEntries.flatMap((entry) => [
+      entry.jsPath,
+      entry.declarationPath,
+      entry.sourceMapPath
+    ]).sort();
+
+    expect(legacySharedDistOutputEntries.map((entry) => entry.moduleName).sort()).toEqual(
+      [...legacySharedCompatibilityModules].sort()
+    );
+    expect(distFiles.filter((path) => path.endsWith('.js') || path.endsWith('.d.ts') || path.endsWith('.js.map')).sort()).toEqual(expectedDistPaths);
+
+    for (const entry of legacySharedDistOutputEntries) {
+      const [jsOutput, declarationOutput, sourceMapOutput] = await Promise.all([
+        readFile(entry.jsPath, 'utf8'),
+        readFile(entry.declarationPath, 'utf8'),
+        readFile(entry.sourceMapPath, 'utf8')
+      ]);
+
+      expect(jsOutput).toContain('../../packages/shared/dist/');
+      expect(jsOutput).not.toContain('const redacted =');
+      expect(jsOutput).not.toContain('function decodeAnsiCStringEscape');
+      expect(declarationOutput).toContain('../../packages/shared/dist/');
+      expect(sourceMapOutput).toContain(`"file":"${entry.moduleName}.js"`);
+    }
+  });
+
+  it('keeps legacy shared source modules as package compatibility wrappers', async () => {
+    for (const entry of legacySharedWrapperSourceEntries) {
+      const legacySource = await readFile(entry.path, 'utf8');
+
+      expect(legacySource).toContain('../../packages/shared/dist/');
+      expect(legacySource).not.toContain('const redacted =');
+      expect(legacySource).not.toContain('function decodeAnsiCStringEscape');
     }
   });
 });

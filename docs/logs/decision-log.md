@@ -1,5 +1,23 @@
 # 决策日志
 
+## 2026年6月23日 - shared package 抽取
+
+### 决策
+
+执行 Phase 2c shared package 抽取：`packages/shared/src` 成为脱敏、shell quoting 和 shell word parsing 的实现所有者，根 package 通过 `@hardening-mcp/shared` workspace dependency 引用该包。`src/shared/*` 与 `dist/shared/*` 保留为兼容 wrapper/output，不在本阶段迁移 core、browser explorer 或 repair planner。
+
+### 原因
+
+- shared 工具被 CLI、MCP、domain、internal 和 acceptance 多处复用，继续由 root `src/shared` 承载会阻塞后续 package 边界清晰化。
+- `dist/shared/*` 是既有 build 输出面，必须先通过 TDD 锁定兼容 wrapper、package exports、类型解析和构建顺序。
+- shared 的边界小于 core/browser/repair，适合作为 acceptance package 之后的第二个可控抽取。
+
+### 影响
+
+- 新增 `@hardening-mcp/shared` 包，导出 root、`compatibility`、`privacy-redaction`、`shell-quote` 和 `shell-words` 子路径。
+- 根构建脚本改为先 `build:shared`，再 `build:acceptance`，最后 `build:src`。
+- README、架构概览、monorepo spec 和 ADR-0006 已级联写入 shared package ownership 与兼容路径边界。
+
 ## 2026年6月22日 - 分支保护与发布边界
 
 ### 决策

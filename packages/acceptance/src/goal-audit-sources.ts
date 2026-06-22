@@ -45,13 +45,14 @@ type LegacyAcceptanceTextSourcePaths = Readonly<Record<
 export const GOAL_AUDIT_TEXT_SOURCE_PATHS = {
   packageJson: 'package.json',
   acceptancePackageJson: 'packages/acceptance/package.json',
+  sharedPackageJson: 'packages/shared/package.json',
   codexGoal: 'docs/goals/codex-goal.md',
   toolRegistry: 'src/adapters/mcp/tool-registry.ts',
   mcpServerSource: 'src/adapters/mcp/server.ts',
   mcpServerTest: 'tests/integration/mcp-server.test.ts',
   cliRun: 'src/adapters/cli/run.ts',
   analyzeRepo: 'src/domain/analyze/analyze-repo.ts',
-  privacyRedaction: 'src/shared/privacy-redaction.ts',
+  privacyRedaction: 'packages/shared/src/privacy-redaction.ts',
   playwrightDriver: 'src/domain/explore/playwright-driver.ts',
   bootAppTool: 'src/tools/boot-app-tool.ts',
   exploreAppTool: 'src/tools/explore-app-tool.ts',
@@ -83,6 +84,9 @@ export const GOAL_AUDIT_TEXT_SOURCE_PATHS = {
   goalAuditSource: 'packages/acceptance/src/run-goal-audit.ts',
   goalAuditTests: 'tests/unit/goal-audit.test.ts',
   userAcceptanceRecord: 'docs/acceptance/user-acceptance-record.md',
+  legacySharedPrivacyRedaction: 'src/shared/privacy-redaction.ts',
+  legacySharedShellQuote: 'src/shared/shell-quote.ts',
+  legacySharedShellWords: 'src/shared/shell-words.ts',
   ...buildPackageAcceptanceDistTextSourcePaths(),
   ...buildLegacyAcceptanceTextSourcePaths()
 } as const;

@@ -528,8 +528,12 @@ describe('goal audit', () => {
       blockersLog: '# 阻塞日志 ### 已尝试方案 ### 需要的用户决策或外部条件 listen EPERM Chromium',
       decisionLog: '# 决策日志 ### 决策 ### 原因 ### 影响 MCP Server 采用 Registry + SDK 薄绑定 Goal 审计不替代用户验收',
       goalAuditSource: 'readGoalAuditTextSources buildCurrentGoalAuditItemsFromSources buildGoalAuditItemsFromWorkspace classifyUserAcceptanceRecord goalLastUpdatedText pathExists: async',
-      packageJson: '"@hardening-mcp/acceptance": "workspace:*"',
+      packageJson: readFileSync('package.json', 'utf8'),
       acceptancePackageJson: readFileSync('packages/acceptance/package.json', 'utf8'),
+      sharedPackageJson: readFileSync('packages/shared/package.json', 'utf8'),
+      legacySharedPrivacyRedaction: 'packages/shared/dist',
+      legacySharedShellQuote: 'packages/shared/dist',
+      legacySharedShellWords: 'packages/shared/dist',
       legacyAcceptanceFatalError: 'packages/acceptance/dist',
       legacyAcceptanceGoalAudit: 'packages/acceptance/dist',
       legacyAcceptanceMarkdown: 'packages/acceptance/dist',
@@ -604,6 +608,12 @@ describe('goal audit', () => {
       }),
       expect.objectContaining({
         category: '架构迁移',
+        requirement: 'Shared package typed module exports and legacy wrappers',
+        status: 'passed',
+        evidence: ['root package depends on @hardening-mcp/shared workspace package; packages/shared exports typed root, compatibility, privacy-redaction, shell-quote, and shell-words subpaths; src/shared/*.ts all delegate to packages/shared/dist compatibility wrappers']
+      }),
+      expect.objectContaining({
+        category: '架构迁移',
         requirement: 'Legacy acceptance dist compatibility outputs',
         status: 'passed',
         evidence: ['dist/internal/acceptance/*.js and *.d.ts compatibility outputs all delegate to packages/acceptance/dist package entrypoints; dist/internal/acceptance/*.js.map source maps are present through legacyAcceptanceDistOutputEntries.sourceMapPath and LEGACY_ACCEPTANCE_DIST_SOURCE_MAP_SOURCE_SPECS']
@@ -644,6 +654,12 @@ describe('goal audit', () => {
         requirement: 'Acceptance package typed module exports',
         status: 'missing',
         nextAction: '补齐 root workspace dependency 和 packages/acceptance module typed exports 后重新运行 goal audit。'
+      }),
+      expect.objectContaining({
+        category: '架构迁移',
+        requirement: 'Shared package typed module exports and legacy wrappers',
+        status: 'missing',
+        nextAction: '补齐 root workspace dependency、packages/shared typed exports 和 src/shared legacy wrappers 后重新运行 goal audit。'
       }),
       expect.objectContaining({
         category: '架构迁移',
@@ -892,6 +908,7 @@ describe('goal audit', () => {
       sources: {
         packageJson: readFileSync('package.json', 'utf8'),
         acceptancePackageJson: readFileSync('packages/acceptance/package.json', 'utf8'),
+        sharedPackageJson: readFileSync('packages/shared/package.json', 'utf8'),
         codexGoal: `最后更新：2026年6月21日\n${sharedMarkers}`,
         toolRegistry: sharedMarkers,
         mcpServerSource: sharedMarkers,
@@ -930,6 +947,9 @@ describe('goal audit', () => {
         goalAuditSource: sharedMarkers,
         goalAuditTests: sharedMarkers,
         userAcceptanceRecord: sharedMarkers,
+        legacySharedPrivacyRedaction: 'packages/shared/dist',
+        legacySharedShellQuote: 'packages/shared/dist',
+        legacySharedShellWords: 'packages/shared/dist',
         ...Object.fromEntries([
           ...PACKAGE_ACCEPTANCE_DIST_OUTPUT_SOURCE_SPECS,
           ...PACKAGE_ACCEPTANCE_DIST_DECLARATION_SOURCE_SPECS,
@@ -988,7 +1008,7 @@ describe('goal audit', () => {
       userAcceptanceStatus: 'pending_or_invalid'
     });
 
-    expect(items).toHaveLength(28);
+    expect(items).toHaveLength(29);
     expect(items.map((item) => `${item.category}:${item.requirement}`)).toEqual([
       '交付物:可运行的 CLI',
       '交付物:可运行的 MCP Server',
@@ -1005,6 +1025,7 @@ describe('goal audit', () => {
       'Token 控制:精准上下文与小步审计',
       '架构迁移:Legacy acceptance 兼容 wrapper',
       '架构迁移:Acceptance package typed module exports',
+      '架构迁移:Shared package typed module exports and legacy wrappers',
       '架构迁移:Legacy acceptance dist compatibility outputs',
       'Benchmark:Benchmark 达到 Go 标准',
       '文档与日志:Required Documents 已维护',
@@ -1045,7 +1066,7 @@ describe('goal audit', () => {
       }
     });
 
-    expect(items).toHaveLength(28);
+    expect(items).toHaveLength(29);
     expect(items.at(-1)).toEqual(expect.objectContaining({
       category: '用户验收',
       requirement: '用户确认 MVP 符合预期',

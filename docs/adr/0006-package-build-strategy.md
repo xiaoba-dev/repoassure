@@ -6,7 +6,7 @@
 
 ## Context
 
-ADR-0005 accepts a phased monorepo migration. The initial Phase 2 package extraction was deferred until the build could preserve compatibility outputs, but the acceptance package pilot is no longer deferred: `packages/acceptance` now owns acceptance implementation modules and runner entrypoints while compatibility outputs remain available under `src/internal/acceptance/*` and `dist/internal/acceptance/*`. Existing CLI bins, MCP entrypoints, acceptance scripts, goal audit, benchmark runs, tests, and documentation still rely on stable compatibility paths.
+ADR-0005 accepts a phased monorepo migration. The initial Phase 2 package extraction was deferred until the build could preserve compatibility outputs, but the acceptance package pilot is no longer deferred: `packages/acceptance` now owns acceptance implementation modules and runner entrypoints while compatibility outputs remain available under `src/internal/acceptance/*` and `dist/internal/acceptance/*`. Phase 2c shared package extraction is also implemented: `packages/shared` now owns redaction and shell helper implementations while compatibility outputs remain available under `src/shared/*` and `dist/shared/*`. Existing CLI bins, MCP entrypoints, acceptance scripts, goal audit, benchmark runs, tests, and documentation still rely on stable compatibility paths.
 
 Moving source files directly into `packages/*/src` would create three risks:
 
@@ -25,7 +25,7 @@ Use a compatibility-first package build strategy:
 5. Add compatibility wrappers where old paths must continue to exist.
 6. Require package-boundary tests before moving implementation files.
 
-The first package extraction target is `packages/acceptance`, because its boundary is narrower than `core` and less coupled than `shared`. It should absorb acceptance runners, goal audit, user acceptance handoff, and benchmark report logic only after wrapper tests prove existing scripts still work.
+The first package extraction target is `packages/acceptance`, because its boundary is narrower than `core` and less coupled than the earlier root shared utility surface. Phase 2c applies the same strategy to `packages/shared` after package-first build order and `dist/shared/*` compatibility wrappers are tested.
 
 ## Required Extraction Gates
 
@@ -62,16 +62,17 @@ For `packages/acceptance`, the minimum gates are:
 
 ### Follow-up
 
-- Continue the `packages/acceptance/src` pilot by moving implementation modules only after wrapper compatibility tests stay green.
+- Continue package extraction one bounded package at a time only after wrapper compatibility tests stay green.
 - Keep `dist/internal/acceptance/*` JavaScript and declaration outputs available as compatibility surfaces until downstream callers no longer rely on them.
+- Keep `dist/shared/*` JavaScript and declaration outputs available as compatibility surfaces until downstream callers no longer rely on them.
 - Update ADR-0005 and the monorepo structure spec as each package extraction phase completes.
-- Do not extract `packages/shared` until `dist/shared/*` compatibility preservation is tested.
+- Do not broaden Phase 2c into `core`, `browser-explorer`, or `repair-planner` extraction without a separate TDD goal.
 
 ## Implementation Note
 
 Phase 2a is historical context; current acceptance execution targets package-owned runners in `packages/acceptance/dist/*`, and the implementation modules live in `packages/acceptance/src/*`. The legacy `src/internal/acceptance/*` sources and generated `dist/internal/acceptance/*` files are compatibility wrapper/output surfaces, not the active implementation owner.
 
-The acceptance package pilot is no longer deferred. Broader package extraction for `shared`, `browser-explorer`, `repair-planner`, and `core` remains deferred until each package has equivalent compatibility-output and import-boundary tests.
+The acceptance package pilot is no longer deferred. Phase 2c shared package extraction is implemented with compatibility wrappers. Broader package extraction for `browser-explorer`, `repair-planner`, and `core` remains deferred until each package has equivalent compatibility-output and import-boundary tests.
 
 ## Current Phase 2 Status
 
@@ -96,6 +97,8 @@ The standard acceptance gate also includes a package subpath type-resolution smo
 
 Package acceptance entrypoint resolution now targets package-owned `packages/acceptance/dist/*` runners. The compatibility contract is exposed through the package root and `./compatibility` subpath. It still records `dist/internal/acceptance` as the legacy output root, but package wrapper execution no longer imports that legacy dist tree.
 
-Package build order is now package-first for the acceptance pilot: `pnpm build` runs `build:packages` before `build:src`, and `pnpm typecheck` builds package declarations before checking root `src`. This lets legacy `src/internal/acceptance/*` compatibility wrappers re-export package dist APIs without violating the root `src` build `rootDir`.
+Package build order is now package-first for the acceptance and shared packages: `pnpm build` runs `build:shared`, `build:acceptance`, then `build:src`, and `pnpm typecheck` builds package declarations before checking root `src`. This lets legacy `src/internal/acceptance/*` and `src/shared/*` compatibility wrappers re-export package dist APIs without violating the root `src` build `rootDir`.
 
 The legacy `dist/internal/acceptance/*` remains a compatibility output, not the current package execution path. Existing tests may still compare package behavior against `src/internal/acceptance/*` to preserve behavior during the compatibility window, but new source evidence and package ownership checks should point at `packages/acceptance/src/*`. Goal audit now checks generated `.js` wrappers, `.d.ts` declaration re-exports, and `.js.map` source maps under `dist/internal/acceptance/*`. The legacy markdown helper path is now a re-export wrapper over `packages/acceptance/dist/markdown.js`, the legacy fatal error formatter is now a re-export wrapper over `packages/acceptance/dist/fatal-error.js`, the legacy repo preflight helper path is now a re-export wrapper over `packages/acceptance/dist/repo-preflight.js`, the legacy acceptance report helper path is now a re-export wrapper over `packages/acceptance/dist/report.js`, the legacy user acceptance args helper path is now a re-export wrapper over `packages/acceptance/dist/user-acceptance-args.js`, the legacy user acceptance Markdown helper path is now a re-export wrapper over `packages/acceptance/dist/user-acceptance.js`, the legacy user acceptance handoff Markdown helper path is now a re-export wrapper over `packages/acceptance/dist/user-acceptance-handoff.js`, the legacy goal audit Markdown helper path is now a re-export wrapper over `packages/acceptance/dist/goal-audit.js`, the legacy acceptance runner path is now a re-export wrapper over `packages/acceptance/dist/run-acceptance.js` with a direct-run shim for executable `dist/internal/acceptance/run-acceptance.js` compatibility, the legacy user acceptance handoff runner path is now a re-export wrapper over `packages/acceptance/dist/run-user-acceptance-handoff.js` with a package-exported direct-run helper for executable `dist/internal/acceptance/run-user-acceptance-handoff.js` compatibility, the legacy goal audit runner path is now a re-export wrapper over `packages/acceptance/dist/run-goal-audit.js` with a package-exported direct-run helper for executable `dist/internal/acceptance/run-goal-audit.js` compatibility, and the legacy user acceptance runner path is now a re-export wrapper over `packages/acceptance/dist/run-user-acceptance.js` plus `packages/acceptance/dist/user-acceptance-runner-helpers.js` with a package-exported direct-run helper for executable `dist/internal/acceptance/run-user-acceptance.js` compatibility.
+
+The legacy `dist/shared/*` remains a compatibility output, not the current package execution path. `packages/shared/src` owns the redaction, shell quote, and shell words implementations. `src/shared/*` now re-exports `packages/shared/dist/*`, while package root and `./compatibility` exports expose `sharedPackageExportEntries`, `sharedPackageDistOutputEntries`, `sharedPackageSourceEntries`, `legacySharedDistOutputEntries`, and `legacySharedWrapperSourceEntries` so structure tests and type-smoke checks share one exact shared package extraction contract.

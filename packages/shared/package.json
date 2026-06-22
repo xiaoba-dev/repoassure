@@ -1,0 +1,30 @@
+{
+  "name": "@hardening-mcp/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./compatibility": {
+      "types": "./dist/compatibility.d.ts",
+      "default": "./dist/compatibility.js"
+    },
+    "./privacy-redaction": {
+      "types": "./dist/privacy-redaction.d.ts",
+      "default": "./dist/privacy-redaction.js"
+    },
+    "./shell-quote": {
+      "types": "./dist/shell-quote.d.ts",
+      "default": "./dist/shell-quote.js"
+    },
+    "./shell-words": {
+      "types": "./dist/shell-words.d.ts",
+      "default": "./dist/shell-words.js"
+    }
+  }
+}

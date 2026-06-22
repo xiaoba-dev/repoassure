@@ -84,6 +84,7 @@ export function buildProcessGovernanceGoalAuditItems(
     }),
     buildLegacyAcceptanceWrapperGoalAuditItem(sources),
     buildAcceptancePackageTypedModuleExportsGoalAuditItem(sources),
+    buildSharedPackageTypedModuleExportsGoalAuditItem(sources),
     buildLegacyAcceptanceDistOutputGoalAuditItem(sources)
   ];
 }
@@ -161,6 +162,30 @@ function buildAcceptancePackageTypedModuleExportsGoalAuditItem(
   };
 }
 
+function buildSharedPackageTypedModuleExportsGoalAuditItem(
+  sources: Partial<GoalAuditTextSources>
+): GoalAuditItem {
+  const rootPackageJson = sources.packageJson ?? '';
+  const sharedPackageJson = sources.sharedPackageJson ?? '';
+  const missingMarkers = [
+    ...findMissingMarkers(rootPackageJson, ['"@hardening-mcp/shared": "workspace:*"']),
+    ...findMissingSharedTypedPackageExportMarkers(sharedPackageJson),
+    ...findMissingSharedLegacyWrapperMarkers(sources)
+  ];
+
+  return {
+    category: '架构迁移',
+    requirement: 'Shared package typed module exports and legacy wrappers',
+    status: missingMarkers.length === 0 ? 'passed' : 'missing',
+    evidence: missingMarkers.length === 0
+      ? ['root package depends on @hardening-mcp/shared workspace package; packages/shared exports typed root, compatibility, privacy-redaction, shell-quote, and shell-words subpaths; src/shared/*.ts all delegate to packages/shared/dist compatibility wrappers']
+      : [`missing shared package markers: ${missingMarkers.join(', ')}`],
+    ...(missingMarkers.length > 0
+      ? { nextAction: '补齐 root workspace dependency、packages/shared typed exports 和 src/shared legacy wrappers 后重新运行 goal audit。' }
+      : {})
+  };
+}
+
 function findMissingPackageDistOutputMarkers(sources: Partial<GoalAuditTextSources>): string[] {
   return [
     ...PACKAGE_ACCEPTANCE_DIST_OUTPUT_SOURCE_SPECS,
@@ -225,6 +250,62 @@ function findMissingTypedPackageExportMarkers(packageJsonText: string): string[]
   });
 
   return [...missingExpectedExportMarkers, ...unexpectedExportMarkers];
+}
+
+function findMissingSharedTypedPackageExportMarkers(packageJsonText: string): string[] {
+  const expectedSharedExports = [
+    { exportPath: '.', types: './dist/index.d.ts', default: './dist/index.js' },
+    { exportPath: './compatibility', types: './dist/compatibility.d.ts', default: './dist/compatibility.js' },
+    { exportPath: './privacy-redaction', types: './dist/privacy-redaction.d.ts', default: './dist/privacy-redaction.js' },
+    { exportPath: './shell-quote', types: './dist/shell-quote.d.ts', default: './dist/shell-quote.js' },
+    { exportPath: './shell-words', types: './dist/shell-words.d.ts', default: './dist/shell-words.js' }
+  ] as const;
+  const packageJson = parsePackageJson(packageJsonText);
+  const exports = packageJson?.exports;
+
+  if (!exports || typeof exports !== 'object' || Array.isArray(exports)) {
+    return ['shared exports object'];
+  }
+
+  const expectedExportPaths = new Set<string>(expectedSharedExports.map(({ exportPath }) => exportPath));
+  const unexpectedExportMarkers = Object.keys(exports)
+    .filter((exportPath) => !expectedExportPaths.has(exportPath))
+    .sort()
+    .map((exportPath) => `unexpected shared export ${exportPath}`);
+  const missingExpectedExportMarkers = expectedSharedExports.flatMap(({ exportPath, types, default: defaultPath }) => {
+    const value = (exports as Record<string, unknown>)[exportPath];
+
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return [exportPath];
+    }
+
+    const typedExport = value as { types?: unknown; default?: unknown };
+    const missing: string[] = [];
+
+    if (typedExport.types !== types) {
+      missing.push(`${exportPath}.types=${types}`);
+    }
+
+    if (typedExport.default !== defaultPath) {
+      missing.push(`${exportPath}.default=${defaultPath}`);
+    }
+
+    return missing;
+  });
+
+  return [...missingExpectedExportMarkers, ...unexpectedExportMarkers];
+}
+
+function findMissingSharedLegacyWrapperMarkers(sources: Partial<GoalAuditTextSources>): string[] {
+  const wrapperSources: Array<{ label: string; sourceText: string | undefined }> = [
+    { label: 'legacy shared privacy-redaction wrapper', sourceText: sources.legacySharedPrivacyRedaction },
+    { label: 'legacy shared shell-quote wrapper', sourceText: sources.legacySharedShellQuote },
+    { label: 'legacy shared shell-words wrapper', sourceText: sources.legacySharedShellWords }
+  ];
+
+  return wrapperSources
+    .filter(({ sourceText }) => typeof sourceText !== 'string' || !sourceText.includes('packages/shared/dist'))
+    .map(({ label }) => label);
 }
 
 function parsePackageJson(sourceText: string): { exports?: unknown } | undefined {

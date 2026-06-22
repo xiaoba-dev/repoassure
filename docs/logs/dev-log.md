@@ -1,5 +1,32 @@
 # 开发日志
 
+## 2026年6月23日 - Shared Package Phase 2c Extraction
+
+### 完成内容
+
+- 新增 `@hardening-mcp/shared` / `packages/shared`，由 package-owned `src` 承载 `privacy-redaction`、`shell-quote` 和 `shell-words` 实现。
+- 将 `src/shared/*` 收缩为 `packages/shared/dist/*` compatibility wrappers，保留 legacy source 路径和 `dist/shared/*` 输出面。
+- 将根构建脚本拆分为 `build:shared`、`build:acceptance` 和 `build:src`，保证 package-first build order。
+- 新增 shared package compatibility contract、typed package exports、type-smoke 和 project structure 测试，约束 source、exports、dist outputs 和 wrapper drift。
+- 级联更新 README、monorepo spec、ADR-0006、架构概览、decision log 和 goal audit，使 Phase 2c shared package 状态进入自动验收摘要。
+
+### 验证
+
+- Red：`pnpm vitest run tests/unit/project-structure.test.ts tests/unit/privacy-redaction.test.ts tests/unit/shell-quote.test.ts tests/unit/shell-words.test.ts` 因 `packages/shared` 尚不存在按预期失败。
+- Green：同一最小集合通过，4 个测试文件、69 个测试。
+- `pnpm repo:hygiene`：通过。
+- `pnpm typecheck`：通过。
+- `pnpm lint`：通过。
+- `pnpm build`：通过。
+- `pnpm test:unit`：通过，33 个测试文件、505 个测试。
+- `pnpm test:integration`：普通沙箱下因本地端口监听权限失败；提升权限后通过，11 个测试文件、27 个测试。
+- `pnpm test:e2e`：通过 1 个、跳过 1 个环境条件测试。
+- `pnpm goal:audit`：通过，29 项检查、28 项已通过、0 missing、1 项需要人工确认。
+
+### 阻塞
+
+- 无新增产品阻塞。integration 普通沙箱下的 `listen` 权限失败是既有环境限制，提升权限后通过。
+
 ## 2026年6月21日 - Acceptance Package Phase 2de Auto Patch Plan Prototype
 
 ### 完成内容

@@ -1,14 +1,14 @@
 # Goal 完成度审计
 
-生成时间：2026-06-22T15:31:22.606Z
+生成时间：2026-06-22T16:35:27.971Z
 
 ## 摘要
 
 | 项目 | 结果 |
 | --- | --- |
 | 总体状态 | 已准备好请求用户验收 |
-| 检查项总数 | 28 |
-| 已通过 | 27 |
+| 检查项总数 | 29 |
+| 已通过 | 28 |
 | 缺失 | 0 |
 | 需要人工确认 | 1 |
 
@@ -86,6 +86,7 @@
 | --- | --- | --- | --- |
 | Legacy acceptance 兼容 wrapper | 已通过 | src/internal/acceptance/*.ts all delegate to packages/acceptance/dist compatibility wrappers |  |
 | Acceptance package typed module exports | 已通过 | root package depends on @hardening-mcp/acceptance workspace package; exact package export surface matches acceptancePackageExportEntries; package dist output contract matches acceptancePackageDistOutputEntries including .js.map sourceMapPath; package dist source specs match PACKAGE_ACCEPTANCE_DIST_OUTPUT_SOURCE_SPECS, PACKAGE_ACCEPTANCE_DIST_DECLARATION_SOURCE_SPECS, and PACKAGE_ACCEPTANCE_DIST_SOURCE_MAP_SOURCE_SPECS; package source contract matches acceptancePackageSourceEntries; typed dist entrypoints have no unexpected package exports |  |
+| Shared package typed module exports and legacy wrappers | 已通过 | root package depends on @hardening-mcp/shared workspace package; packages/shared exports typed root, compatibility, privacy-redaction, shell-quote, and shell-words subpaths; src/shared/*.ts all delegate to packages/shared/dist compatibility wrappers |  |
 | Legacy acceptance dist compatibility outputs | 已通过 | dist/internal/acceptance/*.js and *.d.ts compatibility outputs all delegate to packages/acceptance/dist package entrypoints; dist/internal/acceptance/*.js.map source maps are present through legacyAcceptanceDistOutputEntries.sourceMapPath and LEGACY_ACCEPTANCE_DIST_SOURCE_MAP_SOURCE_SPECS |  |
 
 ## Benchmark

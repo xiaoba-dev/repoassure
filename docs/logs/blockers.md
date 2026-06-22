@@ -14,6 +14,7 @@ GitHub branch protection and repository rulesets are unavailable for the private
 
 1. 运行 `gh api repos/xiaoba-dev/repoassure/branches/main/protection`：返回 HTTP 403。
 2. 运行 `gh api repos/xiaoba-dev/repoassure/rulesets`：返回 HTTP 403。
+3. 运行 `gh api --method PUT repos/xiaoba-dev/repoassure/branches/main/protection`，尝试要求 `Quality Gates` status check：返回 HTTP 403。
 
 错误信息：
 

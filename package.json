@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.28.1",
   "description": "Local-first Code Hardening MCP Server and CLI for AI-generated Web Apps.",
   "bin": {
     "hardening": "dist/adapters/cli/index.js",

@@ -18,7 +18,7 @@
     "typecheck:packages": "tsc -p packages/acceptance/tsconfig.json --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:unit": "vitest run tests/unit",
+    "test:unit": "pnpm build && vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
     "test:e2e": "vitest run tests/e2e",
     "dev": "tsx src/adapters/cli/index.ts",

@@ -286,6 +286,7 @@ describe('project structure', () => {
 
     expect(packageJson).toContain('"repo:hygiene": "node scripts/check-repo-hygiene.mjs"');
     expect(packageJson).toContain('"packageManager": "pnpm@');
+    expect(packageJson).toContain('"test:unit": "pnpm build && vitest run tests/unit"');
     expect(ciWorkflow).toContain('RepoAssure CI');
     expect(ciWorkflow).toContain('pnpm install --frozen-lockfile');
     expect(ciWorkflow).toContain('pnpm test:unit');

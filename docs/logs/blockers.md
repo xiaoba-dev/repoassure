@@ -1,5 +1,34 @@
 # 阻塞日志
 
+## 2026年6月22日 - GitHub branch protection and repository rulesets are unavailable for the private repo
+
+### 背景
+
+ADR-0012 要求 `main` 进入分支保护或等价 repository ruleset，并要求 `RepoAssure CI` / `Quality Gates` 作为 required status check。当前仓库必须保持 private，不能通过改 public 解锁功能。
+
+### 影响
+
+GitHub branch protection and repository rulesets are unavailable for the private repo under the current account plan. 在解除该外部条件前，`main` 仍无法由 GitHub 强制要求 CI 通过后再合并。
+
+### 已尝试方案
+
+1. 运行 `gh api repos/xiaoba-dev/repoassure/branches/main/protection`：返回 HTTP 403。
+2. 运行 `gh api repos/xiaoba-dev/repoassure/rulesets`：返回 HTTP 403。
+
+错误信息：
+
+```text
+Upgrade to GitHub Pro or make this repository public to enable this feature.
+```
+
+### 当前判断
+
+这是 GitHub plan / repository feature 权限限制，不是本地配置或 CI 实现缺失。由于 ADR-0009 和 ADR-0012 均要求仓库保持 private，不能通过 make repository public 作为绕过方案。
+
+### 需要的用户决策或外部条件
+
+升级仓库 owner 或组织到支持 private repo branch protection / rulesets 的 GitHub plan。权限可用后，按 `docs/operations/branch-protection-release-boundary-v0.1.md` 配置 `main`，要求 `RepoAssure CI` / `Quality Gates` status check，并重新验证。
+
 ## 2026年6月21日 - Agent-Reach CLI mode 真实 repo 复验需要本地路径或网络授权
 
 ### 背景

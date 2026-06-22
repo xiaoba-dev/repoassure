@@ -27,6 +27,10 @@
 - [ ] Public-release-only changes are not included.
 - [ ] Manual user acceptance impact is documented when relevant.
 
+## Release Boundary
+
+- [ ] This PR does not add a repository-level LICENSE, publish packages, remove package.json private true, or make the repo public.
+
 ## Notes
 
 <!-- Add reviewer context, screenshots, acceptance evidence, or known limitations. -->

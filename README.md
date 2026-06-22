@@ -56,7 +56,7 @@ examples/      示例目标 repo 和集成示例预留区
 
 开发者优先从 `src/adapters/cli/`、`src/adapters/mcp/` 和 `src/tools/` 追踪入口；验收命令和验收实现优先从 `packages/acceptance/` 追踪，`src/internal/acceptance/` 与 `dist/internal/acceptance/` 仅作为兼容 wrapper/output 路径保留；产品和验收资料优先从 `docs/product/`、`docs/acceptance/` 和 `docs/goals/` 读取；长期架构决策优先读取 `docs/adr/README.md`。AI IDE / Agent 消费目标 repo 的硬化物料时，应优先读取目标 repo 的 `.hardening/latest/manifest.json`。
 
-核心架构决策已级联到当前文档和实现：ADR-0001 固化 local-first CLI/MCP 边界，ADR-0002 固化 CLI/MCP shared core，ADR-0003 固化 `.hardening/latest/manifest.json` 和 run-scoped artifact 布局，ADR-0004 固化 repair plan 与 executable task package 物料合同。ADR-0010 固化 RepoAssure 品牌定位；ADR-0011 固化私有 GitHub 工程基线、CI 门禁和 repo hygiene 检查；`hardening-mcp` 暂时保留为内部 package、CLI 和 MCP 实现名称。
+核心架构决策已级联到当前文档和实现：ADR-0001 固化 local-first CLI/MCP 边界，ADR-0002 固化 CLI/MCP shared core，ADR-0003 固化 `.hardening/latest/manifest.json` 和 run-scoped artifact 布局，ADR-0004 固化 repair plan 与 executable task package 物料合同。ADR-0010 固化 RepoAssure 品牌定位；ADR-0011 固化私有 GitHub 工程基线、CI 门禁和 repo hygiene 检查；ADR-0012 固化 branch protection 和 release boundary operations 要求；`hardening-mcp` 暂时保留为内部 package、CLI 和 MCP 实现名称。
 
 ## 安装
 
@@ -168,6 +168,8 @@ pnpm goal:audit
 ```
 
 私有 GitHub repo 的 CI 基线见 `docs/architecture/specs/private-github-engineering-baseline-v0.1.md`：PR 和 `main` push 必须运行 `pnpm repo:hygiene`、unit、typecheck、lint、build 和 `pnpm goal:audit`。`pnpm repo:hygiene` 只检查已追踪文件，阻止 generated artifacts、build outputs、local hardening runs、env files、private keys 和 local logs 进入提交。当前环境中，监听本地端口的 boot 集成测试和真实浏览器 E2E 需要额外权限。详见 `docs/logs/blockers.md`。
+
+分支保护与发布边界见 `docs/operations/branch-protection-release-boundary-v0.1.md`。当前目标状态是 `main` 要求 `RepoAssure CI` / `Quality Gates`，但 GitHub 对当前 private repo plan 返回 403；仓库仍必须保持 private，不能添加仓库级 `LICENSE`、发布 package、移除 `package.json` `"private": true` 或通过公开仓库绕过该限制。
 
 可使用单一验收入口生成 `docs/acceptance/acceptance-run.md`：
 

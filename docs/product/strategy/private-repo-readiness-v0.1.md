@@ -14,6 +14,8 @@ Brand decision: ADR-0010 selects RepoAssure as the product brand and `repoassure
 
 Private engineering baseline: ADR-0011 defines CI, PR/issue templates, repository hygiene, and the private pre-release merge boundary.
 
+Branch protection and release boundary: ADR-0012 defines `main` protection as an operations requirement and blocks making the repo public, adding a repository-level license, publishing packages, or removing `package.json` `"private": true` until the public release checklist is complete.
+
 ## Decision
 
 The project is suitable for a private GitHub repository after local guardrails and quality gates pass.
@@ -70,6 +72,7 @@ Allowed:
 - Push the initial workspace after quality gates pass.
 - Use GitHub issues and private PRs for implementation tracking.
 - Require `pnpm repo:hygiene` before merge so generated artifacts, build outputs, local hardening runs, env files, private keys, and logs stay out of tracked history.
+- Treat branch protection and release boundary enforcement as required repository operations before broad collaboration.
 
 Blocked:
 

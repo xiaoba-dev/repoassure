@@ -1,5 +1,23 @@
 # 决策日志
 
+## 2026年6月22日 - 分支保护与发布边界
+
+### 决策
+
+新增 `ADR-0012: Branch Protection and Release Boundary`，将 `main` 分支保护和 private release boundary 固化为仓库 operations 要求。目标状态是要求 `RepoAssure CI` / `Quality Gates` 作为 required status check；在 GitHub plan 不支持 private repo branch protection / rulesets 时，记录 blocker，不允许通过公开仓库绕过限制。
+
+### 原因
+
+- CI 已经通过，但如果 `main` 不受保护，CI 只能提示问题，不能阻止低质量变更进入主分支。
+- 当前项目仍处于 private pre-release 阶段，不能添加仓库级 `LICENSE`、发布 package、移除 `package.json` `"private": true` 或公开仓库。
+- GitHub API 对 private repo branch protection 和 rulesets 返回 HTTP 403，需要把这个外部限制记录为治理 blocker。
+
+### 影响
+
+- 新增 `docs/operations/branch-protection-release-boundary-v0.1.md`，记录目标保护状态、当前 403 阻塞和手动解除步骤。
+- `docs/product/strategy/public-release-checklist-v0.1.md` 增加 main branch protection / equivalent ruleset 检查项。
+- PR 模板增加 release boundary 确认项。
+
 ## 2026年6月22日 - 私有 GitHub 工程基线
 
 ### 决策

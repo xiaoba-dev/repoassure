@@ -20,6 +20,7 @@ This checklist does not publish the project. It defines prerequisites for a futu
 - [ ] Run dependency license scan and document incompatible dependencies, if any.
 - [ ] Add contribution policy, including CLA or Developer Certificate of Origin decision.
 - [ ] Add security disclosure policy.
+- [ ] Branch protection or an equivalent repository ruleset is enabled for `main`.
 - [ ] Review project name, package name, and trademark risk.
 - [ ] Define which modules are open core and which are commercial-only before hosted dashboard work begins.
 - [ ] Confirm no private customer data, secrets, or non-public target repo artifacts are committed.

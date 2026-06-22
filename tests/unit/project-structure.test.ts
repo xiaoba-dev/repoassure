@@ -314,6 +314,53 @@ describe('project structure', () => {
     expect(decisionLog).toContain('私有 GitHub 工程基线');
   });
 
+  it('records branch protection and public release boundary governance', async () => {
+    const [
+      packageJsonText,
+      adrIndex,
+      branchProtectionAdr,
+      operationsGuide,
+      taxonomySpec,
+      publicReleaseChecklist,
+      privateReadiness,
+      prTemplate,
+      blockersLog,
+      decisionLog
+    ] = await Promise.all([
+      readFile('package.json', 'utf8'),
+      readFile('docs/adr/README.md', 'utf8'),
+      readFile('docs/adr/0012-branch-protection-and-release-boundary.md', 'utf8'),
+      readFile('docs/operations/branch-protection-release-boundary-v0.1.md', 'utf8'),
+      readFile('docs/architecture/specs/docs-taxonomy-spec-v0.1.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/product/strategy/private-repo-readiness-v0.1.md', 'utf8'),
+      readFile('.github/pull_request_template.md', 'utf8'),
+      readFile('docs/logs/blockers.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8')
+    ]);
+    const packageJson = JSON.parse(packageJsonText) as { private?: boolean };
+
+    expect(packageJson.private).toBe(true);
+    await expect(stat('LICENSE')).rejects.toMatchObject({ code: 'ENOENT' });
+    expect(adrIndex).toContain('[0012](0012-branch-protection-and-release-boundary.md)');
+    expect(branchProtectionAdr).toContain('Branch protection and release boundary');
+    expect(branchProtectionAdr).toContain('Do not make the repository public to unlock branch protection');
+    expect(operationsGuide).toContain('Branch Protection and Release Boundary v0.1');
+    expect(operationsGuide).toContain('RepoAssure CI');
+    expect(operationsGuide).toContain('Quality Gates');
+    expect(operationsGuide).toContain('required status check');
+    expect(operationsGuide).toContain('GitHub API returned HTTP 403');
+    expect(operationsGuide).toContain('Upgrade to GitHub Pro or make this repository public to enable this feature');
+    expect(taxonomySpec).toContain('operations/');
+    expect(publicReleaseChecklist).toContain('Branch protection or an equivalent repository ruleset is enabled for `main`');
+    expect(privateReadiness).toContain('branch protection and release boundary');
+    expect(prTemplate).toContain('Release Boundary');
+    expect(prTemplate).toContain('This PR does not add a repository-level LICENSE, publish packages, remove package.json private true, or make the repo public');
+    expect(blockersLog).toContain('GitHub branch protection and repository rulesets are unavailable for the private repo');
+    expect(blockersLog).toContain('HTTP 403');
+    expect(decisionLog).toContain('分支保护与发布边界');
+  });
+
   it('records the repository acceptance scope decision for Web App versus Python CLI repos', async () => {
     const [adrIndex, acceptanceScopeAdr, readme, userGuide, acceptanceChecklist, productSpecV02] = await Promise.all([
       readFile('docs/adr/README.md', 'utf8'),

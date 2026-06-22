@@ -48,6 +48,7 @@ flowchart LR
 | [ADR-0003](../adr/0003-target-repo-hardening-artifacts.md) | Target repo hardening artifacts | `.hardening/runs/<run-id>/`、`.hardening/latest`、legacy paths、workspace output 和 manifest 消费规则 |
 | [ADR-0004](../adr/0004-repair-plan-and-task-package.md) | Repair plan and executable task package | `repair-plan.json`、`repair-plan.md`、`repair-task-package.json`、`repair-task-package.md`、repair handoff、repair execution 和 patch plan 物料链路 |
 | [ADR-0011](../adr/0011-private-github-engineering-baseline.md) | Private GitHub engineering baseline | `.github/workflows/ci.yml`、PR/issue templates、`pnpm repo:hygiene` 和 private pre-release merge boundary |
+| [ADR-0012](../adr/0012-branch-protection-and-release-boundary.md) | Branch protection and release boundary | `docs/operations/branch-protection-release-boundary-v0.1.md`、public release checklist、PR release boundary confirmation 和 GitHub plan blocker |
 
 ## Artifact 布局
 

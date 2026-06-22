@@ -1,5 +1,23 @@
 # 决策日志
 
+## 2026年6月23日 - repair-planner package 抽取
+
+### 决策
+
+执行 Phase 2d repair-planner package 抽取：`packages/repair-planner/src` 成为 repair plan 和 executable repair task package 的实现所有者，根 package 通过 `@hardening-mcp/repair-planner` workspace dependency 引用该包。`src/domain/repair-plan/*`、`dist/domain/repair-plan/*`、`src/types/repair-plan.ts` 和 `dist/types/repair-plan.*` 保留为兼容 wrapper/output，不在本阶段迁移 core 或 browser explorer。
+
+### 原因
+
+- repair planner 已经有清晰边界：上层 tool 只调用 `generateRepairPlan`，schema/types 集中在 repair plan 契约。
+- `repair-plan.json`、`repair-task-package.json` 和对应 Markdown 是 AI IDE 消费的核心物料，抽包必须先通过行为 parity、package exports、type-smoke 和 legacy dist output 测试锁定。
+- acceptance 与 shared 已经证明 compatibility-first package build strategy 可行，repair-planner 是下一步低耦合抽取对象。
+
+### 影响
+
+- 新增 `@hardening-mcp/repair-planner` 包，导出 root、`compatibility`、`generate-repair-plan` 和 `repair-plan` 子路径。
+- 根构建脚本改为先 `build:shared`，再 `build:repair-planner`、`build:acceptance`，最后 `build:src`。
+- README、架构概览、monorepo spec、ADR-0006、dev log 和 goal audit 已级联写入 repair-planner package ownership 与兼容路径边界。
+
 ## 2026年6月23日 - shared package 抽取
 
 ### 决策

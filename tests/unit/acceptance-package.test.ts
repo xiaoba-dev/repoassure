@@ -216,7 +216,7 @@ describe('acceptance package', () => {
 
   it('exports process governance goal audit builders as package-owned implementation', () => {
     expect(acceptanceCompatibilityContract.packageOwnedModules).toContain('goal-audit-process-governance');
-    expect(buildProcessGovernanceGoalAuditItems({})).toHaveLength(7);
+    expect(buildProcessGovernanceGoalAuditItems({})).toHaveLength(8);
   });
 
   it('exports evidence and document goal audit builders as package-owned implementation', async () => {
@@ -233,7 +233,7 @@ describe('acceptance package', () => {
       sources: {},
       pathExists: async () => false,
       userAcceptanceStatus: 'pending_or_invalid'
-    })).resolves.toHaveLength(29);
+    })).resolves.toHaveLength(30);
   });
 
   it('exports user acceptance helpers as package-owned implementation', () => {

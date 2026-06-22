@@ -1,5 +1,32 @@
 # 开发日志
 
+## 2026年6月23日 - Repair Planner Package Phase 2d Extraction
+
+### 完成内容
+
+- 新增 `@hardening-mcp/repair-planner` / `packages/repair-planner`，由 package-owned `src` 承载 `generate-repair-plan` 和 `repair-plan` 实现。
+- 将 `src/domain/repair-plan/*` 与 `src/types/repair-plan.ts` 收缩为 `packages/repair-planner/dist/*` compatibility wrappers，保留 legacy source 路径和 `dist/domain/repair-plan/*`、`dist/types/repair-plan.*` 输出面。
+- 将根构建脚本拆分为 `build:shared`、`build:repair-planner`、`build:acceptance` 和 `build:src`，保证 package-first build order。
+- 新增 repair-planner package compatibility contract、typed package exports、type-smoke、project structure 测试和 legacy/package 行为 parity 测试，约束 source、exports、dist outputs、wrapper drift 和 artifact 行为稳定。
+- 级联更新 README、monorepo spec、ADR-0006、架构概览、decision log 和 goal audit，使 Phase 2d repair-planner package 状态进入自动验收摘要。
+
+### 验证
+
+- Red：`pnpm vitest run tests/unit/project-structure.test.ts tests/unit/repair-plan.test.ts` 因 `packages/repair-planner/src/index.js` 与 `packages/repair-planner/src/generate-repair-plan.js` 尚不存在按预期失败。
+- Green：同一最小集合通过，2 个测试文件、52 个测试。
+- `pnpm repo:hygiene`：通过。
+- `pnpm typecheck`：通过。
+- `pnpm lint`：通过。
+- `pnpm build`：通过。
+- `pnpm test:unit`：通过，33 个测试文件、510 个测试。
+- `pnpm test:integration`：普通沙箱下因本地 dev server 无法进入 running 状态失败；提升权限后通过，11 个测试文件、27 个测试。
+- `pnpm test:e2e`：通过 1 个、跳过 1 个环境条件测试。
+- `pnpm goal:audit`：通过，30 项检查、29 项已通过、0 missing、1 项需要人工确认。
+
+### 阻塞
+
+- 无新增产品阻塞。
+
 ## 2026年6月23日 - Shared Package Phase 2c Extraction
 
 ### 完成内容

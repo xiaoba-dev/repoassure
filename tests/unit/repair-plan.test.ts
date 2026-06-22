@@ -2,13 +2,85 @@ import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { generateRepairPlan } from '../../src/domain/repair-plan/generate-repair-plan.js';
+import { generateRepairPlan as packageGenerateRepairPlan } from '../../packages/repair-planner/src/generate-repair-plan.js';
+import { generateRepairPlan as legacyGenerateRepairPlan } from '../../src/domain/repair-plan/generate-repair-plan.js';
 
 async function createRunDir(): Promise<string> {
   return mkdtemp(join(tmpdir(), 'hardening-repair-plan-'));
 }
 
 describe('generateRepairPlan', () => {
+  it('keeps package-owned and legacy repair plan generators aligned', async () => {
+    const repoRoot = await mkdtemp(join(tmpdir(), 'hardening-repair-parity-repo-'));
+    const runDir = await createRunDir();
+    const sourceManifestPath = join(repoRoot, 'manifest.json');
+
+    const findings = JSON.stringify({
+      findings: [
+        {
+          severity: 'P1',
+          type: 'dead_control',
+          title: 'Submit button does nothing',
+          reproSteps: ['Go to /settings', 'click Save changes'],
+          evidence: ['console: TypeError token=secret-token']
+        }
+      ]
+    });
+    const testGeneration = JSON.stringify({
+      createdFiles: ['tests/hardening/generated-settings.spec.ts'],
+      testCommand: 'npx playwright test tests/hardening/generated-settings.spec.ts --reporter=line',
+      validationStatus: 'passed',
+      errors: []
+    });
+    const bootResult = JSON.stringify({
+      status: 'running',
+      url: 'http://localhost:4173/settings?code=secret-code',
+      blockers: [],
+      errors: []
+    });
+
+    await Promise.all([
+      writeFile(join(runDir, 'findings.json'), findings),
+      writeFile(join(runDir, 'test-generation.json'), testGeneration),
+      writeFile(join(runDir, 'boot-result.json'), bootResult)
+    ]);
+
+    const legacyResult = await legacyGenerateRepairPlan({
+      repoRoot,
+      runDir,
+      sourceManifestPath,
+      runId: 'run-parity',
+      outputJsonPath: join(runDir, 'legacy-repair-plan.json'),
+      outputMarkdownPath: join(runDir, 'legacy-repair-plan.md'),
+      outputTaskPackageJsonPath: join(runDir, 'legacy-repair-task-package.json'),
+      outputTaskPackageMarkdownPath: join(runDir, 'legacy-repair-task-package.md')
+    });
+    const packageResult = await packageGenerateRepairPlan({
+      repoRoot,
+      runDir,
+      sourceManifestPath,
+      runId: 'run-parity',
+      outputJsonPath: join(runDir, 'package-repair-plan.json'),
+      outputMarkdownPath: join(runDir, 'package-repair-plan.md'),
+      outputTaskPackageJsonPath: join(runDir, 'package-repair-task-package.json'),
+      outputTaskPackageMarkdownPath: join(runDir, 'package-repair-task-package.md')
+    });
+    const legacyPlan = normalizeGeneratedAt(JSON.parse(await readFile(legacyResult.repairPlanPath, 'utf8')) as Record<string, unknown>);
+    const packagePlan = normalizeGeneratedAt(JSON.parse(await readFile(packageResult.repairPlanPath, 'utf8')) as Record<string, unknown>);
+    const legacyTaskPackage = normalizeGeneratedAt(JSON.parse(await readFile(legacyResult.repairTaskPackagePath, 'utf8')) as Record<string, unknown>);
+    const packageTaskPackage = normalizeGeneratedAt(JSON.parse(await readFile(packageResult.repairTaskPackagePath, 'utf8')) as Record<string, unknown>);
+
+    expect(packageResult).toMatchObject({
+      taskCount: legacyResult.taskCount,
+      highestSeverity: legacyResult.highestSeverity,
+      recommendedNextTaskId: legacyResult.recommendedNextTaskId
+    });
+    expect(packagePlan).toEqual(legacyPlan);
+    expect(packageTaskPackage).toEqual(legacyTaskPackage);
+    await expect(readFile(packageResult.repairPlanMarkdownPath, 'utf8')).resolves.toContain('p1-dead-control-submit-button-does-nothing');
+    await expect(readFile(packageResult.repairTaskPackageMarkdownPath, 'utf8')).resolves.toContain('Executable Repair Task Package');
+  });
+
   it('generates deterministic JSON and markdown repair plans from findings', async () => {
     const repoRoot = await mkdtemp(join(tmpdir(), 'hardening-repair-repo-'));
     const runDir = await createRunDir();
@@ -54,8 +126,8 @@ describe('generateRepairPlan', () => {
       })
     );
 
-    const first = await generateRepairPlan({ repoRoot, runDir, sourceManifestPath, runId: 'run-fixed' });
-    const second = await generateRepairPlan({ repoRoot, runDir, sourceManifestPath, runId: 'run-fixed' });
+    const first = await legacyGenerateRepairPlan({ repoRoot, runDir, sourceManifestPath, runId: 'run-fixed' });
+    const second = await legacyGenerateRepairPlan({ repoRoot, runDir, sourceManifestPath, runId: 'run-fixed' });
     const planText = await readFile(first.repairPlanPath, 'utf8');
     const markdown = await readFile(first.repairPlanMarkdownPath, 'utf8');
     const plan = JSON.parse(planText) as {
@@ -141,7 +213,7 @@ describe('generateRepairPlan', () => {
     );
     await writeFile(join(runDir, 'boot-result.json'), JSON.stringify({ status: 'failed', url: null, blockers: [], errors: [] }));
 
-    const result = await generateRepairPlan({
+    const result = await legacyGenerateRepairPlan({
       repoRoot,
       runDir,
       sourceManifestPath: join(runDir, 'manifest.json'),
@@ -157,3 +229,10 @@ describe('generateRepairPlan', () => {
     await expect(readFile(result.repairTaskPackageMarkdownPath, 'utf8')).resolves.toContain('No Executable Repair Tasks');
   });
 });
+
+function normalizeGeneratedAt<T extends Record<string, unknown>>(value: T): T {
+  return {
+    ...value,
+    generatedAt: '<generated-at>'
+  };
+}

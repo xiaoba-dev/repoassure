@@ -12,13 +12,15 @@
   "scripts": {
     "build": "pnpm build:packages && pnpm build:src",
     "build:src": "tsc -p tsconfig.build.json",
-    "build:packages": "pnpm build:shared && pnpm build:acceptance",
+    "build:packages": "pnpm build:shared && pnpm build:repair-planner && pnpm build:acceptance",
     "build:shared": "tsc -p packages/shared/tsconfig.build.json",
+    "build:repair-planner": "tsc -p packages/repair-planner/tsconfig.build.json",
     "build:acceptance": "tsc -p packages/acceptance/tsconfig.build.json",
     "repo:hygiene": "node scripts/check-repo-hygiene.mjs",
     "typecheck": "pnpm build:packages && tsc --noEmit && pnpm typecheck:packages",
-    "typecheck:packages": "pnpm typecheck:shared && pnpm typecheck:acceptance",
+    "typecheck:packages": "pnpm typecheck:shared && pnpm typecheck:repair-planner && pnpm typecheck:acceptance",
     "typecheck:shared": "tsc -p packages/shared/tsconfig.json --noEmit",
+    "typecheck:repair-planner": "tsc -p packages/repair-planner/tsconfig.json --noEmit",
     "typecheck:acceptance": "tsc -p packages/acceptance/tsconfig.json --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
@@ -59,6 +61,7 @@
   },
   "dependencies": {
     "@hardening-mcp/acceptance": "workspace:*",
+    "@hardening-mcp/repair-planner": "workspace:*",
     "@hardening-mcp/shared": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "playwright": "^1.61.0"

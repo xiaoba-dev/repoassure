@@ -531,9 +531,12 @@ describe('goal audit', () => {
       packageJson: readFileSync('package.json', 'utf8'),
       acceptancePackageJson: readFileSync('packages/acceptance/package.json', 'utf8'),
       sharedPackageJson: readFileSync('packages/shared/package.json', 'utf8'),
+      repairPlannerPackageJson: readFileSync('packages/repair-planner/package.json', 'utf8'),
       legacySharedPrivacyRedaction: 'packages/shared/dist',
       legacySharedShellQuote: 'packages/shared/dist',
       legacySharedShellWords: 'packages/shared/dist',
+      legacyRepairPlanGenerator: 'packages/repair-planner/dist',
+      legacyRepairPlanTypes: 'packages/repair-planner/dist',
       legacyAcceptanceFatalError: 'packages/acceptance/dist',
       legacyAcceptanceGoalAudit: 'packages/acceptance/dist',
       legacyAcceptanceMarkdown: 'packages/acceptance/dist',
@@ -614,6 +617,12 @@ describe('goal audit', () => {
       }),
       expect.objectContaining({
         category: '架构迁移',
+        requirement: 'Repair planner package typed module exports and legacy wrappers',
+        status: 'passed',
+        evidence: ['root package depends on @hardening-mcp/repair-planner workspace package; packages/repair-planner exports typed root, compatibility, generate-repair-plan, and repair-plan subpaths; src/domain/repair-plan/*.ts and src/types/repair-plan.ts delegate to packages/repair-planner/dist compatibility wrappers']
+      }),
+      expect.objectContaining({
+        category: '架构迁移',
         requirement: 'Legacy acceptance dist compatibility outputs',
         status: 'passed',
         evidence: ['dist/internal/acceptance/*.js and *.d.ts compatibility outputs all delegate to packages/acceptance/dist package entrypoints; dist/internal/acceptance/*.js.map source maps are present through legacyAcceptanceDistOutputEntries.sourceMapPath and LEGACY_ACCEPTANCE_DIST_SOURCE_MAP_SOURCE_SPECS']
@@ -660,6 +669,12 @@ describe('goal audit', () => {
         requirement: 'Shared package typed module exports and legacy wrappers',
         status: 'missing',
         nextAction: '补齐 root workspace dependency、packages/shared typed exports 和 src/shared legacy wrappers 后重新运行 goal audit。'
+      }),
+      expect.objectContaining({
+        category: '架构迁移',
+        requirement: 'Repair planner package typed module exports and legacy wrappers',
+        status: 'missing',
+        nextAction: '补齐 root workspace dependency、packages/repair-planner typed exports 和 repair planner legacy wrappers 后重新运行 goal audit。'
       }),
       expect.objectContaining({
         category: '架构迁移',
@@ -909,6 +924,7 @@ describe('goal audit', () => {
         packageJson: readFileSync('package.json', 'utf8'),
         acceptancePackageJson: readFileSync('packages/acceptance/package.json', 'utf8'),
         sharedPackageJson: readFileSync('packages/shared/package.json', 'utf8'),
+        repairPlannerPackageJson: readFileSync('packages/repair-planner/package.json', 'utf8'),
         codexGoal: `最后更新：2026年6月21日\n${sharedMarkers}`,
         toolRegistry: sharedMarkers,
         mcpServerSource: sharedMarkers,
@@ -950,6 +966,8 @@ describe('goal audit', () => {
         legacySharedPrivacyRedaction: 'packages/shared/dist',
         legacySharedShellQuote: 'packages/shared/dist',
         legacySharedShellWords: 'packages/shared/dist',
+        legacyRepairPlanGenerator: 'packages/repair-planner/dist',
+        legacyRepairPlanTypes: 'packages/repair-planner/dist',
         ...Object.fromEntries([
           ...PACKAGE_ACCEPTANCE_DIST_OUTPUT_SOURCE_SPECS,
           ...PACKAGE_ACCEPTANCE_DIST_DECLARATION_SOURCE_SPECS,
@@ -1008,7 +1026,7 @@ describe('goal audit', () => {
       userAcceptanceStatus: 'pending_or_invalid'
     });
 
-    expect(items).toHaveLength(29);
+    expect(items).toHaveLength(30);
     expect(items.map((item) => `${item.category}:${item.requirement}`)).toEqual([
       '交付物:可运行的 CLI',
       '交付物:可运行的 MCP Server',
@@ -1026,6 +1044,7 @@ describe('goal audit', () => {
       '架构迁移:Legacy acceptance 兼容 wrapper',
       '架构迁移:Acceptance package typed module exports',
       '架构迁移:Shared package typed module exports and legacy wrappers',
+      '架构迁移:Repair planner package typed module exports and legacy wrappers',
       '架构迁移:Legacy acceptance dist compatibility outputs',
       'Benchmark:Benchmark 达到 Go 标准',
       '文档与日志:Required Documents 已维护',
@@ -1066,7 +1085,7 @@ describe('goal audit', () => {
       }
     });
 
-    expect(items).toHaveLength(29);
+    expect(items).toHaveLength(30);
     expect(items.at(-1)).toEqual(expect.objectContaining({
       category: '用户验收',
       requirement: '用户确认 MVP 符合预期',

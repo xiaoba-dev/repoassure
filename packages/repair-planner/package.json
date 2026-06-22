@@ -1,0 +1,29 @@
+{
+  "name": "@hardening-mcp/repair-planner",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./compatibility": {
+      "types": "./dist/compatibility.d.ts",
+      "default": "./dist/compatibility.js"
+    },
+    "./generate-repair-plan": {
+      "types": "./dist/generate-repair-plan.d.ts",
+      "default": "./dist/generate-repair-plan.js"
+    },
+    "./repair-plan": {
+      "types": "./dist/repair-plan.d.ts",
+      "default": "./dist/repair-plan.js"
+    }
+  },
+  "dependencies": {
+    "@hardening-mcp/shared": "workspace:*"
+  }
+}

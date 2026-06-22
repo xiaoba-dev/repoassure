@@ -20,6 +20,16 @@ import {
   sharedPackageSourceEntries,
   sharedPackageSubpathSpecifiers
 } from '../../packages/shared/src/index.js';
+import {
+  legacyRepairPlannerCompatibilityModules,
+  legacyRepairPlannerDistOutputEntries,
+  legacyRepairPlannerWrapperSourceEntries,
+  repairPlannerCompatibilityContract,
+  repairPlannerPackageDistOutputEntries,
+  repairPlannerPackageExportEntries,
+  repairPlannerPackageSourceEntries,
+  repairPlannerPackageSubpathSpecifiers
+} from '../../packages/repair-planner/src/index.js';
 
 describe('project structure', () => {
   it('routes benchmark artifacts through the artifacts directory while excluding legacy output', async () => {
@@ -91,7 +101,7 @@ describe('project structure', () => {
     expect(monorepoSpec).toContain('Monorepo Structure Spec v0.1');
     expect(monorepoSpec).toContain('Phase 0: Scaffold and Contract');
     expect(monorepoSpec).toContain('Phase 0 status: completed');
-    expect(monorepoSpec).toContain('Phase 2 acceptance package pilot and Phase 2c shared package extraction are part of the current acceptance criteria');
+    expect(monorepoSpec).toContain('Phase 2 acceptance package pilot, Phase 2c shared package extraction, and Phase 2d repair-planner package extraction are part of the current acceptance criteria');
     expect(monorepoSpec).not.toContain('Status: In progress.');
     expect(monorepoSpec).not.toContain('Do not move runtime code yet');
     expect(monorepoSpec).not.toContain('Existing quality gates continue to pass after Phase 0.');
@@ -130,7 +140,7 @@ describe('project structure', () => {
       readFile('docs/adr/0006-package-build-strategy.md', 'utf8')
     ]);
 
-    expect(monorepoSpec).toContain('Phase 2 status: acceptance package pilot and Phase 2c shared package extraction implemented; broader package extraction remains deferred');
+    expect(monorepoSpec).toContain('Phase 2 status: acceptance package pilot, Phase 2c shared package extraction, and Phase 2d repair-planner package extraction implemented; broader package extraction remains deferred');
     expect(monorepoSpec).toContain('ADR-0006: Package Build Strategy');
     expect(monorepoSpec).toContain('Phase 2c shared package status: implemented with compatibility wrappers');
     expect(monorepoSpec).toContain('`packages/shared/src` owns shared utility implementation modules');
@@ -441,12 +451,14 @@ describe('project structure', () => {
 
     expect(rootPackageJson).toContain('"build": "pnpm build:packages && pnpm build:src"');
     expect(rootPackageJson).toContain('"build:src": "tsc -p tsconfig.build.json"');
-    expect(rootPackageJson).toContain('"build:packages": "pnpm build:shared && pnpm build:acceptance"');
+    expect(rootPackageJson).toContain('"build:packages": "pnpm build:shared && pnpm build:repair-planner && pnpm build:acceptance"');
     expect(rootPackageJson).toContain('"build:shared": "tsc -p packages/shared/tsconfig.build.json"');
+    expect(rootPackageJson).toContain('"build:repair-planner": "tsc -p packages/repair-planner/tsconfig.build.json"');
     expect(rootPackageJson).toContain('"build:acceptance": "tsc -p packages/acceptance/tsconfig.build.json"');
     expect(rootPackageJson).toContain('"typecheck": "pnpm build:packages && tsc --noEmit && pnpm typecheck:packages"');
-    expect(rootPackageJson).toContain('"typecheck:packages": "pnpm typecheck:shared && pnpm typecheck:acceptance"');
+    expect(rootPackageJson).toContain('"typecheck:packages": "pnpm typecheck:shared && pnpm typecheck:repair-planner && pnpm typecheck:acceptance"');
     expect(rootPackageJson).toContain('"typecheck:shared": "tsc -p packages/shared/tsconfig.json --noEmit"');
+    expect(rootPackageJson).toContain('"typecheck:repair-planner": "tsc -p packages/repair-planner/tsconfig.json --noEmit"');
     expect(rootPackageJson).toContain('"typecheck:acceptance": "tsc -p packages/acceptance/tsconfig.json --noEmit"');
     expect(rootPackageJson).toContain('"@hardening-mcp/acceptance": "workspace:*"');
     expect(rootPackageJson).toContain('"acceptance": "node packages/acceptance/dist/run-acceptance.js"');
@@ -790,26 +802,27 @@ describe('project structure', () => {
     );
   });
 
-  it('records current shared package extraction evidence gates in the latest dev log entry', async () => {
+  it('records current repair planner package extraction evidence gates in the latest dev log entry', async () => {
     const devLog = await readFile('docs/logs/dev-log.md', 'utf8');
-    const latestEntryStart = devLog.indexOf('## 2026年6月23日 - Shared Package Phase 2c Extraction');
-    const latestEntryEnd = devLog.indexOf('\n## 2026年6月21日 - Acceptance Package Phase 2de Auto Patch Plan Prototype');
+    const latestEntryStart = devLog.indexOf('## 2026年6月23日 - Repair Planner Package Phase 2d Extraction');
+    const latestEntryEnd = devLog.indexOf('\n## 2026年6月23日 - Shared Package Phase 2c Extraction');
     const latestEntry = devLog.slice(latestEntryStart, latestEntryEnd);
 
     expect(latestEntryStart).toBe(devLog.indexOf('## '));
     expect(latestEntryEnd).toBeGreaterThan(latestEntryStart);
-    expect(latestEntry).toContain('@hardening-mcp/shared');
-    expect(latestEntry).toContain('Phase 2c shared package');
-    expect(latestEntry).toContain('src/shared/*');
-    expect(latestEntry).toContain('packages/shared/dist');
-    expect(latestEntry).toContain('Red：`pnpm vitest run tests/unit/project-structure.test.ts tests/unit/privacy-redaction.test.ts tests/unit/shell-quote.test.ts tests/unit/shell-words.test.ts`');
-    expect(latestEntry).toContain('4 个测试文件、69 个测试');
+    expect(latestEntry).toContain('@hardening-mcp/repair-planner');
+    expect(latestEntry).toContain('Phase 2d repair-planner package');
+    expect(latestEntry).toContain('src/domain/repair-plan/*');
+    expect(latestEntry).toContain('src/types/repair-plan.ts');
+    expect(latestEntry).toContain('packages/repair-planner/dist');
+    expect(latestEntry).toContain('Red：`pnpm vitest run tests/unit/project-structure.test.ts tests/unit/repair-plan.test.ts`');
+    expect(latestEntry).toContain('2 个测试文件、52 个测试');
     expect(latestEntry).toContain('pnpm test:unit');
-    expect(latestEntry).toContain('33 个测试文件、505 个测试');
+    expect(latestEntry).toContain('33 个测试文件、510 个测试');
     expect(latestEntry).toContain('pnpm test:integration');
     expect(latestEntry).toContain('11 个测试文件、27 个测试');
     expect(latestEntry).toContain('pnpm goal:audit');
-    expect(latestEntry).toContain('29 项检查、28 项已通过、0 missing、1 项需要人工确认');
+    expect(latestEntry).toContain('30 项检查、29 项已通过、0 missing、1 项需要人工确认');
   });
 
   it('keeps legacy acceptance markdown as a package compatibility wrapper', async () => {
@@ -1377,11 +1390,13 @@ describe('project structure', () => {
       .map((path) => path.replace('src/shared/', '').replace(/\.ts$/u, ''))
       .sort();
 
-    expect(rootPackageJson.scripts?.['build:packages']).toBe('pnpm build:shared && pnpm build:acceptance');
+    expect(rootPackageJson.scripts?.['build:packages']).toBe('pnpm build:shared && pnpm build:repair-planner && pnpm build:acceptance');
     expect(rootPackageJson.scripts?.['build:shared']).toBe('tsc -p packages/shared/tsconfig.build.json');
+    expect(rootPackageJson.scripts?.['build:repair-planner']).toBe('tsc -p packages/repair-planner/tsconfig.build.json');
     expect(rootPackageJson.scripts?.['build:acceptance']).toBe('tsc -p packages/acceptance/tsconfig.build.json');
-    expect(rootPackageJson.scripts?.['typecheck:packages']).toBe('pnpm typecheck:shared && pnpm typecheck:acceptance');
+    expect(rootPackageJson.scripts?.['typecheck:packages']).toBe('pnpm typecheck:shared && pnpm typecheck:repair-planner && pnpm typecheck:acceptance');
     expect(rootPackageJson.scripts?.['typecheck:shared']).toBe('tsc -p packages/shared/tsconfig.json --noEmit');
+    expect(rootPackageJson.scripts?.['typecheck:repair-planner']).toBe('tsc -p packages/repair-planner/tsconfig.json --noEmit');
     expect(rootPackageJson.scripts?.['typecheck:acceptance']).toBe('tsc -p packages/acceptance/tsconfig.json --noEmit');
     expect(rootPackageJson.dependencies?.['@hardening-mcp/shared']).toBe('workspace:*');
 
@@ -1457,6 +1472,190 @@ describe('project structure', () => {
     await expectPath('packages/shared/src/privacy-redaction.ts');
     await expectPath('packages/shared/src/shell-quote.ts');
     await expectPath('packages/shared/src/shell-words.ts');
+  });
+
+  it('extracts repair planner ownership into a workspace package while preserving compatibility outputs', async () => {
+    const [
+      rootPackageJsonText,
+      repairPlannerPackageJsonText,
+      repairPlannerCompatibility,
+      repairPlannerReadme,
+      packageIndex,
+      packageSubpathTypeSmoke,
+      readme,
+      monorepoSpec,
+      packageBuildAdr,
+      architecture,
+      decisionLog
+    ] = await Promise.all([
+      readFile('package.json', 'utf8'),
+      readFile('packages/repair-planner/package.json', 'utf8'),
+      readFile('packages/repair-planner/src/compatibility.ts', 'utf8'),
+      readFile('packages/repair-planner/README.md', 'utf8'),
+      readFile('packages/repair-planner/src/index.ts', 'utf8'),
+      readFile('tests/type-smoke/repair-planner-package-subpaths.ts', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/architecture/specs/monorepo-structure-spec-v0.1.md', 'utf8'),
+      readFile('docs/adr/0006-package-build-strategy.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8')
+    ]);
+    const [packageSourceFiles, legacyDomainSourceFiles] = await Promise.all([
+      listFiles('packages/repair-planner/src'),
+      listFiles('src/domain/repair-plan')
+    ]);
+    const rootPackageJson = JSON.parse(rootPackageJsonText) as {
+      scripts?: Record<string, string>;
+      dependencies?: Record<string, string>;
+    };
+    const repairPlannerPackageJson = JSON.parse(repairPlannerPackageJsonText) as {
+      name?: string;
+      main?: string;
+      dependencies?: Record<string, string>;
+      exports?: Record<string, { types?: string; default?: string } | string>;
+    };
+    const packageModuleNames = packageSourceFiles
+      .filter((path) => path.endsWith('.ts'))
+      .map((path) => path.replace('packages/repair-planner/src/', '').replace(/\.ts$/u, ''))
+      .filter((moduleName) => moduleName !== 'index')
+      .sort();
+    const legacyModules = [
+      ...legacyDomainSourceFiles
+        .filter((path) => path.endsWith('.ts'))
+        .map((path) => path.replace('src/domain/repair-plan/', '').replace(/\.ts$/u, '')),
+      'repair-plan'
+    ].sort();
+
+    expect(rootPackageJson.scripts?.['build:packages']).toBe('pnpm build:shared && pnpm build:repair-planner && pnpm build:acceptance');
+    expect(rootPackageJson.scripts?.['build:repair-planner']).toBe('tsc -p packages/repair-planner/tsconfig.build.json');
+    expect(rootPackageJson.scripts?.['typecheck:packages']).toBe('pnpm typecheck:shared && pnpm typecheck:repair-planner && pnpm typecheck:acceptance');
+    expect(rootPackageJson.scripts?.['typecheck:repair-planner']).toBe('tsc -p packages/repair-planner/tsconfig.json --noEmit');
+    expect(rootPackageJson.dependencies?.['@hardening-mcp/repair-planner']).toBe('workspace:*');
+
+    expect(repairPlannerPackageJson.name).toBe('@hardening-mcp/repair-planner');
+    expect(repairPlannerPackageJson.main).toBe('dist/index.js');
+    expect(repairPlannerPackageJson.dependencies?.['@hardening-mcp/shared']).toBe('workspace:*');
+    expectPackageExport(repairPlannerPackageJsonText, '.', './dist/index.d.ts', './dist/index.js');
+    expectPackageExport(repairPlannerPackageJsonText, './compatibility', './dist/compatibility.d.ts', './dist/compatibility.js');
+    expectPackageExport(repairPlannerPackageJsonText, './generate-repair-plan', './dist/generate-repair-plan.d.ts', './dist/generate-repair-plan.js');
+    expectPackageExport(repairPlannerPackageJsonText, './repair-plan', './dist/repair-plan.d.ts', './dist/repair-plan.js');
+    expect(Object.entries(repairPlannerPackageJson.exports ?? {}).sort(([left], [right]) => left.localeCompare(right))).toEqual(
+      [...repairPlannerPackageExportEntries]
+        .map((entry) => [entry.exportPath, { types: entry.types, default: entry.default }])
+        .sort(([left], [right]) => String(left).localeCompare(String(right)))
+    );
+
+    expect(repairPlannerCompatibility).toContain('repairPlannerCompatibilityContract');
+    expect(repairPlannerCompatibility).toContain('legacyRepairPlannerWrapperSourceEntries');
+    expect(repairPlannerCompatibility).toContain('repairPlannerPackageDistOutputEntries');
+    expect(packageModuleNames).toEqual(['compatibility', 'generate-repair-plan', 'repair-plan']);
+    expect([...repairPlannerCompatibilityContract.packageOwnedModules].sort()).toEqual(packageModuleNames);
+    expect(repairPlannerPackageSourceEntries.map((entry) => entry.path).sort()).toEqual(
+      packageModuleNames.map((moduleName) => `packages/repair-planner/src/${moduleName}.ts`).sort()
+    );
+    expect(legacyModules).toEqual(['generate-repair-plan', 'repair-plan']);
+    expect([...legacyRepairPlannerCompatibilityModules].sort()).toEqual(legacyModules);
+    expect(legacyRepairPlannerWrapperSourceEntries.map((entry) => entry.path).sort()).toEqual([
+      'src/domain/repair-plan/generate-repair-plan.ts',
+      'src/types/repair-plan.ts'
+    ]);
+
+    for (const moduleName of packageModuleNames) {
+      expect(packageIndex).toContain(`from './${moduleName}.js'`);
+      expect(packageSubpathTypeSmoke).toContain(`from '@hardening-mcp/repair-planner/${moduleName}'`);
+      expect(repairPlannerPackageSubpathSpecifiers).toContain(`@hardening-mcp/repair-planner/${moduleName}`);
+    }
+    expect(packageSubpathTypeSmoke).toContain("from '@hardening-mcp/repair-planner'");
+    expect(packageSubpathTypeSmoke).toContain('repairPlanner.repairPlannerPackageExportEntries');
+    expect(packageSubpathTypeSmoke).toContain('compatibility.repairPlannerPackageExportEntries');
+    expect(packageSubpathTypeSmoke).toContain('repairPlanner.RepairPlannerPackageExportEntry');
+    expect(packageSubpathTypeSmoke).toContain('compatibility.RepairPlannerPackageExportEntry');
+    expect(packageSubpathTypeSmoke).toContain('repairPlannerPackageExportEntryContracts');
+    expect(packageSubpathTypeSmoke).toContain('repairPlanner.RepairPlannerPackageDistOutputEntry');
+    expect(packageSubpathTypeSmoke).toContain('compatibility.RepairPlannerPackageDistOutputEntry');
+    expect(packageSubpathTypeSmoke).toContain('repairPlannerPackageDistOutputEntryContracts');
+    expect(packageSubpathTypeSmoke).toContain('repairPlanner.RepairPlanGenerationResult');
+    expect(packageSubpathTypeSmoke).toContain('generateRepairPlan.GenerateRepairPlanInput');
+    expect(packageSubpathTypeSmoke).toContain('repairPlan.RepairTaskPackage');
+
+    expect(repairPlannerReadme).toContain('Phase 2d repair-planner package extraction');
+    expect(repairPlannerReadme).toContain('This package owns repair plan implementation modules');
+    expect(repairPlannerReadme).toContain('`src/domain/repair-plan/*` and `src/types/repair-plan.ts` compatibility wrappers');
+    expect(monorepoSpec).toContain('Phase 2d repair-planner package status: implemented with compatibility wrappers');
+    expect(monorepoSpec).toContain('`packages/repair-planner/src` owns repair plan and executable repair task package implementation modules');
+    expect(monorepoSpec).toContain('`src/domain/repair-plan/*` remains as compatibility wrappers');
+    expect(monorepoSpec).toContain('`src/types/repair-plan.ts` remains as a compatibility wrapper');
+    expect(packageBuildAdr).toContain('Phase 2d');
+    expect(packageBuildAdr).toContain('`packages/repair-planner`');
+    expect(packageBuildAdr).toContain('repair-planner package extraction');
+    expect(readme).toContain('@hardening-mcp/repair-planner');
+    expect(architecture).toContain('@hardening-mcp/repair-planner');
+    expect(decisionLog).toContain('repair-planner package 抽取');
+
+    await expectPath('packages/repair-planner/package.json');
+    await expectPath('packages/repair-planner/tsconfig.json');
+    await expectPath('packages/repair-planner/tsconfig.build.json');
+    await expectPath('packages/repair-planner/src/index.ts');
+    await expectPath('packages/repair-planner/src/compatibility.ts');
+    await expectPath('packages/repair-planner/src/generate-repair-plan.ts');
+    await expectPath('packages/repair-planner/src/repair-plan.ts');
+  });
+
+  it('keeps generated repair planner package dist outputs described by the package compatibility contract', async () => {
+    const packageDistFiles = await listFiles('packages/repair-planner/dist');
+    const expectedDistPaths = repairPlannerPackageDistOutputEntries.flatMap((entry) => [
+      entry.jsPath,
+      entry.declarationPath,
+      entry.sourceMapPath
+    ]).sort();
+
+    expect(repairPlannerPackageDistOutputEntries.map((entry) => entry.exportPath).sort()).toEqual(
+      repairPlannerPackageExportEntries.map((entry) => entry.exportPath).sort()
+    );
+    expect(packageDistFiles.filter((path) => path.endsWith('.js') || path.endsWith('.d.ts') || path.endsWith('.js.map')).sort()).toEqual(expectedDistPaths);
+  });
+
+  it('keeps generated legacy repair planner dist outputs as package compatibility wrappers', async () => {
+    const distFiles = [
+      ...(await listFiles('dist/domain/repair-plan')),
+      ...(await listFiles('dist/types'))
+    ];
+    const expectedDistPaths = legacyRepairPlannerDistOutputEntries.flatMap((entry) => [
+      entry.jsPath,
+      entry.declarationPath,
+      entry.sourceMapPath
+    ]).sort();
+
+    expect(legacyRepairPlannerDistOutputEntries.map((entry) => entry.moduleName).sort()).toEqual(
+      [...legacyRepairPlannerCompatibilityModules].sort()
+    );
+    expect(distFiles.filter((path) => expectedDistPaths.includes(path)).sort()).toEqual(expectedDistPaths);
+
+    for (const entry of legacyRepairPlannerDistOutputEntries) {
+      const [jsOutput, declarationOutput, sourceMapOutput] = await Promise.all([
+        readFile(entry.jsPath, 'utf8'),
+        readFile(entry.declarationPath, 'utf8'),
+        readFile(entry.sourceMapPath, 'utf8')
+      ]);
+
+      expect(jsOutput).toContain('packages/repair-planner/dist/');
+      expect(jsOutput).not.toContain('function buildRepairTaskPackage');
+      expect(jsOutput).not.toContain('function slugify');
+      expect(jsOutput).not.toContain('function findingTypeRepairIntent');
+      expect(declarationOutput).toContain('packages/repair-planner/dist/');
+      expect(sourceMapOutput).toContain(`"file":"${entry.moduleName}.js"`);
+    }
+  });
+
+  it('keeps legacy repair planner source modules as package compatibility wrappers', async () => {
+    for (const entry of legacyRepairPlannerWrapperSourceEntries) {
+      const legacySource = await readFile(entry.path, 'utf8');
+
+      expect(legacySource).toContain('packages/repair-planner/dist/');
+      expect(legacySource).not.toContain('function buildRepairTaskPackage');
+      expect(legacySource).not.toContain('function slugify');
+      expect(legacySource).not.toContain('function findingTypeRepairIntent');
+    }
   });
 
   it('keeps generated shared package dist outputs described by the package compatibility contract', async () => {

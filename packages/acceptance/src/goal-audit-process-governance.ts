@@ -85,6 +85,7 @@ export function buildProcessGovernanceGoalAuditItems(
     buildLegacyAcceptanceWrapperGoalAuditItem(sources),
     buildAcceptancePackageTypedModuleExportsGoalAuditItem(sources),
     buildSharedPackageTypedModuleExportsGoalAuditItem(sources),
+    buildRepairPlannerPackageTypedModuleExportsGoalAuditItem(sources),
     buildLegacyAcceptanceDistOutputGoalAuditItem(sources)
   ];
 }
@@ -182,6 +183,30 @@ function buildSharedPackageTypedModuleExportsGoalAuditItem(
       : [`missing shared package markers: ${missingMarkers.join(', ')}`],
     ...(missingMarkers.length > 0
       ? { nextAction: '补齐 root workspace dependency、packages/shared typed exports 和 src/shared legacy wrappers 后重新运行 goal audit。' }
+      : {})
+  };
+}
+
+function buildRepairPlannerPackageTypedModuleExportsGoalAuditItem(
+  sources: Partial<GoalAuditTextSources>
+): GoalAuditItem {
+  const rootPackageJson = sources.packageJson ?? '';
+  const repairPlannerPackageJson = sources.repairPlannerPackageJson ?? '';
+  const missingMarkers = [
+    ...findMissingMarkers(rootPackageJson, ['"@hardening-mcp/repair-planner": "workspace:*"']),
+    ...findMissingRepairPlannerTypedPackageExportMarkers(repairPlannerPackageJson),
+    ...findMissingRepairPlannerLegacyWrapperMarkers(sources)
+  ];
+
+  return {
+    category: '架构迁移',
+    requirement: 'Repair planner package typed module exports and legacy wrappers',
+    status: missingMarkers.length === 0 ? 'passed' : 'missing',
+    evidence: missingMarkers.length === 0
+      ? ['root package depends on @hardening-mcp/repair-planner workspace package; packages/repair-planner exports typed root, compatibility, generate-repair-plan, and repair-plan subpaths; src/domain/repair-plan/*.ts and src/types/repair-plan.ts delegate to packages/repair-planner/dist compatibility wrappers']
+      : [`missing repair planner package markers: ${missingMarkers.join(', ')}`],
+    ...(missingMarkers.length > 0
+      ? { nextAction: '补齐 root workspace dependency、packages/repair-planner typed exports 和 repair planner legacy wrappers 后重新运行 goal audit。' }
       : {})
   };
 }
@@ -294,6 +319,58 @@ function findMissingSharedTypedPackageExportMarkers(packageJsonText: string): st
   });
 
   return [...missingExpectedExportMarkers, ...unexpectedExportMarkers];
+}
+
+function findMissingRepairPlannerTypedPackageExportMarkers(packageJsonText: string): string[] {
+  const packageJson = parsePackageJson(packageJsonText);
+  const exports = packageJson?.exports;
+
+  if (!exports || typeof exports !== 'object' || Array.isArray(exports)) {
+    return ['repair planner exports object'];
+  }
+
+  const expectedExports = [
+    { exportPath: '.', types: './dist/index.d.ts', default: './dist/index.js' },
+    { exportPath: './compatibility', types: './dist/compatibility.d.ts', default: './dist/compatibility.js' },
+    { exportPath: './generate-repair-plan', types: './dist/generate-repair-plan.d.ts', default: './dist/generate-repair-plan.js' },
+    { exportPath: './repair-plan', types: './dist/repair-plan.d.ts', default: './dist/repair-plan.js' }
+  ] as const;
+  const expectedExportPaths = new Set<string>(expectedExports.map(({ exportPath }) => exportPath));
+  const unexpectedExportMarkers = Object.keys(exports)
+    .filter((exportPath) => !expectedExportPaths.has(exportPath))
+    .sort()
+    .map((exportPath) => `unexpected repair planner export ${exportPath}`);
+  const missingExpectedExportMarkers = expectedExports.flatMap(({ exportPath, types, default: defaultPath }) => {
+    const value = (exports as Record<string, unknown>)[exportPath];
+
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return [exportPath];
+    }
+
+    const typedExport = value as { types?: unknown; default?: unknown };
+    const missing: string[] = [];
+
+    if (typedExport.types !== types) {
+      missing.push(`${exportPath} types ${types}`);
+    }
+
+    if (typedExport.default !== defaultPath) {
+      missing.push(`${exportPath} default ${defaultPath}`);
+    }
+
+    return missing;
+  });
+
+  return [...unexpectedExportMarkers, ...missingExpectedExportMarkers];
+}
+
+function findMissingRepairPlannerLegacyWrapperMarkers(sources: Partial<GoalAuditTextSources>): string[] {
+  return [
+    { label: 'legacy repair plan generator wrapper', sourceText: sources.legacyRepairPlanGenerator },
+    { label: 'legacy repair plan types wrapper', sourceText: sources.legacyRepairPlanTypes }
+  ]
+    .filter(({ sourceText }) => typeof sourceText !== 'string' || !sourceText.includes('packages/repair-planner/dist'))
+    .map(({ label }) => label);
 }
 
 function findMissingSharedLegacyWrapperMarkers(sources: Partial<GoalAuditTextSources>): string[] {

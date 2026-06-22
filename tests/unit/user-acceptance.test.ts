@@ -20,6 +20,9 @@ import {
   parseUserAcceptanceArgs
 } from '../../packages/acceptance/src/user-acceptance-args.js';
 import {
+  parseShellWords
+} from '../../packages/acceptance/src/shell-words.js';
+import {
   buildGeneratedTestValidationCheck as buildLegacyGeneratedTestValidationCheck,
   formatGeneratedTestValidationCommand as formatLegacyGeneratedTestValidationCommand,
   shouldManageGeneratedTestBootSession as shouldLegacyManageGeneratedTestBootSession
@@ -1068,7 +1071,7 @@ describe('user acceptance record', () => {
     );
   });
 
-  it('quotes generated acceptance commands so paths and intent prompts remain runnable', () => {
+  it('formats generated acceptance commands so paths and intent prompts remain runnable', () => {
     const options = parseUserAcceptanceArgs([
       '--repo',
       'fixtures/benchmark/vite-basic',
@@ -1080,8 +1083,9 @@ describe('user acceptance record', () => {
       'needs reviewer confirmation'
     ]);
     const command = formatUserAcceptanceCommand(options);
+    const words = parseShellWords(command);
 
-    expect(command).toContain(`--repo '${options.repoRoot}'`);
+    expect(words?.[words.indexOf('--repo') + 1]).toBe(options.repoRoot);
     expect(command).toContain("--critical-path 'login, create a project, then send a chat message'");
     expect(command).toContain("--start-command 'pnpm dev --host 127.0.0.1'");
     expect(command).toContain("--notes 'needs reviewer confirmation'");

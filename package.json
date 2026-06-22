@@ -12,6 +12,7 @@
     "build": "pnpm build:packages && pnpm build:src",
     "build:src": "tsc -p tsconfig.build.json",
     "build:packages": "tsc -p packages/acceptance/tsconfig.build.json",
+    "repo:hygiene": "node scripts/check-repo-hygiene.mjs",
     "typecheck": "pnpm build:packages && tsc --noEmit && pnpm typecheck:packages",
     "typecheck:packages": "tsc -p packages/acceptance/tsconfig.json --noEmit",
     "lint": "eslint .",

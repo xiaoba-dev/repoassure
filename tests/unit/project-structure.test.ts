@@ -253,6 +253,65 @@ describe('project structure', () => {
     expect(decisionLog).toContain('RepoAssure 品牌定位');
   });
 
+  it('records the private GitHub engineering baseline and CI collaboration surface', async () => {
+    const [
+      packageJson,
+      ciWorkflow,
+      prTemplate,
+      bugTemplate,
+      featureTemplate,
+      configTemplate,
+      adrIndex,
+      engineeringAdr,
+      engineeringSpec,
+      readme,
+      architecture,
+      readiness,
+      decisionLog
+    ] = await Promise.all([
+      readFile('package.json', 'utf8'),
+      readFile('.github/workflows/ci.yml', 'utf8'),
+      readFile('.github/pull_request_template.md', 'utf8'),
+      readFile('.github/ISSUE_TEMPLATE/bug_report.yml', 'utf8'),
+      readFile('.github/ISSUE_TEMPLATE/feature_request.yml', 'utf8'),
+      readFile('.github/ISSUE_TEMPLATE/config.yml', 'utf8'),
+      readFile('docs/adr/README.md', 'utf8'),
+      readFile('docs/adr/0011-private-github-engineering-baseline.md', 'utf8'),
+      readFile('docs/architecture/specs/private-github-engineering-baseline-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/product/strategy/private-repo-readiness-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8')
+    ]);
+
+    expect(packageJson).toContain('"repo:hygiene": "node scripts/check-repo-hygiene.mjs"');
+    expect(ciWorkflow).toContain('RepoAssure CI');
+    expect(ciWorkflow).toContain('pnpm install --frozen-lockfile');
+    expect(ciWorkflow).toContain('pnpm test:unit');
+    expect(ciWorkflow).toContain('pnpm typecheck');
+    expect(ciWorkflow).toContain('pnpm lint');
+    expect(ciWorkflow).toContain('pnpm build');
+    expect(ciWorkflow).toContain('pnpm goal:audit');
+    expect(ciWorkflow).toContain('pnpm repo:hygiene');
+    expect(ciWorkflow).toContain('actions/checkout@v4');
+    expect(ciWorkflow).toContain('actions/setup-node@v4');
+    expect(prTemplate).toContain('Repository Hygiene');
+    expect(prTemplate).toContain('Generated artifacts, build outputs, local hardening runs, env files, and secrets are not committed');
+    expect(bugTemplate).toContain('RepoAssure bug report');
+    expect(featureTemplate).toContain('RepoAssure feature request');
+    expect(configTemplate).toContain('blank_issues_enabled: false');
+    expect(adrIndex).toContain('[0011](0011-private-github-engineering-baseline.md)');
+    expect(engineeringAdr).toContain('Private GitHub engineering baseline');
+    expect(engineeringAdr).toContain('GitHub Actions CI must run the repository hygiene check');
+    expect(engineeringSpec).toContain('Private GitHub Engineering Baseline v0.1');
+    expect(engineeringSpec).toContain('Manual user acceptance remains outside CI');
+    expect(readme).toContain('pnpm repo:hygiene');
+    expect(readme).toContain('ADR-0011');
+    expect(architecture).toContain('ADR-0011');
+    expect(readiness).toContain('pnpm repo:hygiene');
+    expect(decisionLog).toContain('私有 GitHub 工程基线');
+  });
+
   it('records the repository acceptance scope decision for Web App versus Python CLI repos', async () => {
     const [adrIndex, acceptanceScopeAdr, readme, userGuide, acceptanceChecklist, productSpecV02] = await Promise.all([
       readFile('docs/adr/README.md', 'utf8'),

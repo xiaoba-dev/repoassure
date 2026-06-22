@@ -16,6 +16,7 @@ ADR records long-lived architecture decisions. Use `docs/logs/decision-log.md` f
 | [0008](0008-repository-acceptance-scope.md) | Accepted | Repository acceptance scope |
 | [0009](0009-commercialization-and-licensing-strategy.md) | Accepted | Commercialization and licensing strategy |
 | [0010](0010-repoassure-brand-positioning.md) | Accepted | RepoAssure brand positioning |
+| [0011](0011-private-github-engineering-baseline.md) | Accepted | Private GitHub engineering baseline |
 
 ## Template
 

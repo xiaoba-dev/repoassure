@@ -12,6 +12,8 @@ This document is not a public release checklist. Public release is governed by [
 
 Brand decision: ADR-0010 selects RepoAssure as the product brand and `repoassure` as the preferred private GitHub repository name if available.
 
+Private engineering baseline: ADR-0011 defines CI, PR/issue templates, repository hygiene, and the private pre-release merge boundary.
+
 ## Decision
 
 The project is suitable for a private GitHub repository after local guardrails and quality gates pass.
@@ -50,6 +52,7 @@ pnpm test:unit
 pnpm typecheck
 pnpm lint
 pnpm build
+pnpm repo:hygiene
 ```
 
 Optional but recommended:
@@ -66,6 +69,7 @@ Allowed:
 - Prefer the private GitHub repository name `repoassure` if available.
 - Push the initial workspace after quality gates pass.
 - Use GitHub issues and private PRs for implementation tracking.
+- Require `pnpm repo:hygiene` before merge so generated artifacts, build outputs, local hardening runs, env files, private keys, and logs stay out of tracked history.
 
 Blocked:
 

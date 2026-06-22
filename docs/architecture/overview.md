@@ -47,6 +47,7 @@ flowchart LR
 | [ADR-0002](../adr/0002-shared-cli-mcp-core.md) | Shared core for CLI and MCP | CLI 与 MCP 共享 `src/tools/*`、`src/domain/*`、`src/shared/*`；README 的入口追踪说明 |
 | [ADR-0003](../adr/0003-target-repo-hardening-artifacts.md) | Target repo hardening artifacts | `.hardening/runs/<run-id>/`、`.hardening/latest`、legacy paths、workspace output 和 manifest 消费规则 |
 | [ADR-0004](../adr/0004-repair-plan-and-task-package.md) | Repair plan and executable task package | `repair-plan.json`、`repair-plan.md`、`repair-task-package.json`、`repair-task-package.md`、repair handoff、repair execution 和 patch plan 物料链路 |
+| [ADR-0011](../adr/0011-private-github-engineering-baseline.md) | Private GitHub engineering baseline | `.github/workflows/ci.yml`、PR/issue templates、`pnpm repo:hygiene` 和 private pre-release merge boundary |
 
 ## Artifact 布局
 
@@ -175,6 +176,7 @@ CLI 和 MCP 不各自实现业务逻辑。它们都调用 `src/tools/*`，而 to
 - 不上传代码、日志、截图、trace 或 env value。
 - env 检测只记录 key hint，不读取或输出 secret value。
 - benchmark 产物写入 `artifacts/benchmark-runs/`，该目录已加入 `.gitignore`、ESLint ignore 和 Vitest exclude；旧的 `benchmark-runs/` 继续被忽略，避免历史产物被扫描。
+- 私有 GitHub CI 通过 `pnpm repo:hygiene` 检查已追踪文件，阻止 generated artifacts、build outputs、local hardening runs、env files、private keys 和 local logs 进入提交；完整规则见 `docs/architecture/specs/private-github-engineering-baseline-v0.1.md`。
 
 ## 进程生命周期
 

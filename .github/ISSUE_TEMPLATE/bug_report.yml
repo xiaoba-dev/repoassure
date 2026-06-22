@@ -1,0 +1,33 @@
+name: RepoAssure bug report
+description: Report a reproducible issue in the private pre-release repo.
+title: "fix: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What failed, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Include commands, target repo mode, artifacts, and relevant logs with secrets redacted.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Describe affected workflow, severity, and whether it blocks user acceptance.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Link local artifact paths, CI runs, screenshots, or reports when available.
+    validations:
+      required: false

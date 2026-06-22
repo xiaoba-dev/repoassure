@@ -1,5 +1,23 @@
 # 决策日志
 
+## 2026年6月22日 - 私有 GitHub 工程基线
+
+### 决策
+
+新增 `ADR-0011: Private GitHub Engineering Baseline`，将 RepoAssure 私有仓库的协作和自动化基线固化为 GitHub Actions CI、PR 模板、Issue 模板和 `pnpm repo:hygiene` 已追踪文件检查。
+
+### 原因
+
+- 私有仓库已经完成首次推送，后续功能开发需要可重复的 PR 和 CI 质量门禁。
+- generated artifacts、build outputs、local hardening runs、env files、private keys 和 local logs 不能依赖人工记忆避免提交。
+- `pnpm goal:audit` 能验证自动证据，但不能替代用户人工验收；该边界需要在 PR 和 CI 文档中明确。
+
+### 影响
+
+- 新增 `.github/workflows/ci.yml`，在 PR 和 `main` push 上运行 `pnpm repo:hygiene`、unit、typecheck、lint、build 和 `pnpm goal:audit`。
+- 新增 `.github/pull_request_template.md` 与 `.github/ISSUE_TEMPLATE/`，规范 private pre-release backlog 和 PR 审查材料。
+- 新增 `docs/architecture/specs/private-github-engineering-baseline-v0.1.md` 作为工程基线操作说明。
+
 ## 2026年6月22日 - RepoAssure 品牌定位
 
 ### 决策

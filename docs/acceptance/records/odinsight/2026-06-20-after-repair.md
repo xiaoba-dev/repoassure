@@ -1,0 +1,53 @@
+# 真实项目用户验收记录
+
+生成时间：2026-06-20T08:31:05.543Z
+
+## 摘要
+
+| 项目 | 结果 |
+| --- | --- |
+| 验收运行状态 | 通过 |
+| 用户结论 | 待用户确认 |
+| 真实项目路径 | `/private/tmp/odinsight` |
+| 验收命令 | `pnpm user:accept -- --repo /private/tmp/odinsight --browser --validate-generated-tests --start-command 'npm run dev -- --host 127.0.0.1' --output '/Users/ycn/Desktop/Agent Tester/docs/acceptance/user-acceptance-record.odinsight-after-repair.md' --decision pending` |
+| 就绪度评分 | 100 |
+| P0 | 0 |
+| P1 | 0 |
+| P2 | 0 |
+| hardening report | `/private/tmp/odinsight/hardening-report.md` |
+| findings | `/private/tmp/odinsight/.hardening/run/findings.json` |
+| 检查总数 | 12 |
+| 通过 | 12 |
+| 失败 | 0 |
+| 跳过 | 0 |
+| 必需项失败 | 0 |
+
+## Artifact 检查
+
+| 检查项 | 必需 | 状态 | 证据 |
+| --- | --- | --- | --- |
+| hardening-report.md 已生成 | 是 | 通过 | /private/tmp/odinsight/hardening-report.md |
+| findings.json 已生成 | 是 | 通过 | /private/tmp/odinsight/.hardening/run/findings.json |
+| run manifest 已生成 | 是 | 通过 | /private/tmp/odinsight/.hardening/runs/run-2026-06-20T08-31-03-805Z/manifest.json |
+| repair-plan.json 已生成 | 是 | 通过 | /private/tmp/odinsight/.hardening/runs/run-2026-06-20T08-31-03-805Z/repair-plan.json |
+| repair-plan.md 已生成 | 是 | 通过 | /private/tmp/odinsight/.hardening/runs/run-2026-06-20T08-31-03-805Z/repair-plan.md |
+| repair-task-package.json 已生成 | 是 | 通过 | /private/tmp/odinsight/.hardening/runs/run-2026-06-20T08-31-03-805Z/repair-task-package.json |
+| repair-task-package.md 已生成 | 是 | 通过 | /private/tmp/odinsight/.hardening/runs/run-2026-06-20T08-31-03-805Z/repair-task-package.md |
+| patch.diff 已生成 | 是 | 通过 | /private/tmp/odinsight/.hardening/run/patch.diff |
+| generated Playwright spec 已生成 | 是 | 通过 | /private/tmp/odinsight/tests/hardening/generated-findings-9.spec.ts |
+| generated Playwright spec 执行验证 | 是 | 通过 | cd /private/tmp/odinsight && HARDENING_BASE_URL=http://127.0.0.1:5174 NODE_PATH='/Users/ycn/Desktop/Agent Tester/node_modules' '/Users/ycn/Desktop/Agent Tester/node_modules/.bin/playwright' test tests/hardening/generated-findings-9.spec.ts --reporter=line |
+| browser artifacts 已生成 | 是 | 通过 | /private/tmp/odinsight/.hardening/artifacts/127-0-0-1-5174-root.png, /private/tmp/odinsight/.hardening/artifacts/127-0-0-1-5174-root.png |
+| repo root 已记录 | 是 | 通过 | /private/tmp/odinsight |
+
+## 用户备注
+
+待用户填写。
+
+## 验收判定
+
+真实项目验收运行通过，但用户结论仍待确认；不能仅凭该记录标记长期 goal complete。
+
+## 下一步
+
+- 用户需要将结论更新为 `accepted` 或 `changes_requested`。
+- 通过后运行 `pnpm user:accept -- --repo <repo> --browser --validate-generated-tests --decision accepted --notes "用户确认 MVP 符合预期"`。

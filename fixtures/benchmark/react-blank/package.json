@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "dev": "node server.mjs"
+  },
+  "dependencies": {
+    "react": "19.0.0"
+  }
+}

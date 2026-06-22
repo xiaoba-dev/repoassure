@@ -1,0 +1,154 @@
+{
+  "name": "@hardening-mcp/acceptance",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./compatibility": {
+      "types": "./dist/compatibility.d.ts",
+      "default": "./dist/compatibility.js"
+    },
+    "./markdown": {
+      "types": "./dist/markdown.d.ts",
+      "default": "./dist/markdown.js"
+    },
+    "./report": {
+      "types": "./dist/report.d.ts",
+      "default": "./dist/report.js"
+    },
+    "./goal-audit": {
+      "types": "./dist/goal-audit.d.ts",
+      "default": "./dist/goal-audit.js"
+    },
+    "./goal-audit-requirements": {
+      "types": "./dist/goal-audit-requirements.d.ts",
+      "default": "./dist/goal-audit-requirements.js"
+    },
+    "./goal-audit-user-acceptance": {
+      "types": "./dist/goal-audit-user-acceptance.d.ts",
+      "default": "./dist/goal-audit-user-acceptance.js"
+    },
+    "./goal-audit-user-acceptance-materials": {
+      "types": "./dist/goal-audit-user-acceptance-materials.d.ts",
+      "default": "./dist/goal-audit-user-acceptance-materials.js"
+    },
+    "./goal-audit-sources": {
+      "types": "./dist/goal-audit-sources.d.ts",
+      "default": "./dist/goal-audit-sources.js"
+    },
+    "./goal-audit-delivery": {
+      "types": "./dist/goal-audit-delivery.d.ts",
+      "default": "./dist/goal-audit-delivery.js"
+    },
+    "./goal-audit-runtime": {
+      "types": "./dist/goal-audit-runtime.d.ts",
+      "default": "./dist/goal-audit-runtime.js"
+    },
+    "./goal-audit-workflow-artifacts": {
+      "types": "./dist/goal-audit-workflow-artifacts.d.ts",
+      "default": "./dist/goal-audit-workflow-artifacts.js"
+    },
+    "./goal-audit-observability-security": {
+      "types": "./dist/goal-audit-observability-security.d.ts",
+      "default": "./dist/goal-audit-observability-security.js"
+    },
+    "./goal-audit-process-governance": {
+      "types": "./dist/goal-audit-process-governance.d.ts",
+      "default": "./dist/goal-audit-process-governance.js"
+    },
+    "./goal-audit-evidence-documents": {
+      "types": "./dist/goal-audit-evidence-documents.d.ts",
+      "default": "./dist/goal-audit-evidence-documents.js"
+    },
+    "./goal-audit-current-items": {
+      "types": "./dist/goal-audit-current-items.d.ts",
+      "default": "./dist/goal-audit-current-items.js"
+    },
+    "./user-acceptance": {
+      "types": "./dist/user-acceptance.d.ts",
+      "default": "./dist/user-acceptance.js"
+    },
+    "./user-acceptance-handoff": {
+      "types": "./dist/user-acceptance-handoff.d.ts",
+      "default": "./dist/user-acceptance-handoff.js"
+    },
+    "./fatal-error": {
+      "types": "./dist/fatal-error.d.ts",
+      "default": "./dist/fatal-error.js"
+    },
+    "./redaction": {
+      "types": "./dist/redaction.d.ts",
+      "default": "./dist/redaction.js"
+    },
+    "./repo-preflight": {
+      "types": "./dist/repo-preflight.d.ts",
+      "default": "./dist/repo-preflight.js"
+    },
+    "./python-cli-profile": {
+      "types": "./dist/python-cli-profile.d.ts",
+      "default": "./dist/python-cli-profile.js"
+    },
+    "./python-cli-checks": {
+      "types": "./dist/python-cli-checks.d.ts",
+      "default": "./dist/python-cli-checks.js"
+    },
+    "./python-cli-artifacts": {
+      "types": "./dist/python-cli-artifacts.d.ts",
+      "default": "./dist/python-cli-artifacts.js"
+    },
+    "./user-acceptance-args": {
+      "types": "./dist/user-acceptance-args.d.ts",
+      "default": "./dist/user-acceptance-args.js"
+    },
+    "./shell-quote": {
+      "types": "./dist/shell-quote.d.ts",
+      "default": "./dist/shell-quote.js"
+    },
+    "./shell-words": {
+      "types": "./dist/shell-words.d.ts",
+      "default": "./dist/shell-words.js"
+    },
+    "./user-acceptance-record": {
+      "types": "./dist/user-acceptance-record.d.ts",
+      "default": "./dist/user-acceptance-record.js"
+    },
+    "./user-acceptance-runner-helpers": {
+      "types": "./dist/user-acceptance-runner-helpers.d.ts",
+      "default": "./dist/user-acceptance-runner-helpers.js"
+    },
+    "./run-acceptance": {
+      "types": "./dist/run-acceptance.d.ts",
+      "default": "./dist/run-acceptance.js"
+    },
+    "./run-goal-audit": {
+      "types": "./dist/run-goal-audit.d.ts",
+      "default": "./dist/run-goal-audit.js"
+    },
+    "./run-user-acceptance": {
+      "types": "./dist/run-user-acceptance.d.ts",
+      "default": "./dist/run-user-acceptance.js"
+    },
+    "./run-user-acceptance-handoff": {
+      "types": "./dist/run-user-acceptance-handoff.d.ts",
+      "default": "./dist/run-user-acceptance-handoff.js"
+    },
+    "./run-repair-handoff": {
+      "types": "./dist/run-repair-handoff.d.ts",
+      "default": "./dist/run-repair-handoff.js"
+    },
+    "./run-repair-execute": {
+      "types": "./dist/run-repair-execute.d.ts",
+      "default": "./dist/run-repair-execute.js"
+    },
+    "./run-repair-patch-plan": {
+      "types": "./dist/run-repair-patch-plan.d.ts",
+      "default": "./dist/run-repair-patch-plan.js"
+    }
+  }
+}

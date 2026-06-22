@@ -1,0 +1,11 @@
+[project]
+name = "python-cli-basic"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+python-cli-basic = "python_cli_basic:main"
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff"]

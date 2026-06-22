@@ -1,0 +1,29 @@
+import { shellQuoteArg as legacyShellQuoteArg } from '../../src/shared/shell-quote.js';
+import { shellQuoteArg } from '../../packages/acceptance/src/index.js';
+
+describe('shellQuoteArg', () => {
+  it('keeps simple shell arguments unquoted', () => {
+    expect(shellQuoteArg('tests/hardening')).toBe('tests/hardening');
+  });
+
+  it('single-quotes arguments with spaces', () => {
+    expect(shellQuoteArg('tests with spaces/hardening')).toBe("'tests with spaces/hardening'");
+  });
+
+  it('uses one-line ANSI-C quoting for control characters', () => {
+    expect(shellQuoteArg("first line\nsecond 'line'\tend")).toBe("$'first line\\nsecond \\'line\\'\\tend'");
+  });
+
+  it('keeps the package-owned shell quote helper aligned with the shared legacy implementation', () => {
+    const samples = [
+      'tests/hardening',
+      'tests with spaces/hardening',
+      "first line\nsecond 'line'\tend",
+      'http://127.0.0.1:5173/path?query=value'
+    ];
+
+    for (const sample of samples) {
+      expect(shellQuoteArg(sample)).toBe(legacyShellQuoteArg(sample));
+    }
+  });
+});

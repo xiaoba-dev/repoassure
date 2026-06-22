@@ -1,0 +1,59 @@
+{
+  "name": "hardening-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local-first Code Hardening MCP Server and CLI for AI-generated Web Apps.",
+  "bin": {
+    "hardening": "dist/adapters/cli/index.js",
+    "hardening-mcp": "dist/adapters/mcp/index.js"
+  },
+  "scripts": {
+    "build": "pnpm build:packages && pnpm build:src",
+    "build:src": "tsc -p tsconfig.build.json",
+    "build:packages": "tsc -p packages/acceptance/tsconfig.build.json",
+    "typecheck": "pnpm build:packages && tsc --noEmit && pnpm typecheck:packages",
+    "typecheck:packages": "tsc -p packages/acceptance/tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:e2e": "vitest run tests/e2e",
+    "dev": "tsx src/adapters/cli/index.ts",
+    "app:cli": "node apps/cli/index.js",
+    "app:mcp": "node apps/mcp-server/index.js",
+    "benchmark": "node scripts/run-benchmark.mjs",
+    "preacceptance": "pnpm build",
+    "acceptance": "node packages/acceptance/dist/run-acceptance.js",
+    "pregoal:audit": "pnpm build",
+    "goal:audit": "node packages/acceptance/dist/run-goal-audit.js",
+    "preuser:accept": "pnpm build",
+    "user:accept": "node packages/acceptance/dist/run-user-acceptance.js",
+    "preuser:handoff": "pnpm build",
+    "user:handoff": "node packages/acceptance/dist/run-user-acceptance-handoff.js",
+    "prerepair:handoff": "pnpm build",
+    "repair:handoff": "node packages/acceptance/dist/run-repair-handoff.js",
+    "prerepair:execute": "pnpm build",
+    "repair:execute": "node packages/acceptance/dist/run-repair-execute.js",
+    "prerepair:patch-plan": "pnpm build",
+    "repair:patch-plan": "node packages/acceptance/dist/run-repair-patch-plan.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.61.0",
+    "@types/node": "^25.9.3",
+    "eslint": "^10.5.0",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1",
+    "vitest": "^4.1.9"
+  },
+  "dependencies": {
+    "@hardening-mcp/acceptance": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "playwright": "^1.61.0"
+  }
+}

@@ -1,0 +1,316 @@
+# RepoAssure
+
+RepoAssure 是一个本地优先的 AI 代码验收与交付保障层，用于把 AI 生成的 repo 转化为可验收、可修复、可交付的工程资产。
+
+当前实现工作区仍命名为 `hardening-mcp`：一个 Code Hardening MCP Server + CLI，用于分析、启动、探索和测试 AI 生成的 Web 应用代码，并生成硬化报告、回归测试、修复计划和 AI IDE 可消费的交接物料。
+
+## 当前能力
+
+- 分析本地 repo：识别框架、包管理器、脚本、workspace 子包、环境变量线索和启动建议；包管理器支持 npm、pnpm、yarn 和 Bun，优先按 lockfile 判断，缺失时读取 `package.json#packageManager`；启动建议按 `dev`、`start`、`preview` 顺序选择，缺失标准脚本时会尝试常见 app/web/frontend dev 脚本，并可从 `package.json#workspaces` 或 `pnpm-workspace.yaml` 的多行列表/简单 inline array 子包声明生成 workspace 启动命令，且优先选择通过依赖、`next.config.*`、`vite.config.*` 或 framework 启动脚本识别为 Web app 的子包；当根脚本只是 `turbo`、`nx`、`lerna` 这类通用 workspace 编排器时，会优先推荐已识别 Web app 子包的直接启动命令；`appDirectories` 会优先列出已识别的 Web app 子包，并在根项目本身不是 Web app 时过滤根 `src` 这类噪声信号。
+- 启动应用：执行 dev server 命令，提取本地 URL，写入 boot artifact。
+- 探索应用：
+  - 默认轻量 fetch 路由探索。
+  - 可选 Playwright 浏览器探索，捕获 console error、pageerror、failed request、截图和基础点击/提交交互。
+  - submit 前会对非敏感文本字段填入固定测试值，跳过 password、token、信用卡等敏感字段。
+  - 可传入 Playwright `storageState` JSON 复用登录态，覆盖已登录页面。
+  - 可选输出 Playwright trace zip，帮助回放复杂前端问题。
+  - 默认跳过删除、支付、退出登录等高风险控件，避免探索真实项目时执行破坏性动作。
+- 生成测试：根据 findings 和已探索关键路径生成 Playwright 回归测试草案；优先使用 `reproSteps` 中的显式页面导航，普通描述文本、evidence 和 smoke route 里的完整 URL 只接受本地 app URL（如 `localhost`、`127.0.0.1`、`0.0.0.0`、`[::1]`、`[::]`）或当前被测 app 同源 URL，避免把第三方 API/CDN URL 误生成成本地页面测试；传入 app URL 时，generated spec 会把安全 origin 写作默认 baseURL，并仍支持 `HARDENING_BASE_URL` 覆盖；写入 generated spec 前会脱敏 route query/fragment 中的 token、code、session、CSRF 等敏感参数值，保留 SPA hash route，并脱敏 generated test title 中的敏感值。
+- 生成报告、修复计划和物料包：输出 `hardening-report.md`、AI IDE 可消费的 `repair-plan.json`、人类可读的 `repair-plan.md`、可执行修复任务包 `repair-task-package.json` / `repair-task-package.md`、repair handoff 的 `repair-handoff-package.json` / `.md` / `verification-plan.md`、repair execute 的 `repair-execution-report.json` / `.md`、patch plan 的 `patch-plan.json` / `.md`、可人工审查的 `.hardening/run/patch.diff`，并为每次 `run_hardening` 生成 `.hardening/runs/<run-id>/manifest.json`；`.hardening/latest` 会指向最新 run，方便 AI IDE 从单一入口读取本次报告、JSON、截图、generated tests、repair plan 和修复任务包。报告、repair plan、修复任务包、repair handoff、repair execution report、patch plan 和 diff 会脱敏 API key、token、password、session、JWT、CSRF、Cookie/Set-Cookie value、Authorization/Proxy-Authorization credential、URL userinfo credential 和 URL query/fragment 中的敏感参数值；`boot-result.json` 的 URL、日志路径、blockers 和 errors 写入前也会脱敏。
+- CLI：成功 stdout JSON 和 stderr 错误输出都会在写入前脱敏，避免上游工具结果或异常消息中的敏感值直接进入终端。
+- MCP Server：通过 stdio 暴露 hardening tools，供 Agent/IDE 调用；tool 成功响应和错误响应写入 `content` 与 `structuredContent` 前都会脱敏，进程级启动失败写入 stderr 前也会脱敏；`sessionId` 作为 `stop_app` 所需操作句柄会保留在成功响应的 `structuredContent` 中。
+
+## 项目结构
+
+当前代码是分阶段迁移中的 monorepo workspace：CLI/MCP 入口仍通过兼容 bin 运行，monorepo 迁移已进入 Phase 2 acceptance package pilot。`packages/acceptance/` 已承载验收实现模块、runner、goal audit 和 user handoff；`src/internal/acceptance/` 与 `dist/internal/acceptance/` 仅作为兼容 wrapper/output 路径保留。完整目标结构和迁移规则见 `docs/architecture/specs/monorepo-structure-spec-v0.1.md`；文档分类与命名规则见 `docs/architecture/specs/docs-taxonomy-spec-v0.1.md`。
+
+```text
+apps/
+  cli/        hardening CLI 的未来 app 边界说明
+  mcp-server/ hardening-mcp stdio server 的未来 app 边界说明
+packages/
+  core/              未来核心编排包
+  browser-explorer/  未来浏览器探索包
+  repair-planner/    未来修复计划包
+  acceptance/        Phase 2 acceptance 实现与验收命令包
+  shared/            未来共享工具包
+src/
+  adapters/    当前 CLI 和 MCP 入口适配器
+  tools/       当前 MCP/CLI 共享的工具编排层
+  domain/      当前 analyze、boot、explore、reports、tests 等领域逻辑
+  shared/      当前脱敏、shell quoting/parsing 等共享基础能力
+  internal/    acceptance 兼容 wrapper 与 benchmark 等项目治理脚本
+docs/
+  adr/         长期架构决策记录
+  product/     specs/ 和 research/
+  architecture/overview、specs/ 和 spikes/
+  testing/     strategy/ 和 samples/
+  acceptance/  guides/、checklists/、records/ 和当前验收输出
+  logs/        dev-log、blockers、decision-log、spike-results
+  goals/       active goal 和 completed/
+artifacts/
+  benchmark-runs/  benchmark 运行产物
+  test-results/    测试运行产物
+examples/      示例目标 repo 和集成示例预留区
+```
+
+开发者优先从 `src/adapters/cli/`、`src/adapters/mcp/` 和 `src/tools/` 追踪入口；验收命令和验收实现优先从 `packages/acceptance/` 追踪，`src/internal/acceptance/` 与 `dist/internal/acceptance/` 仅作为兼容 wrapper/output 路径保留；产品和验收资料优先从 `docs/product/`、`docs/acceptance/` 和 `docs/goals/` 读取；长期架构决策优先读取 `docs/adr/README.md`。AI IDE / Agent 消费目标 repo 的硬化物料时，应优先读取目标 repo 的 `.hardening/latest/manifest.json`。
+
+核心架构决策已级联到当前文档和实现：ADR-0001 固化 local-first CLI/MCP 边界，ADR-0002 固化 CLI/MCP shared core，ADR-0003 固化 `.hardening/latest/manifest.json` 和 run-scoped artifact 布局，ADR-0004 固化 repair plan 与 executable task package 物料合同。ADR-0010 固化 RepoAssure 品牌定位；`hardening-mcp` 暂时保留为内部 package、CLI 和 MCP 实现名称。
+
+## 安装
+
+环境前置条件：
+
+- Node.js 22 或更高版本。
+- pnpm。
+- 如需 `--browser`、真实 Chromium trace E2E 或 generated Playwright spec 验证，请安装 Playwright Chromium，并在允许启动浏览器进程的环境中运行。
+
+```bash
+pnpm install
+```
+
+## CLI
+
+```bash
+pnpm build
+
+pnpm dev analyze <repo>
+pnpm dev explore <repo> <url>
+pnpm dev explore <repo> <url> --browser --critical-path /login --max-routes 20 --max-actions-per-route 20
+pnpm dev generate-tests <findingsPath> <outputDir> --smoke-route /login --base-url http://127.0.0.1:5173
+pnpm dev plan <repo>
+pnpm dev report <runDir> <outputPath>
+pnpm dev run <repo> [url]
+pnpm dev run <repo> [url] --browser --critical-path /login --start-command "pnpm dev" --boot-timeout-ms 30000
+pnpm dev run <repo> [url] --workspace-output .hardening-workspace
+```
+
+构建后也可以使用 bin：
+
+```bash
+node dist/adapters/cli/index.js analyze --help
+node dist/adapters/cli/index.js explore --help
+node dist/adapters/cli/index.js generate-tests --help
+node dist/adapters/cli/index.js plan --help
+node dist/adapters/cli/index.js report --help
+node dist/adapters/cli/index.js run --help
+node dist/adapters/cli/index.js run -h
+node dist/adapters/cli/index.js run <repo> [url] --browser
+```
+
+Monorepo Phase 1 也提供 app shell，仍复用兼容 bin 入口：
+
+```bash
+pnpm build
+node apps/cli/index.js --help
+pnpm app:cli -- --help
+```
+
+每个 CLI 子命令的 `--help` / `-h` 都会在参数校验和工具执行前返回用法说明，不会触发 repo 分析、浏览器探索或文件写入。CLI 成功 stdout JSON 和 stderr 错误输出会在写入前脱敏。
+
+常用参数：
+
+| 参数 | 适用命令 | 说明 |
+| --- | --- | --- |
+| `--browser` | `explore`、`run` | 使用 Playwright 浏览器探索，而不是轻量 fetch 探索。 |
+| `--critical-path <path-or-intent>` | `explore`、`run` | 添加必须探索的业务路径、同源 URL 或短自然语言意图，可重复传入；例如 `/login` 或 `"login, create a project, then send a chat message"`。外部 origin 会被忽略。 |
+| `--max-routes <n>` | `explore`、`run` | 限制最多访问的路由数。 |
+| `--max-actions-per-route <n>` | `explore`、`run` | 限制每个路由最多执行的基础交互数；传 `0` 可禁用点击/提交交互。 |
+| `--storage-state <path>` | `explore`、`run` | 使用 Playwright storageState JSON 复用登录态。 |
+| `--trace` | `explore`、`run` | 为每个 browser snapshot 输出 Playwright trace zip artifact。 |
+| `--smoke-route <path-or-url>` | `generate-tests` | 为已知关键路径额外生成 Playwright smoke test，可重复传入。 |
+| `--base-url <url>` | `generate-tests` | 指定 generated spec 默认 `baseURL` 的应用 URL；只写入安全 origin，仍可由 `HARDENING_BASE_URL` 覆盖。 |
+| `--run-dir <dir>` | `plan` | 从指定 hardening run 目录生成或刷新 `repair-plan.json`、`repair-plan.md`、`repair-task-package.json` 和 `repair-task-package.md`；默认读取 `<repo>/.hardening/latest`。 |
+| `--start-command <command>` | `run` | URL 省略时，指定应用启动命令。 |
+| `--boot-timeout-ms <ms>` | `run` | URL 省略时，指定启动等待超时。 |
+| `--workspace-output <dir>` | `run` | 额外把本 repo 的 run bundle 同步到一个多 repo 中央输出目录，并更新 workspace manifest。 |
+
+## MCP Server
+
+构建后启动 stdio MCP Server：
+
+```bash
+pnpm build
+node dist/adapters/mcp/index.js
+# 或使用 Phase 1 app shell
+node apps/mcp-server/index.js
+```
+
+暴露的 tools：
+
+- `analyze_repo`
+- `boot_app`
+- `stop_app`
+- `explore_app`
+- `generate_tests`
+- `generate_repair_plan`
+- `harden_report`
+- `run_hardening`
+
+`boot_app` 会返回 `sessionId`。独立调用 `boot_app` 后，应调用 `stop_app` 清理进程。`run_hardening` 内部会自动清理自己的 boot session。
+
+`explore_app` 和 `run_hardening` 支持 `criticalPaths`、`maxRoutes`、`maxActionsPerRoute`、`storageStatePath`、`trace` 与 `browser`。`criticalPaths` 可传同源 URL/path，也可传短自然语言关键路径意图；外部 origin 会被忽略。`generate_tests` 支持 `smokeRoutes` 和 `baseUrl`，用于独立生成关键路径 smoke tests 并指定 generated spec 的安全默认 origin。`generate_repair_plan` 默认读取 `<repo>/.hardening/latest`，也可传 `runDir` 刷新指定 run 的 repair plan 和可执行修复任务包。`run_hardening` 额外支持 `startCommand`、`bootTimeoutMs` 和 `workspaceOutputDir`，并会自动生成 repair plan 与修复任务包。
+
+MCP client 配置示例见 `docs/acceptance/guides/user-acceptance-guide.md`。
+
+## 质量门禁
+
+```bash
+pnpm test:unit
+pnpm test:integration
+pnpm test:e2e
+pnpm typecheck
+pnpm lint
+pnpm build
+```
+
+当前环境中，监听本地端口的 boot 集成测试和真实浏览器 E2E 需要额外权限。详见 `docs/logs/blockers.md`。
+
+可使用单一验收入口生成 `docs/acceptance/acceptance-run.md`：
+
+```bash
+pnpm acceptance
+pnpm acceptance -- --help
+pnpm acceptance -- -h
+pnpm acceptance -- --full
+pnpm acceptance -- --full --browser
+pnpm goal:audit
+pnpm user:handoff
+pnpm user:handoff -- --repo <real-web-app-repo>
+pnpm user:handoff -- --mode cli --repo <python-cli-repo>
+pnpm user:handoff -- --help
+pnpm user:handoff -- --output docs/acceptance/user-acceptance-handoff.md
+pnpm repair:handoff -- --run <repo>/.hardening/runs/<run-id>
+pnpm repair:execute -- --package <repo>/.hardening/runs/<run-id>/repair-handoff-package.json --task <taskId> --dry-run
+pnpm repair:execute -- --package <repo>/.hardening/runs/<run-id>/repair-handoff-package.json --task <taskId> --validation-only
+pnpm repair:patch-plan -- --report <repo>/.hardening/runs/<run-id>/repair-execution-report.json
+pnpm user:accept -- --help
+pnpm user:accept -- -h
+pnpm user:accept -- --repo <real-web-app-repo> --browser --decision pending
+pnpm user:accept -- --repo <real-web-app-repo> --browser --validate-generated-tests --decision pending
+pnpm user:accept -- --repo <real-web-app-repo> --url <running-url> --browser --validate-generated-tests --generated-test-timeout-ms 240000 --decision pending
+pnpm user:accept -- --mode cli --repo <python-cli-repo> --decision pending
+```
+
+`pnpm acceptance -- --help` 和 `pnpm acceptance -- -h` 会输出验收门禁参数说明。`pnpm acceptance` 运行快速本地门禁、all-subpath package import smoke、package subpath type-resolution smoke 与关键文档/产物检查；`--full` 额外运行完整 integration tests 和 benchmark；`--browser` 额外运行真实 Chromium trace E2E。验收 runner 和 benchmark runner 的进程级 fatal stderr 写入前会脱敏。
+
+真实项目验收的产品范围见 ADR-0008（`docs/adr/0008-repository-acceptance-scope.md`）：当前 `user:accept` 浏览器验收流限定为可自动启动的 Web App repo，或已通过 `--url` 提供运行地址的 Web App。Python CLI / Agent capability repo、纯库、后端服务、移动端和其他非浏览器 UI 目标不会被静默降级为 browser acceptance；例如 `Panniantong/Agent-Reach` 这类只有 `pyproject.toml`、没有根目录 `package.json` 的 repo，在默认 browser mode 会产生结构化 preflight 失败。当前已新增显式 Python/CLI acceptance mode：`pnpm user:accept -- --mode cli --repo <python-cli-repo> --decision pending` 会校验 `pyproject.toml`、生成 Python/CLI profile、执行 CLI smoke / pytest / ruff / mypy 检查、记录 exit code/stdout/stderr/timeout，并输出 `hardening-report.md`、run manifest、repair plan 和 repair task package；该模式不会要求 generated Playwright spec validation。
+
+`pnpm repair:handoff -- --run <repo>/.hardening/runs/<run-id>` 会从某次 run bundle 的 `manifest.json` 读取失败命令和失败验收项，生成 `repair-handoff-package.json`、`repair-handoff-package.md` 和 `verification-plan.md`。该命令本身只负责生成交接物料，成功生成即返回 0；任务数量表示目标 repo 仍需修复的 backlog，不表示 handoff 命令失败。
+
+`pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --dry-run` 会生成执行计划报告但不运行命令；`--validation-only` 会只复跑该任务的 verification commands，并写出 `repair-execution-report.json` 和 `repair-execution-report.md`。当前 v0.1 不自动修改目标 repo 代码；失败验证会进入 report，命令本身只表示执行报告是否成功生成。
+
+`pnpm repair:patch-plan -- --report <repair-execution-report.json>` 会把失败验证证据分类为可审查补丁计划，输出 `patch-plan.json` 和 `patch-plan.md`。当前 v0.1 识别 `ruff I001` import-sort 自动修复候选，以及 mypy `[index]`、`[return-value]`、`[attr-defined]` 等类型修复候选；该命令只生成计划，不写目标 repo 源码、不运行 formatter、不创建 PR。
+
+`pnpm goal:audit` 生成 `docs/acceptance/goal-completion-audit.md`，用于把 `docs/goals/codex-goal.md` 的成功条件映射到当前证据。该审计不会替代用户验收；只在自动可验证范围内确认是否已准备好请求验收。只有带具体确认备注、且 generated Playwright spec 执行验证通过的 `--validate-generated-tests --decision accepted --notes "用户确认 MVP 符合预期"` 会被判定为完成；`--decision changes_requested` 也必须带具体 `--notes`，会被识别为有效修改反馈并要求继续迭代。
+
+`pnpm user:handoff` 生成 `docs/acceptance/user-acceptance-handoff.md`，把 goal audit、自动质量门禁、架构迁移状态、真实项目验收命令、通过/修改两条路径和人工确认边界集中成一个最终验收入口。默认输出会在写入后重算 goal audit 摘要，并同步刷新 `docs/acceptance/goal-completion-audit.md`，避免旧交接包或旧审计文件导致一次性失败。`pnpm user:handoff -- --repo <real-web-app-repo>` 会把交接包中的验收命令渲染成可直接复制执行的真实 repo 命令，并显示 repo root / `package.json` 前置检查结果；`pnpm user:handoff -- --mode cli --repo <python-cli-repo>` 会显示 repo root / `pyproject.toml` 前置检查，并渲染 CLI mode 的 `user:accept --mode cli` 命令。若必需前置检查失败，命令仍会写出交接包并返回非零退出码，交接包不会展示带失败 repo 的 `pnpm user:accept` 命令，只提示先修复 repo 路径或对应 manifest 后重新生成交接包；前置检查通过时，交接包中的 `accepted` 和 `changes_requested` 命令都会使用可被 CLI 接受的具体备注。`pnpm user:handoff -- --help` 会输出参数说明；`--output <path>` 可写入自定义交接包路径。该交接包只帮助用户验收，不能由自动脚本代替用户确认。
+
+`pnpm user:accept -- --help` 和 `pnpm user:accept -- -h` 会输出真实项目验收参数说明。`pnpm user:accept` 用于真实项目验收：先校验 `--repo` 是已存在的目录且包含文件型 `package.json`，再运行 hardening flow，检查关键 artifacts，并生成 `docs/acceptance/user-acceptance-record.md`。如果 repo 路径缺失、不是目录、缺少 `package.json`，或 hardening flow 发生非预期异常，会写入结构化失败记录且不会创建目标 repo 目录；摘要路径、异常摘要、artifact 检查证据和用户备注会先经过敏感信息脱敏。用户可用 `--decision pending` 保持待确认，用 `--validate-generated-tests --decision accepted --notes "用户确认 MVP 符合预期"` 写入通过结论，或用 `--decision changes_requested --notes "补齐登录态探索并降低误报"` 写入继续迭代输入。
+
+`--validate-generated-tests` 会执行生成的 Playwright spec。未传 `--url` 时，`user:accept` 会让自动启动的 app 保持运行直到验证结束；如果目标应用已经由用户或 CI 启动，也可以传入 `--url <running-url>` 复用现有服务。复杂真实项目可用 `--generated-test-timeout-ms <ms>` 调整 generated spec 验证超时，默认 120000ms。
+
+Python/CLI mode 的 accepted 记录仍要求具体 `--notes`，但不要求 `--validate-generated-tests`；其完成证据来自 `pyproject.toml` preflight、Python/CLI profile、CLI smoke/static/test check execution results、report、manifest、repair plan 和 repair task package。
+
+在允许启动本地 server 和 Chromium 的环境中，可运行完整浏览器验收：
+
+```bash
+HARDENING_E2E_BROWSER=1 pnpm vitest run tests/e2e/run-browser.e2e.test.ts
+```
+
+运行 5 个本地 benchmark repo，并生成 `docs/logs/spike-results.md`：
+
+```bash
+pnpm build
+pnpm benchmark
+```
+
+Benchmark 会对每个 repo 执行完整 `run --browser`，并重启 fixture app 验证生成的 Playwright spec 可执行；benchmark runner 的进程级 fatal stderr 写入前会脱敏。
+
+## 主要产物
+
+- `.hardening/latest/manifest.json`
+- `.hardening/runs/<run-id>/hardening-report.md`
+- `.hardening/runs/<run-id>/repo-profile.json`
+- `.hardening/runs/<run-id>/boot-result.json`
+- `.hardening/runs/<run-id>/findings.json`
+- `.hardening/runs/<run-id>/test-generation.json`
+- `.hardening/runs/<run-id>/repair-plan.json`
+- `.hardening/runs/<run-id>/repair-plan.md`
+- `.hardening/runs/<run-id>/repair-handoff-package.json`
+- `.hardening/runs/<run-id>/repair-handoff-package.md`
+- `.hardening/runs/<run-id>/verification-plan.md`
+- `.hardening/runs/<run-id>/repair-execution-report.json`
+- `.hardening/runs/<run-id>/repair-execution-report.md`
+- `.hardening/runs/<run-id>/patch-plan.json`
+- `.hardening/runs/<run-id>/patch-plan.md`
+- `.hardening/runs/<run-id>/patch.diff`
+- `.hardening/runs/<run-id>/artifacts/*`
+- `.hardening/runs/<run-id>/generated-tests/*`
+- `.hardening/run/repo-profile.json`
+- `.hardening/run/boot-result.json`
+- `.hardening/run/findings.json`
+- `.hardening/run/test-generation.json`
+- `.hardening/run/repair-plan.json`
+- `.hardening/run/repair-plan.md`
+- `.hardening/run/patch.diff`
+- `.hardening/artifacts/*`
+- `hardening-report.md`
+- `tests/hardening/*.spec.ts`
+- `docs/acceptance/acceptance-run.md`
+- `docs/acceptance/goal-completion-audit.md`
+- `docs/acceptance/user-acceptance-handoff.md`
+- `docs/acceptance/user-acceptance-record.md`
+- `docs/testing/samples/sample-hardening-report.md`
+
+AI IDE / Agent 应优先读取 `.hardening/latest/manifest.json`，再按 `files.repairPlan`、`files.findings`、`files.report`、`files.generatedTests` 和 `files.artifacts` 消费物料。`repair-plan.json` 是 v0.2 的首选修复任务入口；`repair-handoff-package.json` 和 `verification-plan.md` 是从 run bundle 汇总后的执行交接入口；`repair-execution-report.json` 是 dry-run 或 validation-only 后的执行证据；`patch-plan.json` 是失败验证转成可审查补丁动作后的计划入口；`legacyPaths` 保留原有落盘路径，便于人工查看和兼容已有脚本。
+
+多 repo 场景可使用 `--workspace-output <dir>` 或 MCP `workspaceOutputDir` 把多个 repo 汇总到同一个中央目录：
+
+```text
+.hardening-workspace/
+  manifest.json
+  repos/
+    <repo-slug>/
+      latest -> runs/<run-id>
+      runs/
+        <run-id>/
+          manifest.json
+          hardening-report.md
+          repair-plan.json
+          repair-plan.md
+          findings.json
+          generated-tests/
+          artifacts/
+```
+
+中央 `manifest.json` 列出每个 repo 的 `repoSlug`、`repoRoot`、`latestRunId`、`latestRunDir` 和 `latestManifest`。
+
+`patch.diff` 当前包含 remediation plan 和已生成回归测试的新增文件 diff，不会自动修改业务代码；写入前会统一脱敏敏感值。
+
+## 项目文档
+
+- `docs/product/specs/mvp-spec-v0.1.md`
+- `docs/product/specs/mvp-spec-v0.2.md`
+- `docs/product/research/competitive-landscape-v0.1.md`
+- `docs/product/strategy/commercialization-strategy-v0.1.md`
+- `docs/product/strategy/public-release-checklist-v0.1.md`
+- `docs/product/strategy/open-core-packaging-spec-v0.1.md`
+- `docs/goals/codex-goal.md`
+- `docs/architecture/overview.md`
+- `docs/architecture/specs/docs-taxonomy-spec-v0.1.md`
+- `docs/architecture/specs/monorepo-structure-spec-v0.1.md`
+- `docs/acceptance/guides/user-acceptance-guide.md`
+- `docs/testing/strategy/test-strategy-v0.1.md`
+- `docs/acceptance/checklists/acceptance-checklist-v0.1.md`
+- `docs/acceptance/acceptance-run.md`
+- `docs/acceptance/goal-completion-audit.md`
+- `docs/acceptance/user-acceptance-record.md`
+- `docs/testing/samples/sample-hardening-report.md`
+- `docs/logs/spike-results.md`
+- `docs/logs/dev-log.md`
+- `docs/logs/blockers.md`
+- `docs/logs/decision-log.md`
+- `docs/goals/completed/2026-06-20-structure-refactor.md`
+- `docs/goals/completed/2026-06-20-repair-plan-v0.2.md`

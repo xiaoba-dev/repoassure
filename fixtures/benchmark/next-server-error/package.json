@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "dev": "node server.mjs"
+  },
+  "dependencies": {
+    "next": "16.0.0"
+  }
+}

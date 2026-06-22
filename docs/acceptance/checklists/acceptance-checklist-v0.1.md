@@ -1,0 +1,64 @@
+# 用户验收清单
+
+## 当前已通过
+
+- [x] 可以安装依赖
+- [x] 目标完成度审计已覆盖安装步骤和环境前置条件：README 与用户验收指南均说明 Node.js 22+、pnpm、Playwright Chromium、`pnpm install` 和 `pnpm build`
+- [x] 可以运行 typecheck：`pnpm typecheck`
+- [x] 可以运行 lint：`pnpm lint`
+- [x] 可以运行 unit tests：当前 25 个测试文件，454 个测试通过
+- [x] 可以运行非监听 integration tests：当前 8 个测试文件，17 个测试通过
+- [x] 可以运行不依赖本地监听的 E2E smoke：当前 1 个测试文件，1 个测试通过
+- [x] 提权环境可运行完整 integration tests：当前 11 个测试文件，27 个测试通过
+- [x] 提权环境可运行 full acceptance：`pnpm acceptance -- --full --browser` 当前 17/17 检查通过，包含 unit 25/454、all-subpath package import smoke、package subpath type-resolution smoke、integration 11/27、E2E smoke、benchmark 5/5 和真实 Chromium trace E2E
+- [x] Benchmark 验证通过：5/5 个本地半真实 repo 完成完整流程，5/5 生成 Playwright spec 实际执行通过，总耗时约 1 分 4 秒，结果见 `docs/logs/spike-results.md`
+- [x] 目标完成度审计已覆盖示例 repo 运行流程：`pnpm benchmark`、5 个本地 benchmark repo、`docs/logs/spike-results.md`、completed repo 报告和 generated spec 验证步骤均已记录
+- [x] 可以运行单一验收入口：`pnpm acceptance -- --full --browser` 17/17 检查通过，报告写入 `docs/acceptance/acceptance-run.md`
+- [x] 单一验收入口提供 `pnpm acceptance -- --help` 和 `pnpm acceptance -- -h` 参数说明入口
+- [x] 可以运行目标完成度审计：`pnpm goal:audit` 当前 28 项检查中 27 项自动证据通过、0 项缺失、1 项需人工确认，报告写入 `docs/acceptance/goal-completion-audit.md`；accepted 验收记录的生成时间必须不早于 `docs/goals/codex-goal.md` 的最后更新日期、包含具体确认备注，且 generated Playwright spec 执行验证通过；`changes_requested` 验收记录会被识别为有效修改反馈并要求继续迭代；自动脚本不能代替用户确认 MVP 符合预期
+- [x] 可以运行用户验收交接包生成：`pnpm user:handoff` 会写入 `docs/acceptance/user-acceptance-handoff.md`，默认输出会在写入后重算 goal audit 摘要，并同步刷新 `docs/acceptance/goal-completion-audit.md`，避免旧交接包或旧审计文件导致一次性失败；默认交接包会直接展示当前结论、自动质量门禁、架构迁移状态、当前用户验收状态、证据和下一步；默认交接包会提示用 `--repo <real-web-app-repo>` 重新生成带 repo 前置检查的交接包；`--repo <repo>` 可渲染真实 repo 命令并显示 repo root 和文件型、JSON 对象 manifest 的 `package.json` 两个独立前置检查结果，误传 `<real-web-app-repo>` 这类占位符时会先提示替换为真实 Web App repo 路径，必需前置检查失败时仍会写出交接包并返回非零退出码，当前结论会优先提示修复 repo 路径或 package.json manifest，且不会展示带失败 repo 的 `pnpm user:accept` 命令，只提示先修复 repo 路径或 package.json manifest 后重新生成交接包；当前已覆盖有效 repo 时 `user:handoff -- --repo <repo>` 返回 0 并生成具体 `user:accept` 命令，且 `accepted` 和 `changes_requested` 命令都使用可被 CLI 接受的具体备注；如果 repo 路径中的敏感值被脱敏，交接包会提醒用户用真实 repo 路径重新运行；`pnpm user:handoff -- --help` 提供参数说明，`--output <path>` 可写入自定义交接包路径
+- [x] 目标完成度审计已覆盖用户验收交接包：最终验收入口、当前结论、repo preflight blocker 优先结论、自动质量门禁、架构迁移状态、当前用户验收状态与下一步、真实项目验收命令、`accepted` / `changes_requested` 具体备注路径、accepted 验收记录 freshness 要求和不能由自动脚本代替用户确认的边界均已记录
+- [x] 目标完成度审计已覆盖可观测性和可复现性：profile/findings/report/repair-plan/result/log 路径、repro steps、evidence、verification command、blockers/errors 和 artifact 检查
+- [x] `run_hardening` 会生成 run-scoped artifact bundle：`.hardening/runs/<run-id>/manifest.json` 汇总报告、repair plan、findings、patch、generated tests 和 browser artifacts，`.hardening/latest` 指向最新 run，旧路径继续兼容
+- [x] `run_hardening` 支持多 repo workspace 输出：传入 `workspaceOutputDir` / `--workspace-output <dir>` 时，会在同一个中央目录下按 repo slug 归档 run bundle，并维护 `<dir>/manifest.json`
+- [x] 目标完成度审计已覆盖开发流程：TDD Red/Green 记录、测试金字塔策略、unit/integration/E2E 验收门禁
+- [x] 目标完成度审计已覆盖安全边界：不上传代码/日志/screenshots/traces、env 只输出 key hints、CLI/MCP/report/acceptance 输出脱敏、浏览器探索跳过敏感字段和危险动作
+- [x] 目标完成度审计已覆盖日志治理：阻塞日志记录环境限制、尝试方案和外部条件；决策日志记录架构、依赖、测试和验收相关长期决策
+- [x] 目标完成度审计已覆盖 Token 控制：目标契约、开发日志小步 TDD 记录和 goal audit 定向证据读取共同证明精准上下文与小步审计
+- [x] 目标完成度审计已覆盖 CLI 可运行性：子命令帮助入口、`analyze/explore/generate-tests/plan/report/run` handler smoke 和 artifact 输出检查
+- [x] 目标完成度审计已覆盖 MCP 可运行性：stdio bin、协议级 `tools/list`/`tools/call`、P0 MCP 链路、`stop_app` session 清理和 MCP 脱敏边界
+- [x] 目标完成度审计已覆盖 MCP 配置示例和客户端验收步骤：stdio 启动命令、`mcpServers.hardening-mcp` JSON 配置、包含 `generate_repair_plan` 的 tool 列表、`analyze_repo` smoke 和 `stop_app` 清理步骤均已记录
+- [x] 目标完成度审计已覆盖稳定报告样例：`docs/testing/samples/sample-hardening-report.md` 已作为用户验收材料纳入审计
+- [x] 目标完成度审计已覆盖已知限制和未解决 blocker 列表：默认沙箱本地监听、Chromium 权限、真实项目 hardening run 和用户验收结论均有明确状态与下一步
+- [x] 已提供真实项目验收 runner：`pnpm user:accept -- --repo <repo> --browser --decision pending`，记录写入 `docs/acceptance/user-acceptance-record.md`；待验收模板和生成记录都会给出下一步，生成记录会按 failed、pending、accepted、changes_requested 四类状态给出下一步，包括修复失败项、更新用户结论、复跑 `pnpm goal:audit` 或按用户备注继续迭代；`accepted` 和 `changes_requested` 命令都必须带具体 `--notes`，无备注或占位备注会被 CLI 拒绝
+- [x] 真实项目验收 runner 提供 `pnpm user:accept -- --help` 和 `pnpm user:accept -- -h` 参数说明入口
+- [x] 真实项目验收 runner 会把 repo root 和 `package.json` 作为两个独立前置检查记录；误传 `<real-web-app-repo>` 这类占位符时会先提示替换为真实 Web App repo 路径，验收记录中的真实项目路径和可见命令都会保留占位符而不是展示解析后的假绝对路径；无效路径、缺失 `package.json`、`package.json` JSON 语法错误、非对象 package manifest 或 hardening flow 非预期异常会生成结构化失败记录，不会创建目标 repo 目录，摘要路径、异常摘要、artifact 检查证据和用户备注会脱敏
+- [x] ADR-0008 已固化真实项目验收范围：当前 browser acceptance 只覆盖可自动启动或已提供 URL 的 Web App repo；Python CLI、Agent capability package、纯库、后端服务和移动端等非浏览器 UI repo 不会被静默降级到 browser flow。`Panniantong/Agent-Reach` 这类只有 `pyproject.toml`、没有根目录 `package.json` 的 repo 在默认 browser mode 应在 preflight 阶段生成结构化失败记录；当前已支持显式 Python/CLI acceptance mode：`pnpm user:accept -- --mode cli --repo <python-cli-repo> --decision pending` 会校验 `pyproject.toml`，生成 Python/CLI profile，执行 CLI smoke / pytest / ruff / mypy 检查，记录 exit code/stdout/stderr/timeout，并输出 report、manifest、repair plan 和 repair task package
+- [x] 用户验收交接包支持显式 Python/CLI mode：`pnpm user:handoff -- --mode cli --repo <python-cli-repo>` 会显示 repo root / `pyproject.toml` 前置检查，并生成不含 browser / generated Playwright spec validation 的 CLI mode 验收命令
+- [x] 真实项目验收 runner 可选验证 generated Playwright spec：`--validate-generated-tests` 支持自动 boot 托管，也支持显式 `--url`，并可用 `--generated-test-timeout-ms` 调整慢项目验证超时
+- [x] 真实 Playwright Chromium 已安装并通过提权 data URL 探测
+- [x] 项目自己的 Playwright browser driver 已通过提权 data URL 探测
+- [x] 提权环境可运行完整 browser hardening E2E：`HARDENING_E2E_BROWSER=1 pnpm vitest run tests/e2e/run-browser.e2e.test.ts`
+- [x] 可以执行 `hardening analyze`
+- [x] 可以执行 `hardening run <repo> <url>`
+- [x] 可以执行 `hardening plan <repo>`
+- [x] 可以执行 `hardening run <repo>` 的注入式自动 boot 编排测试
+- [x] CLI 子命令提供零副作用帮助入口：`hardening analyze|explore|generate-tests|plan|report|run --help` 和 `-h`
+- [x] 可以生成 `hardening-report.md`
+- [x] 可以生成 `repair-plan.json` 和 `repair-plan.md`
+- [x] 已提供稳定报告样例：`docs/testing/samples/sample-hardening-report.md`
+- [x] 可以生成 `tests/hardening/*.spec.ts`
+- [x] MCP tools 可通过协议级集成测试调用
+- [x] 架构说明完整：`docs/architecture/overview.md`
+- [x] 用户验收指南完整：`docs/acceptance/guides/user-acceptance-guide.md`
+- [x] 文档足够开发者试用当前 MVP 切片
+- [x] boot 失败时仍生成失败报告
+
+## 待完整验收
+
+- [ ] 默认沙箱内完整运行 `pnpm test:integration`
+  - 当前阻塞：本地监听 `127.0.0.1` 会触发 `listen EPERM`
+- [x] 真实项目上的 `hardening run <repo> --browser`
+  - 当前状态：`rotifer-alpha/site` pending 验收已通过，7/7 artifact 检查通过；报告 readiness score 0、P1 75
+- [ ] 真实项目上的 `pnpm user:accept -- --repo <repo> --browser --validate-generated-tests --decision accepted --notes "用户确认 MVP 符合预期"`
+  - 当前状态：`rotifer-alpha/site` 的 pending 验收已通过；仍需用户明确 `accepted` 或 `changes_requested` 结论。若用户使用 `--decision accepted`，该验收记录生成时间必须不早于 `docs/goals/codex-goal.md` 的最后更新日期、包含具体确认备注，且 generated Playwright spec 执行验证通过；若用户使用 `--decision changes_requested` 并写明备注，goal audit 会把它作为继续迭代输入，而不是完成证据

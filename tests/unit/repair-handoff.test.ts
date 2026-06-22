@@ -1,0 +1,95 @@
+import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+import { describe, expect, it } from 'vitest';
+
+import {
+  buildRepairHandoffPackage,
+  formatRepairHandoffMarkdown,
+  formatVerificationPlanMarkdown,
+  runRepairHandoff
+} from '../../packages/acceptance/src/run-repair-handoff.js';
+
+describe('repair handoff', () => {
+  it('standardizes failing Python/CLI command results into executable repair tasks', () => {
+    const pkg = buildRepairHandoffPackage({
+      generatedAt: '2026-06-21T09:00:00.000Z',
+      runDir: '/tmp/agent-reach/.hardening/runs/run-fixed',
+      manifest: {
+        schemaVersion: 1,
+        mode: 'cli',
+        runId: 'run-fixed',
+        repoRoot: '/tmp/agent-reach',
+        artifacts: {
+          repairTaskPackagePath: '/tmp/agent-reach/.hardening/runs/run-fixed/repair-task-package.json'
+        },
+        commandResults: [
+          { command: 'agent-reach', args: ['--help'], exitCode: 0, stdout: 'usage: agent-reach', stderr: '', timedOut: false },
+          { command: 'ruff', args: ['check', '.'], exitCode: 1, stdout: 'Found 46 errors API_KEY=sk-secret', stderr: '', timedOut: false },
+          { command: 'mypy', args: ['.'], exitCode: 1, stdout: '', stderr: '15 errors token=abc123', timedOut: false }
+        ],
+        checks: [
+          { name: 'Python CLI check 执行: ruff check .', required: false, status: 'failed', evidence: 'exit=1' },
+          { name: 'Python CLI check 执行: mypy .', required: false, status: 'failed', evidence: 'exit=1' }
+        ]
+      }
+    });
+
+    expect(pkg.schemaVersion).toBe(1);
+    expect(pkg.mode).toBe('cli');
+    expect(pkg.summary).toEqual({
+      totalTasks: 2,
+      failedCommands: 2,
+      requiredFailed: 0,
+      highestPriority: 'P1'
+    });
+    expect(pkg.tasks.map((task) => task.taskId)).toEqual([
+      'pycli-failed-ruff-check',
+      'pycli-failed-mypy'
+    ]);
+    expect(pkg.tasks[0]?.objective).toContain('修复失败命令：ruff check .');
+    expect(pkg.tasks[0]?.evidence.commandResult?.stdout).toContain('API_KEY=[REDACTED]');
+    expect(pkg.tasks[0]?.evidence.commandResult?.stdout).not.toContain('sk-secret');
+    expect(pkg.tasks[0]?.verification.commands).toContain('ruff check .');
+    expect(pkg.tasks[0]?.handoffPrompt).toContain('你是接手目标 repo 的修复 Agent');
+    expect(formatRepairHandoffMarkdown(pkg)).toContain('# Repair Handoff Package');
+    expect(formatRepairHandoffMarkdown(pkg)).toContain('pycli-failed-ruff-check');
+    expect(formatVerificationPlanMarkdown(pkg)).toContain('# Verification Plan');
+    expect(formatVerificationPlanMarkdown(pkg)).toContain('ruff check .');
+    expect(formatVerificationPlanMarkdown(pkg)).toContain('mypy .');
+  });
+
+  it('writes repair handoff artifacts from a run manifest', async () => {
+    const repoRoot = await mkdtemp(join(tmpdir(), 'hardening-repair-handoff-repo-'));
+    const runDir = join(repoRoot, '.hardening', 'runs', 'run-fixed');
+    const outputDir = join(repoRoot, '.hardening', 'repair-handoff', 'run-fixed');
+
+    await mkdir(runDir, { recursive: true });
+    await writeFile(join(runDir, 'manifest.json'), JSON.stringify({
+      schemaVersion: 1,
+      mode: 'cli',
+      runId: 'run-fixed',
+      repoRoot,
+      artifacts: {
+        repairTaskPackagePath: join(runDir, 'repair-task-package.json')
+      },
+      commandResults: [
+        { command: 'agent-reach', args: ['--help'], exitCode: 0, stdout: 'usage: agent-reach', stderr: '', timedOut: false },
+        { command: 'ruff', args: ['check', '.'], exitCode: 1, stdout: 'Found 46 errors', stderr: '', timedOut: false }
+      ]
+    }, null, 2));
+
+    const result = await runRepairHandoff({
+      runDir,
+      outputDir,
+      generatedAt: '2026-06-21T09:00:00.000Z'
+    });
+
+    expect(result.taskCount).toBe(1);
+    expect(result.packagePath).toBe(join(outputDir, 'repair-handoff-package.json'));
+    await expect(readFile(result.packagePath, 'utf8')).resolves.toContain('"pycli-failed-ruff-check"');
+    await expect(readFile(result.markdownPath, 'utf8')).resolves.toContain('Found 46 errors');
+    await expect(readFile(result.verificationPlanPath, 'utf8')).resolves.toContain('ruff check .');
+  });
+});

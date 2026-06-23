@@ -2103,6 +2103,29 @@ describe('project structure', () => {
       expect(legacySource).not.toContain('function decodeAnsiCStringEscape');
     }
   });
+
+  it('keeps MVP closure documents consistent with the current acceptance boundary', async () => {
+    const [codexGoal, goalAudit, handoff, userAcceptanceRecord] = await Promise.all([
+      readFile('docs/goals/codex-goal.md', 'utf8'),
+      readFile('docs/acceptance/goal-completion-audit.md', 'utf8'),
+      readFile('docs/acceptance/user-acceptance-handoff.md', 'utf8'),
+      readFile('docs/acceptance/user-acceptance-record.md', 'utf8')
+    ]);
+    const automaticPassed = Number(goalAudit.match(/\| 已通过 \| (?<count>\d+) \|/u)?.groups?.count);
+    const handoffAutomaticPassed = Number(handoff.match(/\| 自动证据通过 \| (?<count>\d+) \|/u)?.groups?.count);
+
+    expect(Number.isFinite(automaticPassed)).toBe(true);
+    expect(Number.isFinite(handoffAutomaticPassed)).toBe(true);
+    expect(handoffAutomaticPassed).toBeGreaterThanOrEqual(automaticPassed);
+    expect(handoff).toContain('| 自动证据缺失 | 0 |');
+    expect(handoff).toContain('| 需要人工确认 | 1 |');
+
+    if (!userAcceptanceRecord.includes('| 用户结论 | 用户确认通过 |')) {
+      expect(codexGoal).not.toContain('状态：已完成');
+      expect(codexGoal).not.toContain('真实项目用户验收已通过');
+      expect(codexGoal).toContain('状态：自动证据已准备好请求用户验收，等待用户最终验收结论');
+    }
+  });
 });
 
 async function expectPath(path: string): Promise<void> {

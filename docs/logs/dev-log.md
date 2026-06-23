@@ -1,5 +1,43 @@
 # 开发日志
 
+## 2026年6月23日 - MVP v0.2 Remaining Auto-Executable Closure
+
+### 完成内容
+
+- 扫描 MVP v0.2 spec、goal audit、user acceptance handoff、user acceptance record、blockers、goal 文档和 TODO/follow-up 标记。
+- 分类结论：当前没有未实现的本地自动可执行 MVP v0.2 Must Have 产品能力；自动可执行缺口是验收/goal 状态治理一致性。
+- 将 `docs/goals/codex-goal.md` 状态从“已完成，真实项目用户验收已通过”修正为“自动证据已准备好请求用户验收，等待用户最终验收结论”，与当前 `docs/acceptance/user-acceptance-record.md` 和 `pnpm goal:audit` 的人工验收边界保持一致。
+- 刷新 `docs/acceptance/acceptance-run.md`、`docs/acceptance/goal-completion-audit.md`、`docs/acceptance/user-acceptance-handoff.md` 和 `docs/logs/spike-results.md`。
+- 新增结构测试，防止后续在用户验收记录未 accepted 时把长期 goal 文档标成完成，并约束 handoff 自动证据数不能落后于当前 goal audit。
+
+### 剩余任务分类
+
+| 类型 | 任务 | 状态 |
+| --- | --- | --- |
+| Must / 自动可执行 | 验收状态文档一致性、handoff 刷新、acceptance-run freshness、goal audit freshness | 已完成 |
+| Must / 人工或外部条件 | 用户对真实项目验收给出 `accepted` 或 `changes_requested` 结论 | 未完成；不能由自动脚本替代 |
+| Must / 外部权限 | GitHub private repo branch protection / rulesets | 被 GitHub plan 权限阻塞，已记录在 `docs/logs/blockers.md` |
+| Should / 后续产品增强 | 更多 Security Assurance provider 格式、SARIF 兼容、provider coverage audit | v0.2 之后 |
+| Could / 后续商业化 | public release、客户访谈、商业推广、团队模式 | v0.2 之后 |
+
+### 验证
+
+- Red：`pnpm vitest run tests/unit/project-structure.test.ts --testNamePattern "MVP closure documents"` 因 handoff 仍显示 30 项自动证据通过而失败。
+- Green：刷新 handoff 并修正 goal 状态后，同一 focused test 通过。
+- `pnpm acceptance -- --full --browser`：首次运行因新测试对 acceptance 中间态过度严格而失败；将断言修正为 handoff 自动证据数不得低于当前 goal audit 自动通过数后复跑通过，17/17 检查通过。
+- `pnpm goal:audit`：通过，33 项检查、32 项已通过、0 missing、1 项需要人工确认。
+- `pnpm user:handoff`：通过，自动证据通过 32、自动证据缺失 0、需要人工确认 1。
+- `pnpm repo:hygiene`：通过。
+- `pnpm build`：通过。
+- `pnpm typecheck`：通过。
+- `pnpm lint`：通过。
+- `pnpm test:unit`：通过，34 个测试文件、525 个测试。
+- 最终复跑 `pnpm goal:audit`：通过，33 项检查、32 项已通过、0 missing、1 项需要人工确认。
+
+### 阻塞
+
+- 无新增产品阻塞。剩余 `用户确认 MVP 符合预期` 是既有人工验收边界；GitHub branch protection 仍受 private repo plan 权限限制。
+
 ## 2026年6月23日 - Security Assurance Lane Phase 1 Local Import
 
 ### 完成内容

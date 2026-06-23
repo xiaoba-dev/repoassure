@@ -2116,11 +2116,19 @@ describe('project structure', () => {
 
     expect(Number.isFinite(automaticPassed)).toBe(true);
     expect(Number.isFinite(handoffAutomaticPassed)).toBe(true);
+    const hasAcceptedUserDecision = userAcceptanceRecord.includes('| 用户结论 | 用户确认通过 |');
+
     expect(handoffAutomaticPassed).toBeGreaterThanOrEqual(automaticPassed);
     expect(handoff).toContain('| 自动证据缺失 | 0 |');
-    expect(handoff).toContain('| 需要人工确认 | 1 |');
 
-    if (!userAcceptanceRecord.includes('| 用户结论 | 用户确认通过 |')) {
+    if (hasAcceptedUserDecision) {
+      expect(goalAudit).toContain('| 需要人工确认 | 0 |');
+      expect(handoff).toContain('| 需要人工确认 | 0 |');
+      expect(handoff).toContain('| 总体状态 | 已完成 |');
+      expect(codexGoal).toContain('状态：已完成，真实项目用户验收已通过');
+    } else {
+      expect(goalAudit).toContain('| 需要人工确认 | 1 |');
+      expect(handoff).toContain('| 需要人工确认 | 1 |');
       expect(codexGoal).not.toContain('状态：已完成');
       expect(codexGoal).not.toContain('真实项目用户验收已通过');
       expect(codexGoal).toContain('状态：自动证据已准备好请求用户验收，等待用户最终验收结论');

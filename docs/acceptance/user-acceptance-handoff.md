@@ -1,22 +1,22 @@
 # 用户验收交接包
 
-生成时间：2026-06-23T15:51:22.350Z
+生成时间：2026-06-23T23:02:21.518Z
 
 ## 当前状态
 
 | 项目 | 结果 |
 | --- | --- |
-| 总体状态 | 已准备好请求用户验收 |
-| 自动证据通过 | 32 |
+| 总体状态 | 已完成 |
+| 自动证据通过 | 33 |
 | 自动证据缺失 | 0 |
-| 需要人工确认 | 1 |
+| 需要人工确认 | 0 |
 | 验收模式 | browser |
 | 目标完成度审计 | `docs/acceptance/goal-completion-audit.md` |
 | 真实项目验收记录 | `docs/acceptance/user-acceptance-record.md` |
 | 用户验收指南 | `docs/acceptance/guides/user-acceptance-guide.md` |
 | 用户验收清单 | `docs/acceptance/checklists/acceptance-checklist-v0.1.md` |
 
-当前结论：自动证据已齐，仍需用户验收结论。
+当前结论：自动证据和用户验收结论均已具备，可以进入 goal 完成审计。
 
 ## 自动质量门禁
 
@@ -42,7 +42,7 @@
 
 | 要求 | 状态 | 证据 | 下一步 |
 | --- | --- | --- | --- |
-| 用户确认 MVP 符合预期 | 需要人工确认 | docs/goals/codex-goal.md Success Definition requires user confirmation or explicit remaining changes | 等待用户提供真实 Web App repo 或人工验收结论；不能由自动脚本代替。 |
+| 用户确认 MVP 符合预期 | 已通过 | docs/acceptance/user-acceptance-record.md records a passing run and accepted user decision |  |
 
 
 ## Repo 参数行为

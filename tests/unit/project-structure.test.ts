@@ -814,13 +814,63 @@ describe('project structure', () => {
     );
   });
 
-  it('records current browser explorer package extraction evidence gates in the latest dev log entry', async () => {
+  it('records Codex Security strategy ADR cascade in the latest dev log entry', async () => {
+    const [
+      devLog,
+      adrIndex,
+      architectureOverview,
+      mvpSpec,
+      competitiveLandscape,
+      commercializationStrategy,
+      readme,
+      decisionLog,
+      codexSecurityAdr
+    ] = await Promise.all([
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('docs/adr/README.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/product/specs/mvp-spec-v0.2.md', 'utf8'),
+      readFile('docs/product/research/competitive-landscape-v0.1.md', 'utf8'),
+      readFile('docs/product/strategy/commercialization-strategy-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/adr/0013-codex-security-and-security-assurance-lane.md', 'utf8')
+    ]);
+    const latestEntryStart = devLog.indexOf('## 2026年6月23日 - Codex Security Strategy ADR');
+    const latestEntryEnd = devLog.indexOf('\n## 2026年6月23日 - Browser Explorer Package Phase 2e Extraction');
+    const latestEntry = devLog.slice(latestEntryStart, latestEntryEnd);
+
+    expect(latestEntryStart).toBe(devLog.indexOf('## '));
+    expect(latestEntryEnd).toBeGreaterThan(latestEntryStart);
+    expect(latestEntry).toContain('ADR-0013: Codex Security and Security Assurance Lane');
+    expect(latestEntry).toContain('Security Assurance Lane');
+    expect(latestEntry).toContain('provider-backed evidence lane');
+    expect(latestEntry).toContain('未修改运行时代码');
+    expect(latestEntry).toContain('pnpm repo:hygiene');
+
+    expect(adrIndex).toContain('[0013](0013-codex-security-and-security-assurance-lane.md)');
+    expect(codexSecurityAdr).toContain('RepoAssure will not position itself as a direct replacement for Codex Security');
+    expect(codexSecurityAdr).toContain('Security Provider Interface');
+    expect(codexSecurityAdr).toContain('repoassure security import --provider codex-security --scan-dir <scan-dir>');
+    expect(architectureOverview).toContain('[ADR-0013](../adr/0013-codex-security-and-security-assurance-lane.md)');
+    expect(architectureOverview).toContain('Security Assurance Lane');
+    expect(mvpSpec).toContain('ADR-0013 将 Codex Security 视为未来优先集成的 security provider');
+    expect(mvpSpec).toContain('当前 v0.2 不自研 deep vulnerability scanner');
+    expect(competitiveLandscape).toContain('Platform-native security scan');
+    expect(competitiveLandscape).toContain('Codex Security');
+    expect(competitiveLandscape).toContain('Provider-backed Security Assurance Lane');
+    expect(commercializationStrategy).toContain('Do not position the product as a direct Codex Security replacement');
+    expect(readme).toContain('ADR-0013 固化 Codex Security 影响下的 Security Assurance Lane 策略');
+    expect(decisionLog).toContain('新增 `ADR-0013: Codex Security and Security Assurance Lane`');
+  });
+
+  it('records current browser explorer package extraction evidence gates in the dev log entry', async () => {
     const devLog = await readFile('docs/logs/dev-log.md', 'utf8');
     const latestEntryStart = devLog.indexOf('## 2026年6月23日 - Browser Explorer Package Phase 2e Extraction');
     const latestEntryEnd = devLog.indexOf('\n## 2026年6月23日 - Repair Planner Package Phase 2d Extraction');
     const latestEntry = devLog.slice(latestEntryStart, latestEntryEnd);
 
-    expect(latestEntryStart).toBe(devLog.indexOf('## '));
+    expect(latestEntryStart).toBeGreaterThan(devLog.indexOf('## '));
     expect(latestEntryEnd).toBeGreaterThan(latestEntryStart);
     expect(latestEntry).toContain('@hardening-mcp/browser-explorer');
     expect(latestEntry).toContain('Phase 2e browser-explorer package');

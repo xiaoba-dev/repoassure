@@ -18,6 +18,7 @@ The adjacent market is already forming around four clusters:
 2. AI agent observability and trust platforms.
 3. Enterprise AppSec and autonomous remediation platforms.
 4. Solo-developer launch checklist tools.
+5. First-party AI security scan plugins and platform-native security workflows.
 
 The strongest naming risk is around `VibeProof`, `AgentProof`, `CodeGate`, `AgentGate`, `CodeAsure`, and `VibeCheck`. These names or close variants are already in active use.
 
@@ -30,6 +31,7 @@ RepoAssure remains the preferred brand because it avoids direct collision with t
 | Vibe app security scanning | Vibeproof | Find security issues before launch | RepoAssure covers acceptance evidence, repair handoff, and patch planning, not only security findings |
 | Agent runtime trust | AgentProof | Monitor agent behavior, drift, cost, and compliance | RepoAssure validates generated repositories and repair evidence rather than monitoring deployed agents |
 | Enterprise AI AppSec | CodeGate | Local zero-day hunting, sandbox verification, autonomous patch delivery | RepoAssure starts with local-first acceptance artifacts and AI IDE task contracts before enterprise AppSec automation |
+| Platform-native security scan | Codex Security | Threat modeling, vulnerability discovery, validation, attack-path analysis, reports, and finding tracking inside Codex | RepoAssure treats Codex Security as a provider for a future Security Assurance Lane and keeps its core value in repo readiness, acceptance evidence, repair handoff, and agent-ready improvement packages |
 | Agent API control | AgentGate | Human approval gateway for agent API writes | RepoAssure governs repository delivery quality, not live API access control |
 | Launch checklist | VibeCheck.software | Structured local checklist for vibe-coded launches | RepoAssure produces machine-readable artifacts and verification plans, not only manual checklists |
 | Commit-message tooling | rshdhere/vibecheck | AI-generated git commit messages | Not functionally competitive, but creates search and naming collision risk around `vibecheck` |
@@ -116,6 +118,25 @@ Implication:
 - Do not use `CodeGate`.
 - CodeGate is the closest enterprise AppSec future-state competitor.
 - RepoAssure should emphasize acceptance artifacts and AI IDE repair contracts before moving into autonomous security remediation.
+
+### Codex Security
+
+Source: Codex Security plugin capabilities observed in the local Codex environment; public reporting around OpenAI's Codex Security / Aardvark security scanner.
+
+Observed positioning:
+
+- First-party Codex security workflow.
+- Repository-wide or scoped security scans.
+- Phase model includes threat model, finding discovery, validation, attack-path analysis, final report, and finding tracking.
+- Deep scan mode repeats discovery with multiple workers and then centralizes validation and attack-path analysis.
+- Tracking workflow can create or reuse Linear, Jira, GitHub issues, or GitHub security advisories after preview and approval.
+
+Implication:
+
+- Codex Security validates that security assurance for AI-generated code is a real platform category.
+- RepoAssure should not position itself as a generic deep vulnerability scanner or "better Codex Security".
+- RepoAssure should define Security Assurance Lane as a provider-backed evidence lane, with Codex Security as a preferred provider integration rather than the only supported engine.
+- Security findings should become normalized RepoAssure artifacts and repair planning inputs alongside browser, CLI, architecture, and test evidence.
 
 ### AgentGate
 
@@ -215,6 +236,7 @@ Core differentiation:
 - Machine-readable outputs for AI IDEs and agents.
 - Repair plan, repair task package, repair handoff package, execution report, and patch plan.
 - Browser and Python/CLI acceptance modes.
+- Provider-backed Security Assurance Lane rather than direct competition with Codex Security or enterprise AppSec scanners.
 - Future compatibility with Team Cloud and Enterprise/on-prem packaging without weakening local execution.
 
 ## Watchlist
@@ -222,6 +244,7 @@ Core differentiation:
 - Monitor Vibeproof for movement from security scanner into repo acceptance or repair task packaging.
 - Monitor CodeGate for open-core or developer-tool releases that overlap with local-first enterprise hardening.
 - Monitor AgentProof for movement from runtime observability into pre-deployment repo certification.
+- Monitor Codex Security for output format, provider access, finding tracking, and security scan artifact contracts that should feed RepoAssure's Security Assurance Lane.
 - Re-check `RepoAssure` availability before public release, domain purchase, package publication, or trademark filing.
 
 ## Sources
@@ -235,3 +258,4 @@ Core differentiation:
 - `https://codeasure.com/`
 - `https://vibecheck.software/`
 - `https://github.com/rshdhere/vibecheck`
+- Codex Security plugin capability notes from the local Codex environment

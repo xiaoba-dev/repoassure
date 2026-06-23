@@ -18,6 +18,7 @@ ADR records long-lived architecture decisions. Use `docs/logs/decision-log.md` f
 | [0010](0010-repoassure-brand-positioning.md) | Accepted | RepoAssure brand positioning |
 | [0011](0011-private-github-engineering-baseline.md) | Accepted | Private GitHub engineering baseline |
 | [0012](0012-branch-protection-and-release-boundary.md) | Accepted | Branch protection and release boundary |
+| [0013](0013-codex-security-and-security-assurance-lane.md) | Accepted | Codex Security and Security Assurance Lane |
 
 ## Template
 

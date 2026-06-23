@@ -49,6 +49,7 @@ flowchart LR
 | [ADR-0004](../adr/0004-repair-plan-and-task-package.md) | Repair plan and executable task package | `repair-plan.json`、`repair-plan.md`、`repair-task-package.json`、`repair-task-package.md`、repair handoff、repair execution 和 patch plan 物料链路 |
 | [ADR-0011](../adr/0011-private-github-engineering-baseline.md) | Private GitHub engineering baseline | `.github/workflows/ci.yml`、PR/issue templates、`pnpm repo:hygiene` 和 private pre-release merge boundary |
 | [ADR-0012](../adr/0012-branch-protection-and-release-boundary.md) | Branch protection and release boundary | `docs/operations/branch-protection-release-boundary-v0.1.md`、public release checklist、PR release boundary confirmation 和 GitHub plan blocker |
+| [ADR-0013](../adr/0013-codex-security-and-security-assurance-lane.md) | Codex Security and Security Assurance Lane | Future provider-backed security evidence import, security finding provenance, and repair-plan integration without repositioning RepoAssure as a generic vulnerability scanner |
 
 ## Artifact 布局
 
@@ -159,6 +160,7 @@ flowchart TB
 | Repair Planner | `@hardening-mcp/repair-planner` / `packages/repair-planner/` | repair plan 与 executable repair task package 实现；`src/domain/repair-plan/`、`dist/domain/repair-plan/` 和 `src/types/repair-plan.ts` / `dist/types/repair-plan.*` 保留兼容 wrapper/output |
 | Browser Explorer | `@hardening-mcp/browser-explorer` / `packages/browser-explorer/` | fetch route exploration、Playwright browser exploration、安全交互、截图和 trace evidence 实现；`src/domain/explore/` 与 `dist/domain/explore/` 保留兼容 wrapper/output |
 | Shared | `@hardening-mcp/shared` / `packages/shared/` | 脱敏、shell quoting、shell word parsing 等共享 helper；`src/shared/` 与 `dist/shared/` 保留兼容 wrapper/output |
+| Security Assurance Lane | Future `packages/security-assurance/` or provider adapters | 按 ADR-0013 作为 provider-backed evidence lane；Codex Security、CodeQL、Semgrep、Gitleaks、OSV 等输出应被导入和规范化为 RepoAssure artifact / repair planning 输入，而不是替代当前 acceptance workflow |
 | Internal | `src/internal/` | acceptance、goal audit、benchmark 等项目治理工具 |
 | Shared Types | `src/types/` | findings、repair plan 等共享契约 |
 | Benchmark | `src/internal/benchmark/`、`scripts/run-benchmark.mjs` | benchmark 汇总与 `docs/logs/spike-results.md` 生成 |

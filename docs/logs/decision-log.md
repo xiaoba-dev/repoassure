@@ -1,5 +1,23 @@
 # 决策日志
 
+## 2026年6月23日 - Codex Security 与 Security Assurance Lane
+
+### 决策
+
+新增 `ADR-0013: Codex Security and Security Assurance Lane`。RepoAssure 不把自身定位为 Codex Security 的直接替代品或通用 deep vulnerability scanner；安全能力作为 future provider-backed `Security Assurance Lane` 接入，Codex Security 是优先集成 provider，但不是唯一依赖。
+
+### 原因
+
+- Codex Security 会把 AI security scan 能力平台化，直接竞争安全扫描本身会削弱 RepoAssure 的差异化。
+- RepoAssure 的核心价值在 repo readiness、acceptance evidence、repair task package、agent handoff 和 artifact normalization。
+- 用户未来仍会需要把安全发现纳入交付验收和修复闭环，因此需要 provider interface，而不是忽略安全扫描生态。
+
+### 影响
+
+- 新增 ADR-0013，并级联更新 ADR 索引、架构概览、MVP v0.2、竞品调研、商业化策略和 README。
+- 后续实现应优先考虑 `security import --provider codex-security --scan-dir <scan-dir>` 这类导入能力。
+- 当前不启动自研 deep vulnerability scanner，也不改变 v0.2 已实现范围。
+
 ## 2026年6月23日 - browser-explorer package 抽取
 
 ### 决策

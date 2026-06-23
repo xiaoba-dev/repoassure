@@ -1,5 +1,24 @@
 # 开发日志
 
+## 2026年6月23日 - Codex Security Strategy ADR
+
+### 完成内容
+
+- 新增 `ADR-0013: Codex Security and Security Assurance Lane`，明确 RepoAssure 不与 Codex Security 正面竞争为通用安全扫描器。
+- 将 Security Assurance Lane 定义为 future provider-backed evidence lane；Codex Security 是优先 provider，但不是唯一依赖。
+- 级联更新 ADR 索引、架构概览、MVP v0.2、竞品调研、商业化策略、README 和 decision log。
+- 明确当前 v0.2 仍聚焦 acceptance、repair plan、repair handoff、repair execution 和 patch plan，不启动自研 deep vulnerability scanner。
+
+### 验证
+
+- 文档-only 决策变更；未修改运行时代码。
+- `pnpm vitest run tests/unit/project-structure.test.ts`：通过，1 个测试文件、54 个测试。
+- `pnpm repo:hygiene`：通过。
+
+### 阻塞
+
+- 无新增产品阻塞。
+
 ## 2026年6月23日 - Browser Explorer Package Phase 2e Extraction
 
 ### 完成内容

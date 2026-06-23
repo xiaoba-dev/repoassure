@@ -14,6 +14,8 @@ RepoAssure is the AI code quality and delivery assurance layer between AI IDEs, 
 
 Implementation note: `hardening-mcp` remains the current internal package and CLI/MCP implementation name until a separate rename migration is accepted.
 
+Security positioning note: ADR-0013 defines Codex Security and similar scanners as future security evidence providers for RepoAssure, not as products RepoAssure should directly imitate. RepoAssure should commercialize the broader repo readiness, evidence, and repair workflow.
+
 Primary message:
 
 > You used AI to generate the code. Now prove it is ready to ship.
@@ -27,7 +29,7 @@ The product should integrate with Cursor, Codex, Claude Code, GitHub Copilot, an
 | Individual AI builders | AI-generated repos are fast to create but hard to trust | Open-core CLI, MCP, local reports, repair plans, patch plans |
 | AI delivery teams | Client delivery needs objective acceptance evidence | Standardized reports, repair handoff packages, verification plans |
 | Small engineering teams | Multiple AI-assisted repos need repeatable quality gates | Hosted report history, collaboration, PR gate integration |
-| Enterprise and regulated teams | AI coding needs governance, retention, policy, and auditability | Private deployment, SSO/RBAC, audit retention, policy center |
+| Enterprise and regulated teams | AI coding needs governance, retention, policy, security evidence, and auditability | Private deployment, SSO/RBAC, audit retention, policy center, pluggable security provider imports |
 
 ## Commercial Stages
 
@@ -44,10 +46,12 @@ The product should integrate with Cursor, Codex, Claude Code, GitHub Copilot, an
 - Package MCP and GitHub Action entrypoints as the first distribution channels after CLI stability.
 - Build public examples around before/after repair evidence rather than abstract AI testing claims.
 - Keep competitor positioning anchored by `docs/product/research/competitive-landscape-v0.1.md`, especially around Vibeproof, AgentProof, CodeGate, AgentGate, CodeAsure, and VibeCheck.
+- Treat Codex Security as an ecosystem tailwind: show how RepoAssure can ingest security findings into acceptance evidence, repair plans, and agent handoff rather than competing as another isolated scanner.
 
 ## Non-Goals
 
 - Do not position the product as an AI IDE replacement.
+- Do not position the product as a direct Codex Security replacement or generic deep vulnerability scanner.
 - Do not move open-core execution to cloud-only workflows.
 - Do not publish the repository or package until the public release checklist is complete.
 

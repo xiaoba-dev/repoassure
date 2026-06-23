@@ -86,6 +86,7 @@ export function buildProcessGovernanceGoalAuditItems(
     buildAcceptancePackageTypedModuleExportsGoalAuditItem(sources),
     buildSharedPackageTypedModuleExportsGoalAuditItem(sources),
     buildRepairPlannerPackageTypedModuleExportsGoalAuditItem(sources),
+    buildBrowserExplorerPackageTypedModuleExportsGoalAuditItem(sources),
     buildLegacyAcceptanceDistOutputGoalAuditItem(sources)
   ];
 }
@@ -209,6 +210,82 @@ function buildRepairPlannerPackageTypedModuleExportsGoalAuditItem(
       ? { nextAction: '补齐 root workspace dependency、packages/repair-planner typed exports 和 repair planner legacy wrappers 后重新运行 goal audit。' }
       : {})
   };
+}
+
+function buildBrowserExplorerPackageTypedModuleExportsGoalAuditItem(
+  sources: Partial<GoalAuditTextSources>
+): GoalAuditItem {
+  const rootPackageJson = sources.packageJson ?? '';
+  const browserExplorerPackageJson = sources.browserExplorerPackageJson ?? '';
+  const missingMarkers = [
+    ...findMissingMarkers(rootPackageJson, ['"@hardening-mcp/browser-explorer": "workspace:*"']),
+    ...findMissingBrowserExplorerTypedPackageExportMarkers(browserExplorerPackageJson),
+    ...findMissingBrowserExplorerLegacyWrapperMarkers(sources)
+  ];
+
+  return {
+    category: '架构迁移',
+    requirement: 'Browser explorer package typed module exports and legacy wrappers',
+    status: missingMarkers.length === 0 ? 'passed' : 'missing',
+    evidence: missingMarkers.length === 0
+      ? ['root package depends on @hardening-mcp/browser-explorer workspace package; packages/browser-explorer exports typed root, compatibility, explore-app, and playwright-driver subpaths; src/domain/explore/*.ts delegates to packages/browser-explorer/dist compatibility wrappers']
+      : [`missing browser explorer package markers: ${missingMarkers.join(', ')}`],
+    ...(missingMarkers.length > 0
+      ? { nextAction: '补齐 root workspace dependency、packages/browser-explorer typed exports 和 browser explorer legacy wrappers 后重新运行 goal audit。' }
+      : {})
+  };
+}
+
+function findMissingBrowserExplorerTypedPackageExportMarkers(packageJsonText: string): string[] {
+  const packageJson = parsePackageJson(packageJsonText);
+  const exports = packageJson?.exports;
+
+  if (!exports || typeof exports !== 'object' || Array.isArray(exports)) {
+    return ['browser explorer exports object'];
+  }
+
+  const expectedExports = [
+    { exportPath: '.', types: './dist/index.d.ts', default: './dist/index.js' },
+    { exportPath: './compatibility', types: './dist/compatibility.d.ts', default: './dist/compatibility.js' },
+    { exportPath: './explore-app', types: './dist/explore-app.d.ts', default: './dist/explore-app.js' },
+    { exportPath: './playwright-driver', types: './dist/playwright-driver.d.ts', default: './dist/playwright-driver.js' }
+  ] as const;
+  const expectedExportPaths = new Set<string>(expectedExports.map(({ exportPath }) => exportPath));
+  const unexpectedExportMarkers = Object.keys(exports)
+    .filter((exportPath) => !expectedExportPaths.has(exportPath))
+    .sort()
+    .map((exportPath) => `unexpected browser explorer export ${exportPath}`);
+  const missingExpectedExportMarkers = expectedExports.flatMap(({ exportPath, types, default: defaultPath }) => {
+    const value = (exports as Record<string, unknown>)[exportPath];
+
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return [exportPath];
+    }
+
+    const typedExport = value as { types?: unknown; default?: unknown };
+    const missing: string[] = [];
+
+    if (typedExport.types !== types) {
+      missing.push(`${exportPath} types ${types}`);
+    }
+
+    if (typedExport.default !== defaultPath) {
+      missing.push(`${exportPath} default ${defaultPath}`);
+    }
+
+    return missing;
+  });
+
+  return [...unexpectedExportMarkers, ...missingExpectedExportMarkers];
+}
+
+function findMissingBrowserExplorerLegacyWrapperMarkers(sources: Partial<GoalAuditTextSources>): string[] {
+  return [
+    { label: 'legacy browser explorer explore-app wrapper', sourceText: sources.legacyBrowserExplorerExploreApp },
+    { label: 'legacy browser explorer playwright-driver wrapper', sourceText: sources.legacyBrowserExplorerPlaywrightDriver }
+  ]
+    .filter(({ sourceText }) => typeof sourceText !== 'string' || !sourceText.includes('packages/browser-explorer/dist'))
+    .map(({ label }) => label);
 }
 
 function findMissingPackageDistOutputMarkers(sources: Partial<GoalAuditTextSources>): string[] {

@@ -1,5 +1,23 @@
 # 决策日志
 
+## 2026年6月23日 - browser-explorer package 抽取
+
+### 决策
+
+执行 Phase 2e browser-explorer package 抽取：`packages/browser-explorer/src` 成为 fetch route exploration、Playwright browser exploration、安全交互、截图和 trace evidence 的实现所有者，根 package 通过 `@hardening-mcp/browser-explorer` workspace dependency 引用该包。`src/domain/explore/*` 与 `dist/domain/explore/*` 保留为兼容 wrapper/output，不在本阶段迁移 core 或新增 exploration strategy。
+
+### 原因
+
+- browser explorer 是 RepoAssure 模拟用户操作和 Agent 操作的关键能力，长期需要独立演进。
+- explorer 当前边界清晰：上层 tool 通过 `exploreApp` 和 `createPlaywrightBrowserDriver` 消费能力，适合在 core 之前抽成 package。
+- `findings.json`、截图、trace、visited routes 和 interactions 是现有 artifact schema 的关键部分，必须先通过 TDD 锁定 package exports、legacy wrappers、dist outputs 和行为 parity。
+
+### 影响
+
+- 新增 `@hardening-mcp/browser-explorer` 包，导出 root、`compatibility`、`explore-app` 和 `playwright-driver` 子路径。
+- 根构建脚本改为先 `build:shared`，再 `build:browser-explorer`、`build:repair-planner`、`build:acceptance`，最后 `build:src`。
+- README、架构概览、monorepo spec、ADR-0006、dev log 和 goal audit 已级联写入 browser-explorer package ownership 与兼容路径边界。
+
 ## 2026年6月23日 - repair-planner package 抽取
 
 ### 决策

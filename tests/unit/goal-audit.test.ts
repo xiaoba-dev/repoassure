@@ -228,6 +228,10 @@ describe('goal audit', () => {
     });
 
     expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.packageJson).toBe('package.json');
+    expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.browserExplorerPackageJson).toBe('packages/browser-explorer/package.json');
+    expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.playwrightDriver).toBe('packages/browser-explorer/src/playwright-driver.ts');
+    expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.legacyBrowserExplorerExploreApp).toBe('src/domain/explore/explore-app.ts');
+    expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.legacyBrowserExplorerPlaywrightDriver).toBe('src/domain/explore/playwright-driver.ts');
     expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.userAcceptanceHandoff).toBe('docs/acceptance/user-acceptance-handoff.md');
     expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.userAcceptanceHandoffBuilder).toBe('packages/acceptance/src/user-acceptance-handoff.ts');
     expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.userAcceptanceHandoffRunner).toBe('packages/acceptance/src/run-user-acceptance-handoff.ts');
@@ -532,11 +536,14 @@ describe('goal audit', () => {
       acceptancePackageJson: readFileSync('packages/acceptance/package.json', 'utf8'),
       sharedPackageJson: readFileSync('packages/shared/package.json', 'utf8'),
       repairPlannerPackageJson: readFileSync('packages/repair-planner/package.json', 'utf8'),
+      browserExplorerPackageJson: readFileSync('packages/browser-explorer/package.json', 'utf8'),
       legacySharedPrivacyRedaction: 'packages/shared/dist',
       legacySharedShellQuote: 'packages/shared/dist',
       legacySharedShellWords: 'packages/shared/dist',
       legacyRepairPlanGenerator: 'packages/repair-planner/dist',
       legacyRepairPlanTypes: 'packages/repair-planner/dist',
+      legacyBrowserExplorerExploreApp: 'packages/browser-explorer/dist',
+      legacyBrowserExplorerPlaywrightDriver: 'packages/browser-explorer/dist',
       legacyAcceptanceFatalError: 'packages/acceptance/dist',
       legacyAcceptanceGoalAudit: 'packages/acceptance/dist',
       legacyAcceptanceMarkdown: 'packages/acceptance/dist',
@@ -623,6 +630,12 @@ describe('goal audit', () => {
       }),
       expect.objectContaining({
         category: '架构迁移',
+        requirement: 'Browser explorer package typed module exports and legacy wrappers',
+        status: 'passed',
+        evidence: ['root package depends on @hardening-mcp/browser-explorer workspace package; packages/browser-explorer exports typed root, compatibility, explore-app, and playwright-driver subpaths; src/domain/explore/*.ts delegates to packages/browser-explorer/dist compatibility wrappers']
+      }),
+      expect.objectContaining({
+        category: '架构迁移',
         requirement: 'Legacy acceptance dist compatibility outputs',
         status: 'passed',
         evidence: ['dist/internal/acceptance/*.js and *.d.ts compatibility outputs all delegate to packages/acceptance/dist package entrypoints; dist/internal/acceptance/*.js.map source maps are present through legacyAcceptanceDistOutputEntries.sourceMapPath and LEGACY_ACCEPTANCE_DIST_SOURCE_MAP_SOURCE_SPECS']
@@ -675,6 +688,12 @@ describe('goal audit', () => {
         requirement: 'Repair planner package typed module exports and legacy wrappers',
         status: 'missing',
         nextAction: '补齐 root workspace dependency、packages/repair-planner typed exports 和 repair planner legacy wrappers 后重新运行 goal audit。'
+      }),
+      expect.objectContaining({
+        category: '架构迁移',
+        requirement: 'Browser explorer package typed module exports and legacy wrappers',
+        status: 'missing',
+        nextAction: '补齐 root workspace dependency、packages/browser-explorer typed exports 和 browser explorer legacy wrappers 后重新运行 goal audit。'
       }),
       expect.objectContaining({
         category: '架构迁移',
@@ -925,6 +944,7 @@ describe('goal audit', () => {
         acceptancePackageJson: readFileSync('packages/acceptance/package.json', 'utf8'),
         sharedPackageJson: readFileSync('packages/shared/package.json', 'utf8'),
         repairPlannerPackageJson: readFileSync('packages/repair-planner/package.json', 'utf8'),
+        browserExplorerPackageJson: readFileSync('packages/browser-explorer/package.json', 'utf8'),
         codexGoal: `最后更新：2026年6月21日\n${sharedMarkers}`,
         toolRegistry: sharedMarkers,
         mcpServerSource: sharedMarkers,
@@ -968,6 +988,8 @@ describe('goal audit', () => {
         legacySharedShellWords: 'packages/shared/dist',
         legacyRepairPlanGenerator: 'packages/repair-planner/dist',
         legacyRepairPlanTypes: 'packages/repair-planner/dist',
+        legacyBrowserExplorerExploreApp: 'packages/browser-explorer/dist',
+        legacyBrowserExplorerPlaywrightDriver: 'packages/browser-explorer/dist',
         ...Object.fromEntries([
           ...PACKAGE_ACCEPTANCE_DIST_OUTPUT_SOURCE_SPECS,
           ...PACKAGE_ACCEPTANCE_DIST_DECLARATION_SOURCE_SPECS,
@@ -1026,7 +1048,7 @@ describe('goal audit', () => {
       userAcceptanceStatus: 'pending_or_invalid'
     });
 
-    expect(items).toHaveLength(30);
+    expect(items).toHaveLength(31);
     expect(items.map((item) => `${item.category}:${item.requirement}`)).toEqual([
       '交付物:可运行的 CLI',
       '交付物:可运行的 MCP Server',
@@ -1045,6 +1067,7 @@ describe('goal audit', () => {
       '架构迁移:Acceptance package typed module exports',
       '架构迁移:Shared package typed module exports and legacy wrappers',
       '架构迁移:Repair planner package typed module exports and legacy wrappers',
+      '架构迁移:Browser explorer package typed module exports and legacy wrappers',
       '架构迁移:Legacy acceptance dist compatibility outputs',
       'Benchmark:Benchmark 达到 Go 标准',
       '文档与日志:Required Documents 已维护',
@@ -1085,7 +1108,7 @@ describe('goal audit', () => {
       }
     });
 
-    expect(items).toHaveLength(30);
+    expect(items).toHaveLength(31);
     expect(items.at(-1)).toEqual(expect.objectContaining({
       category: '用户验收',
       requirement: '用户确认 MVP 符合预期',

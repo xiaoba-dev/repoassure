@@ -1,3 +1,4 @@
+import { exploreApp as packageExploreApp } from '../../packages/browser-explorer/src/explore-app.js';
 import { expandCriticalPathInput, exploreApp, extractLinks } from '../../src/domain/explore/explore-app.js';
 
 describe('extractLinks', () => {
@@ -17,6 +18,33 @@ describe('extractLinks', () => {
 });
 
 describe('exploreApp', () => {
+  it('keeps package-owned and legacy route exploration results aligned', async () => {
+    const pages = new Map([
+      [
+        'http://localhost:3000/',
+        {
+          status: 200,
+          body: '<html><body><a href="/settings?token=route-secret">Settings</a></body></html>'
+        }
+      ],
+      ['http://localhost:3000/settings?token=route-secret', { status: 500, body: 'server error' }]
+    ]);
+    const input = {
+      url: 'http://localhost:3000/',
+      criticalPaths: ['登录'],
+      maxRoutes: 3,
+      maxActionsPerRoute: 0,
+      fetchPage: async (url: string) => pages.get(url) ?? { status: 200, body: '<html><body>ok</body></html>' }
+    };
+
+    const legacyResult = await exploreApp(input);
+    const packageResult = await packageExploreApp(input);
+
+    expect(packageResult).toEqual(legacyResult);
+    expect(JSON.stringify(packageResult)).toContain('token=[REDACTED]');
+    expect(JSON.stringify(packageResult)).not.toContain('route-secret');
+  });
+
   it('visits routes and records broken route findings', async () => {
     const pages = new Map([
       [

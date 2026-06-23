@@ -2,14 +2,50 @@ import { mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { createPlaywrightBrowserDriver } from '../../src/domain/explore/playwright-driver.js';
+import { createPlaywrightBrowserDriver as packageCreatePlaywrightBrowserDriver } from '../../packages/browser-explorer/src/playwright-driver.js';
+import { createPlaywrightBrowserDriver as legacyCreatePlaywrightBrowserDriver } from '../../src/domain/explore/playwright-driver.js';
 
 describe('createPlaywrightBrowserDriver', () => {
+  it('keeps package-owned and legacy Playwright browser drivers aligned', async () => {
+    const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-parity-'));
+    const legacyPage = new FakePage();
+    const packagePage = new FakePage();
+    const legacyBrowser = new FakeBrowser(legacyPage);
+    const packageBrowser = new FakeBrowser(packagePage);
+    const legacyDriver = await legacyCreatePlaywrightBrowserDriver({
+      launcher: {
+        launch: async () => legacyBrowser
+      }
+    });
+    const packageDriver = await packageCreatePlaywrightBrowserDriver({
+      launcher: {
+        launch: async () => packageBrowser
+      }
+    });
+
+    const legacySnapshot = await legacyDriver.snapshot('http://localhost:3000/', {
+      artifactsDir,
+      maxActionsPerRoute: 0
+    });
+    const packageSnapshot = await packageDriver.snapshot('http://localhost:3000/', {
+      artifactsDir,
+      maxActionsPerRoute: 0
+    });
+    await legacyDriver.close();
+    await packageDriver.close();
+
+    expect(packageSnapshot).toEqual(legacySnapshot);
+    expect(legacyPage.closed).toBe(true);
+    expect(packagePage.closed).toBe(true);
+    expect(legacyBrowser.closed).toBe(true);
+    expect(packageBrowser.closed).toBe(true);
+  });
+
   it('captures page runtime signals and screenshot artifacts', async () => {
     const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-artifacts-'));
     const page = new FakePage();
     const browser = new FakeBrowser(page);
-    const driver = await createPlaywrightBrowserDriver({
+    const driver = await legacyCreatePlaywrightBrowserDriver({
       launcher: {
         launch: async () => browser
       }
@@ -43,7 +79,7 @@ describe('createPlaywrightBrowserDriver', () => {
     const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-storage-state-'));
     const page = new FakePage();
     const browser = new FakeBrowser(page);
-    const driver = await createPlaywrightBrowserDriver({
+    const driver = await legacyCreatePlaywrightBrowserDriver({
       launcher: {
         launch: async () => browser
       },
@@ -66,7 +102,7 @@ describe('createPlaywrightBrowserDriver', () => {
     const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-trace-'));
     const page = new FakePage();
     const browser = new FakeBrowser(page);
-    const driver = await createPlaywrightBrowserDriver({
+    const driver = await legacyCreatePlaywrightBrowserDriver({
       launcher: {
         launch: async () => browser
       },
@@ -103,7 +139,7 @@ describe('createPlaywrightBrowserDriver', () => {
         }
       ]
     });
-    const driver = await createPlaywrightBrowserDriver({
+    const driver = await legacyCreatePlaywrightBrowserDriver({
       launcher: {
         launch: async () => new FakeBrowser(page)
       }
@@ -142,7 +178,7 @@ describe('createPlaywrightBrowserDriver', () => {
         'button:nth-of-type(1)': 'TimeoutError: page.click: element is not visible'
       }
     });
-    const driver = await createPlaywrightBrowserDriver({
+    const driver = await legacyCreatePlaywrightBrowserDriver({
       launcher: {
         launch: async () => new FakeBrowser(page)
       }
@@ -182,7 +218,7 @@ describe('createPlaywrightBrowserDriver', () => {
         '[data-testid="btc-unit"]': ['aria-pressed=false', 'aria-pressed=true']
       }
     });
-    const driver = await createPlaywrightBrowserDriver({
+    const driver = await legacyCreatePlaywrightBrowserDriver({
       launcher: {
         launch: async () => new FakeBrowser(page)
       }
@@ -214,7 +250,7 @@ describe('createPlaywrightBrowserDriver', () => {
       ],
       downloadSelectors: new Set(['[data-testid="export"]'])
     });
-    const driver = await createPlaywrightBrowserDriver({
+    const driver = await legacyCreatePlaywrightBrowserDriver({
       launcher: {
         launch: async () => new FakeBrowser(page)
       }
@@ -246,7 +282,7 @@ describe('createPlaywrightBrowserDriver', () => {
         }
       ]
     });
-    const driver = await createPlaywrightBrowserDriver({
+    const driver = await legacyCreatePlaywrightBrowserDriver({
       launcher: {
         launch: async () => new FakeBrowser(page)
       }
@@ -279,7 +315,7 @@ describe('createPlaywrightBrowserDriver', () => {
         })
       ]
     });
-    const driver = await createPlaywrightBrowserDriver({
+    const driver = await legacyCreatePlaywrightBrowserDriver({
       launcher: {
         launch: async () => new FakeBrowser(page)
       }
@@ -312,7 +348,7 @@ describe('createPlaywrightBrowserDriver', () => {
         }
       ]
     });
-    const driver = await createPlaywrightBrowserDriver({
+    const driver = await legacyCreatePlaywrightBrowserDriver({
       launcher: {
         launch: async () => new FakeBrowser(page)
       }
@@ -361,7 +397,7 @@ describe('createPlaywrightBrowserDriver', () => {
         }
       ]
     });
-    const driver = await createPlaywrightBrowserDriver({
+    const driver = await legacyCreatePlaywrightBrowserDriver({
       launcher: {
         launch: async () => new FakeBrowser(page)
       }
@@ -402,7 +438,7 @@ describe('createPlaywrightBrowserDriver', () => {
         }
       ]
     });
-    const driver = await createPlaywrightBrowserDriver({
+    const driver = await legacyCreatePlaywrightBrowserDriver({
       launcher: {
         launch: async () => new FakeBrowser(page)
       }
@@ -454,7 +490,7 @@ describe('createPlaywrightBrowserDriver', () => {
         }
       ]
     });
-    const driver = await createPlaywrightBrowserDriver({
+    const driver = await legacyCreatePlaywrightBrowserDriver({
       launcher: {
         launch: async () => new FakeBrowser(page)
       }
@@ -506,7 +542,7 @@ describe('createPlaywrightBrowserDriver', () => {
         }
       ]
     });
-    const driver = await createPlaywrightBrowserDriver({
+    const driver = await legacyCreatePlaywrightBrowserDriver({
       launcher: {
         launch: async () => new FakeBrowser(page)
       }

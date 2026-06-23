@@ -9,7 +9,7 @@ Move `hardening-mcp` toward a monorepo that separates runnable apps, reusable pa
 
 ## Current State
 
-The current implementation is a phased monorepo workspace: CLI/MCP runtime entrypoints still preserve the root package compatibility bins, while `packages/acceptance` now owns the acceptance implementation modules, runner entrypoints, goal audit, and user acceptance handoff, `packages/shared/src` owns shared utility implementation modules, and `packages/repair-planner/src` owns repair plan and executable repair task package implementation modules. The legacy `src/internal/acceptance/*`, `dist/internal/acceptance/*`, `src/shared/*`, `dist/shared/*`, `src/domain/repair-plan/*`, `dist/domain/repair-plan/*`, `src/types/repair-plan.ts`, and `dist/types/repair-plan.*` paths remain compatibility wrapper/output surfaces during the migration window.
+The current implementation is a phased monorepo workspace: CLI/MCP runtime entrypoints still preserve the root package compatibility bins, while `packages/acceptance` now owns the acceptance implementation modules, runner entrypoints, goal audit, and user acceptance handoff, `packages/shared/src` owns shared utility implementation modules, `packages/browser-explorer/src` owns browser and route exploration implementation modules, and `packages/repair-planner/src` owns repair plan and executable repair task package implementation modules. The legacy `src/internal/acceptance/*`, `dist/internal/acceptance/*`, `src/shared/*`, `dist/shared/*`, `src/domain/explore/*`, `dist/domain/explore/*`, `src/domain/repair-plan/*`, `dist/domain/repair-plan/*`, `src/types/repair-plan.ts`, and `dist/types/repair-plan.*` paths remain compatibility wrapper/output surfaces during the migration window.
 
 ```text
 apps/
@@ -30,7 +30,7 @@ artifacts/
 fixtures/
 ```
 
-Remaining runtime code still has useful internal boundaries, but core orchestration, browser exploration, and app entrypoint implementation are still coupled through the root package during the compatibility window.
+Remaining runtime code still has useful internal boundaries, but core orchestration and app entrypoint implementation are still coupled through the root package during the compatibility window.
 
 ## Target Shape
 
@@ -69,7 +69,7 @@ examples/
 | CLI entrypoint | User-facing command-line app | `src/adapters/cli` | `apps/cli` |
 | MCP entrypoint | stdio MCP server and registry | `src/adapters/mcp` | `apps/mcp-server` |
 | Core orchestration | hardening flow and tool contracts | `src/tools`, selected `src/domain/*` | `packages/core` |
-| Browser explorer | Playwright/fetch exploration and interaction model | `src/domain/explore` | `packages/browser-explorer` |
+| Browser explorer | Playwright/fetch exploration and interaction model | `src/domain/explore` compatibility wrappers | `packages/browser-explorer` |
 | Repair planner | repair plan and repair task package generation | `src/domain/repair-plan`, `src/types/repair-plan.ts` compatibility wrappers | `packages/repair-planner` |
 | Acceptance | acceptance, user acceptance, and goal audit | `src/internal/acceptance` | `packages/acceptance` |
 | Benchmark | benchmark runner and spike report generation | `src/internal/benchmark`, `scripts/run-benchmark.mjs` | Deferred separate package decision |
@@ -114,11 +114,10 @@ Implementation note: during the compatibility window, `apps/cli/index.js` and `a
 
 ### Phase 2: Package Boundary Split
 
-Phase 2 status: acceptance package pilot, Phase 2c shared package extraction, and Phase 2d repair-planner package extraction implemented; broader package extraction remains deferred.
+Phase 2 status: acceptance package pilot, Phase 2c shared package extraction, Phase 2d repair-planner package extraction, and Phase 2e browser-explorer package extraction implemented; broader package extraction remains deferred.
 
 - Extract `packages/acceptance` first as the Phase 2 implementation-owner pilot.
 - Extract `packages/shared` after `dist/shared/*` compatibility preservation is tested.
-- Extract `packages/browser-explorer` next.
 - Extract `packages/core` only after CLI/MCP import boundaries are stable.
 - Keep public APIs narrow and typed.
 
@@ -133,13 +132,17 @@ Current decision:
 - `src/domain/repair-plan/*` remains as compatibility wrappers over `packages/repair-planner/dist/*`.
 - `src/types/repair-plan.ts` remains as a compatibility wrapper over `packages/repair-planner/dist/repair-plan.js`.
 - `dist/domain/repair-plan/*` and `dist/types/repair-plan.*` remain as compatibility output wrappers over `packages/repair-planner/dist/*`.
+- Phase 2e browser-explorer package status: implemented with compatibility wrappers.
+- `packages/browser-explorer/src` owns browser and route exploration implementation modules.
+- `src/domain/explore/*` remains as compatibility wrappers over `packages/browser-explorer/dist/*`.
+- `dist/domain/explore/*` remains as compatibility output wrappers over `packages/browser-explorer/dist/*`.
 - Follow [ADR-0006: Package Build Strategy](../../adr/0006-package-build-strategy.md) before moving implementation files into `packages/*/src`.
 - Extract `packages/acceptance` first as the Phase 2 pilot because its boundary is narrower than `core` and less coupled than `shared`.
 - Shared extraction follows the package build strategy: package sources compile first, legacy wrappers preserve existing relative imports in `src/domain`, `src/tools`, `src/adapters`, and `src/internal`, and generated `dist/shared/*` outputs remain available.
 - Phase 2 acceptance package pilot status: implemented as package-owned runner entrypoints with compatibility outputs.
 - `packages/acceptance` now owns implementation modules and runner entrypoints for `acceptance`, `goal:audit`, `user:accept`, and `user:handoff`, while `src/internal/acceptance/*` remains a compatibility wrapper surface and `dist/internal/acceptance/*` remains a compatibility output surface.
 - Package acceptance wrapper resolution now points at `packages/acceptance/dist/*`; legacy `dist/internal/acceptance/*` remains a compatibility output surface, not the package execution target, and `.js` runtime wrappers, `.d.ts` declaration re-exports, and `.js.map` source maps are checked by goal audit.
-- Package build order is package-first for the acceptance, shared, and repair-planner packages: `pnpm build` runs `build:shared`, `build:repair-planner`, `build:acceptance`, then `build:src`, and `pnpm typecheck` builds package declarations before checking root `src`.
+- Package build order is package-first for the acceptance, shared, browser-explorer, and repair-planner packages: `pnpm build` runs `build:shared`, `build:browser-explorer`, `build:repair-planner`, `build:acceptance`, then `build:src`, and `pnpm typecheck` builds package declarations before checking root `src`.
 - Legacy acceptance markdown helpers now re-export `packages/acceptance/dist/markdown.js`, proving selected `src/internal/acceptance/*` paths can become compatibility wrappers rather than duplicate implementations.
 - Legacy acceptance fatal error formatting now re-exports `packages/acceptance/dist/fatal-error.js`, keeping redacted fatal errors package-owned while preserving the old source path.
 - Legacy repo preflight helpers now re-export `packages/acceptance/dist/repo-preflight.js`, keeping repo root and `package.json` manifest checks package-owned while preserving the old source path.
@@ -163,6 +166,8 @@ Current decision:
 - `sharedPackageExportEntries`, `sharedPackageDistOutputEntries`, `sharedPackageSourceEntries`, `legacySharedDistOutputEntries`, and `legacySharedWrapperSourceEntries` govern the exact shared package export surface, package dist outputs, package source files, legacy dist outputs, and legacy source wrappers.
 - The root package depends on `@hardening-mcp/repair-planner` via `workspace:*`; the package exports root, `compatibility`, `generate-repair-plan`, and `repair-plan` subpaths with both `types` and `default` entries.
 - `repairPlannerPackageExportEntries`, `repairPlannerPackageDistOutputEntries`, `repairPlannerPackageSourceEntries`, `legacyRepairPlannerDistOutputEntries`, and `legacyRepairPlannerWrapperSourceEntries` govern the exact repair-planner package export surface, package dist outputs, package source files, legacy dist outputs, and legacy source wrappers.
+- The root package depends on `@hardening-mcp/browser-explorer` via `workspace:*`; the package exports root, `compatibility`, `explore-app`, and `playwright-driver` subpaths with both `types` and `default` entries.
+- `browserExplorerPackageExportEntries`, `browserExplorerPackageDistOutputEntries`, `browserExplorerPackageSourceEntries`, `legacyBrowserExplorerDistOutputEntries`, and `legacyBrowserExplorerWrapperSourceEntries` govern the exact browser-explorer package export surface, package dist outputs, package source files, legacy dist outputs, and legacy source wrappers.
 - Goal audit treats the acceptance package exports as an exact package export surface derived from `acceptancePackageExportEntries`; missing, mismatched, or unexpected `packages/acceptance/package.json` exports fail the architecture migration evidence.
 - `acceptancePackageDistOutputEntries` is derived from `acceptancePackageExportEntries`, so package dist `.js`, `.d.ts`, and `.js.map` structure tests, runtime smoke checks, and package type-resolution checks share the same package export contract.
 - `acceptancePackageDistOutputEntries` and `legacyAcceptanceDistOutputEntries` include `.js.map` source map paths through `sourceMapPath`, so generated package and legacy compatibility source maps are governed by the same dist output contracts as runtime JavaScript and declarations.
@@ -171,7 +176,7 @@ Current decision:
 - Standard acceptance now runs an all-subpath package import smoke gate for every `@hardening-mcp/acceptance/*` package export, proving package export resolution during routine validation, verifying runner subpaths expose `main()`, checking root/compatibility runtime contracts for `acceptancePackageExportEntries`, `acceptancePackageDistOutputEntries`, `acceptancePackageSourceEntries`, `legacyAcceptanceDistOutputEntries`, and `legacyAcceptanceWrapperSourceEntries`, and checking that root and `goal-audit-sources` package subpaths expose identical package and legacy source map source specs through `PACKAGE_ACCEPTANCE_DIST_OUTPUT_SOURCE_SPECS`, `PACKAGE_ACCEPTANCE_DIST_DECLARATION_SOURCE_SPECS`, `PACKAGE_ACCEPTANCE_DIST_SOURCE_MAP_SOURCE_SPECS`, and `LEGACY_ACCEPTANCE_DIST_SOURCE_MAP_SOURCE_SPECS`.
 - Standard acceptance also runs a package subpath type-resolution smoke gate, proving TypeScript resolves every package-owned acceptance subpath and the root/compatibility/`goal-audit-sources` contract types, including `acceptancePackageDistOutputEntries`, `acceptancePackageSourceEntries`, `legacyAcceptanceWrapperSourceEntries`, `PACKAGE_ACCEPTANCE_DIST_OUTPUT_SOURCE_SPECS`, `PACKAGE_ACCEPTANCE_DIST_DECLARATION_SOURCE_SPECS`, `PACKAGE_ACCEPTANCE_DIST_SOURCE_MAP_SOURCE_SPECS`, and `LEGACY_ACCEPTANCE_DIST_SOURCE_MAP_SOURCE_SPECS`, through the package `types` entries.
 - Phase 2b package-owned implementation status: `packages/acceptance` now exposes `compatibility`, `markdown`, `report`, `goal-audit`, `goal-audit-requirements`, `goal-audit-user-acceptance`, `goal-audit-user-acceptance-materials`, `goal-audit-sources`, `goal-audit-delivery`, `goal-audit-runtime`, `goal-audit-workflow-artifacts`, `goal-audit-observability-security`, `goal-audit-process-governance`, `goal-audit-evidence-documents`, `goal-audit-current-items`, `user-acceptance`, `user-acceptance-handoff`, `fatal-error`, `redaction`, `repo-preflight`, `user-acceptance-args`, `run-acceptance`, `run-user-acceptance-handoff`, `shell-quote`, `shell-words`, `user-acceptance-record`, `user-acceptance-runner-helpers`, `run-user-acceptance`, and `run-goal-audit` as implementation modules, with the old `src/internal/acceptance/*` behavior kept in compatibility tests.
-- Remaining Phase 2 work is governance, compatibility evidence, and future extraction of `browser-explorer` and `core`; it is not moving more `src/internal/acceptance/*`, `src/shared/*`, or `src/domain/repair-plan/*` implementation modules in this phase.
+- Remaining Phase 2 work is governance, compatibility evidence, and future extraction of `core`; it is not moving more `src/internal/acceptance/*`, `src/shared/*`, `src/domain/explore/*`, or `src/domain/repair-plan/*` implementation modules in this phase.
 
 ### Phase 3: Acceptance and Dashboard Expansion
 
@@ -192,5 +197,5 @@ Current decision:
 - `apps/cli`, `apps/mcp-server`, and planned `packages/*` ownership docs exist.
 - README points readers to this spec.
 - `tests/unit/project-structure.test.ts` guards the completed Phase 0 scaffold, Phase 1 app shell compatibility, and Phase 2 acceptance package pilot.
-- Phase 2 acceptance package pilot, Phase 2c shared package extraction, and Phase 2d repair-planner package extraction are part of the current acceptance criteria: `packages/acceptance` owns acceptance implementation modules and runner entrypoints, `packages/shared` owns shared utility implementation modules, `packages/repair-planner` owns repair plan implementation modules, legacy `src/internal/acceptance/*`, `dist/internal/acceptance/*`, `src/shared/*`, `dist/shared/*`, `src/domain/repair-plan/*`, `dist/domain/repair-plan/*`, `src/types/repair-plan.ts`, and `dist/types/repair-plan.*` remain compatibility wrapper/output surfaces, and package subpath runtime/type smoke gates pass.
+- Phase 2 acceptance package pilot, Phase 2c shared package extraction, Phase 2d repair-planner package extraction, and Phase 2e browser-explorer package extraction are part of the current acceptance criteria: `packages/acceptance` owns acceptance implementation modules and runner entrypoints, `packages/shared` owns shared utility implementation modules, `packages/browser-explorer` owns browser and route exploration implementation modules, `packages/repair-planner` owns repair plan implementation modules, legacy `src/internal/acceptance/*`, `dist/internal/acceptance/*`, `src/shared/*`, `dist/shared/*`, `src/domain/explore/*`, `dist/domain/explore/*`, `src/domain/repair-plan/*`, `dist/domain/repair-plan/*`, `src/types/repair-plan.ts`, and `dist/types/repair-plan.*` remain compatibility wrapper/output surfaces, and package subpath runtime/type smoke gates pass.
 - Current quality gates continue to pass: `pnpm test:unit`, `pnpm typecheck`, `pnpm lint`, `pnpm build`, and `pnpm acceptance -- --full --browser`.

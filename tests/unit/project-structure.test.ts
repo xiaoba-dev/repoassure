@@ -30,6 +30,16 @@ import {
   repairPlannerPackageSourceEntries,
   repairPlannerPackageSubpathSpecifiers
 } from '../../packages/repair-planner/src/index.js';
+import {
+  browserExplorerCompatibilityContract,
+  browserExplorerPackageDistOutputEntries,
+  browserExplorerPackageExportEntries,
+  browserExplorerPackageSourceEntries,
+  browserExplorerPackageSubpathSpecifiers,
+  legacyBrowserExplorerCompatibilityModules,
+  legacyBrowserExplorerDistOutputEntries,
+  legacyBrowserExplorerWrapperSourceEntries
+} from '../../packages/browser-explorer/src/index.js';
 
 describe('project structure', () => {
   it('routes benchmark artifacts through the artifacts directory while excluding legacy output', async () => {
@@ -101,7 +111,7 @@ describe('project structure', () => {
     expect(monorepoSpec).toContain('Monorepo Structure Spec v0.1');
     expect(monorepoSpec).toContain('Phase 0: Scaffold and Contract');
     expect(monorepoSpec).toContain('Phase 0 status: completed');
-    expect(monorepoSpec).toContain('Phase 2 acceptance package pilot, Phase 2c shared package extraction, and Phase 2d repair-planner package extraction are part of the current acceptance criteria');
+    expect(monorepoSpec).toContain('Phase 2 acceptance package pilot, Phase 2c shared package extraction, Phase 2d repair-planner package extraction, and Phase 2e browser-explorer package extraction are part of the current acceptance criteria');
     expect(monorepoSpec).not.toContain('Status: In progress.');
     expect(monorepoSpec).not.toContain('Do not move runtime code yet');
     expect(monorepoSpec).not.toContain('Existing quality gates continue to pass after Phase 0.');
@@ -140,7 +150,7 @@ describe('project structure', () => {
       readFile('docs/adr/0006-package-build-strategy.md', 'utf8')
     ]);
 
-    expect(monorepoSpec).toContain('Phase 2 status: acceptance package pilot, Phase 2c shared package extraction, and Phase 2d repair-planner package extraction implemented; broader package extraction remains deferred');
+    expect(monorepoSpec).toContain('Phase 2 status: acceptance package pilot, Phase 2c shared package extraction, Phase 2d repair-planner package extraction, and Phase 2e browser-explorer package extraction implemented; broader package extraction remains deferred');
     expect(monorepoSpec).toContain('ADR-0006: Package Build Strategy');
     expect(monorepoSpec).toContain('Phase 2c shared package status: implemented with compatibility wrappers');
     expect(monorepoSpec).toContain('`packages/shared/src` owns shared utility implementation modules');
@@ -451,13 +461,15 @@ describe('project structure', () => {
 
     expect(rootPackageJson).toContain('"build": "pnpm build:packages && pnpm build:src"');
     expect(rootPackageJson).toContain('"build:src": "tsc -p tsconfig.build.json"');
-    expect(rootPackageJson).toContain('"build:packages": "pnpm build:shared && pnpm build:repair-planner && pnpm build:acceptance"');
+    expect(rootPackageJson).toContain('"build:packages": "pnpm build:shared && pnpm build:browser-explorer && pnpm build:repair-planner && pnpm build:acceptance"');
     expect(rootPackageJson).toContain('"build:shared": "tsc -p packages/shared/tsconfig.build.json"');
+    expect(rootPackageJson).toContain('"build:browser-explorer": "tsc -p packages/browser-explorer/tsconfig.build.json"');
     expect(rootPackageJson).toContain('"build:repair-planner": "tsc -p packages/repair-planner/tsconfig.build.json"');
     expect(rootPackageJson).toContain('"build:acceptance": "tsc -p packages/acceptance/tsconfig.build.json"');
     expect(rootPackageJson).toContain('"typecheck": "pnpm build:packages && tsc --noEmit && pnpm typecheck:packages"');
-    expect(rootPackageJson).toContain('"typecheck:packages": "pnpm typecheck:shared && pnpm typecheck:repair-planner && pnpm typecheck:acceptance"');
+    expect(rootPackageJson).toContain('"typecheck:packages": "pnpm typecheck:shared && pnpm typecheck:browser-explorer && pnpm typecheck:repair-planner && pnpm typecheck:acceptance"');
     expect(rootPackageJson).toContain('"typecheck:shared": "tsc -p packages/shared/tsconfig.json --noEmit"');
+    expect(rootPackageJson).toContain('"typecheck:browser-explorer": "tsc -p packages/browser-explorer/tsconfig.json --noEmit"');
     expect(rootPackageJson).toContain('"typecheck:repair-planner": "tsc -p packages/repair-planner/tsconfig.json --noEmit"');
     expect(rootPackageJson).toContain('"typecheck:acceptance": "tsc -p packages/acceptance/tsconfig.json --noEmit"');
     expect(rootPackageJson).toContain('"@hardening-mcp/acceptance": "workspace:*"');
@@ -802,27 +814,26 @@ describe('project structure', () => {
     );
   });
 
-  it('records current repair planner package extraction evidence gates in the latest dev log entry', async () => {
+  it('records current browser explorer package extraction evidence gates in the latest dev log entry', async () => {
     const devLog = await readFile('docs/logs/dev-log.md', 'utf8');
-    const latestEntryStart = devLog.indexOf('## 2026年6月23日 - Repair Planner Package Phase 2d Extraction');
-    const latestEntryEnd = devLog.indexOf('\n## 2026年6月23日 - Shared Package Phase 2c Extraction');
+    const latestEntryStart = devLog.indexOf('## 2026年6月23日 - Browser Explorer Package Phase 2e Extraction');
+    const latestEntryEnd = devLog.indexOf('\n## 2026年6月23日 - Repair Planner Package Phase 2d Extraction');
     const latestEntry = devLog.slice(latestEntryStart, latestEntryEnd);
 
     expect(latestEntryStart).toBe(devLog.indexOf('## '));
     expect(latestEntryEnd).toBeGreaterThan(latestEntryStart);
-    expect(latestEntry).toContain('@hardening-mcp/repair-planner');
-    expect(latestEntry).toContain('Phase 2d repair-planner package');
-    expect(latestEntry).toContain('src/domain/repair-plan/*');
-    expect(latestEntry).toContain('src/types/repair-plan.ts');
-    expect(latestEntry).toContain('packages/repair-planner/dist');
-    expect(latestEntry).toContain('Red：`pnpm vitest run tests/unit/project-structure.test.ts tests/unit/repair-plan.test.ts`');
-    expect(latestEntry).toContain('2 个测试文件、52 个测试');
+    expect(latestEntry).toContain('@hardening-mcp/browser-explorer');
+    expect(latestEntry).toContain('Phase 2e browser-explorer package');
+    expect(latestEntry).toContain('src/domain/explore/*');
+    expect(latestEntry).toContain('packages/browser-explorer/dist');
+    expect(latestEntry).toContain('Red：`pnpm vitest run tests/unit/project-structure.test.ts tests/unit/explore-app.test.ts tests/unit/playwright-driver.test.ts`');
+    expect(latestEntry).toContain('3 个测试文件、81 个测试');
     expect(latestEntry).toContain('pnpm test:unit');
-    expect(latestEntry).toContain('33 个测试文件、510 个测试');
+    expect(latestEntry).toContain('33 个测试文件、516 个测试');
     expect(latestEntry).toContain('pnpm test:integration');
     expect(latestEntry).toContain('11 个测试文件、27 个测试');
     expect(latestEntry).toContain('pnpm goal:audit');
-    expect(latestEntry).toContain('30 项检查、29 项已通过、0 missing、1 项需要人工确认');
+    expect(latestEntry).toContain('31 项检查、30 项已通过、0 missing、1 项需要人工确认');
   });
 
   it('keeps legacy acceptance markdown as a package compatibility wrapper', async () => {
@@ -1390,12 +1401,14 @@ describe('project structure', () => {
       .map((path) => path.replace('src/shared/', '').replace(/\.ts$/u, ''))
       .sort();
 
-    expect(rootPackageJson.scripts?.['build:packages']).toBe('pnpm build:shared && pnpm build:repair-planner && pnpm build:acceptance');
+    expect(rootPackageJson.scripts?.['build:packages']).toBe('pnpm build:shared && pnpm build:browser-explorer && pnpm build:repair-planner && pnpm build:acceptance');
     expect(rootPackageJson.scripts?.['build:shared']).toBe('tsc -p packages/shared/tsconfig.build.json');
+    expect(rootPackageJson.scripts?.['build:browser-explorer']).toBe('tsc -p packages/browser-explorer/tsconfig.build.json');
     expect(rootPackageJson.scripts?.['build:repair-planner']).toBe('tsc -p packages/repair-planner/tsconfig.build.json');
     expect(rootPackageJson.scripts?.['build:acceptance']).toBe('tsc -p packages/acceptance/tsconfig.build.json');
-    expect(rootPackageJson.scripts?.['typecheck:packages']).toBe('pnpm typecheck:shared && pnpm typecheck:repair-planner && pnpm typecheck:acceptance');
+    expect(rootPackageJson.scripts?.['typecheck:packages']).toBe('pnpm typecheck:shared && pnpm typecheck:browser-explorer && pnpm typecheck:repair-planner && pnpm typecheck:acceptance');
     expect(rootPackageJson.scripts?.['typecheck:shared']).toBe('tsc -p packages/shared/tsconfig.json --noEmit');
+    expect(rootPackageJson.scripts?.['typecheck:browser-explorer']).toBe('tsc -p packages/browser-explorer/tsconfig.json --noEmit');
     expect(rootPackageJson.scripts?.['typecheck:repair-planner']).toBe('tsc -p packages/repair-planner/tsconfig.json --noEmit');
     expect(rootPackageJson.scripts?.['typecheck:acceptance']).toBe('tsc -p packages/acceptance/tsconfig.json --noEmit');
     expect(rootPackageJson.dependencies?.['@hardening-mcp/shared']).toBe('workspace:*');
@@ -1526,9 +1539,9 @@ describe('project structure', () => {
       'repair-plan'
     ].sort();
 
-    expect(rootPackageJson.scripts?.['build:packages']).toBe('pnpm build:shared && pnpm build:repair-planner && pnpm build:acceptance');
+    expect(rootPackageJson.scripts?.['build:packages']).toBe('pnpm build:shared && pnpm build:browser-explorer && pnpm build:repair-planner && pnpm build:acceptance');
     expect(rootPackageJson.scripts?.['build:repair-planner']).toBe('tsc -p packages/repair-planner/tsconfig.build.json');
-    expect(rootPackageJson.scripts?.['typecheck:packages']).toBe('pnpm typecheck:shared && pnpm typecheck:repair-planner && pnpm typecheck:acceptance');
+    expect(rootPackageJson.scripts?.['typecheck:packages']).toBe('pnpm typecheck:shared && pnpm typecheck:browser-explorer && pnpm typecheck:repair-planner && pnpm typecheck:acceptance');
     expect(rootPackageJson.scripts?.['typecheck:repair-planner']).toBe('tsc -p packages/repair-planner/tsconfig.json --noEmit');
     expect(rootPackageJson.dependencies?.['@hardening-mcp/repair-planner']).toBe('workspace:*');
 
@@ -1599,6 +1612,183 @@ describe('project structure', () => {
     await expectPath('packages/repair-planner/src/compatibility.ts');
     await expectPath('packages/repair-planner/src/generate-repair-plan.ts');
     await expectPath('packages/repair-planner/src/repair-plan.ts');
+  });
+
+  it('extracts browser explorer ownership into a workspace package while preserving compatibility outputs', async () => {
+    const [
+      rootPackageJsonText,
+      browserExplorerPackageJsonText,
+      browserExplorerCompatibility,
+      browserExplorerReadme,
+      packageIndex,
+      packageSubpathTypeSmoke,
+      readme,
+      monorepoSpec,
+      packageBuildAdr,
+      architecture,
+      decisionLog
+    ] = await Promise.all([
+      readFile('package.json', 'utf8'),
+      readFile('packages/browser-explorer/package.json', 'utf8'),
+      readFile('packages/browser-explorer/src/compatibility.ts', 'utf8'),
+      readFile('packages/browser-explorer/README.md', 'utf8'),
+      readFile('packages/browser-explorer/src/index.ts', 'utf8'),
+      readFile('tests/type-smoke/browser-explorer-package-subpaths.ts', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/architecture/specs/monorepo-structure-spec-v0.1.md', 'utf8'),
+      readFile('docs/adr/0006-package-build-strategy.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8')
+    ]);
+    const [packageSourceFiles, legacyDomainSourceFiles] = await Promise.all([
+      listFiles('packages/browser-explorer/src'),
+      listFiles('src/domain/explore')
+    ]);
+    const rootPackageJson = JSON.parse(rootPackageJsonText) as {
+      scripts?: Record<string, string>;
+      dependencies?: Record<string, string>;
+    };
+    const browserExplorerPackageJson = JSON.parse(browserExplorerPackageJsonText) as {
+      name?: string;
+      main?: string;
+      dependencies?: Record<string, string>;
+      exports?: Record<string, { types?: string; default?: string } | string>;
+    };
+    const packageModuleNames = packageSourceFiles
+      .filter((path) => path.endsWith('.ts'))
+      .map((path) => path.replace('packages/browser-explorer/src/', '').replace(/\.ts$/u, ''))
+      .filter((moduleName) => moduleName !== 'index')
+      .sort();
+    const legacyModules = legacyDomainSourceFiles
+      .filter((path) => path.endsWith('.ts'))
+      .map((path) => path.replace('src/domain/explore/', '').replace(/\.ts$/u, ''))
+      .sort();
+
+    expect(rootPackageJson.scripts?.['build:packages']).toBe('pnpm build:shared && pnpm build:browser-explorer && pnpm build:repair-planner && pnpm build:acceptance');
+    expect(rootPackageJson.scripts?.['build:browser-explorer']).toBe('tsc -p packages/browser-explorer/tsconfig.build.json');
+    expect(rootPackageJson.scripts?.['typecheck:packages']).toBe('pnpm typecheck:shared && pnpm typecheck:browser-explorer && pnpm typecheck:repair-planner && pnpm typecheck:acceptance');
+    expect(rootPackageJson.scripts?.['typecheck:browser-explorer']).toBe('tsc -p packages/browser-explorer/tsconfig.json --noEmit');
+    expect(rootPackageJson.dependencies?.['@hardening-mcp/browser-explorer']).toBe('workspace:*');
+
+    expect(browserExplorerPackageJson.name).toBe('@hardening-mcp/browser-explorer');
+    expect(browserExplorerPackageJson.main).toBe('dist/index.js');
+    expect(browserExplorerPackageJson.dependencies?.['@hardening-mcp/shared']).toBe('workspace:*');
+    expectPackageExport(browserExplorerPackageJsonText, '.', './dist/index.d.ts', './dist/index.js');
+    expectPackageExport(browserExplorerPackageJsonText, './compatibility', './dist/compatibility.d.ts', './dist/compatibility.js');
+    expectPackageExport(browserExplorerPackageJsonText, './explore-app', './dist/explore-app.d.ts', './dist/explore-app.js');
+    expectPackageExport(browserExplorerPackageJsonText, './playwright-driver', './dist/playwright-driver.d.ts', './dist/playwright-driver.js');
+    expect(Object.entries(browserExplorerPackageJson.exports ?? {}).sort(([left], [right]) => left.localeCompare(right))).toEqual(
+      [...browserExplorerPackageExportEntries]
+        .map((entry) => [entry.exportPath, { types: entry.types, default: entry.default }])
+        .sort(([left], [right]) => String(left).localeCompare(String(right)))
+    );
+
+    expect(browserExplorerCompatibility).toContain('browserExplorerCompatibilityContract');
+    expect(browserExplorerCompatibility).toContain('legacyBrowserExplorerWrapperSourceEntries');
+    expect(browserExplorerCompatibility).toContain('browserExplorerPackageDistOutputEntries');
+    expect(packageModuleNames).toEqual(['compatibility', 'explore-app', 'playwright-driver']);
+    expect([...browserExplorerCompatibilityContract.packageOwnedModules].sort()).toEqual(packageModuleNames);
+    expect(browserExplorerPackageSourceEntries.map((entry) => entry.path).sort()).toEqual(
+      packageModuleNames.map((moduleName) => `packages/browser-explorer/src/${moduleName}.ts`).sort()
+    );
+    expect(legacyModules).toEqual(['explore-app', 'playwright-driver']);
+    expect([...legacyBrowserExplorerCompatibilityModules].sort()).toEqual(legacyModules);
+    expect(legacyBrowserExplorerWrapperSourceEntries.map((entry) => entry.path).sort()).toEqual(
+      legacyModules.map((moduleName) => `src/domain/explore/${moduleName}.ts`).sort()
+    );
+
+    for (const moduleName of packageModuleNames) {
+      expect(packageIndex).toContain(`from './${moduleName}.js'`);
+      expect(packageSubpathTypeSmoke).toContain(`from '@hardening-mcp/browser-explorer/${moduleName}'`);
+      expect(browserExplorerPackageSubpathSpecifiers).toContain(`@hardening-mcp/browser-explorer/${moduleName}`);
+    }
+    expect(packageSubpathTypeSmoke).toContain("from '@hardening-mcp/browser-explorer'");
+    expect(packageSubpathTypeSmoke).toContain('browserExplorer.browserExplorerPackageExportEntries');
+    expect(packageSubpathTypeSmoke).toContain('compatibility.browserExplorerPackageExportEntries');
+    expect(packageSubpathTypeSmoke).toContain('browserExplorer.BrowserExplorerPackageExportEntry');
+    expect(packageSubpathTypeSmoke).toContain('compatibility.BrowserExplorerPackageExportEntry');
+    expect(packageSubpathTypeSmoke).toContain('browserExplorerPackageExportEntryContracts');
+    expect(packageSubpathTypeSmoke).toContain('browserExplorer.BrowserExplorerPackageDistOutputEntry');
+    expect(packageSubpathTypeSmoke).toContain('compatibility.BrowserExplorerPackageDistOutputEntry');
+    expect(packageSubpathTypeSmoke).toContain('browserExplorerPackageDistOutputEntryContracts');
+    expect(packageSubpathTypeSmoke).toContain('browserExplorer.ExploreAppResult');
+    expect(packageSubpathTypeSmoke).toContain('exploreApp.ExploreBrowserDriver');
+    expect(packageSubpathTypeSmoke).toContain('playwrightDriver.CreatePlaywrightBrowserDriverInput');
+
+    expect(browserExplorerReadme).toContain('Phase 2e browser-explorer package extraction');
+    expect(browserExplorerReadme).toContain('This package owns browser and route exploration implementation modules');
+    expect(browserExplorerReadme).toContain('`src/domain/explore/*` compatibility wrappers');
+    expect(monorepoSpec).toContain('Phase 2e browser-explorer package status: implemented with compatibility wrappers');
+    expect(monorepoSpec).toContain('`packages/browser-explorer/src` owns browser and route exploration implementation modules');
+    expect(monorepoSpec).toContain('`src/domain/explore/*` remains as compatibility wrappers');
+    expect(packageBuildAdr).toContain('Phase 2e');
+    expect(packageBuildAdr).toContain('`packages/browser-explorer`');
+    expect(packageBuildAdr).toContain('browser-explorer package extraction');
+    expect(readme).toContain('@hardening-mcp/browser-explorer');
+    expect(architecture).toContain('@hardening-mcp/browser-explorer');
+    expect(decisionLog).toContain('browser-explorer package 抽取');
+
+    await expectPath('packages/browser-explorer/package.json');
+    await expectPath('packages/browser-explorer/tsconfig.json');
+    await expectPath('packages/browser-explorer/tsconfig.build.json');
+    await expectPath('packages/browser-explorer/src/index.ts');
+    await expectPath('packages/browser-explorer/src/compatibility.ts');
+    await expectPath('packages/browser-explorer/src/explore-app.ts');
+    await expectPath('packages/browser-explorer/src/playwright-driver.ts');
+  });
+
+  it('keeps generated browser explorer package dist outputs described by the package compatibility contract', async () => {
+    const packageDistFiles = await listFiles('packages/browser-explorer/dist');
+    const expectedDistPaths = browserExplorerPackageDistOutputEntries.flatMap((entry) => [
+      entry.jsPath,
+      entry.declarationPath,
+      entry.sourceMapPath
+    ]).sort();
+
+    expect(browserExplorerPackageDistOutputEntries.map((entry) => entry.exportPath).sort()).toEqual(
+      browserExplorerPackageExportEntries.map((entry) => entry.exportPath).sort()
+    );
+    expect(packageDistFiles.filter((path) => path.endsWith('.js') || path.endsWith('.d.ts') || path.endsWith('.js.map')).sort()).toEqual(expectedDistPaths);
+  });
+
+  it('keeps generated legacy browser explorer dist outputs as package compatibility wrappers', async () => {
+    const distFiles = await listFiles(browserExplorerCompatibilityContract.legacyDistRoot);
+    const expectedDistPaths = legacyBrowserExplorerDistOutputEntries.flatMap((entry) => [
+      entry.jsPath,
+      entry.declarationPath,
+      entry.sourceMapPath
+    ]).sort();
+
+    expect(legacyBrowserExplorerDistOutputEntries.map((entry) => entry.moduleName).sort()).toEqual(
+      [...legacyBrowserExplorerCompatibilityModules].sort()
+    );
+    expect(distFiles.filter((path) => path.endsWith('.js') || path.endsWith('.d.ts') || path.endsWith('.js.map')).sort()).toEqual(expectedDistPaths);
+
+    for (const entry of legacyBrowserExplorerDistOutputEntries) {
+      const [jsOutput, declarationOutput, sourceMapOutput] = await Promise.all([
+        readFile(entry.jsPath, 'utf8'),
+        readFile(entry.declarationPath, 'utf8'),
+        readFile(entry.sourceMapPath, 'utf8')
+      ]);
+
+      expect(jsOutput).toContain('packages/browser-explorer/dist/');
+      expect(jsOutput).not.toContain('function classifyRouteResult');
+      expect(jsOutput).not.toContain('function collectInteractions');
+      expect(jsOutput).not.toContain('function unsafeInteractionReason');
+      expect(declarationOutput).toContain('packages/browser-explorer/dist/');
+      expect(sourceMapOutput).toContain(`"file":"${entry.moduleName}.js"`);
+    }
+  });
+
+  it('keeps legacy browser explorer source modules as package compatibility wrappers', async () => {
+    for (const entry of legacyBrowserExplorerWrapperSourceEntries) {
+      const legacySource = await readFile(entry.path, 'utf8');
+
+      expect(legacySource).toContain('packages/browser-explorer/dist/');
+      expect(legacySource).not.toContain('function classifyRouteResult');
+      expect(legacySource).not.toContain('function collectInteractions');
+      expect(legacySource).not.toContain('function unsafeInteractionReason');
+    }
   });
 
   it('keeps generated repair planner package dist outputs described by the package compatibility contract', async () => {

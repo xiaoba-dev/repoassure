@@ -1,0 +1,30 @@
+{
+  "name": "@hardening-mcp/browser-explorer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./compatibility": {
+      "types": "./dist/compatibility.d.ts",
+      "default": "./dist/compatibility.js"
+    },
+    "./explore-app": {
+      "types": "./dist/explore-app.d.ts",
+      "default": "./dist/explore-app.js"
+    },
+    "./playwright-driver": {
+      "types": "./dist/playwright-driver.d.ts",
+      "default": "./dist/playwright-driver.js"
+    }
+  },
+  "dependencies": {
+    "@hardening-mcp/shared": "workspace:*",
+    "playwright": "^1.61.0"
+  }
+}

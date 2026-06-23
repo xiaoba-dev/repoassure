@@ -1,5 +1,32 @@
 # 开发日志
 
+## 2026年6月23日 - Browser Explorer Package Phase 2e Extraction
+
+### 完成内容
+
+- 新增 `@hardening-mcp/browser-explorer` / `packages/browser-explorer`，由 package-owned `src` 承载 `explore-app` 和 `playwright-driver` 实现。
+- 将 `src/domain/explore/*` 收缩为 `packages/browser-explorer/dist/*` compatibility wrappers，保留 legacy source 路径和 `dist/domain/explore/*` 输出面。
+- 将根构建脚本拆分为 `build:shared`、`build:browser-explorer`、`build:repair-planner`、`build:acceptance` 和 `build:src`，保证 package-first build order。
+- 新增 browser-explorer package compatibility contract、typed package exports、type-smoke、project structure 测试、legacy/package route exploration parity 测试和 Playwright driver parity 测试，约束 source、exports、dist outputs、wrapper drift 和 artifact 行为稳定。
+- 级联更新 README、monorepo spec、ADR-0006、架构概览、decision log 和 goal audit，使 Phase 2e browser-explorer package 状态进入自动验收摘要。
+
+### 验证
+
+- Red：`pnpm vitest run tests/unit/project-structure.test.ts tests/unit/explore-app.test.ts tests/unit/playwright-driver.test.ts` 因 `packages/browser-explorer/src/index.js`、`packages/browser-explorer/src/explore-app.js` 和 `packages/browser-explorer/src/playwright-driver.js` 尚不存在按预期失败。
+- Green：同一最小集合通过，3 个测试文件、81 个测试。
+- `pnpm repo:hygiene`：通过。
+- `pnpm typecheck`：通过。
+- `pnpm lint`：通过。
+- `pnpm build`：通过。
+- `pnpm test:unit`：初次完整运行仅因本条 dev log 尚未写入完整门禁统计失败；写入后复跑通过，33 个测试文件、516 个测试。
+- `pnpm test:integration`：普通沙箱下因本地 dev server 无法进入 running 状态失败；提升权限后通过，11 个测试文件、27 个测试。
+- `pnpm test:e2e`：通过 1 个、跳过 1 个环境条件测试。
+- `pnpm goal:audit`：通过，31 项检查、30 项已通过、0 missing、1 项需要人工确认。
+
+### 阻塞
+
+- 无新增产品阻塞。
+
 ## 2026年6月23日 - Repair Planner Package Phase 2d Extraction
 
 ### 完成内容

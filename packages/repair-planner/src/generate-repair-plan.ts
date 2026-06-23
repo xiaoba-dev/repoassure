@@ -52,15 +52,39 @@ interface HardeningFinding {
   evidence: string[];
 }
 
+interface SecurityFinding {
+  findingId: string;
+  providerFindingId: string;
+  provider: string;
+  title: string;
+  severity: FindingSeverity;
+  category: string;
+  affectedLocations: Array<{ path: string; startLine?: number; endLine?: number }>;
+  evidence: string[];
+  attackPath?: string;
+  validationStatus?: string;
+  remediation?: string;
+  verification: string[];
+  provenance: {
+    provider: string;
+    providerVersion?: string;
+    sourceType?: string;
+    sourcePath?: string;
+    targetRevision?: string;
+  };
+}
+
 export async function generateRepairPlan(input: GenerateRepairPlanInput): Promise<RepairPlanGenerationResult> {
-  const [findings, testGeneration, bootResult] = await Promise.all([
+  const [findings, securityFindings, testGeneration, bootResult] = await Promise.all([
     readFindings(join(input.runDir, 'findings.json')),
+    readSecurityFindings(join(input.runDir, 'security', 'security-findings.json')),
     readTestGeneration(join(input.runDir, 'test-generation.json')),
     readBootResult(join(input.runDir, 'boot-result.json'))
   ]);
   const tasks = buildRepairTasks({
     runDir: input.runDir,
     findings,
+    securityFindings,
     testGeneration,
     bootResult
   });
@@ -107,17 +131,23 @@ export async function generateRepairPlan(input: GenerateRepairPlanInput): Promis
 function buildRepairTasks(input: {
   runDir: string;
   findings: HardeningFinding[];
+  securityFindings: SecurityFinding[];
   testGeneration: TestGenerationSummary;
   bootResult: BootResultSummary;
 }): RepairTask[] {
-  return input.findings
-    .map((finding, index) => buildRepairTask({
+  const hardeningTasks = input.findings.map((finding, index) => buildRepairTask({
       runDir: input.runDir,
       finding,
       index,
       testGeneration: input.testGeneration,
       bootResult: input.bootResult
-    }))
+    }));
+  const securityTasks = input.securityFindings.map((finding) => buildSecurityRepairTask({
+    runDir: input.runDir,
+    finding
+  }));
+
+  return [...hardeningTasks, ...securityTasks]
     .sort((left, right) => {
       const severity = severityRank(left.severity) - severityRank(right.severity);
       return severity === 0 ? left.taskId.localeCompare(right.taskId) : severity;
@@ -155,6 +185,60 @@ function buildRepairTask(input: {
     verification,
     agentPrompt: buildAgentPrompt(input.finding.severity, title, verification.commands)
   };
+}
+
+function buildSecurityRepairTask(input: {
+  runDir: string;
+  finding: SecurityFinding;
+}): RepairTask {
+  const title = cleanText(input.finding.title);
+  const provenance = formatSecurityProvenance(input.finding);
+  const verification: RepairVerification = {
+    commands: input.finding.verification.map(cleanText),
+    generatedTests: [],
+    validationStatus: input.finding.validationStatus ?? null
+  };
+
+  return {
+    taskId: `${input.finding.severity.toLowerCase()}-security-${slugify(title)}`,
+    severity: input.finding.severity,
+    status: 'todo',
+    title,
+    rootCauseHypothesis: cleanText(
+      `Security provider provenance: ${provenance}. ${input.finding.attackPath ? `Attack path: ${input.finding.attackPath}. ` : ''}${input.finding.evidence[0] ?? 'Provider reported a security finding.'}`
+    ),
+    repairIntent: cleanText(input.finding.remediation ?? `修复 ${input.finding.category} 安全发现，并保留 provider provenance。`),
+    findingIds: [cleanText(input.finding.findingId)],
+    evidence: [
+      {
+        type: 'security',
+        path: join(input.runDir, 'security', 'security-findings.json'),
+        summary: cleanText([
+          title,
+          `provider provenance: ${provenance}`,
+          ...input.finding.evidence
+        ].join(' | '))
+      }
+    ],
+    targetAreas: extractSecurityTargetAreas(input.finding),
+    suggestedFiles: input.finding.affectedLocations.map((location) => ({
+      path: cleanText(location.path),
+      confidence: 'high',
+      reason: cleanText(`Provider affected location from ${input.finding.provider}`)
+    })),
+    verification,
+    agentPrompt: cleanText(
+      `请基于 security evidence 修复 ${input.finding.severity} 安全问题：${title}。必须保留 provider provenance，优先检查 ${formatSecurityLocations(input.finding)}。修复后运行 verification.commands：${verification.commands.join(' && ') || '项目安全回归检查'}。`
+    )
+  };
+}
+
+function formatSecurityProvenance(finding: SecurityFinding): string {
+  return [
+    `provider=${finding.provenance.provider}`,
+    finding.provenance.providerVersion ? `version=${finding.provenance.providerVersion}` : null,
+    finding.provenance.targetRevision ? `revision=${finding.provenance.targetRevision}` : null
+  ].filter((item): item is string => item !== null).join(' ');
 }
 
 function buildTaskId(finding: HardeningFinding): string {
@@ -225,6 +309,19 @@ function extractTargetAreas(finding: HardeningFinding): RepairTargetArea[] {
   }
 
   return areas.size > 0 ? [...areas.values()] : [{ kind: 'unknown', value: 'unknown' }];
+}
+
+function extractSecurityTargetAreas(finding: SecurityFinding): RepairTargetArea[] {
+  const areas = finding.affectedLocations.map((location) => ({
+    kind: 'file' as const,
+    value: cleanText(location.path)
+  }));
+
+  return areas.length > 0 ? areas : [{ kind: 'unknown', value: 'unknown' }];
+}
+
+function formatSecurityLocations(finding: SecurityFinding): string {
+  return finding.affectedLocations.map((location) => cleanText(location.path)).join(', ') || 'unknown';
 }
 
 function extractRoute(value: string): string | null {
@@ -361,14 +458,18 @@ function buildHandoffPrompt(task: RepairTask): string {
   const commandText = task.verification.commands.length > 0
     ? `修复后运行：${task.verification.commands.join(' && ')}。`
     : '修复后运行项目既有测试和 hardening run。';
+  const provenanceText = task.evidence.some((item) => item.type === 'security')
+    ? '保留 provider provenance，并在修复说明中说明安全证据来源。'
+    : '';
 
   return cleanText([
     `你是接手目标 repo 的修复 Agent。请修复 ${task.severity} 任务 ${task.taskId}：${task.title}。`,
     `先读取 evidence 和 generatedTests，基于 rootCauseHypothesis 定位根因。`,
     `保持最小改动，只修改与 targetAreas 和 repairIntent 直接相关的代码。`,
+    provenanceText,
     commandText,
     `满足 acceptanceCriteria 后输出修改摘要、测试结果和剩余风险。`
-  ].join(' '));
+  ].filter(Boolean).join(' '));
 }
 
 function buildRepairPlanMarkdown(plan: RepairPlan): string {
@@ -440,6 +541,16 @@ async function readFindings(path: string): Promise<HardeningFinding[]> {
   return record.findings.flatMap((finding) => (isFinding(finding) ? [finding] : []));
 }
 
+async function readSecurityFindings(path: string): Promise<SecurityFinding[]> {
+  const record = await readJsonRecord(path);
+
+  if (!Array.isArray(record.findings)) {
+    return [];
+  }
+
+  return record.findings.flatMap((finding) => (isSecurityFinding(finding) ? [finding] : []));
+}
+
 async function readTestGeneration(path: string): Promise<TestGenerationSummary> {
   const record = await readJsonRecord(path);
   return {
@@ -506,6 +617,33 @@ function isFindingType(value: unknown): value is FindingType {
     value === 'console_error' ||
     value === 'network_error'
   );
+}
+
+function isSecurityFinding(value: unknown): value is SecurityFinding {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  return (
+    typeof value.findingId === 'string' &&
+    typeof value.providerFindingId === 'string' &&
+    typeof value.provider === 'string' &&
+    typeof value.title === 'string' &&
+    isSeverity(value.severity) &&
+    typeof value.category === 'string' &&
+    Array.isArray(value.affectedLocations) &&
+    value.affectedLocations.every(isSecurityAffectedLocation) &&
+    Array.isArray(value.evidence) &&
+    value.evidence.every((item) => typeof item === 'string') &&
+    Array.isArray(value.verification) &&
+    value.verification.every((item) => typeof item === 'string') &&
+    isRecord(value.provenance) &&
+    typeof value.provenance.provider === 'string'
+  );
+}
+
+function isSecurityAffectedLocation(value: unknown): value is { path: string; startLine?: number; endLine?: number } {
+  return isRecord(value) && typeof value.path === 'string';
 }
 
 function cleanText(value: string): string {

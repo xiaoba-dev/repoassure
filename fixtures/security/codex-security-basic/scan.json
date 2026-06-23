@@ -1,0 +1,24 @@
+{
+  "provider": "codex-security",
+  "providerVersion": "0.1-fixture",
+  "targetRevision": "abc1234",
+  "coverage": {
+    "summary": "fixture scan covers source auth handler"
+  },
+  "findings": [
+    {
+      "id": "CS-001",
+      "title": "JWT accepted without audience validation",
+      "severity": "high",
+      "category": "CWE-347",
+      "path": "src/auth.ts",
+      "startLine": 42,
+      "endLine": 45,
+      "evidence": "Authorization: Bearer sk-live-secret reaches verifyJwt without audience check",
+      "attackPath": "Forged token can reach /admin",
+      "validationStatus": "validated",
+      "remediation": "Validate aud and iss before accepting the token",
+      "verification": ["pnpm test auth"]
+    }
+  ]
+}

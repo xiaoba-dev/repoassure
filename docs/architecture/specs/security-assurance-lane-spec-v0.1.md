@@ -61,6 +61,8 @@ repoassure security import --provider codex-security --scan-dir <scan-dir>
 
 The current implementation name may expose this through `hardening` first, but user-facing docs should keep the RepoAssure product language.
 
+Phase 1 implementation note: the current internal CLI exposes `hardening security import --provider codex-security --scan-dir <dir> --repo <repo> --run-dir <dir>` through `@hardening-mcp/security-assurance`. It imports local provider scan directories, writes redacted run-scoped security artifacts, and does not invoke Codex Security runtime, run scanners, fetch remote provider state, upload target repo data, create external records, or modify target repo source.
+
 ## Normalized Finding Contract
 
 Each imported security finding should preserve provider provenance and map into RepoAssure repair planning.
@@ -169,7 +171,7 @@ When implemented, goal audit should verify:
 - security findings can feed repair plan and repair task package outputs
 - unsupported provider formats fail with structured blockers
 
-Security imports should not be required for the current MVP acceptance gate. They are an optional future lane unless a later ADR changes the product scope.
+Security imports should not be required for the current MVP acceptance gate. Phase 1 is an optional lane unless a later ADR changes the product scope.
 
 ## Non-goals
 
@@ -183,8 +185,7 @@ Security imports should not be required for the current MVP acceptance gate. The
 
 ## Follow-up
 
-- Write a provider import implementation goal after this spec is accepted.
-- Start with a Codex Security local scan directory importer.
+- Extend the current Codex Security local scan directory importer beyond fixture-style `scan.json` when real provider output formats are available.
 - Add fixture provider outputs before runtime implementation.
 - Extend repair-plan tests with security evidence types.
 - Update goal audit only when provider import becomes implemented behavior.

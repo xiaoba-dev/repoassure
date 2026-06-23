@@ -1,14 +1,14 @@
 # Goal 完成度审计
 
-生成时间：2026-06-23T11:03:20.393Z
+生成时间：2026-06-23T11:40:41.691Z
 
 ## 摘要
 
 | 项目 | 结果 |
 | --- | --- |
 | 总体状态 | 已准备好请求用户验收 |
-| 检查项总数 | 31 |
-| 已通过 | 30 |
+| 检查项总数 | 33 |
+| 已通过 | 32 |
 | 缺失 | 0 |
 | 需要人工确认 | 1 |
 
@@ -87,6 +87,7 @@
 | Legacy acceptance 兼容 wrapper | 已通过 | src/internal/acceptance/*.ts all delegate to packages/acceptance/dist compatibility wrappers |  |
 | Acceptance package typed module exports | 已通过 | root package depends on @hardening-mcp/acceptance workspace package; exact package export surface matches acceptancePackageExportEntries; package dist output contract matches acceptancePackageDistOutputEntries including .js.map sourceMapPath; package dist source specs match PACKAGE_ACCEPTANCE_DIST_OUTPUT_SOURCE_SPECS, PACKAGE_ACCEPTANCE_DIST_DECLARATION_SOURCE_SPECS, and PACKAGE_ACCEPTANCE_DIST_SOURCE_MAP_SOURCE_SPECS; package source contract matches acceptancePackageSourceEntries; typed dist entrypoints have no unexpected package exports |  |
 | Shared package typed module exports and legacy wrappers | 已通过 | root package depends on @hardening-mcp/shared workspace package; packages/shared exports typed root, compatibility, privacy-redaction, shell-quote, and shell-words subpaths; src/shared/*.ts all delegate to packages/shared/dist compatibility wrappers |  |
+| Security assurance package typed module exports | 已通过 | root package depends on @hardening-mcp/security-assurance workspace package; packages/security-assurance exports typed root, compatibility, and import-security-evidence subpaths; type-smoke covers root and subpath resolution |  |
 | Repair planner package typed module exports and legacy wrappers | 已通过 | root package depends on @hardening-mcp/repair-planner workspace package; packages/repair-planner exports typed root, compatibility, generate-repair-plan, and repair-plan subpaths; src/domain/repair-plan/*.ts and src/types/repair-plan.ts delegate to packages/repair-planner/dist compatibility wrappers |  |
 | Browser explorer package typed module exports and legacy wrappers | 已通过 | root package depends on @hardening-mcp/browser-explorer workspace package; packages/browser-explorer exports typed root, compatibility, explore-app, and playwright-driver subpaths; src/domain/explore/*.ts delegates to packages/browser-explorer/dist compatibility wrappers |  |
 | Legacy acceptance dist compatibility outputs | 已通过 | dist/internal/acceptance/*.js and *.d.ts compatibility outputs all delegate to packages/acceptance/dist package entrypoints; dist/internal/acceptance/*.js.map source maps are present through legacyAcceptanceDistOutputEntries.sourceMapPath and LEGACY_ACCEPTANCE_DIST_SOURCE_MAP_SOURCE_SPECS |  |
@@ -113,7 +114,13 @@
 
 | 要求 | 状态 | 证据 | 下一步 |
 | --- | --- | --- | --- |
-| 不硬编码密钥、不上传代码、不泄露 env value | 已通过 | codex goal documents local-only boundaries; analyze_repo returns env key hints; shared redaction is used by CLI, MCP, report and acceptance paths; handoff commands redact sensitive repo path values; browser tests skip sensitive fields and destructive actions |  |
+| 不硬编码密钥、不上传代码、不泄露 env value | 已通过 | codex goal documents local-only boundaries; analyze_repo returns env key hints; shared redaction is used by CLI, MCP, report and acceptance paths; handoff commands redact sensitive repo path values; browser tests skip sensitive fields and destructive actions; security assurance imports local provider evidence with redaction, provider provenance, and no scanner runtime or upload |  |
+
+## Security Assurance Lane
+
+| 要求 | 状态 | 证据 | 下一步 |
+| --- | --- | --- | --- |
+| 本地安全证据导入和 repair planning 集成 | 已通过 | Security Assurance Lane Phase 1 imports local provider scan directories, writes run-scoped redacted security artifacts, preserves provider provenance, and feeds security findings into repair plan and repair task package outputs without becoming a required MVP gate |  |
 
 ## 用户验收材料
 

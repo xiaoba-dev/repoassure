@@ -1,5 +1,23 @@
 # 决策日志
 
+## 2026年6月23日 - Security Assurance Lane Phase 1 本地导入
+
+### 决策
+
+实现 Security Assurance Lane Phase 1：新增 `@hardening-mcp/security-assurance` / `packages/security-assurance`，通过 `hardening security import --provider codex-security --scan-dir <dir> --repo <repo> --run-dir <dir>` 导入本地 provider scan directory，生成 run-scoped `security-summary.json`、`security-findings.json`、provider `import-manifest.json` 和 `normalized-findings.json`，并让 repair plan / repair task package 消费 normalized security findings。
+
+### 原因
+
+- ADR-0013 和 `security-assurance-lane-spec-v0.1.md` 已明确 RepoAssure 应作为 provider-backed security evidence lane，而不是自研通用漏洞扫描器。
+- Phase 1 可以先交付本地、可测试、可脱敏、可追踪 provenance 的 import contract，为后续 Codex Security、SARIF 或其他 provider 输出格式扩展打基础。
+- 将 security evidence 转入 repair planning，比单独保存扫描报告更符合 RepoAssure 的 AI IDE / Agent handoff 定位。
+
+### 影响
+
+- 新增 open-core package `@hardening-mcp/security-assurance`。
+- Security Assurance Lane 仍为可选 lane，不进入当前 MVP 必需验收门槛。
+- 本轮不调用 Codex Security 插件/runtime，不联网、不上传目标 repo、不创建 issue/PR/advisory、不修改目标 repo，也不实现 native deep vulnerability scanner。
+
 ## 2026年6月23日 - 自动化治理收口与 Security Assurance Lane 规格
 
 ### 决策

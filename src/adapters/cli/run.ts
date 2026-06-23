@@ -5,6 +5,7 @@ import { runGenerateTestsTool } from '../../tools/generate-tests-tool.js';
 import { runGenerateRepairPlanTool } from '../../tools/generate-repair-plan-tool.js';
 import { runHardenReportTool } from '../../tools/harden-report-tool.js';
 import { runHardeningTool } from '../../tools/run-hardening-tool.js';
+import { runSecurityImportTool } from '../../tools/security-import-tool.js';
 import { createPlaywrightBrowserDriver } from '../../domain/explore/playwright-driver.js';
 import { redactSensitiveText } from '../../shared/privacy-redaction.js';
 
@@ -38,6 +39,14 @@ export interface GenerateTestsCliOptions {
 
 export interface GenerateRepairPlanCliOptions {
   root?: string;
+  runDir?: string;
+  error?: string;
+}
+
+export interface SecurityImportCliOptions {
+  provider?: 'codex-security' | 'codeql' | 'semgrep' | 'gitleaks' | 'osv' | 'manual-import';
+  scanDir?: string;
+  repoRoot?: string;
   runDir?: string;
   error?: string;
 }
@@ -81,12 +90,48 @@ export async function runCli(args: string[], io: CliIO): Promise<number> {
     return runReport(rest, io);
   }
 
+  if (command === 'security') {
+    return runSecurity(rest, io);
+  }
+
   if (command === 'run') {
     return runHardening(rest, io);
   }
 
   writeCliError(io, `Unknown command: ${command}`);
   return 1;
+}
+
+async function runSecurity(args: string[], io: CliIO): Promise<number> {
+  if (args[0] !== 'import') {
+    writeCliError(io, args[0] ? `Unknown security subcommand: ${args[0]}` : 'Missing required security subcommand: import');
+    return 1;
+  }
+
+  const options = parseSecurityImportOptions(args.slice(1));
+  if (options.error) {
+    writeCliError(io, options.error);
+    return 1;
+  }
+  if (!options.provider || !options.scanDir || !options.repoRoot || !options.runDir) {
+    writeCliError(io, 'Missing required options: --provider, --scan-dir, --repo, --run-dir');
+    return 1;
+  }
+
+  try {
+    const result = await runSecurityImportTool({
+      provider: options.provider,
+      sourcePath: options.scanDir,
+      repoRoot: options.repoRoot,
+      runDir: options.runDir
+    });
+    io.writeStdout(formatCliJsonOutput(result));
+    return 0;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    writeCliError(io, `Failed to import security evidence: ${message}`);
+    return 1;
+  }
 }
 
 async function runGenerateRepairPlan(args: string[], io: CliIO): Promise<number> {
@@ -289,6 +334,7 @@ Usage:
   hardening generate-tests <findingsPath> <outputDir> [--smoke-route <path-or-url>] [--base-url <url>]
   hardening plan <repo> [--run-dir <dir>]
   hardening report <runDir> <outputPath>
+  hardening security import --provider <provider> --scan-dir <dir> --repo <repo> --run-dir <dir>
   hardening run <repo> [url] [--browser] [--critical-path <path-or-intent>] [--max-routes <n>] [--max-actions-per-route <n>] [--storage-state <path>] [--trace] [--start-command <command>] [--boot-timeout-ms <ms>] [--workspace-output <dir>]
 
 Options:
@@ -409,6 +455,117 @@ Options:
   --help, -h                   Show this help.
 
 `;
+  }
+
+  if (command === 'security') {
+    return `hardening security
+
+Usage:
+  hardening security import --provider <provider> --scan-dir <dir> --repo <repo> --run-dir <dir>
+
+Options:
+  --provider <provider>  Security provider id. Phase 1 supports codex-security fixtures.
+  --scan-dir <dir>       Local provider scan directory containing scan.json.
+  --repo <repo>          Path to the target repository.
+  --run-dir <dir>        Existing or new RepoAssure run directory.
+  --help, -h             Show this help.
+
+`;
+  }
+
+  return undefined;
+}
+
+export function parseSecurityImportOptions(args: string[]): SecurityImportCliOptions {
+  let provider: SecurityImportCliOptions['provider'];
+  let scanDir: string | undefined;
+  let repoRoot: string | undefined;
+  let runDir: string | undefined;
+  let error: string | undefined;
+
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+    if (!arg) {
+      continue;
+    }
+
+    if (arg === '--provider' || arg.startsWith('--provider=')) {
+      const value = readOptionValue(args, index, '--provider');
+      if (value.consumedNext) {
+        index += 1;
+      }
+      if (value.error) {
+        error = value.error;
+      } else if (value.value) {
+        provider = parseSecurityProvider(value.value) ?? provider;
+        if (!parseSecurityProvider(value.value)) {
+          error = `Unsupported security provider: ${value.value}`;
+        }
+      }
+      continue;
+    }
+
+    if (arg === '--scan-dir' || arg.startsWith('--scan-dir=')) {
+      const value = readOptionValue(args, index, '--scan-dir');
+      if (value.consumedNext) {
+        index += 1;
+      }
+      if (value.error) {
+        error = value.error;
+      } else if (value.value) {
+        scanDir = value.value;
+      }
+      continue;
+    }
+
+    if (arg === '--repo' || arg.startsWith('--repo=')) {
+      const value = readOptionValue(args, index, '--repo');
+      if (value.consumedNext) {
+        index += 1;
+      }
+      if (value.error) {
+        error = value.error;
+      } else if (value.value) {
+        repoRoot = value.value;
+      }
+      continue;
+    }
+
+    if (arg === '--run-dir' || arg.startsWith('--run-dir=')) {
+      const value = readOptionValue(args, index, '--run-dir');
+      if (value.consumedNext) {
+        index += 1;
+      }
+      if (value.error) {
+        error = value.error;
+      } else if (value.value) {
+        runDir = value.value;
+      }
+      continue;
+    }
+
+    error = arg.startsWith('--') ? `Unknown option: ${arg}` : `Unexpected argument: ${arg}`;
+  }
+
+  return {
+    ...(provider ? { provider } : {}),
+    ...(scanDir ? { scanDir } : {}),
+    ...(repoRoot ? { repoRoot } : {}),
+    ...(runDir ? { runDir } : {}),
+    ...(error ? { error } : {})
+  };
+}
+
+function parseSecurityProvider(value: string): SecurityImportCliOptions['provider'] | undefined {
+  if (
+    value === 'codex-security' ||
+    value === 'codeql' ||
+    value === 'semgrep' ||
+    value === 'gitleaks' ||
+    value === 'osv' ||
+    value === 'manual-import'
+  ) {
+    return value;
   }
 
   return undefined;

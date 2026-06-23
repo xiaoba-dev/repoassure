@@ -64,10 +64,14 @@ export function buildObservabilityAndSecurityGoalAuditItems(
         sources.userAcceptanceGuide,
         sources.analyzeRepo,
         sources.privacyRedaction,
+        sources.securityAssuranceImporter,
+        sources.securityImportTool,
+        sources.securityLaneSpec,
         sources.playwrightDriver,
         sources.cliRun,
         sources.toolRegistry,
         sources.hardenReport,
+        sources.securityAssuranceTests,
         sources.securityTests
       ].join('\n'),
       needles: [
@@ -84,9 +88,44 @@ export function buildObservabilityAndSecurityGoalAuditItems(
         'redacts sensitive values from user notes in acceptance records',
         'redacts sensitive repo path values in handoff commands',
         'fills safe form fields and skips sensitive fields before submit interactions',
-        'destructive_or_sensitive_action'
+        'destructive_or_sensitive_action',
+        'local-first provider security evidence import',
+        'Do not upload target code',
+        'provider provenance',
+        'security-summary.json',
+        'security-findings.json',
+        'does not invoke Codex Security runtime',
+        'not.toContain(\'sk-live-secret\')'
       ],
-      evidence: ['codex goal documents local-only boundaries; analyze_repo returns env key hints; shared redaction is used by CLI, MCP, report and acceptance paths; handoff commands redact sensitive repo path values; browser tests skip sensitive fields and destructive actions']
+      evidence: ['codex goal documents local-only boundaries; analyze_repo returns env key hints; shared redaction is used by CLI, MCP, report and acceptance paths; handoff commands redact sensitive repo path values; browser tests skip sensitive fields and destructive actions; security assurance imports local provider evidence with redaction, provider provenance, and no scanner runtime or upload']
+    }),
+    buildGoalAuditTextRequirement({
+      category: 'Security Assurance Lane',
+      requirement: '本地安全证据导入和 repair planning 集成',
+      text: [
+        sources.readme,
+        sources.securityLaneSpec,
+        sources.securityAssuranceImporter,
+        sources.securityImportTool,
+        sources.repairPlanGenerator,
+        sources.securityAssuranceTests,
+        sources.cliRun
+      ].join('\n'),
+      needles: [
+        'hardening security import --provider codex-security',
+        'security-summary.json',
+        'security-findings.json',
+        'import-manifest.json',
+        'normalized-findings.json',
+        'provider provenance',
+        'readSecurityFindings',
+        "type: 'security'",
+        "kind: 'file'",
+        'feeds imported security findings into repair plan',
+        'does not invoke Codex Security runtime',
+        'no native deep vulnerability scanner'
+      ],
+      evidence: ['Security Assurance Lane Phase 1 imports local provider scan directories, writes run-scoped redacted security artifacts, preserves provider provenance, and feeds security findings into repair plan and repair task package outputs without becoming a required MVP gate']
     })
   ];
 }

@@ -17,6 +17,9 @@ importers:
       '@hardening-mcp/repair-planner':
         specifier: workspace:*
         version: link:packages/repair-planner
+      '@hardening-mcp/security-assurance':
+        specifier: workspace:*
+        version: link:packages/security-assurance
       '@hardening-mcp/shared':
         specifier: workspace:*
         version: link:packages/shared
@@ -64,6 +67,12 @@ importers:
         version: 1.61.0
 
   packages/repair-planner:
+    dependencies:
+      '@hardening-mcp/shared':
+        specifier: workspace:*
+        version: link:../shared
+
+  packages/security-assurance:
     dependencies:
       '@hardening-mcp/shared':
         specifier: workspace:*

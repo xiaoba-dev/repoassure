@@ -40,6 +40,13 @@ import {
   legacyBrowserExplorerDistOutputEntries,
   legacyBrowserExplorerWrapperSourceEntries
 } from '../../packages/browser-explorer/src/index.js';
+import {
+  securityAssuranceCompatibilityContract,
+  securityAssurancePackageDistOutputEntries,
+  securityAssurancePackageExportEntries,
+  securityAssurancePackageSourceEntries,
+  securityAssurancePackageSubpathSpecifiers
+} from '../../packages/security-assurance/src/index.js';
 
 describe('project structure', () => {
   it('routes benchmark artifacts through the artifacts directory while excluding legacy output', async () => {
@@ -111,7 +118,7 @@ describe('project structure', () => {
     expect(monorepoSpec).toContain('Monorepo Structure Spec v0.1');
     expect(monorepoSpec).toContain('Phase 0: Scaffold and Contract');
     expect(monorepoSpec).toContain('Phase 0 status: completed');
-    expect(monorepoSpec).toContain('Phase 2 acceptance package pilot, Phase 2c shared package extraction, Phase 2d repair-planner package extraction, and Phase 2e browser-explorer package extraction are part of the current acceptance criteria');
+    expect(monorepoSpec).toContain('Phase 2 acceptance package pilot, Phase 2c shared package extraction, Phase 2d repair-planner package extraction, Phase 2e browser-explorer package extraction, and Phase 2f security-assurance package extraction are part of the current acceptance criteria');
     expect(monorepoSpec).not.toContain('Status: In progress.');
     expect(monorepoSpec).not.toContain('Do not move runtime code yet');
     expect(monorepoSpec).not.toContain('Existing quality gates continue to pass after Phase 0.');
@@ -150,7 +157,7 @@ describe('project structure', () => {
       readFile('docs/adr/0006-package-build-strategy.md', 'utf8')
     ]);
 
-    expect(monorepoSpec).toContain('Phase 2 status: acceptance package pilot, Phase 2c shared package extraction, Phase 2d repair-planner package extraction, and Phase 2e browser-explorer package extraction implemented; broader package extraction remains deferred');
+    expect(monorepoSpec).toContain('Phase 2 status: acceptance package pilot, Phase 2c shared package extraction, Phase 2d repair-planner package extraction, Phase 2e browser-explorer package extraction, and Phase 2f security-assurance package extraction implemented; broader package extraction remains deferred');
     expect(monorepoSpec).toContain('ADR-0006: Package Build Strategy');
     expect(monorepoSpec).toContain('Phase 2c shared package status: implemented with compatibility wrappers');
     expect(monorepoSpec).toContain('`packages/shared/src` owns shared utility implementation modules');
@@ -461,18 +468,21 @@ describe('project structure', () => {
 
     expect(rootPackageJson).toContain('"build": "pnpm build:packages && pnpm build:src"');
     expect(rootPackageJson).toContain('"build:src": "tsc -p tsconfig.build.json"');
-    expect(rootPackageJson).toContain('"build:packages": "pnpm build:shared && pnpm build:browser-explorer && pnpm build:repair-planner && pnpm build:acceptance"');
+    expect(rootPackageJson).toContain('"build:packages": "pnpm build:shared && pnpm build:security-assurance && pnpm build:browser-explorer && pnpm build:repair-planner && pnpm build:acceptance"');
     expect(rootPackageJson).toContain('"build:shared": "tsc -p packages/shared/tsconfig.build.json"');
+    expect(rootPackageJson).toContain('"build:security-assurance": "tsc -p packages/security-assurance/tsconfig.build.json"');
     expect(rootPackageJson).toContain('"build:browser-explorer": "tsc -p packages/browser-explorer/tsconfig.build.json"');
     expect(rootPackageJson).toContain('"build:repair-planner": "tsc -p packages/repair-planner/tsconfig.build.json"');
     expect(rootPackageJson).toContain('"build:acceptance": "tsc -p packages/acceptance/tsconfig.build.json"');
     expect(rootPackageJson).toContain('"typecheck": "pnpm build:packages && tsc --noEmit && pnpm typecheck:packages"');
-    expect(rootPackageJson).toContain('"typecheck:packages": "pnpm typecheck:shared && pnpm typecheck:browser-explorer && pnpm typecheck:repair-planner && pnpm typecheck:acceptance"');
+    expect(rootPackageJson).toContain('"typecheck:packages": "pnpm typecheck:shared && pnpm typecheck:security-assurance && pnpm typecheck:browser-explorer && pnpm typecheck:repair-planner && pnpm typecheck:acceptance"');
     expect(rootPackageJson).toContain('"typecheck:shared": "tsc -p packages/shared/tsconfig.json --noEmit"');
+    expect(rootPackageJson).toContain('"typecheck:security-assurance": "tsc -p packages/security-assurance/tsconfig.json --noEmit"');
     expect(rootPackageJson).toContain('"typecheck:browser-explorer": "tsc -p packages/browser-explorer/tsconfig.json --noEmit"');
     expect(rootPackageJson).toContain('"typecheck:repair-planner": "tsc -p packages/repair-planner/tsconfig.json --noEmit"');
     expect(rootPackageJson).toContain('"typecheck:acceptance": "tsc -p packages/acceptance/tsconfig.json --noEmit"');
     expect(rootPackageJson).toContain('"@hardening-mcp/acceptance": "workspace:*"');
+    expect(rootPackageJson).toContain('"@hardening-mcp/security-assurance": "workspace:*"');
     expect(rootPackageJson).toContain('"acceptance": "node packages/acceptance/dist/run-acceptance.js"');
     expect(rootPackageJson).toContain('"goal:audit": "node packages/acceptance/dist/run-goal-audit.js"');
     expect(rootPackageJson).toContain('"user:accept": "node packages/acceptance/dist/run-user-acceptance.js"');
@@ -854,8 +864,9 @@ describe('project structure', () => {
     expect(codexSecurityAdr).toContain('repoassure security import --provider codex-security --scan-dir <scan-dir>');
     expect(architectureOverview).toContain('[ADR-0013](../adr/0013-codex-security-and-security-assurance-lane.md)');
     expect(architectureOverview).toContain('Security Assurance Lane');
-    expect(mvpSpec).toContain('ADR-0013 将 Codex Security 视为未来优先集成的 security provider');
-    expect(mvpSpec).toContain('当前 v0.2 不自研 deep vulnerability scanner');
+    expect(mvpSpec).toContain('ADR-0013 将 Codex Security 视为优先集成的 security provider');
+    expect(mvpSpec).toContain('当前已实现 Phase 1 本地 provider scan directory 导入 MVP');
+    expect(mvpSpec).toContain('不自研 deep vulnerability scanner');
     expect(competitiveLandscape).toContain('Platform-native security scan');
     expect(competitiveLandscape).toContain('Codex Security');
     expect(competitiveLandscape).toContain('Provider-backed Security Assurance Lane');
@@ -892,7 +903,8 @@ describe('project structure', () => {
 
     expect(openCoreSpec).toContain('| `packages/browser-explorer` | Open core | Implemented browser and route exploration package |');
     expect(openCoreSpec).toContain('| `packages/repair-planner` | Open core | Implemented repair plan and executable task package package |');
-    expect(openCoreSpec).toContain('| Security Assurance Lane | Open core interface, provider-specific packaging TBD | Future provider-backed security evidence import boundary |');
+    expect(openCoreSpec).toContain('| `packages/security-assurance` | Open core | Implemented local-first provider security evidence import package |');
+    expect(openCoreSpec).toContain('| Security Assurance Lane | Open core interface | Optional provider-backed security evidence import boundary |');
     expect(openCoreSpec).not.toContain('| `packages/browser-explorer` | Open core target | Future browser exploration package |');
     expect(openCoreSpec).not.toContain('| `packages/repair-planner` | Open core target | Future repair plan and task package package |');
 
@@ -912,6 +924,96 @@ describe('project structure', () => {
     expect(architectureOverview).toContain('security-assurance-lane-spec-v0.1.md');
     expect(decisionLog).toContain('自动化治理收口与 Security Assurance Lane 规格');
     expect(devLog).toContain('Governance Cleanup and Security Assurance Lane Spec');
+  });
+
+  it('keeps Security Assurance Lane Phase 1 package, CLI, and repair integration under structure governance', async () => {
+    const [
+      rootPackageJsonText,
+      securityPackageJsonText,
+      securityReadme,
+      securityIndex,
+      packageSubpathTypeSmoke,
+      cliRun,
+      repairPlanGenerator,
+      monorepoSpec,
+      architectureOverview,
+      mvpSpec,
+      readme,
+      securityLaneSpec,
+      packageSourceFiles
+    ] = await Promise.all([
+      readFile('package.json', 'utf8'),
+      readFile('packages/security-assurance/package.json', 'utf8'),
+      readFile('packages/security-assurance/README.md', 'utf8'),
+      readFile('packages/security-assurance/src/index.ts', 'utf8'),
+      readFile('tests/type-smoke/security-assurance-package-subpaths.ts', 'utf8'),
+      readFile('src/adapters/cli/run.ts', 'utf8'),
+      readFile('packages/repair-planner/src/generate-repair-plan.ts', 'utf8'),
+      readFile('docs/architecture/specs/monorepo-structure-spec-v0.1.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/product/specs/mvp-spec-v0.2.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/architecture/specs/security-assurance-lane-spec-v0.1.md', 'utf8'),
+      listFiles('packages/security-assurance/src')
+    ]);
+    const rootPackageJson = JSON.parse(rootPackageJsonText) as {
+      scripts?: Record<string, string>;
+      dependencies?: Record<string, string>;
+    };
+    const securityPackageJson = JSON.parse(securityPackageJsonText) as {
+      name?: string;
+      main?: string;
+      exports?: Record<string, { types?: string; default?: string } | string>;
+    };
+    const packageModuleNames = packageSourceFiles
+      .filter((path) => path.endsWith('.ts'))
+      .map((path) => path.replace('packages/security-assurance/src/', '').replace(/\.ts$/u, ''))
+      .filter((moduleName) => moduleName !== 'index')
+      .sort();
+
+    expect(rootPackageJson.dependencies?.['@hardening-mcp/security-assurance']).toBe('workspace:*');
+    expect(rootPackageJson.scripts?.['build:security-assurance']).toBe('tsc -p packages/security-assurance/tsconfig.build.json');
+    expect(rootPackageJson.scripts?.['typecheck:security-assurance']).toBe('tsc -p packages/security-assurance/tsconfig.json --noEmit');
+    expect(securityPackageJson.name).toBe('@hardening-mcp/security-assurance');
+    expect(securityPackageJson.main).toBe('dist/index.js');
+    expect(Object.entries(securityPackageJson.exports ?? {}).sort(([left], [right]) => left.localeCompare(right))).toEqual(
+      [...securityAssurancePackageExportEntries]
+        .map((entry) => [entry.exportPath, { types: entry.types, default: entry.default }])
+        .sort(([left], [right]) => String(left).localeCompare(String(right)))
+    );
+    expect([...securityAssuranceCompatibilityContract.packageOwnedModules].sort()).toEqual(packageModuleNames);
+    expect(securityAssurancePackageSourceEntries.map((entry) => entry.path).sort()).toEqual(
+      packageSourceFiles.filter((path) => path.endsWith('.ts')).sort()
+    );
+    for (const entry of securityAssurancePackageDistOutputEntries) {
+      expect(entry.jsPath).toContain('packages/security-assurance/dist/');
+      expect(entry.declarationPath).toContain('packages/security-assurance/dist/');
+      expect(entry.sourceMapPath).toContain('packages/security-assurance/dist/');
+    }
+    for (const moduleName of securityAssuranceCompatibilityContract.packageOwnedModules) {
+      expect(packageSubpathTypeSmoke).toContain(`from '@hardening-mcp/security-assurance/${moduleName}'`);
+      expect(securityAssurancePackageSubpathSpecifiers).toContain(`@hardening-mcp/security-assurance/${moduleName}`);
+    }
+    expect(packageSubpathTypeSmoke).toContain("from '@hardening-mcp/security-assurance'");
+    expect(securityIndex).toContain("export * from './import-security-evidence.js'");
+    expect(securityReadme).toContain('Security Assurance Lane Phase 1 package');
+    expect(cliRun).toContain('hardening security import --provider <provider> --scan-dir <dir> --repo <repo> --run-dir <dir>');
+    expect(repairPlanGenerator).toContain("readSecurityFindings(join(input.runDir, 'security', 'security-findings.json'))");
+    expect(repairPlanGenerator).toContain("type: 'security'");
+    expect(monorepoSpec).toContain('Phase 2f security-assurance package status: implemented');
+    expect(architectureOverview).toContain('@hardening-mcp/security-assurance');
+    expect(mvpSpec).toContain('Security Assurance Lane Phase 1');
+    expect(readme).toContain('hardening security import --provider codex-security');
+    expect(securityLaneSpec).toContain('Phase 1 implementation note');
+
+    await expectPath('packages/security-assurance/package.json');
+    await expectPath('packages/security-assurance/tsconfig.json');
+    await expectPath('packages/security-assurance/tsconfig.build.json');
+    await expectPath('packages/security-assurance/src/index.ts');
+    await expectPath('packages/security-assurance/src/compatibility.ts');
+    await expectPath('packages/security-assurance/src/import-security-evidence.ts');
+    await expectPath('src/tools/security-import-tool.ts');
+    await expectPath('fixtures/security/codex-security-basic/scan.json');
   });
 
   it('records current browser explorer package extraction evidence gates in the dev log entry', async () => {
@@ -1501,13 +1603,15 @@ describe('project structure', () => {
       .map((path) => path.replace('src/shared/', '').replace(/\.ts$/u, ''))
       .sort();
 
-    expect(rootPackageJson.scripts?.['build:packages']).toBe('pnpm build:shared && pnpm build:browser-explorer && pnpm build:repair-planner && pnpm build:acceptance');
+    expect(rootPackageJson.scripts?.['build:packages']).toBe('pnpm build:shared && pnpm build:security-assurance && pnpm build:browser-explorer && pnpm build:repair-planner && pnpm build:acceptance');
     expect(rootPackageJson.scripts?.['build:shared']).toBe('tsc -p packages/shared/tsconfig.build.json');
+    expect(rootPackageJson.scripts?.['build:security-assurance']).toBe('tsc -p packages/security-assurance/tsconfig.build.json');
     expect(rootPackageJson.scripts?.['build:browser-explorer']).toBe('tsc -p packages/browser-explorer/tsconfig.build.json');
     expect(rootPackageJson.scripts?.['build:repair-planner']).toBe('tsc -p packages/repair-planner/tsconfig.build.json');
     expect(rootPackageJson.scripts?.['build:acceptance']).toBe('tsc -p packages/acceptance/tsconfig.build.json');
-    expect(rootPackageJson.scripts?.['typecheck:packages']).toBe('pnpm typecheck:shared && pnpm typecheck:browser-explorer && pnpm typecheck:repair-planner && pnpm typecheck:acceptance');
+    expect(rootPackageJson.scripts?.['typecheck:packages']).toBe('pnpm typecheck:shared && pnpm typecheck:security-assurance && pnpm typecheck:browser-explorer && pnpm typecheck:repair-planner && pnpm typecheck:acceptance');
     expect(rootPackageJson.scripts?.['typecheck:shared']).toBe('tsc -p packages/shared/tsconfig.json --noEmit');
+    expect(rootPackageJson.scripts?.['typecheck:security-assurance']).toBe('tsc -p packages/security-assurance/tsconfig.json --noEmit');
     expect(rootPackageJson.scripts?.['typecheck:browser-explorer']).toBe('tsc -p packages/browser-explorer/tsconfig.json --noEmit');
     expect(rootPackageJson.scripts?.['typecheck:repair-planner']).toBe('tsc -p packages/repair-planner/tsconfig.json --noEmit');
     expect(rootPackageJson.scripts?.['typecheck:acceptance']).toBe('tsc -p packages/acceptance/tsconfig.json --noEmit');
@@ -1639,9 +1743,9 @@ describe('project structure', () => {
       'repair-plan'
     ].sort();
 
-    expect(rootPackageJson.scripts?.['build:packages']).toBe('pnpm build:shared && pnpm build:browser-explorer && pnpm build:repair-planner && pnpm build:acceptance');
+    expect(rootPackageJson.scripts?.['build:packages']).toBe('pnpm build:shared && pnpm build:security-assurance && pnpm build:browser-explorer && pnpm build:repair-planner && pnpm build:acceptance');
     expect(rootPackageJson.scripts?.['build:repair-planner']).toBe('tsc -p packages/repair-planner/tsconfig.build.json');
-    expect(rootPackageJson.scripts?.['typecheck:packages']).toBe('pnpm typecheck:shared && pnpm typecheck:browser-explorer && pnpm typecheck:repair-planner && pnpm typecheck:acceptance');
+    expect(rootPackageJson.scripts?.['typecheck:packages']).toBe('pnpm typecheck:shared && pnpm typecheck:security-assurance && pnpm typecheck:browser-explorer && pnpm typecheck:repair-planner && pnpm typecheck:acceptance');
     expect(rootPackageJson.scripts?.['typecheck:repair-planner']).toBe('tsc -p packages/repair-planner/tsconfig.json --noEmit');
     expect(rootPackageJson.dependencies?.['@hardening-mcp/repair-planner']).toBe('workspace:*');
 
@@ -1764,9 +1868,9 @@ describe('project structure', () => {
       .map((path) => path.replace('src/domain/explore/', '').replace(/\.ts$/u, ''))
       .sort();
 
-    expect(rootPackageJson.scripts?.['build:packages']).toBe('pnpm build:shared && pnpm build:browser-explorer && pnpm build:repair-planner && pnpm build:acceptance');
+    expect(rootPackageJson.scripts?.['build:packages']).toBe('pnpm build:shared && pnpm build:security-assurance && pnpm build:browser-explorer && pnpm build:repair-planner && pnpm build:acceptance');
     expect(rootPackageJson.scripts?.['build:browser-explorer']).toBe('tsc -p packages/browser-explorer/tsconfig.build.json');
-    expect(rootPackageJson.scripts?.['typecheck:packages']).toBe('pnpm typecheck:shared && pnpm typecheck:browser-explorer && pnpm typecheck:repair-planner && pnpm typecheck:acceptance');
+    expect(rootPackageJson.scripts?.['typecheck:packages']).toBe('pnpm typecheck:shared && pnpm typecheck:security-assurance && pnpm typecheck:browser-explorer && pnpm typecheck:repair-planner && pnpm typecheck:acceptance');
     expect(rootPackageJson.scripts?.['typecheck:browser-explorer']).toBe('tsc -p packages/browser-explorer/tsconfig.json --noEmit');
     expect(rootPackageJson.dependencies?.['@hardening-mcp/browser-explorer']).toBe('workspace:*');
 

@@ -185,6 +185,8 @@ describe('acceptance package', () => {
       readText: async (path) => path
     })).resolves.toEqual(expect.objectContaining({
       packageJson: '/repo/package.json',
+      securityAssurancePackageJson: '/repo/packages/security-assurance/package.json',
+      securityAssuranceImporter: '/repo/packages/security-assurance/src/import-security-evidence.ts',
       legacyDistAcceptanceRunAcceptance: '/repo/dist/internal/acceptance/run-acceptance.js',
       legacyDistAcceptanceRunAcceptanceDeclaration: '/repo/dist/internal/acceptance/run-acceptance.d.ts',
       cliSmokeTests: expect.stringContaining('/repo/tests/integration/cli-run.test.ts')
@@ -211,12 +213,12 @@ describe('acceptance package', () => {
 
   it('exports observability and security goal audit builders as package-owned implementation', () => {
     expect(acceptanceCompatibilityContract.packageOwnedModules).toContain('goal-audit-observability-security');
-    expect(buildObservabilityAndSecurityGoalAuditItems({})).toHaveLength(3);
+    expect(buildObservabilityAndSecurityGoalAuditItems({})).toHaveLength(4);
   });
 
   it('exports process governance goal audit builders as package-owned implementation', () => {
     expect(acceptanceCompatibilityContract.packageOwnedModules).toContain('goal-audit-process-governance');
-    expect(buildProcessGovernanceGoalAuditItems({})).toHaveLength(9);
+    expect(buildProcessGovernanceGoalAuditItems({})).toHaveLength(10);
   });
 
   it('exports evidence and document goal audit builders as package-owned implementation', async () => {
@@ -233,7 +235,7 @@ describe('acceptance package', () => {
       sources: {},
       pathExists: async () => false,
       userAcceptanceStatus: 'pending_or_invalid'
-    })).resolves.toHaveLength(31);
+    })).resolves.toHaveLength(33);
   });
 
   it('exports user acceptance helpers as package-owned implementation', () => {

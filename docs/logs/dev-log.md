@@ -1,5 +1,38 @@
 # 开发日志
 
+## 2026年6月23日 - Security Assurance Lane Phase 1 Local Import
+
+### 完成内容
+
+- 新增 `@hardening-mcp/security-assurance` / `packages/security-assurance`，实现 local-first provider security evidence import。
+- 新增 Codex Security fixture-style scan directory：`fixtures/security/codex-security-basic/scan.json`。
+- 新增 `hardening security import --provider codex-security --scan-dir <dir> --repo <repo> --run-dir <dir>`，通过 `src/tools/security-import-tool.ts` 调用 package importer。
+- security import 生成 run-scoped `security/security-summary.json`、`security/security-findings.json`、provider `import-manifest.json` 和 `normalized-findings.json`。
+- repair-planner 读取 `security/security-findings.json`，将 security findings 转成 repair plan / repair task package tasks，保留 provider provenance、file target areas、verification commands 和 redacted security evidence。
+- 级联更新 README、monorepo spec、architecture overview、MVP spec、Security Assurance Lane spec、open-core packaging spec 和 decision log。
+- 本轮不调用 Codex Security plugin/runtime、不运行 scanner、不联网、不上传目标 repo、不创建 issue/PR/advisory、不修改目标 repo，不把 security import 变成 MVP 必需验收门槛。
+
+### 验证
+
+- Red：`pnpm vitest run tests/unit/security-assurance.test.ts` 因 `packages/security-assurance/src/import-security-evidence.js` 缺失按预期失败。
+- Green：`pnpm vitest run tests/unit/security-assurance.test.ts` 通过，2 个测试。
+- Red：`pnpm vitest run tests/unit/cli-options.test.ts --testNamePattern "security|imports local security"` 因 `security` CLI command 缺失按预期失败。
+- Green：同一 CLI focused test 通过，3 个相关测试。
+- Red：`pnpm vitest run tests/unit/project-structure.test.ts --testNamePattern "Security Assurance Lane Phase 1"` 因 monorepo / docs 级联尚未完成按预期失败。
+- Green：`pnpm vitest run tests/unit/security-assurance.test.ts tests/unit/cli-options.test.ts tests/unit/repair-plan.test.ts tests/unit/project-structure.test.ts tests/unit/goal-audit.test.ts` 通过，5 个测试文件、200 个测试。
+- `pnpm repo:hygiene`：通过。
+- `pnpm build`：通过。
+- `pnpm typecheck`：通过。
+- `pnpm lint`：通过。
+- `pnpm test:unit`：首次完整运行因 acceptance package 旧数量契约仍为 3/9/31 而失败；同步为 Security Assurance Lane 后的 4/10/33 后复跑通过，34 个测试文件、524 个测试。
+- `pnpm test:integration`：通过，11 个测试文件、27 个测试。
+- `pnpm test:e2e`：通过 1 个测试文件、1 个测试；跳过 1 个环境条件测试。
+- `pnpm goal:audit`：通过，33 项检查、32 项已通过、0 missing、1 项需要人工确认。
+
+### 阻塞
+
+- 无新增产品阻塞。
+
 ## 2026年6月23日 - Governance Cleanup and Security Assurance Lane Spec
 
 ### 完成内容

@@ -9,8 +9,8 @@ export type FindingType =
   | 'network_error';
 
 export type RepairTaskStatus = 'todo';
-export type RepairEvidenceType = 'finding' | 'test' | 'boot';
-export type RepairTargetAreaKind = 'route' | 'interaction' | 'unknown';
+export type RepairEvidenceType = 'finding' | 'test' | 'boot' | 'security';
+export type RepairTargetAreaKind = 'route' | 'interaction' | 'file' | 'unknown';
 export type RepairTaskPackageStatus = 'todo';
 
 export interface RepairPlan {

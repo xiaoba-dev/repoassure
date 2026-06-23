@@ -1,0 +1,25 @@
+{
+  "name": "@hardening-mcp/security-assurance",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./compatibility": {
+      "types": "./dist/compatibility.d.ts",
+      "default": "./dist/compatibility.js"
+    },
+    "./import-security-evidence": {
+      "types": "./dist/import-security-evidence.d.ts",
+      "default": "./dist/import-security-evidence.js"
+    }
+  },
+  "dependencies": {
+    "@hardening-mcp/shared": "workspace:*"
+  }
+}

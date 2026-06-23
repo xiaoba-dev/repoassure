@@ -160,14 +160,14 @@ flowchart TB
 | Repair Planner | `@hardening-mcp/repair-planner` / `packages/repair-planner/` | repair plan 与 executable repair task package 实现；`src/domain/repair-plan/`、`dist/domain/repair-plan/` 和 `src/types/repair-plan.ts` / `dist/types/repair-plan.*` 保留兼容 wrapper/output |
 | Browser Explorer | `@hardening-mcp/browser-explorer` / `packages/browser-explorer/` | fetch route exploration、Playwright browser exploration、安全交互、截图和 trace evidence 实现；`src/domain/explore/` 与 `dist/domain/explore/` 保留兼容 wrapper/output |
 | Shared | `@hardening-mcp/shared` / `packages/shared/` | 脱敏、shell quoting、shell word parsing 等共享 helper；`src/shared/` 与 `dist/shared/` 保留兼容 wrapper/output |
-| Security Assurance Lane | Future `packages/security-assurance/` or provider adapters | 按 ADR-0013 和 `docs/architecture/specs/security-assurance-lane-spec-v0.1.md` 作为 provider-backed evidence lane；Codex Security、CodeQL、Semgrep、Gitleaks、OSV 等输出应被导入和规范化为 RepoAssure artifact / repair planning 输入，而不是替代当前 acceptance workflow |
+| Security Assurance Lane | `@hardening-mcp/security-assurance` / `packages/security-assurance/` | 按 ADR-0013 和 `docs/architecture/specs/security-assurance-lane-spec-v0.1.md` 作为 provider-backed evidence lane；Phase 1 已支持本地 provider scan directory 导入、provider provenance 保留、security artifact 生成和 repair-plan integration，但不运行 scanner、不联网、不上传目标 repo，也不是当前 acceptance workflow 的替代或必需门槛 |
 | Internal | `src/internal/` | acceptance、goal audit、benchmark 等项目治理工具 |
 | Shared Types | `src/types/` | findings、repair plan 等共享契约 |
 | Benchmark | `src/internal/benchmark/`、`scripts/run-benchmark.mjs` | benchmark 汇总与 `docs/logs/spike-results.md` 生成 |
 
 ## CLI 与 MCP 共享实现
 
-CLI 和 MCP 不各自实现业务逻辑。它们都调用 `src/tools/*`，而 tool wrappers 再调用 `src/domain/*`、`@hardening-mcp/shared`、`@hardening-mcp/browser-explorer` 和 `@hardening-mcp/repair-planner`；迁移窗口内的旧 `src/shared/*` import 会通过 wrapper 指向 `packages/shared/dist/*`，旧 `src/domain/explore/*` import 会通过 wrapper 指向 `packages/browser-explorer/dist/*`，旧 `src/domain/repair-plan/*` 与 `src/types/repair-plan.ts` import 会通过 wrapper 指向 `packages/repair-planner/dist/*`。
+CLI 和 MCP 不各自实现业务逻辑。它们都调用 `src/tools/*`，而 tool wrappers 再调用 `src/domain/*`、`@hardening-mcp/shared`、`@hardening-mcp/security-assurance`、`@hardening-mcp/browser-explorer` 和 `@hardening-mcp/repair-planner`；迁移窗口内的旧 `src/shared/*` import 会通过 wrapper 指向 `packages/shared/dist/*`，旧 `src/domain/explore/*` import 会通过 wrapper 指向 `packages/browser-explorer/dist/*`，旧 `src/domain/repair-plan/*` 与 `src/types/repair-plan.ts` import 会通过 wrapper 指向 `packages/repair-planner/dist/*`。
 
 这样做的目的：
 

@@ -1,3 +1,7 @@
+import { mkdtemp, readFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
 import { formatCliJsonOutput, parseGenerateTestsOptions, parseRepoUrlOptions, runCli } from '../../src/adapters/cli/run.js';
 
 async function runCliForTest(args: string[]): Promise<{ exitCode: number; stdout: string; stderr: string }> {
@@ -230,6 +234,7 @@ describe('runCli argument validation', () => {
     ['generate-tests', 'hardening generate-tests <findingsPath> <outputDir>'],
     ['plan', 'hardening plan <repo>'],
     ['report', 'hardening report <runDir> <outputPath>'],
+    ['security', 'hardening security import --provider <provider> --scan-dir <dir> --repo <repo> --run-dir <dir>'],
     ['run', 'hardening run <repo> [url]']
   ])('prints command help for %s without running the command', async (command, usage) => {
     await expect(runCliForTest([command, '--help'])).resolves.toEqual({
@@ -239,7 +244,7 @@ describe('runCli argument validation', () => {
     });
   });
 
-  it.each(['analyze', 'explore', 'generate-tests', 'plan', 'report', 'run'])(
+  it.each(['analyze', 'explore', 'generate-tests', 'plan', 'report', 'security', 'run'])(
     'prints short command help for %s with the help option documented',
     async (command) => {
       await expect(runCliForTest([command, '-h'])).resolves.toEqual({
@@ -279,6 +284,36 @@ describe('runCli argument validation', () => {
       stdout: '',
       stderr: 'Unexpected argument: unexpected\n'
     });
+  });
+
+  it('imports local security evidence from the CLI without running a scanner', async () => {
+    const repoRoot = await mkdtemp(join(tmpdir(), 'repoassure-cli-security-repo-'));
+    const runDir = join(repoRoot, '.hardening', 'runs', 'run-cli-security');
+    const result = await runCliForTest([
+      'security',
+      'import',
+      '--provider',
+      'codex-security',
+      '--scan-dir',
+      join(process.cwd(), 'fixtures/security/codex-security-basic'),
+      '--repo',
+      repoRoot,
+      '--run-dir',
+      runDir
+    ]);
+    const output = JSON.parse(result.stdout) as {
+      securitySummaryPath: string;
+      securityFindingsPath: string;
+      findingCount: number;
+      highestSeverity: string;
+    };
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(output.findingCount).toBe(1);
+    expect(output.highestSeverity).toBe('P1');
+    await expect(readFile(output.securitySummaryPath, 'utf8')).resolves.toContain('"providerCount": 1');
+    await expect(readFile(output.securityFindingsPath, 'utf8')).resolves.toContain('"provider": "codex-security"');
   });
 });
 

@@ -51,6 +51,7 @@ export async function buildCurrentGoalAuditItemsFromSources(
     ...evidenceAndDocumentItems,
     observabilityAndSecurityItems[1],
     observabilityAndSecurityItems[2],
+    observabilityAndSecurityItems[3],
     ...userAcceptanceMaterialItems,
     buildUserAcceptanceGoalRequirement(input.userAcceptanceStatus)
   ].filter(isGoalAuditItem);

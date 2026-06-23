@@ -229,6 +229,20 @@ describe('goal audit', () => {
 
     expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.packageJson).toBe('package.json');
     expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.browserExplorerPackageJson).toBe('packages/browser-explorer/package.json');
+    expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.securityAssurancePackageJson).toBe(
+      'packages/security-assurance/package.json'
+    );
+    expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.securityAssuranceImporter).toBe(
+      'packages/security-assurance/src/import-security-evidence.ts'
+    );
+    expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.securityImportTool).toBe('src/tools/security-import-tool.ts');
+    expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.securityAssuranceTests).toBe('tests/unit/security-assurance.test.ts');
+    expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.securityAssuranceTypeSmoke).toBe(
+      'tests/type-smoke/security-assurance-package-subpaths.ts'
+    );
+    expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.securityLaneSpec).toBe(
+      'docs/architecture/specs/security-assurance-lane-spec-v0.1.md'
+    );
     expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.playwrightDriver).toBe('packages/browser-explorer/src/playwright-driver.ts');
     expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.legacyBrowserExplorerExploreApp).toBe('src/domain/explore/explore-app.ts');
     expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.legacyBrowserExplorerPlaywrightDriver).toBe('src/domain/explore/playwright-driver.ts');
@@ -279,11 +293,21 @@ describe('goal audit', () => {
       'tests/integration/cli-run.test.ts'
     ]);
     expect(reads).toContain('/repo/package.json');
+    expect(reads).toContain('/repo/packages/security-assurance/package.json');
+    expect(reads).toContain('/repo/packages/security-assurance/src/import-security-evidence.ts');
+    expect(reads).toContain('/repo/src/tools/security-import-tool.ts');
+    expect(reads).toContain('/repo/tests/unit/security-assurance.test.ts');
+    expect(reads).toContain('/repo/tests/type-smoke/security-assurance-package-subpaths.ts');
+    expect(reads).toContain('/repo/docs/architecture/specs/security-assurance-lane-spec-v0.1.md');
     expect(reads).toContain('/repo/tests/integration/cli-run.test.ts');
     expect(reads).toContain('/repo/src/internal/acceptance/run-user-acceptance.ts');
     expect(reads).toContain('/repo/packages/acceptance/dist/index.js');
     expect(reads).toContain('/repo/packages/acceptance/dist/index.d.ts');
     expect(sources.packageJson).toBe('content:/repo/package.json');
+    expect(sources.securityAssuranceImporter).toBe(
+      'content:/repo/packages/security-assurance/src/import-security-evidence.ts'
+    );
+    expect(sources.securityImportTool).toBe('content:/repo/src/tools/security-import-tool.ts');
     expect(sources.packageAcceptanceDistIndex).toBe('content:/repo/packages/acceptance/dist/index.js');
     expect(sources.packageAcceptanceDistIndexDeclaration).toBe(
       'content:/repo/packages/acceptance/dist/index.d.ts'
@@ -453,6 +477,9 @@ describe('goal audit', () => {
       userAcceptanceGuide: '本地优先 不读取浏览器个人资料 工具是否没有输出 env value 或敏感信息',
       analyzeRepo: 'envHints',
       privacyRedaction: 'redactSensitiveText sensitiveKeyValuePattern',
+      securityAssuranceImporter: 'local-first provider security evidence import provider provenance security-summary.json security-findings.json does not invoke Codex Security runtime',
+      securityImportTool: 'hardening security import --provider codex-security',
+      securityLaneSpec: 'Do not upload target code no native deep vulnerability scanner does not invoke Codex Security runtime provider provenance security-summary.json security-findings.json import-manifest.json normalized-findings.json',
       playwrightDriver: 'fills safe form fields and skips sensitive fields before submit interactions destructive_or_sensitive_action',
       bootAppTool: 'profilePath resultPath logsPath blockers errors',
       exploreAppTool: 'visitedRoutes artifactFiles',
@@ -461,6 +488,7 @@ describe('goal audit', () => {
       hardenReport: 'reproSteps evidence verificationCommand formatBlockersAndErrors',
       cliRun: 'redactSensitiveText',
       toolRegistry: 'redactSensitiveText',
+      securityAssuranceTests: "not.toContain('sk-live-secret') readSecurityFindings type: 'security' kind: 'file' feeds imported security findings into repair plan",
       securityTests: 'redacts sensitive values from successful CLI JSON output redacts sensitive values from successful MCP tool content and structured content redacts sensitive values from boot errors in reports and patch diffs redacts sensitive values from user notes in acceptance records redacts sensitive repo path values in handoff commands fills safe form fields and skips sensitive fields before submit interactions destructive_or_sensitive_action',
       observabilityTests: 'writes a serializable boot result artifact prints the repo profile and writes the artifact boots a local app, explores it with Playwright, writes artifacts, and stops the app'
     });
@@ -482,7 +510,13 @@ describe('goal audit', () => {
         category: '安全边界',
         requirement: '不硬编码密钥、不上传代码、不泄露 env value',
         status: 'passed',
-        evidence: ['codex goal documents local-only boundaries; analyze_repo returns env key hints; shared redaction is used by CLI, MCP, report and acceptance paths; handoff commands redact sensitive repo path values; browser tests skip sensitive fields and destructive actions']
+        evidence: ['codex goal documents local-only boundaries; analyze_repo returns env key hints; shared redaction is used by CLI, MCP, report and acceptance paths; handoff commands redact sensitive repo path values; browser tests skip sensitive fields and destructive actions; security assurance imports local provider evidence with redaction, provider provenance, and no scanner runtime or upload']
+      }),
+      expect.objectContaining({
+        category: 'Security Assurance Lane',
+        requirement: '本地安全证据导入和 repair planning 集成',
+        status: 'passed',
+        evidence: ['Security Assurance Lane Phase 1 imports local provider scan directories, writes run-scoped redacted security artifacts, preserves provider provenance, and feeds security findings into repair plan and repair task package outputs without becoming a required MVP gate']
       })
     ]);
   });
@@ -506,6 +540,12 @@ describe('goal audit', () => {
       expect.objectContaining({
         category: '安全边界',
         requirement: '不硬编码密钥、不上传代码、不泄露 env value',
+        status: 'missing',
+        nextAction: '补齐实现或文档证据后重新运行 goal audit。'
+      }),
+      expect.objectContaining({
+        category: 'Security Assurance Lane',
+        requirement: '本地安全证据导入和 repair planning 集成',
         status: 'missing',
         nextAction: '补齐实现或文档证据后重新运行 goal audit。'
       })
@@ -535,6 +575,8 @@ describe('goal audit', () => {
       packageJson: readFileSync('package.json', 'utf8'),
       acceptancePackageJson: readFileSync('packages/acceptance/package.json', 'utf8'),
       sharedPackageJson: readFileSync('packages/shared/package.json', 'utf8'),
+      securityAssurancePackageJson: readFileSync('packages/security-assurance/package.json', 'utf8'),
+      securityAssuranceTypeSmoke: readFileSync('tests/type-smoke/security-assurance-package-subpaths.ts', 'utf8'),
       repairPlannerPackageJson: readFileSync('packages/repair-planner/package.json', 'utf8'),
       browserExplorerPackageJson: readFileSync('packages/browser-explorer/package.json', 'utf8'),
       legacySharedPrivacyRedaction: 'packages/shared/dist',
@@ -624,6 +666,12 @@ describe('goal audit', () => {
       }),
       expect.objectContaining({
         category: '架构迁移',
+        requirement: 'Security assurance package typed module exports',
+        status: 'passed',
+        evidence: ['root package depends on @hardening-mcp/security-assurance workspace package; packages/security-assurance exports typed root, compatibility, and import-security-evidence subpaths; type-smoke covers root and subpath resolution']
+      }),
+      expect.objectContaining({
+        category: '架构迁移',
         requirement: 'Repair planner package typed module exports and legacy wrappers',
         status: 'passed',
         evidence: ['root package depends on @hardening-mcp/repair-planner workspace package; packages/repair-planner exports typed root, compatibility, generate-repair-plan, and repair-plan subpaths; src/domain/repair-plan/*.ts and src/types/repair-plan.ts delegate to packages/repair-planner/dist compatibility wrappers']
@@ -682,6 +730,12 @@ describe('goal audit', () => {
         requirement: 'Shared package typed module exports and legacy wrappers',
         status: 'missing',
         nextAction: '补齐 root workspace dependency、packages/shared typed exports 和 src/shared legacy wrappers 后重新运行 goal audit。'
+      }),
+      expect.objectContaining({
+        category: '架构迁移',
+        requirement: 'Security assurance package typed module exports',
+        status: 'missing',
+        nextAction: '补齐 root workspace dependency、packages/security-assurance typed exports 和 type-smoke 后重新运行 goal audit。'
       }),
       expect.objectContaining({
         category: '架构迁移',
@@ -907,6 +961,7 @@ describe('goal audit', () => {
       'pathExists: async',
       'packages/acceptance/dist',
       '"@hardening-mcp/acceptance": "workspace:*"',
+      '"@hardening-mcp/security-assurance": "workspace:*"',
       '"./run-acceptance"',
       '"types": "./dist/run-acceptance.d.ts"',
       '"default": "./dist/run-acceptance.js"',
@@ -919,6 +974,24 @@ describe('goal audit', () => {
       '"./run-user-acceptance-handoff"',
       '"types": "./dist/run-user-acceptance-handoff.d.ts"',
       '"default": "./dist/run-user-acceptance-handoff.js"',
+      '"./import-security-evidence"',
+      '"types": "./dist/import-security-evidence.d.ts"',
+      '"default": "./dist/import-security-evidence.js"',
+      'local-first provider security evidence import',
+      'provider provenance',
+      'security-summary.json',
+      'security-findings.json',
+      'import-manifest.json',
+      'normalized-findings.json',
+      'hardening security import --provider codex-security',
+      'Do not upload target code',
+      'does not invoke Codex Security runtime',
+      'no native deep vulnerability scanner',
+      "not.toContain('sk-live-secret')",
+      'readSecurityFindings',
+      "type: 'security'",
+      "kind: 'file'",
+      'feeds imported security findings into repair plan',
       '本地优先',
       '不读取浏览器个人资料',
       '工具是否没有输出 env value 或敏感信息',
@@ -943,6 +1016,8 @@ describe('goal audit', () => {
         packageJson: readFileSync('package.json', 'utf8'),
         acceptancePackageJson: readFileSync('packages/acceptance/package.json', 'utf8'),
         sharedPackageJson: readFileSync('packages/shared/package.json', 'utf8'),
+        securityAssurancePackageJson: readFileSync('packages/security-assurance/package.json', 'utf8'),
+        securityAssuranceTypeSmoke: readFileSync('tests/type-smoke/security-assurance-package-subpaths.ts', 'utf8'),
         repairPlannerPackageJson: readFileSync('packages/repair-planner/package.json', 'utf8'),
         browserExplorerPackageJson: readFileSync('packages/browser-explorer/package.json', 'utf8'),
         codexGoal: `最后更新：2026年6月21日\n${sharedMarkers}`,
@@ -952,6 +1027,10 @@ describe('goal audit', () => {
         cliRun: sharedMarkers,
         analyzeRepo: sharedMarkers,
         privacyRedaction: sharedMarkers,
+        securityAssuranceImporter: sharedMarkers,
+        securityImportTool: sharedMarkers,
+        securityAssuranceTests: sharedMarkers,
+        securityLaneSpec: sharedMarkers,
         playwrightDriver: sharedMarkers,
         bootAppTool: sharedMarkers,
         exploreAppTool: sharedMarkers,
@@ -1048,7 +1127,7 @@ describe('goal audit', () => {
       userAcceptanceStatus: 'pending_or_invalid'
     });
 
-    expect(items).toHaveLength(31);
+    expect(items).toHaveLength(33);
     expect(items.map((item) => `${item.category}:${item.requirement}`)).toEqual([
       '交付物:可运行的 CLI',
       '交付物:可运行的 MCP Server',
@@ -1066,6 +1145,7 @@ describe('goal audit', () => {
       '架构迁移:Legacy acceptance 兼容 wrapper',
       '架构迁移:Acceptance package typed module exports',
       '架构迁移:Shared package typed module exports and legacy wrappers',
+      '架构迁移:Security assurance package typed module exports',
       '架构迁移:Repair planner package typed module exports and legacy wrappers',
       '架构迁移:Browser explorer package typed module exports and legacy wrappers',
       '架构迁移:Legacy acceptance dist compatibility outputs',
@@ -1073,6 +1153,7 @@ describe('goal audit', () => {
       '文档与日志:Required Documents 已维护',
       'Local-first 与隐私:报告和验收文档声明本地优先与敏感信息边界',
       '安全边界:不硬编码密钥、不上传代码、不泄露 env value',
+      'Security Assurance Lane:本地安全证据导入和 repair planning 集成',
       '用户验收材料:演示命令和验收清单',
       '用户验收材料:稳定报告样例',
       '用户验收材料:已知限制和未解决 blocker 列表',
@@ -1108,7 +1189,7 @@ describe('goal audit', () => {
       }
     });
 
-    expect(items).toHaveLength(31);
+    expect(items).toHaveLength(33);
     expect(items.at(-1)).toEqual(expect.objectContaining({
       category: '用户验收',
       requirement: '用户确认 MVP 符合预期',
@@ -1116,6 +1197,12 @@ describe('goal audit', () => {
     }));
     expect(reads).toContain('/repo/package.json');
     expect(reads).toContain('/repo/packages/acceptance/package.json');
+    expect(reads).toContain('/repo/packages/security-assurance/package.json');
+    expect(reads).toContain('/repo/packages/security-assurance/src/import-security-evidence.ts');
+    expect(reads).toContain('/repo/src/tools/security-import-tool.ts');
+    expect(reads).toContain('/repo/tests/unit/security-assurance.test.ts');
+    expect(reads).toContain('/repo/tests/type-smoke/security-assurance-package-subpaths.ts');
+    expect(reads).toContain('/repo/docs/architecture/specs/security-assurance-lane-spec-v0.1.md');
     expect(reads).toContain('/repo/dist/internal/acceptance/run-acceptance.js');
     expect(reads).toContain('/repo/dist/internal/acceptance/run-acceptance.d.ts');
     expect(reads).toContain('/repo/docs/acceptance/user-acceptance-record.md');

@@ -22,6 +22,8 @@
 - `pnpm goal:audit`：通过，31 项检查、30 项已通过、0 missing、1 项需要人工确认。
 - `pnpm user:handoff`：通过，刷新 `docs/acceptance/user-acceptance-handoff.md` 和 `docs/acceptance/goal-completion-audit.md`，当前结论仍为自动证据已齐、等待用户验收结论。
 - 本轮只修改文档、goal 状态和结构约束测试，未改运行时 acceptance/explore/repair 行为；未重复运行 integration/E2E。
+- GitHub CI 首次运行失败暴露远端 checkout 中空目录 `docs/goals/active/` 不会被 Git 保留；新增 `docs/goals/active/.gitkeep` 固化 active goal 目录存在性。
+- 修复后复跑 `pnpm vitest run tests/unit/project-structure.test.ts` 通过，1 个测试文件、55 个测试；复跑 `pnpm goal:audit` 通过，31 项检查、30 项已通过、0 missing、1 项需要人工确认。
 
 ### 阻塞
 

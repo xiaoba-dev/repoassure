@@ -1,15 +1,16 @@
 # 用户验收交接包
 
-生成时间：2026-06-21T01:24:47.385Z
+生成时间：2026-06-23T10:57:33.453Z
 
 ## 当前状态
 
 | 项目 | 结果 |
 | --- | --- |
 | 总体状态 | 已准备好请求用户验收 |
-| 自动证据通过 | 27 |
+| 自动证据通过 | 30 |
 | 自动证据缺失 | 0 |
 | 需要人工确认 | 1 |
+| 验收模式 | browser |
 | 目标完成度审计 | `docs/acceptance/goal-completion-audit.md` |
 | 真实项目验收记录 | `docs/acceptance/user-acceptance-record.md` |
 | 用户验收指南 | `docs/acceptance/guides/user-acceptance-guide.md` |
@@ -30,6 +31,9 @@
 | --- | --- | --- | --- |
 | Legacy acceptance 兼容 wrapper | 已通过 | src/internal/acceptance/*.ts all delegate to packages/acceptance/dist compatibility wrappers |  |
 | Acceptance package typed module exports | 已通过 | root package depends on @hardening-mcp/acceptance workspace package; exact package export surface matches acceptancePackageExportEntries; package dist output contract matches acceptancePackageDistOutputEntries including .js.map sourceMapPath; package dist source specs match PACKAGE_ACCEPTANCE_DIST_OUTPUT_SOURCE_SPECS, PACKAGE_ACCEPTANCE_DIST_DECLARATION_SOURCE_SPECS, and PACKAGE_ACCEPTANCE_DIST_SOURCE_MAP_SOURCE_SPECS; package source contract matches acceptancePackageSourceEntries; typed dist entrypoints have no unexpected package exports |  |
+| Shared package typed module exports and legacy wrappers | 已通过 | root package depends on @hardening-mcp/shared workspace package; packages/shared exports typed root, compatibility, privacy-redaction, shell-quote, and shell-words subpaths; src/shared/*.ts all delegate to packages/shared/dist compatibility wrappers |  |
+| Repair planner package typed module exports and legacy wrappers | 已通过 | root package depends on @hardening-mcp/repair-planner workspace package; packages/repair-planner exports typed root, compatibility, generate-repair-plan, and repair-plan subpaths; src/domain/repair-plan/*.ts and src/types/repair-plan.ts delegate to packages/repair-planner/dist compatibility wrappers |  |
+| Browser explorer package typed module exports and legacy wrappers | 已通过 | root package depends on @hardening-mcp/browser-explorer workspace package; packages/browser-explorer exports typed root, compatibility, explore-app, and playwright-driver subpaths; src/domain/explore/*.ts delegates to packages/browser-explorer/dist compatibility wrappers |  |
 | Legacy acceptance dist compatibility outputs | 已通过 | dist/internal/acceptance/*.js and *.d.ts compatibility outputs all delegate to packages/acceptance/dist package entrypoints; dist/internal/acceptance/*.js.map source maps are present through legacyAcceptanceDistOutputEntries.sourceMapPath and LEGACY_ACCEPTANCE_DIST_SOURCE_MAP_SOURCE_SPECS |  |
 
 
@@ -45,44 +49,36 @@
 使用 `--repo <repo>` 刷新交接包时，会显示 repo root 和文件型、JSON 对象 manifest 的 `package.json` 两个独立前置检查结果；如果传入 `<real-web-app-repo>` 这类占位符，会在访问文件系统前提示替换为真实路径；必需前置检查失败时仍会写出交接包并返回非零退出码。如果报告显示未通过，请先修复 repo 路径或 package.json manifest，再运行 `pnpm user:accept`。
 
 
-## Repo 前置检查
-
-| 检查项 | 必需 | 状态 | 证据 |
-| --- | --- | --- | --- |
-| repo root 是有效目录 | 是 | 通过 | /private/tmp/openclaw-openclaw-shallow |
-| package.json 是有效文件 | 是 | 通过 | /private/tmp/openclaw-openclaw-shallow/package.json |
-
-前置检查结论：通过。可以继续运行下方 `pnpm user:accept` 命令。
-
 
 ## 刷新交接包
 
 ```bash
 pnpm user:handoff -- --help
-pnpm user:handoff -- --repo /private/tmp/openclaw-openclaw-shallow
+pnpm user:handoff -- --repo <real-web-app-repo>
+pnpm user:handoff -- --output <path>
 ```
 
 ## 建议验收顺序
 
 1. 打开 `docs/acceptance/goal-completion-audit.md`，确认自动可验证项没有缺失。
 2. 打开 `docs/acceptance/guides/user-acceptance-guide.md`，按真实项目环境准备 Node.js、pnpm 和 Playwright Chromium。
-3. 在一个真实 Web App repo 上运行真实项目验收：
+3. 在一个真实 repo 上运行真实项目验收：
 
 ```bash
-pnpm user:accept -- --repo /private/tmp/openclaw-openclaw-shallow --browser --validate-generated-tests --decision pending
+pnpm user:accept -- --repo <real-web-app-repo> --browser --validate-generated-tests --decision pending
 ```
 
 4. 如果结果符合预期，写入用户通过结论并复跑目标审计：
 
 ```bash
-pnpm user:accept -- --repo /private/tmp/openclaw-openclaw-shallow --browser --validate-generated-tests --decision accepted --notes '用户确认 MVP 符合预期'
+pnpm user:accept -- --repo <real-web-app-repo> --browser --validate-generated-tests --decision accepted --notes "用户确认 MVP 符合预期"
 pnpm goal:audit
 ```
 
 5. 如果需要继续修改，写入具体修改项并复跑目标审计：
 
 ```bash
-pnpm user:accept -- --repo /private/tmp/openclaw-openclaw-shallow --browser --decision changes_requested --notes '补齐登录态探索并降低误报'
+pnpm user:accept -- --repo <real-web-app-repo> --browser --decision changes_requested --notes "补齐登录态探索并降低误报"
 pnpm goal:audit
 ```
 

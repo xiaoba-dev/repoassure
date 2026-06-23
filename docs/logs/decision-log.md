@@ -1,5 +1,23 @@
 # 决策日志
 
+## 2026年6月23日 - 自动化治理收口与 Security Assurance Lane 规格
+
+### 决策
+
+将 ADR-0013 后可全自动完成的治理任务收口：新增 `docs/architecture/specs/security-assurance-lane-spec-v0.1.md`，把 Security Assurance Lane 从战略决策细化为 provider interface、Codex Security import、provider provenance、local-first evidence handling、redaction、artifact layout 和 repair-plan integration 的规格合同。同时将已完成的 `acceptance-package-migration` 与 `python-cli-acceptance-mode` goal 从 active 归档到 completed。
+
+### 原因
+
+- ADR-0013 已明确 RepoAssure 不应正面竞争为通用 deep vulnerability scanner，但仍需要一份后续实现可执行的 provider-backed evidence lane 规格。
+- `docs/goals/active` 中存在已完成但仍标记进行中/待执行的历史 goal，会误导后续任务规划。
+- `open-core-packaging-spec-v0.1.md` 仍把已经实现的 browser-explorer 和 repair-planner package 标记为 future target，需要与当前 monorepo 实际状态对齐。
+
+### 影响
+
+- 新增 Security Assurance Lane Spec v0.1，但不实现 Codex Security provider runtime import。
+- `docs/goals/completed/` 现在包含 acceptance package migration 和 Python/CLI acceptance mode 的完成证据。
+- open-core packaging spec 反映 browser-explorer、repair-planner 已是 implemented open-core packages，并新增 Security Assurance Lane packaging boundary TBD。
+
 ## 2026年6月23日 - Codex Security 与 Security Assurance Lane
 
 ### 决策

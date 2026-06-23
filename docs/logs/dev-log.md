@@ -1,5 +1,32 @@
 # 开发日志
 
+## 2026年6月23日 - Governance Cleanup and Security Assurance Lane Spec
+
+### 完成内容
+
+- 新增 `docs/architecture/specs/security-assurance-lane-spec-v0.1.md`，定义 provider interface、Codex Security preferred provider、provider provenance、local-first evidence handling、redaction requirements、artifact layout、repair plan / repair task package integration 和 non-goals。
+- 将已完成的 `acceptance-package-migration` 与 `python-cli-acceptance-mode` goal 从 `docs/goals/active/` 归档到 `docs/goals/completed/`，并补充完成证据。
+- 更新 `docs/product/strategy/open-core-packaging-spec-v0.1.md`，将 `packages/browser-explorer` 与 `packages/repair-planner` 标记为已实现 open-core packages，并新增 Security Assurance Lane packaging boundary TBD。
+- 级联更新 README、架构概览和 decision log；本轮不实现 Codex Security provider runtime import、不抽取 `packages/core`、不修改目标 repo。
+
+### 验证
+
+- Red：`pnpm vitest run tests/unit/project-structure.test.ts --testNamePattern "post-ADR-0013"` 因 `docs/architecture/specs/security-assurance-lane-spec-v0.1.md` 缺失按预期失败。
+- Green：同一 focused test 通过，1 个测试文件、1 个测试。
+- `pnpm vitest run tests/unit/project-structure.test.ts`：通过，1 个测试文件、55 个测试。
+- `pnpm repo:hygiene`：通过。
+- `pnpm typecheck`：通过。
+- `pnpm lint`：通过。
+- `pnpm build`：通过。
+- `pnpm test:unit`：通过，33 个测试文件、518 个测试。
+- `pnpm goal:audit`：通过，31 项检查、30 项已通过、0 missing、1 项需要人工确认。
+- `pnpm user:handoff`：通过，刷新 `docs/acceptance/user-acceptance-handoff.md` 和 `docs/acceptance/goal-completion-audit.md`，当前结论仍为自动证据已齐、等待用户验收结论。
+- 本轮只修改文档、goal 状态和结构约束测试，未改运行时 acceptance/explore/repair 行为；未重复运行 integration/E2E。
+
+### 阻塞
+
+- 无新增产品阻塞。
+
 ## 2026年6月23日 - Codex Security Strategy ADR
 
 ### 完成内容

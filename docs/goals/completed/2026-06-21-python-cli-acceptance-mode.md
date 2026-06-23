@@ -1,7 +1,7 @@
 # Python/CLI Acceptance Mode Codex Goal
 
-最后更新：2026年6月21日
-状态：待执行
+最后更新：2026年6月23日
+状态：已完成
 适用范围：ADR-0008 后续能力；为当前 Web App browser acceptance flow 增加独立 Python/CLI acceptance mode
 关联文档：
 
@@ -30,9 +30,25 @@ pyproject.toml / CLI repo
   -> user acceptance record
 ```
 
+## Completion Evidence
+
+本 goal 已归档为 completed。当前产品已支持显式 Python/CLI acceptance mode，且默认 browser mode 仍保持 ADR-0008 的 Web App 边界。
+
+完成证据：
+
+- `README.md`、`docs/product/specs/mvp-spec-v0.2.md`、`docs/acceptance/guides/user-acceptance-guide.md` 和 `docs/acceptance/checklists/acceptance-checklist-v0.1.md` 均记录 `pnpm user:accept -- --mode cli --repo <python-cli-repo> --decision pending`。
+- `artifacts/acceptance/python-cli-basic-user-acceptance.md` 记录 fixture CLI mode pending 验收，13/13 检查通过。
+- `artifacts/acceptance/python-cli-basic-user-handoff.md` 记录 fixture CLI mode handoff。
+- `artifacts/acceptance/agent-reach-user-acceptance.md` 记录 `/private/tmp/agent-reach` CLI mode pending 验收，17 项检查中 15 项通过、2 项失败、0 项必需失败；`agent-reach --help` 和 `pytest` 通过，`ruff check .` 与 `mypy .` 失败被转化为目标 repo repair evidence。
+- `artifacts/acceptance/agent-reach-native-test-summary.md` 记录 Agent-Reach native test baseline。
+- `docs/logs/dev-log.md` 记录 Python/CLI acceptance mode、check execution、repair handoff、repair execution 和 patch plan 的 TDD/verification evidence。
+- `docs/logs/blockers.md` 中 Agent-Reach CLI mode 复验 blocker 已标注为已解除；若需要验证远端最新提交，仍需额外网络授权。
+
+该 goal 完成不代表目标 repo `Panniantong/Agent-Reach` 已被修复；其 ruff/mypy 失败属于目标 repo repair backlog，不是 RepoAssure Python/CLI acceptance mode 阻塞。
+
 ## Authorization Boundary
 
-本 goal 文档本身不代表立即执行实现。用户后续明确授权执行时，Codex 可全自动完成本 goal，包括：
+本 goal 文档已作为历史执行计划归档。执行期间用户授权 Codex 全自动完成本 goal，包括：
 
 - 修改 TypeScript 源码、测试、README、验收指南、验收清单、product spec、ADR follow-up 和日志。
 - 新增 Python/CLI acceptance mode 的 domain、runner、CLI args、MCP/tool output 或 acceptance package API。

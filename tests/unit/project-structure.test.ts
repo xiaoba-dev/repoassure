@@ -684,26 +684,26 @@ describe('project structure', () => {
   });
 
   it('keeps package export surface governance synchronized across migration documents', async () => {
-    const [activeMigrationGoal, monorepoSpec, packageBuildAdr, acceptanceReadme] = await Promise.all([
-      readFile('docs/goals/active/2026-06-20-acceptance-package-migration.md', 'utf8'),
+    const [completedMigrationGoal, monorepoSpec, packageBuildAdr, acceptanceReadme] = await Promise.all([
+      readFile('docs/goals/completed/2026-06-23-acceptance-package-migration.md', 'utf8'),
       readFile('docs/architecture/specs/monorepo-structure-spec-v0.1.md', 'utf8'),
       readFile('docs/adr/0006-package-build-strategy.md', 'utf8'),
       readFile('packages/acceptance/README.md', 'utf8')
     ]);
     const exactExportSurfaceMarker = 'exact package export surface';
 
-    expect(activeMigrationGoal).toContain(exactExportSurfaceMarker);
+    expect(completedMigrationGoal).toContain(exactExportSurfaceMarker);
     expect(monorepoSpec).toContain(exactExportSurfaceMarker);
     expect(packageBuildAdr).toContain(exactExportSurfaceMarker);
     expect(acceptanceReadme).toContain(exactExportSurfaceMarker);
-    expect(activeMigrationGoal).toContain('unexpected `packages/acceptance/package.json` exports');
+    expect(completedMigrationGoal).toContain('unexpected `packages/acceptance/package.json` exports');
     expect(monorepoSpec).toContain('unexpected `packages/acceptance/package.json` exports');
     expect(packageBuildAdr).toContain('unexpected `packages/acceptance/package.json` exports');
-    expect(activeMigrationGoal).toContain('acceptancePackageSourceEntries');
-    expect(activeMigrationGoal).toContain('acceptancePackageDistOutputEntries');
-    expect(activeMigrationGoal).toContain('PACKAGE_ACCEPTANCE_DIST_OUTPUT_SOURCE_SPECS');
-    expect(activeMigrationGoal).toContain('PACKAGE_ACCEPTANCE_DIST_DECLARATION_SOURCE_SPECS');
-    expect(activeMigrationGoal).toContain('PACKAGE_ACCEPTANCE_DIST_SOURCE_MAP_SOURCE_SPECS');
+    expect(completedMigrationGoal).toContain('acceptancePackageSourceEntries');
+    expect(completedMigrationGoal).toContain('acceptancePackageDistOutputEntries');
+    expect(completedMigrationGoal).toContain('PACKAGE_ACCEPTANCE_DIST_OUTPUT_SOURCE_SPECS');
+    expect(completedMigrationGoal).toContain('PACKAGE_ACCEPTANCE_DIST_DECLARATION_SOURCE_SPECS');
+    expect(completedMigrationGoal).toContain('PACKAGE_ACCEPTANCE_DIST_SOURCE_MAP_SOURCE_SPECS');
     expect(packageBuildAdr).toContain('acceptancePackageSourceEntries');
     expect(packageBuildAdr).toContain('acceptancePackageDistOutputEntries');
     expect(packageBuildAdr).toContain('PACKAGE_ACCEPTANCE_DIST_OUTPUT_SOURCE_SPECS');
@@ -748,13 +748,13 @@ describe('project structure', () => {
   });
 
   it('keeps benchmark report ownership outside the acceptance package migration scope', async () => {
-    const [activeMigrationGoal, acceptanceReadme, monorepoSpec] = await Promise.all([
-      readFile('docs/goals/active/2026-06-20-acceptance-package-migration.md', 'utf8'),
+    const [completedMigrationGoal, acceptanceReadme, monorepoSpec] = await Promise.all([
+      readFile('docs/goals/completed/2026-06-23-acceptance-package-migration.md', 'utf8'),
       readFile('packages/acceptance/README.md', 'utf8'),
       readFile('docs/architecture/specs/monorepo-structure-spec-v0.1.md', 'utf8')
     ]);
 
-    expect(activeMigrationGoal).toContain('benchmark report ownership decision 仍保持在 `src/internal/benchmark`，不属于本 acceptance package 迁移的阻塞项');
+    expect(completedMigrationGoal).toContain('benchmark report ownership decision 仍保持在 `src/internal/benchmark`，不属于本 acceptance package 迁移的阻塞项');
     expect(acceptanceReadme).toContain('Benchmark report ownership remains outside this acceptance package migration');
     expect(acceptanceReadme).toContain('Preserve legacy compatibility outputs under `dist/internal/acceptance/*`');
     expect(acceptanceReadme).not.toContain('Preserve legacy implementation outputs under `dist/internal/acceptance/*`');
@@ -767,20 +767,20 @@ describe('project structure', () => {
     expect(monorepoSpec).not.toContain('The next safe Phase 2 step is to move selected acceptance implementation modules');
   });
 
-  it('keeps the active acceptance package migration goal aligned with the current package-owned state', async () => {
-    const [activeMigrationGoal, readme, monorepoSpec] = await Promise.all([
-      readFile('docs/goals/active/2026-06-20-acceptance-package-migration.md', 'utf8'),
+  it('keeps the completed acceptance package migration goal aligned with the current package-owned state', async () => {
+    const [completedMigrationGoal, readme, monorepoSpec] = await Promise.all([
+      readFile('docs/goals/completed/2026-06-23-acceptance-package-migration.md', 'utf8'),
       readFile('README.md', 'utf8'),
       readFile('docs/architecture/specs/monorepo-structure-spec-v0.1.md', 'utf8')
     ]);
 
-    expect(activeMigrationGoal).toContain('Phase 2 implementation modules now live under `packages/acceptance/src`');
-    expect(activeMigrationGoal).toContain('`src/internal/acceptance/*` remains as compatibility wrappers');
-    expect(activeMigrationGoal).toContain('`dist/internal/acceptance/*` remains as compatibility outputs');
-    expect(activeMigrationGoal).toContain('`pnpm acceptance -- --full --browser` 通过 17/17');
-    expect(activeMigrationGoal).toContain('`pnpm goal:audit` 显示自动可验证项 0 missing');
-    expect(activeMigrationGoal).not.toContain('仍未完成：');
-    expect(activeMigrationGoal).not.toContain('通过 15/15');
+    expect(completedMigrationGoal).toContain('Phase 2 implementation modules now live under `packages/acceptance/src`');
+    expect(completedMigrationGoal).toContain('`src/internal/acceptance/*` remains as compatibility wrappers');
+    expect(completedMigrationGoal).toContain('`dist/internal/acceptance/*` remains as compatibility outputs');
+    expect(completedMigrationGoal).toContain('`pnpm acceptance -- --full --browser` 通过 17/17');
+    expect(completedMigrationGoal).toContain('`pnpm goal:audit` 显示自动可验证项 0 missing');
+    expect(completedMigrationGoal).not.toContain('仍未完成：');
+    expect(completedMigrationGoal).not.toContain('通过 15/15');
     expect(readme).toContain('monorepo 迁移已进入 Phase 2 package extraction');
     expect(readme).toContain('`packages/acceptance/` 已承载验收实现模块');
     expect(readme).toContain('`@hardening-mcp/shared` / `packages/shared/` 已承载脱敏、shell quoting 和 shell word parsing 共享工具实现');
@@ -794,16 +794,16 @@ describe('project structure', () => {
   });
 
   it('keeps legacy dist source map compatibility evidence aligned in migration governance docs', async () => {
-    const [activeMigrationGoal, monorepoSpec, packageBuildAdr] = await Promise.all([
-      readFile('docs/goals/active/2026-06-20-acceptance-package-migration.md', 'utf8'),
+    const [completedMigrationGoal, monorepoSpec, packageBuildAdr] = await Promise.all([
+      readFile('docs/goals/completed/2026-06-23-acceptance-package-migration.md', 'utf8'),
       readFile('docs/architecture/specs/monorepo-structure-spec-v0.1.md', 'utf8'),
       readFile('docs/adr/0006-package-build-strategy.md', 'utf8')
     ]);
 
-    expect(activeMigrationGoal).toContain(
+    expect(completedMigrationGoal).toContain(
       '`dist/internal/acceptance/*` remains as compatibility outputs, and `.js` runtime wrappers, `.d.ts` declaration re-exports, and `.js.map` source maps are now checked by goal audit.'
     );
-    expect(activeMigrationGoal).toContain(
+    expect(completedMigrationGoal).toContain(
       '`legacyAcceptanceCompatibilityModules` now drives legacy wrapper, legacy dist JavaScript, legacy dist declaration, and legacy dist source map source specs'
     );
     expect(monorepoSpec).toContain(
@@ -814,7 +814,7 @@ describe('project structure', () => {
     );
   });
 
-  it('records Codex Security strategy ADR cascade in the latest dev log entry', async () => {
+  it('records Codex Security strategy ADR cascade in the dev log entry', async () => {
     const [
       devLog,
       adrIndex,
@@ -840,7 +840,7 @@ describe('project structure', () => {
     const latestEntryEnd = devLog.indexOf('\n## 2026年6月23日 - Browser Explorer Package Phase 2e Extraction');
     const latestEntry = devLog.slice(latestEntryStart, latestEntryEnd);
 
-    expect(latestEntryStart).toBe(devLog.indexOf('## '));
+    expect(latestEntryStart).toBeGreaterThan(devLog.indexOf('## '));
     expect(latestEntryEnd).toBeGreaterThan(latestEntryStart);
     expect(latestEntry).toContain('ADR-0013: Codex Security and Security Assurance Lane');
     expect(latestEntry).toContain('Security Assurance Lane');
@@ -862,6 +862,56 @@ describe('project structure', () => {
     expect(commercializationStrategy).toContain('Do not position the product as a direct Codex Security replacement');
     expect(readme).toContain('ADR-0013 固化 Codex Security 影响下的 Security Assurance Lane 策略');
     expect(decisionLog).toContain('新增 `ADR-0013: Codex Security and Security Assurance Lane`');
+  });
+
+  it('keeps post-ADR-0013 governance cleanup and security lane specification current', async () => {
+    const [
+      activeGoalFiles,
+      completedGoalFiles,
+      securityLaneSpec,
+      openCoreSpec,
+      readme,
+      architectureOverview,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readdir('docs/goals/active'),
+      readdir('docs/goals/completed'),
+      readFile('docs/architecture/specs/security-assurance-lane-spec-v0.1.md', 'utf8'),
+      readFile('docs/product/strategy/open-core-packaging-spec-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(activeGoalFiles).not.toContain('2026-06-20-acceptance-package-migration.md');
+    expect(activeGoalFiles).not.toContain('2026-06-21-python-cli-acceptance-mode.md');
+    expect(completedGoalFiles).toContain('2026-06-23-acceptance-package-migration.md');
+    expect(completedGoalFiles).toContain('2026-06-21-python-cli-acceptance-mode.md');
+
+    expect(openCoreSpec).toContain('| `packages/browser-explorer` | Open core | Implemented browser and route exploration package |');
+    expect(openCoreSpec).toContain('| `packages/repair-planner` | Open core | Implemented repair plan and executable task package package |');
+    expect(openCoreSpec).toContain('| Security Assurance Lane | Open core interface, provider-specific packaging TBD | Future provider-backed security evidence import boundary |');
+    expect(openCoreSpec).not.toContain('| `packages/browser-explorer` | Open core target | Future browser exploration package |');
+    expect(openCoreSpec).not.toContain('| `packages/repair-planner` | Open core target | Future repair plan and task package package |');
+
+    expect(securityLaneSpec).toContain('# Security Assurance Lane Spec v0.1');
+    expect(securityLaneSpec).toContain('Status: Draft');
+    expect(securityLaneSpec).toContain('Source ADR: [ADR-0013](../../adr/0013-codex-security-and-security-assurance-lane.md)');
+    expect(securityLaneSpec).toContain('Codex Security is the preferred first provider');
+    expect(securityLaneSpec).toContain('Provider provenance');
+    expect(securityLaneSpec).toContain('Local-first evidence handling');
+    expect(securityLaneSpec).toContain('Redaction requirements');
+    expect(securityLaneSpec).toContain('Artifact layout');
+    expect(securityLaneSpec).toContain('Repair plan and repair task package integration');
+    expect(securityLaneSpec).toContain('Non-goals');
+    expect(securityLaneSpec).toContain('no native deep vulnerability scanner');
+
+    expect(readme).toContain('security-assurance-lane-spec-v0.1.md');
+    expect(architectureOverview).toContain('security-assurance-lane-spec-v0.1.md');
+    expect(decisionLog).toContain('自动化治理收口与 Security Assurance Lane 规格');
+    expect(devLog).toContain('Governance Cleanup and Security Assurance Lane Spec');
   });
 
   it('records current browser explorer package extraction evidence gates in the dev log entry', async () => {

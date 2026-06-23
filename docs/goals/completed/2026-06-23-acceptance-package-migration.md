@@ -1,7 +1,7 @@
 # Acceptance Package Migration Codex Goal
 
-最后更新：2026年6月21日
-状态：进行中
+最后更新：2026年6月23日
+状态：已完成
 适用范围：`packages/acceptance` 后续迁移
 关联文档：
 
@@ -41,6 +41,21 @@
 - 不上传代码、日志、截图、trace、env value、token、cookie 或私有 repo 内容。
 - 遇到无法解决的问题，必须记录到 `docs/logs/blockers.md`。
 
+## Completion Evidence
+
+本 goal 已归档为 completed。`packages/acceptance` 当前已经承载 acceptance implementation modules、runner entrypoints、goal audit、user acceptance、user handoff、repo preflight、Python/CLI acceptance mode 和相关 helper；`src/internal/acceptance/*` 与 `dist/internal/acceptance/*` 保留为 compatibility wrapper/output surfaces。
+
+完成证据：
+
+- `packages/acceptance/src` owns acceptance implementation modules and runner entrypoints.
+- Root scripts `acceptance`、`goal:audit`、`user:accept`、`user:handoff` execute package-owned dist runners.
+- Legacy `src/internal/acceptance/*` and `dist/internal/acceptance/*` compatibility outputs are covered by project structure tests and goal audit.
+- `pnpm acceptance -- --full --browser` documented as passing 17/17 in the migration record.
+- `pnpm goal:audit` now reports 31 checks, 30 passed, 0 missing, and 1 manual user confirmation boundary.
+- Later package extractions for shared、browser-explorer and repair-planner are complete; benchmark report ownership remains intentionally outside this goal.
+
+The remaining user confirmation is not an acceptance-package migration blocker; it is the product-level manual acceptance boundary recorded in `docs/acceptance/goal-completion-audit.md`.
+
 ## Current State
 
 已完成：
@@ -59,7 +74,7 @@
 - `legacyAcceptanceWrapperSourceEntries` is derived from `legacyAcceptanceCompatibilityModules` and now drives legacy wrapper source paths for goal audit source collection, structure tests, package import smoke runtime contract checks, and package type-resolution smoke checks.
 - Legacy `GOAL_AUDIT_TEXT_SOURCE_PATHS` entries for source wrappers, runtime outputs, declaration outputs, and source map outputs are generated from compatibility contract entries.
 - `pnpm acceptance -- --full --browser` 当前通过 17/17；额外的 all-subpath package import smoke 和 package subpath type-resolution smoke 已纳入标准验收门禁。
-- `pnpm goal:audit` 当前为 28 项检查、27 项自动证据通过、0 项缺失、1 项需用户人工确认。
+- `pnpm goal:audit` 当前为 31 项检查、30 项自动证据通过、0 项缺失、1 项需用户人工确认。
 
 剩余外部条件：
 

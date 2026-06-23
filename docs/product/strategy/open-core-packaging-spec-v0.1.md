@@ -46,8 +46,9 @@ Commercial surfaces should focus on organization-level value rather than restric
 | `apps/mcp-server` | Open core | AI IDE integration surface |
 | `packages/acceptance` | Open core | Acceptance, handoff, execution report, patch plan runners |
 | `packages/core` | Open core target | Future extraction of shared hardening orchestration |
-| `packages/browser-explorer` | Open core target | Future browser exploration package |
-| `packages/repair-planner` | Open core target | Future repair plan and task package package |
+| `packages/browser-explorer` | Open core | Implemented browser and route exploration package |
+| `packages/repair-planner` | Open core | Implemented repair plan and executable task package package |
+| Security Assurance Lane | Open core interface, provider-specific packaging TBD | Future provider-backed security evidence import boundary |
 | Hosted dashboard | Commercial | Future Team Cloud surface |
 | Policy center | Commercial | Future enterprise governance surface |
 
@@ -55,3 +56,4 @@ Commercial surfaces should focus on organization-level value rather than restric
 
 - Revisit this spec before implementing hosted dashboard or enterprise packaging.
 - Add package-level README updates whenever a module changes classification.
+- Revisit the Security Assurance Lane provider packaging boundary before implementing provider-specific import adapters.

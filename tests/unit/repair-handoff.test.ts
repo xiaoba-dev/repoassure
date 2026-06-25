@@ -44,6 +44,17 @@ describe('repair handoff', () => {
       requiredFailed: 0,
       highestPriority: 'P1'
     });
+    expect(pkg.agentContract).toMatchObject({
+      schema: 'repoassure.repair-handoff.v1',
+      primaryReadPath: '.hardening/latest/repair-handoff-package.json',
+      nextCommands: {
+        dryRun: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --dry-run',
+        validationOnly: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --validation-only',
+        patchPlan: 'pnpm repair:patch-plan -- --report <repair-execution-report.json>'
+      }
+    });
+    expect(pkg.agentContract.boundaries).toContain('Does not modify target repository files.');
+    expect(pkg.agentContract.readOrder).toContain('tasks[].verification.commands');
     expect(pkg.tasks.map((task) => task.taskId)).toEqual([
       'pycli-failed-ruff-check',
       'pycli-failed-mypy'

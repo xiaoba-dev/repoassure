@@ -14,6 +14,8 @@ import * as goalAuditObservabilitySecurity from '@hardening-mcp/acceptance/goal-
 import * as goalAuditProcessGovernance from '@hardening-mcp/acceptance/goal-audit-process-governance';
 import * as goalAuditEvidenceDocuments from '@hardening-mcp/acceptance/goal-audit-evidence-documents';
 import * as goalAuditCurrentItems from '@hardening-mcp/acceptance/goal-audit-current-items';
+import * as goalAuditV03Distribution from '@hardening-mcp/acceptance/goal-audit-v03-distribution';
+import * as goalAuditPublicReleaseReadiness from '@hardening-mcp/acceptance/goal-audit-public-release-readiness';
 import * as userAcceptance from '@hardening-mcp/acceptance/user-acceptance';
 import * as userAcceptanceHandoff from '@hardening-mcp/acceptance/user-acceptance-handoff';
 import * as fatalError from '@hardening-mcp/acceptance/fatal-error';
@@ -52,6 +54,8 @@ const packageSubpathModules = [
   goalAuditProcessGovernance,
   goalAuditEvidenceDocuments,
   goalAuditCurrentItems,
+  goalAuditV03Distribution,
+  goalAuditPublicReleaseReadiness,
   userAcceptance,
   userAcceptanceHandoff,
   fatalError,

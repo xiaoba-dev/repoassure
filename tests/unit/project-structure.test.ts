@@ -246,7 +246,7 @@ describe('project structure', () => {
     expect(commercializationAdr).toContain('Position `hardening-mcp` as an AI code quality and delivery assurance layer');
     expect(commercializationAdr).toContain('Release the developer-facing core under Apache-2.0 before public distribution');
     expect(commercializationAdr).toContain('Do not use AGPL, BSL, FSL, SSPL, or Elastic License for the initial public release');
-    expect(commercializationAdr).toContain('The repository is currently private in `package.json` and has no repository-level `LICENSE` file');
+    expect(commercializationAdr).toContain('At decision time, the repository was private in `package.json` and had no repository-level `LICENSE` file');
     expect(decisionLog).toContain('商业化与 License 策略');
     expect(decisionLog).toContain('新增 `ADR-0009: Commercialization and Licensing Strategy`');
     expect(taxonomySpec).toContain('product/strategy/');
@@ -358,10 +358,16 @@ describe('project structure', () => {
       packageJsonText,
       adrIndex,
       branchProtectionAdr,
+      publicReleaseReadinessAdr,
       operationsGuide,
       taxonomySpec,
       publicReleaseChecklist,
+      dependencyLicenseAudit,
+      releaseNotesDraft,
       privateReadiness,
+      contributing,
+      securityPolicy,
+      licenseText,
       prTemplate,
       blockersLog,
       decisionLog
@@ -369,21 +375,32 @@ describe('project structure', () => {
       readFile('package.json', 'utf8'),
       readFile('docs/adr/README.md', 'utf8'),
       readFile('docs/adr/0012-branch-protection-and-release-boundary.md', 'utf8'),
+      readFile('docs/adr/0015-public-release-readiness-boundary.md', 'utf8'),
       readFile('docs/operations/branch-protection-release-boundary-v0.1.md', 'utf8'),
       readFile('docs/architecture/specs/docs-taxonomy-spec-v0.1.md', 'utf8'),
       readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/product/strategy/dependency-license-audit-v0.1.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-notes-v0.1.md', 'utf8'),
       readFile('docs/product/strategy/private-repo-readiness-v0.1.md', 'utf8'),
+      readFile('CONTRIBUTING.md', 'utf8'),
+      readFile('SECURITY.md', 'utf8'),
+      readFile('LICENSE', 'utf8'),
       readFile('.github/pull_request_template.md', 'utf8'),
       readFile('docs/logs/blockers.md', 'utf8'),
       readFile('docs/logs/decision-log.md', 'utf8')
     ]);
-    const packageJson = JSON.parse(packageJsonText) as { private?: boolean };
+    const packageJson = JSON.parse(packageJsonText) as { private?: boolean; license?: string };
 
     expect(packageJson.private).toBe(true);
-    await expect(stat('LICENSE')).rejects.toMatchObject({ code: 'ENOENT' });
+    expect(packageJson.license).toBe('Apache-2.0');
+    expect(licenseText).toContain('Apache License');
+    expect(licenseText).toContain('Version 2.0');
+    expect(adrIndex).toContain('[0015](0015-public-release-readiness-boundary.md)');
     expect(adrIndex).toContain('[0012](0012-branch-protection-and-release-boundary.md)');
     expect(branchProtectionAdr).toContain('Branch protection and release boundary');
     expect(branchProtectionAdr).toContain('Do not make the repository public to unlock branch protection');
+    expect(publicReleaseReadinessAdr).toContain('Public release readiness boundary');
+    expect(publicReleaseReadinessAdr).toContain('Adding `LICENSE` is readiness preparation, not publication authorization');
     expect(operationsGuide).toContain('Branch Protection and Release Boundary v0.1');
     expect(operationsGuide).toContain('RepoAssure CI');
     expect(operationsGuide).toContain('Quality Gates');
@@ -392,12 +409,45 @@ describe('project structure', () => {
     expect(operationsGuide).toContain('Upgrade to GitHub Pro or make this repository public to enable this feature');
     expect(taxonomySpec).toContain('operations/');
     expect(publicReleaseChecklist).toContain('Branch protection or an equivalent repository ruleset is enabled for `main`');
+    expect(publicReleaseChecklist).toContain('Add repository-level Apache-2.0 `LICENSE` text as readiness material');
+    expect(dependencyLicenseAudit).toContain('No known incompatible dependency licenses');
+    expect(releaseNotesDraft).toContain('Public Release Notes v0.1');
+    expect(contributing).toContain('Developer Certificate of Origin');
+    expect(contributing).toContain('No CLA is required');
+    expect(securityPolicy).toContain('Report a Vulnerability');
     expect(privateReadiness).toContain('branch protection and release boundary');
     expect(prTemplate).toContain('Release Boundary');
-    expect(prTemplate).toContain('This PR does not add a repository-level LICENSE, publish packages, remove package.json private true, or make the repo public');
+    expect(prTemplate).toContain('This PR does not publish packages, remove package.json private true, make the repo public, or treat LICENSE presence as publication authorization');
     expect(blockersLog).toContain('GitHub branch protection and repository rulesets are unavailable for the private repo');
     expect(blockersLog).toContain('HTTP 403');
     expect(decisionLog).toContain('分支保护与发布边界');
+    expect(decisionLog).toContain('Public release readiness boundary');
+  });
+
+  it('records release candidate handoff boundaries before publishing or pushing', async () => {
+    const [handoff, readme, publicReleaseChecklist, devLog] = await Promise.all([
+      readFile('docs/operations/release-candidate-handoff-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(handoff).toContain('Release Candidate Handoff v0.1');
+    expect(handoff).toContain('Review branch: `codex/release-candidate-packaging-v0.1`');
+    expect(handoff).toContain('Commit Packaging Plan');
+    expect(handoff).toContain('Final Verification Gates');
+    expect(handoff).toContain('Manual Gates Still Blocking Public Release');
+    expect(handoff).toContain('Do not publish npm packages');
+    expect(handoff).toContain('Do not make the repository public');
+    expect(handoff).toContain('Do not create a GitHub release');
+    expect(handoff).toContain('pnpm acceptance -- --full --browser');
+    expect(handoff).toContain('pnpm release:check');
+    expect(handoff).toContain('public release ready: no');
+    expect(readme).toContain('docs/operations/release-candidate-handoff-v0.1.md');
+    expect(publicReleaseChecklist).toContain('release-candidate-handoff-v0.1.md');
+    expect(devLog).toContain('Release Candidate Packaging v0.1');
+
+    await expectPath('docs/operations/release-candidate-handoff-v0.1.md');
   });
 
   it('records the repository acceptance scope decision for Web App versus Python CLI repos', async () => {
@@ -469,7 +519,7 @@ describe('project structure', () => {
     ] = await Promise.all([
       readFile('docs/architecture/specs/monorepo-readiness-audit-v0.1.md', 'utf8'),
       readFile('docs/goals/completed/2026-06-25-monorepo-readiness-audit.md', 'utf8'),
-      readFile('docs/goals/active/2026-06-25-v0.3-distribution-repair-loop-readiness.md', 'utf8'),
+      readFile('docs/goals/completed/2026-06-25-v0.3-distribution-repair-loop-readiness.md', 'utf8'),
       readFile('docs/architecture/specs/monorepo-structure-spec-v0.1.md', 'utf8'),
       readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
       readFile('docs/logs/decision-log.md', 'utf8'),
@@ -503,6 +553,37 @@ describe('project structure', () => {
 
     await expectPath('docs/architecture/specs/monorepo-readiness-audit-v0.1.md');
     await expectPath('docs/goals/completed/2026-06-25-monorepo-readiness-audit.md');
+  });
+
+  it('defines a local-first GitHub Action wrapper for v0.3 distribution', async () => {
+    const [action, exampleWorkflow, readme, userGuide, v03Spec] = await Promise.all([
+      readFile('.github/actions/repoassure/action.yml', 'utf8'),
+      readFile('examples/github-actions/repoassure-local-first.yml', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/acceptance/guides/user-acceptance-guide.md', 'utf8'),
+      readFile('docs/product/specs/mvp-spec-v0.3.md', 'utf8')
+    ]);
+
+    expect(action).toContain('name: RepoAssure Local Hardening');
+    expect(action).toContain('description: Run RepoAssure through the checked-out repository local CLI without a hosted service');
+    expect(action).toContain('repo-path');
+    expect(action).toContain('upload-artifacts');
+    expect(action).toContain('default: "false"');
+    expect(action).toContain('pnpm install --frozen-lockfile');
+    expect(action).toContain('pnpm build');
+    expect(action).toContain('node dist/adapters/cli/index.js run');
+    expect(action).toContain('does not upload target repo source, logs, screenshots, traces, env values, or private artifacts');
+    expect(exampleWorkflow).toContain('uses: ./.github/actions/repoassure');
+    expect(exampleWorkflow).toContain('upload-artifacts: "false"');
+    expect(exampleWorkflow).toContain('actions/upload-artifact');
+    expect(exampleWorkflow).toContain("if: inputs.upload-artifacts == 'true'");
+    expect(readme).toContain('pnpm release:check');
+    expect(readme).toContain('.github/actions/repoassure/action.yml');
+    expect(userGuide).toContain('RepoAssure Local Hardening');
+    expect(v03Spec).toContain('GitHub Action wrapper');
+
+    await expectPath('.github/actions/repoassure/action.yml');
+    await expectPath('examples/github-actions/repoassure-local-first.yml');
   });
 
   it('extracts acceptance command ownership into a workspace package while preserving compatibility outputs', async () => {
@@ -1410,11 +1491,13 @@ describe('project structure', () => {
       'goal-audit-evidence-documents',
       'goal-audit-observability-security',
       'goal-audit-process-governance',
+      'goal-audit-public-release-readiness',
       'goal-audit-requirements',
       'goal-audit-runtime',
       'goal-audit-sources',
       'goal-audit-user-acceptance',
       'goal-audit-user-acceptance-materials',
+      'goal-audit-v03-distribution',
       'goal-audit-workflow-artifacts',
       'markdown',
       'python-cli-artifacts',

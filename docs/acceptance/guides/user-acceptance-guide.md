@@ -67,6 +67,10 @@ pnpm repair:patch-plan -- --report <repo>/.hardening/runs/<run-id>/repair-execut
 | `--validate-generated-tests` | 与 `pnpm user:accept` 配合使用，执行生成的 Playwright spec；最终 `--decision accepted` 必须启用该项。未传 `--url` 时会保持自动启动的 app 运行到验证结束，已运行服务可通过 `--url` 复用。 |
 | `--generated-test-timeout-ms <ms>` | 与 `--validate-generated-tests` 配合使用，调整 generated spec 执行超时；默认 120000ms，适合慢启动或慢登录的真实项目。 |
 
+### GitHub Action wrapper
+
+`RepoAssure Local Hardening` 是 v0.3 的本地优先 GitHub Action wrapper，定义在 `.github/actions/repoassure/action.yml`。它在 checked-out repository 内运行 `pnpm install --frozen-lockfile`、`pnpm build` 和本地 CLI `node dist/adapters/cli/index.js run <repo>`，不调用 hosted RepoAssure 服务，也不会默认上传目标 repo source、logs、screenshots、traces、env values 或 private artifacts。示例 workflow 见 `examples/github-actions/repoassure-local-first.yml`；上传报告摘要必须由调用 workflow 显式 opt-in。
+
 验收 runner 和 benchmark runner 的进程级 fatal stderr 写入前会脱敏敏感值。
 
 ### Repository acceptance scope
@@ -396,7 +400,7 @@ node dist/adapters/cli/index.js run <repo> --browser --trace
 | 默认沙箱内完整运行 `pnpm test:integration` | 默认沙箱本地监听 `127.0.0.1` 会触发 `listen EPERM`；提权环境完整 integration tests 已通过。 | 在允许监听本地端口的环境中运行，或按需批准相关测试命令。 |
 | Playwright 浏览器启动需要沙箱外权限 | 默认沙箱可能无法启动 Chromium；提权环境的 data URL 探测和真实 Chromium trace E2E 已通过。 | 在允许启动 Chromium 的环境中运行，或按需批准 browser/E2E 命令。 |
 | 真实项目上的 `hardening run <repo> --browser` | 已在多个真实项目上运行；`openclaw/openclaw` accepted 验收已通过。 | 若要扩展覆盖登录态或后端完整联调，可提供 storageState、运行 URL 或 worker 启动方式后复跑。 |
-| 真实项目上的 `pnpm user:accept -- --repo <repo> --browser --validate-generated-tests --decision accepted --notes "用户确认 MVP 符合预期"` | 已在 `openclaw/openclaw` 上通过 accepted 验收，12/12 artifact 检查通过，generated Playwright spec 执行验证通过，`pnpm goal:audit` 已转为 33/33 通过。 | 后续 v0.3 验收应覆盖 GitHub Action wrapper、repair loop contract 和 public-release readiness checks。 |
+| 真实项目上的 `pnpm user:accept -- --repo <repo> --browser --validate-generated-tests --decision accepted --notes "用户确认 MVP 符合预期"` | 已在 `openclaw/openclaw` 上通过 accepted 验收，12/12 artifact 检查通过，generated Playwright spec 执行验证通过；当前自动审计已覆盖 GitHub Action wrapper、repair loop contract 和 Public Release Readiness，`pnpm goal:audit` 当前为 35/35 通过。 | 后续真实项目验收可继续扩展到 GitHub Action CI 环境和更复杂业务流。 |
 
 详细历史见 `docs/logs/blockers.md`。
 

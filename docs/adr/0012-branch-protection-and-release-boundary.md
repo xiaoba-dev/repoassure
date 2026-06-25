@@ -33,7 +33,7 @@ The desired `main` branch protection state is:
 
 Do not make the repository public to unlock branch protection.
 
-Do not add a repository-level `LICENSE`, publish packages, remove `package.json` `"private": true`, or make public announcements until `docs/product/strategy/public-release-checklist-v0.1.md` is complete.
+Do not publish packages, remove `package.json` `"private": true`, make the repository public, or make public announcements until `docs/product/strategy/public-release-checklist-v0.1.md` is complete and publication is explicitly authorized. ADR-0015 narrows the earlier `LICENSE` restriction: a repository-level Apache-2.0 `LICENSE` may exist as public-release readiness material, but it is not publication authorization.
 
 If GitHub plan permissions block branch protection or repository rulesets, record the blocker with the exact API error and manual resolution steps.
 

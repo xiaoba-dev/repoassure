@@ -7,7 +7,7 @@
 
 - `docs/architecture/specs/monorepo-readiness-audit-v0.1.md`
 - `docs/architecture/specs/monorepo-structure-spec-v0.1.md`
-- `docs/goals/active/2026-06-25-v0.3-distribution-repair-loop-readiness.md`
+- `docs/goals/completed/2026-06-25-v0.3-distribution-repair-loop-readiness.md`
 - `docs/testing/strategy/test-strategy-v0.1.md`
 
 ## Goal Objective
@@ -21,7 +21,7 @@
 用户授权 Codex 全自动执行本 goal，包括：
 
 - 扫描 repo 当前目录结构、package/app ownership、CI、hygiene、examples、docs taxonomy 和 active goals。
-- 新增或更新架构规格、active goal、testing strategy、decision log、dev log。
+- 新增或更新架构规格、v0.3 goal、testing strategy、decision log、dev log。
 - 以 TDD 方式新增结构测试，先暴露缺失文档和级联关系，再补齐文档。
 - 运行 focused structure tests、repo hygiene、lint、typecheck、goal audit 等低风险自动门禁。
 
@@ -36,7 +36,7 @@
 
 ## TDD Plan
 
-1. Red：新增 `project-structure` 测试，要求存在 monorepo readiness audit、active goal、v0.3 前置条件和日志级联。
+1. Red：新增 `project-structure` 测试，要求存在 monorepo readiness audit、v0.3 goal、前置条件和日志级联。
 2. Green：新增 `monorepo-readiness-audit-v0.1.md` 与本 goal。
 3. Green：更新 v0.3 goal、monorepo structure spec、testing strategy、decision log 和 dev log。
 4. Refactor：只整理文档措辞、排序和交叉引用，不迁移运行时代码。

@@ -20,6 +20,7 @@ ADR records long-lived architecture decisions. Use `docs/logs/decision-log.md` f
 | [0012](0012-branch-protection-and-release-boundary.md) | Accepted | Branch protection and release boundary |
 | [0013](0013-codex-security-and-security-assurance-lane.md) | Accepted | Codex Security and Security Assurance Lane |
 | [0014](0014-distribution-and-repair-loop-readiness.md) | Accepted | Distribution and repair loop readiness |
+| [0015](0015-public-release-readiness-boundary.md) | Accepted | Public release readiness boundary |
 
 ## Template
 

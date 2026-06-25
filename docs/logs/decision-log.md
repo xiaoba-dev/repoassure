@@ -1,5 +1,24 @@
 # 决策日志
 
+## 2026年6月25日 - Public release readiness boundary
+
+### 决策
+
+新增 `ADR-0015: Public Release Readiness Boundary`。允许在 private repo 中加入 Apache-2.0 `LICENSE`、`package.json#license`、`CONTRIBUTING.md`、`SECURITY.md`、dependency license audit 和 public release notes draft，作为公开发布准备材料。
+
+### 原因
+
+- ADR-0009 已选择 Apache-2.0 作为 open-core license target。
+- v0.3 已完成本地优先 GitHub Action、repair loop agent contract 和 release readiness checker，下一步需要让公开发布材料可审计。
+- `LICENSE`、贡献政策和安全披露应在真正公开前被 review，而不是在发布瞬间才生成。
+
+### 影响
+
+- `LICENSE` 存在不代表公开发布授权。
+- `package.json` 继续保持 `"private": true`，npm package publication 仍关闭。
+- `pnpm release:check` 会检查自动 readiness materials，并在 manual publication authorization 缺失时继续报告 `public release ready: no`。
+- 公开 repo、npm publish、公开公告、外部 case study 仍必须等待法律、商标、branch protection 或等效 ruleset 和最终 maintainer authorization。
+
 ## 2026年6月25日 - Monorepo readiness before v0.3
 
 ### 决策
@@ -17,7 +36,7 @@
 
 - 新增 `docs/architecture/specs/monorepo-readiness-audit-v0.1.md`。
 - 新增并归档 `docs/goals/completed/2026-06-25-monorepo-readiness-audit.md`。
-- 更新 v0.3 active goal，将 `monorepo readiness audit` 设为前置条件。
+- 更新 v0.3 goal，将 `monorepo readiness audit` 设为前置条件；该 goal 后续已完成并归档。
 - 级联更新 monorepo structure spec、testing strategy 和 dev log，并新增结构测试守护。
 
 ## 2026年6月25日 - v0.3 Distribution and Repair Loop Readiness
@@ -35,7 +54,7 @@
 
 ### 影响
 
-- 新增 `docs/product/specs/mvp-spec-v0.3.md` 和 `docs/goals/active/2026-06-25-v0.3-distribution-repair-loop-readiness.md`。
+- 新增 `docs/product/specs/mvp-spec-v0.3.md` 和 `docs/goals/completed/2026-06-25-v0.3-distribution-repair-loop-readiness.md`。
 - 级联更新 ADR index、architecture overview、README、commercialization strategy、open-core packaging spec、public release checklist、testing strategy、user acceptance guide、acceptance checklist 和 blockers。
 - `mvp-spec-v0.2` 状态修正为已实现且真实项目用户验收已通过。
 
@@ -156,7 +175,7 @@
 ### 原因
 
 - CI 已经通过，但如果 `main` 不受保护，CI 只能提示问题，不能阻止低质量变更进入主分支。
-- 当前项目仍处于 private pre-release 阶段，不能添加仓库级 `LICENSE`、发布 package、移除 `package.json` `"private": true` 或公开仓库。
+- 当时项目仍处于 private pre-release 阶段，尚未添加仓库级 `LICENSE`，也不能发布 package、移除 `package.json` `"private": true` 或公开仓库。ADR-0015 后续允许添加 Apache-2.0 `LICENSE` 作为 readiness material，但不授权公开发布。
 - GitHub API 对 private repo branch protection 和 rulesets 返回 HTTP 403，需要把这个外部限制记录为治理 blocker。
 
 ### 影响

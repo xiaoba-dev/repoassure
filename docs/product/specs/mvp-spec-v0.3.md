@@ -1,7 +1,7 @@
 # RepoAssure MVP 规格 v0.3
 
 最后更新：2026年6月25日
-状态：规划中
+状态：已实现
 范围：v0.2 之后的分发与修复闭环就绪增量
 
 关联决策：
@@ -43,9 +43,19 @@ RepoAssure v0.3 是面向 AI IDE 和 CI 的本地优先交付保障层，把 rep
 - `.hardening/runs/<run-id>` 与 `.hardening/latest/manifest.json`。
 - Repair plan、repair task package、repair handoff、verification plan、repair execution report 和 patch plan。
 - Security Assurance Lane Phase 1 本地 provider evidence import。
-- 真实项目 accepted 用户验收和 33/33 goal audit。
+- 真实项目 accepted 用户验收；Public Release Readiness 后当前 goal audit 为 35/35。
 
 剩余主要问题不在“能不能生成材料”，而在“能不能低摩擦地分发、复用、集成和形成修复闭环”。
+
+## 实现状态
+
+v0.3 已实现以下 P0 增量：
+
+- `.github/actions/repoassure/action.yml` 提供本地优先 GitHub Action wrapper，复用 checked-out repo 内的本地 CLI，不依赖 hosted service，默认不上传目标 repo source、logs、screenshots、traces、env values 或 private artifacts。
+- `examples/github-actions/repoassure-local-first.yml` 提供 opt-in artifact upload 示例。
+- `repair-handoff-package.json`、`repair-execution-report.json` 和 `patch-plan.json` 新增 `agentContract`，声明 schema、读取顺序、下一步命令和不可自动改源码边界。
+- `pnpm release:check` 提供 public-release readiness 预检查；当前自动准备项通过，但因 manual publication authorization 缺失明确报告 `public release ready: no`，不发布 package、不改变仓库可见性。
+- `pnpm goal:audit` 新增 v0.3 分发与修复闭环审计项，将 Action wrapper、agent contract 和 release readiness 纳入自动证据。
 
 ## 目标用户
 
@@ -99,14 +109,14 @@ flowchart LR
 
 | 能力 | 优先级 | 验收产物 |
 | --- | --- | --- |
-| GitHub Action wrapper | P0 | `.github/actions` 或 action entrypoint、usage example、CI fixture |
+| GitHub Action wrapper | P0 | `.github/actions/repoassure/action.yml`、usage example、local-first boundary |
 | CLI/MCP 分发示例 | P0 | README / user guide 中可复制的安装、配置和运行示例 |
 | Repair task package 强化 | P0 | 更稳定的 task priority、evidence、verification、agent prompt |
 | Validation-only 闭环强化 | P0 | 每个 task 可追踪验证命令、exit code、stdout/stderr 摘要和通过标准 |
 | Patch plan 可读性强化 | P0 | 失败证据到 patch action 的分类更清晰，保持不写源码 |
-| Public release checklist 可执行化 | P0 | 依赖 license scan、secret/artifact hygiene、release boundary checks 的脚本或文档门禁 |
+| Public release checklist 可执行化 | P0 | `pnpm release:check` 执行 private boundary、license status、tracked artifact/secret hygiene 和 release checklist 检查 |
 | Safe examples | P0 | 不含私有数据的示例报告、repair plan、repair handoff 和 patch plan |
-| Goal audit 扩展 | P0 | v0.3 交付物进入 goal audit 或等价验收审计 |
+| Goal audit 扩展 | P0 | `pnpm goal:audit` 包含 v0.3 分发与修复闭环审计项 |
 
 ## P1 能力
 

@@ -1,0 +1,42 @@
+name: RepoAssure Local-First Example
+
+on:
+  workflow_dispatch:
+    inputs:
+      upload-artifacts:
+        description: Explicitly upload sanitized RepoAssure summaries from this example workflow.
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+jobs:
+  hardening:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run RepoAssure locally
+        id: repoassure
+        uses: ./.github/actions/repoassure
+        with:
+          repo-path: "."
+          browser: "false"
+          upload-artifacts: "false"
+
+      - name: Upload sanitized RepoAssure summaries
+        if: inputs.upload-artifacts == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: repoassure-summaries
+          path: |
+            hardening-report.md
+            .hardening/latest/manifest.json
+          if-no-files-found: warn
+

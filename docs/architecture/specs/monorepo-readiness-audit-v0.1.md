@@ -8,7 +8,7 @@
 
 当前 repo 是可运行的分阶段 monorepo，不是成熟完成态 monorepo。
 
-它已经具备 `apps/*`、`packages/*`、package-first build、兼容 wrapper、CI、goal audit、acceptance 文档和多 package ownership；但 `packages/core` 仍是未来占位，`apps/cli` 与 `apps/mcp-server` 仍通过 built `dist/adapters/*` 兼容入口运行，`examples/` 仍未承载真实示例，GitHub Action wrapper 尚未实现，repo hygiene 仍主要检查路径级别的 generated/private artifact 入库风险。
+审计时 repo 已经具备 `apps/*`、`packages/*`、package-first build、兼容 wrapper、CI、goal audit、acceptance 文档和多 package ownership；但 `packages/core` 仍是未来占位，`apps/cli` 与 `apps/mcp-server` 仍通过 built `dist/adapters/*` 兼容入口运行，`examples/` 当时仍未承载真实示例，GitHub Action wrapper 当时尚未实现，repo hygiene 仍主要检查路径级别的 generated/private artifact 入库风险。
 
 因此，v0.3 可以继续推进，但必须在正式开发 v0.3 distribution and repair loop 之前完成本审计落档，并把未完成项纳入明确优先级。v0.3 不应吸收所有 monorepo 成熟化工作；它只处理与分发、repair loop 和 public-release readiness 直接相关的缺口。
 
@@ -66,7 +66,7 @@ v0.3 distribution and repair loop readiness 启动前必须满足：
 
 - `docs/architecture/specs/monorepo-readiness-audit-v0.1.md` 存在，并记录当前 repo 不是成熟完成态 monorepo。
 - `docs/goals/completed/2026-06-25-monorepo-readiness-audit.md` 存在，并定义 TDD、测试金字塔和完成证据。
-- v0.3 active goal 明确包含 `monorepo readiness audit` 前置条件。
+- v0.3 goal 明确包含 `monorepo readiness audit` 前置条件，并已在后续实现完成后归档。
 - `monorepo-structure-spec-v0.1.md` 引用本审计。
 - `test-strategy-v0.1.md` 说明 monorepo readiness 结构测试职责。
 - `decision-log.md` 和 `dev-log.md` 记录本次排序决策与执行内容。

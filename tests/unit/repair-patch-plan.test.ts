@@ -28,6 +28,19 @@ function buildExecutionReport(): RepairExecutionReport {
       failed: 2,
       skipped: 0
     },
+    agentContract: {
+      schema: 'repoassure.repair-execution-report.v1',
+      readOrder: ['status', 'summary', 'tasks[]', 'tasks[].verificationResults'],
+      resultSemantics: {
+        planned: 'No verification commands were run.',
+        passed: 'All selected verification commands exited zero.',
+        failed: 'At least one selected verification command failed or timed out.'
+      },
+      nextCommands: {
+        patchPlan: 'pnpm repair:patch-plan -- --report <repair-execution-report.json>'
+      },
+      boundaries: ['Validation-only mode does not modify target repository files.']
+    },
     tasks: [
       {
         taskId: 'pycli-failed-ruff-check',
@@ -93,6 +106,15 @@ describe('repair patch plan', () => {
       manualReviewRequired: 3,
       affectedFiles: 4
     });
+    expect(plan.agentContract).toMatchObject({
+      schema: 'repoassure.patch-plan.v1',
+      applyPolicy: 'manual-review-only',
+      nextCommands: {
+        validate: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --validation-only'
+      }
+    });
+    expect(plan.agentContract.boundaries).toContain('Does not write target repository files.');
+    expect(plan.agentContract.reviewWorkflow).toContain('Review each action before applying edits in an AI IDE or editor.');
     expect(plan.actions.map((action) => action.actionType)).toEqual([
       'import-sort',
       'type-fix',

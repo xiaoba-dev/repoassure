@@ -1,14 +1,14 @@
 # Goal 完成度审计
 
-生成时间：2026-06-25T02:49:47.647Z
+生成时间：2026-06-25T04:19:59.532Z
 
 ## 摘要
 
 | 项目 | 结果 |
 | --- | --- |
 | 总体状态 | 完成证据齐全 |
-| 检查项总数 | 33 |
-| 已通过 | 33 |
+| 检查项总数 | 35 |
+| 已通过 | 35 |
 | 缺失 | 0 |
 | 需要人工确认 | 0 |
 
@@ -55,6 +55,18 @@
 | 要求 | 状态 | 证据 | 下一步 |
 | --- | --- | --- | --- |
 | 可复现信息与失败证据 | 已通过 | tool outputs expose profile/findings/report/result/log paths, findings include repro steps and evidence, reports include verification command plus blockers/errors, and integration/E2E tests inspect those artifacts |  |
+
+## v0.3 分发与修复闭环
+
+| 要求 | 状态 | 证据 | 下一步 |
+| --- | --- | --- | --- |
+| GitHub Action、agent contract 与 release readiness | 已通过 | v0.3 local-first GitHub Action wrapper exists; repair handoff/execution/patch plan expose agentContract schemas; release:check runs public-release readiness checks without publishing |  |
+
+## Public Release Readiness
+
+| 要求 | 状态 | 证据 | 下一步 |
+| --- | --- | --- | --- |
+| license、policy、dependency audit 与 manual authorization gate | 已通过 | Apache-2.0 LICENSE, contribution policy, security policy, dependency license audit, release notes draft, and manual authorization gate are documented and checked without publishing |  |
 
 ## 质量门禁
 

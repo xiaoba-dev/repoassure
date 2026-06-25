@@ -1,14 +1,104 @@
 # 开发日志
 
+## 2026年6月25日 - Release Candidate Packaging v0.1
+
+### 完成内容
+
+- Red：新增 `project-structure` 测试，要求 release candidate handoff 明确 review branch、commit packaging plan、final verification gates、manual gates 和 no-publication boundary；测试因 `docs/operations/release-candidate-handoff-v0.1.md` 缺失失败。
+- Green：新增 `docs/operations/release-candidate-handoff-v0.1.md`，将 v0.3 distribution/repair loop、public-release readiness 和 release candidate handoff 拆成可审查提交计划，并记录 `public release ready: no` 是当前正确发布边界。
+- 级联更新 README 和 public release checklist，确保 review 入口指向 release candidate handoff，且不把本地打包误解为 push、PR、GitHub release、npm publish 或仓库公开授权。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-structure.test.ts --testNamePattern "release candidate handoff"`：Red 阶段因 handoff 文档缺失失败；修正后 Green 阶段通过。
+- `pnpm vitest run tests/unit/project-structure.test.ts`：通过，60 个测试。
+- `pnpm repo:hygiene`：通过。
+- `pnpm release:check`：自动 prerequisites 通过，并按边界报告 `public release ready: no`。
+- `pnpm test:unit`：通过，35 个测试文件、534 个测试。
+- `pnpm typecheck`：通过。
+- `pnpm lint`：通过。
+- `pnpm acceptance -- --full --browser`：提权环境通过，full 模式 17/17 项检查通过，包含 integration、benchmark 5/5 Go 和 Real Chromium trace E2E。
+- `pnpm goal:audit`：通过，35 项检查、35 项已通过、0 missing、0 需要人工确认。
+- `pnpm user:handoff`：通过，自动证据通过 35、自动证据缺失 0、需要人工确认 0。
+- `git diff --check`：通过。
+
+### 阻塞
+
+- 无新增产品阻塞。公开发布仍受法律 review、商标/name review、branch protection 或等效 repository ruleset、最终 maintainer publication authorization 阻塞。
+
+## 2026年6月25日 - Public Release Readiness v0.1
+
+### 完成内容
+
+- Red：新增 `public-release-readiness.test.ts` 用例，要求 `pnpm release:check` 检查 Apache-2.0 `LICENSE`、贡献政策、安全披露、dependency license audit、release notes draft 和 manual publication authorization gate；旧 checker 在材料齐全时会误判 `releaseReady: true`。
+- Green：扩展 `scripts/check-public-release-readiness.mjs`，新增 `repository-license`、`contribution-policy`、`security-policy`、`dependency-license-audit`、`public-release-notes-draft` 和 `manual-publication-authorization` 检查；自动项通过但缺人工授权时继续报告 `public release ready: no`。
+- Red：更新 `project-structure` 测试，要求 public release readiness boundary 由 ADR-0015 固化，并级联到 README、PR 模板、private readiness、operations guide、release checklist、CONTRIBUTING、SECURITY 和 LICENSE。
+- Green：新增 `ADR-0015: Public Release Readiness Boundary`、Apache-2.0 `LICENSE`、`CONTRIBUTING.md`、`SECURITY.md`、dependency license audit 和 public release notes draft；同步 README、PR 模板、private readiness、operations guide、public release checklist、architecture overview 和 decision log。
+- Red：新增 `goal-audit-public-release-readiness` 测试，要求 public release readiness materials 进入 `pnpm goal:audit`；测试因模块和 source keys 缺失失败。
+- Green：新增 `packages/acceptance/src/goal-audit-public-release-readiness.ts`，接入 goal audit source collection、current item composer、package export contract 和 type-smoke。
+- 新增 completed goal 文档 `docs/goals/completed/2026-06-25-public-release-readiness-v0.1.md`，记录自动可执行范围完成，公开发布仍需人工授权。
+
+### 验证
+
+- `pnpm vitest run tests/unit/public-release-readiness.test.ts`：通过，4 个测试。
+- `pnpm vitest run tests/unit/project-structure.test.ts --testNamePattern "branch protection and public release boundary"`：通过。
+- `pnpm vitest run tests/unit/goal-audit.test.ts tests/unit/acceptance-package.test.ts --testNamePattern "public release readiness|current goal audit item composer|current goal audit items"`：通过，3 个测试。
+- `pnpm build`：通过。
+- `pnpm vitest run tests/unit/public-release-readiness.test.ts tests/unit/project-structure.test.ts tests/unit/goal-audit.test.ts tests/unit/acceptance-package.test.ts`：通过，4 个测试文件、201 个测试。
+- `pnpm test:unit`：通过，35 个测试文件、533 个测试。
+- `pnpm typecheck`：通过。
+- `pnpm lint`：通过。
+- `pnpm release:check`：自动 public-release prerequisites 通过，`manual-publication-authorization` 为 not_ready，整体仍报告 `public release ready: no`。
+- `pnpm repo:hygiene`：通过。
+- `pnpm acceptance -- --full --browser`：提权环境通过，full 模式 17/17 项检查通过；包含 unit、E2E smoke、typecheck、lint、build、package subpath smoke、integration、benchmark 和 Real Chromium trace E2E。
+- `pnpm goal:audit`：通过，35 项检查、35 项已通过、0 missing、0 需要人工确认。
+- `pnpm user:handoff`：通过，自动证据通过 35、自动证据缺失 0、需要人工确认 0。
+
+### 阻塞
+
+- 公开发布仍需人工/外部 gate：法律 review、商标/name review、branch protection 或等效 repository ruleset、最终 maintainer publication authorization。已记录到 `docs/logs/blockers.md`。
+
+## 2026年6月25日 - v0.3 Distribution and Repair Loop Implementation
+
+### 完成内容
+
+- Red：新增 `project-structure` 测试，要求本地优先 GitHub Action wrapper、safe example workflow、README/user guide 入口存在；测试因 `.github/actions/repoassure/action.yml` 缺失失败。
+- Green：新增 `.github/actions/repoassure/action.yml` 和 `examples/github-actions/repoassure-local-first.yml`，Action 复用本地 CLI，不依赖 hosted service，默认不上传目标 repo source、logs、screenshots、traces、env values 或 private artifacts。
+- Red：为 `repair-handoff-package.json`、`repair-execution-report.json` 和 `patch-plan.json` 增加 `agentContract` 单元测试；测试因字段缺失失败。
+- Green：补齐 `repoassure.repair-handoff.v1`、`repoassure.repair-execution-report.v1` 和 `repoassure.patch-plan.v1` contract，包含 read order、next commands、result semantics 和 no-auto-edit boundaries。
+- Red：新增 `public-release-readiness.test.ts` 和 structure 断言，要求 `pnpm release:check` 存在；测试因脚本缺失失败。
+- Green：新增 `scripts/check-public-release-readiness.mjs` 和 `release:check` script。该检查通过 private pre-release boundary 时退出 0，但报告 `public release ready: no`；tracked generated artifacts、env files、private keys 或 logs 会失败。
+- Red：新增 goal audit v0.3 测试，要求 Action wrapper、agent contract 和 release check 进入自动审计；测试因 `goal-audit-v03-distribution` 缺失失败。
+- Green：新增 `packages/acceptance/src/goal-audit-v03-distribution.ts`，纳入 goal audit source plan、package export contract 和 type-smoke。
+- 更新 README、user acceptance guide、MVP spec v0.3、testing strategy、public release checklist、examples README 和 acceptance checklist。
+
+### 验证
+
+- `pnpm vitest run tests/unit/repair-handoff.test.ts tests/unit/repair-execute.test.ts tests/unit/repair-patch-plan.test.ts tests/unit/public-release-readiness.test.ts tests/unit/project-structure.test.ts tests/unit/goal-audit.test.ts`：通过，6 个测试文件、176 个测试。
+- `pnpm repo:hygiene`：通过。
+- `pnpm release:check`：通过 private pre-release boundary，并报告 `public release ready: no`。
+- `pnpm lint`：通过。
+- `pnpm typecheck`：通过。
+- `pnpm build`：通过。
+- `pnpm test:unit`：通过，35 个测试文件、531 个测试。
+- `pnpm test:integration`：提权环境通过，11 个测试文件、27 个测试。
+- `pnpm test:e2e`：通过 1 个测试文件、1 个测试；跳过 1 个环境条件测试。
+- `pnpm acceptance -- --full --browser`：提权环境通过，full 模式 17/17 项检查通过；Unit、E2E smoke、typecheck、lint、build、package subpath smoke、integration、benchmark 和 Real Chromium trace E2E 全部通过。
+- `pnpm goal:audit`：通过，34 项检查、34 项已通过、0 missing、0 需要人工确认。
+
+### 阻塞
+
+- 无新增产品阻塞。Public release 仍未授权；`pnpm release:check` 当前只证明 private pre-release boundary 安全，不代表可以公开发布。
+
 ## 2026年6月25日 - Monorepo Readiness Audit
 
 ### 完成内容
 
 - 扫描当前 monorepo 结构，确认 repo 已具备 `apps/*`、`packages/*`、package-first build、package-owned acceptance/shared/security/browser/repair 模块、CI、repo hygiene 和 goal audit。
-- 判定当前 repo 是可运行的分阶段 monorepo，不是成熟完成态 monorepo：`packages/core` 仍为空壳，`apps/cli` 与 `apps/mcp-server` 仍为 compatibility shells，`examples/` 未承载真实示例，GitHub Action wrapper 尚未实现。
+- 判定当时 repo 是可运行的分阶段 monorepo，不是成熟完成态 monorepo：`packages/core` 仍为空壳，`apps/cli` 与 `apps/mcp-server` 仍为 compatibility shells，`examples/` 当时未承载真实示例，GitHub Action wrapper 当时尚未实现。
 - 新增 `docs/architecture/specs/monorepo-readiness-audit-v0.1.md`，将 v0.3 前置结构判断、P0/P1/P2 缺口和非目标落档。
 - 新增并归档 completed goal：`docs/goals/completed/2026-06-25-monorepo-readiness-audit.md`，记录 TDD、测试金字塔和完成证据。
-- 更新 v0.3 active goal，将 `monorepo readiness audit` 设为启动 v0.3 前置条件。
+- 更新 v0.3 goal，将 `monorepo readiness audit` 设为启动 v0.3 前置条件。
 - 级联更新 monorepo structure spec、testing strategy 和 decision log。
 - 新增 structure test，防止后续跳过 monorepo readiness 直接执行 v0.3 distribution work。
 
@@ -22,7 +112,7 @@
 - `pnpm typecheck`：通过。
 - `pnpm goal:audit`：通过，33 项检查、33 项已通过、0 missing、0 需要人工确认。
 - `git diff --check`：通过。
-- 本 goal 已从 active 归档到 completed；v0.3 distribution and repair loop readiness 仍保留为 active 下一阶段目标。
+- 本 goal 已从 active 归档到 completed；v0.3 distribution and repair loop readiness 已在后续 goal 中完成并归档。
 
 ### 阻塞
 
@@ -36,7 +126,7 @@
 - 判断下一个 goal “RepoAssure v0.3 Distribution and Repair Loop Readiness”会改变产品阶段、分发入口和 repair loop 边界，因此需要级联写入，而不是只作为临时执行目标。
 - 新增 `ADR-0014: Distribution and Repair Loop Readiness`，明确 v0.3 聚焦 GitHub Action wrapper、CLI/MCP 分发示例、AI IDE repair loop、public-release readiness，同时保持 local-first、不默认自动改代码、不上传目标 repo、不实现 hosted dashboard。
 - 新增 `docs/product/specs/mvp-spec-v0.3.md`，定义 v0.3 TL;DR、目标用户、核心工作流、P0/P1、非目标和验收标准。
-- 新增 active goal：`docs/goals/active/2026-06-25-v0.3-distribution-repair-loop-readiness.md`。
+- 新增并归档 completed goal：`docs/goals/completed/2026-06-25-v0.3-distribution-repair-loop-readiness.md`。
 - 修正 `docs/product/specs/mvp-spec-v0.2.md` 状态为“已实现；真实项目用户验收已通过”。
 - 级联更新 ADR index、architecture overview、README、commercialization strategy、open-core packaging spec、public release checklist、testing strategy、user acceptance guide、acceptance checklist 和 blockers。
 - 更新 docs taxonomy，将 `docs/goals/active/` 纳入规范目录和命名规则。

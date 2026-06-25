@@ -122,6 +122,14 @@ export {
 } from './goal-audit-current-items.js';
 
 export {
+  buildV03DistributionRepairLoopGoalAuditItem
+} from './goal-audit-v03-distribution.js';
+
+export {
+  buildPublicReleaseReadinessGoalAuditItem
+} from './goal-audit-public-release-readiness.js';
+
+export {
   buildUserAcceptanceMarkdown,
   formatUserAcceptanceEvidenceCommand,
   summarizeUserAcceptanceChecks,

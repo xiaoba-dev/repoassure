@@ -50,7 +50,7 @@ Commercial surfaces should focus on organization-level value rather than restric
 | `packages/browser-explorer` | Open core | Implemented browser and route exploration package |
 | `packages/repair-planner` | Open core | Implemented repair plan and executable task package package |
 | Security Assurance Lane | Open core interface | Optional provider-backed security evidence import boundary |
-| GitHub Action wrapper | Open core | Future v0.3 distribution wrapper over local CLI execution; must not upload target repo source or private artifacts by default |
+| GitHub Action wrapper | Open core | Implemented v0.3 distribution wrapper over local CLI execution; does not upload target repo source or private artifacts by default |
 | Hosted dashboard | Commercial | Future Team Cloud surface |
 | Policy center | Commercial | Future enterprise governance surface |
 

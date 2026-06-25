@@ -1,5 +1,26 @@
 # 开发日志
 
+## 2026年6月25日 - Maintainer Merge Decision v0.1
+
+### 完成内容
+
+- 读取 PR #1 当前 metadata、comments、reviews、review threads、CI 和 repository visibility。
+- 确认 PR #1 为 `OPEN` + `Draft`，base 为 `main`，head 为 `codex/release-candidate-packaging-v0.1`。
+- 确认 latest head commit 为 `5aa151a`，merge state 为 `CLEAN`，`RepoAssure CI / Quality Gates` 已通过。
+- 确认仓库 visibility 仍为 `PRIVATE`，没有 unresolved review threads，也没有 reviewer-requested changes。
+- 在 `docs/operations/release-candidate-handoff-v0.1.md` 新增 Maintainer Merge Decision checklist。
+- 新增 completed goal：`docs/goals/completed/2026-06-25-maintainer-merge-decision-v0.1.md`。
+
+### 验证
+
+- `gh pr view 1 --repo xiaoba-dev/repoassure --json ...`：确认 PR 状态、CI、merge state 和 head commit。
+- `gh api graphql ... reviewThreads`：确认无 review threads。
+- `gh repo view xiaoba-dev/repoassure --json visibility`：确认 `PRIVATE`。
+
+### 阻塞
+
+- 无新增自动化阻塞。当前状态是等待 maintainer decision：保持 Draft、标记 Ready、请求人工 review、merge 或 close。公开发布仍未授权。
+
 ## 2026年6月25日 - Draft PR Review Closure v0.1
 
 ### 完成内容

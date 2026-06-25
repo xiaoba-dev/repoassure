@@ -85,6 +85,48 @@ Closure boundary:
 - This closure does not satisfy public-release manual gates.
 - This closure does not authorize npm publication, GitHub release creation, public repository visibility, or public announcements.
 
+## Maintainer Merge Decision
+
+Status: Waiting for maintainer decision.
+
+Current PR facts verified on 2026-06-25:
+
+- PR #1 is `OPEN`.
+- PR #1 is still `Draft`.
+- Base branch is `main`.
+- Head branch is `codex/release-candidate-packaging-v0.1`.
+- Latest head commit is `5aa151a`.
+- `RepoAssure CI / Quality Gates` passed.
+- Merge state is `CLEAN`.
+- No unresolved review threads were found.
+- No reviewer-requested changes were found.
+- Repository visibility remains `PRIVATE`.
+- `package.json` keeps `"private": true`.
+- `pnpm release:check` remains expected to report `public release ready: no`.
+
+Maintainer decision checklist:
+
+- [ ] Keep PR as Draft for more private review.
+- [ ] Mark PR Ready for review.
+- [ ] Request additional human review before merge.
+- [ ] Merge PR #1 into `main`.
+- [ ] Close PR #1 without merge.
+
+Manual public-release gates after merge, if any:
+
+- Legal review.
+- Trademark/name review.
+- Branch protection or equivalent repository ruleset.
+- Final maintainer publication authorization.
+
+Decision boundary:
+
+- This handoff does not mark the PR Ready for review.
+- This handoff does not merge the PR.
+- This handoff does not publish npm packages.
+- This handoff does not create a GitHub release.
+- This handoff does not change repository visibility.
+
 ## Final Verification Gates
 
 Run these gates before asking for review:

@@ -27,6 +27,29 @@
 
 - 无新增产品阻塞。公开发布仍受法律 review、商标/name review、branch protection 或等效 repository ruleset、最终 maintainer publication authorization 阻塞。
 
+## 2026年6月25日 - Private GitHub PR Readiness v0.1
+
+### 完成内容
+
+- 确认当前分支为 `codex/release-candidate-packaging-v0.1`，工作树干净。
+- 确认 remote 为 `https://github.com/xiaoba-dev/repoassure.git`。
+- 确认 GitHub 仓库 `xiaoba-dev/repoassure` visibility 为 `PRIVATE`，default branch 为 `main`。
+- Push release candidate 分支到 private remote。
+- 创建 Draft PR：`https://github.com/xiaoba-dev/repoassure/pull/1`。
+- 在 release candidate handoff 中记录 PR URL、private visibility、base/head、Draft 状态和 CI 初始状态。
+
+### 验证
+
+- `gh auth status`：已登录 `xiaoba-dev`，具备 `repo` 和 `workflow` scope。
+- `gh repo view xiaoba-dev/repoassure --json nameWithOwner,visibility,defaultBranchRef,url`：visibility 为 `PRIVATE`，default branch 为 `main`。
+- `git push -u origin codex/release-candidate-packaging-v0.1`：通过。
+- `gh pr create --draft`：创建 PR #1。
+- `gh pr view 1 --json ...`：PR 为 `OPEN` + `Draft`，`RepoAssure CI / Quality Gates` 初始状态为 `IN_PROGRESS`。
+
+### 阻塞
+
+- 无新增产品阻塞。公开发布仍未授权；PR 是 private review surface，不代表 public release。
+
 ## 2026年6月25日 - Public Release Readiness v0.1
 
 ### 完成内容

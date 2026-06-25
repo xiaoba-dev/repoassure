@@ -52,6 +52,18 @@ If a file contains changes from more than one logical area, keep the staged hunk
 - `72f3228 feat: package release candidate readiness` packages the v0.3 distribution/repair loop work, public-release readiness boundary, release candidate handoff, refreshed acceptance evidence, and tests into one locally verified review commit.
 - This follow-up documentation update records the package contents only. It does not push, publish, open a PR, create a GitHub release, or change repository visibility.
 
+## Private Draft PR Status
+
+- PR: [#1 `[codex] Package release candidate readiness`](https://github.com/xiaoba-dev/repoassure/pull/1)
+- Repository visibility at PR creation: `PRIVATE`
+- Base branch: `main`
+- Head branch: `codex/release-candidate-packaging-v0.1`
+- PR state: `OPEN`
+- PR review mode: `Draft`
+- CI status at PR creation: `RepoAssure CI / Quality Gates` in progress
+
+This PR is a private review surface only. It still does not authorize public release, npm publication, GitHub release creation, public repository visibility, or public announcements.
+
 ## Final Verification Gates
 
 Run these gates before asking for review:

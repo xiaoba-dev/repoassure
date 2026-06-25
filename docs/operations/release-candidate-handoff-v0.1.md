@@ -87,15 +87,15 @@ Closure boundary:
 
 ## Maintainer Merge Decision
 
-Status: Waiting for maintainer decision.
+Status: Ready for maintainer review; merge decision still pending.
 
 Current PR facts verified on 2026-06-25:
 
 - PR #1 is `OPEN`.
-- PR #1 is still `Draft`.
+- PR #1 was marked `Ready for review` on 2026-06-25.
 - Base branch is `main`.
 - Head branch is `codex/release-candidate-packaging-v0.1`.
-- Latest head commit is `5aa151a`.
+- Latest head commit before Ready transition was `a4a00c5`.
 - `RepoAssure CI / Quality Gates` passed.
 - Merge state is `CLEAN`.
 - No unresolved review threads were found.
@@ -107,7 +107,7 @@ Current PR facts verified on 2026-06-25:
 Maintainer decision checklist:
 
 - [ ] Keep PR as Draft for more private review.
-- [ ] Mark PR Ready for review.
+- [x] Mark PR Ready for review.
 - [ ] Request additional human review before merge.
 - [ ] Merge PR #1 into `main`.
 - [ ] Close PR #1 without merge.
@@ -121,11 +121,21 @@ Manual public-release gates after merge, if any:
 
 Decision boundary:
 
-- This handoff does not mark the PR Ready for review.
+- This handoff records that PR #1 was marked Ready for review after explicit maintainer authorization.
 - This handoff does not merge the PR.
 - This handoff does not publish npm packages.
 - This handoff does not create a GitHub release.
 - This handoff does not change repository visibility.
+
+## Maintainer Decision Execution
+
+Executed on 2026-06-25:
+
+- PR #1 was changed from Draft to Ready for review.
+- Repository visibility was verified as `PRIVATE` before the transition.
+- `RepoAssure CI / Quality Gates` was verified as passed before the transition.
+- No merge was performed.
+- No public release, npm publish, GitHub release, or repository visibility change was performed.
 
 ## Final Verification Gates
 

@@ -56,7 +56,7 @@ The Project Intelligence Console may scan local repository files and generated a
 
 ### Follow-up
 
-- Use `docs/product/specs/public-website-spec-v0.1.md` before implementing the external website.
+- The Public Website v0.1 surface is implemented under `apps/website` and remains governed by `docs/product/specs/public-website-spec-v0.1.md`.
 - Use `docs/product/specs/project-intelligence-console-spec-v0.1.md` and `docs/architecture/specs/project-intelligence-console-architecture-v0.1.md` before implementing the internal graph console.
 - Add executable graph-builder tests before writing any runtime graph extraction code.
 - Revisit public release, privacy, and artifact exposure boundaries before deploying any externally reachable website.

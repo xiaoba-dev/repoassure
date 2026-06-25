@@ -6,7 +6,7 @@ export default defineConfig({
     environment: 'node',
     restoreMocks: true,
     clearMocks: true,
-    exclude: [...configDefaults.exclude, 'packages/*/dist/**', 'artifacts/benchmark-runs/**', 'benchmark-runs/**'],
+    exclude: [...configDefaults.exclude, 'packages/*/dist/**', 'apps/*/dist/**', 'artifacts/benchmark-runs/**', 'benchmark-runs/**'],
     coverage: {
       reporter: ['text', 'html']
     }

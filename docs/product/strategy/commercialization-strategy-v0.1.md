@@ -43,6 +43,8 @@ Team Cloud and Enterprise planning is now governed by [ADR-0016](../../adr/0016-
 
 Public website planning is governed by [ADR-0017](../../adr/0017-public-website-and-project-intelligence-console.md) and `docs/product/specs/public-website-spec-v0.1.md`. The website should support brand trust, proof artifacts, docs entry, GitHub entry, and waitlist/private-preview conversion without claiming public release or SaaS availability before those gates are complete.
 
+Public website localization is governed by [ADR-0018](../../adr/0018-public-website-localization-strategy.md). Website localization should start with English and Simplified Chinese first, keep Japanese and Korean as roadmap locales, and use localized forbidden-claim checks so translated copy does not imply SaaS, Team Cloud, Enterprise, public npm package, public repository, or source-upload availability before those claims are true. This does not authorize product artifact localization.
+
 ## Growth Motions
 
 - Publish concrete hardening reports, repair plans, and patch plans as proof artifacts.
@@ -67,3 +69,4 @@ Public website planning is governed by [ADR-0017](../../adr/0017-public-website-
 - Revisit license and packaging only if adoption or abuse signals change the assumptions in ADR-0009.
 - Use `team-cloud-enterprise-spec-v0.1.md` as the roadmap source before starting hosted dashboard, team collaboration, enterprise integrations, or advanced governance implementation.
 - Use `public-website-spec-v0.1.md` before implementing or deploying an external website, and keep copy aligned with public release readiness.
+- Use ADR-0018 before implementing website localization, and create a separate ADR before localizing hardening reports, repair plans, acceptance packages, CLI output, or AI IDE handoff materials.

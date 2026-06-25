@@ -35,7 +35,7 @@ pnpm goal:audit
 - generated `.hardening/` runs
 - generated `artifacts/acceptance/`, `artifacts/benchmark-runs/`, `artifacts/orphaned-runs/`, and `artifacts/test-results/`
 - legacy `benchmark-runs/` and `test-results/`
-- root `dist/`, `packages/*/dist/`, and `coverage/`
+- root `dist/`, `packages/*/dist/`, `apps/*/dist/`, and `coverage/`
 - `.env`, `.env.*` except `.env.example`
 - private key, certificate, provisioning, and local log files
 

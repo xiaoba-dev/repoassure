@@ -70,3 +70,13 @@
   - 当前状态：ADR-0016、商业版产品路线图、商业版架构边界、open-core/commercial 级联、测试策略和验收边界已记录；商业版能力仅完成规划和边界验收，不实现 paid cloud runtime。
 - [x] Public Website and Project Intelligence Console planning
   - 当前状态：ADR-0017、响应式 public website spec、内部 Project Intelligence Console spec、project graph architecture 和文档级联测试已记录；当前只完成规划，不部署官网、不实现内部 graph runtime。
+- [x] Public Website Localization Strategy
+  - 当前状态：ADR-0018、public website spec、README、architecture overview、commercialization strategy、testing strategy、decision log 和 dev log 已级联；`apps/website` 已实现 English default + Simplified Chinese runtime、typed locale dictionaries、language switcher、code-native Trust Ledger preview localization、localized forbidden-claim tests 和 `pnpm verify:website` 浏览器验证；不授权产品 artifact 多语言化。
+- [x] Public Website Enterprise Design System
+  - 当前状态：ADR-0019、`docs/design/design-system-v0.1.md`、public website spec、README、architecture overview、testing strategy、decision log 和 dev log 已级联；该项只完成企业级安全审美设计系统与后续 v0.2 redesign 标准，不代表当前官网已经达到最终企业级视觉标准。
+- [x] Public Website v0.2 Enterprise Redesign
+  - 当前状态：`apps/website` 已按 Product Design direction 2 / Assurance Graph 改版首屏，包含 dark enterprise security hero、code-native Assurance Graph、code-native localized Trust Ledger、assurance pipeline、English default、Simplified Chinese switching、browser verification 和 `design-qa.md final result: passed`；仍不授权 SaaS、Team Cloud、Enterprise、public release claims、fake customer logos 或产品 artifact 多语言化。
+- [x] Public Website UI/UX Gate
+  - 当前状态：`apps/website/src/styles.css` 已建立 website semantic token layer，包含 brand / semantic / component token groups、显式 `theme-dark` / `theme-light`、深色和白色表面焦点态 token；`public-website.test.ts` 覆盖 token 和 `:focus-visible` 门禁，`pnpm verify:website` 生成 `desktop-focus-dark.png` 和 `desktop-focus-light.png`。该项只完成官网 UI/UX 质量门禁，不授权公开发布、SaaS、Team Cloud、Enterprise 或产品 artifact 多语言化。
+- [x] Public Website Release Candidate Closure
+  - 当前状态：`docs/operations/public-website-release-candidate-handoff-v0.1.md` 已汇总官网变更范围、截图证据、验证门禁、剩余 P3 和非授权边界；该 closure 只代表 public website 进入本地 reviewable release candidate 状态，不授权部署官网、公开 repo、npm publish、GitHub release、SaaS、Team Cloud、Enterprise 或产品 artifact 多语言化。

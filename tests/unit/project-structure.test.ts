@@ -61,12 +61,15 @@ describe('project structure', () => {
     expect(benchmarkRunner).toContain("join(root, 'dist', 'adapters', 'cli', 'index.js')");
     expect(gitignore).toContain('artifacts/benchmark-runs/');
     expect(gitignore).toContain('packages/*/dist/');
+    expect(gitignore).toContain('apps/*/dist/');
     expect(gitignore).toContain('benchmark-runs/');
     expect(eslintConfig).toContain('artifacts/benchmark-runs/**');
     expect(eslintConfig).toContain('packages/*/dist/**');
+    expect(eslintConfig).toContain('apps/*/dist/**');
     expect(eslintConfig).toContain('benchmark-runs/**');
     expect(vitestConfig).toContain('artifacts/benchmark-runs/**');
     expect(vitestConfig).toContain('packages/*/dist/**');
+    expect(vitestConfig).toContain('apps/*/dist/**');
     expect(vitestConfig).toContain('benchmark-runs/**');
   });
 
@@ -454,6 +457,34 @@ describe('project structure', () => {
     await expectPath('docs/operations/release-candidate-handoff-v0.1.md');
   });
 
+  it('records public website release candidate closure without publishing or deploying', async () => {
+    const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
+      readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(handoff).toContain('Public Website Release Candidate Handoff v0.1');
+    expect(handoff).toContain('Review branch: `codex/public-website-v0.1`');
+    expect(handoff).toContain('Website Change Scope');
+    expect(handoff).toContain('Screenshot Evidence');
+    expect(handoff).toContain('Final Verification Gates');
+    expect(handoff).toContain('Remaining P3 Backlog');
+    expect(handoff).toContain('Non-Authorization Boundary');
+    expect(handoff).toContain('desktop-focus-dark.png');
+    expect(handoff).toContain('desktop-focus-light.png');
+    expect(handoff).toContain('pnpm verify:website');
+    expect(handoff).toContain('Do not deploy the website');
+    expect(handoff).toContain('Do not claim SaaS availability');
+    expect(handoff).toContain('Do not claim Team Cloud or Enterprise availability');
+    expect(readme).toContain('public-website-release-candidate-handoff-v0.1.md');
+    expect(acceptanceChecklist).toContain('Public Website Release Candidate Closure');
+    expect(devLog).toContain('Public Website Release Candidate Closure v0.1');
+
+    await expectPath('docs/operations/public-website-release-candidate-handoff-v0.1.md');
+  });
+
   it('records the repository acceptance scope decision for Web App versus Python CLI repos', async () => {
     const [adrIndex, acceptanceScopeAdr, readme, userGuide, acceptanceChecklist, productSpecV02] = await Promise.all([
       readFile('docs/adr/README.md', 'utf8'),
@@ -725,6 +756,107 @@ describe('project structure', () => {
     await expectPath('docs/architecture/specs/project-intelligence-console-architecture-v0.1.md');
   });
 
+  it('records the public website localization strategy without expanding product runtime scope', async () => {
+    const [
+      adrIndex,
+      localizationAdr,
+      publicWebsiteSpec,
+      readme,
+      architecture,
+      commercialization,
+      acceptanceChecklist,
+      testingStrategy,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/adr/README.md', 'utf8'),
+      readFile('docs/adr/0018-public-website-localization-strategy.md', 'utf8'),
+      readFile('docs/product/specs/public-website-spec-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/product/strategy/commercialization-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(adrIndex).toContain('[0018](0018-public-website-localization-strategy.md)');
+    expect(adrIndex).toContain('Public website localization strategy');
+    expect(localizationAdr).toContain('Default to English and add Simplified Chinese first');
+    expect(localizationAdr).toContain('Japanese and Korean are roadmap locales');
+    expect(localizationAdr).toContain('Do not treat website localization as product artifact localization');
+    expect(localizationAdr).toContain('forbidden-claim checks');
+    expect(publicWebsiteSpec).toContain('ADR-0018');
+    expect(publicWebsiteSpec).toContain('English + Simplified Chinese first');
+    expect(publicWebsiteSpec).toContain('Japanese and Korean are planned roadmap locales');
+    expect(publicWebsiteSpec).toContain('localized forbidden-claim checks');
+    expect(readme).toContain('ADR-0018');
+    expect(architecture).toContain('ADR-0018');
+    expect(commercialization).toContain('website localization');
+    expect(acceptanceChecklist).toContain('Public Website Localization Strategy');
+    expect(testingStrategy).toContain('Public Website Localization Strategy');
+    expect(decisionLog).toContain('Public website localization strategy');
+    expect(devLog).toContain('Public Website Localization Strategy ADR');
+
+    await expectPath('docs/adr/0018-public-website-localization-strategy.md');
+  });
+
+  it('records the public website enterprise design system before redesign implementation', async () => {
+    const [
+      adrIndex,
+      designSystemAdr,
+      designSystem,
+      publicWebsiteSpec,
+      readme,
+      architecture,
+      acceptanceChecklist,
+      testingStrategy,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/adr/README.md', 'utf8'),
+      readFile('docs/adr/0019-public-website-enterprise-design-system.md', 'utf8'),
+      readFile('docs/design/design-system-v0.1.md', 'utf8'),
+      readFile('docs/product/specs/public-website-spec-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(adrIndex).toContain('[0019](0019-public-website-enterprise-design-system.md)');
+    expect(adrIndex).toContain('Public website enterprise design system');
+    expect(designSystemAdr).toContain('security-grade, evidence-first, local-first, enterprise-calm');
+    expect(designSystemAdr).toContain('top-tier security company aesthetic');
+    expect(designSystemAdr).toContain('does not authorize a visual redesign by itself');
+    expect(designSystem).toContain('RepoAssure Design System v0.1');
+    expect(designSystem).toContain('Security-grade');
+    expect(designSystem).toContain('Evidence-first');
+    expect(designSystem).toContain('Trust Ledger');
+    expect(designSystem).toContain('Semantic Token Layer');
+    expect(designSystem).toContain('Focus Visibility Gate');
+    expect(designSystem).toContain('Forbidden Patterns');
+    expect(publicWebsiteSpec).toContain('ADR-0019');
+    expect(publicWebsiteSpec).toContain('design-system-v0.1.md');
+    expect(publicWebsiteSpec).toContain('semantic token layer');
+    expect(publicWebsiteSpec).toContain('focus-visible');
+    expect(readme).toContain('design-system-v0.1.md');
+    expect(architecture).toContain('ADR-0019');
+    expect(acceptanceChecklist).toContain('Public Website Enterprise Design System');
+    expect(acceptanceChecklist).toContain('Public Website UI/UX Gate');
+    expect(testingStrategy).toContain('Public Website Enterprise Design System');
+    expect(testingStrategy).toContain('Public Website UI/UX Gate');
+    expect(decisionLog).toContain('Public website enterprise design system');
+    expect(devLog).toContain('Public Website Enterprise Design System ADR');
+    expect(devLog).toContain('Public Website UI/UX Gate');
+
+    await expectPath('docs/adr/0019-public-website-enterprise-design-system.md');
+    await expectPath('docs/design/design-system-v0.1.md');
+  });
+
   it('extracts acceptance command ownership into a workspace package while preserving compatibility outputs', async () => {
     const [rootPackageJson, acceptancePackageJson, acceptanceCompatibility, acceptanceReadme, monorepoSpec] = await Promise.all([
       readFile('package.json', 'utf8'),
@@ -734,7 +866,8 @@ describe('project structure', () => {
       readFile('docs/architecture/specs/monorepo-structure-spec-v0.1.md', 'utf8')
     ]);
 
-    expect(rootPackageJson).toContain('"build": "pnpm build:packages && pnpm build:src"');
+    expect(rootPackageJson).toContain('"build": "pnpm build:packages && pnpm build:src && pnpm build:website"');
+    expect(rootPackageJson).toContain('"build:website": "pnpm --filter @repoassure/website build"');
     expect(rootPackageJson).toContain('"build:src": "tsc -p tsconfig.build.json"');
     expect(rootPackageJson).toContain('"build:packages": "pnpm build:shared && pnpm build:security-assurance && pnpm build:browser-explorer && pnpm build:repair-planner && pnpm build:acceptance"');
     expect(rootPackageJson).toContain('"build:shared": "tsc -p packages/shared/tsconfig.build.json"');
@@ -742,7 +875,8 @@ describe('project structure', () => {
     expect(rootPackageJson).toContain('"build:browser-explorer": "tsc -p packages/browser-explorer/tsconfig.build.json"');
     expect(rootPackageJson).toContain('"build:repair-planner": "tsc -p packages/repair-planner/tsconfig.build.json"');
     expect(rootPackageJson).toContain('"build:acceptance": "tsc -p packages/acceptance/tsconfig.build.json"');
-    expect(rootPackageJson).toContain('"typecheck": "pnpm build:packages && tsc --noEmit && pnpm typecheck:packages"');
+    expect(rootPackageJson).toContain('"typecheck": "pnpm build:packages && tsc --noEmit && pnpm typecheck:packages && pnpm typecheck:website"');
+    expect(rootPackageJson).toContain('"typecheck:website": "pnpm --filter @repoassure/website typecheck"');
     expect(rootPackageJson).toContain('"typecheck:packages": "pnpm typecheck:shared && pnpm typecheck:security-assurance && pnpm typecheck:browser-explorer && pnpm typecheck:repair-planner && pnpm typecheck:acceptance"');
     expect(rootPackageJson).toContain('"typecheck:shared": "tsc -p packages/shared/tsconfig.json --noEmit"');
     expect(rootPackageJson).toContain('"typecheck:security-assurance": "tsc -p packages/security-assurance/tsconfig.json --noEmit"');

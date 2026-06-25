@@ -33,7 +33,7 @@ Include:
 
 Exclude:
 
-- `node_modules/`, `.pnpm-store/`, root `dist/`, and `packages/*/dist/`.
+- `node_modules/`, `.pnpm-store/`, root `dist/`, `packages/*/dist/`, and `apps/*/dist/`.
 - `.hardening/` target-run output.
 - `artifacts/acceptance/`, `artifacts/benchmark-runs/`, `artifacts/orphaned-runs/`, and `artifacts/test-results/`.
 - `.env`, `.env.*`, private keys, certificates, provisioning profiles, and local logs.

@@ -41,6 +41,7 @@ docs/
   operations/
   goals/
     codex-goal.md
+    active/
     completed/
   logs/
 ```
@@ -62,7 +63,8 @@ docs/
 | Testing strategy | `docs/testing/strategy/` | `<subject>-vX.Y.md` | `test-strategy-v0.1.md` |
 | Testing sample | `docs/testing/samples/` | `<subject>.md` | `sample-hardening-report.md` |
 | Operations guide | `docs/operations/` | `<subject>-vX.Y.md` | `branch-protection-release-boundary-v0.1.md` |
-| Active goal | `docs/goals/` | `<subject>.md` | `codex-goal.md` |
+| Long-running goal | `docs/goals/` | `<subject>.md` | `codex-goal.md` |
+| Active scoped goal | `docs/goals/active/` | `YYYY-MM-DD-<subject>.md` | `2026-06-25-v0.3-distribution-repair-loop-readiness.md` |
 | Completed goal | `docs/goals/completed/` | `YYYY-MM-DD-<subject>.md` | `2026-06-20-structure-refactor.md` |
 | Log | `docs/logs/` | `<subject>-log.md` or `<subject>.md` | `dev-log.md` |
 

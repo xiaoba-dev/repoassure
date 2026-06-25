@@ -1,5 +1,31 @@
 # 阻塞日志
 
+## 2026年6月25日 - Public release manual gates remain before publication
+
+### 背景
+
+ADR-0015 允许在 private repo 中加入 Apache-2.0 `LICENSE`、贡献政策、安全披露、dependency license audit 和 public release notes draft，作为 public release readiness material。
+
+### 影响
+
+`pnpm release:check` 的自动项已经可以通过，但仍报告 `public release ready: no`。在人工发布授权完成前，不能公开 repo、发布 npm package、打公开 release、公开公告或发布外部 case study。
+
+### 已尝试方案
+
+1. 添加 repository-level Apache-2.0 `LICENSE`。
+2. 添加 `CONTRIBUTING.md`，记录 Developer Certificate of Origin 和 no-CLA 初始策略。
+3. 添加 `SECURITY.md`，记录 private vulnerability disclosure 边界。
+4. 添加 `docs/product/strategy/dependency-license-audit-v0.1.md` 和 `docs/product/strategy/public-release-notes-v0.1.md`。
+5. 扩展 `pnpm release:check`，检查 readiness materials，并保留 `manual-publication-authorization` not_ready gate。
+
+### 当前判断
+
+这是人工/外部发布 gate，不是本地代码缺陷。自动 readiness materials 已准备好；公开发布仍需要法律 review、trademark/name review、branch protection 或等效 repository ruleset，以及最终 maintainer publication authorization。
+
+### 需要的用户决策或外部条件
+
+完成法律和商标 review；解决 GitHub branch protection / ruleset 权限；由 maintainer 明确授权是否 make repository public、publish npm package、create public release、announce publicly 或 publish external case studies。
+
 ## 2026年6月22日 - GitHub branch protection and repository rulesets are unavailable for the private repo
 
 ### 背景
@@ -144,11 +170,11 @@ bootstrap_check_in org.chromium.Chromium.MachPortRendezvousServer... Permission 
 
 ### 当前判断
 
-这是外部验收条件，不是产品代码或自动质量门禁缺失。真实项目 pending 验收已经通过，但继续自动修改代码无法替代用户对结果的 `accepted` 或 `changes_requested` 结论。
+已解除。用户已给出 `accepted` 结论，随后使用 `openclaw/openclaw` 的真实项目路径写入 accepted 验收记录，12/12 artifact 检查通过，generated Playwright spec 执行验证通过，`pnpm goal:audit` 转为 33/33 通过，并已提交推送 `055ae85 docs: close mvp v0.2 user acceptance`。
 
 ### 需要的用户决策或外部条件
 
-用户需要确认 `openclaw/openclaw` 的 pending 验收结果是否符合预期。该 repo 的可复现 pending 命令是：
+无。以下命令保留为历史复现路径。该 repo 的可复现 pending 命令是：
 
 ```bash
 pnpm user:accept -- --repo /private/tmp/openclaw-openclaw-shallow --browser --validate-generated-tests --start-command "pnpm ui:dev" --boot-timeout-ms 120000 --decision pending

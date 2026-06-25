@@ -70,6 +70,14 @@
       "types": "./dist/goal-audit-current-items.d.ts",
       "default": "./dist/goal-audit-current-items.js"
     },
+    "./goal-audit-v03-distribution": {
+      "types": "./dist/goal-audit-v03-distribution.d.ts",
+      "default": "./dist/goal-audit-v03-distribution.js"
+    },
+    "./goal-audit-public-release-readiness": {
+      "types": "./dist/goal-audit-public-release-readiness.d.ts",
+      "default": "./dist/goal-audit-public-release-readiness.js"
+    },
     "./user-acceptance": {
       "types": "./dist/user-acceptance.d.ts",
       "default": "./dist/user-acceptance.js"

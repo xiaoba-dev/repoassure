@@ -58,7 +58,7 @@ examples/      示例目标 repo 和集成示例预留区
 
 开发者优先从 `src/adapters/cli/`、`src/adapters/mcp/` 和 `src/tools/` 追踪入口；验收命令和验收实现优先从 `packages/acceptance/` 追踪，`src/internal/acceptance/` 与 `dist/internal/acceptance/` 仅作为兼容 wrapper/output 路径保留；共享脱敏与 shell helper 实现优先从 `@hardening-mcp/shared` / `packages/shared/` 追踪，`src/shared/` 与 `dist/shared/` 仅作为兼容 wrapper/output 路径保留；安全证据导入优先从 `@hardening-mcp/security-assurance` / `packages/security-assurance/` 追踪；浏览器探索、fetch route exploration、Playwright driver 和安全交互策略实现优先从 `@hardening-mcp/browser-explorer` / `packages/browser-explorer/` 追踪，`src/domain/explore/` 与 `dist/domain/explore/` 仅作为兼容 wrapper/output 路径保留；repair plan 与修复任务包实现优先从 `@hardening-mcp/repair-planner` / `packages/repair-planner/` 追踪，`src/domain/repair-plan/`、`dist/domain/repair-plan/` 和 `src/types/repair-plan.ts` / `dist/types/repair-plan.*` 仅作为兼容 wrapper/output 路径保留；产品和验收资料优先从 `docs/product/`、`docs/acceptance/` 和 `docs/goals/` 读取；长期架构决策优先读取 `docs/adr/README.md`。AI IDE / Agent 消费目标 repo 的硬化物料时，应优先读取目标 repo 的 `.hardening/latest/manifest.json`。
 
-核心架构决策已级联到当前文档和实现：ADR-0001 固化 local-first CLI/MCP 边界，ADR-0002 固化 CLI/MCP shared core，ADR-0003 固化 `.hardening/latest/manifest.json` 和 run-scoped artifact 布局，ADR-0004 固化 repair plan 与 executable task package 物料合同。ADR-0010 固化 RepoAssure 品牌定位；ADR-0011 固化私有 GitHub 工程基线、CI 门禁和 repo hygiene 检查；ADR-0012 固化 branch protection 和 release boundary operations 要求；ADR-0013 固化 Codex Security 影响下的 Security Assurance Lane 策略，执行规格见 `docs/architecture/specs/security-assurance-lane-spec-v0.1.md`：安全扫描工具应作为 provider-backed evidence source 接入 RepoAssure，而不是把 RepoAssure 定位成通用 deep vulnerability scanner；`hardening-mcp` 暂时保留为内部 package、CLI 和 MCP 实现名称。
+核心架构决策已级联到当前文档和实现：ADR-0001 固化 local-first CLI/MCP 边界，ADR-0002 固化 CLI/MCP shared core，ADR-0003 固化 `.hardening/latest/manifest.json` 和 run-scoped artifact 布局，ADR-0004 固化 repair plan 与 executable task package 物料合同。ADR-0010 固化 RepoAssure 品牌定位；ADR-0011 固化私有 GitHub 工程基线、CI 门禁和 repo hygiene 检查；ADR-0012 固化 branch protection 和 release boundary operations 要求；ADR-0013 固化 Codex Security 影响下的 Security Assurance Lane 策略，执行规格见 `docs/architecture/specs/security-assurance-lane-spec-v0.1.md`：安全扫描工具应作为 provider-backed evidence source 接入 RepoAssure，而不是把 RepoAssure 定位成通用 deep vulnerability scanner；ADR-0014 固化 v0.3 分发与修复闭环就绪方向，要求 GitHub Action wrapper、AI IDE repair loop 和 public-release readiness 继续遵守 local-first、不默认自动改代码、不上传目标 repo 的边界；ADR-0015 固化 public release readiness boundary：Apache-2.0 `LICENSE`、贡献政策、安全披露、依赖 license audit 和 release notes draft 是发布准备材料，不等于公开发布授权；`hardening-mcp` 暂时保留为内部 package、CLI 和 MCP 实现名称。
 
 ## 安装
 
@@ -161,6 +161,7 @@ MCP client 配置示例见 `docs/acceptance/guides/user-acceptance-guide.md`。
 
 ```bash
 pnpm repo:hygiene
+pnpm release:check
 pnpm test:unit
 pnpm test:integration
 pnpm test:e2e
@@ -172,7 +173,9 @@ pnpm goal:audit
 
 私有 GitHub repo 的 CI 基线见 `docs/architecture/specs/private-github-engineering-baseline-v0.1.md`：PR 和 `main` push 必须运行 `pnpm repo:hygiene`、unit、typecheck、lint、build 和 `pnpm goal:audit`。`pnpm repo:hygiene` 只检查已追踪文件，阻止 generated artifacts、build outputs、local hardening runs、env files、private keys 和 local logs 进入提交。当前环境中，监听本地端口的 boot 集成测试和真实浏览器 E2E 需要额外权限。详见 `docs/logs/blockers.md`。
 
-分支保护与发布边界见 `docs/operations/branch-protection-release-boundary-v0.1.md`。当前目标状态是 `main` 要求 `RepoAssure CI` / `Quality Gates`，但 GitHub 对当前 private repo plan 返回 403；仓库仍必须保持 private，不能添加仓库级 `LICENSE`、发布 package、移除 `package.json` `"private": true` 或通过公开仓库绕过该限制。
+v0.3 新增本地优先 GitHub Action wrapper：`.github/actions/repoassure/action.yml`。该 action 在 CI checkout 内安装依赖、构建本地 CLI，并执行 `node dist/adapters/cli/index.js run <repo>`；它不依赖 hosted RepoAssure 服务，也不会默认上传目标 repo source、logs、screenshots、traces、env values 或 private artifacts。安全示例见 `examples/github-actions/repoassure-local-first.yml`，其中 artifact upload 需要显式 opt-in。
+
+分支保护与发布边界见 `docs/operations/branch-protection-release-boundary-v0.1.md`。当前目标状态是 `main` 要求 `RepoAssure CI` / `Quality Gates`，但 GitHub 对当前 private repo plan 返回 403；仓库仍必须保持 private，不能发布 package、移除 `package.json` `"private": true`、公开仓库或通过公开仓库绕过该限制。仓库级 Apache-2.0 `LICENSE` 只是 public-release readiness material，不是公开发布授权。Release candidate 本地打包与审查交接见 `docs/operations/release-candidate-handoff-v0.1.md`；该交接同样不授权 push、PR、GitHub release、npm publish 或仓库公开。
 
 可使用单一验收入口生成 `docs/acceptance/acceptance-run.md`：
 

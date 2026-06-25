@@ -22,6 +22,14 @@ Browser exploration 的单元测试覆盖截图 artifact、trace artifact、runt
 
 Report generation 的单元和集成测试覆盖 readiness score、issue counts、Markdown report、带 `HARDENING_BASE_URL` 的 generated test verification command、敏感值脱敏，以及非空 `patch.diff`。`patch.diff` 当前验证 remediation plan、generated test diffs 和 diff 内容脱敏，不验证自动业务代码修复。
 
+v0.3 distribution and repair loop readiness 的测试必须覆盖 GitHub Action wrapper 结构、local CLI invocation、默认不上传私有 artifact、repair task package / repair handoff / validation-only / patch plan 的 agent-consumption contract，以及 public-release readiness checks。任何未来 auto-fix、PR creation 或 hosted artifact storage 行为都必须先有 ADR，再进入测试策略。
+
+当前 v0.3 测试覆盖：`project-structure.test.ts` 守护 `.github/actions/repoassure/action.yml`、safe example workflow 和文档入口；`repair-handoff.test.ts`、`repair-execute.test.ts`、`repair-patch-plan.test.ts` 守护 `agentContract` schema、读取顺序、下一步命令和不自动改源码边界；`public-release-readiness.test.ts` 守护 `pnpm release:check` 的 automated public-release prerequisites、tracked artifact/secret hygiene、manual authorization gate 和 CLI 输出；`goal-audit.test.ts` 守护 v0.3 交付物进入 `pnpm goal:audit`。
+
+Public release readiness v0.1 的测试使用 unit / structure / goal-audit 层守护，不执行真实发布动作：`public-release-readiness.test.ts` 覆盖 Apache-2.0 `LICENSE`、`CONTRIBUTING.md`、`SECURITY.md`、dependency license audit、release notes draft 和 manual publication authorization gate；`project-structure.test.ts` 守护 ADR-0015、PR 模板、README、public release checklist 和 private repo boundary 的级联；`goal-audit.test.ts` 守护 public release readiness 作为自动审计项进入 `pnpm goal:audit`。任何 make repo public、npm publish、tag/release 或公开公告都必须另行授权并重新定义测试策略。
+
+monorepo readiness 的测试使用 unit / structure 层守护，不新增 runtime integration 或 E2E：`project-structure.test.ts` 必须验证 readiness audit 文档存在、v0.3 goal 明确依赖该 audit、`packages/core` 仍是延期抽取项、`apps/cli` 与 `apps/mcp-server` 可继续作为 compatibility shells、`examples/` 与 GitHub Action wrapper 被归入 v0.3 分发缺口，以及 decision/dev logs 已记录排序原因。
+
 隐私脱敏单元测试覆盖 API key、service role、password、private key、Authorization/Proxy-Authorization credential、quoted Authorization/Proxy-Authorization object-literal credential、quoted Cookie/Set-Cookie object value、quoted object key/value 中的 API key、access token、client secret、session token、standalone provider API key、standalone repository/deployment token、standalone cloud provider access key、standalone JWT-looking token、JWT、CSRF、Cookie header、Set-Cookie header、URL userinfo credential、signed URL credential/signature query 参数、URL query 敏感参数和 URL fragment 敏感参数等常见敏感值；CLI options 测试覆盖成功 stdout JSON 和 stderr 错误输出写入前会脱敏；MCP registry 测试覆盖 tool 成功响应和错误响应进入 `content` 与 `structuredContent` 前会脱敏，同时覆盖 `sessionId` 在成功 `structuredContent` 中保留以支持 `stop_app`；MCP fatal error 测试覆盖进程级启动失败写入 stderr 前会脱敏；acceptance fatal error 测试覆盖验收 runner 进程级 fatal stderr 写入前会脱敏；benchmark fatal error 测试覆盖 benchmark runner 进程级 fatal stderr 写入前会脱敏；browser exploration 测试覆盖 console/page error、failed request 和 interaction evidence 进入 findings 前会脱敏，`visitedRoutes` 与 `interactions` 返回给 CLI/MCP 前也会脱敏；run hardening 集成测试覆盖 already-running URL 写入 `boot-result.json` 前会脱敏；boot tool 单元测试覆盖 auto-boot 可序列化结果的 URL、日志路径、blockers 和 errors 写入 artifact 或返回给 MCP 前会脱敏；报告层测试覆盖 boot errors、应用 URL、verification command、finding repro/evidence 以及 generated test diff 内容进入 `hardening-report.md` 和 `patch.diff` 前都会经过脱敏；acceptance report 测试覆盖 `docs/acceptance/acceptance-run.md` 的报告路径、命令和说明列写入前会脱敏；benchmark report 测试覆盖 `docs/logs/spike-results.md` 的运行目录、repo 报告路径和失败原因写入前会脱敏；goal audit 测试覆盖 `docs/acceptance/goal-completion-audit.md` 的分类标题、要求、证据和下一步写入前会脱敏；user acceptance 测试覆盖验收命令、摘要路径、异常摘要、artifact 检查证据、generated spec 验证 evidence/失败摘要和用户备注写入验收记录前会脱敏；generated spec 测试覆盖 route query/fragment 中的 signed URL credential/signature 参数脱敏。
 
 Generated tests 的路径提取优先使用 `reproSteps` 中的显式页面导航；普通 repro 描述、finding evidence 和 smoke route 中的完整 URL 只接受本地 app URL 或当前被测 app 同源 URL 作为兜底，本地 app URL 包括 `localhost`、`127.0.0.1`、`0.0.0.0`、`[::1]`、`[::]`，避免第三方 API、CDN 或外部资源 URL 被误生成成本地页面 smoke/regression test。生成 spec 前会保留非敏感 query/fragment 参数与 SPA hash route，并脱敏 token、code、session、CSRF 等敏感 query/fragment 参数值；finding title 进入 generated test title 前也会经过敏感值脱敏。
@@ -45,6 +53,7 @@ node dist/adapters/cli/index.js run -h
 pnpm acceptance
 pnpm acceptance -- --help
 pnpm acceptance -- -h
+pnpm release:check
 pnpm goal:audit
 pnpm user:accept -- --repo <real-web-app-repo> --browser --decision pending
 pnpm user:accept -- --repo <real-web-app-repo> --browser --validate-generated-tests --decision pending
@@ -74,6 +83,7 @@ node dist/adapters/cli/index.js run -h
 pnpm acceptance
 pnpm acceptance -- --help
 pnpm acceptance -- -h
+pnpm release:check
 pnpm goal:audit
 pnpm user:accept -- --repo <real-web-app-repo> --browser --decision pending
 pnpm user:accept -- --repo <real-web-app-repo> --browser --validate-generated-tests --decision pending

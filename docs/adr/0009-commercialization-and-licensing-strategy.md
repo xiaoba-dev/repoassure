@@ -12,7 +12,7 @@ This creates a product boundary decision. The project can either compete directl
 
 The commercialization strategy also affects architecture. License choice, open-core boundaries, hosted services, enterprise controls, and internal usage across multiple AI-owned projects will determine which modules should remain protocol-like public infrastructure and which modules should become commercial product surfaces.
 
-The repository is currently private in `package.json` and has no repository-level `LICENSE` file. This ADR records the intended strategy before a public release; it does not by itself publish the project or create a legal license grant.
+At decision time, the repository was private in `package.json` and had no repository-level `LICENSE` file. This ADR records the intended strategy before a public release; it does not by itself publish the project or create a legal license grant. ADR-0015 later allows adding Apache-2.0 readiness materials while keeping public publication blocked until manual authorization.
 
 ## Decision
 

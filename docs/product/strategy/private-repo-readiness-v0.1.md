@@ -14,13 +14,13 @@ Brand decision: ADR-0010 selects RepoAssure as the product brand and `repoassure
 
 Private engineering baseline: ADR-0011 defines CI, PR/issue templates, repository hygiene, and the private pre-release merge boundary.
 
-Branch protection and release boundary: ADR-0012 defines `main` protection as an operations requirement and blocks making the repo public, adding a repository-level license, publishing packages, or removing `package.json` `"private": true` until the public release checklist is complete.
+Branch protection and release boundary: ADR-0012 defines `main` protection as an operations requirement and blocks making the repo public, publishing packages, or removing `package.json` `"private": true` until the public release checklist is complete and publication is explicitly authorized. ADR-0015 allows a repository-level Apache-2.0 `LICENSE` as readiness material only.
 
 ## Decision
 
 The project is suitable for a private GitHub repository after local guardrails and quality gates pass.
 
-Do not publish publicly, announce externally, add a repository-level open-source `LICENSE`, publish packages, or remove `package.json` `"private": true` until the public release checklist is complete.
+Do not publish publicly, announce externally, publish packages, remove `package.json` `"private": true`, or treat the repository-level Apache-2.0 `LICENSE` as publication authorization until the public release checklist is complete and manual authorization exists.
 
 ## Initial Commit Surface
 
@@ -79,7 +79,7 @@ Blocked:
 - Public repository visibility.
 - npm package publication.
 - Public announcement.
-- Open-source license grant.
+- Public publication or package publication based only on LICENSE presence.
 - External case-study publication using real target repo evidence.
 
 ## Follow-up

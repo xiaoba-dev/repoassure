@@ -186,6 +186,19 @@ Current decision:
 - Phase 2b package-owned implementation status: `packages/acceptance` now exposes `compatibility`, `markdown`, `report`, `goal-audit`, `goal-audit-requirements`, `goal-audit-user-acceptance`, `goal-audit-user-acceptance-materials`, `goal-audit-sources`, `goal-audit-delivery`, `goal-audit-runtime`, `goal-audit-workflow-artifacts`, `goal-audit-observability-security`, `goal-audit-process-governance`, `goal-audit-evidence-documents`, `goal-audit-current-items`, `user-acceptance`, `user-acceptance-handoff`, `fatal-error`, `redaction`, `repo-preflight`, `user-acceptance-args`, `run-acceptance`, `run-user-acceptance-handoff`, `shell-quote`, `shell-words`, `user-acceptance-record`, `user-acceptance-runner-helpers`, `run-user-acceptance`, and `run-goal-audit` as implementation modules, with the old `src/internal/acceptance/*` behavior kept in compatibility tests.
 - Remaining Phase 2 work is governance, compatibility evidence, and future extraction of `core`; it is not moving more `src/internal/acceptance/*`, `src/shared/*`, `src/domain/explore/*`, or `src/domain/repair-plan/*` implementation modules in this phase.
 
+### Readiness Audit Before v0.3
+
+Before v0.3 distribution and repair loop implementation starts, follow [Monorepo Readiness Audit v0.1](monorepo-readiness-audit-v0.1.md).
+
+The audit records that the repo is a runnable phased monorepo rather than a mature completed monorepo. v0.3 may use the current compatibility-first app and package boundaries, but it must not silently absorb every remaining monorepo maturity task.
+
+Current v0.3-facing rules:
+
+- `packages/core` extraction remains deferred unless it directly reduces distribution or repair-loop risk.
+- `apps/cli` and `apps/mcp-server` may remain compatibility shells over built `dist/adapters/*` entrypoints.
+- GitHub Action wrapper, distribution examples, and repo hygiene / public-release readiness checks belong to v0.3 because they affect distribution.
+- Benchmark package ownership, `artifacts/user-acceptance-runs/`, and `apps/web-dashboard` remain future work unless a new ADR changes their priority.
+
 ### Phase 3: Acceptance and Dashboard Expansion
 
 - Acceptance runners already live under `packages/acceptance`; future work should focus on generated output compatibility and any real UI workflow.

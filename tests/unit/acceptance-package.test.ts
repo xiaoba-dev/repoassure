@@ -235,7 +235,7 @@ describe('acceptance package', () => {
       sources: {},
       pathExists: async () => false,
       userAcceptanceStatus: 'pending_or_invalid'
-    })).resolves.toHaveLength(33);
+    })).resolves.toHaveLength(35);
   });
 
   it('exports user acceptance helpers as package-owned implementation', () => {

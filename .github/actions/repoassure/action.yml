@@ -1,0 +1,67 @@
+name: RepoAssure Local Hardening
+description: Run RepoAssure through the checked-out repository local CLI without a hosted service
+
+inputs:
+  repo-path:
+    description: Target repository path relative to the checkout.
+    required: false
+    default: "."
+  start-command:
+    description: Optional command used by RepoAssure to boot a web app target.
+    required: false
+    default: ""
+  browser:
+    description: Enable browser exploration when the target can be started in CI.
+    required: false
+    default: "false"
+  trace:
+    description: Enable Playwright trace capture for browser runs.
+    required: false
+    default: "false"
+  upload-artifacts:
+    description: Explicit opt-in flag for caller workflows; this action itself does not upload target repo source, logs, screenshots, traces, env values, or private artifacts.
+    required: false
+    default: "false"
+
+outputs:
+  latest-manifest:
+    description: Path to the target repo .hardening/latest/manifest.json.
+    value: ${{ steps.hardening.outputs.latest-manifest }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install RepoAssure dependencies
+      shell: bash
+      run: |
+        set -euo pipefail
+        corepack enable
+        pnpm install --frozen-lockfile
+
+    - name: Build local RepoAssure CLI
+      shell: bash
+      run: pnpm build
+
+    - name: Run local hardening CLI
+      id: hardening
+      shell: bash
+      run: |
+        set -euo pipefail
+        # Local CLI invocation starts with: node dist/adapters/cli/index.js run
+        args=("run" "${{ inputs.repo-path }}")
+
+        if [[ -n "${{ inputs.start-command }}" ]]; then
+          args+=("--start-command" "${{ inputs.start-command }}")
+        fi
+
+        if [[ "${{ inputs.browser }}" == "true" ]]; then
+          args+=("--browser")
+        fi
+
+        if [[ "${{ inputs.trace }}" == "true" ]]; then
+          args+=("--trace")
+        fi
+
+        node dist/adapters/cli/index.js "${args[@]}"
+        latest_manifest="${{ inputs.repo-path }}/.hardening/latest/manifest.json"
+        echo "latest-manifest=${latest_manifest}" >> "$GITHUB_OUTPUT"

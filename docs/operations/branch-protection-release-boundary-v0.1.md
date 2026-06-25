@@ -43,9 +43,10 @@ Until `docs/product/strategy/public-release-checklist-v0.1.md` is complete:
 
 - keep the GitHub repository private
 - keep `package.json` `"private": true`
-- do not add a repository-level `LICENSE`
 - do not publish npm packages
 - do not publish external announcements or case studies using non-public target repo evidence
+
+ADR-0015 allows a repository-level Apache-2.0 `LICENSE` as public-release readiness material. LICENSE presence does not authorize changing repository visibility, publishing packages, or announcing the project publicly.
 
 ## Manual Resolution
 

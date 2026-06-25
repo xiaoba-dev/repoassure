@@ -82,7 +82,22 @@ export interface RepairExecutionReport {
     failed: number;
     skipped: number;
   };
+  agentContract: RepairExecutionAgentContract;
   tasks: RepairExecutionTaskReport[];
+}
+
+export interface RepairExecutionAgentContract {
+  schema: 'repoassure.repair-execution-report.v1';
+  readOrder: string[];
+  resultSemantics: {
+    planned: string;
+    passed: string;
+    failed: string;
+  };
+  nextCommands: {
+    patchPlan: string;
+  };
+  boundaries: string[];
 }
 
 export async function main(args: string[] = process.argv.slice(2)): Promise<number> {
@@ -298,6 +313,7 @@ export function buildRepairExecutionReport(input: {
       failed,
       skipped
     },
+    agentContract: buildRepairExecutionAgentContract(),
     tasks: taskReports
   };
 }
@@ -317,8 +333,45 @@ export function formatRepairExecutionReportMarkdown(report: RepairExecutionRepor
 | Failed | ${report.summary.failed} |
 | Skipped | ${report.summary.skipped} |
 
+## Agent Contract
+
+- Schema: ${report.agentContract.schema}
+- Read order: ${report.agentContract.readOrder.join(', ')}
+- Planned: ${report.agentContract.resultSemantics.planned}
+- Passed: ${report.agentContract.resultSemantics.passed}
+- Failed: ${report.agentContract.resultSemantics.failed}
+- Patch plan: ${report.agentContract.nextCommands.patchPlan}
+- Boundaries: ${report.agentContract.boundaries.join(' ')}
+
 ${report.tasks.map(formatTaskMarkdown).join('\n\n')}
 `;
+}
+
+function buildRepairExecutionAgentContract(): RepairExecutionAgentContract {
+  return {
+    schema: 'repoassure.repair-execution-report.v1',
+    readOrder: [
+      'status',
+      'summary',
+      'tasks[]',
+      'tasks[].executionStatus',
+      'tasks[].verificationResults',
+      'tasks[].nextAction'
+    ],
+    resultSemantics: {
+      planned: 'No verification commands were run.',
+      passed: 'All selected verification commands exited zero.',
+      failed: 'At least one selected verification command failed or timed out.'
+    },
+    nextCommands: {
+      patchPlan: 'pnpm repair:patch-plan -- --report <repair-execution-report.json>'
+    },
+    boundaries: [
+      'Validation-only mode does not modify target repository files.',
+      'Reports contain redacted command output summaries, not raw secrets.',
+      'A failed report is evidence for patch planning, not permission to auto-edit.'
+    ]
+  };
 }
 
 function buildTaskReport(

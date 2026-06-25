@@ -29,7 +29,7 @@
 
 ## Release Boundary
 
-- [ ] This PR does not add a repository-level LICENSE, publish packages, remove package.json private true, or make the repo public.
+- [ ] This PR does not publish packages, remove package.json private true, make the repo public, or treat LICENSE presence as publication authorization.
 
 ## Notes
 

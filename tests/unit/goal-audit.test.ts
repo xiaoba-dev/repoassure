@@ -48,6 +48,12 @@ import {
   buildProcessGovernanceGoalAuditItems
 } from '../../packages/acceptance/src/goal-audit-process-governance.js';
 import {
+  buildV03DistributionRepairLoopGoalAuditItem
+} from '../../packages/acceptance/src/goal-audit-v03-distribution.js';
+import {
+  buildPublicReleaseReadinessGoalAuditItem
+} from '../../packages/acceptance/src/goal-audit-public-release-readiness.js';
+import {
   buildEvidenceAndDocumentGoalAuditItems
 } from '../../packages/acceptance/src/goal-audit-evidence-documents.js';
 import {
@@ -243,6 +249,21 @@ describe('goal audit', () => {
     expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.securityLaneSpec).toBe(
       'docs/architecture/specs/security-assurance-lane-spec-v0.1.md'
     );
+    expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.githubActionWrapper).toBe('.github/actions/repoassure/action.yml');
+    expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.githubActionExample).toBe(
+      'examples/github-actions/repoassure-local-first.yml'
+    );
+    expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.publicReleaseReadinessScript).toBe(
+      'scripts/check-public-release-readiness.mjs'
+    );
+    expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.publicReleaseReadinessTests).toBe(
+      'tests/unit/public-release-readiness.test.ts'
+    );
+    expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.repairHandoffRunner).toBe('packages/acceptance/src/run-repair-handoff.ts');
+    expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.repairExecuteRunner).toBe('packages/acceptance/src/run-repair-execute.ts');
+    expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.repairPatchPlanRunner).toBe(
+      'packages/acceptance/src/run-repair-patch-plan.ts'
+    );
     expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.playwrightDriver).toBe('packages/browser-explorer/src/playwright-driver.ts');
     expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.legacyBrowserExplorerExploreApp).toBe('src/domain/explore/explore-app.ts');
     expect(GOAL_AUDIT_TEXT_SOURCE_PATHS.legacyBrowserExplorerPlaywrightDriver).toBe('src/domain/explore/playwright-driver.ts');
@@ -318,6 +339,60 @@ describe('goal audit', () => {
     expect(sources.cliSmokeTests).toContain('content:/repo/tests/unit/cli-options.test.ts');
     expect(sources.cliSmokeTests).toContain('content:/repo/tests/integration/cli-run.test.ts');
     expect(sources.cliSmokeTests.split('\n')).toHaveLength(4);
+  });
+
+  it('audits v0.3 distribution and repair-loop readiness evidence', () => {
+    const item = buildV03DistributionRepairLoopGoalAuditItem({
+      packageJson: '"release:check": "node scripts/check-public-release-readiness.mjs"',
+      githubActionWrapper: [
+        'name: RepoAssure Local Hardening',
+        'node dist/adapters/cli/index.js run',
+        'does not upload target repo source, logs, screenshots, traces, env values, or private artifacts'
+      ].join('\n'),
+      githubActionExample: [
+        'uses: ./.github/actions/repoassure',
+        "if: inputs.upload-artifacts == 'true'",
+        'actions/upload-artifact'
+      ].join('\n'),
+      publicReleaseReadinessScript: 'runPublicReleaseReadinessCheck',
+      publicReleaseReadinessTests: [
+        'public release readiness checker',
+        'private pre-release boundary',
+        'tracked files contain generated artifacts or secret-like paths'
+      ].join('\n'),
+      repairHandoffRunner: 'repoassure.repair-handoff.v1',
+      repairExecuteRunner: 'repoassure.repair-execution-report.v1',
+      repairPatchPlanRunner: 'repoassure.patch-plan.v1',
+      readme: '.github/actions/repoassure/action.yml\npnpm release:check',
+      userAcceptanceGuide: 'RepoAssure Local Hardening'
+    });
+
+    expect(item).toEqual(expect.objectContaining({
+      category: 'v0.3 分发与修复闭环',
+      requirement: 'GitHub Action、agent contract 与 release readiness',
+      status: 'passed'
+    }));
+  });
+
+  it('audits public release readiness materials without treating them as publication authorization', () => {
+    const item = buildPublicReleaseReadinessGoalAuditItem({
+      packageJson: '"private": true\n"license": "Apache-2.0"\n"release:check": "node scripts/check-public-release-readiness.mjs"',
+      license: 'Apache License\nVersion 2.0',
+      contributing: 'Developer Certificate of Origin\nNo CLA is required',
+      securityPolicy: 'Report a Vulnerability\nprivate',
+      dependencyLicenseAudit: 'No known incompatible dependency licenses\nApache-2.0',
+      publicReleaseNotes: 'Public Release Notes v0.1\nlocal-first',
+      publicReleaseReadinessAdr: 'Public release readiness boundary\nAdding `LICENSE` is readiness preparation, not publication authorization',
+      publicReleaseReadinessScript: 'manual-publication-authorization\nrepository-license\ncontribution-policy\nsecurity-policy',
+      publicReleaseReadinessTests: 'checks public release policy materials before reporting automated prerequisites ready',
+      publicReleaseChecklist: 'Final maintainer authorization exists before changing visibility'
+    });
+
+    expect(item).toEqual(expect.objectContaining({
+      category: 'Public Release Readiness',
+      requirement: 'license、policy、dependency audit 与 manual authorization gate',
+      status: 'passed'
+    }));
   });
 
   it('covers user acceptance material source keys in the package-owned goal audit source collection', () => {
@@ -842,6 +917,27 @@ describe('goal audit', () => {
     const sharedMarkers = [
       '"hardening": "dist/adapters/cli/index.js"',
       '"hardening-mcp": "dist/adapters/mcp/index.js"',
+      '"private": true',
+      '"license": "Apache-2.0"',
+      '"release:check": "node scripts/check-public-release-readiness.mjs"',
+      'Apache License',
+      'Version 2.0',
+      'Developer Certificate of Origin',
+      'No CLA is required',
+      'Report a Vulnerability',
+      'private',
+      'No known incompatible dependency licenses',
+      'Apache-2.0',
+      'Public Release Notes v0.1',
+      'local-first',
+      'Public release readiness boundary',
+      'Adding `LICENSE` is readiness preparation, not publication authorization',
+      'manual-publication-authorization',
+      'repository-license',
+      'contribution-policy',
+      'security-policy',
+      'checks public release policy materials before reporting automated prerequisites ready',
+      'Final maintainer authorization exists before changing visibility',
       'analyze_repo',
       'boot_app',
       'explore_app',
@@ -872,6 +968,23 @@ describe('goal audit', () => {
       'hardening plan <repo>',
       'hardening report <runDir> <outputPath>',
       'hardening run <repo> [url]',
+      'name: RepoAssure Local Hardening',
+      'node dist/adapters/cli/index.js run',
+      'does not upload target repo source, logs, screenshots, traces, env values, or private artifacts',
+      'uses: ./.github/actions/repoassure',
+      "if: inputs.upload-artifacts == 'true'",
+      'actions/upload-artifact',
+      '"release:check": "node scripts/check-public-release-readiness.mjs"',
+      'runPublicReleaseReadinessCheck',
+      'public release readiness checker',
+      'private pre-release boundary',
+      'tracked files contain generated artifacts or secret-like paths',
+      'repoassure.repair-handoff.v1',
+      'repoassure.repair-execution-report.v1',
+      'repoassure.patch-plan.v1',
+      '.github/actions/repoassure/action.yml',
+      'pnpm release:check',
+      'RepoAssure Local Hardening',
       '--help, -h',
       'CLI 子命令提供零副作用帮助入口',
       'prints command help for %s without running the command',
@@ -1031,6 +1144,20 @@ describe('goal audit', () => {
         securityImportTool: sharedMarkers,
         securityAssuranceTests: sharedMarkers,
         securityLaneSpec: sharedMarkers,
+        githubActionWrapper: sharedMarkers,
+        githubActionExample: sharedMarkers,
+        publicReleaseReadinessScript: sharedMarkers,
+        publicReleaseReadinessTests: sharedMarkers,
+        publicReleaseReadinessAdr: sharedMarkers,
+        publicReleaseChecklist: sharedMarkers,
+        license: sharedMarkers,
+        contributing: sharedMarkers,
+        securityPolicy: sharedMarkers,
+        dependencyLicenseAudit: sharedMarkers,
+        publicReleaseNotes: sharedMarkers,
+        repairHandoffRunner: sharedMarkers,
+        repairExecuteRunner: sharedMarkers,
+        repairPatchPlanRunner: sharedMarkers,
         playwrightDriver: sharedMarkers,
         bootAppTool: sharedMarkers,
         exploreAppTool: sharedMarkers,
@@ -1127,7 +1254,7 @@ describe('goal audit', () => {
       userAcceptanceStatus: 'pending_or_invalid'
     });
 
-    expect(items).toHaveLength(33);
+    expect(items).toHaveLength(35);
     expect(items.map((item) => `${item.category}:${item.requirement}`)).toEqual([
       '交付物:可运行的 CLI',
       '交付物:可运行的 MCP Server',
@@ -1138,6 +1265,8 @@ describe('goal audit', () => {
       '完整工作流:可执行 analyze_repo -> boot_app -> explore_app -> generate_tests -> harden_report -> repair_plan',
       '本地 artifact:本地 artifact 输出',
       '可观测性:可复现信息与失败证据',
+      'v0.3 分发与修复闭环:GitHub Action、agent contract 与 release readiness',
+      'Public Release Readiness:license、policy、dependency audit 与 manual authorization gate',
       '质量门禁:完整验收门禁通过',
       '开发流程:TDD 与测试金字塔执行记录',
       '日志治理:阻塞与决策记录',
@@ -1189,7 +1318,7 @@ describe('goal audit', () => {
       }
     });
 
-    expect(items).toHaveLength(33);
+    expect(items).toHaveLength(35);
     expect(items.at(-1)).toEqual(expect.objectContaining({
       category: '用户验收',
       requirement: '用户确认 MVP 符合预期',

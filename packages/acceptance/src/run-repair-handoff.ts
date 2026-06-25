@@ -68,6 +68,18 @@ export interface RepairHandoffTask {
   handoffPrompt: string;
 }
 
+export interface RepairHandoffAgentContract {
+  schema: 'repoassure.repair-handoff.v1';
+  primaryReadPath: string;
+  readOrder: string[];
+  nextCommands: {
+    dryRun: string;
+    validationOnly: string;
+    patchPlan: string;
+  };
+  boundaries: string[];
+}
+
 export interface RepairHandoffPackage {
   schemaVersion: 1;
   generatedAt: string;
@@ -82,6 +94,7 @@ export interface RepairHandoffPackage {
     highestPriority: RepairHandoffPriority | null;
   };
   sourceArtifacts: Record<string, unknown>;
+  agentContract: RepairHandoffAgentContract;
   tasks: RepairHandoffTask[];
 }
 
@@ -234,6 +247,7 @@ export function buildRepairHandoffPackage(input: BuildRepairHandoffPackageInput)
       highestPriority: tasks[0]?.priority ?? null
     },
     sourceArtifacts,
+    agentContract: buildRepairHandoffAgentContract(),
     tasks
   };
 }
@@ -255,8 +269,43 @@ export function formatRepairHandoffMarkdown(pkg: RepairHandoffPackage): string {
 | Required Failed Checks | ${pkg.summary.requiredFailed} |
 | Highest Priority | ${pkg.summary.highestPriority ?? 'n/a'} |
 
+## Agent Contract
+
+- Schema: ${pkg.agentContract.schema}
+- Primary read path: ${pkg.agentContract.primaryReadPath}
+- Read order: ${pkg.agentContract.readOrder.join(', ')}
+- Dry run: ${pkg.agentContract.nextCommands.dryRun}
+- Validation only: ${pkg.agentContract.nextCommands.validationOnly}
+- Patch plan: ${pkg.agentContract.nextCommands.patchPlan}
+- Boundaries: ${pkg.agentContract.boundaries.join(' ')}
+
 ${taskSections}
 `;
+}
+
+function buildRepairHandoffAgentContract(): RepairHandoffAgentContract {
+  return {
+    schema: 'repoassure.repair-handoff.v1',
+    primaryReadPath: '.hardening/latest/repair-handoff-package.json',
+    readOrder: [
+      'summary',
+      'tasks[]',
+      'tasks[].evidence',
+      'tasks[].recommendedFix',
+      'tasks[].verification.commands',
+      'tasks[].handoffPrompt'
+    ],
+    nextCommands: {
+      dryRun: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --dry-run',
+      validationOnly: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --validation-only',
+      patchPlan: 'pnpm repair:patch-plan -- --report <repair-execution-report.json>'
+    },
+    boundaries: [
+      'Does not modify target repository files.',
+      'Does not create branches, commits, issues, pull requests, or advisories.',
+      'Read redacted evidence only; do not infer or reconstruct secrets.'
+    ]
+  };
 }
 
 export function formatVerificationPlanMarkdown(pkg: RepairHandoffPackage): string {

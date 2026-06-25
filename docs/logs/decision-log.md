@@ -1,5 +1,63 @@
 # 决策日志
 
+## 2026年6月25日 - Public release readiness boundary
+
+### 决策
+
+新增 `ADR-0015: Public Release Readiness Boundary`。允许在 private repo 中加入 Apache-2.0 `LICENSE`、`package.json#license`、`CONTRIBUTING.md`、`SECURITY.md`、dependency license audit 和 public release notes draft，作为公开发布准备材料。
+
+### 原因
+
+- ADR-0009 已选择 Apache-2.0 作为 open-core license target。
+- v0.3 已完成本地优先 GitHub Action、repair loop agent contract 和 release readiness checker，下一步需要让公开发布材料可审计。
+- `LICENSE`、贡献政策和安全披露应在真正公开前被 review，而不是在发布瞬间才生成。
+
+### 影响
+
+- `LICENSE` 存在不代表公开发布授权。
+- `package.json` 继续保持 `"private": true`，npm package publication 仍关闭。
+- `pnpm release:check` 会检查自动 readiness materials，并在 manual publication authorization 缺失时继续报告 `public release ready: no`。
+- 公开 repo、npm publish、公开公告、外部 case study 仍必须等待法律、商标、branch protection 或等效 ruleset 和最终 maintainer authorization。
+
+## 2026年6月25日 - Monorepo readiness before v0.3
+
+### 决策
+
+在正式执行 v0.3 Distribution and Repair Loop Readiness 之前，先完成并落档 monorepo readiness audit。当前 repo 判定为“可运行的分阶段 monorepo”，不是“成熟完成态 monorepo”；v0.3 可以基于现有 compatibility-first package/app 边界推进，但必须明确哪些结构缺口属于 v0.3，哪些应延期。
+
+### 原因
+
+- 当前 `packages/acceptance`、`packages/shared`、`packages/security-assurance`、`packages/browser-explorer`、`packages/repair-planner` 已具备 package ownership，但 `packages/core` 仍是占位。
+- `apps/cli` 与 `apps/mcp-server` 仍通过 built `dist/adapters/*` 入口运行，适合继续作为兼容 app shells，而不是在 v0.3 中强制深迁移。
+- v0.3 真正需要处理的是 GitHub Action wrapper、examples、repo hygiene / public-release readiness checks 和 repair loop contract；benchmark package ownership、dashboard、多 repo artifact history 不应混入同一个 goal。
+- 本轮只固化排序和级联文档，不改变 ADR-0005、ADR-0006 或 ADR-0014 的长期架构方向，因此不新增 ADR。
+
+### 影响
+
+- 新增 `docs/architecture/specs/monorepo-readiness-audit-v0.1.md`。
+- 新增并归档 `docs/goals/completed/2026-06-25-monorepo-readiness-audit.md`。
+- 更新 v0.3 goal，将 `monorepo readiness audit` 设为前置条件；该 goal 后续已完成并归档。
+- 级联更新 monorepo structure spec、testing strategy 和 dev log，并新增结构测试守护。
+
+## 2026年6月25日 - v0.3 Distribution and Repair Loop Readiness
+
+### 决策
+
+新增 `ADR-0014: Distribution and Repair Loop Readiness`，将下一个产品阶段定义为 v0.3 分发与修复闭环就绪：优先完成 GitHub Action wrapper、CLI/MCP 分发示例、AI IDE repair loop artifact contract、validation-only / patch-plan 闭环强化，以及 public-release readiness checks。
+
+### 原因
+
+- MVP v0.2 已完成真实项目 accepted 用户验收，继续只加诊断能力的边际价值降低。
+- ADR-0009 已将 GitHub Action 和 MCP 作为 open-core adoption 的首批分发渠道，但缺少明确实现边界。
+- ADR-0004 已定义 repair plan / executable task package，但 v0.3 需要把 handoff、validation-only、patch plan 打磨成 AI IDE 可稳定消费的闭环。
+- 需要在进入实现前明确：GitHub Action 只包装本地 CLI，不上传目标 repo；v0.3 不默认自动修改代码、不创建 PR、不实现 hosted dashboard。
+
+### 影响
+
+- 新增 `docs/product/specs/mvp-spec-v0.3.md` 和 `docs/goals/completed/2026-06-25-v0.3-distribution-repair-loop-readiness.md`。
+- 级联更新 ADR index、architecture overview、README、commercialization strategy、open-core packaging spec、public release checklist、testing strategy、user acceptance guide、acceptance checklist 和 blockers。
+- `mvp-spec-v0.2` 状态修正为已实现且真实项目用户验收已通过。
+
 ## 2026年6月23日 - Security Assurance Lane Phase 1 本地导入
 
 ### 决策
@@ -117,7 +175,7 @@
 ### 原因
 
 - CI 已经通过，但如果 `main` 不受保护，CI 只能提示问题，不能阻止低质量变更进入主分支。
-- 当前项目仍处于 private pre-release 阶段，不能添加仓库级 `LICENSE`、发布 package、移除 `package.json` `"private": true` 或公开仓库。
+- 当时项目仍处于 private pre-release 阶段，尚未添加仓库级 `LICENSE`，也不能发布 package、移除 `package.json` `"private": true` 或公开仓库。ADR-0015 后续允许添加 Apache-2.0 `LICENSE` 作为 readiness material，但不授权公开发布。
 - GitHub API 对 private repo branch protection 和 rulesets 返回 HTTP 403，需要把这个外部限制记录为治理 blocker。
 
 ### 影响

@@ -50,6 +50,7 @@ Commercial surfaces should focus on organization-level value rather than restric
 | `packages/browser-explorer` | Open core | Implemented browser and route exploration package |
 | `packages/repair-planner` | Open core | Implemented repair plan and executable task package package |
 | Security Assurance Lane | Open core interface | Optional provider-backed security evidence import boundary |
+| GitHub Action wrapper | Open core | Implemented v0.3 distribution wrapper over local CLI execution; does not upload target repo source or private artifacts by default |
 | Hosted dashboard | Commercial | Future Team Cloud surface |
 | Policy center | Commercial | Future enterprise governance surface |
 
@@ -58,3 +59,4 @@ Commercial surfaces should focus on organization-level value rather than restric
 - Revisit this spec before implementing hosted dashboard or enterprise packaging.
 - Add package-level README updates whenever a module changes classification.
 - Revisit the Security Assurance Lane provider packaging boundary before adding remote provider integrations or commercial team governance surfaces.
+- Keep GitHub Action distribution aligned with ADR-0014: local CLI execution first, explicit artifact publication only, and no hosted service dependency.

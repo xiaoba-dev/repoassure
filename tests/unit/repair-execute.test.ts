@@ -27,6 +27,17 @@ function buildPackage(repoRoot: string): RepairHandoffPackage {
       requiredFailed: 0,
       highestPriority: 'P1'
     },
+    agentContract: {
+      schema: 'repoassure.repair-handoff.v1',
+      primaryReadPath: '.hardening/latest/repair-handoff-package.json',
+      readOrder: ['summary', 'tasks[]', 'tasks[].verification.commands'],
+      nextCommands: {
+        dryRun: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --dry-run',
+        validationOnly: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --validation-only',
+        patchPlan: 'pnpm repair:patch-plan -- --report <repair-execution-report.json>'
+      },
+      boundaries: ['Does not modify target repository files.']
+    },
     tasks: [
       {
         taskId: 'pycli-failed-ruff-check',
@@ -102,6 +113,18 @@ describe('repair execute', () => {
       failed: 0,
       skipped: 1
     });
+    expect(report.agentContract).toMatchObject({
+      schema: 'repoassure.repair-execution-report.v1',
+      resultSemantics: {
+        planned: 'No verification commands were run.',
+        passed: 'All selected verification commands exited zero.',
+        failed: 'At least one selected verification command failed or timed out.'
+      },
+      nextCommands: {
+        patchPlan: 'pnpm repair:patch-plan -- --report <repair-execution-report.json>'
+      }
+    });
+    expect(report.agentContract.boundaries).toContain('Validation-only mode does not modify target repository files.');
     expect(report.tasks[0]?.taskId).toBe('pycli-failed-ruff-check');
     expect(report.tasks[0]?.executionStatus).toBe('planned');
     expect(formatRepairExecutionReportMarkdown(report)).toContain('# Repair Execution Report');

@@ -61,6 +61,18 @@ export interface PatchPlan {
   };
   actions: PatchAction[];
   boundaries: string[];
+  agentContract: PatchPlanAgentContract;
+}
+
+export interface PatchPlanAgentContract {
+  schema: 'repoassure.patch-plan.v1';
+  applyPolicy: 'manual-review-only';
+  readOrder: string[];
+  reviewWorkflow: string[];
+  nextCommands: {
+    validate: string;
+  };
+  boundaries: string[];
 }
 
 export async function main(args: string[] = process.argv.slice(2)): Promise<number> {
@@ -189,7 +201,8 @@ export function buildPatchPlan(input: {
       'This patch plan does not modify target repository files.',
       'Review every action before applying edits in an AI IDE or editor.',
       'After applying any patch, rerun repair:execute --validation-only and user acceptance.'
-    ]
+    ],
+    agentContract: buildPatchPlanAgentContract()
   };
 }
 
@@ -210,8 +223,46 @@ export function formatPatchPlanMarkdown(plan: PatchPlan): string {
 | Manual Review Required | ${plan.summary.manualReviewRequired} |
 | Affected Files | ${plan.summary.affectedFiles} |
 
+## Agent Contract
+
+- Schema: ${plan.agentContract.schema}
+- Apply policy: ${plan.agentContract.applyPolicy}
+- Read order: ${plan.agentContract.readOrder.join(', ')}
+- Review workflow: ${plan.agentContract.reviewWorkflow.join(' ')}
+- Validate: ${plan.agentContract.nextCommands.validate}
+- Boundaries: ${plan.agentContract.boundaries.join(' ')}
+
 ${actions}
 `;
+}
+
+function buildPatchPlanAgentContract(): PatchPlanAgentContract {
+  return {
+    schema: 'repoassure.patch-plan.v1',
+    applyPolicy: 'manual-review-only',
+    readOrder: [
+      'status',
+      'summary',
+      'actions[]',
+      'actions[].targetFiles',
+      'actions[].recommendedChange',
+      'actions[].suggestedCommands',
+      'actions[].reviewNotes'
+    ],
+    reviewWorkflow: [
+      'Review each action before applying edits in an AI IDE or editor.',
+      'Apply only the smallest relevant patch.',
+      'Rerun validation-only and user acceptance after edits.'
+    ],
+    nextCommands: {
+      validate: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --validation-only'
+    },
+    boundaries: [
+      'Does not write target repository files.',
+      'Does not run formatters, create commits, open PRs, or upload artifacts.',
+      'Auto-fix candidates still require review before execution.'
+    ]
+  };
 }
 
 function classifyVerificationResult(taskId: string, result: RepairVerificationCommandResult): PatchAction[] {

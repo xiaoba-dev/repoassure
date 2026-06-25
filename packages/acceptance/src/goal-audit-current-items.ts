@@ -10,6 +10,8 @@ import { buildEvidenceAndDocumentGoalAuditItems } from './goal-audit-evidence-do
 import { buildUserAcceptanceMaterialRequirements } from './goal-audit-user-acceptance-materials.js';
 import { buildUserAcceptanceGoalRequirement } from './goal-audit-user-acceptance.js';
 import { buildAcceptanceRunQualityGateRequirement } from './goal-audit-requirements.js';
+import { buildV03DistributionRepairLoopGoalAuditItem } from './goal-audit-v03-distribution.js';
+import { buildPublicReleaseReadinessGoalAuditItem } from './goal-audit-public-release-readiness.js';
 
 export interface BuildCurrentGoalAuditItemsFromSourcesInput {
   sources: Partial<GoalAuditTextSources>;
@@ -43,6 +45,8 @@ export async function buildCurrentGoalAuditItemsFromSources(
     runtimeItems[1],
     ...workflowAndArtifactItems,
     observabilityAndSecurityItems[0],
+    buildV03DistributionRepairLoopGoalAuditItem(input.sources),
+    buildPublicReleaseReadinessGoalAuditItem(input.sources),
     buildAcceptanceRunQualityGateRequirement({
       acceptanceRun: input.sources.acceptanceRun ?? '',
       codexGoal: input.sources.codexGoal ?? ''

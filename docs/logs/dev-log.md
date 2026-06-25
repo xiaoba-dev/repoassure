@@ -7,6 +7,7 @@
 - Red：新增 `project-structure` 测试，要求 release candidate handoff 明确 review branch、commit packaging plan、final verification gates、manual gates 和 no-publication boundary；测试因 `docs/operations/release-candidate-handoff-v0.1.md` 缺失失败。
 - Green：新增 `docs/operations/release-candidate-handoff-v0.1.md`，将 v0.3 distribution/repair loop、public-release readiness 和 release candidate handoff 拆成可审查提交计划，并记录 `public release ready: no` 是当前正确发布边界。
 - 级联更新 README 和 public release checklist，确保 review 入口指向 release candidate handoff，且不把本地打包误解为 push、PR、GitHub release、npm publish 或仓库公开授权。
+- 本地创建 review commit `72f3228 feat: package release candidate readiness`，并在 release candidate handoff 中记录 commit package；未执行 push、PR、GitHub release、npm publish 或仓库公开。
 
 ### 验证
 

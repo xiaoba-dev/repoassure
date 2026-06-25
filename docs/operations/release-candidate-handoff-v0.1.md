@@ -47,6 +47,11 @@ Use small reviewable commits in this order:
 
 If a file contains changes from more than one logical area, keep the staged hunk with the commit whose behavior it verifies.
 
+## Current Commit Package
+
+- `72f3228 feat: package release candidate readiness` packages the v0.3 distribution/repair loop work, public-release readiness boundary, release candidate handoff, refreshed acceptance evidence, and tests into one locally verified review commit.
+- This follow-up documentation update records the package contents only. It does not push, publish, open a PR, create a GitHub release, or change repository visibility.
+
 ## Final Verification Gates
 
 Run these gates before asking for review:

@@ -457,6 +457,54 @@ describe('project structure', () => {
     await expectPath('docs/goals/completed/2026-06-20-repair-plan-v0.2.md');
   });
 
+  it('records monorepo readiness as a separate prerequisite before v0.3 distribution work', async () => {
+    const [
+      readinessAudit,
+      readinessGoal,
+      v03Goal,
+      monorepoSpec,
+      testingStrategy,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/architecture/specs/monorepo-readiness-audit-v0.1.md', 'utf8'),
+      readFile('docs/goals/completed/2026-06-25-monorepo-readiness-audit.md', 'utf8'),
+      readFile('docs/goals/active/2026-06-25-v0.3-distribution-repair-loop-readiness.md', 'utf8'),
+      readFile('docs/architecture/specs/monorepo-structure-spec-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(readinessAudit).toContain('Monorepo Readiness Audit v0.1');
+    expect(readinessAudit).toContain('当前 repo 是可运行的分阶段 monorepo，不是成熟完成态 monorepo');
+    expect(readinessAudit).toContain('Before v0.3');
+    expect(readinessAudit).toContain('packages/core');
+    expect(readinessAudit).toContain('apps/cli');
+    expect(readinessAudit).toContain('apps/mcp-server');
+    expect(readinessAudit).toContain('examples/');
+    expect(readinessAudit).toContain('GitHub Action wrapper');
+    expect(readinessAudit).toContain('repo hygiene');
+    expect(readinessAudit).toContain('不新增 ADR');
+    expect(readinessGoal).toContain('Monorepo Readiness Audit Codex Goal');
+    expect(readinessGoal).toContain('状态：已完成');
+    expect(readinessGoal).toContain('TDD');
+    expect(readinessGoal).toContain('测试金字塔');
+    expect(readinessGoal).toContain('Completion Evidence');
+    expect(readinessGoal).toContain('v0.3');
+    expect(readinessGoal).toContain('不迁移运行时代码');
+    expect(v03Goal).toContain('前置条件');
+    expect(v03Goal).toContain('monorepo readiness audit');
+    expect(monorepoSpec).toContain('monorepo-readiness-audit-v0.1.md');
+    expect(monorepoSpec).toContain('Readiness Audit Before v0.3');
+    expect(testingStrategy).toContain('monorepo readiness');
+    expect(decisionLog).toContain('Monorepo readiness before v0.3');
+    expect(devLog).toContain('Monorepo Readiness Audit');
+
+    await expectPath('docs/architecture/specs/monorepo-readiness-audit-v0.1.md');
+    await expectPath('docs/goals/completed/2026-06-25-monorepo-readiness-audit.md');
+  });
+
   it('extracts acceptance command ownership into a workspace package while preserving compatibility outputs', async () => {
     const [rootPackageJson, acceptancePackageJson, acceptanceCompatibility, acceptanceReadme, monorepoSpec] = await Promise.all([
       readFile('package.json', 'utf8'),

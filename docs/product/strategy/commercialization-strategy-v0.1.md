@@ -44,6 +44,7 @@ The product should integrate with Cursor, Codex, Claude Code, GitHub Copilot, an
 - Publish concrete hardening reports, repair plans, and patch plans as proof artifacts.
 - Use maintainers' own AI project portfolio as repeatable case-study material when safe.
 - Package MCP and GitHub Action entrypoints as the first distribution channels after CLI stability.
+- Treat ADR-0014 v0.3 distribution and repair loop readiness as the bridge from accepted MVP to open-core adoption: GitHub Action, MCP, CLI examples, and repair loop artifacts should prove repeatable local-first usage before Team Cloud work begins.
 - Build public examples around before/after repair evidence rather than abstract AI testing claims.
 - Keep competitor positioning anchored by `docs/product/research/competitive-landscape-v0.1.md`, especially around Vibeproof, AgentProof, CodeGate, AgentGate, CodeAsure, and VibeCheck.
 - Treat Codex Security as an ecosystem tailwind: show how RepoAssure can ingest security findings into acceptance evidence, repair plans, and agent handoff rather than competing as another isolated scanner.

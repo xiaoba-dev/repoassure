@@ -27,6 +27,8 @@ This checklist does not publish the project. It defines prerequisites for a futu
 - [ ] Run full quality gates: unit, integration, typecheck, lint, build, acceptance, and goal audit.
 - [ ] Prepare public examples using safe fixture repos or explicitly approved case studies.
 - [ ] Prepare release notes that describe local-first behavior, artifact boundaries, and non-goals.
+- [ ] Add GitHub Action usage examples only after ADR-0014 local-first and no-default-upload boundaries are implemented and tested.
+- [ ] Add or document executable public-release readiness checks for dependency licenses, secret exposure, generated artifact hygiene, and release boundary status.
 
 ## Blockers
 
@@ -36,3 +38,4 @@ Any unresolved legal, security, dependency-license, trademark, or secret-exposur
 
 - Convert this draft into an executable release checklist when public release becomes an active goal.
 - Add automated dependency license scanning before the first public package publication.
+- Keep the checklist as a release gate; completing v0.3 distribution readiness does not itself publish the repo or create a license grant.

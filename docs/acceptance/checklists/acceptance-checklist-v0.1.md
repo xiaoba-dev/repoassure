@@ -15,7 +15,7 @@
 - [x] 目标完成度审计已覆盖示例 repo 运行流程：`pnpm benchmark`、5 个本地 benchmark repo、`docs/logs/spike-results.md`、completed repo 报告和 generated spec 验证步骤均已记录
 - [x] 可以运行单一验收入口：`pnpm acceptance -- --full --browser` 17/17 检查通过，报告写入 `docs/acceptance/acceptance-run.md`
 - [x] 单一验收入口提供 `pnpm acceptance -- --help` 和 `pnpm acceptance -- -h` 参数说明入口
-- [x] 可以运行目标完成度审计：`pnpm goal:audit` 当前 28 项检查中 27 项自动证据通过、0 项缺失、1 项需人工确认，报告写入 `docs/acceptance/goal-completion-audit.md`；accepted 验收记录的生成时间必须不早于 `docs/goals/codex-goal.md` 的最后更新日期、包含具体确认备注，且 generated Playwright spec 执行验证通过；`changes_requested` 验收记录会被识别为有效修改反馈并要求继续迭代；自动脚本不能代替用户确认 MVP 符合预期
+- [x] 可以运行目标完成度审计：`pnpm goal:audit` 当前 33 项检查中 33 项自动和用户验收证据通过、0 项缺失、0 项需人工确认，报告写入 `docs/acceptance/goal-completion-audit.md`；accepted 验收记录的生成时间必须不早于 `docs/goals/codex-goal.md` 的最后更新日期、包含具体确认备注，且 generated Playwright spec 执行验证通过；`changes_requested` 验收记录会被识别为有效修改反馈并要求继续迭代；自动脚本不能代替用户确认 MVP 符合预期
 - [x] 可以运行用户验收交接包生成：`pnpm user:handoff` 会写入 `docs/acceptance/user-acceptance-handoff.md`，默认输出会在写入后重算 goal audit 摘要，并同步刷新 `docs/acceptance/goal-completion-audit.md`，避免旧交接包或旧审计文件导致一次性失败；默认交接包会直接展示当前结论、自动质量门禁、架构迁移状态、当前用户验收状态、证据和下一步；默认交接包会提示用 `--repo <real-web-app-repo>` 重新生成带 repo 前置检查的交接包；`--repo <repo>` 可渲染真实 repo 命令并显示 repo root 和文件型、JSON 对象 manifest 的 `package.json` 两个独立前置检查结果，误传 `<real-web-app-repo>` 这类占位符时会先提示替换为真实 Web App repo 路径，必需前置检查失败时仍会写出交接包并返回非零退出码，当前结论会优先提示修复 repo 路径或 package.json manifest，且不会展示带失败 repo 的 `pnpm user:accept` 命令，只提示先修复 repo 路径或 package.json manifest 后重新生成交接包；当前已覆盖有效 repo 时 `user:handoff -- --repo <repo>` 返回 0 并生成具体 `user:accept` 命令，且 `accepted` 和 `changes_requested` 命令都使用可被 CLI 接受的具体备注；如果 repo 路径中的敏感值被脱敏，交接包会提醒用户用真实 repo 路径重新运行；`pnpm user:handoff -- --help` 提供参数说明，`--output <path>` 可写入自定义交接包路径
 - [x] 目标完成度审计已覆盖用户验收交接包：最终验收入口、当前结论、repo preflight blocker 优先结论、自动质量门禁、架构迁移状态、当前用户验收状态与下一步、真实项目验收命令、`accepted` / `changes_requested` 具体备注路径、accepted 验收记录 freshness 要求和不能由自动脚本代替用户确认的边界均已记录
 - [x] 目标完成度审计已覆盖可观测性和可复现性：profile/findings/report/repair-plan/result/log 路径、repro steps、evidence、verification command、blockers/errors 和 artifact 检查
@@ -60,5 +60,7 @@
   - 当前阻塞：本地监听 `127.0.0.1` 会触发 `listen EPERM`
 - [x] 真实项目上的 `hardening run <repo> --browser`
   - 当前状态：`rotifer-alpha/site` pending 验收已通过，7/7 artifact 检查通过；报告 readiness score 0、P1 75
-- [ ] 真实项目上的 `pnpm user:accept -- --repo <repo> --browser --validate-generated-tests --decision accepted --notes "用户确认 MVP 符合预期"`
-  - 当前状态：`rotifer-alpha/site` 的 pending 验收已通过；仍需用户明确 `accepted` 或 `changes_requested` 结论。若用户使用 `--decision accepted`，该验收记录生成时间必须不早于 `docs/goals/codex-goal.md` 的最后更新日期、包含具体确认备注，且 generated Playwright spec 执行验证通过；若用户使用 `--decision changes_requested` 并写明备注，goal audit 会把它作为继续迭代输入，而不是完成证据
+- [x] 真实项目上的 `pnpm user:accept -- --repo <repo> --browser --validate-generated-tests --decision accepted --notes "用户确认 MVP 符合预期"`
+  - 当前状态：`openclaw/openclaw` accepted 验收已通过，12/12 artifact 检查通过，generated Playwright spec 执行验证通过，`pnpm goal:audit` 已转为 33/33 通过。
+- [ ] v0.3 distribution and repair loop readiness
+  - 当前状态：已新增 ADR-0014、`docs/product/specs/mvp-spec-v0.3.md` 和 active Codex goal；具体 GitHub Action wrapper、repair loop contract 和 public-release readiness checks 待后续 TDD 实现。

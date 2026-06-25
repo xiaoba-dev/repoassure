@@ -144,11 +144,11 @@ bootstrap_check_in org.chromium.Chromium.MachPortRendezvousServer... Permission 
 
 ### 当前判断
 
-这是外部验收条件，不是产品代码或自动质量门禁缺失。真实项目 pending 验收已经通过，但继续自动修改代码无法替代用户对结果的 `accepted` 或 `changes_requested` 结论。
+已解除。用户已给出 `accepted` 结论，随后使用 `openclaw/openclaw` 的真实项目路径写入 accepted 验收记录，12/12 artifact 检查通过，generated Playwright spec 执行验证通过，`pnpm goal:audit` 转为 33/33 通过，并已提交推送 `055ae85 docs: close mvp v0.2 user acceptance`。
 
 ### 需要的用户决策或外部条件
 
-用户需要确认 `openclaw/openclaw` 的 pending 验收结果是否符合预期。该 repo 的可复现 pending 命令是：
+无。以下命令保留为历史复现路径。该 repo 的可复现 pending 命令是：
 
 ```bash
 pnpm user:accept -- --repo /private/tmp/openclaw-openclaw-shallow --browser --validate-generated-tests --start-command "pnpm ui:dev" --boot-timeout-ms 120000 --decision pending

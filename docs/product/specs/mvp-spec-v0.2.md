@@ -1,7 +1,7 @@
 # RepoAssure MVP 规格 v0.2
 
-最后更新：2026年6月21日
-状态：已实现；已追加 Executable Repair Task Package、Repair Handoff、Auto Repair Execution 和 Auto Patch Plan 原型增量，待真实项目新一轮用户验收
+最后更新：2026年6月25日
+状态：已实现；真实项目用户验收已通过；后续方向已进入 `docs/product/specs/mvp-spec-v0.3.md`
 范围：v0.1 之后的下一阶段 MVP 增量
 
 品牌决策：ADR-0010 已将产品品牌确定为 RepoAssure；`hardening-mcp` 暂时保留为当前内部 package、CLI 和 MCP 实现名称。

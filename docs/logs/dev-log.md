@@ -1,5 +1,55 @@
 # 开发日志
 
+## 2026年6月25日 - Monorepo Readiness Audit
+
+### 完成内容
+
+- 扫描当前 monorepo 结构，确认 repo 已具备 `apps/*`、`packages/*`、package-first build、package-owned acceptance/shared/security/browser/repair 模块、CI、repo hygiene 和 goal audit。
+- 判定当前 repo 是可运行的分阶段 monorepo，不是成熟完成态 monorepo：`packages/core` 仍为空壳，`apps/cli` 与 `apps/mcp-server` 仍为 compatibility shells，`examples/` 未承载真实示例，GitHub Action wrapper 尚未实现。
+- 新增 `docs/architecture/specs/monorepo-readiness-audit-v0.1.md`，将 v0.3 前置结构判断、P0/P1/P2 缺口和非目标落档。
+- 新增并归档 completed goal：`docs/goals/completed/2026-06-25-monorepo-readiness-audit.md`，记录 TDD、测试金字塔和完成证据。
+- 更新 v0.3 active goal，将 `monorepo readiness audit` 设为启动 v0.3 前置条件。
+- 级联更新 monorepo structure spec、testing strategy 和 decision log。
+- 新增 structure test，防止后续跳过 monorepo readiness 直接执行 v0.3 distribution work。
+
+### 验证
+
+- Red：`pnpm vitest run tests/unit/project-structure.test.ts --testNamePattern "monorepo readiness"` 因 `docs/architecture/specs/monorepo-readiness-audit-v0.1.md` 缺失按预期失败。
+- Green：补齐 audit 文档、active goal 和级联文档后复跑同一 focused test 通过，1 个测试通过、57 个跳过。
+- `pnpm vitest run tests/unit/project-structure.test.ts`：通过，58 个测试。
+- `pnpm repo:hygiene`：通过。
+- `pnpm lint`：通过。
+- `pnpm typecheck`：通过。
+- `pnpm goal:audit`：通过，33 项检查、33 项已通过、0 missing、0 需要人工确认。
+- `git diff --check`：通过。
+- 本 goal 已从 active 归档到 completed；v0.3 distribution and repair loop readiness 仍保留为 active 下一阶段目标。
+
+### 阻塞
+
+- 无新增产品阻塞。
+
+## 2026年6月25日 - v0.3 Documentation Cascade
+
+### 完成内容
+
+- 扫描当前 `docs/` taxonomy、ADR、MVP spec、strategy、acceptance、testing、goal 和 blocker 文档。
+- 判断下一个 goal “RepoAssure v0.3 Distribution and Repair Loop Readiness”会改变产品阶段、分发入口和 repair loop 边界，因此需要级联写入，而不是只作为临时执行目标。
+- 新增 `ADR-0014: Distribution and Repair Loop Readiness`，明确 v0.3 聚焦 GitHub Action wrapper、CLI/MCP 分发示例、AI IDE repair loop、public-release readiness，同时保持 local-first、不默认自动改代码、不上传目标 repo、不实现 hosted dashboard。
+- 新增 `docs/product/specs/mvp-spec-v0.3.md`，定义 v0.3 TL;DR、目标用户、核心工作流、P0/P1、非目标和验收标准。
+- 新增 active goal：`docs/goals/active/2026-06-25-v0.3-distribution-repair-loop-readiness.md`。
+- 修正 `docs/product/specs/mvp-spec-v0.2.md` 状态为“已实现；真实项目用户验收已通过”。
+- 级联更新 ADR index、architecture overview、README、commercialization strategy、open-core packaging spec、public release checklist、testing strategy、user acceptance guide、acceptance checklist 和 blockers。
+- 更新 docs taxonomy，将 `docs/goals/active/` 纳入规范目录和命名规则。
+
+### 验证
+
+- 本轮是文档治理变更，未修改运行时代码。
+- 后续运行 `pnpm repo:hygiene`、focused project-structure tests、`pnpm lint`、`pnpm typecheck` 和 `pnpm goal:audit` 验证文档路径、引用和质量门禁。
+
+### 阻塞
+
+- 无新增产品阻塞。
+
 ## 2026年6月23日 - MVP v0.2 Remaining Auto-Executable Closure
 
 ### 完成内容

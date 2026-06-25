@@ -1,5 +1,33 @@
 # 开发日志
 
+## 2026年6月25日 - Draft PR Review Closure v0.1
+
+### 完成内容
+
+- 读取 PR #1 当前 metadata、diff、comments、reviews、review threads、CI 和 repository visibility。
+- 确认 PR #1 为 `OPEN` + `Draft`，仓库 visibility 仍为 `PRIVATE`，merge state 为 `CLEAN`。
+- 确认没有 reviewer comments、没有 unresolved review threads，`RepoAssure CI / Quality Gates` 已通过。
+- 识别一个可自动处理的 review-readiness 问题：GitHub Actions 对 `actions/checkout@v4`、`actions/setup-node@v4` 和 `pnpm/action-setup@v4` 发出 Node.js 20 runtime deprecation annotation。
+- Red：更新 structure test，要求 CI 使用当前 action release major 并拒绝 v4 action runtime surface；测试因 workflow 仍使用 v4 失败。
+- Green：升级 `.github/workflows/ci.yml` 到 `actions/checkout@v7`、`pnpm/action-setup@v6`、`actions/setup-node@v6`。
+- 新增 completed goal：`docs/goals/completed/2026-06-25-draft-pr-review-closure-v0.1.md`，并在 release candidate handoff 中记录 review closure 结论。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-structure.test.ts --testNamePattern "private GitHub engineering baseline"`：Red 阶段失败，Green 阶段通过。
+- `pnpm test:unit`：通过，35 个测试文件、534 个测试。
+- `pnpm typecheck`：通过。
+- `pnpm lint`：通过。
+- `pnpm release:check`：自动 prerequisites 通过，并按边界报告 `public release ready: no`。
+- `pnpm repo:hygiene`：通过。
+- `pnpm goal:audit`：通过，35 项检查、35 项已通过、0 missing、0 需要人工确认。
+- `pnpm user:handoff`：通过，自动证据通过 35、自动证据缺失 0、需要人工确认 0。
+- `git diff --check`：通过。
+
+### 阻塞
+
+- 无新增产品阻塞。PR #1 可进入 maintainer review；公开发布仍未授权，仍需法律 review、商标/name review、branch protection 或等效 repository ruleset、最终 maintainer publication authorization。
+
 ## 2026年6月25日 - Release Candidate Packaging v0.1
 
 ### 完成内容

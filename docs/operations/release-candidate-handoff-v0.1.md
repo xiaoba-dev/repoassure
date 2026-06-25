@@ -64,6 +64,27 @@ If a file contains changes from more than one logical area, keep the staged hunk
 
 This PR is a private review surface only. It still does not authorize public release, npm publication, GitHub release creation, public repository visibility, or public announcements.
 
+## Draft PR Review Closure
+
+Status: Ready for maintainer review; public release still manually blocked.
+
+Review closure checks completed on 2026-06-25:
+
+- PR comments inspected: no reviewer-requested changes found.
+- Review threads inspected through GitHub GraphQL: no unresolved review threads found.
+- CI inspected: `RepoAssure CI / Quality Gates` passed.
+- Merge state inspected: `CLEAN`.
+- Repository visibility reconfirmed: `PRIVATE`.
+- Automatically actionable issue found: GitHub Actions emitted a Node.js 20 runtime deprecation annotation for `actions/checkout@v4`, `actions/setup-node@v4`, and `pnpm/action-setup@v4`.
+- Resolution: CI workflow updated to `actions/checkout@v7`, `actions/setup-node@v6`, and `pnpm/action-setup@v6`; project structure tests now prevent regression to the deprecated v4 action runtime surface.
+
+Closure boundary:
+
+- The PR can proceed to maintainer review while remaining Draft or be marked ready by a maintainer.
+- This closure does not merge the PR.
+- This closure does not satisfy public-release manual gates.
+- This closure does not authorize npm publication, GitHub release creation, public repository visibility, or public announcements.
+
 ## Final Verification Gates
 
 Run these gates before asking for review:

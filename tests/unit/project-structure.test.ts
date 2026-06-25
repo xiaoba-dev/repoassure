@@ -334,8 +334,12 @@ describe('project structure', () => {
     expect(ciWorkflow).toContain('pnpm build');
     expect(ciWorkflow).toContain('pnpm goal:audit');
     expect(ciWorkflow).toContain('pnpm repo:hygiene');
-    expect(ciWorkflow).toContain('actions/checkout@v4');
-    expect(ciWorkflow).toContain('actions/setup-node@v4');
+    expect(ciWorkflow).toContain('actions/checkout@v7');
+    expect(ciWorkflow).toContain('pnpm/action-setup@v6');
+    expect(ciWorkflow).toContain('actions/setup-node@v6');
+    expect(ciWorkflow).not.toContain('actions/checkout@v4');
+    expect(ciWorkflow).not.toContain('pnpm/action-setup@v4');
+    expect(ciWorkflow).not.toContain('actions/setup-node@v4');
     expect(prTemplate).toContain('Repository Hygiene');
     expect(prTemplate).toContain('Generated artifacts, build outputs, local hardening runs, env files, and secrets are not committed');
     expect(bugTemplate).toContain('RepoAssure bug report');

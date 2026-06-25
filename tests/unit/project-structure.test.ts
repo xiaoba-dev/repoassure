@@ -590,6 +590,141 @@ describe('project structure', () => {
     await expectPath('examples/github-actions/repoassure-local-first.yml');
   });
 
+  it('records the Team Cloud and Enterprise commercial edition boundary before implementation', async () => {
+    const [
+      adrIndex,
+      commercialEditionAdr,
+      commercialEditionSpec,
+      commercialEditionArchitecture,
+      commercialization,
+      openCorePackaging,
+      architecture,
+      mvpV03,
+      acceptanceChecklist,
+      testingStrategy,
+      readme,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/adr/README.md', 'utf8'),
+      readFile('docs/adr/0016-team-cloud-enterprise-boundary.md', 'utf8'),
+      readFile('docs/product/specs/team-cloud-enterprise-spec-v0.1.md', 'utf8'),
+      readFile('docs/architecture/specs/team-cloud-enterprise-architecture-v0.1.md', 'utf8'),
+      readFile('docs/product/strategy/commercialization-strategy-v0.1.md', 'utf8'),
+      readFile('docs/product/strategy/open-core-packaging-spec-v0.1.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/product/specs/mvp-spec-v0.3.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(adrIndex).toContain('[0016](0016-team-cloud-enterprise-boundary.md)');
+    expect(adrIndex).toContain('Team Cloud and Enterprise commercial edition boundary');
+    expect(commercialEditionAdr).toContain('Team Cloud and Enterprise commercial edition boundary');
+    expect(commercialEditionAdr).toContain('commercial packaging layers over the open artifact contract');
+    expect(commercialEditionAdr).toContain('Do not implement hosted paid features in this increment');
+    expect(commercialEditionAdr).toContain('No target repo source upload by default');
+    expect(commercialEditionAdr).toContain('docs/product/specs/team-cloud-enterprise-spec-v0.1.md');
+    expect(commercialEditionAdr).toContain('docs/architecture/specs/team-cloud-enterprise-architecture-v0.1.md');
+    expect(commercialEditionSpec).toContain('Team Cloud & Enterprise Spec v0.1');
+    expect(commercialEditionSpec).toContain('Hosted dashboard');
+    expect(commercialEditionSpec).toContain('Team collaboration');
+    expect(commercialEditionSpec).toContain('Enterprise integrations');
+    expect(commercialEditionSpec).toContain('Advanced governance');
+    expect(commercialEditionSpec).toContain('Roadmap');
+    expect(commercialEditionSpec).toContain('No paid cloud implementation in this increment');
+    expect(commercialEditionArchitecture).toContain('Team Cloud & Enterprise Architecture v0.1');
+    expect(commercialEditionArchitecture).toContain('Open artifact contract');
+    expect(commercialEditionArchitecture).toContain('Commercial control plane');
+    expect(commercialEditionArchitecture).toContain('No target repo source upload by default');
+    expect(commercialization).toContain('team-cloud-enterprise-spec-v0.1.md');
+    expect(openCorePackaging).toContain('team-cloud-enterprise-architecture-v0.1.md');
+    expect(architecture).toContain('ADR-0016');
+    expect(architecture).toContain('Team Cloud and Enterprise');
+    expect(mvpV03).toContain('ADR-0016');
+    expect(mvpV03).toContain('Team Cloud & Enterprise Spec v0.1');
+    expect(acceptanceChecklist).toContain('Team Cloud & Enterprise Spec v0.1');
+    expect(acceptanceChecklist).toContain('商业版能力仅完成规划和边界验收，不实现 paid cloud runtime');
+    expect(testingStrategy).toContain('Team Cloud & Enterprise Spec');
+    expect(testingStrategy).toContain('structure-level tests');
+    expect(readme).toContain('team-cloud-enterprise-spec-v0.1.md');
+    expect(readme).toContain('ADR-0016');
+    expect(decisionLog).toContain('Team Cloud and Enterprise commercial edition boundary');
+    expect(devLog).toContain('Team Cloud & Enterprise Spec v0.1');
+
+    await expectPath('docs/adr/0016-team-cloud-enterprise-boundary.md');
+    await expectPath('docs/product/specs/team-cloud-enterprise-spec-v0.1.md');
+    await expectPath('docs/architecture/specs/team-cloud-enterprise-architecture-v0.1.md');
+  });
+
+  it('separates the public website from the internal project intelligence console', async () => {
+    const [
+      adrIndex,
+      surfacesAdr,
+      publicWebsiteSpec,
+      intelligenceSpec,
+      intelligenceArchitecture,
+      readme,
+      architecture,
+      commercialization,
+      acceptanceChecklist,
+      testingStrategy,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/adr/README.md', 'utf8'),
+      readFile('docs/adr/0017-public-website-and-project-intelligence-console.md', 'utf8'),
+      readFile('docs/product/specs/public-website-spec-v0.1.md', 'utf8'),
+      readFile('docs/product/specs/project-intelligence-console-spec-v0.1.md', 'utf8'),
+      readFile('docs/architecture/specs/project-intelligence-console-architecture-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/product/strategy/commercialization-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(adrIndex).toContain('[0017](0017-public-website-and-project-intelligence-console.md)');
+    expect(adrIndex).toContain('Public website and internal project intelligence console');
+    expect(surfacesAdr).toContain('Public website and internal project intelligence console');
+    expect(surfacesAdr).toContain('separate product surfaces');
+    expect(surfacesAdr).toContain('does not authorize public release');
+    expect(surfacesAdr).toContain('local-only internal observability surface');
+    expect(publicWebsiteSpec).toContain('Public Website Spec v0.1');
+    expect(publicWebsiteSpec).toContain('responsive design');
+    expect(publicWebsiteSpec).toContain('private preview');
+    expect(publicWebsiteSpec).toContain('Waitlist');
+    expect(publicWebsiteSpec).toContain('does not claim SaaS availability');
+    expect(intelligenceSpec).toContain('Project Intelligence Console Spec v0.1');
+    expect(intelligenceSpec).toContain('Docs Graph');
+    expect(intelligenceSpec).toContain('Code Graph');
+    expect(intelligenceSpec).toContain('Project Progress Graph');
+    expect(intelligenceSpec).toContain('local-only');
+    expect(intelligenceArchitecture).toContain('Project Intelligence Console Architecture v0.1');
+    expect(intelligenceArchitecture).toContain('Graph Builder');
+    expect(intelligenceArchitecture).toContain('artifacts/project-graph');
+    expect(intelligenceArchitecture).toContain('No hosted service dependency');
+    expect(readme).toContain('public-website-spec-v0.1.md');
+    expect(readme).toContain('project-intelligence-console-spec-v0.1.md');
+    expect(architecture).toContain('ADR-0017');
+    expect(architecture).toContain('Project Intelligence Console');
+    expect(commercialization).toContain('public-website-spec-v0.1.md');
+    expect(acceptanceChecklist).toContain('Public Website and Project Intelligence Console planning');
+    expect(testingStrategy).toContain('Public Website and Project Intelligence Console');
+    expect(decisionLog).toContain('Public website and internal project intelligence console');
+    expect(devLog).toContain('Public Website and Project Intelligence Console Planning v0.1');
+
+    await expectPath('docs/adr/0017-public-website-and-project-intelligence-console.md');
+    await expectPath('docs/product/specs/public-website-spec-v0.1.md');
+    await expectPath('docs/product/specs/project-intelligence-console-spec-v0.1.md');
+    await expectPath('docs/architecture/specs/project-intelligence-console-architecture-v0.1.md');
+  });
+
   it('extracts acceptance command ownership into a workspace package while preserving compatibility outputs', async () => {
     const [rootPackageJson, acceptancePackageJson, acceptanceCompatibility, acceptanceReadme, monorepoSpec] = await Promise.all([
       readFile('package.json', 'utf8'),

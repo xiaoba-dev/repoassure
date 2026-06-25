@@ -52,6 +52,8 @@ flowchart LR
 | [ADR-0013](../adr/0013-codex-security-and-security-assurance-lane.md) | Codex Security and Security Assurance Lane | `specs/security-assurance-lane-spec-v0.1.md` defines future provider-backed security evidence import, security finding provenance, and repair-plan integration without repositioning RepoAssure as a generic vulnerability scanner |
 | [ADR-0014](../adr/0014-distribution-and-repair-loop-readiness.md) | Distribution and repair loop readiness | `docs/product/specs/mvp-spec-v0.3.md` now records the implemented GitHub Action wrapper, AI IDE repair loop agent contracts, and public-release readiness boundary while preserving local-first and no-default-auto-fix constraints |
 | [ADR-0015](../adr/0015-public-release-readiness-boundary.md) | Public release readiness boundary | Apache-2.0 `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, dependency-license audit, release notes draft, and `pnpm release:check` are readiness materials; public publication still requires manual authorization |
+| [ADR-0016](../adr/0016-team-cloud-enterprise-boundary.md) | Team Cloud and Enterprise commercial edition boundary | `specs/team-cloud-enterprise-architecture-v0.1.md` defines Team Cloud and Enterprise as commercial packaging layers over the open artifact contract, with No target repo source upload by default and no hosted paid implementation in the current increment |
+| [ADR-0017](../adr/0017-public-website-and-project-intelligence-console.md) | Public website and internal project intelligence console | `docs/product/specs/public-website-spec-v0.1.md` defines the external responsive private-preview site; `specs/project-intelligence-console-architecture-v0.1.md` defines a local-only Project Intelligence Console over generated graph snapshots |
 
 ## Artifact 布局
 
@@ -184,6 +186,18 @@ CLI 和 MCP 不各自实现业务逻辑。它们都调用 `src/tools/*`，而 to
 - env 检测只记录 key hint，不读取或输出 secret value。
 - benchmark 产物写入 `artifacts/benchmark-runs/`，该目录已加入 `.gitignore`、ESLint ignore 和 Vitest exclude；旧的 `benchmark-runs/` 继续被忽略，避免历史产物被扫描。
 - 私有 GitHub CI 通过 `pnpm repo:hygiene` 检查已追踪文件，阻止 generated artifacts、build outputs、local hardening runs、env files、private keys 和 local logs 进入提交；完整规则见 `docs/architecture/specs/private-github-engineering-baseline-v0.1.md`。
+
+## Team Cloud and Enterprise
+
+ADR-0016 将 Team Cloud and Enterprise 定义为未来商业版层，而不是当前 open core 的替代执行路径。当前架构边界见 `docs/architecture/specs/team-cloud-enterprise-architecture-v0.1.md`：Open artifact contract 仍由 CLI、MCP、GitHub Action 和本地 run bundle 生成；Commercial control plane 只能在显式授权下存储、索引、展示、协作、治理和集成这些物料。
+
+默认边界保持不变：No target repo source upload by default；hosted dashboard、team collaboration、Enterprise integrations 和 advanced governance 需要另行实现 goal，不在当前增量写入 paid cloud runtime。
+
+## Public Website and Project Intelligence Console
+
+ADR-0017 将 public website 和 Project Intelligence Console 拆成两个独立 surface。Public website 是外部响应式品牌和 private-preview 转化入口，规划见 `docs/product/specs/public-website-spec-v0.1.md`；它不授权公开发布、不声明 SaaS availability，也不改变当前 private release boundary。
+
+Project Intelligence Console 是内部独立站，规划见 `docs/product/specs/project-intelligence-console-spec-v0.1.md` 和 `docs/architecture/specs/project-intelligence-console-architecture-v0.1.md`。它应从本地 docs、code、tests、goals 和 logs 生成 Docs Graph、Code Graph、Project Progress Graph，并把 snapshots 写入 `artifacts/project-graph/`，默认 local-only、No hosted service dependency。
 
 ## 进程生命周期
 

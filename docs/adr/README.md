@@ -21,6 +21,8 @@ ADR records long-lived architecture decisions. Use `docs/logs/decision-log.md` f
 | [0013](0013-codex-security-and-security-assurance-lane.md) | Accepted | Codex Security and Security Assurance Lane |
 | [0014](0014-distribution-and-repair-loop-readiness.md) | Accepted | Distribution and repair loop readiness |
 | [0015](0015-public-release-readiness-boundary.md) | Accepted | Public release readiness boundary |
+| [0016](0016-team-cloud-enterprise-boundary.md) | Accepted | Team Cloud and Enterprise commercial edition boundary |
+| [0017](0017-public-website-and-project-intelligence-console.md) | Accepted | Public website and internal project intelligence console |
 
 ## Template
 

@@ -66,3 +66,7 @@
   - 当前状态：GitHub Action wrapper、safe example workflow、repair loop `agentContract`、`pnpm release:check` 和 goal audit v0.3 证据已实现；public release 仍未授权，`pnpm release:check` 当前报告 `public release ready: no`。
 - [x] public release readiness automated prerequisites
   - 当前状态：Apache-2.0 `LICENSE`、`package.json#license`、`CONTRIBUTING.md`、`SECURITY.md`、dependency license audit、public release notes draft、ADR-0015 和 `pnpm release:check` 自动检查已完成；公开 repo、npm publish、公开公告和外部 case study 仍需法律、商标、branch protection 或等效 ruleset 和最终 maintainer authorization。
+- [x] Team Cloud & Enterprise Spec v0.1
+  - 当前状态：ADR-0016、商业版产品路线图、商业版架构边界、open-core/commercial 级联、测试策略和验收边界已记录；商业版能力仅完成规划和边界验收，不实现 paid cloud runtime。
+- [x] Public Website and Project Intelligence Console planning
+  - 当前状态：ADR-0017、响应式 public website spec、内部 Project Intelligence Console spec、project graph architecture 和文档级联测试已记录；当前只完成规划，不部署官网、不实现内部 graph runtime。

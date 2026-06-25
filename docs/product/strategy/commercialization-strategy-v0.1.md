@@ -39,6 +39,10 @@ The product should integrate with Cursor, Codex, Claude Code, GitHub Copilot, an
 | Team Cloud validation | Hosted dashboard, multi-repo history, collaboration | Teams pay to store, compare, and act on hardening evidence |
 | Enterprise packaging | On-prem, SSO/RBAC, audit retention, policy center | Regulated teams accept the artifact contract as an AI coding control |
 
+Team Cloud and Enterprise planning is now governed by [ADR-0016](../../adr/0016-team-cloud-enterprise-boundary.md) and `docs/product/specs/team-cloud-enterprise-spec-v0.1.md`. The commercial edition roadmap covers hosted dashboard, team collaboration, enterprise integrations, and advanced governance, but the current increment is planning-only and includes no paid cloud runtime.
+
+Public website planning is governed by [ADR-0017](../../adr/0017-public-website-and-project-intelligence-console.md) and `docs/product/specs/public-website-spec-v0.1.md`. The website should support brand trust, proof artifacts, docs entry, GitHub entry, and waitlist/private-preview conversion without claiming public release or SaaS availability before those gates are complete.
+
 ## Growth Motions
 
 - Publish concrete hardening reports, repair plans, and patch plans as proof artifacts.
@@ -61,3 +65,5 @@ The product should integrate with Cursor, Codex, Claude Code, GitHub Copilot, an
 - Validate pricing assumptions after at least three real team workflows.
 - Convert proven case studies into public examples.
 - Revisit license and packaging only if adoption or abuse signals change the assumptions in ADR-0009.
+- Use `team-cloud-enterprise-spec-v0.1.md` as the roadmap source before starting hosted dashboard, team collaboration, enterprise integrations, or advanced governance implementation.
+- Use `public-website-spec-v0.1.md` before implementing or deploying an external website, and keep copy aligned with public release readiness.

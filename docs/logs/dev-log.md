@@ -10821,3 +10821,34 @@ Phase 0：项目初始化。
 - `pnpm typecheck`：通过。
 - `pnpm lint`：通过。
 - `pnpm build`：通过。
+## 2026年6月25日 - Team Cloud & Enterprise Spec v0.1
+
+### 完成内容
+
+- 按 TDD 先新增 `project-structure.test.ts` 文档级联测试，并确认因商业版 ADR/spec 缺失而失败。
+- 新增 `ADR-0016: Team Cloud and Enterprise Commercial Edition Boundary`。
+- 新增 `docs/product/specs/team-cloud-enterprise-spec-v0.1.md`，覆盖 Hosted dashboard、Team collaboration、Enterprise integrations、Advanced governance 和 Roadmap。
+- 新增 `docs/architecture/specs/team-cloud-enterprise-architecture-v0.1.md`，明确 Open artifact contract、Commercial control plane 和 No target repo source upload by default。
+- 级联更新 ADR 索引、README、architecture overview、commercialization strategy、open-core packaging、MVP v0.3、acceptance checklist、testing strategy 和 decision log。
+
+### 边界
+
+- 当前 goal 只完成商业版产品/架构规划与验收边界。
+- 不实现 paid cloud runtime，不新增数据库、账号体系、计费、hosted dashboard 代码或远程 artifact ingestion。
+- 后续任何 Team Cloud / Enterprise 运行时代码必须重新进入 TDD 和测试金字塔。
+## 2026年6月25日 - Public Website and Project Intelligence Console Planning v0.1
+
+### 完成内容
+
+- 按 TDD 新增 structure-level test，先确认 ADR-0017 和相关 specs 缺失时失败。
+- 新增 `ADR-0017: Public Website and Internal Project Intelligence Console`。
+- 新增 `docs/product/specs/public-website-spec-v0.1.md`，定义响应式官网、private preview、Waitlist 和不声明 SaaS availability 的内容边界。
+- 新增 `docs/product/specs/project-intelligence-console-spec-v0.1.md`，定义 Docs Graph、Code Graph、Project Progress Graph 和 local-only 数据边界。
+- 新增 `docs/architecture/specs/project-intelligence-console-architecture-v0.1.md`，定义 Graph Builder、`artifacts/project-graph/` snapshots 和 No hosted service dependency。
+- 级联更新 ADR 索引、README、architecture overview、commercialization strategy、acceptance checklist、testing strategy 和 decision log。
+
+### 边界
+
+- 当前不实现 public website UI。
+- 当前不实现 graph builder、watch mode、internal console runtime 或 hosted dashboard。
+- 后续实现必须进入新的 TDD goal，并先补可执行 graph/website 测试。

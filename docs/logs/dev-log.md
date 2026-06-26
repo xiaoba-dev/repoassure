@@ -15,6 +15,8 @@
 - 运行 `vercel link --yes --project repoassure`，链接到 `web3coderman-devs-projects/repoassure`；本地 `.vercel/` 已写入 `.gitignore`，不提交项目 ID。
 - 首次真实部署因上传文件数超过限制失败；新增 `.vercelignore`，排除 `node_modules`、构建输出、本地 artifacts、`.git`、env 和 key 文件。
 - 多次尝试 `vercel --yes`、`vercel --target preview`、`vercel deploy --target=preview` 和临时分支部署后，Vercel 仍返回 production target 或不可验证的 UNKNOWN preview。
+- Git push to `main` triggered a Vercel production deployment through Vercel Git integration；该 deployment 和 main alias 已移除。
+- 运行 `vercel git disconnect --yes`；CLI 返回 `Disconnected xiaoba-dev/repoassure`，后续 push 不应再自动创建 Vercel deployments。
 - unintended production deployments and aliases were removed；清理后 `vercel ls repoassure` 返回 `No deployments found`。
 
 ### 边界
@@ -22,7 +24,7 @@
 - 已执行真实 Vercel 上传尝试，但没有 accepted private preview deployment。
 - 没有 active preview URL 可以交付。
 - 没有保留 production deployment 或 public production alias。
-- 后续继续前需要解决 Vercel project / CLI target mismatch，并完成 smoke/content/screenshot/forbidden-claim verification。
+- 后续继续前需要解决 Vercel project / CLI target mismatch；Vercel Git integration 已断开，不能在未重新评估 private preview 边界前恢复；通过后再完成 smoke/content/screenshot/forbidden-claim verification。
 
 ### 认证更新
 

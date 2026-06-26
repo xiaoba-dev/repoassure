@@ -936,13 +936,18 @@ describe('project structure', () => {
     expect(blockers).toContain('RepoAssure 官网代码和构建产物上传到 Vercel');
     expect(blockers).toContain('Public website private preview deployment is blocked by Vercel preview target mismatch');
     expect(blockers).toContain('target production');
+    expect(blockers).toContain('Vercel Git integration');
+    expect(blockers).toContain('Git push to `main`');
     expect(blockers).toContain('No deployments found');
     expect(blockers).toContain('不得伪造 preview URL');
     expect(devLog).toContain('Public Website Private Preview Deployment Execution v0.1 Blocked');
     expect(devLog).toContain('Vercel data-export 授权已满足');
     expect(devLog).toContain('unintended production deployments and aliases were removed');
+    expect(devLog).toContain('Git push to `main` triggered a Vercel production deployment');
+    expect(devLog).toContain('Disconnected xiaoba-dev/repoassure');
     expect(handoff).toContain('Private Preview Deployment Execution Attempt');
     expect(handoff).toContain('No accepted preview URL is active');
+    expect(handoff).toContain('Vercel Git integration was disconnected');
 
     await expectPath('.vercelignore');
     await expectPath('vercel.json');

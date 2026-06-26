@@ -189,11 +189,15 @@ Attempted on 2026-06-26:
 - Deployment configuration: `vercel.json` now points to `pnpm build:website`, `pnpm install --frozen-lockfile`, and `apps/website/dist`.
 - Upload boundary: `.vercelignore` excludes `node_modules`, local build output, local artifacts, `.git`, env files, and key material.
 - Result: Vercel repeatedly returned `target production` for CLI deployment attempts, including explicit preview-target commands and a temporary non-main branch deployment.
+- Git integration result: pushing `main` also triggered a Vercel production deployment and main alias through Vercel Git integration.
+- Git integration mitigation: Vercel Git integration was disconnected with `vercel git disconnect --yes`.
 - Cleanup: all unintended production aliases and deployments were removed.
 - Verification: `vercel ls repoassure` returned `No deployments found`.
 - Current status: No accepted preview URL is active.
 
 This execution attempt does not satisfy the private preview deployment gate because it did not produce a `Ready`, access-controlled, non-production preview URL with smoke/content/screenshot/forbidden-claim verification evidence.
+
+Before any retry, keep the Vercel Git integration disconnected unless the deployment boundary is redesigned and explicitly approved.
 
 ## Remaining P3 Backlog
 

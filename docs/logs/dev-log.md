@@ -18,6 +18,13 @@
 - 未上传构建产物到 Vercel。
 - 后续继续前需要用户明确授权 Vercel data export，并具备有效 Vercel 认证。
 
+### 认证更新
+
+- 用户授权执行 Vercel 登录。
+- `vercel login` OAuth device flow 已完成。
+- `vercel whoami` 返回 `web3coderman-dev`。
+- 当前仍未执行部署，因为还缺少对“将 RepoAssure 官网代码和构建产物上传到 Vercel”的明确 data-export 授权。
+
 ## 2026年6月26日 - Public Website Private Preview Deployment Planning v0.1
 
 ### 完成内容

@@ -8,7 +8,7 @@
 
 ### 影响
 
-真实 Vercel 部署会把 RepoAssure private repo 的 website source/build output 上传到 Vercel。当前环境中，Vercel CLI 没有可用登录态；Vercel MCP 部署工具也拒绝执行，因为缺少对具体第三方目的地和数据披露风险的明确确认。
+真实 Vercel 部署会把 RepoAssure private repo 的 website source/build output 上传到 Vercel。当前环境中，Vercel CLI 登录态已恢复为 `web3coderman-dev`；Vercel MCP 部署工具此前拒绝执行，因为缺少对具体第三方目的地和数据披露风险的明确确认。
 
 ### 已尝试方案
 
@@ -17,10 +17,11 @@
 3. `env -u VERCEL_TOKEN vercel whoami`：失败，提示 No existing credentials found。
 4. 尝试使用 Vercel MCP deployment tool：被拒绝，原因是会向未明确确认的第三方服务导出 private repository website code/build output。
 5. 补充 `vercel.json` 部署前置配置，明确 `pnpm build:website`、`pnpm install --frozen-lockfile` 和 `apps/website/dist`，但不执行上传或部署。
+6. 运行 `vercel login` 并完成 OAuth device flow；`vercel whoami` 返回 `web3coderman-dev`。
 
 ### 当前判断
 
-这是外部认证和明确授权 blocker，不是 website build 或产品代码问题。已确认 `pnpm build:website` 在本地通过，但真实 private preview deployment 不能在缺少明确 Vercel 上传授权和有效 Vercel 认证的情况下继续。
+这是明确第三方 data-export 授权 blocker，不是 website build、产品代码或 Vercel CLI 认证问题。已确认 `pnpm build:website` 在本地通过，且 Vercel CLI 已登录；但真实 private preview deployment 不能在缺少明确 Vercel 上传授权的情况下继续。
 
 ### 需要的用户决策或外部条件
 
@@ -30,11 +31,7 @@
 我明确授权将 RepoAssure 官网代码和构建产物上传到 Vercel，用于 private preview deployment。
 ```
 
-同时需要满足至少一个认证条件：
-
-- 当前 Codex/Vercel MCP 具备可部署权限；或
-- 本地 Vercel CLI 完成 `vercel login`；或
-- 用户提供可用于该项目的有效 Vercel token/项目访问方式。
+认证条件当前已满足：本地 Vercel CLI 已完成 `vercel login`，当前账户为 `web3coderman-dev`。
 
 ### 临时绕过方案
 

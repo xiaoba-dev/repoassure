@@ -199,6 +199,19 @@ This execution attempt does not satisfy the private preview deployment gate beca
 
 Before any retry, keep the Vercel Git integration disconnected unless the deployment boundary is redesigned and explicitly approved.
 
+## Preview Deployment Retry Status
+
+Retried on 2026-06-26 under Resolve Vercel Preview Target Blocker v0.1:
+
+- Preflight: `main` was clean, latest `RepoAssure CI` passed, Vercel project settings matched `vercel.json`, Git integration was disconnected, and `vercel ls repoassure` returned `No deployments found`.
+- Retry 1: `vercel deploy --yes --force --logs` on `main` returned `Production` / `target production`; aliases and deployment `dpl_6qQkuqRBRtGtS3Y1zvJK8AwGyiLG` were removed.
+- Retry 2: `vercel deploy --yes --target preview --skip-domain --force --logs` on `main` returned `Production` / `target production`; aliases and deployment `dpl_5n9tj9sHgRQLvRLHvWEnNopDBDbc` were removed.
+- Retry 3: `vercel deploy --yes --force --logs` on temporary non-main branch `codex/vercel-preview-target-retry` returned `Production` / `target production`; aliases and deployment `dpl_3DrDKRnDrjH8yUpBuXDZn718eAyM` were removed.
+- Cleanup: `vercel ls repoassure` returned `No deployments found`.
+- Current status: No accepted preview URL is active.
+
+The blocker remains unresolved. Do not restore Vercel Git integration, do not use `repoassure.vercel.app`, and do not treat any production deployment URL as the private preview. The next retry should either fix the Vercel project/CLI target mismatch in the Vercel dashboard/API or switch to an equivalent access-controlled static host.
+
 ## Remaining P3 Backlog
 
 These are non-blocking polish items:

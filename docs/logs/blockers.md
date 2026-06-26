@@ -23,10 +23,15 @@
 9. 推送 `main` 后，Vercel Git integration 自动创建 Git push to `main` 对应的 production deployment，并绑定 `repoassure-git-main-web3coderman-devs-projects.vercel.app`；已移除 alias 和 deployment。
 10. 运行 `vercel git disconnect --yes`，CLI 返回 `Disconnected xiaoba-dev/repoassure`，后续 push 不应再自动创建 Vercel deployments。
 11. 清理后运行 `vercel ls repoassure`，结果为 `No deployments found`。
+12. Resolve Vercel Preview Target Blocker v0.1：确认 `main` clean、latest `RepoAssure CI` success、Vercel project settings 与 `vercel.json` 一致、Git integration disconnected、`vercel ls repoassure` 为 `No deployments found`。
+13. Vercel preview deployment retry：在 `main` 上执行 `vercel deploy --yes --force --logs`，Vercel 仍返回 `Production`、`target production`，并绑定 production aliases；已移除 aliases 和 deployment `dpl_6qQkuqRBRtGtS3Y1zvJK8AwGyiLG`。
+14. Vercel preview deployment retry：在 `main` 上执行 `vercel deploy --yes --target preview --skip-domain --force --logs`，Vercel 仍返回 `Production`、`target production`；已移除 aliases 和 deployment `dpl_5n9tj9sHgRQLvRLHvWEnNopDBDbc`。
+15. Vercel preview deployment retry：在临时非 main 分支 `codex/vercel-preview-target-retry` 上执行 `vercel deploy --yes --force --logs`，Vercel 仍返回 `Production`、`target production`；已移除 aliases 和 deployment `dpl_3DrDKRnDrjH8yUpBuXDZn718eAyM`。
+16. 清理后再次运行 `vercel ls repoassure`，结果为 `No deployments found`。
 
 ### 当前判断
 
-Vercel data-export 授权和 CLI 认证已满足，当前 blocker 已从“缺少授权”转为“链接后的 Vercel 项目/CLI deployment target 不满足 private preview 边界”。在没有一个 `Ready`、访问受控、非 production alias 的 preview deployment 前，不得伪造 preview URL，不得把 production URL 当成 private preview，不得继续 public launch 或 production gate。
+Vercel data-export 授权和 CLI 认证已满足，Git integration 已断开，本地 main / 非 main 分支差异已排除。当前 blocker 已从“缺少授权”转为“链接后的 Vercel project / CLI deployment target 不满足 private preview 边界”。在没有一个 `Ready`、访问受控、非 production alias 的 preview deployment 前，不得伪造 preview URL，不得把 production URL 当成 private preview，不得继续 public launch 或 production gate。
 
 ### 需要的用户决策或外部条件
 

@@ -940,12 +940,16 @@ describe('project structure', () => {
     expect(blockers).toContain('Git push to `main`');
     expect(blockers).toContain('No deployments found');
     expect(blockers).toContain('不得伪造 preview URL');
+    expect(blockers).toContain('Resolve Vercel Preview Target Blocker v0.1');
+    expect(blockers).toContain('Vercel preview deployment retry');
     expect(devLog).toContain('Public Website Private Preview Deployment Execution v0.1 Blocked');
     expect(devLog).toContain('Vercel data-export 授权已满足');
     expect(devLog).toContain('unintended production deployments and aliases were removed');
     expect(devLog).toContain('Git push to `main` triggered a Vercel production deployment');
     expect(devLog).toContain('Disconnected xiaoba-dev/repoassure');
+    expect(devLog).toContain('Resolve Vercel Preview Target Blocker v0.1');
     expect(handoff).toContain('Private Preview Deployment Execution Attempt');
+    expect(handoff).toContain('Preview Deployment Retry Status');
     expect(handoff).toContain('No accepted preview URL is active');
     expect(handoff).toContain('Vercel Git integration was disconnected');
 

@@ -8,6 +8,7 @@
 - 确认本地 `pnpm build:website` 通过。
 - 检查 Vercel CLI：当前无可用登录态，`vercel whoami` 无法继续。
 - 尝试 Vercel MCP deployment tool：被拒绝，原因是缺少对 Vercel 这一第三方目的地和 private repository website code/build output 上传风险的明确确认。
+- 补充 `vercel.json` 部署前置配置，明确 private preview execution 的 build command、install command 和 website output directory。
 - 已将 blocker 写入 `docs/logs/blockers.md`。
 
 ### 边界

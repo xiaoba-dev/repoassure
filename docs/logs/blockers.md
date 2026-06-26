@@ -16,6 +16,7 @@
 2. 检查 `VERCEL_*` 环境变量：当前进程没有 Vercel 环境变量。
 3. `env -u VERCEL_TOKEN vercel whoami`：失败，提示 No existing credentials found。
 4. 尝试使用 Vercel MCP deployment tool：被拒绝，原因是会向未明确确认的第三方服务导出 private repository website code/build output。
+5. 补充 `vercel.json` 部署前置配置，明确 `pnpm build:website`、`pnpm install --frozen-lockfile` 和 `apps/website/dist`，但不执行上传或部署。
 
 ### 当前判断
 

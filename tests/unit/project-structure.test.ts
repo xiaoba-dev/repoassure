@@ -918,6 +918,25 @@ describe('project structure', () => {
     await expectPath('docs/adr/0020-public-website-private-preview-deployment.md');
   });
 
+  it('records public website private preview deployment preflight while external deployment is blocked', async () => {
+    const [vercelConfig, blockers, devLog] = await Promise.all([
+      readFile('vercel.json', 'utf8'),
+      readFile('docs/logs/blockers.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(vercelConfig).toContain('"buildCommand": "pnpm build:website"');
+    expect(vercelConfig).toContain('"outputDirectory": "apps/website/dist"');
+    expect(vercelConfig).toContain('"installCommand": "pnpm install --frozen-lockfile"');
+    expect(blockers).toContain('Public website private preview deployment requires explicit Vercel data-export approval');
+    expect(blockers).toContain('RepoAssure 官网代码和构建产物上传到 Vercel');
+    expect(blockers).toContain('不得伪造 preview URL');
+    expect(devLog).toContain('Public Website Private Preview Deployment Execution v0.1 Blocked');
+    expect(devLog).toContain('后续继续前需要用户明确授权 Vercel data export');
+
+    await expectPath('vercel.json');
+  });
+
   it('extracts acceptance command ownership into a workspace package while preserving compatibility outputs', async () => {
     const [rootPackageJson, acceptancePackageJson, acceptanceCompatibility, acceptanceReadme, monorepoSpec] = await Promise.all([
       readFile('package.json', 'utf8'),

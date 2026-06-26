@@ -1,5 +1,36 @@
 # 开发日志
 
+## 2026年6月26日 - Public Website Private PR Review v0.1
+
+### 完成内容
+
+- 确认本地分支 `codex/public-website-v0.1` worktree clean，最新 commit 为 `0c8a661 feat: add public website release candidate`。
+- 确认远端仓库 `xiaoba-dev/repoassure` visibility 为 `PRIVATE`。
+- Push `codex/public-website-v0.1` 到 private GitHub remote。
+- 创建 Draft PR：[#2 `[codex] Add public website release candidate`](https://github.com/xiaoba-dev/repoassure/pull/2)。
+- PR body 引用 public website handoff、design QA、验证命令、截图证据和非授权边界。
+- 轮询 PR checks，`RepoAssure CI / Quality Gates` 已 passed。
+- 更新 `docs/operations/public-website-release-candidate-handoff-v0.1.md`，记录 PR URL、Draft 状态、CI 状态和仍未授权事项。
+
+### TDD 记录
+
+- Red：扩展 `tests/unit/project-structure.test.ts`，要求 public website handoff 记录 `Private Draft PR Status`、PR #2 URL、`RepoAssure CI / Quality Gates` 和 `passed`，并要求 dev log 记录本目标；测试因文档尚未记录 PR 状态按预期失败。
+- Green：更新 handoff 和 dev log 后，targeted structure test 通过。
+
+### 已验证
+
+- `gh repo view --json nameWithOwner,visibility,url,defaultBranchRef`：确认仓库为 `PRIVATE`。
+- `git push -u origin codex/public-website-v0.1`：通过。
+- `gh pr create --draft --base main --head codex/public-website-v0.1 --title "[codex] Add public website release candidate"`：通过，创建 PR #2。
+- `gh pr view 2 --json number,title,state,isDraft,url,baseRefName,headRefName,headRefOid,mergeStateStatus,statusCheckRollup,reviewDecision`：确认 PR #2 为 `OPEN` + Draft，head commit 为 `0c8a6618a12a87080c51a1f9771ac4e092850415`。
+- `gh pr checks 2 --watch --interval 10`：`RepoAssure CI / Quality Gates` passed。
+
+### 边界
+
+- 当前不 merge PR、不部署官网、不公开 repo、不发布 npm package、不创建 GitHub release、不发布公开公告。
+- 当前不声明 SaaS、Team Cloud、Enterprise、hosted dashboard 或 product artifact localization 已可用。
+- PR #2 仅用于 private maintainer review。
+
 ## 2026年6月25日 - Public Website Release Candidate Closure v0.1
 
 ### 完成内容

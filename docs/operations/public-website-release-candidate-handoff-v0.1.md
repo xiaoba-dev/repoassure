@@ -122,6 +122,22 @@ Completed on 2026-06-25:
 - `pnpm goal:audit`: passed, 35/35.
 - `git diff --check`: passed.
 
+## Private Draft PR Status
+
+Created on 2026-06-26:
+
+- PR: [#2 `[codex] Add public website release candidate`](https://github.com/xiaoba-dev/repoassure/pull/2)
+- Repository visibility at PR creation: `PRIVATE`
+- Base branch: `main`
+- Head branch: `codex/public-website-v0.1`
+- Head commit: `0c8a6618a12a87080c51a1f9771ac4e092850415`
+- PR state: `OPEN`
+- PR review mode: `Draft`
+- CI: `RepoAssure CI / Quality Gates` passed
+- Merge boundary: do not merge without explicit maintainer review and authorization
+
+This PR is a private review surface only. It still does not authorize website deployment, public release, npm publication, GitHub release creation, public repository visibility, Team Cloud, Enterprise, SaaS availability, hosted dashboard claims, or public announcements.
+
 ## Remaining P3 Backlog
 
 These are non-blocking polish items:

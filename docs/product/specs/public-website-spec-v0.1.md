@@ -2,7 +2,7 @@
 
 Status: Implemented
 Date: 2026-06-25
-Source ADRs: [ADR-0017](../../adr/0017-public-website-and-project-intelligence-console.md), [ADR-0018](../../adr/0018-public-website-localization-strategy.md), [ADR-0019](../../adr/0019-public-website-enterprise-design-system.md), [ADR-0020](../../adr/0020-public-website-private-preview-deployment.md)
+Source ADRs: [ADR-0017](../../adr/0017-public-website-and-project-intelligence-console.md), [ADR-0018](../../adr/0018-public-website-localization-strategy.md), [ADR-0019](../../adr/0019-public-website-enterprise-design-system.md), [ADR-0020](../../adr/0020-public-website-private-preview-deployment.md), [ADR-0021](../../adr/0021-private-preview-hosting-fallback.md)
 
 ## TL;DR
 
@@ -86,6 +86,18 @@ ADR-0020 defines the website deployment boundary.
 - The 2026-06-26 Vercel deployment execution attempt is blocked: the project returned `target production` or an unverifiable `UNKNOWN` preview, Vercel Git integration created a production deployment on `main` push and was then disconnected, Resolve Vercel Preview Target Blocker v0.1 retried default deploy, explicit `--target preview --skip-domain`, and non-main branch deploy without producing an accepted preview URL, all unintended production deployments and aliases were removed, and no accepted active preview URL exists.
 - A future deployment execution retry must record hosting target, access control, secret handling, rollback, smoke verification, screenshot evidence, and post-deployment boundaries.
 - Public launch still requires explicit maintainer authorization and public-release gates.
+
+## Private Preview Hosting Fallback
+
+ADR-0021 defines the private preview hosting fallback.
+
+This section records the Private preview hosting fallback for the public website.
+
+- Local static preview bundle remains the interim review surface.
+- Existing Vercel project usage is paused for remote private preview until the target mismatch is fixed.
+- Remote fallback should use Cloudflare Pages preview deployments with Cloudflare Access, or an equivalent static host where access control is configured before any preview URL is shared.
+- Cloudflare Pages preview deployments are public by default; they only satisfy the gate when access policy is enabled first.
+- This fallback does not authorize public launch, production deployment, public custom domain binding, Vercel Git integration restoration, or new hosting-provider upload without explicit execution authorization.
 
 ## Responsive Design Requirements
 

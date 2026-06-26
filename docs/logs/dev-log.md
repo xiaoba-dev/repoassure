@@ -1,5 +1,22 @@
 # 开发日志
 
+## 2026年6月27日 - Private Preview Hosting Fallback Decision v0.1
+
+### 完成内容
+
+- Red：扩展 `tests/unit/project-structure.test.ts`，要求 ADR-0021、ADR index、public website spec、release candidate handoff、README、architecture overview、acceptance checklist、testing strategy、decision log、dev log 和 blockers 记录 private preview hosting fallback decision；测试因 ADR-0021 缺失按预期失败。
+- 新增 `ADR-0021: Private Preview Hosting Fallback Decision`。
+- 决策：现有 Vercel project 在 target mismatch 修复前暂停用于官网 private preview；local static preview bundle 是临时 review surface；远程 fallback 优先选择 Cloudflare Pages preview deployments with Cloudflare Access 或等效访问受控静态托管。
+- 记录 Cloudflare Pages preview deployments are public by default，必须先启用 Cloudflare Access 或等效 access policy 再分享任何 remote preview URL。
+- 级联更新 ADR index、README、architecture overview、public website spec、release candidate handoff、acceptance checklist、testing strategy、decision log 和 blockers。
+
+### 边界
+
+- 本轮只做 fallback decision，不执行 Cloudflare deployment。
+- 不创建 preview URL，不上传 website source/build output 到新 hosting provider。
+- 不恢复 Vercel Git integration。
+- 不授权 public launch、production deployment、public custom domain、repo public、npm publication、GitHub release、外部公告、SaaS/Team Cloud/Enterprise/hosted dashboard availability claims。
+
 ## 2026年6月26日 - Public Website Private Preview Deployment Execution v0.1 Blocked
 
 ### 完成内容

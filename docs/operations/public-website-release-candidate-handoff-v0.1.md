@@ -212,6 +212,19 @@ Retried on 2026-06-26 under Resolve Vercel Preview Target Blocker v0.1:
 
 The blocker remains unresolved. Do not restore Vercel Git integration, do not use `repoassure.vercel.app`, and do not treat any production deployment URL as the private preview. The next retry should either fix the Vercel project/CLI target mismatch in the Vercel dashboard/API or switch to an equivalent access-controlled static host.
 
+## Private Preview Hosting Fallback Decision
+
+Decided on 2026-06-27:
+
+- Source decision: [ADR-0021: Private Preview Hosting Fallback Decision](../adr/0021-private-preview-hosting-fallback.md)
+- Interim review surface: Local static preview bundle remains the safe fallback while no remote private preview host is ready.
+- Preferred remote fallback candidate: Cloudflare Pages preview deployments with Cloudflare Access, or an equivalent access-controlled static host.
+- Required control: Cloudflare Pages preview deployments are public by default, so Cloudflare Access or equivalent access policy must be enabled before sharing any remote preview URL.
+- Vercel boundary: Do not restore Vercel Git integration and do not retry the existing Vercel project until the target mismatch is fixed and verified.
+- Non-authorization: This decision does not authorize public launch, production deployment, public custom domain binding, repository visibility changes, npm publication, GitHub release creation, SaaS/Team Cloud/Enterprise availability claims, hosted dashboard claims, or upload to a new hosting provider without explicit execution authorization.
+
+The next execution goal should either produce a local static review package or deploy to an access-controlled remote preview host with smoke/content/screenshot/forbidden-claim/access-control/rollback evidence.
+
 ## Remaining P3 Backlog
 
 These are non-blocking polish items:

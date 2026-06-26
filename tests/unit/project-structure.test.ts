@@ -957,6 +957,57 @@ describe('project structure', () => {
     await expectPath('vercel.json');
   });
 
+  it('records the private preview hosting fallback decision after Vercel target mismatch', async () => {
+    const [
+      adrIndex,
+      fallbackAdr,
+      publicWebsiteSpec,
+      handoff,
+      readme,
+      architecture,
+      acceptanceChecklist,
+      testingStrategy,
+      decisionLog,
+      devLog,
+      blockers
+    ] = await Promise.all([
+      readFile('docs/adr/README.md', 'utf8'),
+      readFile('docs/adr/0021-private-preview-hosting-fallback.md', 'utf8'),
+      readFile('docs/product/specs/public-website-spec-v0.1.md', 'utf8'),
+      readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('docs/logs/blockers.md', 'utf8')
+    ]);
+
+    expect(adrIndex).toContain('[0021](0021-private-preview-hosting-fallback.md)');
+    expect(adrIndex).toContain('Private preview hosting fallback decision');
+    expect(fallbackAdr).toContain('Cloudflare Pages preview deployments with Cloudflare Access');
+    expect(fallbackAdr).toContain('Local static preview bundle remains the interim review surface');
+    expect(fallbackAdr).toContain('Do not restore Vercel Git integration');
+    expect(fallbackAdr).toContain('does not authorize public launch');
+    expect(fallbackAdr).toContain('does not authorize production deployment');
+    expect(fallbackAdr).toContain('Cloudflare Pages preview deployments are public by default');
+    expect(fallbackAdr).toContain('Enable access policy before sharing any remote preview URL');
+    expect(publicWebsiteSpec).toContain('ADR-0021');
+    expect(publicWebsiteSpec).toContain('Private preview hosting fallback');
+    expect(handoff).toContain('Private Preview Hosting Fallback Decision');
+    expect(handoff).toContain('Cloudflare Pages preview deployments with Cloudflare Access');
+    expect(readme).toContain('ADR-0021');
+    expect(architecture).toContain('ADR-0021');
+    expect(acceptanceChecklist).toContain('Private Preview Hosting Fallback Decision');
+    expect(testingStrategy).toContain('Private Preview Hosting Fallback Decision');
+    expect(decisionLog).toContain('Private preview hosting fallback decision');
+    expect(devLog).toContain('Private Preview Hosting Fallback Decision v0.1');
+    expect(blockers).toContain('ADR-0021');
+
+    await expectPath('docs/adr/0021-private-preview-hosting-fallback.md');
+  });
+
   it('extracts acceptance command ownership into a workspace package while preserving compatibility outputs', async () => {
     const [rootPackageJson, acceptancePackageJson, acceptanceCompatibility, acceptanceReadme, monorepoSpec] = await Promise.all([
       readFile('package.json', 'utf8'),

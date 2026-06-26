@@ -1,5 +1,44 @@
 # 阻塞日志
 
+## 2026年6月26日 - Public website private preview deployment requires explicit Vercel data-export approval
+
+### 背景
+
+用户已授权执行 Public Website Private Preview Deployment Execution v0.1。当前默认部署路径选择 Vercel preview deployment，因为 ADR-0020 允许在单独 deployment execution goal 中选择 Vercel preview 或等效访问受控静态托管。
+
+### 影响
+
+真实 Vercel 部署会把 RepoAssure private repo 的 website source/build output 上传到 Vercel。当前环境中，Vercel CLI 没有可用登录态；Vercel MCP 部署工具也拒绝执行，因为缺少对具体第三方目的地和数据披露风险的明确确认。
+
+### 已尝试方案
+
+1. `vercel whoami`：失败，提示 specified token is not valid。
+2. 检查 `VERCEL_*` 环境变量：当前进程没有 Vercel 环境变量。
+3. `env -u VERCEL_TOKEN vercel whoami`：失败，提示 No existing credentials found。
+4. 尝试使用 Vercel MCP deployment tool：被拒绝，原因是会向未明确确认的第三方服务导出 private repository website code/build output。
+
+### 当前判断
+
+这是外部认证和明确授权 blocker，不是 website build 或产品代码问题。已确认 `pnpm build:website` 在本地通过，但真实 private preview deployment 不能在缺少明确 Vercel 上传授权和有效 Vercel 认证的情况下继续。
+
+### 需要的用户决策或外部条件
+
+用户需要明确授权以下内容后才能继续：
+
+```text
+我明确授权将 RepoAssure 官网代码和构建产物上传到 Vercel，用于 private preview deployment。
+```
+
+同时需要满足至少一个认证条件：
+
+- 当前 Codex/Vercel MCP 具备可部署权限；或
+- 本地 Vercel CLI 完成 `vercel login`；或
+- 用户提供可用于该项目的有效 Vercel token/项目访问方式。
+
+### 临时绕过方案
+
+在明确授权和认证可用前，只能继续本地 build、文档规划、部署配置设计和非联网测试；不得伪造 preview URL、不得使用其他第三方托管绕过该限制。
+
 ## 2026年6月25日 - Public release manual gates remain before publication
 
 ### 背景

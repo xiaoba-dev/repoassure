@@ -1,5 +1,22 @@
 # 开发日志
 
+## 2026年6月26日 - Public Website Private Preview Deployment Execution v0.1 Blocked
+
+### 完成内容
+
+- 审计 `main`：worktree clean，repo visibility 仍为 `PRIVATE`，最新 `RepoAssure CI` 为 success。
+- 确认本地 `pnpm build:website` 通过。
+- 检查 Vercel CLI：当前无可用登录态，`vercel whoami` 无法继续。
+- 尝试 Vercel MCP deployment tool：被拒绝，原因是缺少对 Vercel 这一第三方目的地和 private repository website code/build output 上传风险的明确确认。
+- 已将 blocker 写入 `docs/logs/blockers.md`。
+
+### 边界
+
+- 未执行真实部署。
+- 未生成 preview URL。
+- 未上传构建产物到 Vercel。
+- 后续继续前需要用户明确授权 Vercel data export，并具备有效 Vercel 认证。
+
 ## 2026年6月26日 - Public Website Private Preview Deployment Planning v0.1
 
 ### 完成内容

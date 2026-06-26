@@ -53,6 +53,7 @@ Commercial surfaces should focus on organization-level value rather than restric
 | GitHub Action wrapper | Open core | Implemented v0.3 distribution wrapper over local CLI execution; does not upload target repo source or private artifacts by default |
 | Hosted dashboard | Commercial | Future Team Cloud surface |
 | Policy center | Commercial | Future enterprise governance surface |
+| Team Cloud & Enterprise architecture | Commercial boundary spec | `docs/architecture/specs/team-cloud-enterprise-architecture-v0.1.md` defines the Commercial control plane over the Open artifact contract |
 
 ## Follow-up
 
@@ -60,3 +61,4 @@ Commercial surfaces should focus on organization-level value rather than restric
 - Add package-level README updates whenever a module changes classification.
 - Revisit the Security Assurance Lane provider packaging boundary before adding remote provider integrations or commercial team governance surfaces.
 - Keep GitHub Action distribution aligned with ADR-0014: local CLI execution first, explicit artifact publication only, and no hosted service dependency.
+- Use ADR-0016 and `team-cloud-enterprise-architecture-v0.1.md` before implementing hosted dashboard, Team Cloud collaboration, Enterprise integrations, or advanced governance.

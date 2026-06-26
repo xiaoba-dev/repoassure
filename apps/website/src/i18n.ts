@@ -1,0 +1,742 @@
+import { useEffect, useMemo, useState } from 'react';
+
+export const defaultLocale = 'en';
+export const supportedLocales = ['en', 'zh-CN'] as const;
+export const roadmapLocales = ['ja', 'ko'] as const;
+
+export type SupportedLocale = (typeof supportedLocales)[number];
+export type RoadmapLocale = (typeof roadmapLocales)[number];
+
+type ArtifactId = 'hardening' | 'repair' | 'patch' | 'acceptance';
+
+export type TrustLedgerPreviewCopy = {
+  label: string;
+  brand: string;
+  title: string;
+  subtitle: string;
+  runIdLabel: string;
+  runId: string;
+  sidebar: string[];
+  columns: {
+    artifact: string;
+    status: string;
+    summary: string;
+    evidence: string;
+  };
+  rows: Array<{
+    id: ArtifactId;
+    artifact: string;
+    status: string;
+    timestamp: string;
+    summary: string;
+    detail: string;
+    evidence: string;
+  }>;
+  footer: string;
+  localNote: string;
+  localBadge: string;
+};
+
+export type AssuranceGraphCopy = {
+  label: string;
+  centerLabel: string;
+  verifiedLabel: string;
+  generatedLabel: string;
+  producesLabel: string;
+  nodes: Array<{
+    id: 'docs' | 'code' | 'tests' | 'adrs' | 'repair' | 'patch' | 'acceptance';
+    label: string;
+    status: string;
+    variant: 'verified' | 'generated' | 'accepted';
+  }>;
+};
+
+export type AssurancePipelineItem = {
+  title: string;
+  text: string;
+};
+
+type WebsiteCopy = {
+  meta: {
+    title: string;
+    description: string;
+  };
+  language: {
+    label: string;
+    options: Record<SupportedLocale, string>;
+  };
+  nav: {
+    howItWorks: string;
+    artifacts: string;
+    openCore: string;
+    roadmap: string;
+    trust: string;
+    privatePreview: string;
+    toggleNavigation: string;
+  };
+  hero: {
+    status: string;
+    heading: string;
+    lede: string;
+    assurances: string[];
+    primaryCta: string;
+    secondaryCta: string;
+    privacyNote: string;
+  };
+  assuranceGraph: AssuranceGraphCopy;
+  trustLedgerPreview: TrustLedgerPreviewCopy;
+  assurancePipeline: {
+    label: string;
+    items: AssurancePipelineItem[];
+  };
+  steps: {
+    label: string;
+    heading: string;
+    items: Array<{
+      title: string;
+      text: string;
+    }>;
+  };
+  artifacts: {
+    label: string;
+    heading: string;
+    intro: string;
+    cards: Array<{
+      title: string;
+      text: string;
+    }>;
+    tabLabel: string;
+    statusLabel: string;
+    evidenceLabel: string;
+    detailLabel: string;
+    items: Record<
+      ArtifactId,
+      {
+        name: string;
+        status: string;
+        summary: string;
+        evidence: string;
+        detail: string;
+      }
+    >;
+  };
+  openCore: {
+    label: string;
+    heading: string;
+    body: string;
+    bullets: string[];
+    link: string;
+  };
+  roadmap: {
+    label: string;
+    heading: string;
+    body: string;
+    bullets: string[];
+    note: string;
+  };
+  trust: {
+    label: string;
+    heading: string;
+    items: Array<{
+      title: string;
+      text: string;
+    }>;
+  };
+  preview: {
+    heading: string;
+    body: string;
+    emailLabel: string;
+    emailPlaceholder: string;
+    submit: string;
+    idleStatus: string;
+    submittedStatus: string;
+  };
+  footer: {
+    description: string;
+    product: string;
+    community: string;
+    company: string;
+    repository: string;
+    contributing: string;
+    privacy: string;
+    contact: string;
+    previewTitle: string;
+    previewText: string;
+  };
+};
+
+export const artifactOrder: ArtifactId[] = ['hardening', 'repair', 'patch', 'acceptance'];
+
+export const locales: Record<SupportedLocale, WebsiteCopy> = {
+  en: {
+    meta: {
+      title: 'RepoAssure',
+      description:
+        'RepoAssure proves AI-generated repositories are ready to ship with local-first assurance artifacts.'
+    },
+    language: {
+      label: 'Language',
+      options: {
+        en: 'English',
+        'zh-CN': '简体中文'
+      }
+    },
+    nav: {
+      howItWorks: 'How it works',
+      artifacts: 'Assurance Graph',
+      openCore: 'Open core',
+      roadmap: 'Evidence model',
+      trust: 'Trust',
+      privatePreview: 'Private preview',
+      toggleNavigation: 'Toggle navigation'
+    },
+    hero: {
+      status: 'Local-first by design',
+      heading: 'Assure every AI-generated repo before it ships',
+      lede: 'Signed local evidence, repair plans, and acceptance decisions for AI-generated repositories.',
+      assurances: ['Docs, code, tests, and ADRs verified', 'Repair plans and patch plans generated', 'Acceptance decisions signed locally'],
+      primaryCta: 'Join private preview',
+      secondaryCta: 'View evidence model',
+      privacyNote: 'Evidence never leaves your machine.'
+    },
+    assuranceGraph: {
+      label: 'Assurance Graph',
+      centerLabel: 'All checks verified',
+      verifiedLabel: 'Verified',
+      generatedLabel: 'Generated',
+      producesLabel: 'Produces',
+      nodes: [
+        { id: 'docs', label: 'Docs', status: 'Verified', variant: 'verified' },
+        { id: 'code', label: 'Code', status: 'Verified', variant: 'verified' },
+        { id: 'tests', label: 'Tests', status: 'Verified', variant: 'verified' },
+        { id: 'adrs', label: 'ADRs', status: 'Verified', variant: 'verified' },
+        { id: 'repair', label: 'Repair Plan', status: 'Generated', variant: 'generated' },
+        { id: 'patch', label: 'Patch Plan', status: 'Generated', variant: 'generated' },
+        { id: 'acceptance', label: 'Acceptance', status: 'Accepted', variant: 'accepted' }
+      ]
+    },
+    trustLedgerPreview: {
+      label: 'Trust Ledger product preview',
+      brand: 'RepoAssure',
+      title: 'Trust Ledger',
+      subtitle: 'Evidence generated locally',
+      runIdLabel: 'Run ID',
+      runId: 'run-2026-06-18T10-48-49-735Z',
+      sidebar: ['Overview', 'Hardening report', 'Repair plan', 'Patch plan', 'Acceptance', 'Environment', 'Provenance'],
+      columns: {
+        artifact: 'Artifact',
+        status: 'Status',
+        summary: 'Summary',
+        evidence: 'Evidence'
+      },
+      rows: [
+        {
+          id: 'hardening',
+          artifact: 'Hardening report',
+          status: 'Generated',
+          timestamp: '2026-06-18 10:48:47Z',
+          summary: '214 findings',
+          detail: '8 high · 27 medium',
+          evidence: 'sha256: af83...b91c'
+        },
+        {
+          id: 'repair',
+          artifact: 'Repair plan',
+          status: 'Generated',
+          timestamp: '2026-06-18 10:48:47Z',
+          summary: '38 actions',
+          detail: 'Prioritized',
+          evidence: 'sha256: d2c7...770e'
+        },
+        {
+          id: 'patch',
+          artifact: 'Patch plan',
+          status: 'Generated',
+          timestamp: '2026-06-18 10:48:47Z',
+          summary: '24 patches',
+          detail: 'Ready to apply',
+          evidence: 'sha256: 1c9a...e3d4'
+        },
+        {
+          id: 'acceptance',
+          artifact: 'Acceptance',
+          status: 'Accepted',
+          timestamp: '2026-06-18 10:50:02Z',
+          summary: 'Risk: Low',
+          detail: 'Policy: team-default',
+          evidence: 'sha256: 9e21...c5ab'
+        }
+      ],
+      footer: 'All artifacts are signed and stored locally.',
+      localNote: 'Evidence never leaves your machine.',
+      localBadge: '100% LOCAL'
+    },
+    assurancePipeline: {
+      label: 'Assurance pipeline',
+      items: [
+        {
+          title: 'Analyze locally',
+          text: 'Static analysis, dependency checks, policy evaluation, and more.'
+        },
+        {
+          title: 'Generate artifacts',
+          text: 'Hardening report, repair plan, patch plan, and acceptance decision.'
+        },
+        {
+          title: 'Repair safely',
+          text: 'Actionable fixes with context and risk, verified before application.'
+        },
+        {
+          title: 'Accept delivery',
+          text: 'Review local evidence and accept delivery with confidence.'
+        }
+      ]
+    },
+    steps: {
+      label: 'How it works',
+      heading: 'From code to confidence in four local steps',
+      items: [
+        {
+          title: 'Add your repo',
+          text: 'Point RepoAssure to your AI-generated repository locally.'
+        },
+        {
+          title: 'Run locally',
+          text: 'Static analysis, dependency checks, policy evaluation, and more.'
+        },
+        {
+          title: 'Generate artifacts',
+          text: 'Hardening report, repair plan, patch plan, and acceptance decision.'
+        },
+        {
+          title: 'Reviewer decision',
+          text: 'Review evidence locally and accept for delivery with confidence.'
+        }
+      ]
+    },
+    artifacts: {
+      label: 'Proof artifacts',
+      heading: 'Evidence that stands up to review',
+      intro: 'Every run produces a signed artifact bundle. Nothing leaves your machine by default.',
+      tabLabel: 'Artifact examples',
+      statusLabel: 'Status',
+      evidenceLabel: 'Evidence',
+      detailLabel: 'Review detail',
+      cards: [
+        {
+          title: 'Hardening report',
+          text: 'Findings, severity, and evidence mapped to policy rules.'
+        },
+        {
+          title: 'Repair plan',
+          text: 'Actionable steps to address issues with prioritization.'
+        },
+        {
+          title: 'Patch plan',
+          text: 'Minimal, reviewable changes with context and risk.'
+        },
+        {
+          title: 'Acceptance',
+          text: 'Final decision, policy version, and risk rating for audit.'
+        }
+      ],
+      items: {
+        hardening: {
+          name: 'Hardening report',
+          status: 'Generated',
+          summary: 'Findings, severity, and evidence mapped to policy rules and best practices.',
+          evidence: 'sha256: af83...b91c',
+          detail: '214 findings, grouped by severity and reviewer impact.'
+        },
+        repair: {
+          name: 'Repair plan',
+          status: 'Generated',
+          summary: 'Actionable repair steps to address issues with prioritization and rationale.',
+          evidence: 'sha256: dc27...7f0e',
+          detail: '38 actions, sequenced for AI IDE or maintainer execution.'
+        },
+        patch: {
+          name: 'Patch plan',
+          status: 'Generated',
+          summary: 'Minimal, reviewable changes with context and risk assessment.',
+          evidence: 'sha256: 1c9a...e3d4',
+          detail: '24 patches, ready to evaluate before application.'
+        },
+        acceptance: {
+          name: 'Acceptance',
+          status: 'Accepted',
+          summary: 'Final decision, policy version, and risk rating for audit.',
+          evidence: 'sha256: 9e21...c5ab',
+          detail: 'Reviewer decision recorded with low delivery risk.'
+        }
+      }
+    },
+    openCore: {
+      label: 'Open core',
+      heading: 'Built in the open. Trusted by design.',
+      body:
+        'RepoAssure is open core. The core engine, policies, and artifact formats are transparent and community-driven.',
+      bullets: [
+        'Core engine and artifact specs in the open',
+        'Pluggable policies and analyzers',
+        'Reproducible, auditable, verifiable'
+      ],
+      link: 'Explore the repository'
+    },
+    roadmap: {
+      label: 'Team Cloud / Enterprise planned',
+      heading: 'Roadmap: Team Cloud and Enterprise',
+      body: 'Secure collaboration, centralized policy, and audit at scale.',
+      bullets: [
+        'Artifact storage and sharing',
+        'Role-based access and approvals',
+        'Enterprise policy management',
+        'Audit trails and compliance exports'
+      ],
+      note: 'Planned. Focused on private preview.'
+    },
+    trust: {
+      label: 'Trust boundary',
+      heading: 'Your code stays with you',
+      items: [
+        {
+          title: 'No source upload by default',
+          text: 'All analysis and artifact generation happens locally on your machine.'
+        },
+        {
+          title: 'Cryptographically verifiable',
+          text: 'Artifacts are signed. Integrity can be verified independent of RepoAssure.'
+        },
+        {
+          title: 'You control storage',
+          text: 'Store artifacts wherever you choose. We do not store your code.'
+        }
+      ]
+    },
+    preview: {
+      heading: 'Join the private preview',
+      body: 'Help shape the future of trustworthy AI code delivery.',
+      emailLabel: 'Work email',
+      emailPlaceholder: 'you@example.com',
+      submit: 'Join private preview',
+      idleStatus: 'Access is by invitation only. Not for public distribution.',
+      submittedStatus: 'Request noted locally for this prototype.'
+    },
+    footer: {
+      description: 'AI code delivery assurance with verifiable, local-first evidence.',
+      product: 'Product',
+      community: 'Community',
+      company: 'Company',
+      repository: 'Repository',
+      contributing: 'Contributing',
+      privacy: 'Privacy',
+      contact: 'Contact',
+      previewTitle: 'Private preview',
+      previewText: 'Access is by invitation only. Not for public distribution.'
+    }
+  },
+  'zh-CN': {
+    meta: {
+      title: 'RepoAssure',
+      description: 'RepoAssure 用本地优先的可信证据，证明 AI 生成的仓库已经达到可交付状态。'
+    },
+    language: {
+      label: '语言',
+      options: {
+        en: 'English',
+        'zh-CN': '简体中文'
+      }
+    },
+    nav: {
+      howItWorks: '工作方式',
+      artifacts: '保障图谱',
+      openCore: '开放核心',
+      roadmap: '证据模型',
+      trust: '信任边界',
+      privatePreview: '私密预览',
+      toggleNavigation: '切换导航'
+    },
+    hero: {
+      status: '本地优先设计',
+      heading: '在交付前保障每个 AI 生成仓库',
+      lede: '为 AI 生成仓库提供已签名的本地证据、修复计划和验收决策。',
+      assurances: ['文档、代码、测试和 ADR 已验证', '修复计划和补丁计划已生成', '验收决策在本地签名'],
+      primaryCta: '加入私密预览',
+      secondaryCta: '查看证据模型',
+      privacyNote: '证据永远不会离开你的机器。'
+    },
+    assuranceGraph: {
+      label: '保障图谱',
+      centerLabel: '所有检查已验证',
+      verifiedLabel: '已验证',
+      generatedLabel: '已生成',
+      producesLabel: '生成',
+      nodes: [
+        { id: 'docs', label: '文档', status: '已验证', variant: 'verified' },
+        { id: 'code', label: '代码', status: '已验证', variant: 'verified' },
+        { id: 'tests', label: '测试', status: '已验证', variant: 'verified' },
+        { id: 'adrs', label: 'ADR', status: '已验证', variant: 'verified' },
+        { id: 'repair', label: '修复计划', status: '已生成', variant: 'generated' },
+        { id: 'patch', label: '补丁计划', status: '已生成', variant: 'generated' },
+        { id: 'acceptance', label: '验收决策', status: '已接受', variant: 'accepted' }
+      ]
+    },
+    trustLedgerPreview: {
+      label: 'Trust Ledger 产品预览',
+      brand: 'RepoAssure',
+      title: '信任账本',
+      subtitle: '本地生成的证据',
+      runIdLabel: '运行 ID',
+      runId: 'run-2026-06-18T10-48-49-735Z',
+      sidebar: ['概览', '硬化报告', '修复计划', '补丁计划', '验收决策', '环境', '来源'],
+      columns: {
+        artifact: '物料',
+        status: '状态',
+        summary: '摘要',
+        evidence: '证据'
+      },
+      rows: [
+        {
+          id: 'hardening',
+          artifact: '硬化报告',
+          status: '已生成',
+          timestamp: '2026-06-18 10:48:47Z',
+          summary: '214 个发现',
+          detail: '8 个高危 · 27 个中危',
+          evidence: 'sha256: af83...b91c'
+        },
+        {
+          id: 'repair',
+          artifact: '修复计划',
+          status: '已生成',
+          timestamp: '2026-06-18 10:48:47Z',
+          summary: '38 个动作',
+          detail: '已排序',
+          evidence: 'sha256: d2c7...770e'
+        },
+        {
+          id: 'patch',
+          artifact: '补丁计划',
+          status: '已生成',
+          timestamp: '2026-06-18 10:48:47Z',
+          summary: '24 个补丁',
+          detail: '可应用',
+          evidence: 'sha256: 1c9a...e3d4'
+        },
+        {
+          id: 'acceptance',
+          artifact: '验收决策',
+          status: '已接受',
+          timestamp: '2026-06-18 10:50:02Z',
+          summary: '风险：低',
+          detail: '策略：team-default',
+          evidence: 'sha256: 9e21...c5ab'
+        }
+      ],
+      footer: '所有证据物料都会在本地签名并存储。',
+      localNote: '证据永远不会离开你的机器。',
+      localBadge: '100% 本地'
+    },
+    assurancePipeline: {
+      label: '保障流水线',
+      items: [
+        {
+          title: '本地分析',
+          text: '执行静态分析、依赖检查、策略评估等流程。'
+        },
+        {
+          title: '生成物料',
+          text: '输出硬化报告、修复计划、补丁计划和验收决策。'
+        },
+        {
+          title: '安全修复',
+          text: '带上下文和风险说明的可执行修复，应用前先验证。'
+        },
+        {
+          title: '接受交付',
+          text: '审查本地证据，并有信心地接受交付结果。'
+        }
+      ]
+    },
+    steps: {
+      label: '工作方式',
+      heading: '从代码到信心，只需四个本地步骤',
+      items: [
+        {
+          title: '添加仓库',
+          text: '在本地将 RepoAssure 指向你的 AI 生成仓库。'
+        },
+        {
+          title: '本地运行',
+          text: '执行静态分析、依赖检查、策略评估等流程。'
+        },
+        {
+          title: '生成证据',
+          text: '输出硬化报告、修复计划、补丁计划和验收决策。'
+        },
+        {
+          title: '评审决策',
+          text: '在本地审查证据，并有信心地接受交付结果。'
+        }
+      ]
+    },
+    artifacts: {
+      label: '证据物料',
+      heading: '经得起评审的交付证据',
+      intro: '每次运行都会生成已签名的证据包。默认情况下，任何内容都不会离开你的机器。',
+      tabLabel: '证据示例',
+      statusLabel: '状态',
+      evidenceLabel: '证据',
+      detailLabel: '评审细节',
+      cards: [
+        {
+          title: '硬化报告',
+          text: '将发现、严重级别和证据映射到策略规则。'
+        },
+        {
+          title: '修复计划',
+          text: '按优先级给出可执行的修复步骤。'
+        },
+        {
+          title: '补丁计划',
+          text: '提供最小、可评审、带上下文和风险说明的变更。'
+        },
+        {
+          title: '验收决策',
+          text: '记录最终决策、策略版本和审计风险等级。'
+        }
+      ],
+      items: {
+        hardening: {
+          name: '硬化报告',
+          status: '已生成',
+          summary: '将发现、严重级别和证据映射到策略规则与最佳实践。',
+          evidence: 'sha256: af83...b91c',
+          detail: '214 个发现，已按严重级别和评审影响分组。'
+        },
+        repair: {
+          name: '修复计划',
+          status: '已生成',
+          summary: '按优先级和原因说明组织可执行修复步骤。',
+          evidence: 'sha256: dc27...7f0e',
+          detail: '38 个动作，可交给 AI IDE 或维护者执行。'
+        },
+        patch: {
+          name: '补丁计划',
+          status: '已生成',
+          summary: '提供最小、可评审、带上下文和风险说明的变更。',
+          evidence: 'sha256: 1c9a...e3d4',
+          detail: '24 个补丁，可在应用前先评估。'
+        },
+        acceptance: {
+          name: '验收决策',
+          status: '已接受',
+          summary: '记录最终决策、策略版本和审计风险等级。',
+          evidence: 'sha256: 9e21...c5ab',
+          detail: '评审决策已记录，交付风险较低。'
+        }
+      }
+    },
+    openCore: {
+      label: '开放核心',
+      heading: '开放构建，以可信为设计原则。',
+      body: 'RepoAssure 采用 open core 路线。核心引擎、策略和证据格式保持透明，并由社区共同演进。',
+      bullets: ['核心引擎和证据规格保持开放', '支持可插拔策略与分析器', '可复现、可审计、可验证'],
+      link: '查看代码仓库'
+    },
+    roadmap: {
+      label: 'Team Cloud / Enterprise 计划中',
+      heading: '路线图：Team Cloud 与 Enterprise',
+      body: '面向团队协作、集中策略和规模化审计的安全能力。',
+      bullets: ['证据存储与共享', '基于角色的访问与审批', '企业策略管理', '审计轨迹与合规导出'],
+      note: '计划中。当前聚焦私密预览。'
+    },
+    trust: {
+      label: '信任边界',
+      heading: '你的代码留在你这里',
+      items: [
+        {
+          title: '默认不上传源代码',
+          text: '所有分析和证据生成都在你的本地环境中完成。'
+        },
+        {
+          title: '可加密验证',
+          text: '证据物料会被签名，完整性可独立于 RepoAssure 进行验证。'
+        },
+        {
+          title: '你控制存储位置',
+          text: '证据物料可以存放在你选择的位置。我们不存储你的代码。'
+        }
+      ]
+    },
+    preview: {
+      heading: '加入私密预览',
+      body: '一起塑造可信 AI 代码交付的未来。',
+      emailLabel: '工作邮箱',
+      emailPlaceholder: 'you@example.com',
+      submit: '加入私密预览',
+      idleStatus: '访问仅限邀请。当前不面向公众分发。',
+      submittedStatus: '请求已在此原型中本地记录。'
+    },
+    footer: {
+      description: '以可验证、本地优先证据保障 AI 代码交付。',
+      product: '产品',
+      community: '社区',
+      company: '公司',
+      repository: '代码仓库',
+      contributing: '参与贡献',
+      privacy: '隐私',
+      contact: '联系',
+      previewTitle: '私密预览',
+      previewText: '访问仅限邀请。当前不面向公众分发。'
+    }
+  }
+};
+
+const storageKey = 'repoassure.website.locale';
+
+export function isSupportedLocale(value: string | null): value is SupportedLocale {
+  return supportedLocales.includes(value as SupportedLocale);
+}
+
+export function useWebsiteLocale() {
+  const [locale, setLocaleState] = useState<SupportedLocale>(() => {
+    if (typeof window === 'undefined') {
+      return defaultLocale;
+    }
+
+    const storedLocale = window.localStorage.getItem(storageKey);
+    if (isSupportedLocale(storedLocale)) {
+      return storedLocale;
+    }
+    return defaultLocale;
+  });
+
+  const copy = locales[locale];
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+    document.title = copy.meta.title;
+    const description = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    if (description) {
+      description.content = copy.meta.description;
+    }
+    window.localStorage.setItem(storageKey, locale);
+  }, [copy.meta.description, copy.meta.title, locale]);
+
+  const localeOptions = useMemo(
+    () =>
+      supportedLocales.map((option) => ({
+        code: option,
+        label: copy.language.options[option]
+      })),
+    [copy]
+  );
+
+  return {
+    copy,
+    locale,
+    localeOptions,
+    setLocale: setLocaleState
+  };
+}

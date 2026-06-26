@@ -12,6 +12,7 @@
 - [ADR-0012](../../adr/0012-branch-protection-and-release-boundary.md)：Branch protection and release boundary
 - [ADR-0013](../../adr/0013-codex-security-and-security-assurance-lane.md)：Codex Security and Security Assurance Lane
 - [ADR-0014](../../adr/0014-distribution-and-repair-loop-readiness.md)：Distribution and repair loop readiness
+- [ADR-0016](../../adr/0016-team-cloud-enterprise-boundary.md)：Team Cloud and Enterprise commercial edition boundary
 
 ## TL;DR
 
@@ -135,6 +136,7 @@ v0.3 不包含：
 - 自动运行 formatter 后写回文件。
 - 自动创建 Git branch、commit、issue 或 pull request。
 - Hosted dashboard、Team Cloud、SSO/RBAC、组织级策略中心。
+- Team Cloud & Enterprise Spec v0.1 之后的 hosted dashboard、team collaboration、enterprise integrations、advanced governance 运行时代码。
 - 远程上传目标 repo、截图、trace、日志、env value 或私有 artifact。
 - 将 RepoAssure 改造成通用 deep vulnerability scanner。
 - 发布公开 package 或添加仓库级 `LICENSE`，除非 public release checklist 完成并另行授权。
@@ -160,3 +162,5 @@ v0.3 不包含：
 - Hosted dashboard、Team Cloud 或远程 artifact storage。
 - 改变 open-core / commercial 模块边界。
 - 改变 RepoAssure 的安全定位，让它成为 scanner runtime 而不是 provider-backed evidence lane。
+
+商业版后续工作必须先遵循 [ADR-0016](../../adr/0016-team-cloud-enterprise-boundary.md) 和 [Team Cloud & Enterprise Spec v0.1](team-cloud-enterprise-spec-v0.1.md)：当前仅完成路线图与边界规划，不实现 paid cloud runtime，并保持 No target repo source upload by default。

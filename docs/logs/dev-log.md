@@ -1,5 +1,87 @@
 # 开发日志
 
+## 2026年6月26日 - Public Website PR #2 Review Closure v0.1
+
+### 完成内容
+
+- 审计 PR #2：状态为 `OPEN`，base 为 `main`，head 为 `codex/public-website-v0.1`，repo visibility 为 `PRIVATE`。
+- 确认 `RepoAssure CI / Quality Gates` 已 passed，merge state 为 `CLEAN`。
+- 确认 No GitHub PR comments，No GitHub PR reviews。
+- 用 TDD 扩展 `tests/unit/project-structure.test.ts`，要求 handoff 和 dev log 记录 review closure、Ready for Review、无 comments/reviews 和不 merge 边界。
+- 更新 `docs/operations/public-website-release-candidate-handoff-v0.1.md`，记录 `PR Review Closure Status`。
+- 将 PR #2 转为 Ready for Review。
+
+### 边界
+
+- Do not merge without explicit merge authorization.
+- 本 goal 不部署官网、不公开 repo、不发布 npm package、不创建 GitHub release、不发布公开公告。
+
+## 2026年6月26日 - Public Website Private PR Review v0.1
+
+### 完成内容
+
+- 确认本地分支 `codex/public-website-v0.1` worktree clean，最新 commit 为 `0c8a661 feat: add public website release candidate`。
+- 确认远端仓库 `xiaoba-dev/repoassure` visibility 为 `PRIVATE`。
+- Push `codex/public-website-v0.1` 到 private GitHub remote。
+- 创建 Draft PR：[#2 `[codex] Add public website release candidate`](https://github.com/xiaoba-dev/repoassure/pull/2)。
+- PR body 引用 public website handoff、design QA、验证命令、截图证据和非授权边界。
+- 轮询 PR checks，`RepoAssure CI / Quality Gates` 已 passed。
+- 更新 `docs/operations/public-website-release-candidate-handoff-v0.1.md`，记录 PR URL、Draft 状态、CI 状态和仍未授权事项。
+- 补充文档状态记录提交 `02a0297 docs: record public website draft PR review` 并推送到 PR 分支；最新 head commit 以 `gh pr view 2 --json headRefOid` 为准。
+
+### TDD 记录
+
+- Red：扩展 `tests/unit/project-structure.test.ts`，要求 public website handoff 记录 `Private Draft PR Status`、PR #2 URL、`RepoAssure CI / Quality Gates` 和 `passed`，并要求 dev log 记录本目标；测试因文档尚未记录 PR 状态按预期失败。
+- Green：更新 handoff 和 dev log 后，targeted structure test 通过。
+
+### 已验证
+
+- `gh repo view --json nameWithOwner,visibility,url,defaultBranchRef`：确认仓库为 `PRIVATE`。
+- `git push -u origin codex/public-website-v0.1`：通过。
+- `gh pr create --draft --base main --head codex/public-website-v0.1 --title "[codex] Add public website release candidate"`：通过，创建 PR #2。
+- `gh pr view 2 --json number,title,state,isDraft,url,baseRefName,headRefName,headRefOid,mergeStateStatus,statusCheckRollup,reviewDecision`：确认 PR #2 为 `OPEN` + Draft；最新 head commit 需以 PR metadata 为准。
+- `gh pr checks 2 --watch --interval 10`：`RepoAssure CI / Quality Gates` passed。
+
+### 边界
+
+- 当前不 merge PR、不部署官网、不公开 repo、不发布 npm package、不创建 GitHub release、不发布公开公告。
+- 当前不声明 SaaS、Team Cloud、Enterprise、hosted dashboard 或 product artifact localization 已可用。
+- PR #2 仅用于 private maintainer review。
+
+## 2026年6月25日 - Public Website Release Candidate Closure v0.1
+
+### 完成内容
+
+- 为 public website 单独新增 release candidate closure 交接文档：`docs/operations/public-website-release-candidate-handoff-v0.1.md`。
+- 交接文档汇总 website change scope、review package、screenshot evidence、final verification gates、remaining P3 backlog 和 non-authorization boundary。
+- 级联更新 README 和 acceptance checklist，使官网 RC 审查入口可从项目入口和验收入口发现。
+- 明确该 closure 不授权部署官网、公开仓库、npm publish、GitHub release、SaaS、Team Cloud、Enterprise、hosted dashboard 或 product artifact localization。
+
+### TDD 记录
+
+- Red：先在 `tests/unit/project-structure.test.ts` 新增 `records public website release candidate closure without publishing or deploying`，要求 handoff 文档和 README / acceptance checklist / dev log 级联；测试因 `docs/operations/public-website-release-candidate-handoff-v0.1.md` 缺失按预期失败。
+- Green：新增 public website RC handoff，并完成 README、acceptance checklist 和 dev log 级联后，targeted structure test 通过。
+
+### 已验证
+
+- `pnpm vitest run tests/unit/project-structure.test.ts --testNamePattern "public website release candidate closure"`：通过。
+- `pnpm vitest run tests/unit/public-website.test.ts tests/unit/project-structure.test.ts`：通过，2 个 test files / 67 个 tests。
+- `pnpm --filter @repoassure/website typecheck`：通过。
+- `pnpm --filter @repoassure/website build`：通过。
+- `pnpm verify:website`（提权，本地浏览器验证）：通过，生成 desktop、zh-CN desktop、mobile、mobile menu、comparison、`desktop-focus-dark.png` 和 `desktop-focus-light.png`。
+- `pnpm lint`：通过。
+- `pnpm typecheck`：通过。
+- `pnpm test:unit`：通过，36 个 test files / 541 个 tests。
+- `pnpm build`：通过。
+- `pnpm repo:hygiene`：通过。
+- `pnpm goal:audit`：通过，35/35。
+- `git diff --check`：通过。
+
+### 边界
+
+- 当前不 push、不创建 PR、不部署官网、不公开 repo、不发布 npm package、不创建 GitHub release。
+- 当前只整理 public website 本地审查包；public release 仍需法律、商标、branch protection / repository ruleset 和最终 maintainer publication authorization。
+
 ## 2026年6月25日 - Maintainer Decision Execution v0.1
 
 ### 完成内容
@@ -10821,3 +10903,284 @@ Phase 0：项目初始化。
 - `pnpm typecheck`：通过。
 - `pnpm lint`：通过。
 - `pnpm build`：通过。
+## 2026年6月25日 - Team Cloud & Enterprise Spec v0.1
+
+### 完成内容
+
+- 按 TDD 先新增 `project-structure.test.ts` 文档级联测试，并确认因商业版 ADR/spec 缺失而失败。
+- 新增 `ADR-0016: Team Cloud and Enterprise Commercial Edition Boundary`。
+- 新增 `docs/product/specs/team-cloud-enterprise-spec-v0.1.md`，覆盖 Hosted dashboard、Team collaboration、Enterprise integrations、Advanced governance 和 Roadmap。
+- 新增 `docs/architecture/specs/team-cloud-enterprise-architecture-v0.1.md`，明确 Open artifact contract、Commercial control plane 和 No target repo source upload by default。
+- 级联更新 ADR 索引、README、architecture overview、commercialization strategy、open-core packaging、MVP v0.3、acceptance checklist、testing strategy 和 decision log。
+
+### 边界
+
+- 当前 goal 只完成商业版产品/架构规划与验收边界。
+- 不实现 paid cloud runtime，不新增数据库、账号体系、计费、hosted dashboard 代码或远程 artifact ingestion。
+- 后续任何 Team Cloud / Enterprise 运行时代码必须重新进入 TDD 和测试金字塔。
+## 2026年6月25日 - Public Website and Project Intelligence Console Planning v0.1
+
+### 完成内容
+
+- 按 TDD 新增 structure-level test，先确认 ADR-0017 和相关 specs 缺失时失败。
+- 新增 `ADR-0017: Public Website and Internal Project Intelligence Console`。
+- 新增 `docs/product/specs/public-website-spec-v0.1.md`，定义响应式官网、private preview、Waitlist 和不声明 SaaS availability 的内容边界。
+- 新增 `docs/product/specs/project-intelligence-console-spec-v0.1.md`，定义 Docs Graph、Code Graph、Project Progress Graph 和 local-only 数据边界。
+- 新增 `docs/architecture/specs/project-intelligence-console-architecture-v0.1.md`，定义 Graph Builder、`artifacts/project-graph/` snapshots 和 No hosted service dependency。
+- 级联更新 ADR 索引、README、architecture overview、commercialization strategy、acceptance checklist、testing strategy 和 decision log。
+
+### 边界
+
+- 当前不实现 public website UI。
+- 当前不实现 graph builder、watch mode、internal console runtime 或 hosted dashboard。
+- 后续实现必须进入新的 TDD goal，并先补可执行 graph/website 测试。
+
+## 2026年6月25日 - Public Website v0.1 Implementation
+
+### 完成内容
+
+- 采用 Product Design 方案 1（Trust Ledger）实现 RepoAssure 响应式官网。
+- 新增 `apps/website` workspace app，包名为 `@repoassure/website`。
+- 新增 Trust Ledger hero 产品视觉资产；后续 Public Website Code-Native Trust Ledger Preview v0.1 已将该 raster 资产替换为 code-native localized React preview。
+- 实现官网核心 section：Hero、How it works、Proof artifacts、Open Core、Roadmap、Trust boundary、Private preview CTA、Footer。
+- 实现交互：移动导航、artifact preview tabs、private preview form 本地状态。
+- 新增 `scripts/verify-website.mjs` 和根脚本 `pnpm verify:website`，用于浏览器截图与交互验证。
+- 新增 `design-qa.md`，记录 Product Design QA 证据并标记 `final result: passed`。
+- 将官网纳入根级 `pnpm build` 和 `pnpm typecheck`。
+- 新增 `apps/*/dist` 到 `.gitignore`、ESLint ignore、Vitest exclude，并同步私有工程基线文档。
+- 更新 `docs/product/specs/public-website-spec-v0.1.md` 为 Implemented。
+
+### TDD 记录
+
+- Red：新增 `tests/unit/public-website.test.ts` 后，因 `apps/website/package.json` 缺失失败。
+- Green：实现 `apps/website` 后，官网契约测试通过。
+- Red：新增 `apps/*/dist` 构建产物边界断言后，因 `.gitignore` 未覆盖失败。
+- Green：补齐 ignore/test/lint 排除规则后，project structure 测试通过。
+
+### 已验证
+
+- `pnpm vitest run tests/unit/public-website.test.ts`：通过。
+- `pnpm vitest run tests/unit/public-website.test.ts tests/unit/project-structure.test.ts`：通过，2 个 test files / 66 个 tests。
+- `pnpm --filter @repoassure/website typecheck`：通过。
+- `pnpm --filter @repoassure/website build`：通过。
+- `pnpm verify:website`（提权，本地浏览器验证）：通过，生成 desktop、zh-CN desktop、mobile、mobile menu、comparison、`desktop-focus-dark.png` 和 `desktop-focus-light.png`。
+- `pnpm lint`：通过。
+- `pnpm typecheck`：通过。
+- `pnpm test:unit`：通过，36 个 test files / 540 个 tests。
+- `pnpm build`：通过。
+- `pnpm repo:hygiene`：通过。
+- `pnpm goal:audit`：通过，35/35。
+- `pnpm vitest run tests/unit/project-structure.test.ts -t "routes benchmark artifacts"`：通过。
+- `pnpm --filter @repoassure/website typecheck`：通过。
+- `pnpm --filter @repoassure/website build`：通过。
+- `pnpm lint`：通过。
+- `pnpm typecheck`：通过。
+- `pnpm verify:website`（提权，本地浏览器验证）：通过，验证桌面/移动截图、artifact tabs、private preview form 和移动菜单。
+
+### 边界
+
+- 当前不部署官网，不配置域名/DNS/analytics。
+- Private preview form 仅为前端本地状态，不接入 waitlist backend。
+- `Explore the repository` 仍使用占位 GitHub 入口，待公开 repo URL 最终确认后替换。
+
+## 2026年6月25日 - Public Website Localization Strategy ADR
+
+### 完成内容
+
+- 按 TDD 新增 `project-structure.test.ts` 文档级联测试，并确认因 `ADR-0018` 缺失而失败。
+- 新增 `ADR-0018: Public Website Localization Strategy`。
+- 级联更新 ADR 索引、README、architecture overview、public website spec、commercialization strategy、acceptance checklist、testing strategy 和 decision log。
+- 明确官网 i18n 节奏：English default，English + Simplified Chinese first，Japanese and Korean 为 roadmap locales。
+- 明确 localized forbidden-claim checks 是未来 i18n runtime 的必须测试。
+
+### 边界
+
+- 当前只落 ADR 和文档级联，不实现 website i18n runtime。
+- 当前不实现 `/en/`、`/zh-CN/`、`/ja/`、`/ko/` 路由。
+- 当前不授权 hardening report、repair plan、acceptance package、generated test、CLI output 或 AI IDE handoff material 的产品物料多语言化。
+
+## 2026年6月25日 - Public Website i18n v0.1 Implementation
+
+### 完成内容
+
+- 按 TDD 先更新 `tests/unit/public-website.test.ts`，确认因 `apps/website/src/i18n.ts` 缺失而失败。
+- 新增 `apps/website/src/i18n.ts`，定义 typed locale dictionaries。
+- 保持 English 为默认 locale，新增 Simplified Chinese (`zh-CN`)。
+- 保留 Japanese (`ja`) 和 Korean (`ko`) 为 roadmap-only locales，不写入 runtime copy。
+- 在官网 header 新增 visible language switcher。
+- 根据 active locale 更新 `document.documentElement.lang`、`document.title` 和 meta description。
+- 将 App 文案改为读取 locale dictionaries，保留 artifact tabs、private preview form、mobile navigation 等交互。
+- 扩展 `scripts/verify-website.mjs`，验证 English default、Simplified Chinese switching、desktop/mobile screenshots、artifact tabs、private preview form 和 mobile navigation。
+- 更新 ADR-0018、public website spec、testing strategy 和 acceptance checklist 的实现状态。
+
+### TDD 记录
+
+- Red：`pnpm vitest run tests/unit/public-website.test.ts` 因 `apps/website/src/i18n.ts` 缺失失败。
+- Green：新增 i18n 字典和 App locale 消费后，`public-website.test.ts` 通过。
+
+### 5S 记录
+
+- Scope：范围限定在 `apps/website`，只实现官网 i18n runtime，不扩展产品 artifact 多语言。
+- Sketch：按 ADR-0018 设计 English default、`zh-CN` first、`ja`/`ko` roadmap-only 和 forbidden-claim checks。
+- Scaffold：新增 typed locale dictionaries、language switcher 和 metadata update hook。
+- Ship：将 App 文案迁移到 locale dictionaries，并扩展 `pnpm verify:website` 覆盖中英文交互。
+- Stabilize：执行 unit、structure、typecheck、build、lint、browser verification、repo hygiene、release check 和 goal audit。
+
+### 已验证
+
+- `pnpm vitest run tests/unit/public-website.test.ts`：通过。
+- `pnpm vitest run tests/unit/project-structure.test.ts`：通过。
+- `pnpm --filter @repoassure/website typecheck`：通过。
+- `pnpm --filter @repoassure/website build`：通过。
+- `pnpm verify:website`（提权，本地浏览器验证）：通过，验证 English default、`zh-CN`、localized Trust Ledger preview、桌面/移动截图、artifact tabs、private preview form 和移动菜单。
+- `pnpm lint`：通过。
+- `pnpm typecheck`：通过。
+- `pnpm test:unit`：通过，36 个 test files / 539 个 tests。
+- `pnpm build`：通过。
+- `pnpm repo:hygiene`：通过。
+- `pnpm release:check`：自动 prerequisites 通过，`public release ready: no`，仍需 manual legal/trademark/branch-protection authorization。
+- `pnpm goal:audit`：通过，35/35。
+- `pnpm verify:website`（提权，本地浏览器验证）：通过，验证 English default、`zh-CN`、桌面/移动截图、artifact tabs、private preview form 和移动菜单。
+
+### 边界
+
+- 当前不实现 `/en/`、`/zh-CN/`、`/ja/`、`/ko/` SEO 路由。
+- 当前不实现 Japanese 或 Korean runtime copy。
+- 当前不本地化 hardening report、repair plan、acceptance package、generated test、CLI output 或 AI IDE handoff material。
+
+## 2026年6月25日 - Public Website Code-Native Trust Ledger Preview v0.1
+
+### 完成内容
+
+- 将官网 hero Trust Ledger 从 raster image 替换为 `apps/website/src/TrustLedgerPreview.tsx`。
+- 新增 `trustLedgerPreview` typed locale dictionary，覆盖标题、副标题、侧栏、表头、artifact rows、status、summary、evidence 和 footer。
+- 保持 English default，新增 Simplified Chinese Trust Ledger preview copy；Japanese 和 Korean 仍为 roadmap-only locales。
+- 移除未使用的 Trust Ledger raster asset，避免图片内嵌英文文本绕过 i18n。
+- 扩展 `scripts/verify-website.mjs`，检查 English 和 Simplified Chinese 的 Trust Ledger preview DOM 文案。
+- 级联更新 ADR-0018、public website spec、testing strategy、acceptance checklist 和 design QA 记录。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/public-website.test.ts`，要求存在 `TrustLedgerPreview.tsx`、App 不再引用 `/assets/trust-ledger.png`、preview copy 进入 English / Simplified Chinese dictionaries；测试按预期失败。
+- Green：新增 `TrustLedgerPreview`、扩展 i18n copy、替换 App hero media 后，`public-website.test.ts` 通过。
+
+### 5S 记录
+
+- Scope：范围限定在 public website app、website verification 和相关文档，不扩展产品 artifact 多语言。
+- Sketch：保留 Product Design option 1 的 Trust Ledger 信息架构，改为真实 DOM 和 locale-driven copy。
+- Scaffold：新增 reusable preview component、typed preview copy 和 responsive CSS。
+- Ship：接入 App，更新 browser verification，删除未使用 raster asset。
+- Stabilize：执行 website unit、typecheck、build，并进入完整金字塔测试。
+
+### 已验证
+
+- `pnpm vitest run tests/unit/public-website.test.ts`：通过。
+- `pnpm --filter @repoassure/website typecheck`：通过。
+- `pnpm --filter @repoassure/website build`：通过。
+
+### 边界
+
+- 当前不实现 locale routes 或 deployment changes。
+- 当前不本地化 hardening report、repair plan、acceptance package、generated test、CLI output 或 AI IDE handoff material。
+
+## 2026年6月25日 - Public Website Enterprise Design System ADR
+
+### 完成内容
+
+- 按 Product Design audit 路线评估当前 Public Website：当前实现功能可用、边界正确，但视觉仍偏通用 SaaS / developer-tool landing page，未达到顶尖安全公司级别。
+- 确认当前 repo 没有真正的 `design.md` / design system 文档；`design-qa.md` 只是 QA 记录，ADR-0010 只是品牌定位。
+- 新增 `ADR-0019: Public Website Enterprise Design System`。
+- 新增 `docs/design/design-system-v0.1.md`，定义 security-grade、evidence-first、local-first、enterprise-calm 的设计原则。
+- 级联更新 ADR index、README、architecture overview、public website spec、testing strategy、acceptance checklist 和 decision log。
+
+### TDD 记录
+
+- Red：先在 `tests/unit/project-structure.test.ts` 新增 enterprise design system 级联测试，因 `docs/adr/0019-public-website-enterprise-design-system.md` 缺失按预期失败。
+- Green：新增 ADR-0019、design system 文档和级联写入后，目标结构测试通过。
+
+### 边界
+
+- 当前只落设计系统与决策，不修改 `apps/website` UI。
+- Public Website v0.2 redesign 需要单独 goal，并基于 `docs/design/design-system-v0.1.md` 执行 Product Design audit、视觉方案、实现和浏览器 QA。
+- 当前不授权 customer logos、analyst badges、SaaS availability、Team Cloud availability、Enterprise availability、public release claims 或产品 artifact 多语言化。
+
+## 2026年6月25日 - Public Website v0.2 Enterprise Redesign
+
+### 完成内容
+
+- 采用 Product Design 方向 2：Assurance Graph。
+- 新增 `apps/website/src/AssuranceGraph.tsx`，用 code-native DOM 和 icon-library icons 呈现 Docs、Code、Tests、ADRs、Repair Plan、Patch Plan 和 Acceptance 的保障图谱。
+- 将官网首屏改为 dark enterprise security surface：左侧 local-first narrative，右侧 Assurance Graph + Trust Ledger dual panel，底部 assurance pipeline。
+- 更新 English / Simplified Chinese copy：English default heading 为 `Assure every AI-generated repo before it ships`，中文为 `在交付前保障每个 AI 生成仓库`。
+- 修正默认 locale 行为：不再根据 `navigator.languages` 自动切换；只有用户手动选择并写入 localStorage 后才使用非默认 locale。
+- 更新 `scripts/verify-website.mjs`，使用选定 source concept，并验证 v0.2 headline、Assurance Graph、Trust Ledger、assurance pipeline、artifact tabs、private preview form 和 mobile navigation。
+- 更新 `design-qa.md`，记录 source visual、implementation screenshots、comparison evidence 和 `final result: passed`。
+- 级联更新 public website spec、design system、testing strategy 和 acceptance checklist。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/public-website.test.ts`，要求 `AssuranceGraph.tsx`、v0.2 copy、dark enterprise token、selected source concept 和 Assurance Graph verification；测试因组件/文案缺失按预期失败。
+- Green：新增 Assurance Graph component、扩展 i18n、重构 hero 和更新 verification script 后，`public-website.test.ts` 通过。
+
+### 5S 记录
+
+- Scope：只改 public website、website verification、design QA 和相关文档，不触碰 CLI/MCP 核心。
+- Sketch：按 Product Design direction 2 对齐 dark navy、Assurance Graph、Trust Ledger 和 assurance pipeline。
+- Scaffold：新增 component 和 locale copy，先让测试契约通过。
+- Ship：重构 hero CSS 和 responsive layout，保持 language switcher、mobile nav、artifact tabs 和 private preview form 可用。
+- Stabilize：执行 unit、typecheck、build、browser verification 和截图 QA；白底 section 低对比问题在 QA 中修复。
+
+### 已验证
+
+- `pnpm vitest run tests/unit/public-website.test.ts`：通过。
+- `pnpm vitest run tests/unit/project-structure.test.ts`：通过。
+- `pnpm --filter @repoassure/website typecheck`：通过。
+- `pnpm --filter @repoassure/website build`：通过。
+- `pnpm verify:website`（提权，本地浏览器验证）：通过，生成 desktop、zh-CN desktop、mobile、mobile menu 和 comparison screenshots。
+- `pnpm lint`：通过。
+- `pnpm typecheck`：通过。
+- `pnpm test:unit`：通过，36 个 test files / 540 个 tests。
+- `pnpm build`：通过。
+- `pnpm repo:hygiene`：通过。
+- `pnpm release:check`：自动 public-release prerequisites 通过，`public release ready: no`，仍需 manual legal/trademark/branch-protection authorization。
+- `pnpm goal:audit`：通过，35/35。
+
+### 边界
+
+- 当前不新增 customer logos、analyst badges、SaaS availability、Team Cloud availability、Enterprise availability 或 public release claims。
+- 当前不实现 product artifact localization。
+- 当前不实现 internal Project Intelligence Console graph runtime。
+
+## 2026年6月25日 - Public Website UI/UX Gate Fix
+
+### 完成内容
+
+- 根据 `design-qa.md` 的 UI/UX QA 结论修复两个 P2：焦点态不足、设计 token 未完全语义化。
+- 在 `apps/website/src/styles.css` 建立 website semantic token layer，分为 brand tokens、semantic tokens 和 component tokens。
+- 为官网主结构增加显式 `theme-dark` / `theme-light`，使深色 hero/header/footer 和白色内容区不依赖隐式 cascade 判断背景与文本语义。
+- 增加统一 `:focus-visible` 规则，覆盖 `a`、`button`、`select`、`input` 和 `[role="tab"]`。
+- 扩展 `scripts/verify-website.mjs`，新增 `desktop-focus-dark.png` 和 `desktop-focus-light.png` 浏览器截图证据。
+- 级联更新 design system、public website spec、testing strategy、acceptance checklist 和 `design-qa.md`。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/public-website.test.ts`，要求 CSS 存在 brand / semantic / component token groups、`theme-dark` / `theme-light`、`--focus-ring`、`--focus-ring-on-dark` 和关键交互元素的 `:focus-visible` 覆盖；更新 `tests/unit/project-structure.test.ts`，要求 UI/UX gate 级联写入文档。targeted tests 因缺少 token/focus/doc 级联按预期失败。
+- Green：实现 semantic token layer、focus-visible gate、显式 theme classes 和文档级联后，targeted website tests 通过。
+
+### 5S 记录
+
+- Scope：范围限定在 public website UI/UX gate、browser verification 和相关文档，不扩展新页面、不改 CLI/MCP 核心。
+- Sketch：将 QA 的两个 P2 映射为可测试契约：semantic token layer 和 focus-visible gate。
+- Scaffold：先补 unit / structure tests，再补 CSS token、theme classes 和 verify script 截图证据。
+- Ship：在保持现有视觉方向的前提下修复焦点态和 token 分层。
+- Stabilize：执行 targeted tests 后进入完整金字塔验证。
+
+### 已验证
+
+- `pnpm vitest run tests/unit/public-website.test.ts`：通过。
+
+### 边界
+
+- 当前不声明公开发布完成；public release 仍受 legal、trademark、branch protection / ruleset 和 maintainer publication authorization 约束。
+- 当前不授权 SaaS、Team Cloud、Enterprise、hosted dashboard、customer logos、analyst badges 或 product artifact localization。
+- P3 移动端信息密度和图谱线条精修仍可在后续视觉 polish goal 中处理。

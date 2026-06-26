@@ -169,6 +169,17 @@ Merged on 2026-06-26:
 
 The website release candidate is now part of `main`, but public release and deployment remain separate manual gates.
 
+## Private Preview Deployment Planning
+
+Planned on 2026-06-26:
+
+- Source decision: [ADR-0020: Public Website Private Preview Deployment Boundary](../adr/0020-public-website-private-preview-deployment.md)
+- Deployment status: planning only.
+- Do not deploy from this planning goal.
+- Private preview, production deployment, and public launch are separate gates.
+- A future deployment execution goal must choose hosting target, access control, secret handling, rollback, smoke verification, screenshot evidence, and post-deployment boundaries.
+- This handoff still does not authorize website deployment, public repo visibility, npm publication, GitHub release creation, external announcement, SaaS availability, Team Cloud availability, Enterprise availability, hosted dashboard claims, or product artifact localization.
+
 ## Remaining P3 Backlog
 
 These are non-blocking polish items:

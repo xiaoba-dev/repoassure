@@ -80,3 +80,5 @@
   - 当前状态：`apps/website/src/styles.css` 已建立 website semantic token layer，包含 brand / semantic / component token groups、显式 `theme-dark` / `theme-light`、深色和白色表面焦点态 token；`public-website.test.ts` 覆盖 token 和 `:focus-visible` 门禁，`pnpm verify:website` 生成 `desktop-focus-dark.png` 和 `desktop-focus-light.png`。该项只完成官网 UI/UX 质量门禁，不授权公开发布、SaaS、Team Cloud、Enterprise 或产品 artifact 多语言化。
 - [x] Public Website Release Candidate Closure
   - 当前状态：`docs/operations/public-website-release-candidate-handoff-v0.1.md` 已汇总官网变更范围、截图证据、验证门禁、剩余 P3 和非授权边界；该 closure 只代表 public website 进入本地 reviewable release candidate 状态，不授权部署官网、公开 repo、npm publish、GitHub release、SaaS、Team Cloud、Enterprise 或产品 artifact 多语言化。
+- [x] Public Website Private Preview Deployment Planning
+  - 当前状态：ADR-0020 已定义 private preview deployment、production deployment 和 public launch 三个独立 gate；当前只完成部署规划，不执行真实部署。后续 deployment execution 必须作为单独 goal 记录 hosting target、access control、secret handling、rollback、smoke verification、screenshot evidence 和 post-deployment boundaries。

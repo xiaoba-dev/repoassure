@@ -25,6 +25,7 @@ ADR records long-lived architecture decisions. Use `docs/logs/decision-log.md` f
 | [0017](0017-public-website-and-project-intelligence-console.md) | Accepted | Public website and internal project intelligence console |
 | [0018](0018-public-website-localization-strategy.md) | Accepted | Public website localization strategy |
 | [0019](0019-public-website-enterprise-design-system.md) | Accepted | Public website enterprise design system |
+| [0020](0020-public-website-private-preview-deployment.md) | Accepted | Public website private preview deployment boundary |
 
 ## Template
 

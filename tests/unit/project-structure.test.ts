@@ -873,6 +873,51 @@ describe('project structure', () => {
     await expectPath('docs/design/design-system-v0.1.md');
   });
 
+  it('records the public website private preview deployment boundary before execution', async () => {
+    const [
+      adrIndex,
+      deploymentAdr,
+      publicWebsiteSpec,
+      handoff,
+      readme,
+      architecture,
+      acceptanceChecklist,
+      testingStrategy,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/adr/README.md', 'utf8'),
+      readFile('docs/adr/0020-public-website-private-preview-deployment.md', 'utf8'),
+      readFile('docs/product/specs/public-website-spec-v0.1.md', 'utf8'),
+      readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(adrIndex).toContain('[0020](0020-public-website-private-preview-deployment.md)');
+    expect(adrIndex).toContain('Public website private preview deployment boundary');
+    expect(deploymentAdr).toContain('Private preview deployment is a separate execution gate');
+    expect(deploymentAdr).toContain('does not authorize production deployment');
+    expect(deploymentAdr).toContain('does not authorize public launch');
+    expect(deploymentAdr).toContain('deployment execution requires a separate Codex goal');
+    expect(publicWebsiteSpec).toContain('ADR-0020');
+    expect(publicWebsiteSpec).toContain('Private preview deployment planning');
+    expect(handoff).toContain('Private Preview Deployment Planning');
+    expect(handoff).toContain('Do not deploy from this planning goal');
+    expect(readme).toContain('ADR-0020');
+    expect(architecture).toContain('ADR-0020');
+    expect(acceptanceChecklist).toContain('Public Website Private Preview Deployment Planning');
+    expect(testingStrategy).toContain('Public Website Private Preview Deployment Planning');
+    expect(decisionLog).toContain('Public website private preview deployment boundary');
+    expect(devLog).toContain('Public Website Private Preview Deployment Planning v0.1');
+
+    await expectPath('docs/adr/0020-public-website-private-preview-deployment.md');
+  });
+
   it('extracts acceptance command ownership into a workspace package while preserving compatibility outputs', async () => {
     const [rootPackageJson, acceptancePackageJson, acceptanceCompatibility, acceptanceReadme, monorepoSpec] = await Promise.all([
       readFile('package.json', 'utf8'),

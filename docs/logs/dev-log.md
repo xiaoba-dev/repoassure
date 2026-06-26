@@ -1,5 +1,20 @@
 # 开发日志
 
+## 2026年6月26日 - Public Website Private Preview Deployment Planning v0.1
+
+### 完成内容
+
+- 新增 `ADR-0020: Public Website Private Preview Deployment Boundary`。
+- 明确 private preview deployment、production deployment 和 public launch 是三个独立 gate。
+- 级联更新 public website spec、release candidate handoff、README、architecture overview、acceptance checklist、testing strategy、decision log 和本 dev log。
+- 用 TDD 扩展 `tests/unit/project-structure.test.ts`，先验证 ADR-0020 缺失导致 Red，再补齐文档进入 Green。
+
+### 边界
+
+- 本 goal 只做部署规划，不执行真实部署。
+- 后续 deployment execution requires a separate Codex goal。
+- 不公开 repo、不发布 npm package、不创建 GitHub release、不发布公开公告、不声明 SaaS/Team Cloud/Enterprise/hosted dashboard availability。
+
 ## 2026年6月26日 - Public Website PR #2 Merge Closure v0.1
 
 ### 完成内容

@@ -2,7 +2,7 @@
 
 Status: Implemented
 Date: 2026-06-25
-Source ADRs: [ADR-0017](../../adr/0017-public-website-and-project-intelligence-console.md), [ADR-0018](../../adr/0018-public-website-localization-strategy.md), [ADR-0019](../../adr/0019-public-website-enterprise-design-system.md)
+Source ADRs: [ADR-0017](../../adr/0017-public-website-and-project-intelligence-console.md), [ADR-0018](../../adr/0018-public-website-localization-strategy.md), [ADR-0019](../../adr/0019-public-website-enterprise-design-system.md), [ADR-0020](../../adr/0020-public-website-private-preview-deployment.md)
 
 ## TL;DR
 
@@ -75,6 +75,16 @@ Public Website v0.2 redesign is implemented against Product Design direction 2, 
 | QA report | `design-qa.md` |
 
 The private-preview form is frontend state only. It does not write to a database, send email, call an API, or create a waitlist backend.
+
+## Private Preview Deployment Planning
+
+ADR-0020 defines the website deployment boundary.
+
+- Private preview deployment planning is complete before deployment execution.
+- Private preview deployment, production deployment, and public launch are separate gates.
+- This spec does not authorize website deployment by itself.
+- A future deployment execution goal must record hosting target, access control, secret handling, rollback, smoke verification, screenshot evidence, and post-deployment boundaries.
+- Public launch still requires explicit maintainer authorization and public-release gates.
 
 ## Responsive Design Requirements
 

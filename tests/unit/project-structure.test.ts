@@ -1046,6 +1046,52 @@ describe('project structure', () => {
     await expectPath('docs/operations/local-static-preview-package-v0.1.md');
   });
 
+  it('defines Cloudflare Access remote preview preflight before upload or deployment', async () => {
+    const [
+      packageJson,
+      preflightScript,
+      preflightDoc,
+      publicWebsiteHandoff,
+      acceptanceChecklist,
+      testingStrategy,
+      devLog
+    ] = await Promise.all([
+      readFile('package.json', 'utf8'),
+      readFile('scripts/preflight-cloudflare-preview.mjs', 'utf8'),
+      readFile('docs/operations/cloudflare-access-preview-preflight-v0.1.md', 'utf8'),
+      readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(packageJson).toContain('"preflight:cloudflare-preview": "node scripts/preflight-cloudflare-preview.mjs"');
+    expect(preflightScript).toContain('Cloudflare Access Remote Preview Preflight v0.1');
+    expect(preflightScript).toContain('REPOASSURE_CLOUDFLARE_ACCOUNT_ID');
+    expect(preflightScript).toContain('REPOASSURE_CLOUDFLARE_PAGES_PROJECT');
+    expect(preflightScript).toContain('REPOASSURE_CLOUDFLARE_ACCESS_POLICY');
+    expect(preflightScript).toContain('REPOASSURE_REMOTE_PREVIEW_DATA_EXPORT_AUTHORIZED');
+    expect(preflightScript).toContain('artifacts/public-website-preview/cloudflare-access-preflight');
+    expect(preflightScript).toContain('preflight-report.json');
+    expect(preflightScript).toContain('No website source or build output is uploaded by this preflight');
+    expect(preflightScript).not.toContain('wrangler pages deploy');
+    expect(preflightScript).not.toContain('fetch(');
+    expect(preflightScript).not.toContain('vercel deploy');
+    expect(preflightDoc).toContain('Cloudflare Access Remote Preview Preflight v0.1');
+    expect(preflightDoc).toContain('pnpm preflight:cloudflare-preview');
+    expect(preflightDoc).toContain('No website source or build output is uploaded by this preflight');
+    expect(preflightDoc).toContain('Cloudflare Pages preview deployments are public by default');
+    expect(preflightDoc).toContain('Cloudflare Access policy must be enabled before any preview URL is shared');
+    expect(preflightDoc).toContain('does not authorize public launch');
+    expect(publicWebsiteHandoff).toContain('Cloudflare Access Remote Preview Preflight');
+    expect(acceptanceChecklist).toContain('Cloudflare Access Remote Preview Preflight');
+    expect(testingStrategy).toContain('Cloudflare Access Remote Preview Preflight');
+    expect(devLog).toContain('Cloudflare Access Remote Preview Preflight v0.1');
+
+    await expectPath('scripts/preflight-cloudflare-preview.mjs');
+    await expectPath('docs/operations/cloudflare-access-preview-preflight-v0.1.md');
+  });
+
   it('extracts acceptance command ownership into a workspace package while preserving compatibility outputs', async () => {
     const [rootPackageJson, acceptancePackageJson, acceptanceCompatibility, acceptanceReadme, monorepoSpec] = await Promise.all([
       readFile('package.json', 'utf8'),

@@ -1,5 +1,23 @@
 # 开发日志
 
+## 2026年6月27日 - Cloudflare Access Remote Preview Preflight v0.1
+
+### 完成内容
+
+- Red：扩展 `tests/unit/project-structure.test.ts`，要求 Cloudflare Access remote preview preflight root script、preflight script、operations handoff、public website handoff、acceptance checklist、testing strategy 和 dev log 完成级联；测试因 `scripts/preflight-cloudflare-preview.mjs` 缺失按预期失败。
+- 新增 `pnpm preflight:cloudflare-preview`。
+- 新增 `scripts/preflight-cloudflare-preview.mjs`，生成本地 `artifacts/public-website-preview/cloudflare-access-preflight/preflight-report.json` 和 `review-guide.md`。
+- 预检检查 `REPOASSURE_CLOUDFLARE_ACCOUNT_ID`、`REPOASSURE_CLOUDFLARE_PAGES_PROJECT`、`REPOASSURE_CLOUDFLARE_ACCESS_POLICY` 和 `REPOASSURE_REMOTE_PREVIEW_DATA_EXPORT_AUTHORIZED` 是否具备，但不打印敏感值。
+- 新增 `docs/operations/cloudflare-access-preview-preflight-v0.1.md`，并级联更新 public website handoff、acceptance checklist 和 testing strategy。
+
+### 边界
+
+- No website source or build output is uploaded by this preflight。
+- 不调用 Cloudflare API，不创建 preview URL，不创建或修改 Cloudflare Pages project。
+- Cloudflare Pages preview deployments are public by default；Cloudflare Access policy must be enabled before any preview URL is shared。
+- 不恢复 Vercel Git integration。
+- 不授权 public launch、production deployment、public custom domain、repo public、npm publication、GitHub release、外部公告、SaaS/Team Cloud/Enterprise/hosted dashboard availability claims。
+
 ## 2026年6月27日 - Local Static Preview Package v0.1
 
 ### 完成内容

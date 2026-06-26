@@ -237,6 +237,18 @@ Implemented on 2026-06-27:
 
 This local package is the current review surface until a separate remote private preview execution goal is authorized and access control is verified.
 
+## Cloudflare Access Remote Preview Preflight
+
+Implemented on 2026-06-27:
+
+- Handoff: [Cloudflare Access Remote Preview Preflight v0.1](cloudflare-access-preview-preflight-v0.1.md)
+- Command: `pnpm preflight:cloudflare-preview`
+- Output: `artifacts/public-website-preview/cloudflare-access-preflight`
+- Required inputs: Cloudflare account ID, Pages project, Cloudflare Access policy, and explicit remote preview data-export authorization.
+- Boundary: No website source or build output is uploaded by this preflight, no hosting provider is mutated, no preview URL is created, and no production deployment or public launch is authorized.
+
+Cloudflare Pages preview deployments are public by default. Cloudflare Access policy must be enabled before any preview URL is shared.
+
 ## Remaining P3 Backlog
 
 These are non-blocking polish items:

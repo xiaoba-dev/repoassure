@@ -130,7 +130,8 @@ Created on 2026-06-26:
 - Repository visibility at PR creation: `PRIVATE`
 - Base branch: `main`
 - Head branch: `codex/public-website-v0.1`
-- Head commit: `0c8a6618a12a87080c51a1f9771ac4e092850415`
+- Initial review commit: `0c8a6618a12a87080c51a1f9771ac4e092850415`
+- Latest head commit: verify with `gh pr view 2 --json headRefOid` before merge because documentation-only follow-up commits may update the branch.
 - PR state: `OPEN`
 - PR review mode: `Draft`
 - CI: `RepoAssure CI / Quality Gates` passed

@@ -11,6 +11,7 @@
 - PR body 引用 public website handoff、design QA、验证命令、截图证据和非授权边界。
 - 轮询 PR checks，`RepoAssure CI / Quality Gates` 已 passed。
 - 更新 `docs/operations/public-website-release-candidate-handoff-v0.1.md`，记录 PR URL、Draft 状态、CI 状态和仍未授权事项。
+- 补充文档状态记录提交 `02a0297 docs: record public website draft PR review` 并推送到 PR 分支；最新 head commit 以 `gh pr view 2 --json headRefOid` 为准。
 
 ### TDD 记录
 
@@ -22,7 +23,7 @@
 - `gh repo view --json nameWithOwner,visibility,url,defaultBranchRef`：确认仓库为 `PRIVATE`。
 - `git push -u origin codex/public-website-v0.1`：通过。
 - `gh pr create --draft --base main --head codex/public-website-v0.1 --title "[codex] Add public website release candidate"`：通过，创建 PR #2。
-- `gh pr view 2 --json number,title,state,isDraft,url,baseRefName,headRefName,headRefOid,mergeStateStatus,statusCheckRollup,reviewDecision`：确认 PR #2 为 `OPEN` + Draft，head commit 为 `0c8a6618a12a87080c51a1f9771ac4e092850415`。
+- `gh pr view 2 --json number,title,state,isDraft,url,baseRefName,headRefName,headRefOid,mergeStateStatus,statusCheckRollup,reviewDecision`：确认 PR #2 为 `OPEN` + Draft；最新 head commit 需以 PR metadata 为准。
 - `gh pr checks 2 --watch --interval 10`：`RepoAssure CI / Quality Gates` passed。
 
 ### 边界

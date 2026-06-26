@@ -1,5 +1,24 @@
 # 开发日志
 
+## 2026年6月27日 - Local Static Preview Package v0.1
+
+### 完成内容
+
+- Red：扩展 `tests/unit/project-structure.test.ts`，要求本地静态官网预览包脚本、root script、`.gitignore`、handoff、acceptance checklist、testing strategy 和 dev log 完成级联；测试因 `scripts/package-website-preview.mjs` 缺失按预期失败。
+- 新增 `pnpm package:website-preview`。
+- 新增 `scripts/package-website-preview.mjs`，从 `apps/website/dist` 复制本地 static preview package 到 `artifacts/public-website-preview/local-static-preview`。
+- 输出 `dist/`、`manifest.json`、`forbidden-claims.json` 和 `review-guide.md`。
+- `.gitignore` 新增 `artifacts/public-website-preview/`，避免提交本地构建预览产物。
+- 新增 `docs/operations/local-static-preview-package-v0.1.md`，并级联更新 public website handoff、acceptance checklist 和 testing strategy。
+
+### 边界
+
+- No remote hosting provider is used。
+- 不创建 preview URL。
+- 不上传 website source/build output 到 Cloudflare、Vercel 或其他 provider。
+- 不恢复 Vercel Git integration。
+- 不授权 public launch、production deployment、public custom domain、repo public、npm publication、GitHub release、外部公告、SaaS/Team Cloud/Enterprise/hosted dashboard availability claims。
+
 ## 2026年6月27日 - Private Preview Hosting Fallback Decision v0.1
 
 ### 完成内容

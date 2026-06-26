@@ -225,6 +225,18 @@ Decided on 2026-06-27:
 
 The next execution goal should either produce a local static review package or deploy to an access-controlled remote preview host with smoke/content/screenshot/forbidden-claim/access-control/rollback evidence.
 
+## Local Static Preview Package
+
+Implemented on 2026-06-27:
+
+- Handoff: [Local Static Preview Package v0.1](local-static-preview-package-v0.1.md)
+- Commands: `pnpm build:website` and `pnpm package:website-preview`
+- Output: `artifacts/public-website-preview/local-static-preview`
+- Contents: static `dist/`, `manifest.json`, `forbidden-claims.json`, and `review-guide.md`.
+- Boundary: No remote hosting provider is used, no preview URL is created, no production deployment is authorized, and this package does not authorize public launch.
+
+This local package is the current review surface until a separate remote private preview execution goal is authorized and access control is verified.
+
 ## Remaining P3 Backlog
 
 These are non-blocking polish items:

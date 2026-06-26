@@ -169,6 +169,8 @@ pnpm typecheck
 pnpm lint
 pnpm build
 pnpm goal:audit
+pnpm build:website
+pnpm package:website-preview
 ```
 
 私有 GitHub repo 的 CI 基线见 `docs/architecture/specs/private-github-engineering-baseline-v0.1.md`：PR 和 `main` push 必须运行 `pnpm repo:hygiene`、unit、typecheck、lint、build 和 `pnpm goal:audit`。`pnpm repo:hygiene` 只检查已追踪文件，阻止 generated artifacts、build outputs、local hardening runs、env files、private keys 和 local logs 进入提交。当前环境中，监听本地端口的 boot 集成测试和真实浏览器 E2E 需要额外权限。详见 `docs/logs/blockers.md`。
@@ -176,6 +178,8 @@ pnpm goal:audit
 v0.3 新增本地优先 GitHub Action wrapper：`.github/actions/repoassure/action.yml`。该 action 在 CI checkout 内安装依赖、构建本地 CLI，并执行 `node dist/adapters/cli/index.js run <repo>`；它不依赖 hosted RepoAssure 服务，也不会默认上传目标 repo source、logs、screenshots、traces、env values 或 private artifacts。安全示例见 `examples/github-actions/repoassure-local-first.yml`，其中 artifact upload 需要显式 opt-in。
 
 分支保护与发布边界见 `docs/operations/branch-protection-release-boundary-v0.1.md`。当前目标状态是 `main` 要求 `RepoAssure CI` / `Quality Gates`，但 GitHub 对当前 private repo plan 返回 403；仓库仍必须保持 private，不能发布 package、移除 `package.json` `"private": true`、公开仓库或通过公开仓库绕过该限制。仓库级 Apache-2.0 `LICENSE` 只是 public-release readiness material，不是公开发布授权。Release candidate 本地打包与审查交接见 `docs/operations/release-candidate-handoff-v0.1.md`；Public Website release candidate 审查交接见 `docs/operations/public-website-release-candidate-handoff-v0.1.md`。ADR-0020 进一步规定官网 private preview deployment、production deployment 和 public launch 是三个独立 gate；ADR-0021 规定 Vercel fallback 决策，当前远程私密预览应先解决 Vercel target mismatch 或改用 Cloudflare Pages preview deployments with Cloudflare Access / 等效访问受控静态托管。上述交接和 ADR 不授权 push、PR、GitHub release、npm publish、部署官网或仓库公开。
+
+Public Website local static preview package 可通过 `pnpm build:website && pnpm package:website-preview` 生成，交接见 `docs/operations/local-static-preview-package-v0.1.md`。输出位于 `artifacts/public-website-preview/local-static-preview`，只用于本地 review，不授权 remote hosting、preview URL、production deployment 或 public launch。
 
 可使用单一验收入口生成 `docs/acceptance/acceptance-run.md`：
 

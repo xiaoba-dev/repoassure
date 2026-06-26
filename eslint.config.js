@@ -30,6 +30,6 @@ export default tseslint.config(
     }
   },
   {
-    ignores: ['dist/**', 'packages/*/dist/**', 'apps/*/dist/**', '**/*.d.ts', 'coverage/**', 'node_modules/**', '.hardening/**', 'artifacts/benchmark-runs/**', 'artifacts/test-results/**', 'benchmark-runs/**', 'test-results/**']
+    ignores: ['dist/**', 'packages/*/dist/**', 'apps/*/dist/**', '**/*.d.ts', 'coverage/**', 'node_modules/**', '.hardening/**', 'artifacts/benchmark-runs/**', 'artifacts/public-website-preview/**', 'artifacts/test-results/**', 'benchmark-runs/**', 'test-results/**']
   }
 );

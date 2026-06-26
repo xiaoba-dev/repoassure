@@ -8,6 +8,7 @@ coverage/
 artifacts/acceptance/
 artifacts/benchmark-runs/
 artifacts/orphaned-runs/
+artifacts/public-website-preview/
 artifacts/test-results/
 benchmark-runs/
 test-results/

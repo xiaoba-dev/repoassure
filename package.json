@@ -39,6 +39,7 @@
     "dev:website": "pnpm --filter @repoassure/website dev",
     "preview:website": "pnpm --filter @repoassure/website preview",
     "verify:website": "node scripts/verify-website.mjs",
+    "package:website-preview": "node scripts/package-website-preview.mjs",
     "app:cli": "node apps/cli/index.js",
     "app:mcp": "node apps/mcp-server/index.js",
     "benchmark": "node scripts/run-benchmark.mjs",

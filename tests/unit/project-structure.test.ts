@@ -1008,6 +1008,44 @@ describe('project structure', () => {
     await expectPath('docs/adr/0021-private-preview-hosting-fallback.md');
   });
 
+  it('defines a local static public website preview package without remote hosting', async () => {
+    const [packageJson, packageScript, gitignore, previewHandoff, publicWebsiteHandoff, acceptanceChecklist, testingStrategy, devLog] =
+      await Promise.all([
+        readFile('package.json', 'utf8'),
+        readFile('scripts/package-website-preview.mjs', 'utf8'),
+        readFile('.gitignore', 'utf8'),
+        readFile('docs/operations/local-static-preview-package-v0.1.md', 'utf8'),
+        readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+        readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+        readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+        readFile('docs/logs/dev-log.md', 'utf8')
+      ]);
+
+    expect(packageJson).toContain('"package:website-preview": "node scripts/package-website-preview.mjs"');
+    expect(packageScript).toContain("apps/website/dist");
+    expect(packageScript).toContain("artifacts/public-website-preview/local-static-preview");
+    expect(packageScript).toContain("forbidden-claims.json");
+    expect(packageScript).toContain("manifest.json");
+    expect(packageScript).toContain("review-guide.md");
+    expect(packageScript).toContain("This package is a local static preview only");
+    expect(packageScript).not.toContain('vercel deploy');
+    expect(packageScript).not.toContain('cloudflare');
+    expect(gitignore).toContain('artifacts/public-website-preview/');
+    expect(previewHandoff).toContain('Local Static Preview Package v0.1');
+    expect(previewHandoff).toContain('pnpm build:website');
+    expect(previewHandoff).toContain('pnpm package:website-preview');
+    expect(previewHandoff).toContain('artifacts/public-website-preview/local-static-preview');
+    expect(previewHandoff).toContain('No remote hosting provider is used');
+    expect(previewHandoff).toContain('does not authorize public launch');
+    expect(publicWebsiteHandoff).toContain('Local Static Preview Package');
+    expect(acceptanceChecklist).toContain('Local Static Preview Package');
+    expect(testingStrategy).toContain('Local Static Preview Package');
+    expect(devLog).toContain('Local Static Preview Package v0.1');
+
+    await expectPath('scripts/package-website-preview.mjs');
+    await expectPath('docs/operations/local-static-preview-package-v0.1.md');
+  });
+
   it('extracts acceptance command ownership into a workspace package while preserving compatibility outputs', async () => {
     const [rootPackageJson, acceptancePackageJson, acceptanceCompatibility, acceptanceReadme, monorepoSpec] = await Promise.all([
       readFile('package.json', 'utf8'),

@@ -471,9 +471,14 @@ describe('project structure', () => {
     expect(handoff).toContain('Screenshot Evidence');
     expect(handoff).toContain('Final Verification Gates');
     expect(handoff).toContain('Private Draft PR Status');
+    expect(handoff).toContain('PR Review Closure Status');
     expect(handoff).toContain('https://github.com/xiaoba-dev/repoassure/pull/2');
     expect(handoff).toContain('RepoAssure CI / Quality Gates');
     expect(handoff).toContain('passed');
+    expect(handoff).toContain('Ready for Review');
+    expect(handoff).toContain('No GitHub PR comments');
+    expect(handoff).toContain('No GitHub PR reviews');
+    expect(handoff).toContain('Do not merge without explicit merge authorization');
     expect(handoff).toContain('Remaining P3 Backlog');
     expect(handoff).toContain('Non-Authorization Boundary');
     expect(handoff).toContain('desktop-focus-dark.png');
@@ -486,6 +491,7 @@ describe('project structure', () => {
     expect(acceptanceChecklist).toContain('Public Website Release Candidate Closure');
     expect(devLog).toContain('Public Website Release Candidate Closure v0.1');
     expect(devLog).toContain('Public Website Private PR Review v0.1');
+    expect(devLog).toContain('Public Website PR #2 Review Closure v0.1');
 
     await expectPath('docs/operations/public-website-release-candidate-handoff-v0.1.md');
   });

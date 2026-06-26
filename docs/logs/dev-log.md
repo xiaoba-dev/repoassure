@@ -1,5 +1,21 @@
 # 开发日志
 
+## 2026年6月26日 - Public Website PR #2 Review Closure v0.1
+
+### 完成内容
+
+- 审计 PR #2：状态为 `OPEN`，base 为 `main`，head 为 `codex/public-website-v0.1`，repo visibility 为 `PRIVATE`。
+- 确认 `RepoAssure CI / Quality Gates` 已 passed，merge state 为 `CLEAN`。
+- 确认 No GitHub PR comments，No GitHub PR reviews。
+- 用 TDD 扩展 `tests/unit/project-structure.test.ts`，要求 handoff 和 dev log 记录 review closure、Ready for Review、无 comments/reviews 和不 merge 边界。
+- 更新 `docs/operations/public-website-release-candidate-handoff-v0.1.md`，记录 `PR Review Closure Status`。
+- 将 PR #2 转为 Ready for Review。
+
+### 边界
+
+- Do not merge without explicit merge authorization.
+- 本 goal 不部署官网、不公开 repo、不发布 npm package、不创建 GitHub release、不发布公开公告。
+
 ## 2026年6月26日 - Public Website Private PR Review v0.1
 
 ### 完成内容

@@ -249,6 +249,19 @@ Implemented on 2026-06-27:
 
 Cloudflare Pages preview deployments are public by default. Cloudflare Access policy must be enabled before any preview URL is shared.
 
+## Cloudflare Pages + Access Private Preview Execution Blocked
+
+Attempted on 2026-06-27:
+
+- User authorization: explicit authorization was provided to create/use Cloudflare Pages, upload RepoAssure website build output, and protect reviewer access with Cloudflare Access.
+- Pages project: `repoassure-preview`.
+- Pages domain: `repoassure-preview.pages.dev`.
+- Result: an empty Pages project was created, but Access configuration failed before deployment because the Access API returned `Authentication error`.
+- Safety check: `wrangler pages deployment list --project-name repoassure-preview` returned no deployments.
+- Current status: No deployment exists for `repoassure-preview`; no website source or build output was uploaded; no accepted preview URL is active.
+
+Before any deploy, configure Cloudflare Access for `repoassure-preview.pages.dev` and verify unauthenticated requests are blocked.
+
 ## Remaining P3 Backlog
 
 These are non-blocking polish items:

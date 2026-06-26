@@ -1092,6 +1092,33 @@ describe('project structure', () => {
     await expectPath('docs/operations/cloudflare-access-preview-preflight-v0.1.md');
   });
 
+  it('records Cloudflare remote preview execution as blocked before website upload when Access is unavailable', async () => {
+    const [blockers, devLog, publicWebsiteHandoff, acceptanceChecklist, testingStrategy] = await Promise.all([
+      readFile('docs/logs/blockers.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8')
+    ]);
+
+    expect(blockers).toContain('Cloudflare Pages + Access private preview execution is blocked before website upload');
+    expect(blockers).toContain('repoassure-preview');
+    expect(blockers).toContain('repoassure-preview.pages.dev');
+    expect(blockers).toContain('accounts/.../access/apps');
+    expect(blockers).toContain('Authentication error');
+    expect(blockers).toContain('No website source or build output was uploaded');
+    expect(blockers).toContain('wrangler pages deployment list --project-name repoassure-preview');
+    expect(devLog).toContain('Cloudflare Pages + Access Private Preview Execution v0.1 Blocked');
+    expect(devLog).toContain('Successfully created the `repoassure-preview` Pages project');
+    expect(devLog).toContain('Access API returned `Authentication error`');
+    expect(devLog).toContain('No website source or build output was uploaded');
+    expect(publicWebsiteHandoff).toContain('Cloudflare Pages + Access Private Preview Execution Blocked');
+    expect(publicWebsiteHandoff).toContain('repoassure-preview.pages.dev');
+    expect(publicWebsiteHandoff).toContain('No deployment exists for `repoassure-preview`');
+    expect(acceptanceChecklist).toContain('Cloudflare Pages + Access Private Preview Execution Blocked');
+    expect(testingStrategy).toContain('Cloudflare Pages + Access Private Preview Execution Blocked');
+  });
+
   it('extracts acceptance command ownership into a workspace package while preserving compatibility outputs', async () => {
     const [rootPackageJson, acceptancePackageJson, acceptanceCompatibility, acceptanceReadme, monorepoSpec] = await Promise.all([
       readFile('package.json', 'utf8'),

@@ -1,5 +1,27 @@
 # 开发日志
 
+## 2026年6月27日 - Cloudflare Pages + Access Private Preview Execution v0.1 Blocked
+
+### 完成内容
+
+- 用户明确授权创建 Cloudflare Pages private preview、上传 RepoAssure 官网构建产物，并使用 Cloudflare Access 保护 reviewer 访问。
+- 确认 `wrangler whoami --json` 登录态可用，账号为 `Web3coderman`。
+- 确认 `wrangler pages project list` 中此前没有 `repoassure-preview`。
+- Successfully created the `repoassure-preview` Pages project，目标域名为 `repoassure-preview.pages.dev`。
+- 按 ADR-0021 安全顺序，在上传 website build output 前尝试配置 Access。
+- `accounts/.../access/apps` Access API returned `Authentication error`，判断当前 token 缺少 Zero Trust Access application / policy 管理权限或需要 dashboard 配置。
+- `wrangler pages deployment list --project-name repoassure-preview` 返回空列表；No website source or build output was uploaded。
+- 已将 blocker 写入 `docs/logs/blockers.md`，并级联更新 public website handoff、acceptance checklist 和 testing strategy。
+
+### 边界
+
+- 已创建空 Cloudflare Pages project，但没有 deployment。
+- 没有执行 `wrangler pages deploy`。
+- 没有上传 website source/build output。
+- 没有 accepted preview URL。
+- 继续前必须先配置并验证 Cloudflare Access policy。
+- 不授权 public launch、production deployment、public custom domain、repo public、npm publication、GitHub release、外部公告、SaaS/Team Cloud/Enterprise/hosted dashboard availability claims。
+
 ## 2026年6月27日 - Cloudflare Access Remote Preview Preflight v0.1
 
 ### 完成内容

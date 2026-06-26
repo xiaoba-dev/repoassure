@@ -1,5 +1,45 @@
 # 阻塞日志
 
+## 2026年6月27日 - Cloudflare Pages + Access private preview execution is blocked before website upload
+
+### 背景
+
+用户已明确授权创建 Cloudflare Pages private preview、上传 RepoAssure 官网构建产物，并使用 Cloudflare Access 保护 reviewer 访问。当前 Cloudflare Wrangler 已登录，账号为 `Web3coderman`，邮箱为 `web3coderman@gmail.com`。
+
+### 影响
+
+Cloudflare Pages preview deployments are public by default。为了避免在 Access policy 生效前暴露官网构建物，本轮遵循安全顺序：先创建空 Pages project，再配置 Access，最后才上传 build output。当前 Access API 权限不足，因此执行被阻塞在上传前。
+
+### 已尝试方案
+
+1. `wrangler whoami --json`：确认登录态可用，账号为 `Web3coderman`。
+2. `wrangler pages project list`：确认此前不存在 `repoassure-preview`。
+3. `wrangler pages project create repoassure-preview --production-branch preview`：Successfully created the `repoassure-preview` Pages project；域名为 `repoassure-preview.pages.dev`，但尚无 deployment。
+4. `curl -sS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" https://api.cloudflare.com/client/v4/user/tokens/verify`：确认 API token active。
+5. `curl -sS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" https://api.cloudflare.com/client/v4/accounts/<account-id>/access/apps`：返回 `Authentication error`。测试合同记录为 `accounts/.../access/apps`，避免泄露 account id。
+6. `wrangler pages deployment list --project-name repoassure-preview`：返回空列表，确认 No website source or build output was uploaded。
+
+### 当前判断
+
+Pages project 创建权限可用，但当前 Cloudflare API token 缺少 Zero Trust Access application / policy 管理权限，或 Access API 需要在 Cloudflare dashboard 中补充权限配置。由于 Access 未配置，不能执行 `wrangler pages deploy apps/website/dist --project-name repoassure-preview --branch preview`，也不能分享任何 preview URL。
+
+### 需要的用户决策或外部条件
+
+需要满足以下任一条件后再继续：
+
+- 在 Cloudflare dashboard 手工为 `repoassure-preview.pages.dev` 创建 Self-hosted Access application，并配置 allow policy 给 reviewer 邮箱。
+- 或更新当前 API token 权限，使其可管理 Cloudflare Zero Trust Access applications and policies，然后重新执行自动配置。
+
+继续前必须先验证：
+
+- Access policy blocks unauthenticated requests。
+- Invited reviewer can authenticate。
+- No deployment exists for `repoassure-preview` until Access is configured。
+
+### 临时绕过方案
+
+保留空的 `repoassure-preview` Pages project 作为后续受控预览目标；继续使用本地静态预览包作为 review surface。不得上传 website source/build output，不得伪造 preview URL，不得 public launch 或 production deployment。
+
 ## 2026年6月26日 - Public website private preview deployment is blocked by Vercel preview target mismatch
 
 ### 背景

@@ -180,6 +180,21 @@ Planned on 2026-06-26:
 - A future deployment execution goal must choose hosting target, access control, secret handling, rollback, smoke verification, screenshot evidence, and post-deployment boundaries.
 - This handoff still does not authorize website deployment, public repo visibility, npm publication, GitHub release creation, external announcement, SaaS availability, Team Cloud availability, Enterprise availability, hosted dashboard claims, or product artifact localization.
 
+## Private Preview Deployment Execution Attempt
+
+Attempted on 2026-06-26:
+
+- User authorization: explicit Vercel data-export approval was provided for uploading RepoAssure website code and build output to Vercel for private preview deployment.
+- Hosting target: Vercel project `repoassure` under the authenticated `web3coderman-dev` account.
+- Deployment configuration: `vercel.json` now points to `pnpm build:website`, `pnpm install --frozen-lockfile`, and `apps/website/dist`.
+- Upload boundary: `.vercelignore` excludes `node_modules`, local build output, local artifacts, `.git`, env files, and key material.
+- Result: Vercel repeatedly returned `target production` for CLI deployment attempts, including explicit preview-target commands and a temporary non-main branch deployment.
+- Cleanup: all unintended production aliases and deployments were removed.
+- Verification: `vercel ls repoassure` returned `No deployments found`.
+- Current status: No accepted preview URL is active.
+
+This execution attempt does not satisfy the private preview deployment gate because it did not produce a `Ready`, access-controlled, non-production preview URL with smoke/content/screenshot/forbidden-claim verification evidence.
+
 ## Remaining P3 Backlog
 
 These are non-blocking polish items:

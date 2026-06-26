@@ -83,7 +83,8 @@ ADR-0020 defines the website deployment boundary.
 - Private preview deployment planning is complete before deployment execution.
 - Private preview deployment, production deployment, and public launch are separate gates.
 - This spec does not authorize website deployment by itself.
-- A future deployment execution goal must record hosting target, access control, secret handling, rollback, smoke verification, screenshot evidence, and post-deployment boundaries.
+- The 2026-06-26 Vercel deployment execution attempt is blocked: the project returned `target production` or an unverifiable `UNKNOWN` preview, all unintended production deployments and aliases were removed, and no accepted active preview URL exists.
+- A future deployment execution retry must record hosting target, access control, secret handling, rollback, smoke verification, screenshot evidence, and post-deployment boundaries.
 - Public launch still requires explicit maintainer authorization and public-release gates.
 
 ## Responsive Design Requirements

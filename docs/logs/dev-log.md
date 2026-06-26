@@ -10,20 +10,26 @@
 - 尝试 Vercel MCP deployment tool：被拒绝，原因是缺少对 Vercel 这一第三方目的地和 private repository website code/build output 上传风险的明确确认。
 - 补充 `vercel.json` 部署前置配置，明确 private preview execution 的 build command、install command 和 website output directory。
 - 已将 blocker 写入 `docs/logs/blockers.md`。
+- 用户随后明确授权将 RepoAssure 官网代码和构建产物上传到 Vercel，用于 private preview deployment；Vercel data-export 授权已满足。
+- 完成 `vercel login`，`vercel whoami` 返回 `web3coderman-dev`。
+- 运行 `vercel link --yes --project repoassure`，链接到 `web3coderman-devs-projects/repoassure`；本地 `.vercel/` 已写入 `.gitignore`，不提交项目 ID。
+- 首次真实部署因上传文件数超过限制失败；新增 `.vercelignore`，排除 `node_modules`、构建输出、本地 artifacts、`.git`、env 和 key 文件。
+- 多次尝试 `vercel --yes`、`vercel --target preview`、`vercel deploy --target=preview` 和临时分支部署后，Vercel 仍返回 production target 或不可验证的 UNKNOWN preview。
+- unintended production deployments and aliases were removed；清理后 `vercel ls repoassure` 返回 `No deployments found`。
 
 ### 边界
 
-- 未执行真实部署。
-- 未生成 preview URL。
-- 未上传构建产物到 Vercel。
-- 后续继续前需要用户明确授权 Vercel data export，并具备有效 Vercel 认证。
+- 已执行真实 Vercel 上传尝试，但没有 accepted private preview deployment。
+- 没有 active preview URL 可以交付。
+- 没有保留 production deployment 或 public production alias。
+- 后续继续前需要解决 Vercel project / CLI target mismatch，并完成 smoke/content/screenshot/forbidden-claim verification。
 
 ### 认证更新
 
 - 用户授权执行 Vercel 登录。
 - `vercel login` OAuth device flow 已完成。
 - `vercel whoami` 返回 `web3coderman-dev`。
-- 当前仍未执行部署，因为还缺少对“将 RepoAssure 官网代码和构建产物上传到 Vercel”的明确 data-export 授权。
+- 用户已补充对“将 RepoAssure 官网代码和构建产物上传到 Vercel”的明确 data-export 授权。
 
 ## 2026年6月26日 - Public Website Private Preview Deployment Planning v0.1
 

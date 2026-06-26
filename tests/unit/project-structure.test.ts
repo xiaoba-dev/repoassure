@@ -919,21 +919,32 @@ describe('project structure', () => {
   });
 
   it('records public website private preview deployment preflight while external deployment is blocked', async () => {
-    const [vercelConfig, blockers, devLog] = await Promise.all([
+    const [vercelConfig, vercelIgnore, blockers, devLog, handoff] = await Promise.all([
       readFile('vercel.json', 'utf8'),
+      readFile('.vercelignore', 'utf8'),
       readFile('docs/logs/blockers.md', 'utf8'),
-      readFile('docs/logs/dev-log.md', 'utf8')
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8')
     ]);
 
     expect(vercelConfig).toContain('"buildCommand": "pnpm build:website"');
     expect(vercelConfig).toContain('"outputDirectory": "apps/website/dist"');
     expect(vercelConfig).toContain('"installCommand": "pnpm install --frozen-lockfile"');
-    expect(blockers).toContain('Public website private preview deployment requires explicit Vercel data-export approval');
+    expect(vercelIgnore).toContain('node_modules');
+    expect(vercelIgnore).toContain('artifacts');
+    expect(vercelIgnore).toContain('.git');
     expect(blockers).toContain('RepoAssure 官网代码和构建产物上传到 Vercel');
+    expect(blockers).toContain('Public website private preview deployment is blocked by Vercel preview target mismatch');
+    expect(blockers).toContain('target production');
+    expect(blockers).toContain('No deployments found');
     expect(blockers).toContain('不得伪造 preview URL');
     expect(devLog).toContain('Public Website Private Preview Deployment Execution v0.1 Blocked');
-    expect(devLog).toContain('后续继续前需要用户明确授权 Vercel data export');
+    expect(devLog).toContain('Vercel data-export 授权已满足');
+    expect(devLog).toContain('unintended production deployments and aliases were removed');
+    expect(handoff).toContain('Private Preview Deployment Execution Attempt');
+    expect(handoff).toContain('No accepted preview URL is active');
 
+    await expectPath('.vercelignore');
     await expectPath('vercel.json');
   });
 

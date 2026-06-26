@@ -1,5 +1,45 @@
 # 阻塞日志
 
+## 2026年6月26日 - Public website private preview deployment is blocked by Vercel preview target mismatch
+
+### 背景
+
+用户已明确授权将 RepoAssure 官网代码和构建产物上传到 Vercel，用于 private preview deployment。本地 Vercel CLI 已登录，当前账户为 `web3coderman-dev`。`main` 仍保持 private repo 状态，且本地 `pnpm build:website` 通过。
+
+### 影响
+
+当前 Vercel 项目会把多次 CLI 部署尝试提升为 `target production` 并绑定公开 production alias。这不满足 ADR-0020 对 private preview deployment、production deployment 和 public launch 三个 gate 的隔离要求，因此不能把这些 URL 作为 accepted private preview 交付。
+
+### 已尝试方案
+
+1. 新增 `vercel.json`，指定 `pnpm build:website`、`pnpm install --frozen-lockfile` 和 `apps/website/dist`。
+2. `vercel link --yes --project repoassure`：创建并链接 `web3coderman-devs-projects/repoassure`，本地 `.vercel/` 已加入 `.gitignore`，不提交项目 ID。
+3. 首次 `vercel --yes`：因上传文件数超过限制失败；随后新增 `.vercelignore`，排除 `node_modules`、构建输出、本地 artifacts、`.git` 和敏感 env/key 文件。
+4. 重试 `vercel --yes`：部署成功但 Vercel 返回 `target production`，并绑定 `repoassure.vercel.app` 等 alias；已移除 aliases 和 deployment。
+5. 尝试 `vercel --yes --target preview --skip-domain`：返回 `target preview`，但状态为 `UNKNOWN`，无法完成 logs、smoke、screenshot 或内容验证；已移除该 deployment。
+6. 尝试 `vercel --yes --target preview --force --logs`：仍返回 `target production`；已移除 aliases 和 deployment。
+7. 尝试 `vercel deploy --yes --target=preview --force --logs`：仍返回 `target production`；已移除 aliases 和 deployment。
+8. 在临时分支 `codex/vercel-preview-deployment` 尝试 `vercel deploy --yes --force --logs`：仍返回 `target production`；已移除 aliases 和 deployment。
+9. 清理后运行 `vercel ls repoassure`，结果为 `No deployments found`。
+
+### 当前判断
+
+Vercel data-export 授权和 CLI 认证已满足，当前 blocker 已从“缺少授权”转为“链接后的 Vercel 项目/CLI deployment target 不满足 private preview 边界”。在没有一个 `Ready`、访问受控、非 production alias 的 preview deployment 前，不得伪造 preview URL，不得把 production URL 当成 private preview，不得继续 public launch 或 production gate。
+
+### 需要的用户决策或外部条件
+
+需要在 Vercel dashboard 或项目配置中确认为什么 CLI deployment 被自动提升为 production，或选择一个可证明生成 private preview URL 的替代托管路径。继续前需要满足以下条件：
+
+- 部署目标 inspect 必须显示 `target preview` 或等效访问受控目标。
+- 部署状态必须为 `Ready`。
+- 不得绑定 public production alias。
+- 能完成 smoke/content/screenshot/forbidden-claim verification。
+- 验证完成前不得将该部署视为 accepted private preview。
+
+### 临时绕过方案
+
+保留 `vercel.json` 和 `.vercelignore` 作为部署前置配置；继续本地 build、文档、测试和部署配置审计。不得伪造 preview URL，也不得用其他第三方托管绕过 access-control、verification 和 post-deployment boundary 要求。
+
 ## 2026年6月26日 - Public website private preview deployment requires explicit Vercel data-export approval
 
 ### 背景

@@ -472,9 +472,13 @@ describe('project structure', () => {
     expect(handoff).toContain('Final Verification Gates');
     expect(handoff).toContain('Private Draft PR Status');
     expect(handoff).toContain('PR Review Closure Status');
+    expect(handoff).toContain('PR Merge Closure Status');
     expect(handoff).toContain('https://github.com/xiaoba-dev/repoassure/pull/2');
     expect(handoff).toContain('RepoAssure CI / Quality Gates');
     expect(handoff).toContain('passed');
+    expect(handoff).toContain('PR state: `MERGED`');
+    expect(handoff).toContain('Merge commit: `b2de16afb42e3afcaa586c8f6edda43c8b64c442`');
+    expect(handoff).toContain('Main branch verification');
     expect(handoff).toContain('Ready for Review');
     expect(handoff).toContain('No GitHub PR comments');
     expect(handoff).toContain('No GitHub PR reviews');
@@ -492,6 +496,7 @@ describe('project structure', () => {
     expect(devLog).toContain('Public Website Release Candidate Closure v0.1');
     expect(devLog).toContain('Public Website Private PR Review v0.1');
     expect(devLog).toContain('Public Website PR #2 Review Closure v0.1');
+    expect(devLog).toContain('Public Website PR #2 Merge Closure v0.1');
 
     await expectPath('docs/operations/public-website-release-candidate-handoff-v0.1.md');
   });

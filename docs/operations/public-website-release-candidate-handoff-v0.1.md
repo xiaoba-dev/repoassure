@@ -154,6 +154,21 @@ Closed on 2026-06-26:
 
 This closure means the private review package is ready for maintainer review. It does not mean the website is released, deployed, or merged.
 
+## PR Merge Closure Status
+
+Merged on 2026-06-26:
+
+- Merge closure goal: `Public Website PR #2 Merge Closure v0.1`
+- PR: [#2 `[codex] Add public website release candidate`](https://github.com/xiaoba-dev/repoassure/pull/2)
+- PR state: `MERGED`
+- Merge commit: `b2de16afb42e3afcaa586c8f6edda43c8b64c442`
+- Main branch verification: local `main` fast-forwarded to `origin/main` and contains the public website workspace, tests, design QA, ADRs, specs, and handoff documentation.
+- PR CI before merge: `RepoAssure CI / Quality Gates` passed.
+- Merge method: squash merge.
+- Release boundary: this merge does not deploy the website, publish npm packages, create a GitHub release, make the repository public, or announce public availability.
+
+The website release candidate is now part of `main`, but public release and deployment remain separate manual gates.
+
 ## Remaining P3 Backlog
 
 These are non-blocking polish items:

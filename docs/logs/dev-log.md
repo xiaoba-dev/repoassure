@@ -1,5 +1,21 @@
 # 开发日志
 
+## 2026年6月26日 - Public Website PR #2 Merge Closure v0.1
+
+### 完成内容
+
+- 复查 PR #2：`OPEN`、非 Draft、`RepoAssure CI / Quality Gates` passed、merge state `CLEAN`、No GitHub PR comments、No GitHub PR reviews。
+- 确认远端仓库 `xiaoba-dev/repoassure` visibility 仍为 `PRIVATE`。
+- 使用 squash merge 将 PR #2 合并进 `main`。
+- 记录 merge commit：`b2de16afb42e3afcaa586c8f6edda43c8b64c442`。
+- 同步本地 `main`，确认主线已包含 `apps/website`、public website tests、design QA、ADR、spec 和 handoff 文档。
+- 用 TDD 扩展 `tests/unit/project-structure.test.ts`，要求 handoff 和 dev log 记录 merge closure、PR `MERGED`、merge commit 和 main branch verification。
+
+### 边界
+
+- 本 goal 只授权 merge，不授权官网部署、不公开 repo、不发布 npm package、不创建 GitHub release、不发布公开公告。
+- 后续 deployment 必须作为独立 goal 执行。
+
 ## 2026年6月26日 - Public Website PR #2 Review Closure v0.1
 
 ### 完成内容

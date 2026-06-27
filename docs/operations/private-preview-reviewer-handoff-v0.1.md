@@ -131,6 +131,8 @@ Use [Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness v0.1]
 
 That readiness record originally covered placeholder reviewer emails `reviewer1@example.com` and `reviewer2@example.com`; after Private Preview Real Reviewer Replacement, the active handoff scope is `confirmed-reviewer-1` and `confirmed-reviewer-2`. It keeps status at `waiting_for_reviewer_feedback` and explicitly does not send email, create external issues, invent reviewer feedback, or record OTP, cookie, Access token, login query-state, raw Access redirect URL, reviewer credentials, or unrelated personal data.
 
+Use [Private Preview Reviewer Handoff Package and Dispatch Execution v0.1](private-preview-reviewer-handoff-package-and-dispatch-execution-v0.1.md) for the combined 1+2 package-and-dispatch record. That record marks Stage 1 as generated and Stage 2 as `pending_channel_confirmation`; no outbound message was sent, and reviewer PII is not stored in Git tracked docs.
+
 ## Rollback and Shutdown
 
 If the private preview must be closed:

@@ -52,6 +52,18 @@ That reconciliation now records Private Preview Real Reviewer Replacement as com
 
 Current handoff status remains `waiting_for_reviewer_feedback` because no real reviewer feedback has been received.
 
+## Handoff Package and Dispatch Execution
+
+Use [Private Preview Reviewer Handoff Package and Dispatch Execution v0.1](private-preview-reviewer-handoff-package-and-dispatch-execution-v0.1.md) for the current 1+2 workflow.
+
+That execution record confirms:
+
+- Stage 1: Handoff package generated.
+- Stage 2: Dispatch execution pending channel confirmation.
+- Status: `pending_channel_confirmation`.
+- No outbound message was sent.
+- Reviewer PII is not stored in Git tracked docs.
+
 ## Handoff Message Template
 
 Use this template when the maintainer decides to send the private preview handoff manually:

@@ -1,5 +1,31 @@
 # 开发日志
 
+## 2026年6月27日 - Private Preview Reviewer Handoff Package and Dispatch Execution v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/private-preview-reviewer-handoff-package-and-dispatch-execution-v0.1.md`。
+- Stage 1：生成标准 reviewer handoff package，包含 review URL、review focus、feedback template 和敏感信息边界。
+- Stage 2：dispatch execution 记录为 `pending_channel_confirmation`，因为本轮没有明确发送渠道，也没有可审计 outbound dispatch evidence。
+- 记录 reviewer slots 为 `confirmed-reviewer-1`、`confirmed-reviewer-2`，不在 Git tracked docs 记录 reviewer PII。
+- 明确 No outbound message was sent。
+- 级联更新 reviewer handoff、dispatch readiness、public website release candidate handoff、acceptance checklist 和 testing strategy。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 Private Preview Reviewer Handoff Package and Dispatch Execution 文档和级联记录存在；测试因 `docs/operations/private-preview-reviewer-handoff-package-and-dispatch-execution-v0.1.md` 缺失按预期失败。
+- Green：新增 package-and-dispatch 文档并补齐级联。
+
+### 边界
+
+- 不记录真实 reviewer email 到 Git tracked docs。
+- No outbound message was sent。
+- Do not create external issues from this goal。
+- Do not invent reviewer feedback。
+- No OTP, cookie, Access token, login query-state, raw Access redirect URL or reviewer credential material may be recorded。
+- 不分享 deployment subdomains 或 branch aliases。
+- 不授权 public launch、repo public、npm publication、GitHub release、外部公告、SaaS/Team Cloud/Enterprise/hosted dashboard availability claims。
+
 ## 2026年6月27日 - Private Preview Real Reviewer Replacement v0.1
 
 ### 完成内容

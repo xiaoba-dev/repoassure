@@ -1353,6 +1353,40 @@ describe('project structure', () => {
     await expectPath('docs/operations/private-preview-real-reviewer-replacement-v0.1.md');
   });
 
+  it('records private preview reviewer handoff package and pending dispatch execution without reviewer PII', async () => {
+    const [handoffDispatch, reviewerHandoff, dispatchReadiness, publicWebsiteHandoff, acceptanceChecklist, testingStrategy, devLog] =
+      await Promise.all([
+        readFile('docs/operations/private-preview-reviewer-handoff-package-and-dispatch-execution-v0.1.md', 'utf8'),
+        readFile('docs/operations/private-preview-reviewer-handoff-v0.1.md', 'utf8'),
+        readFile('docs/operations/private-preview-reviewer-handoff-dispatch-readiness-v0.1.md', 'utf8'),
+        readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+        readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+        readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+        readFile('docs/logs/dev-log.md', 'utf8')
+      ]);
+
+    expect(handoffDispatch).toContain('Private Preview Reviewer Handoff Package and Dispatch Execution v0.1');
+    expect(handoffDispatch).toContain('Status: pending_channel_confirmation');
+    expect(handoffDispatch).toContain('Stage 1: Handoff package generated');
+    expect(handoffDispatch).toContain('Stage 2: Dispatch execution pending channel confirmation');
+    expect(handoffDispatch).toContain('confirmed-reviewer-1');
+    expect(handoffDispatch).toContain('confirmed-reviewer-2');
+    expect(handoffDispatch).toContain('https://repoassure-preview.pages.dev');
+    expect(handoffDispatch).toContain('No outbound message was sent');
+    expect(handoffDispatch).toContain('Reviewer PII is not stored in Git tracked docs');
+    expect(handoffDispatch).toContain('Do not record OTP, cookie, Access token, login query-state');
+    expect(handoffDispatch).toContain('Do not create external issues from this goal');
+    expect(handoffDispatch).not.toContain('@gmail.com');
+    expect(reviewerHandoff).toContain('Private Preview Reviewer Handoff Package and Dispatch Execution');
+    expect(dispatchReadiness).toContain('Private Preview Reviewer Handoff Package and Dispatch Execution');
+    expect(publicWebsiteHandoff).toContain('Private Preview Reviewer Handoff Package and Dispatch Execution');
+    expect(acceptanceChecklist).toContain('Private Preview Reviewer Handoff Package and Dispatch Execution');
+    expect(testingStrategy).toContain('Private Preview Reviewer Handoff Package and Dispatch Execution');
+    expect(devLog).toContain('Private Preview Reviewer Handoff Package and Dispatch Execution v0.1');
+
+    await expectPath('docs/operations/private-preview-reviewer-handoff-package-and-dispatch-execution-v0.1.md');
+  });
+
   it('records Cloudflare remote preview execution as blocked before website upload when Access is unavailable', async () => {
     const [blockers, devLog, publicWebsiteHandoff, acceptanceChecklist, testingStrategy] = await Promise.all([
       readFile('docs/logs/blockers.md', 'utf8'),

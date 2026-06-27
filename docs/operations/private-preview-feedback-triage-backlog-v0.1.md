@@ -115,6 +115,8 @@ The reviewer group may be expanded only when:
 - Latest private preview smoke remains acceptable for desktop and mobile.
 - Feedback storage contains no OTP, cookie, Access token, login query-state, raw Access redirect URL, or reviewer credential.
 
+Use [Private Preview Reviewer Expansion Readiness v0.1](private-preview-reviewer-expansion-readiness-v0.1.md) before any second-batch reviewer invitation. That checklist records Access boundary, feedback operations, content/UX, and maintainer decision criteria. It does not add reviewers to Cloudflare Access.
+
 ### Pause Private Preview
 
 Pause private preview sharing when:

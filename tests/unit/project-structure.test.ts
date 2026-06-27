@@ -1187,6 +1187,36 @@ describe('project structure', () => {
     await expectPath('docs/operations/private-preview-feedback-triage-backlog-v0.1.md');
   });
 
+  it('records private preview reviewer expansion readiness without widening access policy', async () => {
+    const [expansionReadiness, triageBacklog, publicWebsiteHandoff, acceptanceChecklist, testingStrategy, devLog] =
+      await Promise.all([
+        readFile('docs/operations/private-preview-reviewer-expansion-readiness-v0.1.md', 'utf8'),
+        readFile('docs/operations/private-preview-feedback-triage-backlog-v0.1.md', 'utf8'),
+        readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+        readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+        readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+        readFile('docs/logs/dev-log.md', 'utf8')
+      ]);
+
+    expect(expansionReadiness).toContain('Private Preview Reviewer Expansion Readiness v0.1');
+    expect(expansionReadiness).toContain('Readiness Checklist');
+    expect(expansionReadiness).toContain('No open P0 findings');
+    expect(expansionReadiness).toContain('No open P1 findings');
+    expect(expansionReadiness).toContain('Access Boundary Checklist');
+    expect(expansionReadiness).toContain('Content and UX Checklist');
+    expect(expansionReadiness).toContain('Feedback Operations Checklist');
+    expect(expansionReadiness).toContain('Expansion Decision');
+    expect(expansionReadiness).toContain('Do not add reviewers to Cloudflare Access');
+    expect(expansionReadiness).toContain('No OTP, cookie, Access token, login query-state');
+    expect(triageBacklog).toContain('Private Preview Reviewer Expansion Readiness');
+    expect(publicWebsiteHandoff).toContain('Private Preview Reviewer Expansion Readiness');
+    expect(acceptanceChecklist).toContain('Private Preview Reviewer Expansion Readiness');
+    expect(testingStrategy).toContain('Private Preview Reviewer Expansion Readiness');
+    expect(devLog).toContain('Private Preview Reviewer Expansion Readiness v0.1');
+
+    await expectPath('docs/operations/private-preview-reviewer-expansion-readiness-v0.1.md');
+  });
+
   it('records Cloudflare remote preview execution as blocked before website upload when Access is unavailable', async () => {
     const [blockers, devLog, publicWebsiteHandoff, acceptanceChecklist, testingStrategy] = await Promise.all([
       readFile('docs/logs/blockers.md', 'utf8'),

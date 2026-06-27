@@ -1,5 +1,29 @@
 # 开发日志
 
+## 2026年6月27日 - Private Preview Reviewer Expansion Readiness v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/private-preview-reviewer-expansion-readiness-v0.1.md`。
+- 定义第二批 reviewer 扩大私测前的 Readiness Checklist。
+- Readiness Checklist 包含 Access Boundary Checklist、Feedback Operations Checklist、Content and UX Checklist 和 Maintainer Decision Checklist。
+- 定义 Expansion Decision：`ready_to_expand`、`hold_for_fixes`、`pause_private_preview`。
+- 明确 ready 后仍需要单独 execution goal，并且必须先获得 allowed reviewer email 授权，才能修改 Cloudflare Access policy。
+- 级联更新 feedback triage/backlog、public website release candidate handoff、acceptance checklist 和 testing strategy。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 expansion readiness 文档和级联记录存在；测试因 `docs/operations/private-preview-reviewer-expansion-readiness-v0.1.md` 缺失按预期失败。
+- Green：新增 expansion readiness 文档并补齐文档级联。
+
+### 边界
+
+- 本轮不新增 reviewer。
+- 不扩大 Cloudflare Access policy。
+- 不发送 reviewer invitation。
+- 不修改 Cloudflare Pages 或 Access 配置。
+- 不授权 public launch、repo public、npm publication、GitHub release、SaaS/Team Cloud/Enterprise/hosted dashboard availability claims。
+
 ## 2026年6月27日 - Private Preview Feedback Triage & Website Polish Backlog v0.1
 
 ### 完成内容

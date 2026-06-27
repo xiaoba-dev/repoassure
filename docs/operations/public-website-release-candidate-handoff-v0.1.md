@@ -250,6 +250,16 @@ Prepared on 2026-06-27:
 - Defines gates to expand private preview, pause private preview, or enter public launch preparation.
 - Does not authorize sending new reviewer invitations, widening Cloudflare Access policy, public launch, repo public, npm publication, GitHub release, or SaaS/Team Cloud/Enterprise/hosted dashboard claims.
 
+## Private Preview Reviewer Expansion Readiness
+
+Prepared on 2026-06-27:
+
+- Readiness checklist: [Private Preview Reviewer Expansion Readiness v0.1](private-preview-reviewer-expansion-readiness-v0.1.md)
+- Defines Access boundary, feedback operations, content/UX, and maintainer decision checklist items for a possible second reviewer batch.
+- Requires no open P0/P1 findings before expansion.
+- Requires `pnpm verify:cloudflare-preview` to keep passing before expansion.
+- Does not authorize adding reviewers, sending invitations, widening Cloudflare Access policy, public launch, repo public, npm publication, GitHub release, or SaaS/Team Cloud/Enterprise/hosted dashboard claims.
+
 ## Private Preview Deployment Execution Attempt
 
 Attempted on 2026-06-26:

@@ -39,6 +39,29 @@ Cloudflare Pages preview deployments are public by default.
 
 Cloudflare Access policy must be enabled before any preview URL is shared. A future remote execution goal must prove that unauthenticated requests are blocked and invited reviewers can authenticate before the URL is used for review.
 
+## Remote Execution Result
+
+Executed on 2026-06-27 after explicit authorization to upload the RepoAssure website build output to Cloudflare Pages:
+
+- Cloudflare Pages project: `repoassure-preview`
+- Protected review URL: `https://repoassure-preview.pages.dev`
+- Cloudflare Access application: `RepoAssure Private Preview`
+- Cloudflare Access policy: `RepoAssure reviewer allow`
+- Allowed reviewer rule: `Emails` includes `web3coderman@gmail.com`
+- Production deployment id: `997feaee-ef39-43c7-ab4d-2c99014df06d`
+- Deployment source commit: `540f212`
+
+Verification:
+
+- `pnpm build:website`: passed.
+- `pnpm verify:website`: passed against local `http://127.0.0.1:5174/`; screenshot evidence written to `/private/tmp/repoassure-website-qa`.
+- `pnpm package:website-preview`: passed; forbidden availability claims failed count `0`.
+- `pnpm preflight:cloudflare-preview`: passed with status `ready_for_manual_remote_execution`.
+- `wrangler pages deploy apps/website/dist --project-name repoassure-preview --branch preview`: passed.
+- `curl -I https://repoassure-preview.pages.dev`: returned `302` to Cloudflare Access login and `www-authenticate: Cloudflare-Access`.
+
+Do not share deployment subdomains such as `https://997feaee.repoassure-preview.pages.dev`, `https://b29e4023.repoassure-preview.pages.dev`, or branch aliases such as `https://main.repoassure-preview.pages.dev`; they returned public `200` responses during verification. The accepted private preview review surface is only `https://repoassure-preview.pages.dev`.
+
 ## Execution Boundary
 
 This preflight does not:

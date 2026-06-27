@@ -167,7 +167,7 @@ Merged on 2026-06-26:
 - Merge method: squash merge.
 - Release boundary: this merge does not deploy the website, publish npm packages, create a GitHub release, make the repository public, or announce public availability.
 
-The website release candidate is now part of `main`, but public release and deployment remain separate manual gates.
+The website release candidate is now part of `main`, but public release remains a separate manual gate.
 
 ## Private Preview Deployment Planning
 
@@ -178,7 +178,26 @@ Planned on 2026-06-26:
 - Do not deploy from this planning goal.
 - Private preview, production deployment, and public launch are separate gates.
 - A future deployment execution goal must choose hosting target, access control, secret handling, rollback, smoke verification, screenshot evidence, and post-deployment boundaries.
-- This handoff still does not authorize website deployment, public repo visibility, npm publication, GitHub release creation, external announcement, SaaS availability, Team Cloud availability, Enterprise availability, hosted dashboard claims, or product artifact localization.
+
+## Private Preview Deployment Status
+
+Executed on 2026-06-27 after explicit authorization:
+
+- Hosting target: Cloudflare Pages project `repoassure-preview`.
+- Access control: Cloudflare Access application `RepoAssure Private Preview`.
+- Access policy: `RepoAssure reviewer allow`.
+- Protected review URL: `https://repoassure-preview.pages.dev`.
+- Production deployment id: `997feaee-ef39-43c7-ab4d-2c99014df06d`.
+- Local browser QA evidence: `/private/tmp/repoassure-website-qa`.
+
+Verification result:
+
+- Local build and browser verification passed before upload.
+- Cloudflare preflight passed with status `ready_for_manual_remote_execution`.
+- `https://repoassure-preview.pages.dev` returned `302` to Cloudflare Access login with `www-authenticate: Cloudflare-Access`.
+- Deployment subdomains and branch aliases returned public `200` responses and must not be shared as private preview URLs.
+
+This remains a private preview only. It does not authorize public launch, production marketing announcement, public repository visibility, npm publication, GitHub release creation, external announcement, SaaS availability claims, Team Cloud claims, Enterprise claims, hosted dashboard availability claims, or product artifact localization.
 
 ## Private Preview Deployment Execution Attempt
 

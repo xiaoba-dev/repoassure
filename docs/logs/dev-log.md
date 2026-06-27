@@ -11330,3 +11330,28 @@ Phase 0：项目初始化。
 - 当前不声明公开发布完成；public release 仍受 legal、trademark、branch protection / ruleset 和 maintainer publication authorization 约束。
 - 当前不授权 SaaS、Team Cloud、Enterprise、hosted dashboard、customer logos、analyst badges 或 product artifact localization。
 - P3 移动端信息密度和图谱线条精修仍可在后续视觉 polish goal 中处理。
+
+## 2026年6月27日 - Cloudflare Access Private Preview Deployment
+
+### 完成内容
+
+- 在 Cloudflare Zero Trust 中创建 Access application：`RepoAssure Private Preview`。
+- 创建并挂载 Access policy：`RepoAssure reviewer allow`，规则为 `Allow` + `Emails` 包含 `web3coderman@gmail.com`。
+- 部署 RepoAssure public website build output 到 Cloudflare Pages project：`repoassure-preview`。
+- 生产环境部署 id：`997feaee-ef39-43c7-ab4d-2c99014df06d`，保护入口为 `https://repoassure-preview.pages.dev`。
+
+### 已验证
+
+- `pnpm build:website`：通过。
+- `pnpm verify:website`（提权，本地浏览器验证）：通过，生成 desktop、zh-CN desktop、mobile、mobile menu、comparison、`desktop-focus-dark.png` 和 `desktop-focus-light.png`。
+- `pnpm package:website-preview`：通过，forbidden availability claims failed count 为 `0`。
+- `pnpm preflight:cloudflare-preview`：通过，状态为 `ready_for_manual_remote_execution`。
+- `wrangler pages deploy apps/website/dist --project-name repoassure-preview --branch preview`：通过。
+- `curl -I https://repoassure-preview.pages.dev`：返回 `302` 到 Cloudflare Access login，并包含 `www-authenticate: Cloudflare-Access`。
+- `wrangler pages deployment list --project-name repoassure-preview`：显示 Production deployment `997feaee-ef39-43c7-ab4d-2c99014df06d`。
+
+### 边界
+
+- 只能分享 `https://repoassure-preview.pages.dev` 作为 private preview 入口。
+- 不得分享 deployment subdomain 或 branch alias，例如 `https://997feaee.repoassure-preview.pages.dev`、`https://b29e4023.repoassure-preview.pages.dev`、`https://main.repoassure-preview.pages.dev`；这些 URL 在验证中返回 public `200`。
+- 本次只完成私有预览部署，不授权 public launch、生产营销发布、仓库公开、npm 发布、GitHub release、SaaS availability、Team Cloud availability、Enterprise availability 或 hosted dashboard availability claims。

@@ -41,6 +41,7 @@
     "verify:website": "node scripts/verify-website.mjs",
     "package:website-preview": "node scripts/package-website-preview.mjs",
     "preflight:cloudflare-preview": "node scripts/preflight-cloudflare-preview.mjs",
+    "verify:cloudflare-preview": "node scripts/verify-cloudflare-access-preview.mjs",
     "app:cli": "node apps/cli/index.js",
     "app:mcp": "node apps/mcp-server/index.js",
     "benchmark": "node scripts/run-benchmark.mjs",

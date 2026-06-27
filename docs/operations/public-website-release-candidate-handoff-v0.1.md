@@ -199,6 +199,20 @@ Verification result:
 
 This remains a private preview only. It does not authorize public launch, production marketing announcement, public repository visibility, npm publication, GitHub release creation, external announcement, SaaS availability claims, Team Cloud claims, Enterprise claims, hosted dashboard availability claims, or product artifact localization.
 
+## Private Preview Reviewer-Side Acceptance
+
+Executed on 2026-06-27:
+
+- Command: `pnpm verify:cloudflare-preview`.
+- Evidence directory: `artifacts/public-website-preview/cloudflare-access-acceptance`.
+- Protected review URL: `https://repoassure-preview.pages.dev`.
+- Automated unauthenticated boundary: passed when the protected URL redirected to Cloudflare Access.
+- Protected-resource metadata: passed when the response included `www-authenticate: Cloudflare-Access`.
+- Authenticated content smoke: `manual_required`; the allowed reviewer must complete the Cloudflare Access email/OTP login flow and visually confirm the RepoAssure website renders.
+- Rollback or shutdown: `manual_required`; disable/delete the Access application or remove the Cloudflare Pages deployment/project if the private preview must be closed.
+
+The accepted private preview URL remains only `https://repoassure-preview.pages.dev`. Deployment subdomains and branch aliases are not accepted review surfaces.
+
 ## Private Preview Deployment Execution Attempt
 
 Attempted on 2026-06-26:

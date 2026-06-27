@@ -62,6 +62,27 @@ Verification:
 
 Do not share deployment subdomains such as `https://997feaee.repoassure-preview.pages.dev`, `https://b29e4023.repoassure-preview.pages.dev`, or branch aliases such as `https://main.repoassure-preview.pages.dev`; they returned public `200` responses during verification. The accepted private preview review surface is only `https://repoassure-preview.pages.dev`.
 
+## Reviewer-Side Acceptance
+
+Run the reviewer-side acceptance verifier after private preview deployment:
+
+```bash
+pnpm verify:cloudflare-preview
+```
+
+Optional negative-boundary check:
+
+```bash
+REPOASSURE_PRIVATE_PREVIEW_PUBLIC_URLS="https://997feaee.repoassure-preview.pages.dev,https://main.repoassure-preview.pages.dev" pnpm verify:cloudflare-preview
+```
+
+The verifier writes local evidence to:
+
+- `artifacts/public-website-preview/cloudflare-access-acceptance/acceptance-report.json`
+- `artifacts/public-website-preview/cloudflare-access-acceptance/review-guide.md`
+
+The automated gate checks the unauthenticated redirect to Cloudflare Access, the `www-authenticate: Cloudflare-Access` protected-resource metadata, and the exclusion of deployment subdomains from the accepted review surface. Authenticated content smoke remains `manual_required` because the reviewer login uses an email/OTP identity flow that must not be bypassed or automated with stored credentials.
+
 ## Execution Boundary
 
 This preflight does not:

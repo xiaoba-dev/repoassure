@@ -11355,3 +11355,32 @@ Phase 0：项目初始化。
 - 只能分享 `https://repoassure-preview.pages.dev` 作为 private preview 入口。
 - 不得分享 deployment subdomain 或 branch alias，例如 `https://997feaee.repoassure-preview.pages.dev`、`https://b29e4023.repoassure-preview.pages.dev`、`https://main.repoassure-preview.pages.dev`；这些 URL 在验证中返回 public `200`。
 - 本次只完成私有预览部署，不授权 public launch、生产营销发布、仓库公开、npm 发布、GitHub release、SaaS availability、Team Cloud availability、Enterprise availability 或 hosted dashboard availability claims。
+
+## 2026年6月27日 - Cloudflare Access Private Preview Reviewer Acceptance v0.1
+
+### 完成内容
+
+- 新增 `pnpm verify:cloudflare-preview` 和 `scripts/verify-cloudflare-access-preview.mjs`。
+- 验证 accepted private preview URL：`https://repoassure-preview.pages.dev`。
+- 生成 reviewer-side acceptance evidence 到 `artifacts/public-website-preview/cloudflare-access-acceptance`。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求根脚本、verification script、preflight handoff、release candidate handoff、acceptance checklist、testing strategy 和 dev log 记录 reviewer-side acceptance；测试因缺少脚本和文档级联按预期失败。
+- Green：新增 verification script、root package script 和文档级联。
+
+### 已验证
+
+- `pnpm verify:cloudflare-preview`：验证未登录访问 `https://repoassure-preview.pages.dev` 会进入 Cloudflare Access，并包含 `www-authenticate: Cloudflare-Access`。
+- `pnpm vitest run tests/unit/project-structure.test.ts --testNamePattern "Cloudflare Access private preview reviewer-side acceptance"`：通过。
+- `pnpm vitest run tests/unit/project-structure.test.ts`：通过，72 个 tests。
+- `pnpm lint`：通过。
+- `pnpm test:unit`：通过，36 个 test files / 548 个 tests。
+- `git diff --check`：通过。
+- GitHub Actions `RepoAssure CI` for commit `c79b15b`：通过。
+
+### 边界
+
+- 登录后内容 smoke 为 `manual_required`：必须由 allowed reviewer 人工完成 Cloudflare Access email/OTP 登录后确认页面内容。
+- rollback/shutdown 为 `manual_required`：如需关闭 private preview，手动禁用/删除 Access application 或删除 Cloudflare Pages deployment/project。
+- 不得将 deployment subdomain 或 branch alias 作为 accepted review surface。

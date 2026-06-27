@@ -1092,6 +1092,38 @@ describe('project structure', () => {
     await expectPath('docs/operations/cloudflare-access-preview-preflight-v0.1.md');
   });
 
+  it('defines Cloudflare Access private preview reviewer-side acceptance verification', async () => {
+    const [packageJson, acceptanceScript, preflightDoc, publicWebsiteHandoff, acceptanceChecklist, testingStrategy, devLog] =
+      await Promise.all([
+        readFile('package.json', 'utf8'),
+        readFile('scripts/verify-cloudflare-access-preview.mjs', 'utf8'),
+        readFile('docs/operations/cloudflare-access-preview-preflight-v0.1.md', 'utf8'),
+        readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+        readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+        readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+        readFile('docs/logs/dev-log.md', 'utf8')
+      ]);
+
+    expect(packageJson).toContain('"verify:cloudflare-preview": "node scripts/verify-cloudflare-access-preview.mjs"');
+    expect(acceptanceScript).toContain('Cloudflare Access Private Preview Reviewer Acceptance v0.1');
+    expect(acceptanceScript).toContain('REPOASSURE_PRIVATE_PREVIEW_URL');
+    expect(acceptanceScript).toContain('www-authenticate');
+    expect(acceptanceScript).toContain('Cloudflare-Access');
+    expect(acceptanceScript).toContain('manual_required');
+    expect(acceptanceScript).toContain('artifacts/public-website-preview/cloudflare-access-acceptance');
+    expect(acceptanceScript).not.toContain('wrangler pages deploy');
+    expect(preflightDoc).toContain('pnpm verify:cloudflare-preview');
+    expect(preflightDoc).toContain('Reviewer-Side Acceptance');
+    expect(preflightDoc).toContain('manual_required');
+    expect(publicWebsiteHandoff).toContain('Private Preview Reviewer-Side Acceptance');
+    expect(publicWebsiteHandoff).toContain('pnpm verify:cloudflare-preview');
+    expect(acceptanceChecklist).toContain('Private Preview Reviewer-Side Acceptance');
+    expect(testingStrategy).toContain('Private Preview Reviewer-Side Acceptance');
+    expect(devLog).toContain('Cloudflare Access Private Preview Reviewer Acceptance v0.1');
+
+    await expectPath('scripts/verify-cloudflare-access-preview.mjs');
+  });
+
   it('records Cloudflare remote preview execution as blocked before website upload when Access is unavailable', async () => {
     const [blockers, devLog, publicWebsiteHandoff, acceptanceChecklist, testingStrategy] = await Promise.all([
       readFile('docs/logs/blockers.md', 'utf8'),

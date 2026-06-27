@@ -260,6 +260,20 @@ Prepared on 2026-06-27:
 - Requires `pnpm verify:cloudflare-preview` to keep passing before expansion.
 - Does not authorize adding reviewers, sending invitations, widening Cloudflare Access policy, public launch, repo public, npm publication, GitHub release, or SaaS/Team Cloud/Enterprise/hosted dashboard claims.
 
+## Private Preview Second Reviewer Access Execution
+
+Executed on 2026-06-27:
+
+- Execution record: [Private Preview Second Reviewer Access Execution v0.1](private-preview-second-reviewer-access-execution-v0.1.md)
+- User authorization: add `reviewer1@example.com` and `reviewer2@example.com` to `RepoAssure reviewer allow`.
+- Execution path: Cloudflare Dashboard UI, because the available Access API token returned `Authentication error`.
+- Confirmed allowed reviewer emails: `web3coderman@gmail.com`, `reviewer1@example.com`, `reviewer2@example.com`.
+- Verification command: `pnpm verify:cloudflare-preview`.
+- Verification status: `manual_required`, which is expected because authenticated reviewer smoke still requires manual email/OTP login.
+- Sensitive boundary: No OTP, cookie, Access token, login query-state, raw Access redirect URL, or reviewer credential material is recorded in Git-tracked documentation.
+
+This execution only expands the private preview reviewer allow list to the explicitly authorized emails. It still does not authorize public launch, repo public, npm publication, GitHub release, SaaS/Team Cloud/Enterprise availability claims, hosted dashboard claims, or sharing deployment subdomains/branch aliases.
+
 ## Private Preview Deployment Execution Attempt
 
 Attempted on 2026-06-26:

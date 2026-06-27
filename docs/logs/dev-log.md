@@ -1,5 +1,28 @@
 # 开发日志
 
+## 2026年6月27日 - Private Preview Second Reviewer Access Execution v0.1
+
+### 完成内容
+
+- 按用户明确授权，将 `reviewer1@example.com` 和 `reviewer2@example.com` 加入 Cloudflare Access policy `RepoAssure reviewer allow`。
+- 先用 Cloudflare CLI / API context 复查可用性；Access API returned `Authentication error`，因此没有通过 token 调用修改 Access 配置。
+- 切换到 Cloudflare Dashboard UI，在 `RepoAssure reviewer allow` policy 的 Include `Emails` rule 中新增两个授权 reviewer。
+- 保存后重新打开 policy edit page，确认 `web3coderman@gmail.com`、`reviewer1@example.com`、`reviewer2@example.com` 三个 email chip 均存在。
+- 复跑 `pnpm verify:cloudflare-preview`，结果为预期 `manual_required`；自动门禁继续覆盖未登录 Cloudflare Access boundary，登录后 smoke 仍需人工 email/OTP。
+- 新增 `docs/operations/private-preview-second-reviewer-access-execution-v0.1.md`，并级联更新 Cloudflare Access preflight handoff、public website release candidate handoff、acceptance checklist 和 testing strategy。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 second reviewer access execution 文档和级联记录存在；测试因 `docs/operations/private-preview-second-reviewer-access-execution-v0.1.md` 缺失按预期失败。
+- Green：新增 execution 文档并补齐级联。
+
+### 边界
+
+- No OTP, cookie, Access token, login query-state, raw Access redirect URL or reviewer credential material was recorded in Git-tracked documentation。
+- 不新增除 `reviewer1@example.com` 和 `reviewer2@example.com` 之外的 reviewer。
+- 不把 deployment subdomain 或 branch alias 作为 accepted review surface。
+- 不授权 public launch、repo public、npm publication、GitHub release、外部公告、SaaS/Team Cloud/Enterprise/hosted dashboard availability claims。
+
 ## 2026年6月27日 - Private Preview Reviewer Expansion Readiness v0.1
 
 ### 完成内容

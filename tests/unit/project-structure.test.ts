@@ -1217,6 +1217,38 @@ describe('project structure', () => {
     await expectPath('docs/operations/private-preview-reviewer-expansion-readiness-v0.1.md');
   });
 
+  it('records private preview second reviewer access execution without widening beyond authorized emails', async () => {
+    const [secondReviewerAccess, preflightDoc, publicWebsiteHandoff, acceptanceChecklist, testingStrategy, devLog] =
+      await Promise.all([
+        readFile('docs/operations/private-preview-second-reviewer-access-execution-v0.1.md', 'utf8'),
+        readFile('docs/operations/cloudflare-access-preview-preflight-v0.1.md', 'utf8'),
+        readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+        readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+        readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+        readFile('docs/logs/dev-log.md', 'utf8')
+      ]);
+
+    expect(secondReviewerAccess).toContain('Private Preview Second Reviewer Access Execution v0.1');
+    expect(secondReviewerAccess).toContain('reviewer1@example.com');
+    expect(secondReviewerAccess).toContain('reviewer2@example.com');
+    expect(secondReviewerAccess).toContain('RepoAssure reviewer allow');
+    expect(secondReviewerAccess).toContain('Cloudflare Dashboard UI');
+    expect(secondReviewerAccess).toContain('Access API returned `Authentication error`');
+    expect(secondReviewerAccess).toContain('pnpm verify:cloudflare-preview');
+    expect(secondReviewerAccess).toContain('manual_required');
+    expect(secondReviewerAccess).toContain('No OTP, cookie, Access token, login query-state');
+    expect(secondReviewerAccess).toContain('does not authorize public launch');
+    expect(preflightDoc).toContain('Private Preview Second Reviewer Access Execution');
+    expect(preflightDoc).toContain('reviewer1@example.com');
+    expect(preflightDoc).toContain('reviewer2@example.com');
+    expect(publicWebsiteHandoff).toContain('Private Preview Second Reviewer Access Execution');
+    expect(acceptanceChecklist).toContain('Private Preview Second Reviewer Access Execution');
+    expect(testingStrategy).toContain('Private Preview Second Reviewer Access Execution');
+    expect(devLog).toContain('Private Preview Second Reviewer Access Execution v0.1');
+
+    await expectPath('docs/operations/private-preview-second-reviewer-access-execution-v0.1.md');
+  });
+
   it('records Cloudflare remote preview execution as blocked before website upload when Access is unavailable', async () => {
     const [blockers, devLog, publicWebsiteHandoff, acceptanceChecklist, testingStrategy] = await Promise.all([
       readFile('docs/logs/blockers.md', 'utf8'),

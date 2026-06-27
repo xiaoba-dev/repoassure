@@ -1,5 +1,28 @@
 # 开发日志
 
+## 2026年6月27日 - Private Preview Reviewer Handoff & Feedback Intake v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/private-preview-reviewer-handoff-v0.1.md`，作为受邀 reviewer 私测交接包。
+- 明确 accepted private preview URL 为 `https://repoassure-preview.pages.dev`，访问对象为 allowed reviewers only。
+- 明确禁止分享 deployment subdomains or branch aliases。
+- 提供 reviewer instructions、allowed review scope、out-of-scope claims、acceptance questions、Feedback Template、Feedback Intake Workflow 和 Rollback and Shutdown。
+- 明确反馈中不得记录 OTP、cookie、Access token、login query-state 或无关个人数据。
+- 级联更新 public website release candidate handoff、acceptance checklist 和 testing strategy。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 reviewer handoff 文档和级联记录存在；测试因 `docs/operations/private-preview-reviewer-handoff-v0.1.md` 缺失按预期失败。
+- Green：新增 reviewer handoff 文档并补齐文档级联。
+
+### 边界
+
+- 本轮不发送外部 reviewer 邀请。
+- 不扩大 Cloudflare Access policy。
+- 不创建 GitHub issue 或外部反馈渠道。
+- 不授权 public launch、production marketing announcement、repo public、npm publication、GitHub release、SaaS/Team Cloud/Enterprise/hosted dashboard availability claims。
+
 ## 2026年6月27日 - Cloudflare Access Private Preview Authenticated Reviewer Acceptance Closure v0.1
 
 ### 完成内容

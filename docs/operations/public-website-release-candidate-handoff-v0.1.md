@@ -229,6 +229,17 @@ Closed on 2026-06-27:
 
 The private preview review surface is accepted for invited reviewer inspection at `https://repoassure-preview.pages.dev`. This still does not authorize public launch, production marketing announcement, public repository visibility, npm publication, GitHub release creation, SaaS availability claims, Team Cloud availability claims, Enterprise availability claims, hosted dashboard availability claims, or sharing any deployment subdomain/branch alias as the review URL.
 
+## Private Preview Reviewer Handoff & Feedback Intake
+
+Prepared on 2026-06-27:
+
+- Handoff: [Private Preview Reviewer Handoff & Feedback Intake v0.1](private-preview-reviewer-handoff-v0.1.md)
+- Accepted review URL: `https://repoassure-preview.pages.dev`.
+- Audience: allowed reviewers only.
+- The handoff includes reviewer instructions, allowed scope, out-of-scope claims, acceptance questions, feedback template, feedback intake workflow, and rollback/shutdown steps.
+- Feedback must not include OTP, cookie, Access token, login query-state, or unrelated personal data.
+- The handoff does not authorize public launch, production marketing announcement, repo public, npm publication, GitHub release, SaaS, Team Cloud, Enterprise, hosted dashboard claims, or sharing deployment subdomains/branch aliases.
+
 ## Private Preview Deployment Execution Attempt
 
 Attempted on 2026-06-26:

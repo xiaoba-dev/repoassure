@@ -1131,6 +1131,32 @@ describe('project structure', () => {
     await expectPath('scripts/verify-cloudflare-access-preview.mjs');
   });
 
+  it('records the private preview reviewer handoff and feedback intake package', async () => {
+    const [reviewerHandoff, publicWebsiteHandoff, acceptanceChecklist, testingStrategy, devLog] = await Promise.all([
+      readFile('docs/operations/private-preview-reviewer-handoff-v0.1.md', 'utf8'),
+      readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(reviewerHandoff).toContain('Private Preview Reviewer Handoff & Feedback Intake v0.1');
+    expect(reviewerHandoff).toContain('https://repoassure-preview.pages.dev');
+    expect(reviewerHandoff).toContain('allowed reviewers only');
+    expect(reviewerHandoff).toContain('Do not share deployment subdomains or branch aliases');
+    expect(reviewerHandoff).toContain('Feedback Template');
+    expect(reviewerHandoff).toContain('Acceptance Questions');
+    expect(reviewerHandoff).toContain('Rollback and Shutdown');
+    expect(reviewerHandoff).toContain('Feedback Intake Workflow');
+    expect(reviewerHandoff).toContain('No OTP, cookie, Access token, or login query-state');
+    expect(publicWebsiteHandoff).toContain('Private Preview Reviewer Handoff & Feedback Intake');
+    expect(acceptanceChecklist).toContain('Private Preview Reviewer Handoff & Feedback Intake');
+    expect(testingStrategy).toContain('Private Preview Reviewer Handoff & Feedback Intake');
+    expect(devLog).toContain('Private Preview Reviewer Handoff & Feedback Intake v0.1');
+
+    await expectPath('docs/operations/private-preview-reviewer-handoff-v0.1.md');
+  });
+
   it('records Cloudflare remote preview execution as blocked before website upload when Access is unavailable', async () => {
     const [blockers, devLog, publicWebsiteHandoff, acceptanceChecklist, testingStrategy] = await Promise.all([
       readFile('docs/logs/blockers.md', 'utf8'),

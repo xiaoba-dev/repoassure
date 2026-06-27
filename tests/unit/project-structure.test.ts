@@ -1157,6 +1157,36 @@ describe('project structure', () => {
     await expectPath('docs/operations/private-preview-reviewer-handoff-v0.1.md');
   });
 
+  it('records private preview feedback triage and website polish backlog gates', async () => {
+    const [triageBacklog, reviewerHandoff, publicWebsiteHandoff, acceptanceChecklist, testingStrategy, devLog] =
+      await Promise.all([
+        readFile('docs/operations/private-preview-feedback-triage-backlog-v0.1.md', 'utf8'),
+        readFile('docs/operations/private-preview-reviewer-handoff-v0.1.md', 'utf8'),
+        readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+        readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+        readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+        readFile('docs/logs/dev-log.md', 'utf8')
+      ]);
+
+    expect(triageBacklog).toContain('Private Preview Feedback Triage & Website Polish Backlog v0.1');
+    expect(triageBacklog).toContain('P0: Stop private preview sharing');
+    expect(triageBacklog).toContain('P1: Fix before expanding reviewer group');
+    expect(triageBacklog).toContain('P2: Fix before public launch preparation');
+    expect(triageBacklog).toContain('P3: Polish backlog');
+    expect(triageBacklog).toContain('Expand Private Preview');
+    expect(triageBacklog).toContain('Pause Private Preview');
+    expect(triageBacklog).toContain('Enter Public Launch Preparation');
+    expect(triageBacklog).toContain('Backlog Item Template');
+    expect(triageBacklog).toContain('Do not store OTP, cookie, Access token, login query-state');
+    expect(reviewerHandoff).toContain('Triage and Backlog');
+    expect(publicWebsiteHandoff).toContain('Private Preview Feedback Triage & Website Polish Backlog');
+    expect(acceptanceChecklist).toContain('Private Preview Feedback Triage & Website Polish Backlog');
+    expect(testingStrategy).toContain('Private Preview Feedback Triage & Website Polish Backlog');
+    expect(devLog).toContain('Private Preview Feedback Triage & Website Polish Backlog v0.1');
+
+    await expectPath('docs/operations/private-preview-feedback-triage-backlog-v0.1.md');
+  });
+
   it('records Cloudflare remote preview execution as blocked before website upload when Access is unavailable', async () => {
     const [blockers, devLog, publicWebsiteHandoff, acceptanceChecklist, testingStrategy] = await Promise.all([
       readFile('docs/logs/blockers.md', 'utf8'),

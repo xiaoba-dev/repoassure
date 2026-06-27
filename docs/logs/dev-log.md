@@ -1,5 +1,29 @@
 # 开发日志
 
+## 2026年6月27日 - Private Preview Feedback Triage & Website Polish Backlog v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/private-preview-feedback-triage-backlog-v0.1.md`。
+- 定义 reviewer feedback 的 P0/P1/P2/P3 severity rules。
+- 定义 Backlog Item Template 和 Triage Workflow。
+- 定义 Expand Private Preview、Pause Private Preview、Enter Public Launch Preparation 三个决策门槛。
+- 定义 Website Polish Backlog Policy，覆盖 homepage clarity、security-grade visual polish、mobile density、Assurance Graph、Trust Ledger、localization、accessibility、claim-boundary wording 和 private preview form clarity。
+- 明确 backlog item 不得存储 OTP、cookie、Access token、login query-state、raw Cloudflare Access redirect URL、reviewer credentials 或无关个人数据。
+- 级联更新 reviewer handoff、public website release candidate handoff、acceptance checklist 和 testing strategy。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 triage/backlog 文档和级联记录存在；测试因 `docs/operations/private-preview-feedback-triage-backlog-v0.1.md` 缺失按预期失败。
+- Green：新增 triage/backlog 文档并补齐文档级联。
+
+### 边界
+
+- 本轮不发送外部 reviewer 邀请。
+- 不扩大 Cloudflare Access policy。
+- 不创建外部 issue 或反馈渠道。
+- 不授权 public launch、repo public、npm publication、GitHub release、SaaS/Team Cloud/Enterprise/hosted dashboard availability claims。
+
 ## 2026年6月27日 - Private Preview Reviewer Handoff & Feedback Intake v0.1
 
 ### 完成内容

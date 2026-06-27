@@ -121,6 +121,10 @@ Severity guidance:
 5. Convert P2/P3 findings into the website polish backlog unless they affect launch claims or trust boundary accuracy.
 6. Update the public website handoff, acceptance checklist, testing strategy, and dev log when feedback changes release readiness.
 
+## Triage and Backlog
+
+Use [Private Preview Feedback Triage & Website Polish Backlog v0.1](private-preview-feedback-triage-backlog-v0.1.md) after feedback is received. That document defines P0/P1/P2/P3 severity rules, backlog item structure, and the gates for expanding private preview, pausing private preview, or entering public launch preparation.
+
 ## Rollback and Shutdown
 
 If the private preview must be closed:

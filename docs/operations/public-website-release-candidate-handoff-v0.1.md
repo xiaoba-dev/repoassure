@@ -240,6 +240,16 @@ Prepared on 2026-06-27:
 - Feedback must not include OTP, cookie, Access token, login query-state, or unrelated personal data.
 - The handoff does not authorize public launch, production marketing announcement, repo public, npm publication, GitHub release, SaaS, Team Cloud, Enterprise, hosted dashboard claims, or sharing deployment subdomains/branch aliases.
 
+## Private Preview Feedback Triage & Website Polish Backlog
+
+Prepared on 2026-06-27:
+
+- Triage and backlog: [Private Preview Feedback Triage & Website Polish Backlog v0.1](private-preview-feedback-triage-backlog-v0.1.md)
+- Defines P0/P1/P2/P3 severity rules.
+- Defines backlog item structure and website polish backlog policy.
+- Defines gates to expand private preview, pause private preview, or enter public launch preparation.
+- Does not authorize sending new reviewer invitations, widening Cloudflare Access policy, public launch, repo public, npm publication, GitHub release, or SaaS/Team Cloud/Enterprise/hosted dashboard claims.
+
 ## Private Preview Deployment Execution Attempt
 
 Attempted on 2026-06-26:

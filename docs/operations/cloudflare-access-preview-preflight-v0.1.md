@@ -83,6 +83,20 @@ The verifier writes local evidence to:
 
 The automated gate checks the unauthenticated redirect to Cloudflare Access, the `www-authenticate: Cloudflare-Access` protected-resource metadata, and the exclusion of deployment subdomains from the accepted review surface. Authenticated content smoke remains `manual_required` because the reviewer login uses an email/OTP identity flow that must not be bypassed or automated with stored credentials.
 
+## Authenticated Reviewer Acceptance Closure
+
+Closed on 2026-06-27:
+
+- Accepted private preview URL: `https://repoassure-preview.pages.dev`.
+- Allowed reviewer route: Chrome profile `Web3coderman`, matching the Access policy email allow rule.
+- Desktop authenticated content smoke: passed.
+- Mobile-width authenticated responsive smoke: passed.
+- Verified page content included RepoAssure hero copy, language selection, Assurance Graph, Trust Ledger, proof artifact tabs, trust boundary, and the private preview form.
+- No reviewer OTP, cookie, Access token, or query-state material was recorded in Git-tracked documentation.
+- No Access policy widening was required or performed.
+
+`pnpm verify:cloudflare-preview` continues to cover the automated unauthenticated boundary. Authenticated reviewer closure is intentionally recorded as a manual/browser evidence step because Cloudflare Access login depends on email/OTP identity proof.
+
 ## Execution Boundary
 
 This preflight does not:

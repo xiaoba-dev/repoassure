@@ -213,6 +213,22 @@ Executed on 2026-06-27:
 
 The accepted private preview URL remains only `https://repoassure-preview.pages.dev`. Deployment subdomains and branch aliases are not accepted review surfaces.
 
+## Private Preview Authenticated Reviewer Acceptance Closure
+
+Closed on 2026-06-27:
+
+- Goal: `RepoAssure Private Preview Authenticated Reviewer Acceptance Closure v0.1`.
+- Reviewer identity path: Chrome profile `Web3coderman`, already allowed by the `RepoAssure reviewer allow` Access policy.
+- No Access policy widening was performed.
+- Desktop authenticated content smoke: passed at `https://repoassure-preview.pages.dev`.
+- Mobile-width authenticated responsive smoke: passed after resizing the authenticated Chrome window to a narrow viewport.
+- Verified authenticated content included the RepoAssure hero, language selector, private preview CTA, Assurance Graph, Trust Ledger, proof artifact tabs, trust boundary, and private preview form.
+- OTP and reviewer credentials were not scripted, exported, persisted, or committed.
+- `pnpm verify:cloudflare-preview` remains the automated unauthenticated boundary verifier; authenticated reviewer content smoke remains a human/browser closure step because Cloudflare Access email/OTP login must not be bypassed with stored credentials.
+- Rollback or shutdown remains a manual operational action: disable/delete the Access application, remove the allowed reviewer policy, or remove the Cloudflare Pages deployment/project when closing the private preview.
+
+The private preview review surface is accepted for invited reviewer inspection at `https://repoassure-preview.pages.dev`. This still does not authorize public launch, production marketing announcement, public repository visibility, npm publication, GitHub release creation, SaaS availability claims, Team Cloud availability claims, Enterprise availability claims, hosted dashboard availability claims, or sharing any deployment subdomain/branch alias as the review URL.
+
 ## Private Preview Deployment Execution Attempt
 
 Attempted on 2026-06-26:

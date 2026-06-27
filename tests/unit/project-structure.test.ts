@@ -1115,11 +1115,18 @@ describe('project structure', () => {
     expect(preflightDoc).toContain('pnpm verify:cloudflare-preview');
     expect(preflightDoc).toContain('Reviewer-Side Acceptance');
     expect(preflightDoc).toContain('manual_required');
+    expect(preflightDoc).toContain('Authenticated Reviewer Acceptance Closure');
     expect(publicWebsiteHandoff).toContain('Private Preview Reviewer-Side Acceptance');
     expect(publicWebsiteHandoff).toContain('pnpm verify:cloudflare-preview');
+    expect(publicWebsiteHandoff).toContain('Private Preview Authenticated Reviewer Acceptance Closure');
+    expect(publicWebsiteHandoff).toContain('Desktop authenticated content smoke: passed');
+    expect(publicWebsiteHandoff).toContain('Mobile-width authenticated responsive smoke: passed');
     expect(acceptanceChecklist).toContain('Private Preview Reviewer-Side Acceptance');
+    expect(acceptanceChecklist).toContain('Private Preview Authenticated Reviewer Acceptance Closure');
     expect(testingStrategy).toContain('Private Preview Reviewer-Side Acceptance');
+    expect(testingStrategy).toContain('Private Preview Authenticated Reviewer Acceptance Closure');
     expect(devLog).toContain('Cloudflare Access Private Preview Reviewer Acceptance v0.1');
+    expect(devLog).toContain('Cloudflare Access Private Preview Authenticated Reviewer Acceptance Closure v0.1');
 
     await expectPath('scripts/verify-cloudflare-access-preview.mjs');
   });

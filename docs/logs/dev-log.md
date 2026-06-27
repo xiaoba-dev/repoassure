@@ -1,5 +1,28 @@
 # 开发日志
 
+## 2026年6月27日 - Cloudflare Access Private Preview Authenticated Reviewer Acceptance Closure v0.1
+
+### 完成内容
+
+- 使用已在 Cloudflare Access `RepoAssure reviewer allow` policy 中允许的 Chrome profile `Web3coderman` 访问 `https://repoassure-preview.pages.dev`。
+- 完成登录后 desktop authenticated content smoke；页面标题为 RepoAssure，内容树包含 hero、language selector、private preview CTA、Assurance Graph、Trust Ledger、proof artifact tabs、trust boundary 和 private preview form。
+- 将浏览器窗口调整为移动宽度，完成 mobile-width authenticated responsive smoke；汉堡菜单、language selector、hero、CTA、Assurance Graph、Trust Ledger 和后续内容仍可访问。
+- 未扩大 Access policy，未添加额外 reviewer email。
+- 未脚本化、导出、保存或提交 OTP、cookie、Access token 或 Cloudflare Access 登录 query-state。
+
+### 已验证
+
+- `pnpm verify:cloudflare-preview`：未登录访问 protected review URL 会重定向到 Cloudflare Access，并包含 `www-authenticate: Cloudflare-Access`。
+- Desktop authenticated content smoke：通过。
+- Mobile-width authenticated responsive smoke：通过。
+
+### 边界
+
+- `pnpm verify:cloudflare-preview` 仍只作为自动化未登录边界 verifier；authenticated content smoke 必须由 allowed reviewer 通过 email/OTP browser flow 完成。
+- rollback/shutdown 仍是人工运维动作：关闭 private preview 时禁用/删除 Access application、移除 reviewer allow policy 或删除 Cloudflare Pages deployment/project。
+- accepted private preview URL 仍仅为 `https://repoassure-preview.pages.dev`；不得分享 deployment subdomain 或 branch alias。
+- 本闭环不授权 public launch、production marketing announcement、repo public、npm publication、GitHub release、SaaS/Team Cloud/Enterprise/hosted dashboard availability claims。
+
 ## 2026年6月27日 - Cloudflare Pages + Access Private Preview Execution v0.1 Blocked
 
 ### 完成内容

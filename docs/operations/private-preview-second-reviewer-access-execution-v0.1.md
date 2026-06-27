@@ -77,6 +77,12 @@ Result:
 - The accepted private preview URL remains only `https://repoassure-preview.pages.dev`.
 - Rollback remains manual: remove `reviewer1@example.com` and `reviewer2@example.com` from the same policy, or disable/delete the Access application when closing private preview.
 
+## Reviewer Identity Reconciliation
+
+See [Private Preview Reviewer Identity Reconciliation v0.1](private-preview-reviewer-identity-reconciliation-v0.1.md).
+
+That reconciliation records `reviewer1@example.com` and `reviewer2@example.com` as placeholder only until the maintainer provides real reviewer identities. Do not treat placeholder emails as real reviewer feedback.
+
 ## Non-Authorization Boundary
 
 This execution does not authorize public launch.

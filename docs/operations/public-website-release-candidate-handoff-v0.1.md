@@ -286,6 +286,18 @@ Prepared on 2026-06-27:
 
 The next feedback triage execution goal should only start after real reviewer feedback is received and redacted.
 
+## Private Preview Reviewer Identity Reconciliation
+
+Prepared on 2026-06-27:
+
+- Reconciliation record: [Private Preview Reviewer Identity Reconciliation v0.1](private-preview-reviewer-identity-reconciliation-v0.1.md)
+- Current state: `waiting_for_real_reviewer_identity`.
+- Maintainer / user owns reviewer selection and product decisions.
+- Authenticated reviewer identity `web3coderman@gmail.com` proves allowed Access smoke, not external reviewer feedback.
+- `reviewer1@example.com` and `reviewer2@example.com` are placeholder only until replaced with real reviewer emails.
+- No Cloudflare Access policy change is authorized by this reconciliation.
+- No OTP, cookie, Access token, login query-state, raw Access redirect URL, reviewer credentials, or unrelated personal data is recorded.
+
 ## Private Preview Deployment Execution Attempt
 
 Attempted on 2026-06-26:

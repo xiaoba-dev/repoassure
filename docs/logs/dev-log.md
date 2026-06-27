@@ -1,5 +1,30 @@
 # 开发日志
 
+## 2026年6月27日 - Private Preview Reviewer Identity Reconciliation v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/private-preview-reviewer-identity-reconciliation-v0.1.md`。
+- 澄清 Maintainer / user 负责 reviewer selection、authorization 和 product decisions。
+- 澄清 `web3coderman@gmail.com` 是已完成 authenticated reviewer smoke 的 identity path，不等同于外部 reviewer feedback。
+- 澄清 `reviewer1@example.com` 和 `reviewer2@example.com` 当前为 placeholder only，必须替换为真实 reviewer emails 后才能作为外部 reviewer feedback 输入。
+- 将状态记录为 `waiting_for_real_reviewer_identity`。
+- 级联更新 second reviewer access execution、handoff dispatch readiness、public website release candidate handoff、acceptance checklist 和 testing strategy。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 identity reconciliation 文档和级联记录存在；测试因 `docs/operations/private-preview-reviewer-identity-reconciliation-v0.1.md` 缺失按预期失败。
+- Green：新增 identity reconciliation 文档并补齐级联。
+
+### 边界
+
+- No Cloudflare Access policy change is authorized by this reconciliation。
+- 不发送 reviewer invitation。
+- 不创建 external issue。
+- 不编造 reviewer feedback。
+- No OTP, cookie, Access token, login query-state, raw Access redirect URL or reviewer credential material may be recorded。
+- 不授权 public launch、repo public、npm publication、GitHub release、外部公告、SaaS/Team Cloud/Enterprise/hosted dashboard availability claims。
+
 ## 2026年6月27日 - Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness v0.1
 
 ### 完成内容

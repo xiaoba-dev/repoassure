@@ -37,6 +37,12 @@ Status: waiting_for_reviewer_feedback
 
 No reviewer feedback has been received or triaged in this record. The next triage goal must use real reviewer feedback as input.
 
+## Reviewer Identity Reconciliation
+
+Use [Private Preview Reviewer Identity Reconciliation v0.1](private-preview-reviewer-identity-reconciliation-v0.1.md) before treating second-batch feedback as external reviewer feedback.
+
+That reconciliation marks `reviewer1@example.com` and `reviewer2@example.com` as placeholder only until the maintainer provides real reviewer emails. Current handoff status therefore remains `waiting_for_real_reviewer_identity` and `waiting_for_reviewer_feedback`.
+
 ## Handoff Message Template
 
 Use this template when the maintainer decides to send the private preview handoff manually:

@@ -1281,6 +1281,41 @@ describe('project structure', () => {
     await expectPath('docs/operations/private-preview-reviewer-handoff-dispatch-readiness-v0.1.md');
   });
 
+  it('reconciles private preview reviewer identities before feedback triage', async () => {
+    const [identityReconciliation, secondReviewerAccess, dispatchReadiness, publicWebsiteHandoff, acceptanceChecklist, testingStrategy, devLog] =
+      await Promise.all([
+        readFile('docs/operations/private-preview-reviewer-identity-reconciliation-v0.1.md', 'utf8'),
+        readFile('docs/operations/private-preview-second-reviewer-access-execution-v0.1.md', 'utf8'),
+        readFile('docs/operations/private-preview-reviewer-handoff-dispatch-readiness-v0.1.md', 'utf8'),
+        readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+        readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+        readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+        readFile('docs/logs/dev-log.md', 'utf8')
+      ]);
+
+    expect(identityReconciliation).toContain('Private Preview Reviewer Identity Reconciliation v0.1');
+    expect(identityReconciliation).toContain('Maintainer / user');
+    expect(identityReconciliation).toContain('Authenticated reviewer identity');
+    expect(identityReconciliation).toContain('web3coderman@gmail.com');
+    expect(identityReconciliation).toContain('Placeholder second-batch reviewer emails');
+    expect(identityReconciliation).toContain('reviewer1@example.com');
+    expect(identityReconciliation).toContain('reviewer2@example.com');
+    expect(identityReconciliation).toContain('placeholder only');
+    expect(identityReconciliation).toContain('must be replaced with real reviewer emails');
+    expect(identityReconciliation).toContain('Do not treat placeholder emails as real reviewer feedback');
+    expect(identityReconciliation).toContain('waiting_for_real_reviewer_identity');
+    expect(identityReconciliation).toContain('No Cloudflare Access policy change is authorized by this reconciliation');
+    expect(identityReconciliation).toContain('No OTP, cookie, Access token, login query-state');
+    expect(secondReviewerAccess).toContain('Private Preview Reviewer Identity Reconciliation');
+    expect(dispatchReadiness).toContain('Private Preview Reviewer Identity Reconciliation');
+    expect(publicWebsiteHandoff).toContain('Private Preview Reviewer Identity Reconciliation');
+    expect(acceptanceChecklist).toContain('Private Preview Reviewer Identity Reconciliation');
+    expect(testingStrategy).toContain('Private Preview Reviewer Identity Reconciliation');
+    expect(devLog).toContain('Private Preview Reviewer Identity Reconciliation v0.1');
+
+    await expectPath('docs/operations/private-preview-reviewer-identity-reconciliation-v0.1.md');
+  });
+
   it('records Cloudflare remote preview execution as blocked before website upload when Access is unavailable', async () => {
     const [blockers, devLog, publicWebsiteHandoff, acceptanceChecklist, testingStrategy] = await Promise.all([
       readFile('docs/logs/blockers.md', 'utf8'),

@@ -13,6 +13,7 @@ This is an internal operations gate. It does not send reviewer invitations, crea
 
 Accepted inputs:
 
+- Redacted intake records created from [Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness v0.1](private-preview-reviewer-handoff-dispatch-readiness-v0.1.md) after real reviewer feedback is received.
 - Completed reviewer feedback using `private-preview-reviewer-handoff-v0.1.md`.
 - Internal review notes from invited reviewers.
 - Browser smoke observations from allowed reviewer sessions.
@@ -102,6 +103,8 @@ Status:
 5. Group related items by website area: hero, Assurance Graph, Trust Ledger, localization, mobile, accessibility, trust boundary, private preview form, footer, or claims.
 6. Select the next Codex goal based on the highest-severity unresolved item.
 7. Update `docs/logs/dev-log.md`, acceptance checklist, and public website handoff when triage changes release readiness.
+
+Do not run a triage execution goal until real reviewer feedback exists. The readiness state remains `waiting_for_reviewer_feedback` when no reviewer response has been received.
 
 ## Decision Gates
 

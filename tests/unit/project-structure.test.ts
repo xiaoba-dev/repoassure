@@ -1249,6 +1249,38 @@ describe('project structure', () => {
     await expectPath('docs/operations/private-preview-second-reviewer-access-execution-v0.1.md');
   });
 
+  it('records private preview reviewer handoff dispatch readiness without inventing feedback', async () => {
+    const [dispatchReadiness, reviewerHandoff, triageBacklog, publicWebsiteHandoff, acceptanceChecklist, testingStrategy, devLog] =
+      await Promise.all([
+        readFile('docs/operations/private-preview-reviewer-handoff-dispatch-readiness-v0.1.md', 'utf8'),
+        readFile('docs/operations/private-preview-reviewer-handoff-v0.1.md', 'utf8'),
+        readFile('docs/operations/private-preview-feedback-triage-backlog-v0.1.md', 'utf8'),
+        readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+        readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+        readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+        readFile('docs/logs/dev-log.md', 'utf8')
+      ]);
+
+    expect(dispatchReadiness).toContain('Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness v0.1');
+    expect(dispatchReadiness).toContain('waiting_for_reviewer_feedback');
+    expect(dispatchReadiness).toContain('reviewer1@example.com');
+    expect(dispatchReadiness).toContain('reviewer2@example.com');
+    expect(dispatchReadiness).toContain('Handoff Message Template');
+    expect(dispatchReadiness).toContain('Feedback Intake Record Template');
+    expect(dispatchReadiness).toContain('Do not send email from this goal');
+    expect(dispatchReadiness).toContain('Do not create external issues from this goal');
+    expect(dispatchReadiness).toContain('Do not invent reviewer feedback');
+    expect(dispatchReadiness).toContain('No OTP, cookie, Access token, login query-state');
+    expect(reviewerHandoff).toContain('Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness');
+    expect(triageBacklog).toContain('Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness');
+    expect(publicWebsiteHandoff).toContain('Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness');
+    expect(acceptanceChecklist).toContain('Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness');
+    expect(testingStrategy).toContain('Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness');
+    expect(devLog).toContain('Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness v0.1');
+
+    await expectPath('docs/operations/private-preview-reviewer-handoff-dispatch-readiness-v0.1.md');
+  });
+
   it('records Cloudflare remote preview execution as blocked before website upload when Access is unavailable', async () => {
     const [blockers, devLog, publicWebsiteHandoff, acceptanceChecklist, testingStrategy] = await Promise.all([
       readFile('docs/logs/blockers.md', 'utf8'),

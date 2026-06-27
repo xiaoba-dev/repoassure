@@ -1,5 +1,28 @@
 # 开发日志
 
+## 2026年6月27日 - Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/private-preview-reviewer-handoff-dispatch-readiness-v0.1.md`。
+- 为 `reviewer1@example.com` 和 `reviewer2@example.com` 准备 reviewer handoff message template。
+- 新增 feedback intake record template，用于真实反馈到达后的脱敏、记录和后续 triage。
+- 将当前状态明确为 `waiting_for_reviewer_feedback`。
+- 级联更新 reviewer handoff、feedback triage/backlog、public website release candidate handoff、acceptance checklist 和 testing strategy。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 dispatch readiness 文档和级联记录存在；测试因 `docs/operations/private-preview-reviewer-handoff-dispatch-readiness-v0.1.md` 缺失按预期失败。
+- Green：新增 dispatch readiness 文档并补齐级联。
+
+### 边界
+
+- Do not send email from this goal。
+- Do not create external issues from this goal。
+- Do not invent reviewer feedback。
+- No OTP, cookie, Access token, login query-state, raw Access redirect URL or reviewer credential material may be recorded。
+- 不新增 reviewer，不修改 Cloudflare Access policy，不授权 public launch、repo public、npm publication、GitHub release、外部公告、SaaS/Team Cloud/Enterprise/hosted dashboard availability claims。
+
 ## 2026年6月27日 - Private Preview Second Reviewer Access Execution v0.1
 
 ### 完成内容

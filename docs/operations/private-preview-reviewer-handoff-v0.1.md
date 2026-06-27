@@ -129,7 +129,7 @@ Use [Private Preview Feedback Triage & Website Polish Backlog v0.1](private-prev
 
 Use [Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness v0.1](private-preview-reviewer-handoff-dispatch-readiness-v0.1.md) for the second-batch reviewer handoff template and intake record structure.
 
-That readiness record covers `reviewer1@example.com` and `reviewer2@example.com`, keeps status at `waiting_for_reviewer_feedback`, and explicitly does not send email, create external issues, invent reviewer feedback, or record OTP, cookie, Access token, login query-state, raw Access redirect URL, reviewer credentials, or unrelated personal data.
+That readiness record originally covered placeholder reviewer emails `reviewer1@example.com` and `reviewer2@example.com`; after Private Preview Real Reviewer Replacement, the active handoff scope is `confirmed-reviewer-1` and `confirmed-reviewer-2`. It keeps status at `waiting_for_reviewer_feedback` and explicitly does not send email, create external issues, invent reviewer feedback, or record OTP, cookie, Access token, login query-state, raw Access redirect URL, reviewer credentials, or unrelated personal data.
 
 ## Rollback and Shutdown
 

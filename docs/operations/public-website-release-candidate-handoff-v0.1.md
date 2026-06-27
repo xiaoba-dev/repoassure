@@ -280,7 +280,7 @@ Prepared on 2026-06-27:
 
 - Readiness record: [Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness v0.1](private-preview-reviewer-handoff-dispatch-readiness-v0.1.md)
 - Current state: `waiting_for_reviewer_feedback`.
-- Reviewer handoff scope: `reviewer1@example.com` and `reviewer2@example.com`.
+- Reviewer handoff scope: `confirmed-reviewer-1` and `confirmed-reviewer-2`.
 - Includes a handoff message template and feedback intake record template.
 - Does not send email, create external issues, invent reviewer feedback, or record OTP, cookie, Access token, login query-state, raw Access redirect URL, reviewer credentials, or unrelated personal data.
 
@@ -291,12 +291,27 @@ The next feedback triage execution goal should only start after real reviewer fe
 Prepared on 2026-06-27:
 
 - Reconciliation record: [Private Preview Reviewer Identity Reconciliation v0.1](private-preview-reviewer-identity-reconciliation-v0.1.md)
-- Current state: `waiting_for_real_reviewer_identity`.
+- Current state: `real_reviewer_identities_confirmed`.
 - Maintainer / user owns reviewer selection and product decisions.
 - Authenticated reviewer identity `web3coderman@gmail.com` proves allowed Access smoke, not external reviewer feedback.
-- `reviewer1@example.com` and `reviewer2@example.com` are placeholder only until replaced with real reviewer emails.
+- `reviewer1@example.com` and `reviewer2@example.com` are historical placeholders only after Private Preview Real Reviewer Replacement.
 - No Cloudflare Access policy change is authorized by this reconciliation.
 - No OTP, cookie, Access token, login query-state, raw Access redirect URL, reviewer credentials, or unrelated personal data is recorded.
+
+## Private Preview Real Reviewer Replacement
+
+Executed on 2026-06-27:
+
+- Replacement record: [Private Preview Real Reviewer Replacement v0.1](private-preview-real-reviewer-replacement-v0.1.md)
+- Cloudflare Access policy: `RepoAssure reviewer allow`.
+- Removed placeholder reviewer emails: `reviewer1@example.com`, `reviewer2@example.com`.
+- Confirmed real reviewer emails: `confirmed-reviewer-1`, `confirmed-reviewer-2`.
+- Execution path: Cloudflare Dashboard UI, because prior Access API operations returned `Authentication error`.
+- Verification command: `pnpm verify:cloudflare-preview`.
+- Expected verification status: `manual_required`, because authenticated reviewer smoke still requires manual email/OTP login.
+- Current feedback state: `waiting_for_reviewer_feedback`.
+
+This replacement does not send reviewer invitations, create external issues, invent reviewer feedback, record OTP/cookie/Access token/login query-state/raw Access redirect URL/reviewer credentials, authorize public launch, make the repo public, publish npm packages, create a GitHub release, or make SaaS/Team Cloud/Enterprise/hosted dashboard availability claims.
 
 ## Private Preview Deployment Execution Attempt
 

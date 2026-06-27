@@ -1,5 +1,30 @@
 # 开发日志
 
+## 2026年6月27日 - Private Preview Real Reviewer Replacement v0.1
+
+### 完成内容
+
+- 用户提供真实 reviewer emails：`confirmed-reviewer-1`、`confirmed-reviewer-2`。
+- 在用户明确回复“确认保存”后，通过 Cloudflare Dashboard UI 保存 `RepoAssure reviewer allow` policy。
+- 从 active allow list 移除 placeholder reviewer emails：`reviewer1@example.com`、`reviewer2@example.com`。
+- 保存后打开 Cloudflare policy details panel，确认 Include `Emails` value 为 `confirmed-reviewer-1 , confirmed-reviewer-2`。
+- 新增 `docs/operations/private-preview-real-reviewer-replacement-v0.1.md`。
+- 级联更新 identity reconciliation、handoff dispatch readiness、second reviewer access execution、public website release candidate handoff、acceptance checklist 和 testing strategy。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 Private Preview Real Reviewer Replacement 文档和级联记录存在；测试因 `docs/operations/private-preview-real-reviewer-replacement-v0.1.md` 缺失按预期失败。
+- Green：新增 replacement 文档并补齐级联；随后运行 structure test 和质量门禁。
+
+### 边界
+
+- Do not send reviewer invitations from this goal。
+- Do not create external issues from this goal。
+- Do not invent reviewer feedback。
+- No OTP, cookie, Access token, login query-state, raw Access redirect URL or reviewer credential material may be recorded。
+- 不分享 deployment subdomains 或 branch aliases。
+- 不授权 public launch、repo public、npm publication、GitHub release、外部公告、SaaS/Team Cloud/Enterprise/hosted dashboard availability claims。
+
 ## 2026年6月27日 - Private Preview Reviewer Identity Reconciliation v0.1
 
 ### 完成内容

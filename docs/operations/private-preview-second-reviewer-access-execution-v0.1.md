@@ -83,6 +83,12 @@ See [Private Preview Reviewer Identity Reconciliation v0.1](private-preview-revi
 
 That reconciliation records `reviewer1@example.com` and `reviewer2@example.com` as placeholder only until the maintainer provides real reviewer identities. Do not treat placeholder emails as real reviewer feedback.
 
+## Real Reviewer Replacement
+
+See [Private Preview Real Reviewer Replacement v0.1](private-preview-real-reviewer-replacement-v0.1.md).
+
+Private Preview Real Reviewer Replacement supersedes the active allow-list membership from this historical execution. The placeholder emails `reviewer1@example.com` and `reviewer2@example.com` were removed from `RepoAssure reviewer allow`; the confirmed real reviewer identities are now `confirmed-reviewer-1` and `confirmed-reviewer-2`.
+
 ## Non-Authorization Boundary
 
 This execution does not authorize public launch.

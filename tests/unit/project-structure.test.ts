@@ -1316,6 +1316,43 @@ describe('project structure', () => {
     await expectPath('docs/operations/private-preview-reviewer-identity-reconciliation-v0.1.md');
   });
 
+  it('records private preview real reviewer replacement before external feedback collection', async () => {
+    const [realReviewerReplacement, identityReconciliation, dispatchReadiness, publicWebsiteHandoff, acceptanceChecklist, testingStrategy, devLog] =
+      await Promise.all([
+        readFile('docs/operations/private-preview-real-reviewer-replacement-v0.1.md', 'utf8'),
+        readFile('docs/operations/private-preview-reviewer-identity-reconciliation-v0.1.md', 'utf8'),
+        readFile('docs/operations/private-preview-reviewer-handoff-dispatch-readiness-v0.1.md', 'utf8'),
+        readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+        readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+        readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+        readFile('docs/logs/dev-log.md', 'utf8')
+      ]);
+
+    expect(realReviewerReplacement).toContain('Private Preview Real Reviewer Replacement v0.1');
+    expect(realReviewerReplacement).toContain('confirmed-reviewer-1');
+    expect(realReviewerReplacement).toContain('confirmed-reviewer-2');
+    expect(realReviewerReplacement).toContain('reviewer1@example.com');
+    expect(realReviewerReplacement).toContain('reviewer2@example.com');
+    expect(realReviewerReplacement).toContain('removed placeholder reviewer emails');
+    expect(realReviewerReplacement).toContain('real reviewer identities confirmed');
+    expect(realReviewerReplacement).toContain('Reviewer PII is not stored in Git tracked docs');
+    expect(realReviewerReplacement).toContain('RepoAssure reviewer allow');
+    expect(realReviewerReplacement).toContain('pnpm verify:cloudflare-preview');
+    expect(realReviewerReplacement).toContain('Do not send reviewer invitations from this goal');
+    expect(realReviewerReplacement).toContain('No OTP, cookie, Access token, login query-state');
+    expect(identityReconciliation).toContain('Private Preview Real Reviewer Replacement');
+    expect(identityReconciliation).toContain('real reviewer identities confirmed');
+    expect(dispatchReadiness).toContain('Private Preview Real Reviewer Replacement');
+    expect(dispatchReadiness).toContain('confirmed-reviewer-1');
+    expect(dispatchReadiness).toContain('confirmed-reviewer-2');
+    expect(publicWebsiteHandoff).toContain('Private Preview Real Reviewer Replacement');
+    expect(acceptanceChecklist).toContain('Private Preview Real Reviewer Replacement');
+    expect(testingStrategy).toContain('Private Preview Real Reviewer Replacement');
+    expect(devLog).toContain('Private Preview Real Reviewer Replacement v0.1');
+
+    await expectPath('docs/operations/private-preview-real-reviewer-replacement-v0.1.md');
+  });
+
   it('records Cloudflare remote preview execution as blocked before website upload when Access is unavailable', async () => {
     const [blockers, devLog, publicWebsiteHandoff, acceptanceChecklist, testingStrategy] = await Promise.all([
       readFile('docs/logs/blockers.md', 'utf8'),

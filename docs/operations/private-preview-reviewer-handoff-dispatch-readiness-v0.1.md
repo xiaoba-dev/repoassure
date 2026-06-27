@@ -13,8 +13,15 @@ This is a readiness and template record only. Do not send email from this goal. 
 
 Authorized reviewer emails:
 
+- `confirmed-reviewer-1`
+- `confirmed-reviewer-2`
+
+Historical placeholder emails:
+
 - `reviewer1@example.com`
 - `reviewer2@example.com`
+
+Private Preview Real Reviewer Replacement removed the historical placeholder emails from the active Cloudflare Access allow list and confirmed the real reviewer identities above.
 
 Accepted review URL:
 
@@ -41,7 +48,9 @@ No reviewer feedback has been received or triaged in this record. The next triag
 
 Use [Private Preview Reviewer Identity Reconciliation v0.1](private-preview-reviewer-identity-reconciliation-v0.1.md) before treating second-batch feedback as external reviewer feedback.
 
-That reconciliation marks `reviewer1@example.com` and `reviewer2@example.com` as placeholder only until the maintainer provides real reviewer emails. Current handoff status therefore remains `waiting_for_real_reviewer_identity` and `waiting_for_reviewer_feedback`.
+That reconciliation now records Private Preview Real Reviewer Replacement as completed. `reviewer1@example.com` and `reviewer2@example.com` are historical placeholders only; `confirmed-reviewer-1` and `confirmed-reviewer-2` are the confirmed real reviewer identities.
+
+Current handoff status remains `waiting_for_reviewer_feedback` because no real reviewer feedback has been received.
 
 ## Handoff Message Template
 

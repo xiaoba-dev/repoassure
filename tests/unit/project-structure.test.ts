@@ -457,6 +457,43 @@ describe('project structure', () => {
     await expectPath('docs/operations/release-candidate-handoff-v0.1.md');
   });
 
+  it('records public release readiness v0.2 without authorizing publication', async () => {
+    const [readiness, readme, releaseChecklist, testingStrategy, acceptanceChecklist, devLog] = await Promise.all([
+      readFile('docs/operations/public-release-readiness-v0.2.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(readiness).toContain('Public Release Readiness v0.2');
+    expect(readiness).toContain('Status: automated_prerequisites_ready_manual_gates_pending');
+    expect(readiness).toContain('public release ready: no');
+    expect(readiness).toContain('pnpm release:check');
+    expect(readiness).toContain('pnpm repo:hygiene');
+    expect(readiness).toContain('pnpm acceptance -- --full --browser');
+    expect(readiness).toContain('package.json keeps `"private": true`');
+    expect(readiness).toContain('Manual authorization gates');
+    expect(readiness).toContain('Branch protection or equivalent repository ruleset');
+    expect(readiness).toContain('Legal review');
+    expect(readiness).toContain('Trademark/name review');
+    expect(readiness).toContain('Final maintainer publication authorization');
+    expect(readiness).toContain('No repository visibility change was authorized');
+    expect(readiness).toContain('No npm publication was authorized');
+    expect(readiness).toContain('No GitHub release was authorized');
+    expect(readiness).toContain('No public launch or production marketing announcement was authorized');
+    expect(readiness).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was authorized');
+    expect(readiness).toContain('Private Preview Feedback Triage Execution v0.1 remains blocked until real reviewer feedback exists');
+    expect(readme).toContain('docs/operations/public-release-readiness-v0.2.md');
+    expect(releaseChecklist).toContain('Public Release Readiness v0.2');
+    expect(testingStrategy).toContain('Public Release Readiness v0.2');
+    expect(acceptanceChecklist).toContain('Public Release Readiness v0.2');
+    expect(devLog).toContain('Public Release Readiness v0.2');
+
+    await expectPath('docs/operations/public-release-readiness-v0.2.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

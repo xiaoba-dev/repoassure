@@ -11761,3 +11761,27 @@ Phase 0：项目初始化。
 - Git tracked docs 不记录真实 reviewer email。
 - 不记录 OTP、cookie、Access token、login query-state、raw Access redirect URL、reviewer credentials 或无关个人数据。
 - 不授权 public launch、生产营销发布、仓库公开、npm 发布、GitHub release、SaaS availability、Team Cloud availability、Enterprise availability 或 hosted dashboard availability claims。
+
+## 2026年6月28日 - Public Release Readiness v0.2
+
+### 完成内容
+
+- 新增 `docs/operations/public-release-readiness-v0.2.md`。
+- 记录当前 automated readiness command matrix：`pnpm repo:hygiene`、`pnpm release:check`、unit、typecheck、lint、build、full/browser acceptance、goal audit 和 `git diff --check`。
+- 明确当前 release checker 预期仍为 `public release ready: no`。
+- 记录 manual authorization gates：branch protection or equivalent repository ruleset、legal review、trademark/name review、final maintainer publication authorization。
+- 明确 Private Preview Feedback Triage Execution v0.1 仍需等待真实 reviewer feedback。
+- 级联更新 README、public release checklist、testing strategy 和 acceptance checklist。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Public Release Readiness v0.2 文档和级联记录存在；测试因 `docs/operations/public-release-readiness-v0.2.md` 缺失按预期失败。
+- Green：新增 v0.2 readiness operation record，并更新级联文档。
+
+### 边界
+
+- No repository visibility change was authorized。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。

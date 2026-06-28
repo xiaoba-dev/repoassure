@@ -3343,6 +3343,64 @@ describe('project structure', () => {
     expect(selection).not.toContain('@');
     expect(trackedDocs).toContain('No real reviewer email address is recorded in Git tracked docs');
   });
+
+  it('records external reviewer feedback intake readiness without inventing reviewer feedback', async () => {
+    const [
+      feedbackIntake,
+      manualDispatch,
+      recruitmentPlan,
+      handoffReadiness,
+      feedbackTriageBacklog,
+      websiteHandoff,
+      acceptanceChecklist,
+      testStrategy,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/private-preview-external-reviewer-feedback-intake-v0.1.md', 'utf8'),
+      readFile('docs/operations/private-preview-external-reviewer-manual-dispatch-v0.1.md', 'utf8'),
+      readFile('docs/operations/private-preview-external-reviewer-recruitment-and-dispatch-plan-v0.1.md', 'utf8'),
+      readFile('docs/operations/private-preview-reviewer-handoff-dispatch-readiness-v0.1.md', 'utf8'),
+      readFile('docs/operations/private-preview-feedback-triage-backlog-v0.1.md', 'utf8'),
+      readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+    const trackedDocs = [
+      feedbackIntake,
+      manualDispatch,
+      recruitmentPlan,
+      handoffReadiness,
+      feedbackTriageBacklog,
+      websiteHandoff,
+      acceptanceChecklist,
+      testStrategy,
+      devLog
+    ].join('\n');
+
+    expect(feedbackIntake).toContain('Private Preview External Reviewer Feedback Intake v0.1');
+    expect(feedbackIntake).toContain('Intake status: waiting_for_reviewer_feedback');
+    expect(feedbackIntake).toContain('Feedback received: no');
+    expect(feedbackIntake).toContain('external-reviewer-1');
+    expect(feedbackIntake).toContain('external-reviewer-2');
+    expect(feedbackIntake).toContain('No reviewer feedback was invented');
+    expect(feedbackIntake).toContain('No feedback triage was started');
+    expect(feedbackIntake).toContain('No external issue was created');
+    expect(feedbackIntake).toContain('No real reviewer email address is recorded in Git tracked docs');
+    expect(feedbackIntake).toContain('Sensitive material redaction gate');
+    expect(feedbackIntake).toContain('Private Preview Feedback Triage Execution v0.1');
+    expect(manualDispatch).toContain('Private Preview External Reviewer Feedback Intake v0.1');
+    expect(recruitmentPlan).toContain('Private Preview External Reviewer Feedback Intake v0.1');
+    expect(handoffReadiness).toContain('Private Preview External Reviewer Feedback Intake v0.1');
+    expect(feedbackTriageBacklog).toContain('Private Preview External Reviewer Feedback Intake v0.1');
+    expect(websiteHandoff).toContain('Private Preview External Reviewer Feedback Intake v0.1');
+    expect(acceptanceChecklist).toContain('Private Preview External Reviewer Feedback Intake');
+    expect(testStrategy).toContain('Private Preview External Reviewer Feedback Intake');
+    expect(devLog).toContain('Private Preview External Reviewer Feedback Intake v0.1');
+    expect(feedbackIntake).not.toContain('@');
+    expect(trackedDocs).toContain('waiting_for_reviewer_feedback');
+    expect(feedbackIntake).not.toContain('accepted / changes_requested / blocked');
+  });
 });
 
 async function expectPath(path: string): Promise<void> {

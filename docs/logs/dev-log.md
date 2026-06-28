@@ -11737,3 +11737,27 @@ Phase 0：项目初始化。
 - No reviewer feedback was invented。
 - 不记录 OTP、cookie、Access token、login query-state、raw Access redirect URL、reviewer credentials 或无关个人数据。
 - 不授权 public launch、生产营销发布、仓库公开、npm 发布、GitHub release、SaaS availability、Team Cloud availability、Enterprise availability 或 hosted dashboard availability claims。
+
+## 2026年6月28日 - Private Preview External Reviewer Feedback Intake v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/private-preview-external-reviewer-feedback-intake-v0.1.md`。
+- 为 `external-reviewer-1` 与 `external-reviewer-2` 建立 slot-level intake ledger。
+- 记录 `Intake status: waiting_for_reviewer_feedback` 与 `Feedback received: no`。
+- 明确 Sensitive material redaction gate 和 allowed feedback record shape。
+- 级联更新 manual dispatch、recruitment/dispatch plan、handoff readiness、feedback triage backlog、public website handoff、acceptance checklist 和 test strategy。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Private Preview External Reviewer Feedback Intake 文档和级联记录存在；测试因 `docs/operations/private-preview-external-reviewer-feedback-intake-v0.1.md` 缺失按预期失败。
+- Green：新增 feedback intake operation record，并更新级联文档。
+
+### 边界
+
+- No reviewer feedback was invented。
+- No feedback triage was started。
+- No external issue was created。
+- Git tracked docs 不记录真实 reviewer email。
+- 不记录 OTP、cookie、Access token、login query-state、raw Access redirect URL、reviewer credentials 或无关个人数据。
+- 不授权 public launch、生产营销发布、仓库公开、npm 发布、GitHub release、SaaS availability、Team Cloud availability、Enterprise availability 或 hosted dashboard availability claims。

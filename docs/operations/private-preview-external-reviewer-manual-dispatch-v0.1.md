@@ -55,4 +55,6 @@ The message also instructed reviewers not to include OTPs, cookies, Cloudflare A
 
 Wait for real reviewer feedback.
 
-Do not run feedback triage until at least one reviewer returns feedback and any sensitive material is redacted. The next goal should be `Private Preview External Reviewer Feedback Intake v0.1`.
+Private Preview External Reviewer Feedback Intake v0.1 established the slot-level feedback intake ledger and confirmed that no real reviewer feedback has been received yet.
+
+Do not run feedback triage until at least one reviewer returns feedback and any sensitive material is redacted. The next executable goal after real feedback exists should be `Private Preview Feedback Triage Execution v0.1`.

@@ -181,6 +181,8 @@ Only after real external reviewer feedback is received:
 4. Create a follow-up `Private Preview Feedback Triage Execution v0.1` goal if feedback contains findings.
 5. Keep the state as `waiting_for_reviewer_feedback` until real feedback exists.
 
+Private Preview External Reviewer Feedback Intake v0.1 now provides the current slot-level intake ledger and redaction gate for the external reviewer batch.
+
 ## Non-Authorization Boundary
 
 This readiness record does not authorize:

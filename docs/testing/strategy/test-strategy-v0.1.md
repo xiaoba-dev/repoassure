@@ -213,3 +213,11 @@ rg -n "<out-of-band-reviewer-email-1>|<out-of-band-reviewer-email-2>" docs tests
 The structure test requires the manual dispatch operation record and cascade docs to reference only anonymous slots such as `external-reviewer-1` and `external-reviewer-2`, the `manual maintainer email` channel, `Dispatch status: sent`, `Message template version: private-preview-reviewer-handoff-package-v0.1`, and the `waiting_for_reviewer_feedback` state.
 
 The local sensitive information scan must be run with the real reviewer emails supplied out of band at execution time. The real emails must not be committed into docs, tests, scripts, or examples. The test also requires Git tracked docs not to record real reviewer email addresses, external issues, invented reviewer feedback, OTPs, cookies, Cloudflare Access tokens, login query-state, raw Access redirect URLs, reviewer credentials, or unrelated personal data.
+
+## Private Preview External Reviewer Feedback Intake
+
+Private Preview External Reviewer Feedback Intake v0.1 is verified through structure-level tests and sensitive information scanning.
+
+The structure test requires `docs/operations/private-preview-external-reviewer-feedback-intake-v0.1.md` and cascade docs to record `Intake status: waiting_for_reviewer_feedback`, `Feedback received: no`, `external-reviewer-1`, `external-reviewer-2`, the sensitive material redaction gate, `No reviewer feedback was invented`, `No feedback triage was started`, and `No external issue was created`.
+
+The test intentionally does not assert any reviewer decision such as accepted or changes_requested because no real reviewer feedback exists yet. Triage remains blocked until redacted real feedback is received.

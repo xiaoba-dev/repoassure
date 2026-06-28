@@ -386,6 +386,19 @@ This update only grants Access allow-list coverage to the selected anonymous ext
 
 This dispatch only sends the private preview handoff package to the selected anonymous external reviewer slots. It does not record OTP/cookie/Access token/login query-state/raw Access redirect URL/reviewer credentials, authorize public launch, make the repo public, publish npm packages, create a GitHub release, or make SaaS/Team Cloud/Enterprise/hosted dashboard availability claims.
 
+## Private Preview External Reviewer Feedback Intake
+
+- Intake record: [Private Preview External Reviewer Feedback Intake v0.1](private-preview-external-reviewer-feedback-intake-v0.1.md)
+- Intake status: `waiting_for_reviewer_feedback`.
+- Feedback received: no.
+- Reviewer slots: `external-reviewer-1`, `external-reviewer-2`.
+- No reviewer feedback was invented.
+- No feedback triage was started.
+- No external issue was created.
+- No real reviewer email address is recorded in Git tracked docs.
+
+This intake record only establishes the feedback ledger, redaction gate, and allowed record shape. It does not record reviewer conclusions, authorize public launch, make the repo public, publish npm packages, create a GitHub release, or make SaaS/Team Cloud/Enterprise/hosted dashboard availability claims.
+
 ## Private Preview Reviewer Handoff Package and Dispatch Execution
 
 Prepared on 2026-06-27:

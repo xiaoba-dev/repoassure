@@ -104,7 +104,7 @@ Status:
 6. Select the next Codex goal based on the highest-severity unresolved item.
 7. Update `docs/logs/dev-log.md`, acceptance checklist, and public website handoff when triage changes release readiness.
 
-Do not run a triage execution goal until real external reviewer feedback exists. The readiness state remains `waiting_for_external_reviewer_identity` until non-maintainer reviewers are identified, and then `waiting_for_reviewer_feedback` when no reviewer response has been received.
+Do not run a triage execution goal until real external reviewer feedback exists. Private Preview External Reviewer Feedback Intake v0.1 records the current external reviewer intake state as `waiting_for_reviewer_feedback` with no received feedback yet.
 
 ## Decision Gates
 

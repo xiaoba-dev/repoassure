@@ -146,4 +146,6 @@ Private Preview External Reviewer Access Update v0.1 completed the required Clou
 
 Private Preview External Reviewer Manual Dispatch v0.1 completed manual maintainer email dispatch without recording real reviewer email addresses in Git tracked docs.
 
-Run `Private Preview External Reviewer Feedback Intake v0.1` next only after real reviewer feedback exists.
+Private Preview External Reviewer Feedback Intake v0.1 established the intake ledger and keeps the state at `waiting_for_reviewer_feedback` because no real reviewer feedback has been received yet.
+
+Run `Private Preview Feedback Triage Execution v0.1` only after real reviewer feedback exists and sensitive material is redacted.

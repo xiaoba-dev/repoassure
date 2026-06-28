@@ -65,6 +65,8 @@ That plan defines the external reviewer criteria, minimum reviewer count, dispat
 
 Private Preview External Reviewer Selection v0.1 selects `external-reviewer-1` and `external-reviewer-2`, maps them to developer builder and engineering lead archetypes, selects manual maintainer email as the first-batch channel, and records `Access update decision: required_before_dispatch`.
 
+Private Preview External Reviewer Access Update v0.1 completed the Cloudflare Access allow-list update for those two anonymous slots through the Cloudflare Dashboard UI. Current state is `waiting_for_external_reviewer_dispatch`.
+
 ## Handoff Package and Dispatch Execution
 
 Use [Private Preview Reviewer Handoff Package and Dispatch Execution v0.1](private-preview-reviewer-handoff-package-and-dispatch-execution-v0.1.md) for the current 1+2 workflow.
@@ -175,7 +177,7 @@ Only after real external reviewer feedback is received:
 2. Copy the redacted response into a private tracked note or local intake record.
 3. Classify findings using [Private Preview Feedback Triage & Website Polish Backlog v0.1](private-preview-feedback-triage-backlog-v0.1.md).
 4. Create a follow-up `Private Preview Feedback Triage Execution v0.1` goal if feedback contains findings.
-5. Keep the state as `waiting_for_external_reviewer_identity` until non-maintainer reviewers are identified, then `waiting_for_reviewer_feedback` until real feedback exists.
+5. Keep the state as `waiting_for_external_reviewer_dispatch` until the manual maintainer email is sent, then `waiting_for_reviewer_feedback` until real feedback exists.
 
 ## Non-Authorization Boundary
 

@@ -118,11 +118,13 @@ Do not start `Private Preview Feedback Triage Execution v0.1` until:
 3. Feedback is returned.
 4. OTP, cookie, Access token, login query-state, raw Access redirect URL, reviewer credentials, and unrelated personal data are removed.
 
-Until then, the current state remains:
+After Private Preview External Reviewer Access Update v0.1, the current state is:
 
 ```text
-waiting_for_external_reviewer_identity
+waiting_for_external_reviewer_dispatch
 ```
+
+The first two external reviewer slots have Access allow-list coverage. No invitation has been sent yet.
 
 ## Non-Authorization Boundary
 
@@ -140,4 +142,6 @@ waiting_for_external_reviewer_identity
 
 Private Preview External Reviewer Selection v0.1 has selected `external-reviewer-1` and `external-reviewer-2` as first-batch slots and records `Access update decision: required_before_dispatch`.
 
-Run `Private Preview External Reviewer Access Update v0.1` after the maintainer provides real reviewer emails through a non-Git channel and explicitly authorizes the Cloudflare Access policy update.
+Private Preview External Reviewer Access Update v0.1 completed the required Cloudflare Access allow-list update without recording real reviewer email addresses in Git tracked docs.
+
+Run `Private Preview External Reviewer Manual Dispatch v0.1` next if the maintainer confirms that manual email should be sent.

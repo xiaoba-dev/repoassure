@@ -1473,7 +1473,7 @@ describe('project structure', () => {
     expect(recruitmentPlan).toContain('Do not record real reviewer email addresses in Git tracked docs');
     expect(recruitmentPlan).toContain('Do not create external issues from this goal');
     expect(recruitmentPlan).toContain('Do not treat maintainer-owned access smoke test identities as external reviewers');
-    expect(recruitmentPlan).toContain('waiting_for_external_reviewer_identity');
+    expect(recruitmentPlan).toContain('waiting_for_external_reviewer_dispatch');
     expect(recruitmentPlan).not.toContain('@gmail.com');
     expect(identityCorrection).toContain('Private Preview External Reviewer Recruitment and Dispatch Plan');
     expect(dispatchReadiness).toContain('Private Preview External Reviewer Recruitment and Dispatch Plan');
@@ -3236,6 +3236,60 @@ describe('project structure', () => {
       expect(codexGoal).not.toContain('真实项目用户验收已通过');
       expect(codexGoal).toContain('状态：自动证据已准备好请求用户验收，等待用户最终验收结论');
     }
+  });
+
+  it('records the external reviewer access update without storing reviewer email addresses in Git docs', async () => {
+    const [
+      accessUpdate,
+      selection,
+      recruitmentPlan,
+      handoffReadiness,
+      handoffExecution,
+      websiteHandoff,
+      acceptanceChecklist,
+      testStrategy,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/private-preview-external-reviewer-access-update-v0.1.md', 'utf8'),
+      readFile('docs/operations/private-preview-external-reviewer-selection-v0.1.md', 'utf8'),
+      readFile('docs/operations/private-preview-external-reviewer-recruitment-and-dispatch-plan-v0.1.md', 'utf8'),
+      readFile('docs/operations/private-preview-reviewer-handoff-dispatch-readiness-v0.1.md', 'utf8'),
+      readFile('docs/operations/private-preview-reviewer-handoff-package-and-dispatch-execution-v0.1.md', 'utf8'),
+      readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+    const trackedDocs = [
+      accessUpdate,
+      selection,
+      recruitmentPlan,
+      handoffReadiness,
+      handoffExecution,
+      websiteHandoff,
+      acceptanceChecklist,
+      testStrategy,
+      devLog
+    ].join('\n');
+
+    expect(accessUpdate).toContain('Private Preview External Reviewer Access Update v0.1');
+    expect(accessUpdate).toContain('Access update status: completed');
+    expect(accessUpdate).toContain('Cloudflare Dashboard UI');
+    expect(accessUpdate).toContain('RepoAssure reviewer allow');
+    expect(accessUpdate).toContain('external-reviewer-1');
+    expect(accessUpdate).toContain('external-reviewer-2');
+    expect(accessUpdate).toContain('No invitation was sent');
+    expect(accessUpdate).toContain('No real reviewer email address is recorded in Git tracked docs');
+    expect(accessUpdate).toContain('pnpm verify:cloudflare-preview');
+    expect(selection).toContain('Private Preview External Reviewer Access Update v0.1 completed');
+    expect(recruitmentPlan).toContain('waiting_for_external_reviewer_dispatch');
+    expect(handoffReadiness).toContain('waiting_for_external_reviewer_dispatch');
+    expect(handoffExecution).toContain('waiting_for_external_reviewer_dispatch');
+    expect(websiteHandoff).toContain('Private Preview External Reviewer Access Update v0.1');
+    expect(acceptanceChecklist).toContain('Private Preview External Reviewer Access Update');
+    expect(testStrategy).toContain('pnpm verify:cloudflare-preview');
+    expect(devLog).toContain('Private Preview External Reviewer Access Update v0.1');
+    expect(trackedDocs).not.toMatch(/web3xiaoba@gmail\.com|365248326@qq\.com/u);
   });
 });
 

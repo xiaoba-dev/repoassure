@@ -11688,3 +11688,30 @@ Phase 0：项目初始化。
 - 登录后内容 smoke 为 `manual_required`：必须由 allowed reviewer 人工完成 Cloudflare Access email/OTP 登录后确认页面内容。
 - rollback/shutdown 为 `manual_required`：如需关闭 private preview，手动禁用/删除 Access application 或删除 Cloudflare Pages deployment/project。
 - 不得将 deployment subdomain 或 branch alias 作为 accepted review surface。
+
+## 2026年6月28日 - Private Preview External Reviewer Access Update v0.1
+
+### 完成内容
+
+- 在用户明确授权后，通过 Cloudflare Dashboard UI 更新 `RepoAssure reviewer allow`。
+- 为 `external-reviewer-1` 与 `external-reviewer-2` 两个匿名 first-batch slots 添加 Access allow-list 覆盖。
+- 新增 `docs/operations/private-preview-external-reviewer-access-update-v0.1.md`。
+- 级联更新 external reviewer selection、recruitment/dispatch plan、handoff readiness、handoff package、public website handoff、acceptance checklist 和 test strategy。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求本轮 Access 更新有独立 operations 记录并级联到相关文档；测试因缺少 `docs/operations/private-preview-external-reviewer-access-update-v0.1.md` 按预期失败。
+- Green：新增 access update operation record，并更新级联文档。
+
+### 已验证
+
+- Cloudflare Dashboard UI：policy save 完成并返回 Policies 列表；`RepoAssure reviewer allow` 仍显示被 1 个 application 使用。
+- `pnpm verify:cloudflare-preview`：应继续验证未登录边界；登录后 reviewer smoke 仍为 `manual_required`。
+
+### 边界
+
+- Git tracked docs 只记录匿名 reviewer slots，不记录真实 reviewer email。
+- No invitation was sent。
+- 不创建 external issue，不编造 reviewer feedback。
+- 不记录 OTP、cookie、Access token、login query-state、raw Access redirect URL、reviewer credentials 或无关个人数据。
+- 不授权 public launch、生产营销发布、仓库公开、npm 发布、GitHub release、SaaS availability、Team Cloud availability、Enterprise availability 或 hosted dashboard availability claims。

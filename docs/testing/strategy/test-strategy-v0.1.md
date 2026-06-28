@@ -186,3 +186,17 @@ CLI 子命令帮助入口属于低成本回归项。`node dist/adapters/cli/inde
 `pnpm user:accept` 是真实项目验收入口。该命令不属于默认本地门禁，因为它需要用户提供真实 Web App repo，且通常需要本地 server 与 Chromium 权限。`pnpm user:accept -- --help` 和 `pnpm user:accept -- -h` 可直接输出参数说明，不要求提供 repo。runner 会先校验 `--repo` 是已存在目录且包含文件型 `package.json`；无效路径或缺失 `package.json` 会生成结构化失败记录并返回非零退出码，不进入 hardening flow。若 hardening flow 发生非预期异常，runner 同样写入结构化失败记录，摘要路径、异常摘要、artifact 检查证据和用户备注会先经过敏感信息脱敏。
 
 `--validate-generated-tests` 会执行 generated Playwright spec。未提供 `--url` 时，`pnpm user:accept` 会保持自动 boot 的应用运行到 generated spec 验证结束；如果目标应用已由用户或 CI 启动，则可通过 `--url <running-url>` 复用现有服务。验证阶段复用 client URL 归一化规则，将 `0.0.0.0` 和 `[::]` 转换为 loopback URL，避免探索阶段与 generated spec 验证阶段访问不同地址。慢登录或复杂真实项目可用 `--generated-test-timeout-ms <ms>` 覆盖默认 120000ms 验证超时。
+
+## Private Preview External Reviewer Access Update
+
+Private Preview External Reviewer Access Update v0.1 is verified through three layers:
+
+```text
+pnpm vitest run tests/unit/project-structure.test.ts
+pnpm verify:cloudflare-preview
+manual Cloudflare Dashboard UI confirmation
+```
+
+The structure test requires the access update operation record and cascade docs to reference only anonymous slots such as `external-reviewer-1` and `external-reviewer-2`; real reviewer email addresses must not be stored in Git tracked docs.
+
+`pnpm verify:cloudflare-preview` remains the automated unauthenticated boundary check for `https://repoassure-preview.pages.dev`. Authenticated reviewer content smoke remains `manual_required` because Cloudflare Access email/OTP login must be completed by the reviewer and must not be bypassed or persisted by tests.

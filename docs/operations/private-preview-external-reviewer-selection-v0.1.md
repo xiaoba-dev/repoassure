@@ -124,4 +124,12 @@ No Cloudflare Access reviewer was added.
 
 ## Next Action
 
-Run `Private Preview External Reviewer Access Update v0.1` after the maintainer provides real reviewer emails through a non-Git channel and explicitly authorizes the Cloudflare Access policy update.
+Private Preview External Reviewer Access Update v0.1 completed the Cloudflare Access allow-list update for `external-reviewer-1` and `external-reviewer-2` through the Cloudflare Dashboard UI.
+
+Current state:
+
+```text
+waiting_for_external_reviewer_dispatch
+```
+
+Run `Private Preview External Reviewer Manual Dispatch v0.1` when the maintainer is ready to send the approved handoff package through manual maintainer email. Continue to record only slot-level metadata in Git tracked docs.

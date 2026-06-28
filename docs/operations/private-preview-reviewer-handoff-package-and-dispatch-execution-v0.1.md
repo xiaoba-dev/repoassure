@@ -137,10 +137,10 @@ Sensitive material recorded:
 ## Current State
 
 ```text
-Status: pending_channel_confirmation
+Status: waiting_for_external_reviewer_dispatch
 ```
 
-The handoff package is ready as a reusable template, but dispatch execution is pending a channel confirmation and a non-maintainer reviewer identity. This record does not claim reviewer feedback was requested, sent, received, redacted, or triaged.
+The handoff package is ready as a reusable template. Private Preview External Reviewer Selection v0.1 selected `external-reviewer-1` and `external-reviewer-2`, and Private Preview External Reviewer Access Update v0.1 completed the Cloudflare Access allow-list update for those anonymous slots. Dispatch execution is now waiting for manual maintainer email. This record does not claim reviewer feedback was requested, sent, received, redacted, or triaged.
 
 ## Operating Boundaries
 
@@ -155,10 +155,12 @@ The handoff package is ready as a reusable template, but dispatch execution is p
 
 ## Next Action
 
-Confirm the dispatch channel and non-maintainer external reviewer identities before executing outbound communication.
+Confirm manual maintainer email dispatch before executing outbound communication.
 
 Use [Private Preview External Reviewer Recruitment and Dispatch Plan v0.1](private-preview-external-reviewer-recruitment-and-dispatch-plan-v0.1.md) before selecting external reviewer slots or sending any invitation.
 
 Use [Private Preview External Reviewer Selection v0.1](private-preview-external-reviewer-selection-v0.1.md) for the first-batch anonymous slots, selected archetypes, manual maintainer email channel, and `Access update decision: required_before_dispatch`.
 
 If the maintainer chooses manual sending, use the Stage 1 message body and record only privacy-preserving slot-level dispatch metadata.
+
+Next goal: `Private Preview External Reviewer Manual Dispatch v0.1`.

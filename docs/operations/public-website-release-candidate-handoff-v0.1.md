@@ -357,6 +357,20 @@ Executed on 2026-06-27:
 
 This replacement does not send reviewer invitations, create external issues, invent reviewer feedback, record OTP/cookie/Access token/login query-state/raw Access redirect URL/reviewer credentials, authorize public launch, make the repo public, publish npm packages, create a GitHub release, or make SaaS/Team Cloud/Enterprise/hosted dashboard availability claims.
 
+## Private Preview External Reviewer Access Update
+
+- Execution record: [Private Preview External Reviewer Access Update v0.1](private-preview-external-reviewer-access-update-v0.1.md)
+- Cloudflare Access application: `RepoAssure Private Preview`.
+- Cloudflare Access policy: `RepoAssure reviewer allow`.
+- Execution path: Cloudflare Dashboard UI.
+- Updated slots: `external-reviewer-1`, `external-reviewer-2`.
+- Current state: `waiting_for_external_reviewer_dispatch`.
+- No invitation was sent.
+- No real reviewer email address is recorded in Git tracked docs.
+- `pnpm verify:cloudflare-preview` remains the automated unauthenticated boundary verifier; authenticated external reviewer content smoke still requires the reviewer to complete Cloudflare Access email/OTP login.
+
+This update only grants Access allow-list coverage to the selected anonymous external reviewer slots. It does not send reviewer invitations, create external issues, invent reviewer feedback, record OTP/cookie/Access token/login query-state/raw Access redirect URL/reviewer credentials, authorize public launch, make the repo public, publish npm packages, create a GitHub release, or make SaaS/Team Cloud/Enterprise/hosted dashboard availability claims.
+
 ## Private Preview Reviewer Handoff Package and Dispatch Execution
 
 Prepared on 2026-06-27:

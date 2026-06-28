@@ -11715,3 +11715,25 @@ Phase 0：项目初始化。
 - 不创建 external issue，不编造 reviewer feedback。
 - 不记录 OTP、cookie、Access token、login query-state、raw Access redirect URL、reviewer credentials 或无关个人数据。
 - 不授权 public launch、生产营销发布、仓库公开、npm 发布、GitHub release、SaaS availability、Team Cloud availability、Enterprise availability 或 hosted dashboard availability claims。
+
+## 2026年6月28日 - Private Preview External Reviewer Manual Dispatch v0.1
+
+### 完成内容
+
+- 在 Access allow-list 已更新后，通过 manual maintainer email 向 `external-reviewer-1` 与 `external-reviewer-2` 两个匿名 slot 发送 private preview handoff。
+- 新增 `docs/operations/private-preview-external-reviewer-manual-dispatch-v0.1.md`。
+- 记录 `Dispatch status: sent`、`manual maintainer email`、`Message template version: private-preview-reviewer-handoff-package-v0.1`、slot-level ledger 和 `waiting_for_reviewer_feedback`。
+- 级联更新 access update、external reviewer selection、recruitment/dispatch plan、handoff readiness、handoff package、public website handoff、acceptance checklist 和 test strategy。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Private Preview External Reviewer Manual Dispatch 文档和级联记录存在；测试因 `docs/operations/private-preview-external-reviewer-manual-dispatch-v0.1.md` 缺失按预期失败。
+- Green：新增 manual dispatch operation record，并更新级联文档。
+
+### 边界
+
+- Git tracked docs 只记录匿名 reviewer slots、channel、message template version、sent status 和 recorded timestamp，不记录真实 reviewer email。
+- No external issue was created。
+- No reviewer feedback was invented。
+- 不记录 OTP、cookie、Access token、login query-state、raw Access redirect URL、reviewer credentials 或无关个人数据。
+- 不授权 public launch、生产营销发布、仓库公开、npm 发布、GitHub release、SaaS availability、Team Cloud availability、Enterprise availability 或 hosted dashboard availability claims。

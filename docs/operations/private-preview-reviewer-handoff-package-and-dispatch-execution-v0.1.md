@@ -1,6 +1,6 @@
 # Private Preview Reviewer Handoff Package and Dispatch Execution v0.1
 
-Status: pending_channel_confirmation
+Status: waiting_for_reviewer_feedback
 Date: 2026-06-27
 
 ## Purpose
@@ -137,10 +137,10 @@ Sensitive material recorded:
 ## Current State
 
 ```text
-Status: waiting_for_external_reviewer_dispatch
+Status: waiting_for_reviewer_feedback
 ```
 
-The handoff package is ready as a reusable template. Private Preview External Reviewer Selection v0.1 selected `external-reviewer-1` and `external-reviewer-2`, and Private Preview External Reviewer Access Update v0.1 completed the Cloudflare Access allow-list update for those anonymous slots. Dispatch execution is now waiting for manual maintainer email. This record does not claim reviewer feedback was requested, sent, received, redacted, or triaged.
+The handoff package is ready as a reusable template. Private Preview External Reviewer Selection v0.1 selected `external-reviewer-1` and `external-reviewer-2`, and Private Preview External Reviewer Access Update v0.1 completed the Cloudflare Access allow-list update for those anonymous slots. Private Preview External Reviewer Manual Dispatch v0.1 sent the approved package through manual maintainer email using slot-level records only. This record does not claim reviewer feedback was received, redacted, or triaged.
 
 ## Operating Boundaries
 
@@ -149,18 +149,18 @@ The handoff package is ready as a reusable template. Private Preview External Re
 - Do not create external issues from this goal.
 - Do not invent reviewer feedback.
 - Do not treat maintainer-owned access smoke test identities as external reviewers.
-- Do not claim a message was sent until a real dispatch channel and dispatch evidence exist.
+- Do not claim reviewer feedback exists until real feedback is received.
 - Do not share deployment subdomains or branch aliases.
 - Do not authorize public launch, production marketing announcement, repository visibility changes, npm publication, GitHub release creation, SaaS availability claims, Team Cloud availability claims, Enterprise availability claims, or hosted dashboard availability claims.
 
 ## Next Action
 
-Confirm manual maintainer email dispatch before executing outbound communication.
+Wait for real reviewer feedback.
 
 Use [Private Preview External Reviewer Recruitment and Dispatch Plan v0.1](private-preview-external-reviewer-recruitment-and-dispatch-plan-v0.1.md) before selecting external reviewer slots or sending any invitation.
 
 Use [Private Preview External Reviewer Selection v0.1](private-preview-external-reviewer-selection-v0.1.md) for the first-batch anonymous slots, selected archetypes, manual maintainer email channel, and `Access update decision: required_before_dispatch`.
 
-If the maintainer chooses manual sending, use the Stage 1 message body and record only privacy-preserving slot-level dispatch metadata.
+Manual maintainer email dispatch is recorded in [Private Preview External Reviewer Manual Dispatch v0.1](private-preview-external-reviewer-manual-dispatch-v0.1.md).
 
-Next goal: `Private Preview External Reviewer Manual Dispatch v0.1`.
+Next goal: `Private Preview External Reviewer Feedback Intake v0.1`.

@@ -46,12 +46,12 @@ Expected result:
 ## Dispatch State
 
 ```text
-Dispatch state: waiting_for_external_reviewer_dispatch
+Dispatch state: waiting_for_reviewer_feedback
 ```
 
-No invitation was sent.
+Private Preview External Reviewer Manual Dispatch v0.1 completed.
 
-The next allowed step is manual maintainer email dispatch using the approved handoff package and slot-level recording only.
+The approved handoff package was sent through manual maintainer email to the two anonymous first-batch external reviewer slots. The next allowed step is feedback intake after real reviewer feedback exists.
 
 ## Privacy Boundary
 
@@ -65,4 +65,4 @@ The next allowed step is manual maintainer email dispatch using the approved han
 
 ## Next Action
 
-Run `Private Preview External Reviewer Manual Dispatch v0.1` only after the maintainer confirms that manual email should be sent.
+Wait for real reviewer feedback through `Private Preview External Reviewer Feedback Intake v0.1`.

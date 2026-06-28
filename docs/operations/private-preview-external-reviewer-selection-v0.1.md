@@ -126,10 +126,12 @@ No Cloudflare Access reviewer was added.
 
 Private Preview External Reviewer Access Update v0.1 completed the Cloudflare Access allow-list update for `external-reviewer-1` and `external-reviewer-2` through the Cloudflare Dashboard UI.
 
+Private Preview External Reviewer Manual Dispatch v0.1 completed through manual maintainer email using slot-level records only.
+
 Current state:
 
 ```text
-waiting_for_external_reviewer_dispatch
+waiting_for_reviewer_feedback
 ```
 
-Run `Private Preview External Reviewer Manual Dispatch v0.1` when the maintainer is ready to send the approved handoff package through manual maintainer email. Continue to record only slot-level metadata in Git tracked docs.
+Wait for real reviewer feedback. Continue to record only slot-level metadata in Git tracked docs and do not invent feedback.

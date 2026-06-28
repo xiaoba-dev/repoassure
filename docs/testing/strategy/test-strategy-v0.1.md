@@ -200,3 +200,16 @@ manual Cloudflare Dashboard UI confirmation
 The structure test requires the access update operation record and cascade docs to reference only anonymous slots such as `external-reviewer-1` and `external-reviewer-2`; real reviewer email addresses must not be stored in Git tracked docs.
 
 `pnpm verify:cloudflare-preview` remains the automated unauthenticated boundary check for `https://repoassure-preview.pages.dev`. Authenticated reviewer content smoke remains `manual_required` because Cloudflare Access email/OTP login must be completed by the reviewer and must not be bypassed or persisted by tests.
+
+## Private Preview External Reviewer Manual Dispatch
+
+Private Preview External Reviewer Manual Dispatch v0.1 is verified through structure-level tests and a sensitive information scan:
+
+```text
+pnpm vitest run tests/unit/project-structure.test.ts
+rg -n "<out-of-band-reviewer-email-1>|<out-of-band-reviewer-email-2>" docs tests README.md package.json scripts
+```
+
+The structure test requires the manual dispatch operation record and cascade docs to reference only anonymous slots such as `external-reviewer-1` and `external-reviewer-2`, the `manual maintainer email` channel, `Dispatch status: sent`, `Message template version: private-preview-reviewer-handoff-package-v0.1`, and the `waiting_for_reviewer_feedback` state.
+
+The local sensitive information scan must be run with the real reviewer emails supplied out of band at execution time. The real emails must not be committed into docs, tests, scripts, or examples. The test also requires Git tracked docs not to record real reviewer email addresses, external issues, invented reviewer feedback, OTPs, cookies, Cloudflare Access tokens, login query-state, raw Access redirect URLs, reviewer credentials, or unrelated personal data.

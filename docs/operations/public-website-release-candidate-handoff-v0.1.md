@@ -371,6 +371,21 @@ This replacement does not send reviewer invitations, create external issues, inv
 
 This update only grants Access allow-list coverage to the selected anonymous external reviewer slots. It does not send reviewer invitations, create external issues, invent reviewer feedback, record OTP/cookie/Access token/login query-state/raw Access redirect URL/reviewer credentials, authorize public launch, make the repo public, publish npm packages, create a GitHub release, or make SaaS/Team Cloud/Enterprise/hosted dashboard availability claims.
 
+## Private Preview External Reviewer Manual Dispatch
+
+- Execution record: [Private Preview External Reviewer Manual Dispatch v0.1](private-preview-external-reviewer-manual-dispatch-v0.1.md)
+- Dispatch channel: manual maintainer email.
+- Sent from maintainer email account.
+- Message template version: `private-preview-reviewer-handoff-package-v0.1`.
+- Updated slots: `external-reviewer-1`, `external-reviewer-2`.
+- Dispatch status: sent.
+- Current state: `waiting_for_reviewer_feedback`.
+- No real reviewer email address is recorded in Git tracked docs.
+- No external issue was created.
+- No reviewer feedback was invented.
+
+This dispatch only sends the private preview handoff package to the selected anonymous external reviewer slots. It does not record OTP/cookie/Access token/login query-state/raw Access redirect URL/reviewer credentials, authorize public launch, make the repo public, publish npm packages, create a GitHub release, or make SaaS/Team Cloud/Enterprise/hosted dashboard availability claims.
+
 ## Private Preview Reviewer Handoff Package and Dispatch Execution
 
 Prepared on 2026-06-27:

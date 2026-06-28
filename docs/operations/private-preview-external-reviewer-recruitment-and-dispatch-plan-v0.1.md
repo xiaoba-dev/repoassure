@@ -121,14 +121,14 @@ Do not start `Private Preview Feedback Triage Execution v0.1` until:
 After Private Preview External Reviewer Access Update v0.1, the current state is:
 
 ```text
-waiting_for_external_reviewer_dispatch
+waiting_for_reviewer_feedback
 ```
 
-The first two external reviewer slots have Access allow-list coverage. No invitation has been sent yet.
+The first two external reviewer slots have Access allow-list coverage. Private Preview External Reviewer Manual Dispatch v0.1 sent the approved handoff package through manual maintainer email using slot-level records only.
 
 ## Non-Authorization Boundary
 
-- No invitation was sent.
+- Invitation was sent through manual maintainer email in Private Preview External Reviewer Manual Dispatch v0.1.
 - Do not add reviewers to Cloudflare Access from this goal.
 - Do not record real reviewer email addresses in Git tracked docs.
 - Do not create external issues from this goal.
@@ -144,4 +144,6 @@ Private Preview External Reviewer Selection v0.1 has selected `external-reviewer
 
 Private Preview External Reviewer Access Update v0.1 completed the required Cloudflare Access allow-list update without recording real reviewer email addresses in Git tracked docs.
 
-Run `Private Preview External Reviewer Manual Dispatch v0.1` next if the maintainer confirms that manual email should be sent.
+Private Preview External Reviewer Manual Dispatch v0.1 completed manual maintainer email dispatch without recording real reviewer email addresses in Git tracked docs.
+
+Run `Private Preview External Reviewer Feedback Intake v0.1` next only after real reviewer feedback exists.

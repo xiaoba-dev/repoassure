@@ -57,6 +57,12 @@ That reconciliation now references [Private Preview Reviewer Identity Correction
 
 Current handoff status is `waiting_for_external_reviewer_identity` because the available test identities are maintainer-owned access smoke test identities.
 
+## External Reviewer Recruitment Plan
+
+Use [Private Preview External Reviewer Recruitment and Dispatch Plan v0.1](private-preview-external-reviewer-recruitment-and-dispatch-plan-v0.1.md) before selecting external reviewer slots or sending any invitation.
+
+That plan defines the external reviewer criteria, minimum reviewer count, dispatch channel options, privacy-preserving slot records, feedback intake gate, and non-authorization boundary.
+
 ## Handoff Package and Dispatch Execution
 
 Use [Private Preview Reviewer Handoff Package and Dispatch Execution v0.1](private-preview-reviewer-handoff-package-and-dispatch-execution-v0.1.md) for the current 1+2 workflow.

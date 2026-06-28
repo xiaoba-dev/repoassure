@@ -157,4 +157,6 @@ The handoff package is ready as a reusable template, but dispatch execution is p
 
 Confirm the dispatch channel and non-maintainer external reviewer identities before executing outbound communication.
 
+Use [Private Preview External Reviewer Recruitment and Dispatch Plan v0.1](private-preview-external-reviewer-recruitment-and-dispatch-plan-v0.1.md) before selecting external reviewer slots or sending any invitation.
+
 If the maintainer chooses manual sending, use the Stage 1 message body and record only privacy-preserving slot-level dispatch metadata.

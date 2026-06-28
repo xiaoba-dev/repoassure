@@ -82,4 +82,4 @@ confirmed-reviewer-1 -> maintainer-test-email-1
 confirmed-reviewer-2 -> maintainer-test-email-2
 ```
 
-Real external reviewer recruitment and dispatch remain future work.
+Real external reviewer recruitment and dispatch are planned by [Private Preview External Reviewer Recruitment and Dispatch Plan v0.1](private-preview-external-reviewer-recruitment-and-dispatch-plan-v0.1.md).

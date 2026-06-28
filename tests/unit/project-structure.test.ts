@@ -1437,6 +1437,53 @@ describe('project structure', () => {
     expect(devLog).toContain('Private Preview Reviewer Identity Correction v0.1');
   });
 
+  it('plans external reviewer recruitment and dispatch without sending invitations', async () => {
+    const [
+      recruitmentPlan,
+      identityCorrection,
+      dispatchReadiness,
+      handoffDispatch,
+      publicWebsiteHandoff,
+      acceptanceChecklist,
+      testingStrategy,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/private-preview-external-reviewer-recruitment-and-dispatch-plan-v0.1.md', 'utf8'),
+      readFile('docs/operations/private-preview-reviewer-identity-correction-v0.1.md', 'utf8'),
+      readFile('docs/operations/private-preview-reviewer-handoff-dispatch-readiness-v0.1.md', 'utf8'),
+      readFile('docs/operations/private-preview-reviewer-handoff-package-and-dispatch-execution-v0.1.md', 'utf8'),
+      readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(recruitmentPlan).toContain('Private Preview External Reviewer Recruitment and Dispatch Plan v0.1');
+    expect(recruitmentPlan).toContain('Status: ready_for_external_reviewer_selection');
+    expect(recruitmentPlan).toContain('external reviewer');
+    expect(recruitmentPlan).toContain('not maintainer-owned');
+    expect(recruitmentPlan).toContain('minimum reviewer count: 2');
+    expect(recruitmentPlan).toContain('developer builder');
+    expect(recruitmentPlan).toContain('engineering lead');
+    expect(recruitmentPlan).toContain('security-minded reviewer');
+    expect(recruitmentPlan).toContain('manual maintainer email');
+    expect(recruitmentPlan).toContain('Resend');
+    expect(recruitmentPlan).toContain('No invitation was sent');
+    expect(recruitmentPlan).toContain('Do not add reviewers to Cloudflare Access from this goal');
+    expect(recruitmentPlan).toContain('Do not record real reviewer email addresses in Git tracked docs');
+    expect(recruitmentPlan).toContain('Do not create external issues from this goal');
+    expect(recruitmentPlan).toContain('Do not treat maintainer-owned access smoke test identities as external reviewers');
+    expect(recruitmentPlan).toContain('waiting_for_external_reviewer_identity');
+    expect(recruitmentPlan).not.toContain('@gmail.com');
+    expect(identityCorrection).toContain('Private Preview External Reviewer Recruitment and Dispatch Plan');
+    expect(dispatchReadiness).toContain('Private Preview External Reviewer Recruitment and Dispatch Plan');
+    expect(handoffDispatch).toContain('Private Preview External Reviewer Recruitment and Dispatch Plan');
+    expect(publicWebsiteHandoff).toContain('Private Preview External Reviewer Recruitment and Dispatch Plan');
+    expect(acceptanceChecklist).toContain('Private Preview External Reviewer Recruitment and Dispatch Plan');
+    expect(testingStrategy).toContain('Private Preview External Reviewer Recruitment and Dispatch Plan');
+    expect(devLog).toContain('Private Preview External Reviewer Recruitment and Dispatch Plan v0.1');
+  });
+
   it('records Cloudflare remote preview execution as blocked before website upload when Access is unavailable', async () => {
     const [blockers, devLog, publicWebsiteHandoff, acceptanceChecklist, testingStrategy] = await Promise.all([
       readFile('docs/logs/blockers.md', 'utf8'),

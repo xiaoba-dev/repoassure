@@ -4,7 +4,7 @@
 
 ### 背景
 
-用户已明确授权创建 Cloudflare Pages private preview、上传 RepoAssure 官网构建产物，并使用 Cloudflare Access 保护 reviewer 访问。当前 Cloudflare Wrangler 已登录，账号为 `Web3coderman`，邮箱为 `web3coderman@gmail.com`。
+用户已明确授权创建 Cloudflare Pages private preview、上传 RepoAssure 官网构建产物，并使用 Cloudflare Access 保护 reviewer 访问。当前 Cloudflare Wrangler 已登录，账号为 `Web3coderman`，邮箱记录已匿名化为 `maintainer-authenticated-smoke-identity`。
 
 ### 影响
 

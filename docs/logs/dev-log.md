@@ -1,5 +1,35 @@
 # 开发日志
 
+## 2026年6月28日 - Private Preview External Reviewer Recruitment and Dispatch Plan v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/private-preview-external-reviewer-recruitment-and-dispatch-plan-v0.1.md`。
+- 定义 external reviewer 必须 not maintainer-owned、不是 maintainer test mailbox、能从真实潜在用户/买方/技术评估者视角审查 RepoAssure。
+- 定义 minimum reviewer count: 2。
+- 定义推荐 reviewer mix：developer builder、engineering lead、security-minded reviewer。
+- 定义 dispatch channel options：manual maintainer email、private maintainer-managed chat/DM、Resend。
+- 将第一批推荐 channel 记录为 manual maintainer email；Resend 需要另开 channel decision 后才能使用。
+- 定义 slot-level privacy record、dispatch gate 和 feedback intake gate。
+- 明确 No invitation was sent，且不新增 Cloudflare Access reviewer。
+- 级联更新 identity correction、dispatch readiness、package-and-dispatch、public website release candidate handoff、acceptance checklist 和 testing strategy。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 Private Preview External Reviewer Recruitment and Dispatch Plan 文档和级联记录存在；测试因 `docs/operations/private-preview-external-reviewer-recruitment-and-dispatch-plan-v0.1.md` 缺失按预期失败。
+- Green：新增 recruitment/dispatch plan 文档并补齐级联。
+
+### 边界
+
+- 不发送 reviewer invitation。
+- 不新增 Cloudflare Access reviewer。
+- 不记录真实 reviewer email 到 Git tracked docs。
+- 不创建 external issue。
+- 不编造 reviewer feedback。
+- 不把 maintainer-owned access smoke test identities 视为 external reviewers。
+- No OTP, cookie, Access token, login query-state, raw Access redirect URL or reviewer credential material may be recorded。
+- 不授权 public launch、repo public、npm publication、GitHub release、外部公告、SaaS/Team Cloud/Enterprise/hosted dashboard availability claims。
+
 ## 2026年6月28日 - Private Preview Reviewer Identity Correction v0.1
 
 ### 完成内容
@@ -86,7 +116,7 @@
 
 - 新增 `docs/operations/private-preview-reviewer-identity-reconciliation-v0.1.md`。
 - 澄清 Maintainer / user 负责 reviewer selection、authorization 和 product decisions。
-- 澄清 `web3coderman@gmail.com` 是已完成 authenticated reviewer smoke 的 identity path，不等同于外部 reviewer feedback。
+- 澄清 `maintainer-authenticated-smoke-identity` 是已完成 authenticated reviewer smoke 的 identity path，不等同于外部 reviewer feedback。
 - 澄清 `reviewer1@example.com` 和 `reviewer2@example.com` 当前为 placeholder only，必须替换为真实 reviewer emails 后才能作为外部 reviewer feedback 输入。
 - 将状态记录为 `waiting_for_real_reviewer_identity`。
 - 级联更新 second reviewer access execution、handoff dispatch readiness、public website release candidate handoff、acceptance checklist 和 testing strategy。
@@ -135,7 +165,7 @@
 - 按用户明确授权，将 `reviewer1@example.com` 和 `reviewer2@example.com` 加入 Cloudflare Access policy `RepoAssure reviewer allow`。
 - 先用 Cloudflare CLI / API context 复查可用性；Access API returned `Authentication error`，因此没有通过 token 调用修改 Access 配置。
 - 切换到 Cloudflare Dashboard UI，在 `RepoAssure reviewer allow` policy 的 Include `Emails` rule 中新增两个授权 reviewer。
-- 保存后重新打开 policy edit page，确认 `web3coderman@gmail.com`、`reviewer1@example.com`、`reviewer2@example.com` 三个 email chip 均存在。
+- 保存后重新打开 policy edit page，确认 `maintainer-authenticated-smoke-identity`、`reviewer1@example.com`、`reviewer2@example.com` 三个 email chip 均存在。
 - 复跑 `pnpm verify:cloudflare-preview`，结果为预期 `manual_required`；自动门禁继续覆盖未登录 Cloudflare Access boundary，登录后 smoke 仍需人工 email/OTP。
 - 新增 `docs/operations/private-preview-second-reviewer-access-execution-v0.1.md`，并级联更新 Cloudflare Access preflight handoff、public website release candidate handoff、acceptance checklist 和 testing strategy。
 
@@ -11581,7 +11611,7 @@ Phase 0：项目初始化。
 ### 完成内容
 
 - 在 Cloudflare Zero Trust 中创建 Access application：`RepoAssure Private Preview`。
-- 创建并挂载 Access policy：`RepoAssure reviewer allow`，规则为 `Allow` + `Emails` 包含 `web3coderman@gmail.com`。
+- 创建并挂载 Access policy：`RepoAssure reviewer allow`，规则为 `Allow` + `Emails` 包含 `maintainer-authenticated-smoke-identity`。
 - 部署 RepoAssure public website build output 到 Cloudflare Pages project：`repoassure-preview`。
 - 生产环境部署 id：`997feaee-ef39-43c7-ab4d-2c99014df06d`，保护入口为 `https://repoassure-preview.pages.dev`。
 

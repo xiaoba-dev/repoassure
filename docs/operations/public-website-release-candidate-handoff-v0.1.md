@@ -312,6 +312,21 @@ Prepared on 2026-06-28:
 - They are not external reviewers and do not count as external reviewer feedback.
 - No outbound reviewer invitation was sent.
 
+## Private Preview External Reviewer Recruitment and Dispatch Plan
+
+Prepared on 2026-06-28:
+
+- Plan record: [Private Preview External Reviewer Recruitment and Dispatch Plan v0.1](private-preview-external-reviewer-recruitment-and-dispatch-plan-v0.1.md)
+- Current state: `ready_for_external_reviewer_selection`.
+- Minimum reviewer count: 2.
+- External reviewers must be not maintainer-owned and not maintainer test mailboxes.
+- Recommended reviewer mix: developer builder, engineering lead, and optional security-minded reviewer.
+- Preferred first-batch channel: manual maintainer email.
+- Resend remains an option only after a separate channel decision records API key handling, verified domain, sender address, data sharing, and unsubscribe/compliance boundaries.
+- No invitation was sent.
+- No Cloudflare Access reviewer was added.
+- No real reviewer email address is recorded in Git tracked docs.
+
 ## Private Preview Real Reviewer Replacement
 
 Executed on 2026-06-27:

@@ -1,6 +1,6 @@
 # Spike 与 Benchmark 结果
 
-生成时间：2026-06-28T15:38:08.200Z
+生成时间：2026-06-28T16:03:06.772Z
 
 ## 摘要
 
@@ -11,19 +11,19 @@
 | 完整流程完成数 | 5 |
 | 失败数 | 0 |
 | 通过阈值 | 3 |
-| 总耗时 | 0m 33s |
+| 总耗时 | 0m 17s |
 | 15 分钟内完成 | 是 |
-| 运行目录 | `/Users/ycn/Desktop/Agent Tester/artifacts/benchmark-runs/run-2026-06-28T15-37-34-928Z` |
+| 运行目录 | `/Users/ycn/Desktop/Agent Tester/artifacts/benchmark-runs/run-2026-06-28T16-02-49-785Z` |
 
 ## Repo 结果
 
 | Repo | 状态 | 生成测试数 | 生成测试验证 | 发现项 | artifacts | readiness | 报告 |
 | --- | --- | ---: | --- | ---: | ---: | ---: | --- |
-| next-console | completed | 1 | passed | 1 | 1 | 85 | `/Users/ycn/Desktop/Agent Tester/artifacts/benchmark-runs/run-2026-06-28T15-37-34-928Z/next-console/hardening-report.md` |
-| next-server-error | completed | 1 | passed | 3 | 2 | 55 | `/Users/ycn/Desktop/Agent Tester/artifacts/benchmark-runs/run-2026-06-28T15-37-34-928Z/next-server-error/hardening-report.md` |
-| react-blank | completed | 1 | passed | 1 | 1 | 65 | `/Users/ycn/Desktop/Agent Tester/artifacts/benchmark-runs/run-2026-06-28T15-37-34-928Z/react-blank/hardening-report.md` |
-| vite-basic | completed | 1 | passed | 0 | 2 | 100 | `/Users/ycn/Desktop/Agent Tester/artifacts/benchmark-runs/run-2026-06-28T15-37-34-928Z/vite-basic/hardening-report.md` |
-| vite-broken-route | completed | 1 | passed | 3 | 2 | 55 | `/Users/ycn/Desktop/Agent Tester/artifacts/benchmark-runs/run-2026-06-28T15-37-34-928Z/vite-broken-route/hardening-report.md` |
+| next-console | completed | 1 | passed | 1 | 1 | 85 | `/Users/ycn/Desktop/Agent Tester/artifacts/benchmark-runs/run-2026-06-28T16-02-49-785Z/next-console/hardening-report.md` |
+| next-server-error | completed | 1 | passed | 3 | 2 | 55 | `/Users/ycn/Desktop/Agent Tester/artifacts/benchmark-runs/run-2026-06-28T16-02-49-785Z/next-server-error/hardening-report.md` |
+| react-blank | completed | 1 | passed | 1 | 1 | 65 | `/Users/ycn/Desktop/Agent Tester/artifacts/benchmark-runs/run-2026-06-28T16-02-49-785Z/react-blank/hardening-report.md` |
+| vite-basic | completed | 1 | passed | 0 | 2 | 100 | `/Users/ycn/Desktop/Agent Tester/artifacts/benchmark-runs/run-2026-06-28T16-02-49-785Z/vite-basic/hardening-report.md` |
+| vite-broken-route | completed | 1 | passed | 3 | 2 | 55 | `/Users/ycn/Desktop/Agent Tester/artifacts/benchmark-runs/run-2026-06-28T16-02-49-785Z/vite-broken-route/hardening-report.md` |
 
 ## 失败原因
 

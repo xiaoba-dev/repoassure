@@ -68,6 +68,8 @@
   - 当前状态：Apache-2.0 `LICENSE`、`package.json#license`、`CONTRIBUTING.md`、`SECURITY.md`、dependency license audit、public release notes draft、ADR-0015 和 `pnpm release:check` 自动检查已完成；公开 repo、npm publish、公开公告和外部 case study 仍需法律、商标、branch protection 或等效 ruleset 和最终 maintainer authorization。
 - [x] Public Release Readiness v0.2
   - 当前状态：新增 `docs/operations/public-release-readiness-v0.2.md`，记录当前自动门禁命令矩阵、`public release ready: no` 预期、`package.json` `"private": true` 边界、manual authorization gates，以及不授权 repository visibility change、npm publication、GitHub release、public launch、production marketing announcement、SaaS/Team Cloud/Enterprise/hosted dashboard availability claims。Private Preview Feedback Triage Execution 仍需等待真实 reviewer feedback。
+- [x] Public Release Candidate Final Review v0.1
+  - 当前状态：新增 `docs/operations/public-release-candidate-final-review-v0.1.md`，记录 automated local gates passed、full/browser acceptance 17/17、Real Chromium trace E2E passed、benchmark Go、`public release ready: no` 和 final recommendation no-go for public release；公开发布仍需 branch protection 或等效 ruleset、legal review、trademark/name review 和 final maintainer publication authorization。Private Preview Feedback Triage Execution 仍需等待真实 reviewer feedback。
 - [x] Team Cloud & Enterprise Spec v0.1
   - 当前状态：ADR-0016、商业版产品路线图、商业版架构边界、open-core/commercial 级联、测试策略和验收边界已记录；商业版能力仅完成规划和边界验收，不实现 paid cloud runtime。
 - [x] Public Website and Project Intelligence Console planning

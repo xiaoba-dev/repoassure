@@ -494,6 +494,42 @@ describe('project structure', () => {
     await expectPath('docs/operations/public-release-readiness-v0.2.md');
   });
 
+  it('records public release candidate final review without authorizing publication', async () => {
+    const [review, readme, releaseChecklist, testingStrategy, acceptanceChecklist, devLog] = await Promise.all([
+      readFile('docs/operations/public-release-candidate-final-review-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(review).toContain('Public Release Candidate Final Review v0.1');
+    expect(review).toContain('Status: no_go_until_manual_gates_close');
+    expect(review).toContain('Final recommendation: no-go for public release');
+    expect(review).toContain('public release ready: no');
+    expect(review).toContain('All automated local gates passed');
+    expect(review).toContain('pnpm acceptance -- --full --browser');
+    expect(review).toContain('Real Chromium trace E2E');
+    expect(review).toContain('Branch protection or equivalent repository ruleset');
+    expect(review).toContain('Legal review');
+    expect(review).toContain('Trademark/name review');
+    expect(review).toContain('Final maintainer publication authorization');
+    expect(review).toContain('Private Preview Feedback Triage Execution v0.1 remains blocked until real reviewer feedback exists');
+    expect(review).toContain('No repository visibility change was authorized');
+    expect(review).toContain('No npm publication was authorized');
+    expect(review).toContain('No GitHub release was authorized');
+    expect(review).toContain('No public launch or production marketing announcement was authorized');
+    expect(review).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was authorized');
+    expect(readme).toContain('docs/operations/public-release-candidate-final-review-v0.1.md');
+    expect(releaseChecklist).toContain('Public Release Candidate Final Review v0.1');
+    expect(testingStrategy).toContain('Public Release Candidate Final Review v0.1');
+    expect(acceptanceChecklist).toContain('Public Release Candidate Final Review v0.1');
+    expect(devLog).toContain('Public Release Candidate Final Review v0.1');
+
+    await expectPath('docs/operations/public-release-candidate-final-review-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

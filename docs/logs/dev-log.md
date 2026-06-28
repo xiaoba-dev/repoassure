@@ -11785,3 +11785,28 @@ Phase 0：项目初始化。
 - No GitHub release was authorized。
 - No public launch or production marketing announcement was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
+## 2026年6月28日 - Public Release Candidate Final Review v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/public-release-candidate-final-review-v0.1.md`。
+- 记录最终审查结论：`Status: no_go_until_manual_gates_close`，Final recommendation: no-go for public release。
+- 记录 automated local gates passed：repo hygiene、release check、unit、typecheck、lint、build、full/browser acceptance、Real Chromium trace E2E、benchmark、goal audit、diff check 和 reviewer email sensitive scan。
+- 明确当前 release checker 仍应报告 `public release ready: no`。
+- 明确 manual gates 仍未关闭：branch protection or equivalent repository ruleset、legal review、trademark/name review、final maintainer publication authorization。
+- 明确 Private Preview Feedback Triage Execution v0.1 remains blocked until real reviewer feedback exists。
+- 级联更新 README、public release checklist、testing strategy 和 acceptance checklist。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Public Release Candidate Final Review v0.1 文档和级联记录存在；测试因 `docs/operations/public-release-candidate-final-review-v0.1.md` 缺失按预期失败。
+- Green：新增 final review operation packet，并更新级联文档。
+
+### 边界
+
+- No repository visibility change was authorized。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。

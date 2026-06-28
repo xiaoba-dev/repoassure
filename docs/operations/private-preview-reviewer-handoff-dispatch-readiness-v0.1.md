@@ -63,6 +63,8 @@ Use [Private Preview External Reviewer Recruitment and Dispatch Plan v0.1](priva
 
 That plan defines the external reviewer criteria, minimum reviewer count, dispatch channel options, privacy-preserving slot records, feedback intake gate, and non-authorization boundary.
 
+Private Preview External Reviewer Selection v0.1 selects `external-reviewer-1` and `external-reviewer-2`, maps them to developer builder and engineering lead archetypes, selects manual maintainer email as the first-batch channel, and records `Access update decision: required_before_dispatch`.
+
 ## Handoff Package and Dispatch Execution
 
 Use [Private Preview Reviewer Handoff Package and Dispatch Execution v0.1](private-preview-reviewer-handoff-package-and-dispatch-execution-v0.1.md) for the current 1+2 workflow.

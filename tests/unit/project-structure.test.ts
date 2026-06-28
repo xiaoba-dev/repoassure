@@ -1484,6 +1484,51 @@ describe('project structure', () => {
     expect(devLog).toContain('Private Preview External Reviewer Recruitment and Dispatch Plan v0.1');
   });
 
+  it('selects external reviewer slots without recording emails or sending invitations', async () => {
+    const [
+      selection,
+      recruitmentPlan,
+      dispatchReadiness,
+      handoffDispatch,
+      publicWebsiteHandoff,
+      acceptanceChecklist,
+      testingStrategy,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/private-preview-external-reviewer-selection-v0.1.md', 'utf8'),
+      readFile('docs/operations/private-preview-external-reviewer-recruitment-and-dispatch-plan-v0.1.md', 'utf8'),
+      readFile('docs/operations/private-preview-reviewer-handoff-dispatch-readiness-v0.1.md', 'utf8'),
+      readFile('docs/operations/private-preview-reviewer-handoff-package-and-dispatch-execution-v0.1.md', 'utf8'),
+      readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(selection).toContain('Private Preview External Reviewer Selection v0.1');
+    expect(selection).toContain('Status: ready_for_access_update_decision');
+    expect(selection).toContain('external-reviewer-1');
+    expect(selection).toContain('external-reviewer-2');
+    expect(selection).toContain('developer builder');
+    expect(selection).toContain('engineering lead');
+    expect(selection).toContain('not maintainer-owned');
+    expect(selection).toContain('manual maintainer email');
+    expect(selection).toContain('Access update decision: required_before_dispatch');
+    expect(selection).toContain('No invitation was sent');
+    expect(selection).toContain('No Cloudflare Access reviewer was added');
+    expect(selection).toContain('Do not record real reviewer email addresses in Git tracked docs');
+    expect(selection).toContain('Do not create external issues from this goal');
+    expect(selection).toContain('Do not invent reviewer feedback');
+    expect(selection).not.toContain('@gmail.com');
+    expect(recruitmentPlan).toContain('Private Preview External Reviewer Selection');
+    expect(dispatchReadiness).toContain('Private Preview External Reviewer Selection');
+    expect(handoffDispatch).toContain('Private Preview External Reviewer Selection');
+    expect(publicWebsiteHandoff).toContain('Private Preview External Reviewer Selection');
+    expect(acceptanceChecklist).toContain('Private Preview External Reviewer Selection');
+    expect(testingStrategy).toContain('Private Preview External Reviewer Selection');
+    expect(devLog).toContain('Private Preview External Reviewer Selection v0.1');
+  });
+
   it('records Cloudflare remote preview execution as blocked before website upload when Access is unavailable', async () => {
     const [blockers, devLog, publicWebsiteHandoff, acceptanceChecklist, testingStrategy] = await Promise.all([
       readFile('docs/logs/blockers.md', 'utf8'),

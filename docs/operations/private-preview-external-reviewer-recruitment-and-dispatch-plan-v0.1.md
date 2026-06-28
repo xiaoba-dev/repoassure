@@ -138,4 +138,6 @@ waiting_for_external_reviewer_identity
 
 ## Next Action
 
-Run a separate `Private Preview External Reviewer Selection v0.1` goal to select slot-level external reviewers and decide whether Access allow-list updates are required.
+Private Preview External Reviewer Selection v0.1 has selected `external-reviewer-1` and `external-reviewer-2` as first-batch slots and records `Access update decision: required_before_dispatch`.
+
+Run `Private Preview External Reviewer Access Update v0.1` after the maintainer provides real reviewer emails through a non-Git channel and explicitly authorizes the Cloudflare Access policy update.

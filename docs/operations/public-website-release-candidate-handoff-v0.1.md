@@ -327,6 +327,20 @@ Prepared on 2026-06-28:
 - No Cloudflare Access reviewer was added.
 - No real reviewer email address is recorded in Git tracked docs.
 
+## Private Preview External Reviewer Selection
+
+Prepared on 2026-06-28:
+
+- Selection record: [Private Preview External Reviewer Selection v0.1](private-preview-external-reviewer-selection-v0.1.md)
+- Current state: `ready_for_access_update_decision`.
+- Selected slots: `external-reviewer-1`, `external-reviewer-2`.
+- Selected archetypes: developer builder and engineering lead.
+- Selected first-batch channel: manual maintainer email.
+- Access update decision: required_before_dispatch.
+- No invitation was sent.
+- No Cloudflare Access reviewer was added.
+- No real reviewer email address is recorded in Git tracked docs.
+
 ## Private Preview Real Reviewer Replacement
 
 Executed on 2026-06-27:

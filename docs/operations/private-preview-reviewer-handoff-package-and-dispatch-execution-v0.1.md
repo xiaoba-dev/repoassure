@@ -159,4 +159,6 @@ Confirm the dispatch channel and non-maintainer external reviewer identities bef
 
 Use [Private Preview External Reviewer Recruitment and Dispatch Plan v0.1](private-preview-external-reviewer-recruitment-and-dispatch-plan-v0.1.md) before selecting external reviewer slots or sending any invitation.
 
+Use [Private Preview External Reviewer Selection v0.1](private-preview-external-reviewer-selection-v0.1.md) for the first-batch anonymous slots, selected archetypes, manual maintainer email channel, and `Access update decision: required_before_dispatch`.
+
 If the maintainer chooses manual sending, use the Stage 1 message body and record only privacy-preserving slot-level dispatch metadata.

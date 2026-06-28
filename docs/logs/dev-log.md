@@ -1,5 +1,34 @@
 # 开发日志
 
+## 2026年6月28日 - Private Preview External Reviewer Selection v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/private-preview-external-reviewer-selection-v0.1.md`。
+- 选择 first-batch 匿名 slots：`external-reviewer-1`、`external-reviewer-2`。
+- 将 `external-reviewer-1` 定义为 developer builder archetype。
+- 将 `external-reviewer-2` 定义为 engineering lead archetype。
+- 选择 first-batch dispatch channel：manual maintainer email。
+- 记录 `Access update decision: required_before_dispatch`。
+- 明确下一步必须另开 `Private Preview External Reviewer Access Update v0.1`，并由 maintainer 通过非 Git 渠道提供真实 reviewer emails 后才能更新 Cloudflare Access。
+- 级联更新 recruitment plan、dispatch readiness、package-and-dispatch、public website release candidate handoff、acceptance checklist 和 testing strategy。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 Private Preview External Reviewer Selection 文档和级联记录存在；测试因 `docs/operations/private-preview-external-reviewer-selection-v0.1.md` 缺失按预期失败。
+- Green：新增 selection 文档并补齐级联。
+
+### 边界
+
+- 不发送 reviewer invitation。
+- 不新增 Cloudflare Access reviewer。
+- 不记录真实 reviewer email 到 Git tracked docs。
+- 不创建 external issue。
+- 不编造 reviewer feedback。
+- 不把 maintainer-owned access smoke test identities 视为 external reviewers。
+- No OTP, cookie, Access token, login query-state, raw Access redirect URL or reviewer credential material may be recorded。
+- 不授权 public launch、repo public、npm publication、GitHub release、外部公告、SaaS/Team Cloud/Enterprise/hosted dashboard availability claims。
+
 ## 2026年6月28日 - Private Preview External Reviewer Recruitment and Dispatch Plan v0.1
 
 ### 完成内容

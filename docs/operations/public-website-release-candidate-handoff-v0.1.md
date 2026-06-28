@@ -267,7 +267,7 @@ Executed on 2026-06-27:
 - Execution record: [Private Preview Second Reviewer Access Execution v0.1](private-preview-second-reviewer-access-execution-v0.1.md)
 - User authorization: add `reviewer1@example.com` and `reviewer2@example.com` to `RepoAssure reviewer allow`.
 - Execution path: Cloudflare Dashboard UI, because the available Access API token returned `Authentication error`.
-- Confirmed allowed reviewer emails: `web3coderman@gmail.com`, `reviewer1@example.com`, `reviewer2@example.com`.
+- Confirmed allowed test identities: `maintainer-authenticated-smoke-identity`, `reviewer1@example.com`, `reviewer2@example.com`.
 - Verification command: `pnpm verify:cloudflare-preview`.
 - Verification status: `manual_required`, which is expected because authenticated reviewer smoke still requires manual email/OTP login.
 - Sensitive boundary: No OTP, cookie, Access token, login query-state, raw Access redirect URL, or reviewer credential material is recorded in Git-tracked documentation.
@@ -279,24 +279,38 @@ This execution only expands the private preview reviewer allow list to the expli
 Prepared on 2026-06-27:
 
 - Readiness record: [Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness v0.1](private-preview-reviewer-handoff-dispatch-readiness-v0.1.md)
-- Current state: `waiting_for_reviewer_feedback`.
-- Reviewer handoff scope: `confirmed-reviewer-1` and `confirmed-reviewer-2`.
+- Current state: `waiting_for_external_reviewer_identity`.
+- Current test scope: `maintainer-test-email-1` and `maintainer-test-email-2`.
+- Legacy slot names `confirmed-reviewer-1` and `confirmed-reviewer-2` now map to maintainer-owned access smoke test identities.
 - Includes a handoff message template and feedback intake record template.
 - Does not send email, create external issues, invent reviewer feedback, or record OTP, cookie, Access token, login query-state, raw Access redirect URL, reviewer credentials, or unrelated personal data.
 
-The next feedback triage execution goal should only start after real reviewer feedback is received and redacted.
+The next feedback triage execution goal should only start after non-maintainer external reviewer feedback is received and redacted.
 
 ## Private Preview Reviewer Identity Reconciliation
 
 Prepared on 2026-06-27:
 
 - Reconciliation record: [Private Preview Reviewer Identity Reconciliation v0.1](private-preview-reviewer-identity-reconciliation-v0.1.md)
-- Current state: `real_reviewer_identities_confirmed`.
+- Current state: `maintainer_test_identity_corrected`.
 - Maintainer / user owns reviewer selection and product decisions.
-- Authenticated reviewer identity `web3coderman@gmail.com` proves allowed Access smoke, not external reviewer feedback.
+- Authenticated reviewer identity `maintainer-authenticated-smoke-identity` proves allowed Access smoke, not external reviewer feedback.
 - `reviewer1@example.com` and `reviewer2@example.com` are historical placeholders only after Private Preview Real Reviewer Replacement.
+- Private Preview Reviewer Identity Correction clarifies that the legacy confirmed reviewer slots are maintainer-owned access smoke test identities, not external reviewers.
 - No Cloudflare Access policy change is authorized by this reconciliation.
 - No OTP, cookie, Access token, login query-state, raw Access redirect URL, reviewer credentials, or unrelated personal data is recorded.
+
+## Private Preview Reviewer Identity Correction
+
+Prepared on 2026-06-28:
+
+- Correction record: [Private Preview Reviewer Identity Correction v0.1](private-preview-reviewer-identity-correction-v0.1.md)
+- Current state: `maintainer_test_identity_corrected`.
+- Corrected identity scope: `maintainer-test-email-1` and `maintainer-test-email-2`.
+- The legacy `confirmed-reviewer-1` and `confirmed-reviewer-2` slots are maintainer-owned access smoke test identities.
+- These identities verify Cloudflare Access/OTP smoke and protected website rendering only.
+- They are not external reviewers and do not count as external reviewer feedback.
+- No outbound reviewer invitation was sent.
 
 ## Private Preview Real Reviewer Replacement
 
@@ -305,11 +319,12 @@ Executed on 2026-06-27:
 - Replacement record: [Private Preview Real Reviewer Replacement v0.1](private-preview-real-reviewer-replacement-v0.1.md)
 - Cloudflare Access policy: `RepoAssure reviewer allow`.
 - Removed placeholder reviewer emails: `reviewer1@example.com`, `reviewer2@example.com`.
-- Confirmed real reviewer emails: `confirmed-reviewer-1`, `confirmed-reviewer-2`.
+- Superseded interpretation: `confirmed-reviewer-1`, `confirmed-reviewer-2` are no longer treated as external reviewers.
+- Corrected interpretation: `maintainer-test-email-1`, `maintainer-test-email-2`.
 - Execution path: Cloudflare Dashboard UI, because prior Access API operations returned `Authentication error`.
 - Verification command: `pnpm verify:cloudflare-preview`.
 - Expected verification status: `manual_required`, because authenticated reviewer smoke still requires manual email/OTP login.
-- Current feedback state: `waiting_for_reviewer_feedback`.
+- Current feedback state: `waiting_for_external_reviewer_identity`.
 
 This replacement does not send reviewer invitations, create external issues, invent reviewer feedback, record OTP/cookie/Access token/login query-state/raw Access redirect URL/reviewer credentials, authorize public launch, make the repo public, publish npm packages, create a GitHub release, or make SaaS/Team Cloud/Enterprise/hosted dashboard availability claims.
 
@@ -322,6 +337,7 @@ Prepared on 2026-06-27:
 - Stage 2: Dispatch execution pending channel confirmation.
 - Current status: `pending_channel_confirmation`.
 - Reviewer slots: `confirmed-reviewer-1`, `confirmed-reviewer-2`.
+- Corrected slot meaning: maintainer-owned access smoke test identities, not external reviewers.
 - Accepted review URL: `https://repoassure-preview.pages.dev`.
 - No outbound message was sent.
 - Reviewer PII is not stored in Git tracked docs.

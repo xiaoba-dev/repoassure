@@ -1,17 +1,22 @@
 # Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness v0.1
 
-Status: waiting_for_reviewer_feedback
+Status: waiting_for_external_reviewer_identity
 Date: 2026-06-27
 
 ## Purpose
 
-Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness v0.1 prepares the bounded handoff message and feedback intake record for the two explicitly authorized second-batch private preview reviewers.
+Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness v0.1 prepares the bounded handoff message and feedback intake record for future non-maintainer private preview reviewers.
 
 This is a readiness and template record only. Do not send email from this goal. Do not create external issues from this goal. Do not invent reviewer feedback.
 
 ## Reviewer Scope
 
-Authorized reviewer emails:
+Maintainer-owned access smoke test identities:
+
+- `maintainer-test-email-1`
+- `maintainer-test-email-2`
+
+Legacy slot names:
 
 - `confirmed-reviewer-1`
 - `confirmed-reviewer-2`
@@ -21,7 +26,7 @@ Historical placeholder emails:
 - `reviewer1@example.com`
 - `reviewer2@example.com`
 
-Private Preview Real Reviewer Replacement removed the historical placeholder emails from the active Cloudflare Access allow list and confirmed the real reviewer identities above.
+Private Preview Reviewer Identity Correction records that the legacy confirmed reviewer slots are maintainer-owned access smoke test identities, not external reviewers.
 
 Accepted review URL:
 
@@ -39,18 +44,18 @@ Do not share deployment subdomains or branch aliases.
 ## Current State
 
 ```text
-Status: waiting_for_reviewer_feedback
+Status: waiting_for_external_reviewer_identity
 ```
 
-No reviewer feedback has been received or triaged in this record. The next triage goal must use real reviewer feedback as input.
+No external reviewer has been invited from this readiness record. No reviewer feedback has been received or triaged. The next triage goal must use real external reviewer feedback as input.
 
 ## Reviewer Identity Reconciliation
 
 Use [Private Preview Reviewer Identity Reconciliation v0.1](private-preview-reviewer-identity-reconciliation-v0.1.md) before treating second-batch feedback as external reviewer feedback.
 
-That reconciliation now records Private Preview Real Reviewer Replacement as completed. `reviewer1@example.com` and `reviewer2@example.com` are historical placeholders only; `confirmed-reviewer-1` and `confirmed-reviewer-2` are the confirmed real reviewer identities.
+That reconciliation now references [Private Preview Reviewer Identity Correction v0.1](private-preview-reviewer-identity-correction-v0.1.md). `reviewer1@example.com` and `reviewer2@example.com` are historical placeholders only; `confirmed-reviewer-1` and `confirmed-reviewer-2` are legacy slot names that map to maintainer-owned access smoke test identities.
 
-Current handoff status remains `waiting_for_reviewer_feedback` because no real reviewer feedback has been received.
+Current handoff status is `waiting_for_external_reviewer_identity` because the available test identities are maintainer-owned access smoke test identities.
 
 ## Handoff Package and Dispatch Execution
 
@@ -63,6 +68,7 @@ That execution record confirms:
 - Status: `pending_channel_confirmation`.
 - No outbound message was sent.
 - Reviewer PII is not stored in Git tracked docs.
+- The available legacy slots are maintainer-owned access smoke test identities.
 
 ## Handoff Message Template
 
@@ -155,13 +161,13 @@ Triage status:
 
 ## Next Triage Rule
 
-Only after real reviewer feedback is received:
+Only after real external reviewer feedback is received:
 
 1. Redact OTP, cookie, Access token, login query-state, raw Access redirect URL, reviewer credentials, and unrelated personal data.
 2. Copy the redacted response into a private tracked note or local intake record.
 3. Classify findings using [Private Preview Feedback Triage & Website Polish Backlog v0.1](private-preview-feedback-triage-backlog-v0.1.md).
 4. Create a follow-up `Private Preview Feedback Triage Execution v0.1` goal if feedback contains findings.
-5. Keep the state as `waiting_for_reviewer_feedback` until real feedback exists.
+5. Keep the state as `waiting_for_external_reviewer_identity` until non-maintainer reviewers are identified, then `waiting_for_reviewer_feedback` until real feedback exists.
 
 ## Non-Authorization Boundary
 
@@ -170,6 +176,7 @@ This readiness record does not authorize:
 - Sending emails or messages.
 - Creating external issues.
 - Inventing or simulating reviewer feedback.
+- Treating maintainer-owned access smoke test identities as external reviewers.
 - Adding more reviewers to Cloudflare Access.
 - Sharing deployment subdomains or branch aliases.
 - Recording OTP, cookie, Access token, login query-state, raw Access redirect URL, reviewer credentials, or unrelated personal data.

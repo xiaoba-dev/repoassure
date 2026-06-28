@@ -47,8 +47,8 @@ Executed on 2026-06-27 after explicit authorization to upload the RepoAssure web
 - Protected review URL: `https://repoassure-preview.pages.dev`
 - Cloudflare Access application: `RepoAssure Private Preview`
 - Cloudflare Access policy: `RepoAssure reviewer allow`
-- Allowed reviewer rule: `Emails` initially included `web3coderman@gmail.com`; [Private Preview Second Reviewer Access Execution](private-preview-second-reviewer-access-execution-v0.1.md) later added `reviewer1@example.com` and `reviewer2@example.com` by explicit authorization.
-- Current real reviewer allow list is recorded through privacy-preserving slots by [Private Preview Real Reviewer Replacement](private-preview-real-reviewer-replacement-v0.1.md).
+- Allowed reviewer rule: `Emails` initially included `maintainer-authenticated-smoke-identity`; [Private Preview Second Reviewer Access Execution](private-preview-second-reviewer-access-execution-v0.1.md) later added `reviewer1@example.com` and `reviewer2@example.com` by explicit authorization.
+- Current maintainer-owned access smoke test allow list is recorded through privacy-preserving slots by [Private Preview Reviewer Identity Correction](private-preview-reviewer-identity-correction-v0.1.md).
 - Production deployment id: `997feaee-ef39-43c7-ab4d-2c99014df06d`
 - Deployment source commit: `540f212`
 
@@ -105,7 +105,7 @@ Executed on 2026-06-27:
 - Execution record: [Private Preview Second Reviewer Access Execution v0.1](private-preview-second-reviewer-access-execution-v0.1.md)
 - Access policy: `RepoAssure reviewer allow`
 - Execution path: Cloudflare Dashboard UI, because the Access API returned `Authentication error` for the available token.
-- Confirmed allowed reviewer emails: `web3coderman@gmail.com`, `reviewer1@example.com`, `reviewer2@example.com`.
+- Confirmed allowed test identities: `maintainer-authenticated-smoke-identity`, `reviewer1@example.com`, `reviewer2@example.com`.
 - Verification command: `pnpm verify:cloudflare-preview`
 - Verification status: `manual_required`, which remains expected because authenticated reviewer smoke depends on email/OTP login.
 - Sensitive boundary: No OTP, cookie, Access token, login query-state, raw Access redirect URL, or reviewer credential material is recorded in Git-tracked documentation.
@@ -119,7 +119,7 @@ Executed on 2026-06-27:
 - Replacement record: [Private Preview Real Reviewer Replacement v0.1](private-preview-real-reviewer-replacement-v0.1.md)
 - Access policy: `RepoAssure reviewer allow`
 - Removed placeholder reviewer emails: `reviewer1@example.com`, `reviewer2@example.com`.
-- Confirmed current allowed reviewer emails: `confirmed-reviewer-1`, `confirmed-reviewer-2`.
+- Confirmed current allowed maintainer test slots: `maintainer-test-email-1`, `maintainer-test-email-2`.
 - Verification command: `pnpm verify:cloudflare-preview`
 - Verification status: `manual_required`, which remains expected because authenticated reviewer smoke depends on email/OTP login.
 - Sensitive boundary: No OTP, cookie, Access token, login query-state, raw Access redirect URL, or reviewer credential material is recorded in Git-tracked documentation.

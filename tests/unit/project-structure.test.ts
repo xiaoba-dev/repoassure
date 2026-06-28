@@ -1262,9 +1262,10 @@ describe('project structure', () => {
       ]);
 
     expect(dispatchReadiness).toContain('Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness v0.1');
-    expect(dispatchReadiness).toContain('waiting_for_reviewer_feedback');
+    expect(dispatchReadiness).toContain('waiting_for_external_reviewer_identity');
     expect(dispatchReadiness).toContain('reviewer1@example.com');
     expect(dispatchReadiness).toContain('reviewer2@example.com');
+    expect(dispatchReadiness).toContain('maintainer-owned access smoke test identities');
     expect(dispatchReadiness).toContain('Handoff Message Template');
     expect(dispatchReadiness).toContain('Feedback Intake Record Template');
     expect(dispatchReadiness).toContain('Do not send email from this goal');
@@ -1296,14 +1297,15 @@ describe('project structure', () => {
     expect(identityReconciliation).toContain('Private Preview Reviewer Identity Reconciliation v0.1');
     expect(identityReconciliation).toContain('Maintainer / user');
     expect(identityReconciliation).toContain('Authenticated reviewer identity');
-    expect(identityReconciliation).toContain('web3coderman@gmail.com');
+    expect(identityReconciliation).toContain('maintainer-authenticated-smoke-identity');
     expect(identityReconciliation).toContain('Placeholder second-batch reviewer emails');
     expect(identityReconciliation).toContain('reviewer1@example.com');
     expect(identityReconciliation).toContain('reviewer2@example.com');
     expect(identityReconciliation).toContain('placeholder only');
-    expect(identityReconciliation).toContain('must be replaced with real reviewer emails');
+    expect(identityReconciliation).toContain('must be replaced with non-maintainer reviewer emails');
     expect(identityReconciliation).toContain('Do not treat placeholder emails as real reviewer feedback');
     expect(identityReconciliation).toContain('waiting_for_real_reviewer_identity');
+    expect(identityReconciliation).toContain('maintainer-owned access smoke test identities');
     expect(identityReconciliation).toContain('No Cloudflare Access policy change is authorized by this reconciliation');
     expect(identityReconciliation).toContain('No OTP, cookie, Access token, login query-state');
     expect(secondReviewerAccess).toContain('Private Preview Reviewer Identity Reconciliation');
@@ -1334,17 +1336,19 @@ describe('project structure', () => {
     expect(realReviewerReplacement).toContain('reviewer1@example.com');
     expect(realReviewerReplacement).toContain('reviewer2@example.com');
     expect(realReviewerReplacement).toContain('removed placeholder reviewer emails');
-    expect(realReviewerReplacement).toContain('real reviewer identities confirmed');
+    expect(realReviewerReplacement).toContain('maintainer_test_identity_corrected');
+    expect(realReviewerReplacement).toContain('maintainer-owned access smoke test slots');
     expect(realReviewerReplacement).toContain('Reviewer PII is not stored in Git tracked docs');
     expect(realReviewerReplacement).toContain('RepoAssure reviewer allow');
     expect(realReviewerReplacement).toContain('pnpm verify:cloudflare-preview');
     expect(realReviewerReplacement).toContain('Do not send reviewer invitations from this goal');
     expect(realReviewerReplacement).toContain('No OTP, cookie, Access token, login query-state');
     expect(identityReconciliation).toContain('Private Preview Real Reviewer Replacement');
-    expect(identityReconciliation).toContain('real reviewer identities confirmed');
-    expect(dispatchReadiness).toContain('Private Preview Real Reviewer Replacement');
+    expect(identityReconciliation).toContain('maintainer_test_identity_corrected');
+    expect(dispatchReadiness).toContain('Private Preview Reviewer Identity Correction');
     expect(dispatchReadiness).toContain('confirmed-reviewer-1');
     expect(dispatchReadiness).toContain('confirmed-reviewer-2');
+    expect(dispatchReadiness).toContain('maintainer-owned access smoke test identities');
     expect(publicWebsiteHandoff).toContain('Private Preview Real Reviewer Replacement');
     expect(acceptanceChecklist).toContain('Private Preview Real Reviewer Replacement');
     expect(testingStrategy).toContain('Private Preview Real Reviewer Replacement');
@@ -1385,6 +1389,52 @@ describe('project structure', () => {
     expect(devLog).toContain('Private Preview Reviewer Handoff Package and Dispatch Execution v0.1');
 
     await expectPath('docs/operations/private-preview-reviewer-handoff-package-and-dispatch-execution-v0.1.md');
+  });
+
+  it('corrects private preview reviewer identities to maintainer-owned access smoke identities', async () => {
+    const [
+      identityCorrection,
+      realReviewerReplacement,
+      identityReconciliation,
+      dispatchReadiness,
+      handoffDispatch,
+      publicWebsiteHandoff,
+      acceptanceChecklist,
+      testingStrategy,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/private-preview-reviewer-identity-correction-v0.1.md', 'utf8'),
+      readFile('docs/operations/private-preview-real-reviewer-replacement-v0.1.md', 'utf8'),
+      readFile('docs/operations/private-preview-reviewer-identity-reconciliation-v0.1.md', 'utf8'),
+      readFile('docs/operations/private-preview-reviewer-handoff-dispatch-readiness-v0.1.md', 'utf8'),
+      readFile('docs/operations/private-preview-reviewer-handoff-package-and-dispatch-execution-v0.1.md', 'utf8'),
+      readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(identityCorrection).toContain('Private Preview Reviewer Identity Correction v0.1');
+    expect(identityCorrection).toContain('Status: maintainer_test_identity_corrected');
+    expect(identityCorrection).toContain('maintainer-test-email-1');
+    expect(identityCorrection).toContain('maintainer-test-email-2');
+    expect(identityCorrection).toContain('maintainer-owned access smoke test identities');
+    expect(identityCorrection).toContain('not external reviewers');
+    expect(identityCorrection).toContain('does not count as external reviewer feedback');
+    expect(identityCorrection).toContain('Cloudflare Access/OTP smoke');
+    expect(identityCorrection).toContain('No outbound reviewer invitation was sent');
+    expect(identityCorrection).toContain('Do not record real reviewer email addresses in Git tracked docs');
+    expect(identityCorrection).not.toContain('@gmail.com');
+    expect(realReviewerReplacement).toContain('Private Preview Reviewer Identity Correction');
+    expect(realReviewerReplacement).toContain('maintainer_test_identity_corrected');
+    expect(identityReconciliation).toContain('Private Preview Reviewer Identity Correction');
+    expect(identityReconciliation).toContain('maintainer-owned access smoke test identities');
+    expect(dispatchReadiness).toContain('maintainer-owned access smoke test identities');
+    expect(handoffDispatch).toContain('maintainer-owned access smoke test identities');
+    expect(publicWebsiteHandoff).toContain('Private Preview Reviewer Identity Correction');
+    expect(acceptanceChecklist).toContain('Private Preview Reviewer Identity Correction');
+    expect(testingStrategy).toContain('Private Preview Reviewer Identity Correction');
+    expect(devLog).toContain('Private Preview Reviewer Identity Correction v0.1');
   });
 
   it('records Cloudflare remote preview execution as blocked before website upload when Access is unavailable', async () => {

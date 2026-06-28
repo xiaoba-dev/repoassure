@@ -127,11 +127,13 @@ Use [Private Preview Feedback Triage & Website Polish Backlog v0.1](private-prev
 
 ## Dispatch Readiness
 
-Use [Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness v0.1](private-preview-reviewer-handoff-dispatch-readiness-v0.1.md) for the second-batch reviewer handoff template and intake record structure.
+Use [Private Preview Reviewer Handoff Dispatch & Feedback Intake Readiness v0.1](private-preview-reviewer-handoff-dispatch-readiness-v0.1.md) for the future non-maintainer reviewer handoff template and intake record structure.
 
-That readiness record originally covered placeholder reviewer emails `reviewer1@example.com` and `reviewer2@example.com`; after Private Preview Real Reviewer Replacement, the active handoff scope is `confirmed-reviewer-1` and `confirmed-reviewer-2`. It keeps status at `waiting_for_reviewer_feedback` and explicitly does not send email, create external issues, invent reviewer feedback, or record OTP, cookie, Access token, login query-state, raw Access redirect URL, reviewer credentials, or unrelated personal data.
+That readiness record originally covered placeholder reviewer emails `reviewer1@example.com` and `reviewer2@example.com`; after Private Preview Reviewer Identity Correction, the legacy `confirmed-reviewer-1` and `confirmed-reviewer-2` slots are maintainer-owned access smoke test identities. It now keeps status at `waiting_for_external_reviewer_identity` and explicitly does not send email, create external issues, invent reviewer feedback, or record OTP, cookie, Access token, login query-state, raw Access redirect URL, reviewer credentials, or unrelated personal data.
 
-Use [Private Preview Reviewer Handoff Package and Dispatch Execution v0.1](private-preview-reviewer-handoff-package-and-dispatch-execution-v0.1.md) for the combined 1+2 package-and-dispatch record. That record marks Stage 1 as generated and Stage 2 as `pending_channel_confirmation`; no outbound message was sent, and reviewer PII is not stored in Git tracked docs.
+Use [Private Preview Reviewer Handoff Package and Dispatch Execution v0.1](private-preview-reviewer-handoff-package-and-dispatch-execution-v0.1.md) for the combined 1+2 package-and-dispatch record. That record marks Stage 1 as generated and Stage 2 as `pending_channel_confirmation`; no outbound message was sent, reviewer PII is not stored in Git tracked docs, and maintainer-owned access smoke test identities are not treated as external reviewers.
+
+Use [Private Preview Reviewer Identity Correction v0.1](private-preview-reviewer-identity-correction-v0.1.md) as the current source of truth before any reviewer dispatch or feedback triage.
 
 ## Rollback and Shutdown
 

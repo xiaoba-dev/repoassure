@@ -1,5 +1,34 @@
 # 开发日志
 
+## 2026年6月28日 - Private Preview Reviewer Identity Correction v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/private-preview-reviewer-identity-correction-v0.1.md`。
+- 将此前 `confirmed-reviewer-1`、`confirmed-reviewer-2` 的当前语义纠正为 `maintainer-test-email-1`、`maintainer-test-email-2`。
+- 明确这两个身份是 maintainer-owned access smoke test identities，只用于 Cloudflare Access/OTP smoke 和私测入口验证。
+- 明确它们 not external reviewers，也 does not count as external reviewer feedback。
+- 明确 No outbound reviewer invitation was sent。
+- 将 dispatch readiness 当前状态调整为 `waiting_for_external_reviewer_identity`。
+- 级联更新 real reviewer replacement、identity reconciliation、reviewer handoff、dispatch readiness、package-and-dispatch、public website release candidate handoff、acceptance checklist 和 testing strategy。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 Private Preview Reviewer Identity Correction 文档和级联记录存在；测试因 `docs/operations/private-preview-reviewer-identity-correction-v0.1.md` 缺失按预期失败。
+- Green：新增 identity correction 文档并补齐级联，将旧的 external reviewer 解释纠偏为 maintainer-owned access smoke test identities。
+
+### 边界
+
+- 不记录真实 reviewer email 到 Git tracked docs。
+- 不把 maintainer-owned test emails 视为 independent external reviewers。
+- 不把 maintainer-owned smoke 结果视为 external reviewer feedback。
+- 不解锁 Private Preview Feedback Triage Execution。
+- 不发送 reviewer invitation。
+- 不创建 external issue。
+- 不编造 reviewer feedback。
+- No OTP, cookie, Access token, login query-state, raw Access redirect URL or reviewer credential material may be recorded。
+- 不授权 public launch、repo public、npm publication、GitHub release、外部公告、SaaS/Team Cloud/Enterprise/hosted dashboard availability claims。
+
 ## 2026年6月27日 - Private Preview Reviewer Handoff Package and Dispatch Execution v0.1
 
 ### 完成内容

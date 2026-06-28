@@ -8,18 +8,23 @@ Date: 2026-06-27
 Private Preview Reviewer Handoff Package and Dispatch Execution v0.1 combines two stages:
 
 1. Generate a reusable reviewer handoff package.
-2. Prepare dispatch execution for confirmed reviewers without claiming that external communication has happened.
+2. Prepare dispatch execution for privacy-preserving reviewer slots without claiming that external communication has happened.
 
 This record is intentionally privacy-preserving. Reviewer PII is not stored in Git tracked docs.
 
 ## Reviewer Slots
 
-Confirmed reviewer slots:
+Legacy reviewer slots:
 
 - `confirmed-reviewer-1`
 - `confirmed-reviewer-2`
 
-These slots correspond to real reviewer identities already configured in the Cloudflare Access policy, but the real email addresses are not repeated in Git-tracked documentation.
+Private Preview Reviewer Identity Correction v0.1 supersedes the earlier external reviewer interpretation. These slots now map to maintainer-owned access smoke test identities:
+
+- `confirmed-reviewer-1` -> `maintainer-test-email-1`
+- `confirmed-reviewer-2` -> `maintainer-test-email-2`
+
+They are maintainer-owned access smoke test identities, not external reviewers.
 
 ## Stage 1: Handoff Package Generated
 
@@ -135,7 +140,7 @@ Sensitive material recorded:
 Status: pending_channel_confirmation
 ```
 
-The handoff package is ready, but dispatch execution is pending a channel confirmation. This record does not claim reviewer feedback was requested, sent, received, redacted, or triaged.
+The handoff package is ready as a reusable template, but dispatch execution is pending a channel confirmation and a non-maintainer reviewer identity. This record does not claim reviewer feedback was requested, sent, received, redacted, or triaged.
 
 ## Operating Boundaries
 
@@ -143,12 +148,13 @@ The handoff package is ready, but dispatch execution is pending a channel confir
 - Do not record OTP, cookie, Access token, login query-state, raw Access redirect URL, reviewer credentials, or unrelated personal data.
 - Do not create external issues from this goal.
 - Do not invent reviewer feedback.
+- Do not treat maintainer-owned access smoke test identities as external reviewers.
 - Do not claim a message was sent until a real dispatch channel and dispatch evidence exist.
 - Do not share deployment subdomains or branch aliases.
 - Do not authorize public launch, production marketing announcement, repository visibility changes, npm publication, GitHub release creation, SaaS availability claims, Team Cloud availability claims, Enterprise availability claims, or hosted dashboard availability claims.
 
 ## Next Action
 
-Confirm the dispatch channel before executing outbound communication.
+Confirm the dispatch channel and non-maintainer external reviewer identities before executing outbound communication.
 
 If the maintainer chooses manual sending, use the Stage 1 message body and record only privacy-preserving slot-level dispatch metadata.

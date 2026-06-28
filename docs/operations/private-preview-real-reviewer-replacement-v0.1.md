@@ -1,17 +1,17 @@
 # Private Preview Real Reviewer Replacement v0.1
 
-Status: Executed
+Status: superseded_by_identity_correction
 Date: 2026-06-27
 
 ## Purpose
 
-Private Preview Real Reviewer Replacement v0.1 records the authorized replacement of placeholder reviewer emails with confirmed reviewer identities for the RepoAssure private preview.
+Private Preview Real Reviewer Replacement v0.1 records the authorized replacement of placeholder reviewer emails with privacy-preserving reviewer slots for the RepoAssure private preview.
 
-This execution keeps reviewer identity evidence separate from reviewer feedback. It confirms the Access allow list is ready for real reviewer handoff, but it does not claim that external reviewer feedback has been received.
+This execution is now superseded by [Private Preview Reviewer Identity Correction v0.1](private-preview-reviewer-identity-correction-v0.1.md). The slots are maintainer-owned access smoke test identities, not external reviewers.
 
 ## Authorization
 
-The maintainer provided and accepted two real reviewer identities. Git-tracked documentation intentionally records only privacy-preserving reviewer slots:
+The maintainer provided two maintainer-owned test identities for Cloudflare Access/OTP smoke. Git-tracked documentation intentionally records only privacy-preserving reviewer slots:
 
 - `confirmed-reviewer-1`
 - `confirmed-reviewer-2`
@@ -31,7 +31,7 @@ Execution result:
 
 ```text
 removed placeholder reviewer emails
-real reviewer identities confirmed
+maintainer_test_identity_corrected
 ```
 
 ## Target
@@ -56,7 +56,7 @@ Execution path:
 6. Saved the policy after explicit maintainer confirmation.
 7. Reopened the policy details panel and confirmed the Include `Emails` value was `confirmed-reviewer-1 , confirmed-reviewer-2`.
 
-Confirmed active reviewer slots:
+Confirmed active maintainer-owned access smoke test slots:
 
 - `confirmed-reviewer-1`
 - `confirmed-reviewer-2`
@@ -78,12 +78,12 @@ Expected result:
 ## Current State
 
 ```text
-Status: waiting_for_reviewer_feedback
+Status: maintainer_test_identity_corrected
 ```
 
-Real reviewer identities are now confirmed, and placeholder reviewer emails are no longer active allow-list members.
+Private Preview Reviewer Identity Correction v0.1 clarifies that the active slots are maintainer-owned access smoke test identities.
 
-No real external reviewer feedback has been received, stored, redacted, or triaged in this replacement record.
+No outbound reviewer invitation was sent. No real external reviewer feedback has been received, stored, redacted, or triaged in this replacement record.
 
 ## Operating Boundaries
 
@@ -97,6 +97,6 @@ No real external reviewer feedback has been received, stored, redacted, or triag
 
 ## Next Action
 
-Reviewer handoff may proceed only through a separately authorized communication workflow or manual maintainer action.
+Reviewer handoff may proceed only through a separately authorized communication workflow or manual maintainer action after non-maintainer external reviewer identities are selected.
 
-After real reviewer feedback is received, redact sensitive login material before storing feedback and then run a separate `Private Preview Feedback Triage Execution v0.1` goal.
+After real external reviewer feedback is received, redact sensitive login material before storing feedback and then run a separate `Private Preview Feedback Triage Execution v0.1` goal.

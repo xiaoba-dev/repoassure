@@ -40,7 +40,7 @@ Because the API token did not have the required Access API permission, the execu
 Cloudflare Dashboard UI execution path:
 
 1. Opened the `RepoAssure reviewer allow` policy edit page.
-2. Confirmed the existing include email `web3coderman@gmail.com`.
+2. Confirmed the existing include identity `maintainer-authenticated-smoke-identity`.
 3. Added `reviewer1@example.com`.
 4. Added `reviewer2@example.com`.
 5. Saved the policy.
@@ -48,7 +48,7 @@ Cloudflare Dashboard UI execution path:
 
 Confirmed allowed reviewer emails:
 
-- `web3coderman@gmail.com`
+- `maintainer-authenticated-smoke-identity`
 - `reviewer1@example.com`
 - `reviewer2@example.com`
 
@@ -81,13 +81,13 @@ Result:
 
 See [Private Preview Reviewer Identity Reconciliation v0.1](private-preview-reviewer-identity-reconciliation-v0.1.md).
 
-That reconciliation records `reviewer1@example.com` and `reviewer2@example.com` as placeholder only until the maintainer provides real reviewer identities. Do not treat placeholder emails as real reviewer feedback.
+That reconciliation records `reviewer1@example.com` and `reviewer2@example.com` as placeholder only until the maintainer provides non-maintainer reviewer identities. Do not treat placeholder emails as real reviewer feedback.
 
 ## Real Reviewer Replacement
 
 See [Private Preview Real Reviewer Replacement v0.1](private-preview-real-reviewer-replacement-v0.1.md).
 
-Private Preview Real Reviewer Replacement supersedes the active allow-list membership from this historical execution. The placeholder emails `reviewer1@example.com` and `reviewer2@example.com` were removed from `RepoAssure reviewer allow`; the confirmed real reviewer identities are now `confirmed-reviewer-1` and `confirmed-reviewer-2`.
+Private Preview Real Reviewer Replacement superseded the active allow-list membership from this historical execution. Private Preview Reviewer Identity Correction then clarified that the legacy `confirmed-reviewer-1` and `confirmed-reviewer-2` slots are maintainer-owned access smoke test identities, not external reviewers.
 
 ## Non-Authorization Boundary
 

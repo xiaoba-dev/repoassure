@@ -639,6 +639,44 @@ describe('project structure', () => {
     await expectPath('docs/operations/public-release-manual-gate-evidence-intake-v0.1.md');
   });
 
+  it('records public release manual gate evidence completion as incomplete without manual evidence', async () => {
+    const [completion, readme, releaseChecklist, testingStrategy, acceptanceChecklist, devLog] = await Promise.all([
+      readFile('docs/operations/public-release-manual-gate-evidence-completion-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(completion).toContain('Public Release Manual Gate Evidence Completion v0.1');
+    expect(completion).toContain('Status: incomplete_missing_manual_evidence');
+    expect(completion).toContain('completion remains incomplete');
+    expect(completion).toContain('public release remains no-go');
+    expect(completion).toContain('Goal execution authorization is not publication authorization');
+    expect(completion).toContain('Legal review | incomplete');
+    expect(completion).toContain('Trademark/name review | incomplete');
+    expect(completion).toContain('Branch protection or equivalent repository ruleset | incomplete');
+    expect(completion).toContain('Final maintainer publication authorization | incomplete');
+    expect(completion).toContain('Private preview reviewer feedback decision | incomplete');
+    expect(completion).toContain('Dependency/license risk confirmation | incomplete');
+    expect(completion).toContain('Secret/customer data exposure confirmation | incomplete');
+    expect(completion).toContain('Maintainer Evidence Request Checklist');
+    expect(completion).toContain('No gate was completed, closed, or passed');
+    expect(completion).toContain('No repository visibility change was authorized');
+    expect(completion).toContain('No npm publication was authorized');
+    expect(completion).toContain('No GitHub release was authorized');
+    expect(completion).toContain('No public launch or production marketing announcement was authorized');
+    expect(completion).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was authorized');
+    expect(readme).toContain('Public Release Manual Gate Evidence Completion v0.1');
+    expect(releaseChecklist).toContain('Public Release Manual Gate Evidence Completion v0.1');
+    expect(testingStrategy).toContain('Public Release Manual Gate Evidence Completion v0.1');
+    expect(acceptanceChecklist).toContain('Public Release Manual Gate Evidence Completion v0.1');
+    expect(devLog).toContain('Public Release Manual Gate Evidence Completion v0.1');
+
+    await expectPath('docs/operations/public-release-manual-gate-evidence-completion-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

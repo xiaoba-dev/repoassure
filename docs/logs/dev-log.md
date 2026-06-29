@@ -11786,6 +11786,30 @@ Phase 0：项目初始化。
 - No public launch or production marketing announcement was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
 
+## 2026年6月29日 - Public Release Manual Gate Evidence Completion v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/public-release-manual-gate-evidence-completion-v0.1.md`。
+- 记录当前状态：`Status: incomplete_missing_manual_evidence`，completion remains incomplete，public release remains no-go。
+- 明确 `Goal execution authorization is not publication authorization`。
+- 生成 Maintainer Evidence Request Checklist，列出 legal review、trademark/name review、branch protection or equivalent repository ruleset、final maintainer publication authorization、private preview reviewer feedback decision、dependency/license risk confirmation、secret/customer data exposure confirmation。
+- 记录结论：No gate was completed, closed, or passed。
+- 级联更新 README、public release checklist、testing strategy 和 acceptance checklist。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Public Release Manual Gate Evidence Completion v0.1 文档和级联记录存在；测试因 `docs/operations/public-release-manual-gate-evidence-completion-v0.1.md` 缺失按预期失败。
+- Green：新增 manual gate evidence completion operation packet，并更新级联文档。
+
+### 边界
+
+- No repository visibility change was authorized。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
 ## 2026年6月29日 - Public Release Manual Gate Evidence Intake v0.1
 
 ### 完成内容

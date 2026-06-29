@@ -82,6 +82,8 @@
   - 当前状态：新增 `docs/operations/public-release-manual-evidence-decision-v0.1.md`，记录 maintainer decision table；当前状态为 `pending_manual_decisions`，所有人工 gate 均为 `pending_decision`，public release remains no-go。
 - [x] Public Release Manual Evidence Decision Closure v0.1
   - 当前状态：新增 `docs/operations/public-release-manual-evidence-decision-closure-v0.1.md`，记录 decision closure attempt；当前状态为 `not_closed_pending_decisions`，所有人工 gate 仍为 `pending_decision`，public release remains no-go。
+- [x] Public Release Manual Decision Input v0.1
+  - 当前状态：新增 `docs/operations/public-release-manual-decision-input-v0.1.md`，记录 maintainer 可填写决策表单；当前状态为 `pending_input`，所有人工 gate 均为空白待填写，public release remains no-go。
 - [x] Team Cloud & Enterprise Spec v0.1
   - 当前状态：ADR-0016、商业版产品路线图、商业版架构边界、open-core/commercial 级联、测试策略和验收边界已记录；商业版能力仅完成规划和边界验收，不实现 paid cloud runtime。
 - [x] Public Website and Project Intelligence Console planning

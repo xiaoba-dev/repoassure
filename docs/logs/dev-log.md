@@ -11786,6 +11786,29 @@ Phase 0：项目初始化。
 - No public launch or production marketing announcement was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
 
+## 2026年6月29日 - Public Release Manual Gate Closure v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/public-release-manual-gate-closure-v0.1.md`。
+- 记录当前状态：`Status: not_closed_missing_manual_evidence`，public release remains no-go。
+- 明确本轮“授权执行”只授权该文档 goal，不等同于 legal review、trademark/name review、branch protection evidence、reviewer feedback 或 final maintainer publication authorization。
+- 记录 closure result：Legal review、Trademark/name review、Branch protection or equivalent repository ruleset、Final maintainer publication authorization、Private preview reviewer feedback decision 均为 not_closed；Dependency/license risk confirmation 和 Secret/customer data exposure confirmation 仅有 readiness/automated scan 的部分证据支持。
+- 级联更新 README、public release checklist、testing strategy 和 acceptance checklist。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Public Release Manual Gate Closure v0.1 文档和级联记录存在；测试因 `docs/operations/public-release-manual-gate-closure-v0.1.md` 缺失按预期失败。
+- Green：新增 manual gate closure operation packet，并更新级联文档。
+
+### 边界
+
+- No repository visibility change was authorized。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
 ## 2026年6月29日 - Public Release Manual Gate Input Collection v0.1
 
 ### 完成内容

@@ -11786,6 +11786,32 @@ Phase 0：项目初始化。
 - No public launch or production marketing announcement was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
 
+## 2026年6月29日 - Public Release Manual Decision Input Review v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/public-release-manual-decision-input-review-v0.1.md`。
+- 记录当前状态：`Status: not_ready_pending_input`，public release remains no-go。
+- Review source：`docs/operations/public-release-manual-decision-input-v0.1.md`。
+- 确认当前表单仍未收到 maintainer 填写的 approve / reject / defer / accept risk 决策。
+- 确认所有人工 gate 仍缺少 decision value、evidence、decision date、notes 和 scope。
+- 级联更新 README、public release checklist、testing strategy 和 acceptance checklist。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Public Release Manual Decision Input Review v0.1 文档和级联记录存在；测试因 `docs/operations/public-release-manual-decision-input-review-v0.1.md` 缺失按预期失败。
+- Green：新增 manual decision input review operation record，并更新级联文档。
+
+### 边界
+
+- No gate was approved, rejected, deferred, risk-accepted, closed, or passed in this review。
+- Public Source Release Execution v0.1 remains blocked。
+- No repository visibility change was authorized。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
 ## 2026年6月29日 - Public Release Manual Decision Input v0.1
 
 ### 完成内容

@@ -78,6 +78,8 @@
   - 当前状态：新增 `docs/operations/public-release-manual-gate-evidence-intake-v0.1.md`，记录已存在自动化证据和缺失人工证据；当前状态为 `evidence_intake_incomplete`，legal review、trademark/name review、branch protection or equivalent repository ruleset、final maintainer publication authorization 和 private preview reviewer feedback decision 仍为 missing，public release remains no-go。
 - [x] Public Release Manual Gate Evidence Completion v0.1
   - 当前状态：新增 `docs/operations/public-release-manual-gate-evidence-completion-v0.1.md`，记录 completion attempt；当前状态为 `incomplete_missing_manual_evidence`，No gate was completed, closed, or passed，public release remains no-go。
+- [x] Public Release Manual Evidence Decision v0.1
+  - 当前状态：新增 `docs/operations/public-release-manual-evidence-decision-v0.1.md`，记录 maintainer decision table；当前状态为 `pending_manual_decisions`，所有人工 gate 均为 `pending_decision`，public release remains no-go。
 - [x] Team Cloud & Enterprise Spec v0.1
   - 当前状态：ADR-0016、商业版产品路线图、商业版架构边界、open-core/commercial 级联、测试策略和验收边界已记录；商业版能力仅完成规划和边界验收，不实现 paid cloud runtime。
 - [x] Public Website and Project Intelligence Console planning

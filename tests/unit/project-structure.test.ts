@@ -530,6 +530,41 @@ describe('project structure', () => {
     await expectPath('docs/operations/public-release-candidate-final-review-v0.1.md');
   });
 
+  it('records public release manual gate input collection without closing gates', async () => {
+    const [gateInputs, readme, releaseChecklist, testingStrategy, acceptanceChecklist, devLog] = await Promise.all([
+      readFile('docs/operations/public-release-manual-gate-input-collection-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(gateInputs).toContain('Public Release Manual Gate Input Collection v0.1');
+    expect(gateInputs).toContain('Status: collecting_manual_gate_inputs');
+    expect(gateInputs).toContain('public release remains no-go');
+    expect(gateInputs).toContain('Do not record a gate as passed without explicit maintainer evidence');
+    expect(gateInputs).toContain('Legal review');
+    expect(gateInputs).toContain('Trademark/name review');
+    expect(gateInputs).toContain('Branch protection or equivalent repository ruleset');
+    expect(gateInputs).toContain('Final maintainer publication authorization');
+    expect(gateInputs).toContain('Private preview reviewer feedback decision');
+    expect(gateInputs).toContain('Dependency/license risk confirmation');
+    expect(gateInputs).toContain('Secret/customer data exposure confirmation');
+    expect(gateInputs).toContain('No repository visibility change was authorized');
+    expect(gateInputs).toContain('No npm publication was authorized');
+    expect(gateInputs).toContain('No GitHub release was authorized');
+    expect(gateInputs).toContain('No public launch or production marketing announcement was authorized');
+    expect(gateInputs).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was authorized');
+    expect(readme).toContain('Public Release Manual Gate Input Collection v0.1');
+    expect(releaseChecklist).toContain('Public Release Manual Gate Input Collection v0.1');
+    expect(testingStrategy).toContain('Public Release Manual Gate Input Collection v0.1');
+    expect(acceptanceChecklist).toContain('Public Release Manual Gate Input Collection v0.1');
+    expect(devLog).toContain('Public Release Manual Gate Input Collection v0.1');
+
+    await expectPath('docs/operations/public-release-manual-gate-input-collection-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

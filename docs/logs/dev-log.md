@@ -11786,6 +11786,29 @@ Phase 0：项目初始化。
 - No public launch or production marketing announcement was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
 
+## 2026年6月29日 - Public Release Manual Gate Input Collection v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/public-release-manual-gate-input-collection-v0.1.md`。
+- 记录当前状态：`Status: collecting_manual_gate_inputs`，public release remains no-go。
+- 新增 maintainer 输入收集表：Legal review、Trademark/name review、Branch protection or equivalent repository ruleset、Final maintainer publication authorization、Private preview reviewer feedback decision、Dependency/license risk confirmation、Secret/customer data exposure confirmation。
+- 明确控制规则：Do not record a gate as passed without explicit maintainer evidence。
+- 级联更新 README、public release checklist、testing strategy 和 acceptance checklist。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Public Release Manual Gate Input Collection v0.1 文档和级联记录存在；测试因 `docs/operations/public-release-manual-gate-input-collection-v0.1.md` 缺失按预期失败。
+- Green：新增 manual gate input collection operation packet，并更新级联文档。
+
+### 边界
+
+- No repository visibility change was authorized。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
 ## 2026年6月28日 - Public Release Candidate Final Review v0.1
 
 ### 完成内容

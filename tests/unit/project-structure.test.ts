@@ -601,6 +601,44 @@ describe('project structure', () => {
     await expectPath('docs/operations/public-release-manual-gate-closure-v0.1.md');
   });
 
+  it('records public release manual gate evidence intake without inventing missing evidence', async () => {
+    const [intake, readme, releaseChecklist, testingStrategy, acceptanceChecklist, devLog] = await Promise.all([
+      readFile('docs/operations/public-release-manual-gate-evidence-intake-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(intake).toContain('Public Release Manual Gate Evidence Intake v0.1');
+    expect(intake).toContain('Status: evidence_intake_incomplete');
+    expect(intake).toContain('public release remains no-go');
+    expect(intake).toContain('Do not convert missing manual evidence into a passed gate');
+    expect(intake).toContain('Legal review | missing');
+    expect(intake).toContain('Trademark/name review | missing');
+    expect(intake).toContain('Branch protection or equivalent repository ruleset | missing');
+    expect(intake).toContain('Final maintainer publication authorization | missing');
+    expect(intake).toContain('Private preview reviewer feedback decision | missing');
+    expect(intake).toContain('Dependency/license risk confirmation | automated_readiness_evidence_present');
+    expect(intake).toContain('Secret/customer data exposure confirmation | scoped_automated_scan_present');
+    expect(intake).toContain('pnpm release:check');
+    expect(intake).toContain('pnpm repo:hygiene');
+    expect(intake).toContain('CI run 28350237293');
+    expect(intake).toContain('No repository visibility change was authorized');
+    expect(intake).toContain('No npm publication was authorized');
+    expect(intake).toContain('No GitHub release was authorized');
+    expect(intake).toContain('No public launch or production marketing announcement was authorized');
+    expect(intake).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was authorized');
+    expect(readme).toContain('Public Release Manual Gate Evidence Intake v0.1');
+    expect(releaseChecklist).toContain('Public Release Manual Gate Evidence Intake v0.1');
+    expect(testingStrategy).toContain('Public Release Manual Gate Evidence Intake v0.1');
+    expect(acceptanceChecklist).toContain('Public Release Manual Gate Evidence Intake v0.1');
+    expect(devLog).toContain('Public Release Manual Gate Evidence Intake v0.1');
+
+    await expectPath('docs/operations/public-release-manual-gate-evidence-intake-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

@@ -182,7 +182,7 @@ v0.3 新增本地优先 GitHub Action wrapper：`.github/actions/repoassure/acti
 
 Public Website local static preview package 可通过 `pnpm build:website && pnpm package:website-preview` 生成，交接见 `docs/operations/local-static-preview-package-v0.1.md`。输出位于 `artifacts/public-website-preview/local-static-preview`，只用于本地 review，不授权 remote hosting、preview URL、production deployment 或 public launch。
 
-Cloudflare Access remote preview preflight 可通过 `pnpm preflight:cloudflare-preview` 生成本地 evidence，交接见 `docs/operations/cloudflare-access-preview-preflight-v0.1.md`。该预检不上传 website source/build output、不调用 Cloudflare API、不创建 preview URL；Cloudflare Pages preview deployments are public by default，因此 Cloudflare Access policy must be enabled before any preview URL is shared。
+Cloudflare Access remote preview preflight 可通过 `pnpm preflight:cloudflare-preview` 生成本地 evidence，交接见 `docs/operations/cloudflare-access-preview-preflight-v0.1.md`。该预检不上传 website source/build output、不调用 Cloudflare API、不创建 preview URL；Cloudflare Pages preview deployments are public by default，因此 Cloudflare Access policy must be enabled before any preview URL is shared。Public Website Custom Domain Deployment v0.1 见 `docs/operations/public-website-custom-domain-deployment-v0.1.md`，当前状态为 `blocked_dns_cname_not_set`：Pages custom domain API 已接受 `repoassure.com` 和 `www.repoassure.com` 绑定，但 Cloudflare Pages 仍返回 `CNAME record not set`，且当前 API token 创建 DNS 记录返回 `Authentication error`；该记录不授权仓库公开、npm publish、GitHub release、public launch、production marketing announcement、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
 
 可使用单一验收入口生成 `docs/acceptance/acceptance-run.md`：
 

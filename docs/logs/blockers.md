@@ -1,5 +1,47 @@
 # 阻塞日志
 
+## 2026年6月30日 - Public Website Custom Domain Deployment v0.1 is blocked by missing DNS CNAME records
+
+### 背景
+
+用户已在 Cloudflare 购买 `RepoAssure.com`，并授权将 RepoAssure 官网部署到 `repoassure.com` 和 `www.repoassure.com`。
+
+### 已完成
+
+1. `pnpm build:website`：通过。
+2. `wrangler pages deploy apps/website/dist --project-name repoassure-preview --branch main --commit-dirty=true --commit-message "RepoAssure custom domain deployment"`：通过。
+3. Cloudflare Pages custom domain API 已接受 `repoassure.com` 和 `www.repoassure.com` 两个绑定。
+4. Cloudflare zone lookup 确认 `repoassure.com` 已在 `Web3coderman` account 中 active。
+
+### 当前阻塞
+
+Cloudflare Pages custom domain status 仍为 pending：
+
+- `repoassure.com`: `CNAME record not set`
+- `www.repoassure.com`: `CNAME record not set`
+
+当前 `CLOUDFLARE_API_TOKEN` 创建 DNS 记录返回：
+
+```text
+Authentication error
+```
+
+因此 Codex 不能通过 API 添加所需 DNS 记录。
+
+### 需要的外部条件
+
+需要通过 Cloudflare Dashboard 或具备 DNS Edit 权限的 API token 添加：
+
+1. `CNAME` / Name `@` / Target `repoassure-preview.pages.dev` / Proxy `Proxied`
+2. `CNAME` / Name `www` / Target `repoassure-preview.pages.dev` / Proxy `Proxied`
+
+添加后继续验证 HTTPS、RepoAssure 页面内容、语言切换和 forbidden-claim boundary。
+
+### 边界
+
+- 该阻塞不代表网站已在 custom domain 上成功发布。
+- 不授权 public launch、production marketing announcement、repo public、npm publication、GitHub release、SaaS availability、Team Cloud availability、Enterprise availability 或 hosted dashboard availability claims。
+
 ## 2026年6月27日 - Cloudflare Pages + Access private preview execution is blocked before website upload
 
 ### 背景

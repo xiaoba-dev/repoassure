@@ -1,5 +1,32 @@
 # 开发日志
 
+## 2026年6月30日 - Public Website Custom Domain Deployment v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/public-website-custom-domain-deployment-v0.1.md`。
+- 记录当前状态：`Status: blocked_dns_cname_not_set`。
+- 在用户授权部署 `RepoAssure.com` 后，执行 `pnpm build:website` 并通过。
+- 执行 `wrangler pages deploy apps/website/dist --project-name repoassure-preview --branch main --commit-dirty=true --commit-message "RepoAssure custom domain deployment"` 并通过。
+- 记录最新 deployment URL：`https://9dc5dd8b.repoassure-preview.pages.dev`。
+- Cloudflare Pages custom domain API 已接受 `repoassure.com` 和 `www.repoassure.com` 两个域名绑定。
+- 当前 Cloudflare Pages domain verification 返回 `CNAME record not set`，HTTPS verification、页面内容 smoke、语言切换和 forbidden-claim custom-domain verification 仍未完成。
+- 当前 `CLOUDFLARE_API_TOKEN` 写 DNS 记录返回 `Authentication error`，需要通过 Cloudflare Dashboard 或具备 DNS Edit 权限的 token 添加 CNAME。
+- 级联更新 README、acceptance checklist、testing strategy 和 blockers。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Public Website Custom Domain Deployment v0.1 文档和级联记录存在；测试因 `docs/operations/public-website-custom-domain-deployment-v0.1.md` 缺失按预期失败。
+- Green：新增 custom domain deployment operation record，并更新级联文档。
+
+### 边界
+
+- No repository visibility change was authorized。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
 ## 2026年6月28日 - Private Preview External Reviewer Selection v0.1
 
 ### 完成内容

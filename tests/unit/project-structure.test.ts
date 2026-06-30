@@ -1508,6 +1508,43 @@ describe('project structure', () => {
     await expectPath('scripts/verify-cloudflare-access-preview.mjs');
   });
 
+  it('records public website custom domain deployment as blocked while DNS CNAME records are missing', async () => {
+    const [operation, readme, acceptanceChecklist, testingStrategy, devLog, blockers] = await Promise.all([
+      readFile('docs/operations/public-website-custom-domain-deployment-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('docs/logs/blockers.md', 'utf8')
+    ]);
+
+    expect(operation).toContain('Public Website Custom Domain Deployment v0.1');
+    expect(operation).toContain('Status: blocked_dns_cname_not_set');
+    expect(operation).toContain('Cloudflare Pages project: `repoassure-preview`');
+    expect(operation).toContain('Custom domains requested: `repoassure.com`, `www.repoassure.com`');
+    expect(operation).toContain('Latest deployment URL: `https://9dc5dd8b.repoassure-preview.pages.dev`');
+    expect(operation).toContain('Pages custom domain API accepted both domain bindings');
+    expect(operation).toContain('Verification result: `CNAME record not set`');
+    expect(operation).toContain('DNS API result: `Authentication error`');
+    expect(operation).toContain('Required DNS record: CNAME `@` -> `repoassure-preview.pages.dev`');
+    expect(operation).toContain('Required DNS record: CNAME `www` -> `repoassure-preview.pages.dev`');
+    expect(operation).toContain('HTTPS verification is not complete');
+    expect(operation).toContain('Forbidden availability claim verification remains pending for the custom domain');
+    expect(operation).toContain('No repository visibility change was authorized');
+    expect(operation).toContain('No npm publication was authorized');
+    expect(operation).toContain('No GitHub release was authorized');
+    expect(operation).toContain('No public launch or production marketing announcement was authorized');
+    expect(operation).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was authorized');
+    expect(readme).toContain('Public Website Custom Domain Deployment v0.1');
+    expect(readme).toContain('blocked_dns_cname_not_set');
+    expect(acceptanceChecklist).toContain('Public Website Custom Domain Deployment v0.1');
+    expect(testingStrategy).toContain('Public Website Custom Domain Deployment v0.1');
+    expect(devLog).toContain('Public Website Custom Domain Deployment v0.1');
+    expect(blockers).toContain('Public Website Custom Domain Deployment v0.1 is blocked by missing DNS CNAME records');
+
+    await expectPath('docs/operations/public-website-custom-domain-deployment-v0.1.md');
+  });
+
   it('records the private preview reviewer handoff and feedback intake package', async () => {
     const [reviewerHandoff, publicWebsiteHandoff, acceptanceChecklist, testingStrategy, devLog] = await Promise.all([
       readFile('docs/operations/private-preview-reviewer-handoff-v0.1.md', 'utf8'),

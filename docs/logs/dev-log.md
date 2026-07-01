@@ -1,5 +1,30 @@
 # 开发日志
 
+## 2026年7月1日 - Public Release Manual Decision Input Completion v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/public-release-manual-decision-input-completion-v0.1.md`。
+- 记录当前状态：`Status: not_completed_missing_explicit_decisions`。
+- 明确本轮 goal execution authorization 不是 manual release decision。
+- 确认未收到任何 approve / reject / defer / accept risk decision、evidence、decision date、notes 或 scope。
+- 为 maintainer 保留可填写的 manual decision input template。
+- 级联更新 README、public release checklist、acceptance checklist 和 testing strategy。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Public Release Manual Decision Input Completion v0.1 文档和级联记录存在；测试因 `docs/operations/public-release-manual-decision-input-completion-v0.1.md` 缺失按预期失败。
+- Green：新增 completion attempt 文档和级联记录，明确所有 manual gates 仍为 not_completed / missing_decision。
+
+### 边界
+
+- No gate was approved, rejected, deferred, risk-accepted, closed, passed, or completed。
+- No repository visibility change was authorized。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
 ## 2026年7月1日 - Public Release Manual Gate Closure v0.2
 
 ### 完成内容

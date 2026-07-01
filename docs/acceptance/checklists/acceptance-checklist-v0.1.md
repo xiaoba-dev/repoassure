@@ -86,6 +86,8 @@
   - 当前状态：新增 `docs/operations/public-release-manual-evidence-decision-closure-v0.1.md`，记录 decision closure attempt；当前状态为 `not_closed_pending_decisions`，所有人工 gate 仍为 `pending_decision`，public release remains no-go。
 - [x] Public Release Manual Decision Input v0.1
   - 当前状态：新增 `docs/operations/public-release-manual-decision-input-v0.1.md`，记录 maintainer 可填写决策表单；当前状态为 `pending_input`，所有人工 gate 均为空白待填写，public release remains no-go。
+- [x] Public Release Manual Decision Input Completion v0.1
+  - 当前状态：新增 `docs/operations/public-release-manual-decision-input-completion-v0.1.md`，记录 completion attempt；当前状态为 `not_completed_missing_explicit_decisions`。本轮 goal execution authorization 不等于 manual release decision，未提供任何 approve / reject / defer / accept risk decision、evidence、decision date、notes 或 scope；legal、trademark/name、branch protection or equivalent repository ruleset、final maintainer publication authorization、private preview reviewer feedback decision、dependency/license risk confirmation 和 secret/customer data exposure confirmation 均未完成，public release remains no-go。
 - [x] Public Release Manual Decision Input Review v0.1
   - 当前状态：新增 `docs/operations/public-release-manual-decision-input-review-v0.1.md`，记录对 maintainer 决策表单的 review；当前状态为 `not_ready_pending_input`，所有人工 gate 仍缺少 decision/evidence/date/notes/scope 输入，public release remains no-go。
 - [x] Team Cloud & Enterprise Spec v0.1

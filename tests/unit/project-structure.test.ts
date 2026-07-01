@@ -835,6 +835,44 @@ describe('project structure', () => {
     await expectPath('docs/operations/public-release-manual-decision-input-v0.1.md');
   });
 
+  it('records public release manual decision input completion attempt without inventing decisions', async () => {
+    const [completion, readme, releaseChecklist, testingStrategy, acceptanceChecklist, devLog] = await Promise.all([
+      readFile('docs/operations/public-release-manual-decision-input-completion-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(completion).toContain('Public Release Manual Decision Input Completion v0.1');
+    expect(completion).toContain('Status: not_completed_missing_explicit_decisions');
+    expect(completion).toContain('public release remains no-go');
+    expect(completion).toContain('Goal execution authorization is not a manual release decision');
+    expect(completion).toContain('No approve / reject / defer / accept risk decision was supplied');
+    expect(completion).toContain('Legal review | not_completed | missing_decision');
+    expect(completion).toContain('Trademark/name review | not_completed | missing_decision');
+    expect(completion).toContain('Branch protection or equivalent repository ruleset | not_completed | missing_decision');
+    expect(completion).toContain('Final maintainer publication authorization | not_completed | missing_decision');
+    expect(completion).toContain('Private preview reviewer feedback decision | not_completed | missing_decision');
+    expect(completion).toContain('Dependency/license risk confirmation | not_completed | missing_decision');
+    expect(completion).toContain('Secret/customer data exposure confirmation | not_completed | missing_decision');
+    expect(completion).toContain('No gate was approved, rejected, deferred, risk-accepted, closed, passed, or completed');
+    expect(completion).toContain('Public Source Release Execution v0.1 remains blocked');
+    expect(completion).toContain('No repository visibility change was authorized');
+    expect(completion).toContain('No npm publication was authorized');
+    expect(completion).toContain('No GitHub release was authorized');
+    expect(completion).toContain('No public launch or production marketing announcement was authorized');
+    expect(completion).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was authorized');
+    expect(readme).toContain('Public Release Manual Decision Input Completion v0.1');
+    expect(releaseChecklist).toContain('Public Release Manual Decision Input Completion v0.1');
+    expect(testingStrategy).toContain('Public Release Manual Decision Input Completion v0.1');
+    expect(acceptanceChecklist).toContain('Public Release Manual Decision Input Completion v0.1');
+    expect(devLog).toContain('Public Release Manual Decision Input Completion v0.1');
+
+    await expectPath('docs/operations/public-release-manual-decision-input-completion-v0.1.md');
+  });
+
   it('records public release manual decision input review as not ready while inputs remain blank', async () => {
     const [review, readme, releaseChecklist, testingStrategy, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-release-manual-decision-input-review-v0.1.md', 'utf8'),

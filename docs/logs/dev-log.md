@@ -1,5 +1,37 @@
 # 开发日志
 
+## 2026年7月1日 - Public Release Manual Decision Intake v0.2
+
+### 完成内容
+
+- 新增 `docs/operations/public-release-manual-decision-intake-v0.2.md`。
+- 记录当前状态：`Status: decisions_recorded_release_execution_blocked`。
+- 正式落档 maintainer 明确给出的 7 项 manual gate 决策：
+  - Legal review: approve。
+  - Trademark/name review: accept risk。
+  - Branch protection or equivalent repository ruleset: conditional approve fallback defer，当前最终为 defer。
+  - Final maintainer publication authorization: approve，但被 deferred branch protection gate 阻塞。
+  - Private preview reviewer feedback decision: accept risk。
+  - Dependency/license risk confirmation: accept risk。
+  - Secret/customer data exposure confirmation: approve，基于自动核验。
+- 只读核验 GitHub repository state：repo 仍为 `PRIVATE`，branch protection API 和 repository rulesets API 仍返回 `HTTP 403`。
+- 复核 `pnpm repo:hygiene`、`pnpm release:check` 和 scoped sensitive account scan。
+- 级联更新 README、public release checklist、acceptance checklist 和 testing strategy。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Public Release Manual Decision Intake v0.2 文档和级联记录存在；测试因 `docs/operations/public-release-manual-decision-intake-v0.2.md` 缺失按预期失败。
+- Green：新增 v0.2 decision intake 文档和级联记录，明确 final authorization 已记录但 release execution 仍因 deferred branch protection gate 阻塞。
+
+### 边界
+
+- Public Source Release Execution v0.1 remains blocked。
+- No repository visibility change was authorized。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
 ## 2026年7月1日 - Public Release Manual Decision Input Completion v0.1
 
 ### 完成内容

@@ -1177,6 +1177,38 @@ describe('project structure', () => {
     await expectPath('docs/operations/native-branch-protection-enablement-v0.1.md');
   });
 
+  it('records protected pull request workflow verification', async () => {
+    const [verification, readme, testingStrategy, acceptanceChecklist, decisionLog, devLog] = await Promise.all([
+      readFile('docs/operations/protected-pr-workflow-verification-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(verification).toContain('Protected PR Workflow Verification v0.1');
+    expect(verification).toContain('Status: pr_created_ci_pending_or_passed');
+    expect(verification).toContain('Workflow branch: `codex/protected-pr-workflow-v0.1`');
+    expect(verification).toContain('Base branch: `main`');
+    expect(verification).toContain('Branch protection remains enabled');
+    expect(verification).toContain('Required status check: `Quality Gates`');
+    expect(verification).toContain('Pull request workflow');
+    expect(verification).toContain('Review gate');
+    expect(verification).toContain('No branch protection weakening was executed');
+    expect(verification).toContain('No direct push to `main` was executed');
+    expect(verification).toContain('No npm publication was executed');
+    expect(verification).toContain('No GitHub release was executed');
+    expect(verification).toContain('No public launch or production marketing announcement was executed');
+    expect(readme).toContain('Protected PR Workflow Verification v0.1');
+    expect(testingStrategy).toContain('Protected PR Workflow Verification v0.1');
+    expect(acceptanceChecklist).toContain('Protected PR Workflow Verification v0.1');
+    expect(decisionLog).toContain('Protected PR workflow verification');
+    expect(devLog).toContain('Protected PR Workflow Verification v0.1');
+
+    await expectPath('docs/operations/protected-pr-workflow-verification-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

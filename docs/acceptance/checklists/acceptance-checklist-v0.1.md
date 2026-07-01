@@ -100,6 +100,8 @@
   - 当前状态：新增 `docs/operations/public-source-release-execution-v0.1.md`；状态为 `repository_public_verified`。已将 GitHub repo `xiaoba-dev/repoassure` 从 `PRIVATE` 改为 `PUBLIC`，`gh repo view` 验证 visibility 为 `PUBLIC`，执行时 `git ls-remote https://github.com/xiaoba-dev/repoassure.git HEAD` 验证 public read access 返回 HEAD `1593cfb36871ceef08c9711fd21bc59ebcee6bc8`，`pnpm release:check` 报告 `public release ready: yes`。未执行 npm publication、GitHub release、public launch、production marketing announcement 或商业版 availability claims。
 - [x] Native Branch Protection Enablement v0.1
   - 当前状态：新增 `docs/operations/native-branch-protection-enablement-v0.1.md`；状态为 `enabled_verified`。GitHub branch protection 已保护 `main`，要求 `Quality Gates` 严格状态检查、PR merge、1 个 approving review、stale review dismissal、conversation resolution，并禁用 force pushes 和 branch deletion。未执行 npm publication、GitHub release、public launch、production marketing announcement 或商业版 availability claims。
+- [x] Protected PR Workflow Verification v0.1
+  - 当前状态：新增 `docs/operations/protected-pr-workflow-verification-v0.1.md`；状态为 `pr_created_ci_pending_or_passed`。验证路径为 `codex/protected-pr-workflow-v0.1` -> PR -> `Quality Gates` -> review gate -> merge gate，不弱化 branch protection，不直推 `main`，不执行 npm publication、GitHub release、public launch、production marketing announcement 或商业版 availability claims。
 - [x] Public Release Manual Decision Input Review v0.1
   - 当前状态：新增 `docs/operations/public-release-manual-decision-input-review-v0.1.md`，记录对 maintainer 决策表单的 review；当前状态为 `not_ready_pending_input`，所有人工 gate 仍缺少 decision/evidence/date/notes/scope 输入，public release remains no-go。
 - [x] Team Cloud & Enterprise Spec v0.1

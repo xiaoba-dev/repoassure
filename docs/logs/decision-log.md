@@ -1,5 +1,24 @@
 # 决策日志
 
+## 2026年7月1日 - Protected PR workflow verification
+
+### 决策
+
+使用 `codex/protected-pr-workflow-v0.1` 分支和 GitHub PR 验证 `main` 的受保护协作闭环。
+
+### 原因
+
+- `main` 已启用 native branch protection。
+- 后续变更必须验证 PR、`Quality Gates`、review gate 和 merge gate 是否按预期工作。
+- 该验证不应通过弱化保护规则或直推 `main` 完成。
+
+### 影响
+
+- 新增 `docs/operations/protected-pr-workflow-verification-v0.1.md`。
+- 受保护流程验证通过 PR 执行，CI 和 review/merge gate 由 GitHub 远端状态确认。
+- 如果当前 GitHub identity 不能 approve 自己创建的 PR，应由 maintainer review 完成，而不是绕过保护。
+- 本决策不执行 npm publish、GitHub release、public launch、production marketing announcement 或商业版 availability claims。
+
 ## 2026年7月1日 - Native branch protection enablement
 
 ### 决策

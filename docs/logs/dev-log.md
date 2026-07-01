@@ -1,5 +1,28 @@
 # 开发日志
 
+## 2026年7月1日 - Protected PR Workflow Verification v0.1
+
+### 完成内容
+
+- 创建验证分支 `codex/protected-pr-workflow-v0.1`。
+- 新增 `docs/operations/protected-pr-workflow-verification-v0.1.md`。
+- 记录 protected PR workflow contract：branch protection remains enabled、required status check `Quality Gates`、PR workflow、review gate、merge gate、禁止直推 `main`。
+- 级联更新 README、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Protected PR Workflow Verification v0.1 文档和级联记录存在；测试因 `docs/operations/protected-pr-workflow-verification-v0.1.md` 缺失按预期失败。
+- Green：新增 verification 文档和级联记录，明确 PR workflow 验证范围和非执行边界。
+
+### 边界
+
+- No branch protection weakening was executed。
+- No direct push to `main` was executed。
+- No npm publication was executed。
+- No GitHub release was executed。
+- No public launch or production marketing announcement was executed。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was executed。
+
 ## 2026年7月1日 - Native Branch Protection Enablement v0.1
 
 ### 完成内容

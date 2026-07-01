@@ -1631,6 +1631,54 @@ describe('project structure', () => {
     await expectPath('docs/operations/product-website-user-validation-backlog-v0.1.md');
   });
 
+  it('records product backlog prioritization without reopening the public launch gate', async () => {
+    const [
+      prioritization,
+      readme,
+      releaseChecklist,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/product-backlog-prioritization-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(prioritization).toContain('Product Backlog Prioritization v0.1');
+    expect(prioritization).toContain('Status: product_backlog_prioritized_launch_deferred');
+    expect(prioritization).toContain('Source backlog: `Product / Website / User Validation Backlog Planning v0.1`');
+    expect(prioritization).toContain('Launch authorization status: `not_authorized`');
+    expect(prioritization).toContain('Prioritization decision: `prioritize_product_validation_before_launch`');
+    expect(prioritization).toContain('TDD execution order');
+    expect(prioritization).toContain('Priority 1: Target repo acceptance feedback loop');
+    expect(prioritization).toContain('Priority 2: AI IDE handoff material quality');
+    expect(prioritization).toContain('Priority 3: Repair task actionability');
+    expect(prioritization).toContain('Priority 4: User validation evidence loop');
+    expect(prioritization).toContain('Priority 5: Release readiness hygiene automation');
+    expect(prioritization).toContain('Do not reopen public launch gate');
+    expect(prioritization).toContain('No Action Authorization Receipt was produced');
+    expect(prioritization).toContain('No npm publication was executed');
+    expect(prioritization).toContain('No GitHub release was executed');
+    expect(prioritization).toContain('No public launch or production marketing announcement was executed');
+    expect(prioritization).toContain('No customer contact was executed');
+    expect(prioritization).toContain('No pricing change or spend was executed');
+    expect(prioritization).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was executed');
+    expect(readme).toContain('Product Backlog Prioritization v0.1');
+    expect(releaseChecklist).toContain('Product Backlog Prioritization v0.1');
+    expect(testingStrategy).toContain('Product Backlog Prioritization v0.1');
+    expect(acceptanceChecklist).toContain('Product Backlog Prioritization v0.1');
+    expect(decisionLog).toContain('Product backlog prioritization');
+    expect(devLog).toContain('Product Backlog Prioritization v0.1');
+
+    await expectPath('docs/operations/product-backlog-prioritization-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

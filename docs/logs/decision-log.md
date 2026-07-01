@@ -1,5 +1,23 @@
 # 决策日志
 
+## 2026年7月2日 - Product backlog prioritization
+
+### 决策
+
+接受 Product Backlog Prioritization v0.1：在 Public Launch Defer Closure v0.1 之后，优先推进产品能力验证，而不是重新打开 public launch gate。
+
+### 原因
+
+- Product / Website / User Validation Backlog Planning v0.1 已把后续工作拆为产品、官网、用户验证、release hygiene 和未来 launch reopening criteria。
+- 当前最关键的不确定性是 RepoAssure 对真实目标 repo 的验收反馈、AI IDE 交接物料质量和 repair task 可执行性。
+- public launch 只有在新的完整 launch authorization packet 和 Action Authorization Receipt 出现后才应重新讨论。
+
+### 影响
+
+- 新增 `docs/operations/product-backlog-prioritization-v0.1.md`。
+- 后续 TDD 顺序为 Target repo acceptance feedback loop、AI IDE handoff material quality、Repair task actionability、User validation evidence loop、Release readiness hygiene automation。
+- 本决策不执行 npm publish、GitHub release、public launch、production marketing announcement、customer contact、pricing change、spend、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
+
 ## 2026年7月1日 - Product website user validation backlog planning
 
 ### 决策

@@ -1259,6 +1259,38 @@ describe('project structure', () => {
     await expectPath('docs/operations/protected-pr-workflow-closure-v0.1.md');
   });
 
+  it('records public release post-merge hygiene review', async () => {
+    const [hygiene, readme, testingStrategy, acceptanceChecklist, decisionLog, devLog] = await Promise.all([
+      readFile('docs/operations/public-release-post-merge-hygiene-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(hygiene).toContain('Public Release Post-Merge Hygiene v0.1');
+    expect(hygiene).toContain('Status: hygiene_verified');
+    expect(hygiene).toContain('Repository visibility: `PUBLIC`');
+    expect(hygiene).toContain('Default branch: `main`');
+    expect(hygiene).toContain('Branch protection profile: `solo_maintainer`');
+    expect(hygiene).toContain('Required status check: `Quality Gates`');
+    expect(hygiene).toContain('Main CI run: `28511247860`');
+    expect(hygiene).toContain('Package publication boundary: `package.json` keeps `private: true`');
+    expect(hygiene).toContain('Website custom domains: `repoassure.com`, `www.repoassure.com`');
+    expect(hygiene).toContain('Secret/customer data exposure scan: passed');
+    expect(hygiene).toContain('No npm publication was executed');
+    expect(hygiene).toContain('No GitHub release was executed');
+    expect(hygiene).toContain('No public launch or production marketing announcement was executed');
+    expect(readme).toContain('Public Release Post-Merge Hygiene v0.1');
+    expect(testingStrategy).toContain('Public Release Post-Merge Hygiene v0.1');
+    expect(acceptanceChecklist).toContain('Public Release Post-Merge Hygiene v0.1');
+    expect(decisionLog).toContain('Public release post-merge hygiene');
+    expect(devLog).toContain('Public Release Post-Merge Hygiene v0.1');
+
+    await expectPath('docs/operations/public-release-post-merge-hygiene-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

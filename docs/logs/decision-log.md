@@ -1,5 +1,26 @@
 # 决策日志
 
+## 2026年7月1日 - Public release post-merge hygiene
+
+### 决策
+
+执行 Public Release Post-Merge Hygiene v0.1，确认源码公开、受保护 PR、官网自定义域名和发布边界在 PR #4 合并后仍保持一致。
+
+### 原因
+
+- Repository 已为 `PUBLIC`，但这不等于 npm publication、GitHub release 或 public launch。
+- `main` 已采用 solo maintainer branch protection，需要确认 `Quality Gates` 和 main CI 仍通过。
+- 官网已绑定 `repoassure.com` 和 `www.repoassure.com`，需要确认网站可访问和禁止声明边界仍通过。
+- 公开仓库后需要再次核验 tracked docs/source 中没有真实 reviewer email、maintainer account identifier、secret 或 customer data 暴露。
+
+### 影响
+
+- 新增 `docs/operations/public-release-post-merge-hygiene-v0.1.md`。
+- 确认 repository visibility `PUBLIC`、default branch `main`、branch protection profile `solo_maintainer`、required status check `Quality Gates` 和 main CI run `28511247860`。
+- 确认 `package.json` 仍保持 `"private": true`，GitHub release list 为空、remote tags 为空、npm registry 中不存在 `hardening-mcp` package。
+- 确认 `repoassure.com` 和 `www.repoassure.com` 均通过 `pnpm verify:website`。
+- 本决策不执行 npm publish、GitHub release、public launch、production marketing announcement 或商业版 availability claims。
+
 ## 2026年7月1日 - Solo maintainer branch protection adjustment
 
 ### 决策

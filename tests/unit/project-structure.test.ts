@@ -1384,6 +1384,57 @@ describe('project structure', () => {
     await expectPath('docs/operations/public-launch-authorization-packet-v0.1.md');
   });
 
+  it('records public launch authorization packet completion as deferred without launch authorization', async () => {
+    const [
+      completion,
+      readme,
+      releaseChecklist,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/public-launch-authorization-packet-completion-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(completion).toContain('Public Launch Authorization Packet Completion v0.1');
+    expect(completion).toContain('Status: completion_recorded_launch_not_authorized');
+    expect(completion).toContain('Launch authorization status: `not_authorized`');
+    expect(completion).toContain('Completion decision: `defer_launch_authorization`');
+    expect(completion).toContain('Source packet: `Public Launch Authorization Packet v0.1`');
+    expect(completion).toContain('Launch scope: `defer`');
+    expect(completion).toContain('Launch copy: `defer`');
+    expect(completion).toContain('Release notes: `defer`');
+    expect(completion).toContain('Support boundary: `defer`');
+    expect(completion).toContain('Legal/trademark/claim-risk review: `defer`');
+    expect(completion).toContain('Commercial availability wording review: `defer`');
+    expect(completion).toContain('Risk acceptance: `defer`');
+    expect(completion).toContain('Rollback/correction plan: `defer`');
+    expect(completion).toContain('Maintainer approval: `defer`');
+    expect(completion).toContain('No Action Authorization Receipt was produced');
+    expect(completion).toContain('Required next gate: `maintainer_launch_decision_input`');
+    expect(completion).toContain('No npm publication was executed');
+    expect(completion).toContain('No GitHub release was executed');
+    expect(completion).toContain('No public launch or production marketing announcement was executed');
+    expect(completion).toContain('No customer contact was executed');
+    expect(completion).toContain('No pricing change or spend was executed');
+    expect(completion).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was executed');
+    expect(readme).toContain('Public Launch Authorization Packet Completion v0.1');
+    expect(releaseChecklist).toContain('Public Launch Authorization Packet Completion v0.1');
+    expect(testingStrategy).toContain('Public Launch Authorization Packet Completion v0.1');
+    expect(acceptanceChecklist).toContain('Public Launch Authorization Packet Completion v0.1');
+    expect(decisionLog).toContain('Public launch authorization packet completion');
+    expect(devLog).toContain('Public Launch Authorization Packet Completion v0.1');
+
+    await expectPath('docs/operations/public-launch-authorization-packet-completion-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

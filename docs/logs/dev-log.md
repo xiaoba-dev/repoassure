@@ -1,5 +1,31 @@
 # 开发日志
 
+## 2026年7月1日 - Explicit Launch Authorization or Defer Decision v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/explicit-launch-authorization-or-defer-decision-v0.1.md`。
+- 记录 status `explicit_defer_decision_recorded_launch_not_authorized`。
+- 记录 launch authorization status `not_authorized` 和 explicit launch decision `defer_public_launch`。
+- 记录 decision source `goal_execution_authorization_only`，来源为 `Maintainer Launch Decision Input v0.1`。
+- 将 launch scope、launch copy、release notes、support boundary、legal/trademark/claim-risk review、commercial availability wording review、risk acceptance、rollback/correction plan 和 final launch approval 均记录为 `not_provided`。
+- 明确 No Action Authorization Receipt was produced，下一步 gate 为 `future_launch_authorization_packet`。
+- 级联更新 README、public release checklist、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Explicit Launch Authorization or Defer Decision v0.1 文档和级联记录存在；测试因 `docs/operations/explicit-launch-authorization-or-defer-decision-v0.1.md` 缺失按预期失败。
+- Green：新增 explicit defer decision 文档和级联记录，明确 public launch 继续 deferred，launch 未授权。
+
+### 边界
+
+- No npm publication was executed。
+- No GitHub release was executed。
+- No public launch or production marketing announcement was executed。
+- No customer contact was executed。
+- No pricing change or spend was executed。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was executed。
+
 ## 2026年7月1日 - Maintainer Launch Decision Input v0.1
 
 ### 完成内容

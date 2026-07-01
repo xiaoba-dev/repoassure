@@ -1488,6 +1488,58 @@ describe('project structure', () => {
     await expectPath('docs/operations/maintainer-launch-decision-input-v0.1.md');
   });
 
+  it('records explicit launch decision as deferred without authorizing launch execution', async () => {
+    const [
+      deferDecision,
+      readme,
+      releaseChecklist,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/explicit-launch-authorization-or-defer-decision-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(deferDecision).toContain('Explicit Launch Authorization or Defer Decision v0.1');
+    expect(deferDecision).toContain('Status: explicit_defer_decision_recorded_launch_not_authorized');
+    expect(deferDecision).toContain('Launch authorization status: `not_authorized`');
+    expect(deferDecision).toContain('Explicit launch decision: `defer_public_launch`');
+    expect(deferDecision).toContain('Decision source: `goal_execution_authorization_only`');
+    expect(deferDecision).toContain('Source decision input: `Maintainer Launch Decision Input v0.1`');
+    expect(deferDecision).toContain('Launch scope: `not_provided`');
+    expect(deferDecision).toContain('Launch copy: `not_provided`');
+    expect(deferDecision).toContain('Release notes: `not_provided`');
+    expect(deferDecision).toContain('Support boundary: `not_provided`');
+    expect(deferDecision).toContain('Legal/trademark/claim-risk review: `not_provided`');
+    expect(deferDecision).toContain('Commercial availability wording review: `not_provided`');
+    expect(deferDecision).toContain('Risk acceptance: `not_provided`');
+    expect(deferDecision).toContain('Rollback/correction plan: `not_provided`');
+    expect(deferDecision).toContain('Final launch approval: `not_provided`');
+    expect(deferDecision).toContain('No Action Authorization Receipt was produced');
+    expect(deferDecision).toContain('Required next gate: `future_launch_authorization_packet`');
+    expect(deferDecision).toContain('No npm publication was executed');
+    expect(deferDecision).toContain('No GitHub release was executed');
+    expect(deferDecision).toContain('No public launch or production marketing announcement was executed');
+    expect(deferDecision).toContain('No customer contact was executed');
+    expect(deferDecision).toContain('No pricing change or spend was executed');
+    expect(deferDecision).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was executed');
+    expect(readme).toContain('Explicit Launch Authorization or Defer Decision v0.1');
+    expect(releaseChecklist).toContain('Explicit Launch Authorization or Defer Decision v0.1');
+    expect(testingStrategy).toContain('Explicit Launch Authorization or Defer Decision v0.1');
+    expect(acceptanceChecklist).toContain('Explicit Launch Authorization or Defer Decision v0.1');
+    expect(decisionLog).toContain('Explicit launch authorization or defer decision');
+    expect(devLog).toContain('Explicit Launch Authorization or Defer Decision v0.1');
+
+    await expectPath('docs/operations/explicit-launch-authorization-or-defer-decision-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

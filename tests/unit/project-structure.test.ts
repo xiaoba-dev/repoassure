@@ -1585,6 +1585,52 @@ describe('project structure', () => {
     await expectPath('docs/operations/public-launch-defer-closure-v0.1.md');
   });
 
+  it('records product website user validation backlog planning after launch defer closure', async () => {
+    const [
+      backlog,
+      readme,
+      releaseChecklist,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/product-website-user-validation-backlog-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(backlog).toContain('Product / Website / User Validation Backlog Planning v0.1');
+    expect(backlog).toContain('Status: backlog_planned_launch_deferred');
+    expect(backlog).toContain('Source closure: `Public Launch Defer Closure v0.1`');
+    expect(backlog).toContain('Launch authorization status: `not_authorized`');
+    expect(backlog).toContain('Backlog workstream: `product_website_user_validation_backlog`');
+    expect(backlog).toContain('Product backlog');
+    expect(backlog).toContain('Public website backlog');
+    expect(backlog).toContain('User validation backlog');
+    expect(backlog).toContain('Release readiness hygiene backlog');
+    expect(backlog).toContain('Future launch reopening criteria');
+    expect(backlog).toContain('No Action Authorization Receipt was produced');
+    expect(backlog).toContain('No npm publication was executed');
+    expect(backlog).toContain('No GitHub release was executed');
+    expect(backlog).toContain('No public launch or production marketing announcement was executed');
+    expect(backlog).toContain('No customer contact was executed');
+    expect(backlog).toContain('No pricing change or spend was executed');
+    expect(backlog).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was executed');
+    expect(readme).toContain('Product / Website / User Validation Backlog Planning v0.1');
+    expect(releaseChecklist).toContain('Product / Website / User Validation Backlog Planning v0.1');
+    expect(testingStrategy).toContain('Product / Website / User Validation Backlog Planning v0.1');
+    expect(acceptanceChecklist).toContain('Product / Website / User Validation Backlog Planning v0.1');
+    expect(decisionLog).toContain('Product website user validation backlog planning');
+    expect(devLog).toContain('Product / Website / User Validation Backlog Planning v0.1');
+
+    await expectPath('docs/operations/product-website-user-validation-backlog-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

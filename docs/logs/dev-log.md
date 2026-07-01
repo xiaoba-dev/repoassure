@@ -1,5 +1,31 @@
 # 开发日志
 
+## 2026年7月1日 - Product / Website / User Validation Backlog Planning v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/product-website-user-validation-backlog-v0.1.md`。
+- 记录 status `backlog_planned_launch_deferred`。
+- 记录 source closure `Public Launch Defer Closure v0.1` 和 launch authorization status `not_authorized`。
+- 拆分 product backlog、public website backlog、user validation backlog、release readiness hygiene backlog 和 future launch reopening criteria。
+- 明确 backlog 不重新打开 public launch gate，不生成 Action Authorization Receipt。
+- 级联更新 README、public release checklist、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Product / Website / User Validation Backlog Planning v0.1 文档和级联记录存在；测试因 `docs/operations/product-website-user-validation-backlog-v0.1.md` 缺失按预期失败。
+- Green：新增 backlog planning 文档和级联记录，明确后续 workstream 转向产品、官网、用户验证和 release hygiene。
+
+### 边界
+
+- No Action Authorization Receipt was produced。
+- No npm publication was executed。
+- No GitHub release was executed。
+- No public launch or production marketing announcement was executed。
+- No customer contact was executed。
+- No pricing change or spend was executed。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was executed。
+
 ## 2026年7月1日 - Public Launch Defer Closure v0.1
 
 ### 完成内容

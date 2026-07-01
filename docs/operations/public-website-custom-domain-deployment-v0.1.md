@@ -54,6 +54,7 @@ Current DNS state:
 - `www.repoassure.com` resolves through Cloudflare to `28.0.0.57`.
 - `https://repoassure.com`: HTTP/2 200 over HTTPS.
 - `https://www.repoassure.com`: HTTP/2 200 over HTTPS.
+- Redirect policy verification: both custom domains currently serve the accepted website directly with HTTP/2 200; no apex/www canonical redirect is configured in this increment.
 
 Historical DNS/API blocker:
 
@@ -75,6 +76,7 @@ Both records are proxied through Cloudflare.
 - Cloudflare Pages custom domains API returned `active` for `repoassure.com` and `www.repoassure.com`.
 - `curl -I -L --max-time 30 https://repoassure.com`: HTTP/2 200.
 - `curl -I -L --max-time 30 https://www.repoassure.com`: HTTP/2 200.
+- Redirect policy verification confirmed direct serving for both custom domains, with no unexpected redirect chain.
 - `REPOASSURE_WEBSITE_URL=https://repoassure.com REPOASSURE_WEBSITE_QA_DIR=/private/tmp/repoassure-custom-domain-qa pnpm verify:website`: passed.
 - `REPOASSURE_WEBSITE_URL=https://www.repoassure.com REPOASSURE_WEBSITE_QA_DIR=/private/tmp/repoassure-custom-domain-www-qa pnpm verify:website`: passed.
 - Verified English hero: `Assure every AI-generated repo before it ships`.

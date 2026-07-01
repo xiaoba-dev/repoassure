@@ -1535,6 +1535,7 @@ describe('project structure', () => {
     expect(operation).toContain('Required DNS record: CNAME `www` -> `repoassure-preview.pages.dev`');
     expect(operation).toContain('`https://repoassure.com`: HTTP/2 200 over HTTPS');
     expect(operation).toContain('`https://www.repoassure.com`: HTTP/2 200 over HTTPS');
+    expect(operation).toContain('Redirect policy verification: both custom domains currently serve the accepted website directly with HTTP/2 200');
     expect(operation).toContain('REPOASSURE_WEBSITE_URL=https://repoassure.com');
     expect(operation).toContain('REPOASSURE_WEBSITE_URL=https://www.repoassure.com');
     expect(operation).toContain('Assure every AI-generated repo before it ships');

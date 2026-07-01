@@ -1192,7 +1192,7 @@ describe('project structure', () => {
     expect(verification).toContain('Workflow branch: `codex/protected-pr-workflow-v0.1`');
     expect(verification).toContain('Base branch: `main`');
     expect(verification).toContain('Pull request: `https://github.com/xiaoba-dev/repoassure/pull/3`');
-    expect(verification).toContain('CI run: `28498042001`');
+    expect(verification).toContain('CI run: `28498350618`');
     expect(verification).toContain('Branch protection remains enabled');
     expect(verification).toContain('Required status check: `Quality Gates`');
     expect(verification).toContain('Pull request workflow');

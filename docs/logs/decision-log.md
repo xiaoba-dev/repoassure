@@ -15,7 +15,7 @@
 ### 影响
 
 - 新增 `docs/operations/protected-pr-workflow-verification-v0.1.md`。
-- 受保护流程验证通过 PR #3 执行，CI run `28498042001` 已通过。
+- 受保护流程验证通过 PR #3 执行，CI run `28498350618` 已通过。
 - GitHub 拒绝 self-approval，并返回 `Review Can not approve your own pull request`。
 - 当前 merge gate 正确等待外部 maintainer review，应由 maintainer review 完成，而不是绕过保护。
 - 本决策不执行 npm publish、GitHub release、public launch、production marketing announcement 或商业版 availability claims。

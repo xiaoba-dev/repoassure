@@ -6,7 +6,7 @@ Repository: `xiaoba-dev/repoassure`
 Workflow branch: `codex/protected-pr-workflow-v0.1`
 Base branch: `main`
 Pull request: `https://github.com/xiaoba-dev/repoassure/pull/3`
-CI run: `28498042001`
+CI run: `28498350618`
 Prerequisite: [Native Branch Protection Enablement v0.1](native-branch-protection-enablement-v0.1.md)
 
 ## Purpose
@@ -41,7 +41,7 @@ The local TDD and quality-gate preparation is complete in this branch. PR #3 was
 Remote verification result:
 
 - PR #3 is mergeable at the Git level.
-- `Quality Gates` passed in CI run `28498042001`.
+- `Quality Gates` passed in CI run `28498350618`.
 - Branch protection remains enabled for `main`.
 - Review gate remains active and requires external maintainer review.
 - GitHub rejected self-approval with: `Review Can not approve your own pull request`.

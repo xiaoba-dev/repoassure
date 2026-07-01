@@ -1,5 +1,31 @@
 # 开发日志
 
+## 2026年7月1日 - Maintainer Launch Decision Input v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/maintainer-launch-decision-input-v0.1.md`。
+- 记录 status `decision_input_recorded_launch_not_authorized`。
+- 记录 launch authorization status `not_authorized`、maintainer input decision `not_supplied` 和 launch decision `defer_launch`。
+- 明确 Goal execution authorization is not launch authorization。
+- 将 launch scope、launch copy、release notes、support boundary、legal/trademark/claim-risk review、commercial availability wording review、risk acceptance、rollback/correction plan 和 final launch approval input 均记录为 `not_supplied`。
+- 明确 No Action Authorization Receipt was produced，下一步 gate 为 `explicit_launch_authorization_or_defer_decision`。
+- 级联更新 README、public release checklist、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Maintainer Launch Decision Input v0.1 文档和级联记录存在；测试因 `docs/operations/maintainer-launch-decision-input-v0.1.md` 缺失按预期失败。
+- Green：新增 maintainer launch decision input 文档和级联记录，明确本轮 goal 授权不等于 launch 授权，launch 继续 deferred。
+
+### 边界
+
+- No npm publication was executed。
+- No GitHub release was executed。
+- No public launch or production marketing announcement was executed。
+- No customer contact was executed。
+- No pricing change or spend was executed。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was executed。
+
 ## 2026年7月1日 - Public Launch Authorization Packet Completion v0.1
 
 ### 完成内容

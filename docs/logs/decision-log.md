@@ -1,5 +1,23 @@
 # 决策日志
 
+## 2026年7月1日 - Maintainer launch decision input
+
+### 决策
+
+记录 Maintainer Launch Decision Input v0.1：本轮“授权执行”只授权执行 Codex goal，不等于 launch authorization；maintainer input decision 为 `not_supplied`，launch decision 为 `defer_launch`，launch authorization status 继续保持 `not_authorized`。
+
+### 原因
+
+- 本轮没有提供具体 launch scope、launch copy、release notes、support boundary、claim-risk review、commercial wording、risk acceptance、rollback/correction plan 或 final launch approval。
+- Goal execution authorization is not launch authorization。
+- 缺少最终发布动作、发布内容、风险接受和回滚方案时，不能生成 Action Authorization Receipt。
+
+### 影响
+
+- 新增 `docs/operations/maintainer-launch-decision-input-v0.1.md`。
+- 所有 launch decision input fields 均记录为 `not_supplied`。
+- 本决策不执行 npm publish、GitHub release、public launch、production marketing announcement、customer contact、pricing change、spend、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
+
 ## 2026年7月1日 - Public launch authorization packet completion
 
 ### 决策

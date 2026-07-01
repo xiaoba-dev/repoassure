@@ -22,7 +22,7 @@ This checklist does not publish the project. It defines prerequisites for a futu
 - [x] Add contribution policy, including CLA or Developer Certificate of Origin decision.
 - [x] Add security disclosure policy.
 - [ ] Branch protection or an equivalent repository ruleset is enabled for `main`.
-- [ ] Review project name, package name, and trademark risk.
+- [x] Review project name, package name, and trademark risk: maintainer accepted current RepoAssure naming risk in Public Release Manual Decision Intake v0.2.
 - [ ] Define which modules are open core and which are commercial-only before hosted dashboard work begins.
 - [ ] Confirm no private customer data, secrets, or non-public target repo artifacts are committed.
 - [ ] Run full quality gates: unit, integration, typecheck, lint, build, acceptance, and goal audit.
@@ -32,12 +32,12 @@ This checklist does not publish the project. It defines prerequisites for a futu
 - [x] Add or document executable public-release readiness checks for secret exposure, generated artifact hygiene, release boundary status, and current license readiness status.
 - [x] Add automated dependency license readiness evidence before first public package publication.
 - [x] Prepare local release candidate handoff for review without publication: see `../../operations/release-candidate-handoff-v0.1.md`.
-- [ ] Legal review confirms Apache-2.0 license text, contribution policy, and security disclosure policy.
-- [ ] Final maintainer authorization exists before changing visibility, publishing packages, or announcing publicly.
+- [x] Legal review confirms Apache-2.0 license text, contribution policy, and security disclosure policy: maintainer approved current readiness materials in Public Release Manual Decision Intake v0.2.
+- [x] Final maintainer authorization exists before changing visibility, publishing packages, or announcing publicly: authorization is recorded in Public Release Manual Decision Intake v0.2, but execution remains blocked by the deferred branch protection or equivalent repository ruleset gate.
 
 ## Blockers
 
-Any unresolved legal, security, dependency-license, trademark, or secret-exposure issue blocks public release.
+Any unresolved branch protection or equivalent repository ruleset issue blocks public release. Future legal, security, dependency-license, trademark, or secret-exposure changes must be reviewed before they are included in release materials.
 
 ## Follow-up
 
@@ -55,5 +55,6 @@ Any unresolved legal, security, dependency-license, trademark, or secret-exposur
 - Public Release Manual Decision Input Completion v0.1 is recorded in `../../operations/public-release-manual-decision-input-completion-v0.1.md`; current status is `not_completed_missing_explicit_decisions`, because authorization to execute the Codex goal did not supply explicit approve/reject/defer/accept-risk values, evidence, dates, notes, or scope for the manual gates.
 - Public Release Manual Decision Intake v0.2 is recorded in `../../operations/public-release-manual-decision-intake-v0.2.md`; current status is `decisions_recorded_release_execution_blocked`, with legal review approved, trademark/name risk accepted, final maintainer publication authorization approved, reviewer feedback wait risk accepted, dependency/license risk accepted, and secret/customer data exposure approved based on automated verification. Branch protection or equivalent repository ruleset is deferred because GitHub private repo branch protection/rulesets still return HTTP 403, so public release remains no-go.
 - Public Release Manual Decision Input Review v0.1 is recorded in `../../operations/public-release-manual-decision-input-review-v0.1.md`; current status is `not_ready_pending_input`, because the maintainer decision input form remains blank and public release remains no-go.
-- Manual gates remain: branch protection or equivalent ruleset, legal review, trademark review, and final maintainer publication authorization.
+- Public Release Manual Decision Input Review v0.2 is recorded in `../../operations/public-release-manual-decision-input-review-v0.2.md`; current status is `reviewed_release_execution_still_blocked`, because all seven maintainer decisions are present and reviewable, but branch protection or equivalent repository ruleset remains deferred. Current blocking manual gate: branch protection or equivalent repository ruleset.
+- Current blocking manual gate: branch protection or equivalent repository ruleset.
 - Keep the checklist as a release gate; completing v0.3 distribution readiness does not itself publish the repo or create a license grant.

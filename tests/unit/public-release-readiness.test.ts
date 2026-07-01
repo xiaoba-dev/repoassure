@@ -60,6 +60,7 @@ describe('public release readiness checker', () => {
 
     expect(stdout).toContain('Public release readiness check passed for automated public release prerequisites.');
     expect(stdout).toContain('public release ready: no');
+    expect(stdout).toContain('branch protection or equivalent repository ruleset remains required before making anything public');
   });
 
   it('checks public release policy materials before reporting automated prerequisites ready', async () => {
@@ -98,7 +99,11 @@ describe('public release readiness checker', () => {
       expect.objectContaining({ id: 'security-policy', status: 'passed' }),
       expect.objectContaining({ id: 'dependency-license-audit', status: 'passed' }),
       expect.objectContaining({ id: 'public-release-notes-draft', status: 'passed' }),
-      expect.objectContaining({ id: 'manual-publication-authorization', status: 'not_ready' })
+      expect.objectContaining({
+        id: 'manual-publication-authorization',
+        status: 'not_ready',
+        summary: 'branch protection or equivalent repository ruleset remains required before making anything public'
+      })
     ]));
   });
 });

@@ -1,5 +1,31 @@
 # 开发日志
 
+## 2026年7月1日 - Public Release Manual Decision Input Review v0.2
+
+### 完成内容
+
+- 新增 `docs/operations/public-release-manual-decision-input-review-v0.2.md`。
+- 复核 `docs/operations/public-release-manual-decision-intake-v0.2.md` 中的 7 项 maintainer manual gate 决策。
+- 确认 legal review approve、trademark/name accept risk、final maintainer publication authorization approve、private preview reviewer feedback accept risk、dependency/license risk accept risk、secret/customer data exposure approve 均已记录且可审阅。
+- 确认 branch protection or equivalent repository ruleset 仍为 defer，且是当前唯一 blocking manual gate。
+- 明确本 review 不定义 equivalent release control，不通过公开仓库解锁 branch protection，不授权 Public Source Release Execution v0.1。
+- 更新 `pnpm release:check` 的 not_ready 说明，避免继续提示 legal/trademark/final authorization 仍缺失；当前说明收敛为 branch protection or equivalent repository ruleset remains required。
+- 级联更新 README、public release checklist、acceptance checklist 和 testing strategy。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Public Release Manual Decision Input Review v0.2 文档和级联记录存在；测试因 `docs/operations/public-release-manual-decision-input-review-v0.2.md` 缺失按预期失败。
+- Green：新增 v0.2 review 文档和级联记录，明确 public release remains no-go，当前阻塞项是 branch protection or equivalent repository ruleset。
+
+### 边界
+
+- Public Source Release Execution v0.1 remains blocked。
+- No repository visibility change was authorized。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
 ## 2026年7月1日 - Public Release Manual Decision Intake v0.2
 
 ### 完成内容

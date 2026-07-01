@@ -1188,13 +1188,17 @@ describe('project structure', () => {
     ]);
 
     expect(verification).toContain('Protected PR Workflow Verification v0.1');
-    expect(verification).toContain('Status: pr_created_ci_pending_or_passed');
+    expect(verification).toContain('Status: pr_created_ci_passed_review_required');
     expect(verification).toContain('Workflow branch: `codex/protected-pr-workflow-v0.1`');
     expect(verification).toContain('Base branch: `main`');
+    expect(verification).toContain('Pull request: `https://github.com/xiaoba-dev/repoassure/pull/3`');
+    expect(verification).toContain('CI run: `28498042001`');
     expect(verification).toContain('Branch protection remains enabled');
     expect(verification).toContain('Required status check: `Quality Gates`');
     expect(verification).toContain('Pull request workflow');
     expect(verification).toContain('Review gate');
+    expect(verification).toContain('GitHub rejected self-approval');
+    expect(verification).toContain('Review Can not approve your own pull request');
     expect(verification).toContain('No branch protection weakening was executed');
     expect(verification).toContain('No direct push to `main` was executed');
     expect(verification).toContain('No npm publication was executed');

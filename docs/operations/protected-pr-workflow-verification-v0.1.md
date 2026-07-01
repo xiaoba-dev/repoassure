@@ -1,10 +1,12 @@
 # Protected PR Workflow Verification v0.1
 
-Status: pr_created_ci_pending_or_passed
+Status: pr_created_ci_passed_review_required
 Date: 2026-07-01
 Repository: `xiaoba-dev/repoassure`
 Workflow branch: `codex/protected-pr-workflow-v0.1`
 Base branch: `main`
+Pull request: `https://github.com/xiaoba-dev/repoassure/pull/3`
+CI run: `28498042001`
 Prerequisite: [Native Branch Protection Enablement v0.1](native-branch-protection-enablement-v0.1.md)
 
 ## Purpose
@@ -34,9 +36,17 @@ This verification is intentionally small and documentation-first. Its purpose is
 
 ## Current Verification State
 
-The local TDD and quality-gate preparation is complete in this branch. Remote PR number, CI run ID, review state, and merge state are verified after the branch is pushed and the PR is created.
+The local TDD and quality-gate preparation is complete in this branch. PR #3 was created against protected `main`, and GitHub triggered `RepoAssure CI` / `Quality Gates`.
 
-If the current GitHub identity is not allowed to approve its own PR, that is an expected protected-workflow constraint and must be handled by maintainer review rather than by weakening branch protection.
+Remote verification result:
+
+- PR #3 is mergeable at the Git level.
+- `Quality Gates` passed in CI run `28498042001`.
+- Branch protection remains enabled for `main`.
+- Review gate remains active and requires external maintainer review.
+- GitHub rejected self-approval with: `Review Can not approve your own pull request`.
+
+This is an expected protected-workflow constraint. It must be handled by maintainer review rather than by weakening branch protection.
 
 ## Explicit Non-Execution Boundary
 

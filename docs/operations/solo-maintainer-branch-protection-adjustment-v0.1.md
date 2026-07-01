@@ -1,6 +1,6 @@
 # Solo Maintainer Branch Protection Adjustment v0.1
 
-Status: adjustment_planned_pending_remote_verification
+Status: adjustment_verified_pr3_merged
 Date: 2026-07-01
 Repository: `xiaoba-dev/repoassure`
 Target branch: `main`
@@ -13,7 +13,7 @@ Adjust `main` branch protection from a team review profile to a solo maintainer 
 
 PR #3 proved that the team profile blocks solo maintenance: `Quality Gates` passed, but the PR remained blocked because GitHub rejects self-approval with `Review Can not approve your own pull request`.
 
-## Planned Remote Adjustment
+## Verified Remote Adjustment
 
 - Required approving reviews: `1 -> 0`.
 - Keep required status check: `Quality Gates`.
@@ -24,16 +24,18 @@ PR #3 proved that the team profile blocks solo maintenance: `Quality Gates` pass
 - Keep force pushes disabled.
 - Keep branch deletion disabled.
 
+Remote verification confirmed that `required_pull_request_reviews` is no longer configured, while `Quality Gates`, strict status checks, admin enforcement, conversation resolution, linear history, disabled force pushes, and disabled branch deletion remain enabled.
+
 ## Verification Plan
 
-After the remote branch protection update:
+Verification completed:
 
-1. Verify `main` remains protected.
-2. Verify required status check `Quality Gates` remains enabled with strict status checks.
-3. Verify force pushes and branch deletion remain disabled.
-4. Verify PR #3 no longer reports `REVIEW_REQUIRED`.
-5. Merge PR #3 through GitHub's protected PR flow.
-6. Verify main branch CI after merge.
+1. `main` remains protected.
+2. Required status check `Quality Gates` remains enabled with strict status checks.
+3. Force pushes and branch deletion remain disabled.
+4. PR #3 changed from `REVIEW_REQUIRED` / `BLOCKED` to `CLEAN` / `MERGEABLE`.
+5. PR #3 merged through GitHub's protected PR flow.
+6. Main branch CI run `28510634551` passed after merge.
 
 ## Explicit Non-Execution Boundary
 

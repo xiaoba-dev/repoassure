@@ -1214,9 +1214,10 @@ describe('project structure', () => {
   });
 
   it('records solo maintainer branch protection adjustment', async () => {
-    const [adr, adjustment, readme, testingStrategy, acceptanceChecklist, decisionLog, devLog] = await Promise.all([
+    const [adr, adjustment, closure, readme, testingStrategy, acceptanceChecklist, decisionLog, devLog] = await Promise.all([
       readFile('docs/adr/0023-solo-maintainer-branch-protection.md', 'utf8'),
       readFile('docs/operations/solo-maintainer-branch-protection-adjustment-v0.1.md', 'utf8'),
+      readFile('docs/operations/protected-pr-workflow-closure-v0.1.md', 'utf8'),
       readFile('README.md', 'utf8'),
       readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
       readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
@@ -1230,7 +1231,7 @@ describe('project structure', () => {
     expect(adr).toContain('Required status check: `Quality Gates`');
     expect(adr).toContain('Do not weaken CI gate');
     expect(adjustment).toContain('Solo Maintainer Branch Protection Adjustment v0.1');
-    expect(adjustment).toContain('Status: adjustment_planned_pending_remote_verification');
+    expect(adjustment).toContain('Status: adjustment_verified_pr3_merged');
     expect(adjustment).toContain('Required approving reviews: `1 -> 0`');
     expect(adjustment).toContain('Keep strict status checks: `true`');
     expect(adjustment).toContain('Keep required status check: `Quality Gates`');
@@ -1239,7 +1240,15 @@ describe('project structure', () => {
     expect(adjustment).toContain('No direct push to `main` was executed');
     expect(adjustment).toContain('No npm publication was executed');
     expect(adjustment).toContain('No GitHub release was executed');
+    expect(closure).toContain('Protected PR Workflow Closure v0.1');
+    expect(closure).toContain('Status: pr3_merged_main_ci_passed');
+    expect(closure).toContain('Pull request: `https://github.com/xiaoba-dev/repoassure/pull/3`');
+    expect(closure).toContain('Merge commit: `c522f3c180ea642d4c531f97ecb287aa061d060f`');
+    expect(closure).toContain('Main CI run: `28510634551`');
+    expect(closure).toContain('Quality Gates');
+    expect(closure).toContain('No direct push to `main` was executed');
     expect(readme).toContain('Solo Maintainer Branch Protection Adjustment v0.1');
+    expect(readme).toContain('Protected PR Workflow Closure v0.1');
     expect(testingStrategy).toContain('Solo Maintainer Branch Protection Adjustment v0.1');
     expect(acceptanceChecklist).toContain('Solo Maintainer Branch Protection Adjustment v0.1');
     expect(decisionLog).toContain('Solo maintainer branch protection adjustment');
@@ -1247,6 +1256,7 @@ describe('project structure', () => {
 
     await expectPath('docs/adr/0023-solo-maintainer-branch-protection.md');
     await expectPath('docs/operations/solo-maintainer-branch-protection-adjustment-v0.1.md');
+    await expectPath('docs/operations/protected-pr-workflow-closure-v0.1.md');
   });
 
   it('records public website release candidate closure without publishing or deploying', async () => {

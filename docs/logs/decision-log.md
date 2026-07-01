@@ -1,5 +1,25 @@
 # 决策日志
 
+## 2026年7月1日 - Equivalent release control
+
+### 决策
+
+新增 `ADR-0022: Equivalent Release Control`。当 GitHub private repo branch protection / repository rulesets 仍不可用时，允许把替代门禁设计为一个明确的 evidence package 候选，而不是为了启用 branch protection 公开仓库。
+
+### 原因
+
+- Public Release Manual Decision Input Review v0.2 已确认 7 项 maintainer 决策均可审阅。
+- 当前唯一 blocking manual gate 是 branch protection or equivalent repository ruleset。
+- GitHub private repo plan 仍对 branch protection / repository rulesets 返回 `HTTP 403`。
+- 继续推进 public release governance 需要一个可审计的替代控制设计，但不能绕过 release boundary。
+
+### 影响
+
+- 新增 `docs/operations/equivalent-release-control-design-v0.1.md`。
+- Equivalent release control 当前状态为 `designed_not_executed`。
+- Public Source Release Execution 仍被阻塞，直到 future closure goal 执行证据包并记录 explicit maintainer approval。
+- 不授权 repository visibility change、npm publish、GitHub release、public launch、production marketing announcement 或商业版 availability claims。
+
 ## 2026年6月25日 - Public release readiness boundary
 
 ### 决策

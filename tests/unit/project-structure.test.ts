@@ -992,6 +992,64 @@ describe('project structure', () => {
     await expectPath('docs/operations/public-release-manual-decision-input-review-v0.2.md');
   });
 
+  it('designs an equivalent release control without closing the public release gate', async () => {
+    const [
+      adrIndex,
+      adr,
+      operation,
+      readme,
+      architecture,
+      releaseChecklist,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/adr/README.md', 'utf8'),
+      readFile('docs/adr/0022-equivalent-release-control.md', 'utf8'),
+      readFile('docs/operations/equivalent-release-control-design-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(adrIndex).toContain('[0022](0022-equivalent-release-control.md)');
+    expect(adrIndex).toContain('Equivalent release control');
+    expect(adr).toContain('ADR-0022: Equivalent Release Control');
+    expect(adr).toContain('Status: Accepted');
+    expect(adr).toContain('Design an equivalent release control as a fallback candidate');
+    expect(adr).toContain('does not close the branch protection gate by itself');
+    expect(adr).toContain('Do not make the repository public only to unlock branch protection');
+    expect(adr).toContain('Public Source Release Execution remains blocked until the equivalent control is executed and explicitly closed');
+    expect(operation).toContain('Equivalent Release Control Design v0.1');
+    expect(operation).toContain('Status: designed_not_executed');
+    expect(operation).toContain('Required evidence package');
+    expect(operation).toContain('Exact release commit SHA');
+    expect(operation).toContain('RepoAssure CI / Quality Gates success for the exact SHA');
+    expect(operation).toContain('local full test evidence');
+    expect(operation).toContain('maintainer approval for equivalent control closure');
+    expect(operation).toContain('public release remains no-go');
+    expect(operation).toContain('No repository visibility change was authorized');
+    expect(operation).toContain('No npm publication was authorized');
+    expect(operation).toContain('No GitHub release was authorized');
+    expect(readme).toContain('ADR-0022');
+    expect(readme).toContain('Equivalent Release Control Design v0.1');
+    expect(architecture).toContain('ADR-0022');
+    expect(releaseChecklist).toContain('Equivalent Release Control Design v0.1');
+    expect(releaseChecklist).toContain('designed_not_executed');
+    expect(testingStrategy).toContain('Equivalent Release Control Design v0.1');
+    expect(acceptanceChecklist).toContain('Equivalent Release Control Design v0.1');
+    expect(decisionLog).toContain('Equivalent release control');
+    expect(devLog).toContain('Equivalent Release Control Design v0.1');
+
+    await expectPath('docs/adr/0022-equivalent-release-control.md');
+    await expectPath('docs/operations/equivalent-release-control-design-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

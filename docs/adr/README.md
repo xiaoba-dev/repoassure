@@ -27,6 +27,7 @@ ADR records long-lived architecture decisions. Use `docs/logs/decision-log.md` f
 | [0019](0019-public-website-enterprise-design-system.md) | Accepted | Public website enterprise design system |
 | [0020](0020-public-website-private-preview-deployment.md) | Accepted | Public website private preview deployment boundary |
 | [0021](0021-private-preview-hosting-fallback.md) | Accepted | Private preview hosting fallback decision |
+| [0022](0022-equivalent-release-control.md) | Accepted | Equivalent release control |
 
 ## Template
 

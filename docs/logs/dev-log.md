@@ -1,5 +1,29 @@
 # 开发日志
 
+## 2026年7月1日 - Equivalent Release Control Design v0.1
+
+### 完成内容
+
+- 新增 `docs/adr/0022-equivalent-release-control.md`。
+- 新增 `docs/operations/equivalent-release-control-design-v0.1.md`。
+- 定义 branch protection gate 的替代证据包候选：exact release commit SHA、RepoAssure CI / Quality Gates、local full test、`pnpm build`、`pnpm lint`、`pnpm typecheck`、`pnpm test`、`pnpm repo:hygiene`、`pnpm release:check`、secret/customer-data exposure scan、diff review 和 maintainer approval for equivalent control closure。
+- 明确 equivalent release control 当前状态为 `designed_not_executed`，不关闭 branch protection gate，不执行 Public Source Release Execution v0.1。
+- 级联更新 ADR index、README、architecture overview、public release checklist、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 ADR-0022、Equivalent Release Control Design v0.1 文档和级联记录存在；测试因 `docs/adr/0022-equivalent-release-control.md` 缺失按预期失败。
+- Green：新增 ADR、operation packet 和级联记录，保持 public release remains no-go。
+
+### 边界
+
+- Public Source Release Execution v0.1 remains blocked。
+- No repository visibility change was authorized。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
 ## 2026年7月1日 - Public Release Manual Decision Input Review v0.2
 
 ### 完成内容

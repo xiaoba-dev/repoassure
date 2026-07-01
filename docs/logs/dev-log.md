@@ -1,5 +1,29 @@
 # 开发日志
 
+## 2026年7月1日 - Public Launch Boundary Decision v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/public-launch-boundary-decision-v0.1.md`。
+- 记录当前模式 `source_public_website_live`。
+- 记录决策 `do_not_launch_yet` 和下一步 gate `public_launch_authorization`。
+- 明确源码公开和官网在线不等于 public launch。
+- 级联更新 README、public release checklist、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Public Launch Boundary Decision v0.1 文档和级联记录存在；测试因 `docs/operations/public-launch-boundary-decision-v0.1.md` 缺失按预期失败。
+- Green：新增 launch boundary 文档和级联记录，明确 `launch_not_authorized` 状态与非执行边界。
+
+### 边界
+
+- No npm publication was executed。
+- No GitHub release was executed。
+- No public launch or production marketing announcement was executed。
+- No customer contact was executed。
+- No pricing change or spend was executed。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was executed。
+
 ## 2026年7月1日 - Public Release Post-Merge Hygiene v0.1
 
 ### 完成内容

@@ -1,5 +1,23 @@
 # 决策日志
 
+## 2026年7月1日 - Public launch defer closure
+
+### 决策
+
+接受 Public Launch Defer Closure v0.1：当前 public launch gate 关闭为 deferred，closure decision 为 `close_public_launch_gate_as_deferred`，launch authorization status 继续保持 `not_authorized`。
+
+### 原因
+
+- Explicit Launch Authorization or Defer Decision v0.1 已记录 `defer_public_launch`。
+- 连续推进同一 launch authorization gate 不会增加安全性，只会制造流程噪声。
+- 未来 launch 必须从新的完整 launch authorization packet 重新开始。
+
+### 影响
+
+- 新增 `docs/operations/public-launch-defer-closure-v0.1.md`。
+- 当前后续 workstream 转为 `product_website_user_validation_backlog`。
+- 本决策不执行 npm publish、GitHub release、public launch、production marketing announcement、customer contact、pricing change、spend、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
+
 ## 2026年7月1日 - Explicit launch authorization or defer decision
 
 ### 决策

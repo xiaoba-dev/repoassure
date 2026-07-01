@@ -1540,6 +1540,51 @@ describe('project structure', () => {
     await expectPath('docs/operations/explicit-launch-authorization-or-defer-decision-v0.1.md');
   });
 
+  it('records public launch defer closure and redirects follow-up work away from launch gates', async () => {
+    const [
+      closure,
+      readme,
+      releaseChecklist,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/public-launch-defer-closure-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(closure).toContain('Public Launch Defer Closure v0.1');
+    expect(closure).toContain('Status: launch_gate_closed_deferred');
+    expect(closure).toContain('Launch authorization status: `not_authorized`');
+    expect(closure).toContain('Closure decision: `close_public_launch_gate_as_deferred`');
+    expect(closure).toContain('Source decision: `Explicit Launch Authorization or Defer Decision v0.1`');
+    expect(closure).toContain('Source explicit launch decision: `defer_public_launch`');
+    expect(closure).toContain('Do not continue repeating launch authorization gates');
+    expect(closure).toContain('Future launch entry: `new_future_launch_authorization_packet_required`');
+    expect(closure).toContain('Next workstream: `product_website_user_validation_backlog`');
+    expect(closure).toContain('No Action Authorization Receipt was produced');
+    expect(closure).toContain('No npm publication was executed');
+    expect(closure).toContain('No GitHub release was executed');
+    expect(closure).toContain('No public launch or production marketing announcement was executed');
+    expect(closure).toContain('No customer contact was executed');
+    expect(closure).toContain('No pricing change or spend was executed');
+    expect(closure).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was executed');
+    expect(readme).toContain('Public Launch Defer Closure v0.1');
+    expect(releaseChecklist).toContain('Public Launch Defer Closure v0.1');
+    expect(testingStrategy).toContain('Public Launch Defer Closure v0.1');
+    expect(acceptanceChecklist).toContain('Public Launch Defer Closure v0.1');
+    expect(decisionLog).toContain('Public launch defer closure');
+    expect(devLog).toContain('Public Launch Defer Closure v0.1');
+
+    await expectPath('docs/operations/public-launch-defer-closure-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

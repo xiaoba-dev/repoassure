@@ -6,8 +6,11 @@
 
 - 新增 ADR-0023：`docs/adr/0023-solo-maintainer-branch-protection.md`。
 - 新增 `docs/operations/solo-maintainer-branch-protection-adjustment-v0.1.md`。
+- 新增 `docs/operations/protected-pr-workflow-closure-v0.1.md`。
 - 记录独立开发者维护模式下的 branch protection 调整：required approving reviews `1 -> 0`。
 - 明确保留 `Quality Gates`、strict status checks、admin enforcement、conversation resolution、linear history、禁用 force pushes 和 branch deletion。
+- 合并 PR #3，merge commit `c522f3c180ea642d4c531f97ecb287aa061d060f`。
+- 确认 main CI run `28510634551` 已通过。
 - 级联更新 README、acceptance checklist、testing strategy 和 decision log。
 
 ### TDD 记录

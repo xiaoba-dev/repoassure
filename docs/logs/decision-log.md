@@ -17,6 +17,8 @@
 
 - Required approving reviews 从 `1` 调整为 `0`。
 - `Quality Gates`、strict status checks、admin enforcement、conversation resolution、linear history、禁用 force pushes 和 branch deletion 均保留。
+- PR #3 已通过受保护 PR flow 合并，merge commit 为 `c522f3c180ea642d4c531f97ecb287aa061d060f`。
+- Main CI run `28510634551` 已通过。
 - 本决策不授权直推 `main`、npm publish、GitHub release、public launch、production marketing announcement 或商业版 availability claims。
 
 ## 2026年7月1日 - Protected PR workflow verification

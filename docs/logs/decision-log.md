@@ -1,5 +1,23 @@
 # 决策日志
 
+## 2026年7月1日 - Public launch authorization packet completion
+
+### 决策
+
+接受 Public Launch Authorization Packet Completion v0.1：记录 completion attempt，但 launch authorization status 继续保持 `not_authorized`，completion decision 为 `defer_launch_authorization`。
+
+### 原因
+
+- 本轮只授权执行 Codex goal，没有提供具体 launch scope、launch copy、release notes、support boundary、claim review、commercial wording、risk acceptance、rollback/correction plan 或 maintainer approval。
+- 缺少这些字段时，不能生成 Action Authorization Receipt。
+- Public launch execution 必须等待 `maintainer_launch_decision_input`。
+
+### 影响
+
+- 新增 `docs/operations/public-launch-authorization-packet-completion-v0.1.md`。
+- 所有 launch completion fields 均记录为 `defer`。
+- 本决策不执行 npm publish、GitHub release、public launch、production marketing announcement、customer contact、pricing change、spend、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
+
 ## 2026年7月1日 - Public launch authorization packet
 
 ### 决策

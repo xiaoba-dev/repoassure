@@ -1,16 +1,16 @@
 # Goal 完成度审计
 
-生成时间：2026-06-26T16:39:40.290Z
+生成时间：2026-07-01T01:23:14.616Z
 
 ## 摘要
 
 | 项目 | 结果 |
 | --- | --- |
-| 总体状态 | 完成证据齐全 |
+| 总体状态 | 已准备好请求用户验收 |
 | 检查项总数 | 35 |
-| 已通过 | 35 |
+| 已通过 | 34 |
 | 缺失 | 0 |
-| 需要人工确认 | 0 |
+| 需要人工确认 | 1 |
 
 ## 交付物
 
@@ -150,8 +150,8 @@
 
 | 要求 | 状态 | 证据 | 下一步 |
 | --- | --- | --- | --- |
-| 用户确认 MVP 符合预期 | 已通过 | docs/acceptance/user-acceptance-record.md records a passing run and accepted user decision |  |
+| 用户确认 MVP 符合预期 | 需要人工确认 | docs/goals/codex-goal.md Success Definition requires user confirmation or explicit remaining changes | 等待用户提供真实 Web App repo 或人工验收结论；不能由自动脚本代替。 |
 
 ## 结论
 
-自动可验证范围和用户验收结论均已有证据，可以进入长期 goal 完成审计。
+自动可验证范围内没有缺失项；当前不能标记长期 goal complete，因为 `docs/goals/codex-goal.md` 明确要求用户确认 MVP 符合预期，仍需真实项目或用户人工验收结论。

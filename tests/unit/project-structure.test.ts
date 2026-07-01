@@ -601,6 +601,46 @@ describe('project structure', () => {
     await expectPath('docs/operations/public-release-manual-gate-closure-v0.1.md');
   });
 
+  it('records public release manual gate closure v0.2 with fresh evidence while keeping release blocked', async () => {
+    const [closure, readme, releaseChecklist, testingStrategy, acceptanceChecklist, devLog] = await Promise.all([
+      readFile('docs/operations/public-release-manual-gate-closure-v0.2.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(closure).toContain('Public Release Manual Gate Closure v0.2');
+    expect(closure).toContain('Status: not_closed_after_fresh_evidence_review');
+    expect(closure).toContain('public release remains no-go');
+    expect(closure).toContain('Execution authorization is not final publication authorization');
+    expect(closure).toContain('Repository visibility: `PRIVATE`');
+    expect(closure).toContain('Latest CI run: `28486178718` / `RepoAssure CI` / `success`');
+    expect(closure).toContain('Branch protection API: `HTTP 403`');
+    expect(closure).toContain('Repository rulesets API: `HTTP 403`');
+    expect(closure).toContain('Legal review | not_closed');
+    expect(closure).toContain('Trademark/name review | not_closed');
+    expect(closure).toContain('Branch protection or equivalent repository ruleset | not_closed');
+    expect(closure).toContain('Final maintainer publication authorization | not_closed');
+    expect(closure).toContain('Private preview reviewer feedback decision | not_closed');
+    expect(closure).toContain('Dependency/license risk confirmation | partially_supported_by_readiness_material');
+    expect(closure).toContain('Secret/customer data exposure confirmation | partially_supported_by_automated_scan');
+    expect(closure).toContain('Release execution is blocked');
+    expect(closure).toContain('No repository visibility change was authorized');
+    expect(closure).toContain('No npm publication was authorized');
+    expect(closure).toContain('No GitHub release was authorized');
+    expect(closure).toContain('No public launch or production marketing announcement was authorized');
+    expect(closure).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was authorized');
+    expect(readme).toContain('Public Release Manual Gate Closure v0.2');
+    expect(releaseChecklist).toContain('Public Release Manual Gate Closure v0.2');
+    expect(testingStrategy).toContain('Public Release Manual Gate Closure v0.2');
+    expect(acceptanceChecklist).toContain('Public Release Manual Gate Closure v0.2');
+    expect(devLog).toContain('Public Release Manual Gate Closure v0.2');
+
+    await expectPath('docs/operations/public-release-manual-gate-closure-v0.2.md');
+  });
+
   it('records public release manual gate evidence intake without inventing missing evidence', async () => {
     const [intake, readme, releaseChecklist, testingStrategy, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-release-manual-gate-evidence-intake-v0.1.md', 'utf8'),

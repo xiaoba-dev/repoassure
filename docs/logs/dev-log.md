@@ -1,5 +1,31 @@
 # 开发日志
 
+## 2026年7月1日 - Public Release Manual Gate Closure v0.2
+
+### 完成内容
+
+- 新增 `docs/operations/public-release-manual-gate-closure-v0.2.md`。
+- 记录当前状态：`Status: not_closed_after_fresh_evidence_review`。
+- 只读核验 GitHub repository state：`xiaoba-dev/repoassure` 仍为 `PRIVATE`，default branch 为 `main`。
+- 只读核验最新 CI：`RepoAssure CI` run `28486178718` 为 `success`，head SHA 为 `bd7da4d696c13ff2959c47c05f3a8293409768e9`。
+- 只读核验 branch protection 和 repository rulesets：两个 GitHub API 仍返回 `HTTP 403`，原因仍为当前 private repo plan 限制。
+- 更新 `docs/operations/branch-protection-release-boundary-v0.1.md`，记录 2026-07-01 recheck。
+- 级联更新 README、public release checklist、acceptance checklist 和 testing strategy。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Public Release Manual Gate Closure v0.2 文档和级联记录存在；测试因 `docs/operations/public-release-manual-gate-closure-v0.2.md` 缺失按预期失败。
+- Green：新增 v0.2 closure review 文档和级联记录，明确 fresh evidence 已复核但 manual gates 仍未关闭。
+
+### 边界
+
+- Goal execution authorization is not final publication authorization。
+- No repository visibility change was authorized。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
 ## 2026年7月1日 - Public Website Post-Domain Polish & Launch Boundary Review v0.1
 
 ### 完成内容

@@ -37,6 +37,17 @@ Upgrade to GitHub Pro or make this repository public to enable this feature.
 
 The repository must remain private. Do not make the repository public to unlock branch protection.
 
+## 2026-07-01 Recheck
+
+Public Release Manual Gate Closure v0.2 rechecked the repository state with read-only GitHub API calls:
+
+- `gh repo view xiaoba-dev/repoassure --json nameWithOwner,visibility,isPrivate,defaultBranchRef,url`: repository remains `PRIVATE`, default branch `main`.
+- `gh api repos/xiaoba-dev/repoassure/branches/main/protection`: still returns `HTTP 403`.
+- `gh api repos/xiaoba-dev/repoassure/rulesets`: still returns `HTTP 403`.
+- Latest `RepoAssure CI` run on `main` was successful, but CI success does not replace branch protection or an equivalent release control.
+
+This recheck does not close the branch protection gate and does not authorize making the repository public to bypass the private-repo plan limitation.
+
 ## Release Boundary
 
 Until `docs/product/strategy/public-release-checklist-v0.1.md` is complete:

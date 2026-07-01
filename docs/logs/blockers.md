@@ -1,5 +1,40 @@
 # 阻塞日志
 
+## 2026年7月1日 - Public release branch protection gate remains blocked by private repo plan
+
+### 背景
+
+Public Release Manual Gate Closure v0.2 对 GitHub repository state 做了只读复核，目的是确认 `main` branch protection 或 equivalent repository ruleset 是否可以作为 public release gate 关闭依据。
+
+### 复核结果
+
+- `gh repo view xiaoba-dev/repoassure --json nameWithOwner,visibility,isPrivate,defaultBranchRef,url`：repository remains `PRIVATE`，default branch 为 `main`。
+- `gh api repos/xiaoba-dev/repoassure/branches/main/protection`：返回 `HTTP 403`。
+- `gh api repos/xiaoba-dev/repoassure/rulesets`：返回 `HTTP 403`。
+- Latest `RepoAssure CI` run `28486178718` 为 `success`，但 CI success 不等于 branch protection 或 equivalent release control。
+
+### 当前阻塞
+
+GitHub 仍返回：
+
+```text
+Upgrade to GitHub Pro or make this repository public to enable this feature.
+```
+
+仓库必须继续保持 private，不能为了启用 branch protection 而公开仓库。
+
+### 需要的外部条件
+
+满足以下任一条件后才能重新尝试关闭该 gate：
+
+1. GitHub plan 权限允许 private repo branch protection 或 repository rulesets。
+2. Maintainer 明确提供可接受的 equivalent release control，并记录 scope、执行方式和风险接受边界。
+
+### 边界
+
+- 该阻塞未解决。
+- 不授权 repository visibility change、npm publication、GitHub release、public launch、production marketing announcement、SaaS availability、Team Cloud availability、Enterprise availability 或 hosted dashboard availability claims。
+
 ## 2026年6月30日 - Public Website Custom Domain Deployment v0.1 is blocked by missing DNS CNAME records
 
 Resolved on 2026-07-01.

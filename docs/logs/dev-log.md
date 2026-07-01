@@ -1,5 +1,30 @@
 # 开发日志
 
+## 2026年7月1日 - Native Branch Protection Enablement v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/native-branch-protection-enablement-v0.1.md`。
+- 采用 GitHub branch protection 保护 `main`。
+- 配置 required status check：`Quality Gates`。
+- 配置 strict status checks：`true`。
+- 配置 PR merge、1 个 approving review、stale review dismissal 和 conversation resolution。
+- 禁用 force pushes 和 branch deletion。
+- 级联更新 README、public release checklist、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Native Branch Protection Enablement v0.1 文档和级联记录存在；测试因 `docs/operations/native-branch-protection-enablement-v0.1.md` 缺失按预期失败。
+- Green：新增 execution 文档和级联记录，明确 native branch protection 目标状态与非执行边界。
+
+### 边界
+
+- No npm publication was executed。
+- No GitHub release was executed。
+- No public launch or production marketing announcement was executed。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was executed。
+- 后续 `main` 更新应走受保护 PR 流程。
+
 ## 2026年7月1日 - Public Source Release Execution v0.1
 
 ### 完成内容

@@ -1,5 +1,24 @@
 # 决策日志
 
+## 2026年7月1日 - Native branch protection enablement
+
+### 决策
+
+启用 GitHub native branch protection 保护 `xiaoba-dev/repoassure` 的 `main` 分支。
+
+### 原因
+
+- Repository 已公开，private repo 阶段的 GitHub 403 限制已不再阻塞 native protection 配置。
+- Public Source Release Execution v0.1 已完成，`RepoAssure CI` run `28493500138` 已成功。
+- `main` 需要从等效发布控制升级为真实 GitHub repository control。
+
+### 影响
+
+- `main` 要求 `Quality Gates` 严格状态检查。
+- `main` 要求 PR merge、1 个 approving review、stale review dismissal 和 conversation resolution。
+- Force pushes 和 branch deletion 被禁用。
+- 本决策不执行 npm publish、GitHub release、public launch、production marketing announcement 或商业版 availability claims。
+
 ## 2026年7月1日 - Public source release execution
 
 ### 决策

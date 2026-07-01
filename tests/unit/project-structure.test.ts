@@ -1138,6 +1138,45 @@ describe('project structure', () => {
     await expectPath('docs/operations/public-source-release-execution-v0.1.md');
   });
 
+  it('records native branch protection enablement for main', async () => {
+    const [enablement, readme, releaseChecklist, testingStrategy, acceptanceChecklist, decisionLog, devLog] =
+      await Promise.all([
+        readFile('docs/operations/native-branch-protection-enablement-v0.1.md', 'utf8'),
+        readFile('README.md', 'utf8'),
+        readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+        readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+        readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+        readFile('docs/logs/decision-log.md', 'utf8'),
+        readFile('docs/logs/dev-log.md', 'utf8')
+      ]);
+
+    expect(enablement).toContain('Native Branch Protection Enablement v0.1');
+    expect(enablement).toContain('Status: enabled_verified');
+    expect(enablement).toContain('Protection mechanism: `GitHub branch protection`');
+    expect(enablement).toContain('Protected branch: `main`');
+    expect(enablement).toContain('Required status check: `Quality Gates`');
+    expect(enablement).toContain('Strict status checks: `true`');
+    expect(enablement).toContain('Require pull request before merge');
+    expect(enablement).toContain('Required approving reviews: `1`');
+    expect(enablement).toContain('Dismiss stale reviews: `true`');
+    expect(enablement).toContain('Require conversation resolution: `true`');
+    expect(enablement).toContain('Disallow force pushes');
+    expect(enablement).toContain('Disallow branch deletion');
+    expect(enablement).toContain('Post-enablement verification: `protected: true`');
+    expect(enablement).toContain('No npm publication was executed');
+    expect(enablement).toContain('No GitHub release was executed');
+    expect(enablement).toContain('No public launch or production marketing announcement was executed');
+    expect(enablement).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was executed');
+    expect(readme).toContain('Native Branch Protection Enablement v0.1');
+    expect(releaseChecklist).toContain('Native Branch Protection Enablement v0.1');
+    expect(testingStrategy).toContain('Native Branch Protection Enablement v0.1');
+    expect(acceptanceChecklist).toContain('Native Branch Protection Enablement v0.1');
+    expect(decisionLog).toContain('Native branch protection enablement');
+    expect(devLog).toContain('Native Branch Protection Enablement v0.1');
+
+    await expectPath('docs/operations/native-branch-protection-enablement-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

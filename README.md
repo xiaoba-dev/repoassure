@@ -194,7 +194,7 @@ Public Source Release Execution v0.1 见 `docs/operations/public-source-release-
 
 Native Branch Protection Enablement v0.1 见 `docs/operations/native-branch-protection-enablement-v0.1.md`。当前状态为 `enabled_verified`：GitHub branch protection 已保护 `main`，要求 `Quality Gates` 严格状态检查、PR merge、1 个 approving review、stale review dismissal、conversation resolution，并禁用 force pushes 和 branch deletion。后续更新 `main` 应走受保护 PR 流程。
 
-Protected PR Workflow Verification v0.1 见 `docs/operations/protected-pr-workflow-verification-v0.1.md`。该记录验证后续变更必须通过 `codex/protected-pr-workflow-v0.1` -> PR #3 -> `Quality Gates` -> review gate -> merge gate 的受保护流程；CI run `28498350618` 已通过，GitHub 拒绝 self-approval，merge gate 正确等待外部 maintainer review。不弱化 branch protection，不直推 `main`，不执行 npm publish、GitHub release 或 public launch。
+Protected PR Workflow Verification v0.1 见 `docs/operations/protected-pr-workflow-verification-v0.1.md`。该记录验证后续变更必须通过 `codex/protected-pr-workflow-v0.1` -> PR #3 -> `Quality Gates` -> review gate -> merge gate 的受保护流程；最新 CI 证据由 GitHub PR status 和 PR comment 记录，GitHub 拒绝 self-approval，merge gate 正确等待外部 maintainer review。不弱化 branch protection，不直推 `main`，不执行 npm publish、GitHub release 或 public launch。
 
 Public Website local static preview package 可通过 `pnpm build:website && pnpm package:website-preview` 生成，交接见 `docs/operations/local-static-preview-package-v0.1.md`。输出位于 `artifacts/public-website-preview/local-static-preview`，只用于本地 review，不授权 remote hosting、preview URL、production deployment 或 public launch。
 

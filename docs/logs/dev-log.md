@@ -8,7 +8,7 @@
 - 创建 PR #3：`https://github.com/xiaoba-dev/repoassure/pull/3`。
 - 新增 `docs/operations/protected-pr-workflow-verification-v0.1.md`。
 - 记录 protected PR workflow contract：branch protection remains enabled、required status check `Quality Gates`、PR workflow、review gate、merge gate、禁止直推 `main`。
-- 验证 PR CI run `28498350618` 已通过。
+- 验证 PR CI 已通过；最新具体 run ID 由 GitHub PR status 和 PR evidence comment 记录，避免 evidence-only commit 触发新 CI 后造成 tracked docs stale。
 - 验证 GitHub 拒绝 self-approval：`Review Can not approve your own pull request`。
 - 级联更新 README、acceptance checklist、testing strategy 和 decision log。
 

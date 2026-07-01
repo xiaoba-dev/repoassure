@@ -1,5 +1,30 @@
 # 开发日志
 
+## 2026年7月1日 - Public Website Post-Domain Polish & Launch Boundary Review v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/public-website-post-domain-polish-v0.1.md`。
+- 记录当前状态：`Status: verified_post_domain_polish`。
+- 为 `apps/website/index.html` 补齐 canonical URL、robots meta、theme color、Open Graph metadata、Twitter metadata、favicon link 和 web manifest link。
+- 新增 `apps/website/public/favicon.svg`、`og-image.svg`、`robots.txt`、`site.webmanifest` 和 `sitemap.xml`。
+- 将 `scripts/verify-website.mjs` 扩展为同时验证 SEO metadata、Open Graph/Twitter metadata、favicon、manifest、robots.txt、sitemap.xml 和 OG image。
+- 记录 redirect policy：`repoassure.com` 与 `www.repoassure.com` 当前均直接 HTTP/2 200 服务，不配置 apex/www canonical redirect。
+- 级联更新 README、acceptance checklist 和 testing strategy。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/public-website.test.ts` 和 `tests/unit/project-structure.test.ts`，要求 post-domain SEO/discoverability assets 和 operation 级联记录存在；测试因缺少 `apps/website/public/robots.txt` 和 `docs/operations/public-website-post-domain-polish-v0.1.md` 按预期失败。
+- Green：新增静态 metadata/assets、扩展 verifier，并新增 post-domain operation record 与级联文档。
+
+### 边界
+
+- No repository visibility change was authorized。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
 ## 2026年7月1日 - Public Website Custom Domain Deployment v0.1 verification closure
 
 ### 完成内容

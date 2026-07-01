@@ -1,4 +1,4 @@
-import { Check, Code2, FileText, FlaskConical, GitBranch, ShieldCheck, Wrench } from 'lucide-react';
+import { Check, Code2, FileDiff, FileText, FlaskConical, GitBranch, ShieldCheck, Wrench } from 'lucide-react';
 
 import type { AssuranceGraphCopy } from './i18n.ts';
 
@@ -7,7 +7,7 @@ const graphIcons = {
   acceptance: ShieldCheck,
   code: Code2,
   docs: FileText,
-  patch: Wrench,
+  patch: FileDiff,
   repair: Wrench,
   tests: FlaskConical
 } as const;

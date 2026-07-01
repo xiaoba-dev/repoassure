@@ -1561,6 +1561,44 @@ describe('project structure', () => {
     await expectPath('docs/operations/public-website-custom-domain-deployment-v0.1.md');
   });
 
+  it('records public website post-domain polish and launch boundary review', async () => {
+    const [operation, readme, acceptanceChecklist, testingStrategy, devLog] = await Promise.all([
+      readFile('docs/operations/public-website-post-domain-polish-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(operation).toContain('Public Website Post-Domain Polish & Launch Boundary Review v0.1');
+    expect(operation).toContain('Status: verified_post_domain_polish');
+    expect(operation).toContain('Canonical URL: `https://repoassure.com/`');
+    expect(operation).toContain('Cloudflare Pages production branch: `preview`');
+    expect(operation).toContain('Latest polish deployment URL: `https://eb1aa9ff.repoassure-preview.pages.dev`');
+    expect(operation).toContain('Open Graph image: `https://repoassure.com/og-image.svg`');
+    expect(operation).toContain('Twitter card: `summary_large_image`');
+    expect(operation).toContain('Favicon: `/favicon.svg`');
+    expect(operation).toContain('Web app manifest: `/site.webmanifest`');
+    expect(operation).toContain('Robots: `/robots.txt`');
+    expect(operation).toContain('Sitemap: `/sitemap.xml`');
+    expect(operation).toContain('Redirect policy: both apex and www serve HTTP/2 200 directly');
+    expect(operation).toContain('wrangler pages deploy apps/website/dist --project-name repoassure-preview --branch preview');
+    expect(operation).toContain('`REPOASSURE_WEBSITE_URL=https://repoassure.com pnpm verify:website`: passed');
+    expect(operation).toContain('`REPOASSURE_WEBSITE_URL=https://www.repoassure.com pnpm verify:website`: passed');
+    expect(operation).toContain('No repository visibility change was authorized');
+    expect(operation).toContain('No npm publication was authorized');
+    expect(operation).toContain('No GitHub release was authorized');
+    expect(operation).toContain('No public launch or production marketing announcement was authorized');
+    expect(operation).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was authorized');
+    expect(readme).toContain('Public Website Post-Domain Polish & Launch Boundary Review v0.1');
+    expect(readme).toContain('verified_post_domain_polish');
+    expect(acceptanceChecklist).toContain('Public Website Post-Domain Polish & Launch Boundary Review v0.1');
+    expect(testingStrategy).toContain('Public Website Post-Domain Polish & Launch Boundary Review v0.1');
+    expect(devLog).toContain('Public Website Post-Domain Polish & Launch Boundary Review v0.1');
+
+    await expectPath('docs/operations/public-website-post-domain-polish-v0.1.md');
+  });
+
   it('records the private preview reviewer handoff and feedback intake package', async () => {
     const [reviewerHandoff, publicWebsiteHandoff, acceptanceChecklist, testingStrategy, devLog] = await Promise.all([
       readFile('docs/operations/private-preview-reviewer-handoff-v0.1.md', 'utf8'),

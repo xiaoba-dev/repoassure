@@ -1,24 +1,25 @@
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import {
   ArrowRight,
   Check,
   Code2,
   Database,
-  FileCode2,
-  FileText,
   Lock,
   Menu,
   SearchCheck,
   ShieldCheck,
+  UserCheck,
+  Users,
   X
 } from 'lucide-react';
 
+import { ArtifactPreview } from './ArtifactPreview.tsx';
 import { AssuranceGraph } from './AssuranceGraph.tsx';
+import { CliDemo } from './CliDemo.tsx';
 import { TrustLedgerPreview } from './TrustLedgerPreview.tsx';
 import { artifactOrder, useWebsiteLocale } from './i18n.ts';
 
-const stepIcons = [Code2, SearchCheck, FileText, ShieldCheck] as const;
-const pipelineIcons = [SearchCheck, FileText, Code2, ShieldCheck] as const;
+const stepIcons = [Code2, SearchCheck, Users, UserCheck] as const;
 
 export function App() {
   const { copy, locale, localeOptions, setLocale } = useWebsiteLocale();
@@ -26,11 +27,6 @@ export function App() {
   const [selectedArtifactId, setSelectedArtifactId] = useState(artifactOrder[0]!);
   const [email, setEmail] = useState('');
   const [formState, setFormState] = useState<'idle' | 'submitted'>('idle');
-
-  const activeArtifact = useMemo(
-    () => copy.artifacts.items[selectedArtifactId] ?? copy.artifacts.items[artifactOrder[0]!],
-    [copy, selectedArtifactId]
-  );
 
   function handlePreviewSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -64,6 +60,7 @@ export function App() {
 
         <nav className={menuOpen ? 'nav nav-open' : 'nav'} aria-label="Primary navigation">
           <a href="#how-it-works">{copy.nav.howItWorks}</a>
+          <a href="#assurance-graph">{copy.nav.assuranceGraph}</a>
           <a href="#artifacts">{copy.nav.artifacts}</a>
           <a href="#open-core">{copy.nav.openCore}</a>
           <a href="#roadmap">{copy.nav.roadmap}</a>
@@ -126,49 +123,34 @@ export function App() {
           </p>
         </div>
 
-        <div className="hero-media hero-assurance-surface">
-          <AssuranceGraph copy={copy.assuranceGraph} />
-          <TrustLedgerPreview copy={copy.trustLedgerPreview} />
-        </div>
-
-        <div className="assurance-pipeline" data-testid="assurance-pipeline">
-          <p className="section-label">{copy.assurancePipeline.label}</p>
-          <div>
-            {copy.assurancePipeline.items.map((item, index) => {
-              const PipelineIcon = pipelineIcons[index] ?? ShieldCheck;
-              return (
-                <article key={item.title}>
-                  <span>
-                    <PipelineIcon size={24} />
-                  </span>
-                  <div>
-                    <h3>
-                      {index + 1}. {item.title}
-                    </h3>
-                    <p>{item.text}</p>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+        <div className="hero-media">
+          <TrustLedgerPreview copy={copy.trustLedgerPreview} variant="hero" />
         </div>
       </section>
 
+      <section className="assurance-graph-section theme-dark" id="assurance-graph" data-testid="assurance-graph-section">
+        <div className="assurance-graph-copy">
+          <p className="section-label">{copy.assuranceGraphSection.label}</p>
+          <h2>{copy.assuranceGraphSection.heading}</h2>
+          <p className="section-intro">{copy.assuranceGraphSection.intro}</p>
+        </div>
+        <AssuranceGraph copy={copy.assuranceGraph} />
+      </section>
+
       <section className="steps-section theme-light" id="how-it-works">
-        <p className="section-label">{copy.steps.label}</p>
-        <h2>{copy.steps.heading}</h2>
-        <div className="steps-grid">
+        <CliDemo copy={copy.cliDemo} />
+        <div className="steps-grid steps-grid-compact">
           {copy.steps.items.map((step, index) => {
-            const StepIcon = stepIcons[index] ?? FileText;
+            const StepIcon = stepIcons[index] ?? ShieldCheck;
             return (
-              <article className="step-card" key={step.title}>
+              <article className="step-card step-card-compact" key={step.title}>
                 <span className="step-icon">
-                  <StepIcon size={30} />
+                  <StepIcon size={24} />
                 </span>
-                <h3>
-                  {index + 1}. {step.title}
-                </h3>
-                <p>{step.text}</p>
+                <div>
+                  <h3>{step.title}</h3>
+                  <p>{step.text}</p>
+                </div>
               </article>
             );
           })}
@@ -180,51 +162,18 @@ export function App() {
         <h2>{copy.artifacts.heading}</h2>
         <p className="section-intro">{copy.artifacts.intro}</p>
 
-        <div className="artifact-cards">
-          {copy.artifacts.cards.map((card) => (
-            <article className="artifact-card" key={card.title}>
-              <FileCode2 size={28} />
-              <h3>{card.title}</h3>
-              <p>{card.text}</p>
-            </article>
-          ))}
-        </div>
-
-        <div className="artifact-preview" data-testid="artifact-preview-tabs">
-          <div className="tab-list" role="tablist" aria-label={copy.artifacts.tabLabel}>
-            {artifactOrder.map((artifactId) => {
-              const artifact = copy.artifacts.items[artifactId];
-              return (
-                <button
-                  key={artifactId}
-                  type="button"
-                  role="tab"
-                  aria-selected={artifactId === selectedArtifactId}
-                  onClick={() => setSelectedArtifactId(artifactId)}
-                >
-                  {artifact.name}
-                </button>
-              );
-            })}
-          </div>
-          <article className="artifact-detail">
-            <div>
-              <p className="artifact-status">{activeArtifact.status}</p>
-              <h3>{activeArtifact.name}</h3>
-              <p>{activeArtifact.summary}</p>
-            </div>
-            <dl>
-              <div>
-                <dt>{copy.artifacts.evidenceLabel}</dt>
-                <dd>{activeArtifact.evidence}</dd>
-              </div>
-              <div>
-                <dt>{copy.artifacts.detailLabel}</dt>
-                <dd>{activeArtifact.detail}</dd>
-              </div>
-            </dl>
-          </article>
-        </div>
+        <ArtifactPreview
+          artifactOrder={artifactOrder}
+          items={copy.artifacts.items}
+          labels={{
+            tabLabel: copy.artifacts.tabLabel,
+            evidenceLabel: copy.artifacts.evidenceLabel,
+            detailLabel: copy.artifacts.detailLabel,
+            previewLabel: copy.artifacts.previewLabel
+          }}
+          selectedArtifactId={selectedArtifactId}
+          onSelect={setSelectedArtifactId}
+        />
       </section>
 
       <section className="split-section theme-light" id="open-core">
@@ -240,10 +189,7 @@ export function App() {
               </li>
             ))}
           </ul>
-          <a className="text-link" href="https://github.com/" rel="noreferrer">
-            {copy.openCore.link}
-            <ArrowRight size={17} />
-          </a>
+          <p className="repository-note">{copy.openCore.repositoryNote}</p>
         </article>
 
         <article className="roadmap-panel" id="roadmap">
@@ -318,15 +264,14 @@ export function App() {
         <div>
           <h3>{copy.footer.product}</h3>
           <a href="#how-it-works">{copy.nav.howItWorks}</a>
+          <a href="#assurance-graph">{copy.nav.assuranceGraph}</a>
           <a href="#artifacts">{copy.nav.artifacts}</a>
           <a href="#trust">{copy.nav.trust}</a>
         </div>
         <div>
           <h3>{copy.footer.community}</h3>
           <a href="#open-core">{copy.nav.openCore}</a>
-          <a href="https://github.com/" rel="noreferrer">
-            {copy.footer.repository}
-          </a>
+          <a href="#open-core">{copy.footer.repository}</a>
           <a href="#private-preview">{copy.footer.contributing}</a>
         </div>
         <div>

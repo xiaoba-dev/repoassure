@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="RepoAssure social preview">
+  <rect width="1200" height="630" fill="#04111f" />
+  <rect x="72" y="72" width="1056" height="486" rx="36" fill="#081b2d" stroke="#24415e" stroke-width="2" />
+  <g transform="translate(104 112)">
+    <rect width="116" height="116" rx="26" fill="#0e2a42" stroke="#2d4e6e" stroke-width="2" />
+    <path d="M58 24 88 40v27c0 19-12 35-30 43-18-8-30-24-30-43V40l30-16Z" fill="none" stroke="#f8fafc" stroke-width="7" stroke-linejoin="round" />
+    <path d="m45 62 11 11 22-29" fill="none" stroke="#24d979" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+  <text x="250" y="178" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="76" font-weight="800">Repo<tspan fill="#24d979">Assure</tspan></text>
+  <text x="104" y="314" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="760">Assure every AI-generated repo before it ships</text>
+  <text x="104" y="400" fill="#b9c7d6" font-family="Inter, Arial, sans-serif" font-size="32">Local-first assurance artifacts, repair plans, and acceptance decisions.</text>
+  <g fill="none" stroke-width="3">
+    <path d="M106 484h148" stroke="#24d979" />
+    <path d="M284 484h148" stroke="#8bb5ff" />
+    <path d="M462 484h148" stroke="#24d979" />
+  </g>
+  <text x="104" y="528" fill="#d8e0ea" font-family="Inter, Arial, sans-serif" font-size="24">Evidence stays local by default · Private preview boundary · repoassure.com</text>
+</svg>

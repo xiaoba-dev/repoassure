@@ -7,7 +7,7 @@ export const roadmapLocales = ['ja', 'ko'] as const;
 export type SupportedLocale = (typeof supportedLocales)[number];
 export type RoadmapLocale = (typeof roadmapLocales)[number];
 
-type ArtifactId = 'hardening' | 'repair' | 'patch' | 'acceptance';
+export type ArtifactId = 'hardening' | 'repair' | 'patch' | 'acceptance';
 
 export type TrustLedgerPreviewCopy = {
   label: string;
@@ -51,11 +51,6 @@ export type AssuranceGraphCopy = {
   }>;
 };
 
-export type AssurancePipelineItem = {
-  title: string;
-  text: string;
-};
-
 type WebsiteCopy = {
   meta: {
     title: string;
@@ -67,6 +62,7 @@ type WebsiteCopy = {
   };
   nav: {
     howItWorks: string;
+    assuranceGraph: string;
     artifacts: string;
     openCore: string;
     roadmap: string;
@@ -84,10 +80,19 @@ type WebsiteCopy = {
     privacyNote: string;
   };
   assuranceGraph: AssuranceGraphCopy;
-  trustLedgerPreview: TrustLedgerPreviewCopy;
-  assurancePipeline: {
+  assuranceGraphSection: {
     label: string;
-    items: AssurancePipelineItem[];
+    heading: string;
+    intro: string;
+  };
+  trustLedgerPreview: TrustLedgerPreviewCopy;
+  cliDemo: {
+    label: string;
+    heading: string;
+    intro: string;
+    command: string;
+    lines: string[];
+    footnote: string;
   };
   steps: {
     label: string;
@@ -101,14 +106,11 @@ type WebsiteCopy = {
     label: string;
     heading: string;
     intro: string;
-    cards: Array<{
-      title: string;
-      text: string;
-    }>;
     tabLabel: string;
     statusLabel: string;
     evidenceLabel: string;
     detailLabel: string;
+    previewLabel: string;
     items: Record<
       ArtifactId,
       {
@@ -117,6 +119,13 @@ type WebsiteCopy = {
         summary: string;
         evidence: string;
         detail: string;
+        previewHeading: string;
+        previewLines: Array<{
+          kind: 'meta' | 'finding' | 'code' | 'json';
+          label?: string;
+          severity?: 'P0' | 'P1' | 'P2';
+          text: string;
+        }>;
       }
     >;
   };
@@ -126,6 +135,7 @@ type WebsiteCopy = {
     body: string;
     bullets: string[];
     link: string;
+    repositoryNote: string;
   };
   roadmap: {
     label: string;
@@ -183,7 +193,8 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
     },
     nav: {
       howItWorks: 'How it works',
-      artifacts: 'Assurance Graph',
+      assuranceGraph: 'Assurance Graph',
+      artifacts: 'Proof artifacts',
       openCore: 'Open core',
       roadmap: 'Evidence model',
       trust: 'Trust',
@@ -214,6 +225,12 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
         { id: 'patch', label: 'Patch Plan', status: 'Generated', variant: 'generated' },
         { id: 'acceptance', label: 'Acceptance', status: 'Accepted', variant: 'accepted' }
       ]
+    },
+    assuranceGraphSection: {
+      label: 'Assurance Graph',
+      heading: 'See how local evidence connects across the delivery loop',
+      intro:
+        'Verified inputs produce signed artifacts and acceptance decisions without leaving your machine.'
     },
     trustLedgerPreview: {
       label: 'Trust Ledger product preview',
@@ -271,46 +288,39 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       localNote: 'Evidence never leaves your machine.',
       localBadge: '100% LOCAL'
     },
-    assurancePipeline: {
-      label: 'Assurance pipeline',
-      items: [
-        {
-          title: 'Analyze locally',
-          text: 'Static analysis, dependency checks, policy evaluation, and more.'
-        },
-        {
-          title: 'Generate artifacts',
-          text: 'Hardening report, repair plan, patch plan, and acceptance decision.'
-        },
-        {
-          title: 'Repair safely',
-          text: 'Actionable fixes with context and risk, verified before application.'
-        },
-        {
-          title: 'Accept delivery',
-          text: 'Review local evidence and accept delivery with confidence.'
-        }
-      ]
+    cliDemo: {
+      label: 'How it works',
+      heading: 'Run hardening locally in one command',
+      intro:
+        'RepoAssure analyzes your AI-generated repo, boots the app when needed, explores routes, and writes a signed artifact bundle under .hardening/.',
+      command: 'pnpm hardening run ./my-ai-app --browser',
+      lines: [
+        'Repo profile detected: vite · npm',
+        'Booted http://127.0.0.1:5173',
+        'Generated hardening-report.md, repair-plan.json, repair-task-package.json',
+        'Latest bundle: .hardening/latest/manifest.json'
+      ],
+      footnote: 'No source upload. Artifacts stay on your machine.'
     },
     steps: {
-      label: 'How it works',
-      heading: 'From code to confidence in four local steps',
+      label: 'Delivery roles',
+      heading: 'Who reviews what, locally',
       items: [
         {
-          title: 'Add your repo',
-          text: 'Point RepoAssure to your AI-generated repository locally.'
+          title: 'Developer',
+          text: 'Runs hardening, inspects findings, and hands repair tasks to the IDE.'
         },
         {
-          title: 'Run locally',
-          text: 'Static analysis, dependency checks, policy evaluation, and more.'
+          title: 'Reviewer',
+          text: 'Reads reports, repair plans, and patch plans before approving delivery.'
         },
         {
-          title: 'Generate artifacts',
-          text: 'Hardening report, repair plan, patch plan, and acceptance decision.'
+          title: 'AI IDE',
+          text: 'Consumes repair-plan.json and repair-task-package.json without cloud upload.'
         },
         {
-          title: 'Reviewer decision',
-          text: 'Review evidence locally and accept for delivery with confidence.'
+          title: 'Maintainer',
+          text: 'Records acceptance decisions with signed local evidence.'
         }
       ]
     },
@@ -322,52 +332,63 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       statusLabel: 'Status',
       evidenceLabel: 'Evidence',
       detailLabel: 'Review detail',
-      cards: [
-        {
-          title: 'Hardening report',
-          text: 'Findings, severity, and evidence mapped to policy rules.'
-        },
-        {
-          title: 'Repair plan',
-          text: 'Actionable steps to address issues with prioritization.'
-        },
-        {
-          title: 'Patch plan',
-          text: 'Minimal, reviewable changes with context and risk.'
-        },
-        {
-          title: 'Acceptance',
-          text: 'Final decision, policy version, and risk rating for audit.'
-        }
-      ],
+      previewLabel: 'Artifact preview',
       items: {
         hardening: {
           name: 'Hardening report',
           status: 'Generated',
           summary: 'Findings, severity, and evidence mapped to policy rules and best practices.',
           evidence: 'sha256: af83...b91c',
-          detail: '214 findings, grouped by severity and reviewer impact.'
+          detail: '214 findings, grouped by severity and reviewer impact.',
+          previewHeading: 'hardening-report.md excerpt',
+          previewLines: [
+            { kind: 'meta', label: 'Readiness score', text: '85 · P0: 0 · P1: 1' },
+            {
+              kind: 'finding',
+              severity: 'P1',
+              text: 'Interaction did not produce an observable result on /settings (dead_control).'
+            },
+            { kind: 'code', text: 'click_error=TimeoutError: page.click: Timeout 1000ms exceeded.' }
+          ]
         },
         repair: {
           name: 'Repair plan',
           status: 'Generated',
           summary: 'Actionable repair steps to address issues with prioritization and rationale.',
           evidence: 'sha256: dc27...7f0e',
-          detail: '38 actions, sequenced for AI IDE or maintainer execution.'
+          detail: '38 actions, sequenced for AI IDE or maintainer execution.',
+          previewHeading: 'repair-plan.json task excerpt',
+          previewLines: [
+            { kind: 'meta', label: 'Tasks', text: '38 prioritized actions for AI IDE handoff' },
+            {
+              kind: 'json',
+              text: '{\n  "taskId": "repair-014",\n  "severity": "P1",\n  "title": "Stabilize Save control on /settings"\n}'
+            }
+          ]
         },
         patch: {
           name: 'Patch plan',
           status: 'Generated',
           summary: 'Minimal, reviewable changes with context and risk assessment.',
           evidence: 'sha256: 1c9a...e3d4',
-          detail: '24 patches, ready to evaluate before application.'
+          detail: '24 patches, ready to evaluate before application.',
+          previewHeading: 'patch-plan.md candidate',
+          previewLines: [
+            { kind: 'meta', label: 'Candidates', text: '24 reviewable patches before apply' },
+            { kind: 'code', text: 'ruff I001 · sort imports in src/components/SettingsForm.tsx' }
+          ]
         },
         acceptance: {
           name: 'Acceptance',
           status: 'Accepted',
           summary: 'Final decision, policy version, and risk rating for audit.',
           evidence: 'sha256: 9e21...c5ab',
-          detail: 'Reviewer decision recorded with low delivery risk.'
+          detail: 'Reviewer decision recorded with low delivery risk.',
+          previewHeading: 'acceptance decision record',
+          previewLines: [
+            { kind: 'meta', label: 'Decision', text: 'Accepted · Risk: Low · Policy: team-default' },
+            { kind: 'meta', label: 'Reviewer', text: 'Recorded locally at 2026-06-18 10:50:02Z' }
+          ]
         }
       }
     },
@@ -381,7 +402,8 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
         'Pluggable policies and analyzers',
         'Reproducible, auditable, verifiable'
       ],
-      link: 'Explore the repository'
+      link: 'Explore the repository',
+      repositoryNote: 'Public repository link opens after the public release gate closes.'
     },
     roadmap: {
       label: 'Team Cloud / Enterprise planned',
@@ -449,7 +471,8 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
     },
     nav: {
       howItWorks: '工作方式',
-      artifacts: '保障图谱',
+      assuranceGraph: '保障图谱',
+      artifacts: '证据物料',
       openCore: '开放核心',
       roadmap: '证据模型',
       trust: '信任边界',
@@ -480,6 +503,11 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
         { id: 'patch', label: '补丁计划', status: '已生成', variant: 'generated' },
         { id: 'acceptance', label: '验收决策', status: '已接受', variant: 'accepted' }
       ]
+    },
+    assuranceGraphSection: {
+      label: '保障图谱',
+      heading: '看清本地证据如何在交付链路中串联',
+      intro: '已验证输入会生成签名证据与验收决策，全程不离开你的机器。'
     },
     trustLedgerPreview: {
       label: 'Trust Ledger 产品预览',
@@ -537,46 +565,39 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       localNote: '证据永远不会离开你的机器。',
       localBadge: '100% 本地'
     },
-    assurancePipeline: {
-      label: '保障流水线',
-      items: [
-        {
-          title: '本地分析',
-          text: '执行静态分析、依赖检查、策略评估等流程。'
-        },
-        {
-          title: '生成物料',
-          text: '输出硬化报告、修复计划、补丁计划和验收决策。'
-        },
-        {
-          title: '安全修复',
-          text: '带上下文和风险说明的可执行修复，应用前先验证。'
-        },
-        {
-          title: '接受交付',
-          text: '审查本地证据，并有信心地接受交付结果。'
-        }
-      ]
+    cliDemo: {
+      label: '工作方式',
+      heading: '一条命令在本地完成硬化',
+      intro:
+        'RepoAssure 会分析 AI 生成仓库，在需要时启动应用、探索路由，并把签名证据包写入 .hardening/。',
+      command: 'pnpm hardening run ./my-ai-app --browser',
+      lines: [
+        '已识别仓库配置：vite · npm',
+        '已启动 http://127.0.0.1:5173',
+        '已生成 hardening-report.md、repair-plan.json、repair-task-package.json',
+        '最新证据包：.hardening/latest/manifest.json'
+      ],
+      footnote: '默认不上传源码，证据保留在你的机器上。'
     },
     steps: {
-      label: '工作方式',
-      heading: '从代码到信心，只需四个本地步骤',
+      label: '交付角色',
+      heading: '谁在本地审查什么',
       items: [
         {
-          title: '添加仓库',
-          text: '在本地将 RepoAssure 指向你的 AI 生成仓库。'
+          title: '开发者',
+          text: '运行硬化流程，查看发现项，并把修复任务交给 IDE。'
         },
         {
-          title: '本地运行',
-          text: '执行静态分析、依赖检查、策略评估等流程。'
+          title: '评审者',
+          text: '在批准交付前阅读报告、修复计划和补丁计划。'
         },
         {
-          title: '生成证据',
-          text: '输出硬化报告、修复计划、补丁计划和验收决策。'
+          title: 'AI IDE',
+          text: '消费 repair-plan.json 与 repair-task-package.json，无需云端上传。'
         },
         {
-          title: '评审决策',
-          text: '在本地审查证据，并有信心地接受交付结果。'
+          title: '维护者',
+          text: '用已签名的本地证据记录验收决策。'
         }
       ]
     },
@@ -588,52 +609,63 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       statusLabel: '状态',
       evidenceLabel: '证据',
       detailLabel: '评审细节',
-      cards: [
-        {
-          title: '硬化报告',
-          text: '将发现、严重级别和证据映射到策略规则。'
-        },
-        {
-          title: '修复计划',
-          text: '按优先级给出可执行的修复步骤。'
-        },
-        {
-          title: '补丁计划',
-          text: '提供最小、可评审、带上下文和风险说明的变更。'
-        },
-        {
-          title: '验收决策',
-          text: '记录最终决策、策略版本和审计风险等级。'
-        }
-      ],
+      previewLabel: '物料预览',
       items: {
         hardening: {
           name: '硬化报告',
           status: '已生成',
           summary: '将发现、严重级别和证据映射到策略规则与最佳实践。',
           evidence: 'sha256: af83...b91c',
-          detail: '214 个发现，已按严重级别和评审影响分组。'
+          detail: '214 个发现，已按严重级别和评审影响分组。',
+          previewHeading: 'hardening-report.md 摘要',
+          previewLines: [
+            { kind: 'meta', label: '就绪度评分', text: '85 · P0: 0 · P1: 1' },
+            {
+              kind: 'finding',
+              severity: 'P1',
+              text: '/settings 页面 Save 控件交互未产生可观察结果（dead_control）。'
+            },
+            { kind: 'code', text: 'click_error=TimeoutError: page.click: Timeout 1000ms exceeded.' }
+          ]
         },
         repair: {
           name: '修复计划',
           status: '已生成',
           summary: '按优先级和原因说明组织可执行修复步骤。',
           evidence: 'sha256: dc27...7f0e',
-          detail: '38 个动作，可交给 AI IDE 或维护者执行。'
+          detail: '38 个动作，可交给 AI IDE 或维护者执行。',
+          previewHeading: 'repair-plan.json 任务摘要',
+          previewLines: [
+            { kind: 'meta', label: '任务数', text: '38 个已排序动作，供 AI IDE 交接' },
+            {
+              kind: 'json',
+              text: '{\n  "taskId": "repair-014",\n  "severity": "P1",\n  "title": "稳定 /settings 页面 Save 控件"\n}'
+            }
+          ]
         },
         patch: {
           name: '补丁计划',
           status: '已生成',
           summary: '提供最小、可评审、带上下文和风险说明的变更。',
           evidence: 'sha256: 1c9a...e3d4',
-          detail: '24 个补丁，可在应用前先评估。'
+          detail: '24 个补丁，可在应用前先评估。',
+          previewHeading: 'patch-plan.md 候选补丁',
+          previewLines: [
+            { kind: 'meta', label: '候选数', text: '24 个可评审补丁，应用前需确认' },
+            { kind: 'code', text: 'ruff I001 · 整理 src/components/SettingsForm.tsx 的 import' }
+          ]
         },
         acceptance: {
           name: '验收决策',
           status: '已接受',
           summary: '记录最终决策、策略版本和审计风险等级。',
           evidence: 'sha256: 9e21...c5ab',
-          detail: '评审决策已记录，交付风险较低。'
+          detail: '评审决策已记录，交付风险较低。',
+          previewHeading: '验收决策记录',
+          previewLines: [
+            { kind: 'meta', label: '决策', text: '已接受 · 风险：低 · 策略：team-default' },
+            { kind: 'meta', label: '评审者', text: '已于 2026-06-18 10:50:02Z 在本地记录' }
+          ]
         }
       }
     },
@@ -642,7 +674,8 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       heading: '开放构建，以可信为设计原则。',
       body: 'RepoAssure 采用 open core 路线。核心引擎、策略和证据格式保持透明，并由社区共同演进。',
       bullets: ['核心引擎和证据规格保持开放', '支持可插拔策略与分析器', '可复现、可审计、可验证'],
-      link: '查看代码仓库'
+      link: '查看代码仓库',
+      repositoryNote: '公开仓库链接将在公开发布门禁关闭后开放。'
     },
     roadmap: {
       label: 'Team Cloud / Enterprise 计划中',

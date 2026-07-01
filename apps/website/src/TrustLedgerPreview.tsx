@@ -13,11 +13,18 @@ const rowIcons = {
 
 type TrustLedgerPreviewProps = {
   copy: TrustLedgerPreviewCopy;
+  variant?: 'hero' | 'default';
 };
 
-export function TrustLedgerPreview({ copy }: TrustLedgerPreviewProps) {
+export function TrustLedgerPreview({ copy, variant = 'default' }: TrustLedgerPreviewProps) {
+  const sidebarItems = variant === 'hero' ? copy.sidebar.slice(0, 4) : copy.sidebar;
+
   return (
-    <section className="trust-ledger-preview" data-testid="trust-ledger-preview" aria-label={copy.label}>
+    <section
+      className={variant === 'hero' ? 'trust-ledger-preview trust-ledger-preview-hero' : 'trust-ledger-preview'}
+      data-testid="trust-ledger-preview"
+      aria-label={copy.label}
+    >
       <div className="trust-ledger-shell">
         <aside className="trust-ledger-sidebar" aria-label={copy.label}>
           <div className="trust-ledger-brand">
@@ -29,7 +36,7 @@ export function TrustLedgerPreview({ copy }: TrustLedgerPreviewProps) {
             </span>
           </div>
           <nav>
-            {copy.sidebar.map((item, index) => {
+            {sidebarItems.map((item, index) => {
               const NavIcon = navIcons[index] ?? FileText;
               return (
                 <span className={index === 0 ? 'active' : undefined} key={item}>

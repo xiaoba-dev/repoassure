@@ -1,5 +1,6 @@
 import { mkdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { URL } from 'node:url';
 
 import { chromium } from 'playwright';
 
@@ -21,11 +22,71 @@ async function launchBrowser() {
   }
 }
 
+async function fetchTextWithRetry(request, url, attempts = 3) {
+  let lastError;
+
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      const response = await request.get(url);
+      return {
+        ok: response.ok(),
+        status: response.status(),
+        text: await response.text()
+      };
+    } catch (error) {
+      lastError = error;
+      await delay(500);
+    }
+  }
+
+  throw lastError;
+}
+
+async function delay(ms) {
+  await new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 const browser = await launchBrowser();
 
 try {
   const desktop = await browser.newPage({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
   await desktop.goto(baseUrl, { waitUntil: 'networkidle' });
+  const metadata = await desktop.evaluate(() => {
+    const meta = (selector) => globalThis.document.querySelector(selector)?.getAttribute('content') ?? null;
+    const link = (selector) => globalThis.document.querySelector(selector)?.getAttribute('href') ?? null;
+
+    return {
+      canonical: link('link[rel="canonical"]'),
+      description: meta('meta[name="description"]'),
+      robots: meta('meta[name="robots"]'),
+      themeColor: meta('meta[name="theme-color"]'),
+      favicon: link('link[rel="icon"]'),
+      manifest: link('link[rel="manifest"]'),
+      ogTitle: meta('meta[property="og:title"]'),
+      ogDescription: meta('meta[property="og:description"]'),
+      ogType: meta('meta[property="og:type"]'),
+      ogUrl: meta('meta[property="og:url"]'),
+      ogImage: meta('meta[property="og:image"]'),
+      twitterCard: meta('meta[name="twitter:card"]'),
+      twitterTitle: meta('meta[name="twitter:title"]'),
+      twitterDescription: meta('meta[name="twitter:description"]'),
+      twitterImage: meta('meta[name="twitter:image"]')
+    };
+  });
+  const robotsUrl = new URL('/robots.txt', baseUrl).toString();
+  const sitemapUrl = new URL('/sitemap.xml', baseUrl).toString();
+  const manifestUrl = new URL('/site.webmanifest', baseUrl).toString();
+  const faviconUrl = new URL('/favicon.svg', baseUrl).toString();
+  const ogImageUrl = new URL('/og-image.svg', baseUrl).toString();
+  const [robotsAsset, sitemapAsset, manifestAsset, faviconAsset, ogImageAsset] = await Promise.all([
+    fetchTextWithRetry(desktop.request, robotsUrl),
+    fetchTextWithRetry(desktop.request, sitemapUrl),
+    fetchTextWithRetry(desktop.request, manifestUrl),
+    fetchTextWithRetry(desktop.request, faviconUrl),
+    fetchTextWithRetry(desktop.request, ogImageUrl)
+  ]);
   const initialLang = await desktop.locator('html').getAttribute('lang');
   const desktopScreenshot = join(outDir, 'desktop-full.png');
   await desktop.screenshot({ path: desktopScreenshot, fullPage: true });
@@ -46,7 +107,8 @@ try {
   const heading = await desktop.locator('h1').innerText();
   const assuranceGraphText = await desktop.locator('[data-testid="assurance-graph"]').innerText();
   const normalizedAssuranceGraphText = assuranceGraphText.toLowerCase();
-  const assurancePipelineVisible = await desktop.locator('[data-testid="assurance-pipeline"]').isVisible();
+  const assuranceGraphSectionVisible = await desktop.locator('[data-testid="assurance-graph-section"]').isVisible();
+  const cliDemoVisible = await desktop.locator('[data-testid="cli-demo"]').isVisible();
   const trustLedgerPreviewVisible = await desktop.locator('[data-testid="trust-ledger-preview"]').isVisible();
   const trustLedgerPreviewText = await desktop.locator('[data-testid="trust-ledger-preview"]').innerText();
 
@@ -99,6 +161,53 @@ try {
   if (heading !== 'Assure every AI-generated repo before it ships') {
     throw new Error(`Unexpected hero heading: ${heading}`);
   }
+  if (metadata.canonical !== 'https://repoassure.com/') {
+    throw new Error(`Unexpected canonical URL: ${metadata.canonical}`);
+  }
+  if (metadata.description !== 'RepoAssure proves AI-generated repositories are ready to ship with local-first assurance artifacts.') {
+    throw new Error(`Unexpected description metadata: ${metadata.description}`);
+  }
+  if (metadata.robots !== 'index,follow') {
+    throw new Error(`Unexpected robots metadata: ${metadata.robots}`);
+  }
+  if (metadata.themeColor !== '#04111f') {
+    throw new Error(`Unexpected theme color: ${metadata.themeColor}`);
+  }
+  if (metadata.favicon !== '/favicon.svg' || metadata.manifest !== '/site.webmanifest') {
+    throw new Error(`Unexpected icon manifest metadata: ${JSON.stringify({ favicon: metadata.favicon, manifest: metadata.manifest })}`);
+  }
+  if (
+    metadata.ogTitle !== 'RepoAssure' ||
+    metadata.ogDescription !== 'Local-first assurance artifacts for AI-generated repositories.' ||
+    metadata.ogType !== 'website' ||
+    metadata.ogUrl !== 'https://repoassure.com/' ||
+    metadata.ogImage !== 'https://repoassure.com/og-image.svg'
+  ) {
+    throw new Error(`Unexpected Open Graph metadata: ${JSON.stringify(metadata)}`);
+  }
+  if (
+    metadata.twitterCard !== 'summary_large_image' ||
+    metadata.twitterTitle !== 'RepoAssure' ||
+    metadata.twitterDescription !== 'Local-first assurance artifacts for AI-generated repositories.' ||
+    metadata.twitterImage !== 'https://repoassure.com/og-image.svg'
+  ) {
+    throw new Error(`Unexpected Twitter metadata: ${JSON.stringify(metadata)}`);
+  }
+  if (!robotsAsset.ok || !robotsAsset.text.includes('Allow: /') || !robotsAsset.text.includes('Sitemap: https://repoassure.com/sitemap.xml')) {
+    throw new Error(`Unexpected robots.txt response: ${robotsAsset.status} ${robotsAsset.text}`);
+  }
+  if (!sitemapAsset.ok || !sitemapAsset.text.includes('<loc>https://repoassure.com/</loc>') || !sitemapAsset.text.includes('<lastmod>2026-07-01</lastmod>')) {
+    throw new Error(`Unexpected sitemap.xml response: ${sitemapAsset.status} ${sitemapAsset.text}`);
+  }
+  if (!manifestAsset.ok || !manifestAsset.text.includes('"name": "RepoAssure"') || !manifestAsset.text.includes('/favicon.svg')) {
+    throw new Error(`Unexpected web manifest response: ${manifestAsset.status} ${manifestAsset.text}`);
+  }
+  if (!faviconAsset.ok || !faviconAsset.text.includes('RepoAssure') || !faviconAsset.text.includes('<svg')) {
+    throw new Error(`Unexpected favicon response: ${faviconAsset.status} ${faviconAsset.text.slice(0, 120)}`);
+  }
+  if (!ogImageAsset.ok || !ogImageAsset.text.includes('RepoAssure') || !ogImageAsset.text.includes('Assure every AI-generated repo before it ships')) {
+    throw new Error(`Unexpected og-image response: ${ogImageAsset.status} ${ogImageAsset.text.slice(0, 120)}`);
+  }
   if (initialLang !== 'en') {
     throw new Error(`Unexpected initial html lang: ${initialLang}`);
   }
@@ -115,7 +224,8 @@ try {
     throw new Error('Mobile navigation did not open.');
   }
   if (
-    !assurancePipelineVisible ||
+    !assuranceGraphSectionVisible ||
+    !cliDemoVisible ||
     !normalizedAssuranceGraphText.includes('assurance graph') ||
     !assuranceGraphText.includes('All checks verified') ||
     !assuranceGraphText.includes('Repair Plan') ||
@@ -176,13 +286,20 @@ try {
         zhHeading,
         selectedTab,
         zhSelectedTab,
-        assurancePipelineVisible,
+        assuranceGraphSectionVisible,
+        cliDemoVisible,
         repairDetailVisible,
         zhRepairDetailVisible,
         formStatus,
         mobileNavVisible,
         mobileZhHeading,
-        trustLedgerPreviewVisible
+        trustLedgerPreviewVisible,
+        metadata,
+        robotsUrl,
+        sitemapUrl,
+        manifestUrl,
+        faviconUrl,
+        ogImageUrl
       },
       null,
       2

@@ -1,5 +1,24 @@
 # 决策日志
 
+## 2026年7月1日 - Solo maintainer branch protection adjustment
+
+### 决策
+
+接受 ADR-0023，将 `main` branch protection 调整为独立开发者维护模式。
+
+### 原因
+
+- RepoAssure 当前由独立开发者维护。
+- 团队式 1 人 review gate 会导致 PR 作者无法合并自己的 PR。
+- GitHub 已在 PR #3 中拒绝 self-approval：`Review Can not approve your own pull request`。
+- 强制 `Quality Gates` 比强制第二个 GitHub 身份更符合当前维护阶段。
+
+### 影响
+
+- Required approving reviews 从 `1` 调整为 `0`。
+- `Quality Gates`、strict status checks、admin enforcement、conversation resolution、linear history、禁用 force pushes 和 branch deletion 均保留。
+- 本决策不授权直推 `main`、npm publish、GitHub release、public launch、production marketing announcement 或商业版 availability claims。
+
 ## 2026年7月1日 - Protected PR workflow verification
 
 ### 决策

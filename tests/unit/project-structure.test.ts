@@ -1213,6 +1213,42 @@ describe('project structure', () => {
     await expectPath('docs/operations/protected-pr-workflow-verification-v0.1.md');
   });
 
+  it('records solo maintainer branch protection adjustment', async () => {
+    const [adr, adjustment, readme, testingStrategy, acceptanceChecklist, decisionLog, devLog] = await Promise.all([
+      readFile('docs/adr/0023-solo-maintainer-branch-protection.md', 'utf8'),
+      readFile('docs/operations/solo-maintainer-branch-protection-adjustment-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(adr).toContain('ADR-0023: Solo Maintainer Branch Protection');
+    expect(adr).toContain('Status: Accepted');
+    expect(adr).toContain('Required approving reviews: `0`');
+    expect(adr).toContain('Required status check: `Quality Gates`');
+    expect(adr).toContain('Do not weaken CI gate');
+    expect(adjustment).toContain('Solo Maintainer Branch Protection Adjustment v0.1');
+    expect(adjustment).toContain('Status: adjustment_planned_pending_remote_verification');
+    expect(adjustment).toContain('Required approving reviews: `1 -> 0`');
+    expect(adjustment).toContain('Keep strict status checks: `true`');
+    expect(adjustment).toContain('Keep required status check: `Quality Gates`');
+    expect(adjustment).toContain('Keep force pushes disabled');
+    expect(adjustment).toContain('Keep branch deletion disabled');
+    expect(adjustment).toContain('No direct push to `main` was executed');
+    expect(adjustment).toContain('No npm publication was executed');
+    expect(adjustment).toContain('No GitHub release was executed');
+    expect(readme).toContain('Solo Maintainer Branch Protection Adjustment v0.1');
+    expect(testingStrategy).toContain('Solo Maintainer Branch Protection Adjustment v0.1');
+    expect(acceptanceChecklist).toContain('Solo Maintainer Branch Protection Adjustment v0.1');
+    expect(decisionLog).toContain('Solo maintainer branch protection adjustment');
+    expect(devLog).toContain('Solo Maintainer Branch Protection Adjustment v0.1');
+
+    await expectPath('docs/adr/0023-solo-maintainer-branch-protection.md');
+    await expectPath('docs/operations/solo-maintainer-branch-protection-adjustment-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

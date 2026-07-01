@@ -1,5 +1,23 @@
 # 决策日志
 
+## 2026年7月1日 - Public launch authorization packet
+
+### 决策
+
+准备 Public Launch Authorization Packet v0.1，但不授权执行 public launch。
+
+### 原因
+
+- Public Launch Boundary Decision v0.1 已确认当前是 `source_public_website_live`，不是 public launch。
+- 真正 launch 前需要收集 launch scope、launch copy、release notes、support boundary、claim review、commercial wording、risk acceptance、rollback/correction plan 和 maintainer approval。
+- 该 packet 只是 review gate，不是 Action Authorization Receipt。
+
+### 影响
+
+- 新增 `docs/operations/public-launch-authorization-packet-v0.1.md`。
+- Launch authorization status remains `not_authorized`。
+- 本决策不执行 npm publish、GitHub release、public launch、production marketing announcement、customer contact、pricing change、spend 或商业版 availability claims。
+
 ## 2026年7月1日 - Public launch boundary decision
 
 ### 决策

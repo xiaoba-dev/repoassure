@@ -1,5 +1,23 @@
 # 决策日志
 
+## 2026年7月1日 - Public launch boundary decision
+
+### 决策
+
+接受 Public Launch Boundary Decision v0.1：RepoAssure 当前保持 `source_public_website_live` 模式，决策为 `do_not_launch_yet`。
+
+### 原因
+
+- 源码公开和官网在线已经完成，但这不等于 public launch。
+- npm publish、GitHub release、production marketing announcement、customer contact、pricing change、spend 和商业版 availability claims 都属于更高风险外部动作。
+- 真正 launch 前需要单独的 `public_launch_authorization` gate，明确 launch copy、support boundary、claim risk、rollback/correction plan 和最终 maintainer approval。
+
+### 影响
+
+- 新增 `docs/operations/public-launch-boundary-decision-v0.1.md`。
+- Public launch remains not authorized。
+- 本决策不执行 npm publish、GitHub release、public launch、production marketing announcement、customer contact、pricing change、spend 或商业版 availability claims。
+
 ## 2026年7月1日 - Public release post-merge hygiene
 
 ### 决策

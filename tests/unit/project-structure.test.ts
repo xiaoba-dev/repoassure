@@ -1291,6 +1291,49 @@ describe('project structure', () => {
     await expectPath('docs/operations/public-release-post-merge-hygiene-v0.1.md');
   });
 
+  it('records public launch boundary decision without executing launch actions', async () => {
+    const [
+      decision,
+      readme,
+      releaseChecklist,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/public-launch-boundary-decision-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(decision).toContain('Public Launch Boundary Decision v0.1');
+    expect(decision).toContain('Status: launch_not_authorized');
+    expect(decision).toContain('Current mode: `source_public_website_live`');
+    expect(decision).toContain('Decision: `do_not_launch_yet`');
+    expect(decision).toContain('Public source repository: `PUBLIC`');
+    expect(decision).toContain('Website custom domains: `repoassure.com`, `www.repoassure.com`');
+    expect(decision).toContain('Package publication boundary: `package.json` keeps `private: true`');
+    expect(decision).toContain('Required next gate: `public_launch_authorization`');
+    expect(decision).toContain('No npm publication was executed');
+    expect(decision).toContain('No GitHub release was executed');
+    expect(decision).toContain('No public launch or production marketing announcement was executed');
+    expect(decision).toContain('No customer contact was executed');
+    expect(decision).toContain('No pricing change or spend was executed');
+    expect(decision).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was executed');
+    expect(readme).toContain('Public Launch Boundary Decision v0.1');
+    expect(releaseChecklist).toContain('Public Launch Boundary Decision v0.1');
+    expect(testingStrategy).toContain('Public Launch Boundary Decision v0.1');
+    expect(acceptanceChecklist).toContain('Public Launch Boundary Decision v0.1');
+    expect(decisionLog).toContain('Public launch boundary decision');
+    expect(devLog).toContain('Public Launch Boundary Decision v0.1');
+
+    await expectPath('docs/operations/public-launch-boundary-decision-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

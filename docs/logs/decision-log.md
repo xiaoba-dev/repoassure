@@ -1,5 +1,23 @@
 # 决策日志
 
+## 2026年7月1日 - Explicit launch authorization or defer decision
+
+### 决策
+
+接受 Explicit Launch Authorization or Defer Decision v0.1：当前显式决策为 `defer_public_launch`，launch authorization status 继续保持 `not_authorized`。
+
+### 原因
+
+- 本轮只授权执行 Codex goal，不提供 public launch 的具体动作授权。
+- Launch scope、launch copy、release notes、support boundary、claim-risk review、commercial wording、risk acceptance、rollback/correction plan 和 final launch approval 均未提供。
+- 缺少 Action Authorization Receipt 时，不能执行任何 public launch action。
+
+### 影响
+
+- 新增 `docs/operations/explicit-launch-authorization-or-defer-decision-v0.1.md`。
+- Future launch 必须重新进入 `future_launch_authorization_packet`。
+- 本决策不执行 npm publish、GitHub release、public launch、production marketing announcement、customer contact、pricing change、spend、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
+
 ## 2026年7月1日 - Maintainer launch decision input
 
 ### 决策

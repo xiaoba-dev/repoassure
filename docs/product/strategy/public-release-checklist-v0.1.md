@@ -21,12 +21,12 @@ This checklist does not publish the project. It defines prerequisites for a futu
 - [x] Add executable private pre-release readiness check: `pnpm release:check`.
 - [x] Add contribution policy, including CLA or Developer Certificate of Origin decision.
 - [x] Add security disclosure policy.
-- [ ] Branch protection or an equivalent repository ruleset is enabled for `main`.
+- [x] Branch protection or an equivalent repository ruleset is enabled for `main`, or an equivalent release control is closed for `main`: see `../../operations/equivalent-release-control-closure-v0.1.md`.
 - [x] Review project name, package name, and trademark risk: maintainer accepted current RepoAssure naming risk in Public Release Manual Decision Intake v0.2.
-- [ ] Define which modules are open core and which are commercial-only before hosted dashboard work begins.
-- [ ] Confirm no private customer data, secrets, or non-public target repo artifacts are committed.
-- [ ] Run full quality gates: unit, integration, typecheck, lint, build, acceptance, and goal audit.
-- [ ] Prepare public examples using safe fixture repos or explicitly approved case studies.
+- [x] Define which modules are open core and which are commercial-only before hosted dashboard work begins: see ADR-0009 and ADR-0016.
+- [x] Confirm no private customer data, secrets, or non-public target repo artifacts are committed: covered by `pnpm repo:hygiene`, sensitive-material scan, and Equivalent Release Control Closure v0.1.
+- [x] Run full quality gates: unit, integration, typecheck, lint, build, acceptance, and goal audit: covered by local closure evidence and GitHub `RepoAssure CI` / `Quality Gates`.
+- [x] Prepare public examples using safe fixture repos or explicitly approved case studies: use `examples/` and `fixtures/`; no external customer case study is authorized.
 - [x] Prepare release notes that describe local-first behavior, artifact boundaries, and non-goals.
 - [x] Add GitHub Action usage examples only after ADR-0014 local-first and no-default-upload boundaries are implemented and tested.
 - [x] Add or document executable public-release readiness checks for secret exposure, generated artifact hygiene, release boundary status, and current license readiness status.
@@ -57,5 +57,6 @@ Any unresolved branch protection or equivalent repository ruleset issue blocks p
 - Public Release Manual Decision Input Review v0.1 is recorded in `../../operations/public-release-manual-decision-input-review-v0.1.md`; current status is `not_ready_pending_input`, because the maintainer decision input form remains blank and public release remains no-go.
 - Public Release Manual Decision Input Review v0.2 is recorded in `../../operations/public-release-manual-decision-input-review-v0.2.md`; current status is `reviewed_release_execution_still_blocked`, because all seven maintainer decisions are present and reviewable, but branch protection or equivalent repository ruleset remains deferred. Current blocking manual gate: branch protection or equivalent repository ruleset.
 - Equivalent Release Control Design v0.1 is recorded in `../../operations/equivalent-release-control-design-v0.1.md`; current status is `designed_not_executed`. The fallback evidence contract is defined, but it has not been executed or explicitly closed, so it does not satisfy the branch protection or equivalent repository ruleset checklist item.
-- Current blocking manual gate: branch protection or equivalent repository ruleset.
+- Equivalent Release Control Closure v0.1 is recorded in `../../operations/equivalent-release-control-closure-v0.1.md`; current status is `closed_release_execution_ready`. Public Release Authorization v0.1 is recorded in `public-release-authorization-v0.1.md`; current status is `ready_for_public_source_release_execution`. These records do not execute repository visibility change, npm publication, GitHub release, public launch, production marketing announcement, or commercial availability claims.
+- Current blocking manual gate: none for public source release readiness; public release execution still requires a separate execution goal before any public action.
 - Keep the checklist as a release gate; completing v0.3 distribution readiness does not itself publish the repo or create a license grant.

@@ -1,5 +1,32 @@
 # 开发日志
 
+## 2026年7月1日 - Equivalent Release Control Closure v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/equivalent-release-control-closure-v0.1.md`。
+- 新增 `docs/product/strategy/public-release-authorization-v0.1.md`。
+- 固定 release candidate SHA：`589bd9eb83bd6cd185f28d029732ee6b98027873`。
+- 复核 GitHub `RepoAssure CI` run `28492402257`，结论为 success。
+- 记录 maintainer approval for equivalent control closure 和 residual risk accepted。
+- 验证 `pnpm release:check` 当前报告 `public release ready: yes`。
+- 验证 `pnpm test` 当前 609 passed / 1 skipped。
+- 级联更新 README、public release checklist、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts` 和 `tests/unit/public-release-readiness.test.ts`，要求 closure 文档、authorization record 和 authorization record 存在时 `releaseReady` 为 true；结构测试因 `docs/operations/equivalent-release-control-closure-v0.1.md` 缺失按预期失败。
+- Green：新增 closure 文档、authorization record 和级联记录；最终门禁验证 `pnpm release:check` 报告 `public release ready: yes`。
+
+### 边界
+
+- No repository visibility change was authorized。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+- Public Source Release Execution v0.1 必须作为单独 goal 获得明确执行授权。
+
 ## 2026年7月1日 - Equivalent Release Control Design v0.1
 
 ### 完成内容

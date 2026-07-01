@@ -1050,6 +1050,58 @@ describe('project structure', () => {
     await expectPath('docs/operations/equivalent-release-control-design-v0.1.md');
   });
 
+  it('closes the equivalent release control without executing public release actions', async () => {
+    const [
+      closure,
+      authorization,
+      readme,
+      releaseChecklist,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/equivalent-release-control-closure-v0.1.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-authorization-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(closure).toContain('Equivalent Release Control Closure v0.1');
+    expect(closure).toContain('Status: closed_release_execution_ready');
+    expect(closure).toContain('Release candidate SHA: `589bd9eb83bd6cd185f28d029732ee6b98027873`');
+    expect(closure).toContain('RepoAssure CI / Quality Gates success for the exact SHA');
+    expect(closure).toContain('Local full test evidence');
+    expect(closure).toContain('Secret/customer-data exposure scan evidence');
+    expect(closure).toContain('Maintainer approval for equivalent control closure');
+    expect(closure).toContain('Residual risk accepted');
+    expect(closure).toContain('No repository visibility change was authorized');
+    expect(closure).toContain('No npm publication was authorized');
+    expect(closure).toContain('No GitHub release was authorized');
+    expect(closure).toContain('No public launch or production marketing announcement was authorized');
+    expect(authorization).toContain('Public Release Authorization v0.1');
+    expect(authorization).toContain('Status: ready_for_public_source_release_execution');
+    expect(authorization).toContain('does not execute repository visibility change');
+    expect(authorization).toContain('does not execute npm publication');
+    expect(authorization).toContain('does not execute GitHub release');
+    expect(authorization).toContain('does not execute public launch');
+    expect(readme).toContain('Equivalent Release Control Closure v0.1');
+    expect(readme).toContain('Public Release Authorization v0.1');
+    expect(releaseChecklist).toContain('Equivalent Release Control Closure v0.1');
+    expect(releaseChecklist).toContain('ready_for_public_source_release_execution');
+    expect(testingStrategy).toContain('Equivalent Release Control Closure v0.1');
+    expect(acceptanceChecklist).toContain('Equivalent Release Control Closure v0.1');
+    expect(decisionLog).toContain('Equivalent release control closure');
+    expect(devLog).toContain('Equivalent Release Control Closure v0.1');
+
+    await expectPath('docs/operations/equivalent-release-control-closure-v0.1.md');
+    await expectPath('docs/product/strategy/public-release-authorization-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

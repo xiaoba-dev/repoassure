@@ -1,5 +1,24 @@
 # 决策日志
 
+## 2026年7月1日 - Equivalent release control closure
+
+### 决策
+
+执行并关闭 `Equivalent Release Control Closure v0.1`。在 GitHub private repo branch protection / repository rulesets 仍不可用的前提下，使用 ADR-0022 定义的等效证据包关闭 branch protection or equivalent repository ruleset manual gate。
+
+### 原因
+
+- ADR-0022 已把替代门禁设计为 exact release SHA、RepoAssure CI / Quality Gates、local full test、release hygiene、sensitive-material scan 和 maintainer closure approval 的证据包。
+- Release candidate SHA `589bd9eb83bd6cd185f28d029732ee6b98027873` 对应 GitHub `RepoAssure CI` run `28492402257`，结论为 success。
+- Maintainer 已授权执行 Equivalent Release Control Closure v0.1，并接受以该等效控制替代当前不可用的 platform-enforced private repo branch protection/rulesets 的 residual risk。
+
+### 影响
+
+- 新增 `docs/operations/equivalent-release-control-closure-v0.1.md`。
+- 新增 `docs/product/strategy/public-release-authorization-v0.1.md`。
+- Public release readiness 可以进入 Public Source Release Execution v0.1，但该 execution 必须是单独 goal。
+- 本决策不执行 repository visibility change、npm publish、GitHub release、public launch、production marketing announcement 或商业版 availability claims。
+
 ## 2026年7月1日 - Equivalent release control
 
 ### 决策

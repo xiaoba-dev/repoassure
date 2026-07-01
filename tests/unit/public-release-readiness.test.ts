@@ -106,6 +106,46 @@ describe('public release readiness checker', () => {
       })
     ]));
   });
+
+  it('reports public release readiness when the manual authorization record exists', async () => {
+    const { runPublicReleaseReadinessCheck } = await importReadinessModule();
+    const workspace = await buildWorkspace({
+      license: true,
+      contributing: true,
+      security: true,
+      dependencyAudit: true,
+      releaseNotes: true,
+      authorization: true
+    });
+    const inputPath = join(workspace, 'tracked.txt');
+    await writeFile(
+      inputPath,
+      [
+        'package.json',
+        '.gitignore',
+        'LICENSE',
+        'CONTRIBUTING.md',
+        'SECURITY.md',
+        'docs/product/strategy/dependency-license-audit-v0.1.md',
+        'docs/product/strategy/public-release-authorization-v0.1.md',
+        'docs/product/strategy/public-release-checklist-v0.1.md',
+        'docs/product/strategy/public-release-notes-v0.1.md'
+      ].join('\n'),
+      'utf8'
+    );
+
+    const result = await runPublicReleaseReadinessCheck({ cwd: workspace, inputPath });
+
+    expect(result.ok).toBe(true);
+    expect(result.releaseReady).toBe(true);
+    expect(result.checks).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: 'manual-publication-authorization',
+        status: 'passed',
+        summary: 'manual publication authorization record exists'
+      })
+    ]));
+  });
 });
 
 async function buildWorkspace(options: {
@@ -114,6 +154,7 @@ async function buildWorkspace(options: {
   security?: boolean;
   dependencyAudit?: boolean;
   releaseNotes?: boolean;
+  authorization?: boolean;
 } = {}): Promise<string> {
   const workspace = await mkdtemp(join(tmpdir(), 'public-release-readiness-'));
   await mkdir(join(workspace, 'docs', 'product', 'strategy'), { recursive: true });
@@ -155,6 +196,13 @@ async function buildWorkspace(options: {
     await writeFile(
       join(workspace, 'docs', 'product', 'strategy', 'public-release-notes-v0.1.md'),
       '# Public Release Notes v0.1\n\nlocal-first behavior and non-goals.\n',
+      'utf8'
+    );
+  }
+  if (options.authorization) {
+    await writeFile(
+      join(workspace, 'docs', 'product', 'strategy', 'public-release-authorization-v0.1.md'),
+      '# Public Release Authorization v0.1\n\nStatus: ready_for_public_source_release_execution\n',
       'utf8'
     );
   }

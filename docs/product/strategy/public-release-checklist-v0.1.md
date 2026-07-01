@@ -1,6 +1,6 @@
 # Public Release Checklist v0.1
 
-Status: Automated readiness prepared; manual publication gates pending
+Status: Public source repository released; package publication and launch actions blocked
 Date: 2026-06-22
 Source ADR: [ADR-0009](../../adr/0009-commercialization-and-licensing-strategy.md)
 
@@ -58,5 +58,6 @@ Any unresolved branch protection or equivalent repository ruleset issue blocks p
 - Public Release Manual Decision Input Review v0.2 is recorded in `../../operations/public-release-manual-decision-input-review-v0.2.md`; current status is `reviewed_release_execution_still_blocked`, because all seven maintainer decisions are present and reviewable, but branch protection or equivalent repository ruleset remains deferred. Current blocking manual gate: branch protection or equivalent repository ruleset.
 - Equivalent Release Control Design v0.1 is recorded in `../../operations/equivalent-release-control-design-v0.1.md`; current status is `designed_not_executed`. The fallback evidence contract is defined, but it has not been executed or explicitly closed, so it does not satisfy the branch protection or equivalent repository ruleset checklist item.
 - Equivalent Release Control Closure v0.1 is recorded in `../../operations/equivalent-release-control-closure-v0.1.md`; current status is `closed_release_execution_ready`. Public Release Authorization v0.1 is recorded in `public-release-authorization-v0.1.md`; current status is `ready_for_public_source_release_execution`. These records do not execute repository visibility change, npm publication, GitHub release, public launch, production marketing announcement, or commercial availability claims.
+- Public Source Release Execution v0.1 is recorded in `../../operations/public-source-release-execution-v0.1.md`; current status is `repository_public_verified`. The repository visibility changed from `PRIVATE` to `PUBLIC`, public read access was verified, and no npm publication, GitHub release, public launch, production marketing announcement, or commercial availability claim was executed.
 - Current blocking manual gate: none for public source release readiness; public release execution still requires a separate execution goal before any public action.
 - Keep the checklist as a release gate; completing v0.3 distribution readiness does not itself publish the repo or create a license grant.

@@ -1,5 +1,30 @@
 # 开发日志
 
+## 2026年7月1日 - Public Source Release Execution v0.1
+
+### 完成内容
+
+- 执行 `gh repo edit xiaoba-dev/repoassure --visibility public --accept-visibility-change-consequences`。
+- 新增 `docs/operations/public-source-release-execution-v0.1.md`。
+- Post-release GitHub visibility verification：`PUBLIC`，`isPrivate: false`。
+- Public read access verification：执行时 `git ls-remote https://github.com/xiaoba-dev/repoassure.git HEAD` 返回 `1593cfb36871ceef08c9711fd21bc59ebcee6bc8`。
+- 复核最新 pre-execution `RepoAssure CI` run `28492994026` 为 success。
+- 验证 `pnpm release:check` 报告 `public release ready: yes`。
+- 级联更新 README、public release checklist、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Public Source Release Execution v0.1 文档和级联记录存在；测试因 `docs/operations/public-source-release-execution-v0.1.md` 缺失按预期失败。
+- Green：执行 repository visibility change 后新增 execution 文档和级联记录，明确 repository public verified 且只执行 visibility change。
+
+### 边界
+
+- No npm publication was executed。
+- No GitHub release was executed。
+- No public launch or production marketing announcement was executed。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was executed。
+- 下一步建议配置 native branch protection / repository ruleset。
+
 ## 2026年7月1日 - Equivalent Release Control Closure v0.1
 
 ### 完成内容

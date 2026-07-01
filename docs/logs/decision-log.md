@@ -1,5 +1,25 @@
 # 决策日志
 
+## 2026年7月1日 - Public source release execution
+
+### 决策
+
+执行 `Public Source Release Execution v0.1`，将 GitHub repository `xiaoba-dev/repoassure` visibility 从 `PRIVATE` 改为 `PUBLIC`。
+
+### 原因
+
+- Public Release Authorization v0.1 状态为 `ready_for_public_source_release_execution`。
+- Equivalent Release Control Closure v0.1 已关闭 branch protection / equivalent repository ruleset gate。
+- `pnpm release:check` 已报告 `public release ready: yes`。
+- Maintainer 已授权执行该 public source release goal。
+
+### 影响
+
+- `gh repo view` 验证 repository visibility 为 `PUBLIC`。
+- 执行时 `git ls-remote https://github.com/xiaoba-dev/repoassure.git HEAD` 验证 public read access 返回 HEAD `1593cfb36871ceef08c9711fd21bc59ebcee6bc8`。
+- 本决策不执行 npm publish、GitHub release、public launch、production marketing announcement 或商业版 availability claims。
+- 下一步建议配置 native branch protection / repository ruleset，要求 `RepoAssure CI` / `Quality Gates`。
+
 ## 2026年7月1日 - Equivalent release control closure
 
 ### 决策

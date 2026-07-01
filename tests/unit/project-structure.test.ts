@@ -1102,6 +1102,42 @@ describe('project structure', () => {
     await expectPath('docs/product/strategy/public-release-authorization-v0.1.md');
   });
 
+  it('records public source release execution as repository visibility only', async () => {
+    const [execution, readme, releaseChecklist, testingStrategy, acceptanceChecklist, decisionLog, devLog] =
+      await Promise.all([
+        readFile('docs/operations/public-source-release-execution-v0.1.md', 'utf8'),
+        readFile('README.md', 'utf8'),
+        readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+        readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+        readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+        readFile('docs/logs/decision-log.md', 'utf8'),
+        readFile('docs/logs/dev-log.md', 'utf8')
+      ]);
+
+    expect(execution).toContain('Public Source Release Execution v0.1');
+    expect(execution).toContain('Status: repository_public_verified');
+    expect(execution).toContain('Executed action: repository visibility changed from `PRIVATE` to `PUBLIC`');
+    expect(execution).toContain('Repository: `xiaoba-dev/repoassure`');
+    expect(execution).toContain('Execution commit SHA: `1593cfb36871ceef08c9711fd21bc59ebcee6bc8`');
+    expect(execution).toContain('Post-release GitHub visibility verification: `PUBLIC`');
+    expect(execution).toContain('Public read access verification');
+    expect(execution).toContain('RepoAssure CI / Quality Gates');
+    expect(execution).toContain('pnpm release:check');
+    expect(execution).toContain('public release ready: yes');
+    expect(execution).toContain('No npm publication was executed');
+    expect(execution).toContain('No GitHub release was executed');
+    expect(execution).toContain('No public launch or production marketing announcement was executed');
+    expect(execution).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was executed');
+    expect(readme).toContain('Public Source Release Execution v0.1');
+    expect(releaseChecklist).toContain('Public Source Release Execution v0.1');
+    expect(testingStrategy).toContain('Public Source Release Execution v0.1');
+    expect(acceptanceChecklist).toContain('Public Source Release Execution v0.1');
+    expect(decisionLog).toContain('Public source release execution');
+    expect(devLog).toContain('Public Source Release Execution v0.1');
+
+    await expectPath('docs/operations/public-source-release-execution-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

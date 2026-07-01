@@ -1,7 +1,8 @@
 # Public Website Custom Domain Deployment v0.1
 
-Status: blocked_dns_cname_not_set
+Status: verified_custom_domain_active
 Date: 2026-06-30
+Verified: 2026-07-01
 
 ## Purpose
 
@@ -29,43 +30,57 @@ This operation is not a GitHub repository public release, npm publication, GitHu
   - `repoassure.com`
   - `www.repoassure.com`
 - Cloudflare zone lookup confirmed `repoassure.com` exists and is active in the same account.
+- Cloudflare DNS now contains proxied CNAME records for both custom domains:
+  - CNAME `@` -> `repoassure-preview.pages.dev`
+  - CNAME `www` -> `repoassure-preview.pages.dev`
+- Cloudflare Pages custom domain verification is active for both custom domains.
+- HTTPS verification passed for both custom domains.
+- Desktop, mobile, English, and Simplified Chinese browser smoke verification passed for both custom domains.
+- Forbidden availability claim verification passed for the custom domain surface.
 
 ## Current External State
 
-Cloudflare Pages custom domain status remains pending:
+Cloudflare Pages custom domain status is active:
 
-- `repoassure.com`: pending.
-- `www.repoassure.com`: pending.
-- Verification result: `CNAME record not set`.
+- `repoassure.com`: active.
+- `www.repoassure.com`: active.
+- Verification result: `active`.
 - Validation method: HTTP.
 - Certificate authority: Google.
 
-Current DNS/API blocker:
+Current DNS state:
 
-- DNS API result: `Authentication error`.
-- The current `CLOUDFLARE_API_TOKEN` can query Pages custom domains but cannot create or inspect DNS records for the zone.
-- HTTPS verification is not complete for `https://repoassure.com` or `https://www.repoassure.com`.
-- Forbidden availability claim verification remains pending for the custom domain because the domains do not yet serve the website.
+- `repoassure.com` resolves through Cloudflare to `28.0.0.56`.
+- `www.repoassure.com` resolves through Cloudflare to `28.0.0.57`.
+- `https://repoassure.com`: HTTP/2 200 over HTTPS.
+- `https://www.repoassure.com`: HTTP/2 200 over HTTPS.
+
+Historical DNS/API blocker:
+
+- Before manual DNS completion, Pages verification returned `CNAME record not set`.
+- Before manual DNS completion, the available API token returned DNS API result `Authentication error`.
+- The blocker is resolved by Cloudflare Dashboard DNS records, not by expanding stored API credentials.
 
 ## Required DNS Records
 
-The remaining required DNS records are:
+The verified DNS records are:
 
 - Required DNS record: CNAME `@` -> `repoassure-preview.pages.dev`
 - Required DNS record: CNAME `www` -> `repoassure-preview.pages.dev`
 
-Both records should be proxied through Cloudflare unless a future operations decision changes the boundary.
+Both records are proxied through Cloudflare.
 
-## Verification Still Required
+## Verification Evidence
 
-After DNS is configured and Pages custom domain status becomes active, the continuation must verify:
-
-- `https://repoassure.com` returns the RepoAssure public website over HTTPS.
-- `https://www.repoassure.com` returns or redirects to the accepted canonical website over HTTPS.
-- The page renders the expected RepoAssure hero copy.
-- English default and Simplified Chinese language switching still work.
-- Desktop and mobile smoke checks pass.
-- No forbidden SaaS, Team Cloud, Enterprise, hosted dashboard, public repository, npm publication, or GitHub release availability claims are present.
+- Cloudflare Pages custom domains API returned `active` for `repoassure.com` and `www.repoassure.com`.
+- `curl -I -L --max-time 30 https://repoassure.com`: HTTP/2 200.
+- `curl -I -L --max-time 30 https://www.repoassure.com`: HTTP/2 200.
+- `REPOASSURE_WEBSITE_URL=https://repoassure.com REPOASSURE_WEBSITE_QA_DIR=/private/tmp/repoassure-custom-domain-qa pnpm verify:website`: passed.
+- `REPOASSURE_WEBSITE_URL=https://www.repoassure.com REPOASSURE_WEBSITE_QA_DIR=/private/tmp/repoassure-custom-domain-www-qa pnpm verify:website`: passed.
+- Verified English hero: `Assure every AI-generated repo before it ships`.
+- Verified Simplified Chinese hero: `在交付前保障每个 AI 生成仓库`.
+- Verified Trust Ledger preview, Assurance Graph, artifact tabs, private preview form, desktop layout, mobile layout, and mobile navigation.
+- Forbidden availability claim verification passed: the custom domain surface does not claim SaaS, Team Cloud, Enterprise, hosted dashboard, public repository, npm publication, GitHub release, public launch, or production marketing availability.
 
 ## Non-Authorization Boundary
 
@@ -78,4 +93,4 @@ After DNS is configured and Pages custom domain status becomes active, the conti
 
 ## Next Action
 
-Add the required DNS CNAME records through Cloudflare Dashboard or with a Cloudflare API token that has DNS Edit permission, then rerun the custom domain verification.
+Keep monitoring custom domain availability and continue public release gates separately. This verified custom domain deployment does not close legal, trademark, branch protection / equivalent ruleset, final maintainer publication authorization, npm publication, GitHub release, SaaS, Team Cloud, Enterprise, hosted dashboard, or public launch gates.

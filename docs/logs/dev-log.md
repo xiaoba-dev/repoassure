@@ -1,5 +1,26 @@
 # 开发日志
 
+## 2026年7月1日 - Public Website Custom Domain Deployment v0.1 verification closure
+
+### 完成内容
+
+- 将 `docs/operations/public-website-custom-domain-deployment-v0.1.md` 状态更新为 `Status: verified_custom_domain_active`。
+- 确认 Cloudflare Pages custom domains API 返回 `repoassure.com` 和 `www.repoassure.com` 均为 active。
+- 确认 DNS 已通过 Cloudflare proxied CNAME 指向 `repoassure-preview.pages.dev`。
+- 确认 `https://repoassure.com` 和 `https://www.repoassure.com` 均返回 HTTP/2 200 over HTTPS。
+- 执行 `REPOASSURE_WEBSITE_URL=https://repoassure.com REPOASSURE_WEBSITE_QA_DIR=/private/tmp/repoassure-custom-domain-qa pnpm verify:website` 并通过。
+- 执行 `REPOASSURE_WEBSITE_URL=https://www.repoassure.com REPOASSURE_WEBSITE_QA_DIR=/private/tmp/repoassure-custom-domain-www-qa pnpm verify:website` 并通过。
+- 验证英文默认、Simplified Chinese 语言切换、desktop/mobile smoke、Trust Ledger、Assurance Graph、artifact tabs、private preview form 和 forbidden-claim custom-domain boundary。
+- 将 README、acceptance checklist、testing strategy 和 blockers 从 DNS blocked 状态级联更新为 verified/resolved。
+
+### 边界
+
+- No repository visibility change was authorized。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
 ## 2026年6月30日 - Public Website Custom Domain Deployment v0.1
 
 ### 完成内容

@@ -2,6 +2,8 @@
 
 ## 2026年6月30日 - Public Website Custom Domain Deployment v0.1 is blocked by missing DNS CNAME records
 
+Resolved on 2026-07-01.
+
 ### 背景
 
 用户已在 Cloudflare 购买 `RepoAssure.com`，并授权将 RepoAssure 官网部署到 `repoassure.com` 和 `www.repoassure.com`。
@@ -15,7 +17,7 @@
 
 ### 当前阻塞
 
-Cloudflare Pages custom domain status 仍为 pending：
+Cloudflare Pages custom domain status 曾为 pending：
 
 - `repoassure.com`: `CNAME record not set`
 - `www.repoassure.com`: `CNAME record not set`
@@ -28,18 +30,33 @@ Authentication error
 
 因此 Codex 不能通过 API 添加所需 DNS 记录。
 
+### 解决结果
+
+用户通过 Cloudflare Dashboard 添加 DNS 后，Cloudflare Pages custom domains API 返回：
+
+- `repoassure.com`: active
+- `www.repoassure.com`: active
+
+验证结果：
+
+- `https://repoassure.com`: HTTP/2 200 over HTTPS。
+- `https://www.repoassure.com`: HTTP/2 200 over HTTPS。
+- `REPOASSURE_WEBSITE_URL=https://repoassure.com pnpm verify:website`: passed。
+- `REPOASSURE_WEBSITE_URL=https://www.repoassure.com pnpm verify:website`: passed。
+- 英文默认、Simplified Chinese 语言切换、desktop/mobile smoke、Trust Ledger、Assurance Graph、artifact tabs、private preview form 和 forbidden-claim custom-domain boundary 均已验证。
+
 ### 需要的外部条件
 
-需要通过 Cloudflare Dashboard 或具备 DNS Edit 权限的 API token 添加：
+已通过 Cloudflare Dashboard 或等效 DNS 操作添加：
 
 1. `CNAME` / Name `@` / Target `repoassure-preview.pages.dev` / Proxy `Proxied`
 2. `CNAME` / Name `www` / Target `repoassure-preview.pages.dev` / Proxy `Proxied`
 
-添加后继续验证 HTTPS、RepoAssure 页面内容、语言切换和 forbidden-claim boundary。
+HTTPS、RepoAssure 页面内容、语言切换和 forbidden-claim boundary 已继续验证并通过。
 
 ### 边界
 
-- 该阻塞不代表网站已在 custom domain 上成功发布。
+- 该阻塞已解决，但历史记录保留用于审计。
 - 不授权 public launch、production marketing announcement、repo public、npm publication、GitHub release、SaaS availability、Team Cloud availability、Enterprise availability 或 hosted dashboard availability claims。
 
 ## 2026年6月27日 - Cloudflare Pages + Access private preview execution is blocked before website upload

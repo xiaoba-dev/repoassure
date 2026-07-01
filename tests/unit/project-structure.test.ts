@@ -1508,7 +1508,7 @@ describe('project structure', () => {
     await expectPath('scripts/verify-cloudflare-access-preview.mjs');
   });
 
-  it('records public website custom domain deployment as blocked while DNS CNAME records are missing', async () => {
+  it('records public website custom domain deployment as verified after DNS activation', async () => {
     const [operation, readme, acceptanceChecklist, testingStrategy, devLog, blockers] = await Promise.all([
       readFile('docs/operations/public-website-custom-domain-deployment-v0.1.md', 'utf8'),
       readFile('README.md', 'utf8'),
@@ -1519,28 +1519,43 @@ describe('project structure', () => {
     ]);
 
     expect(operation).toContain('Public Website Custom Domain Deployment v0.1');
-    expect(operation).toContain('Status: blocked_dns_cname_not_set');
+    expect(operation).toContain('Status: verified_custom_domain_active');
+    expect(operation).toContain('Verified: 2026-07-01');
     expect(operation).toContain('Cloudflare Pages project: `repoassure-preview`');
     expect(operation).toContain('Custom domains requested: `repoassure.com`, `www.repoassure.com`');
     expect(operation).toContain('Latest deployment URL: `https://9dc5dd8b.repoassure-preview.pages.dev`');
     expect(operation).toContain('Pages custom domain API accepted both domain bindings');
-    expect(operation).toContain('Verification result: `CNAME record not set`');
-    expect(operation).toContain('DNS API result: `Authentication error`');
+    expect(operation).toContain('Cloudflare Pages custom domain status is active');
+    expect(operation).toContain('`repoassure.com`: active.');
+    expect(operation).toContain('`www.repoassure.com`: active.');
+    expect(operation).toContain('Verification result: `active`');
+    expect(operation).toContain('Before manual DNS completion, Pages verification returned `CNAME record not set`');
+    expect(operation).toContain('Before manual DNS completion, the available API token returned DNS API result `Authentication error`');
     expect(operation).toContain('Required DNS record: CNAME `@` -> `repoassure-preview.pages.dev`');
     expect(operation).toContain('Required DNS record: CNAME `www` -> `repoassure-preview.pages.dev`');
-    expect(operation).toContain('HTTPS verification is not complete');
-    expect(operation).toContain('Forbidden availability claim verification remains pending for the custom domain');
+    expect(operation).toContain('`https://repoassure.com`: HTTP/2 200 over HTTPS');
+    expect(operation).toContain('`https://www.repoassure.com`: HTTP/2 200 over HTTPS');
+    expect(operation).toContain('REPOASSURE_WEBSITE_URL=https://repoassure.com');
+    expect(operation).toContain('REPOASSURE_WEBSITE_URL=https://www.repoassure.com');
+    expect(operation).toContain('Assure every AI-generated repo before it ships');
+    expect(operation).toContain('在交付前保障每个 AI 生成仓库');
+    expect(operation).toContain('Forbidden availability claim verification passed');
     expect(operation).toContain('No repository visibility change was authorized');
     expect(operation).toContain('No npm publication was authorized');
     expect(operation).toContain('No GitHub release was authorized');
     expect(operation).toContain('No public launch or production marketing announcement was authorized');
     expect(operation).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was authorized');
     expect(readme).toContain('Public Website Custom Domain Deployment v0.1');
-    expect(readme).toContain('blocked_dns_cname_not_set');
+    expect(readme).toContain('verified_custom_domain_active');
     expect(acceptanceChecklist).toContain('Public Website Custom Domain Deployment v0.1');
+    expect(acceptanceChecklist).toContain('verified_custom_domain_active');
     expect(testingStrategy).toContain('Public Website Custom Domain Deployment v0.1');
+    expect(testingStrategy).toContain('forbidden-claim custom-domain verification');
+    expect(testingStrategy).toContain('已通过英文默认');
     expect(devLog).toContain('Public Website Custom Domain Deployment v0.1');
+    expect(devLog).toContain('Status: verified_custom_domain_active');
     expect(blockers).toContain('Public Website Custom Domain Deployment v0.1 is blocked by missing DNS CNAME records');
+    expect(blockers).toContain('Resolved on 2026-07-01');
 
     await expectPath('docs/operations/public-website-custom-domain-deployment-v0.1.md');
   });

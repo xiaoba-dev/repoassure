@@ -1,5 +1,23 @@
 # 决策日志
 
+## 2026年7月1日 - Product website user validation backlog planning
+
+### 决策
+
+接受 Product / Website / User Validation Backlog Planning v0.1：public launch gate 已关闭为 deferred 后，后续工作转入 `product_website_user_validation_backlog`。
+
+### 原因
+
+- Public Launch Defer Closure v0.1 已明确不再重复推进当前 launch authorization gate。
+- 后续更有价值的工作是产品能力、官网说明、用户验证和 release hygiene。
+- Future launch reopening criteria 必须等待新的完整 launch authorization packet。
+
+### 影响
+
+- 新增 `docs/operations/product-website-user-validation-backlog-v0.1.md`。
+- Backlog 拆分为 product、public website、user validation、release readiness hygiene 和 future launch reopening criteria。
+- 本决策不执行 npm publish、GitHub release、public launch、production marketing announcement、customer contact、pricing change、spend、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
+
 ## 2026年7月1日 - Public launch defer closure
 
 ### 决策

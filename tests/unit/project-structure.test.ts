@@ -1435,6 +1435,59 @@ describe('project structure', () => {
     await expectPath('docs/operations/public-launch-authorization-packet-completion-v0.1.md');
   });
 
+  it('records maintainer launch decision input as not supplied without authorizing launch', async () => {
+    const [
+      decisionInput,
+      readme,
+      releaseChecklist,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/maintainer-launch-decision-input-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(decisionInput).toContain('Maintainer Launch Decision Input v0.1');
+    expect(decisionInput).toContain('Status: decision_input_recorded_launch_not_authorized');
+    expect(decisionInput).toContain('Launch authorization status: `not_authorized`');
+    expect(decisionInput).toContain('Maintainer input decision: `not_supplied`');
+    expect(decisionInput).toContain('Launch decision: `defer_launch`');
+    expect(decisionInput).toContain('Source packet completion: `Public Launch Authorization Packet Completion v0.1`');
+    expect(decisionInput).toContain('Goal execution authorization is not launch authorization');
+    expect(decisionInput).toContain('Launch scope input: `not_supplied`');
+    expect(decisionInput).toContain('Launch copy input: `not_supplied`');
+    expect(decisionInput).toContain('Release notes input: `not_supplied`');
+    expect(decisionInput).toContain('Support boundary input: `not_supplied`');
+    expect(decisionInput).toContain('Legal/trademark/claim-risk review input: `not_supplied`');
+    expect(decisionInput).toContain('Commercial availability wording review input: `not_supplied`');
+    expect(decisionInput).toContain('Risk acceptance input: `not_supplied`');
+    expect(decisionInput).toContain('Rollback/correction plan input: `not_supplied`');
+    expect(decisionInput).toContain('Final launch approval input: `not_supplied`');
+    expect(decisionInput).toContain('No Action Authorization Receipt was produced');
+    expect(decisionInput).toContain('Required next gate: `explicit_launch_authorization_or_defer_decision`');
+    expect(decisionInput).toContain('No npm publication was executed');
+    expect(decisionInput).toContain('No GitHub release was executed');
+    expect(decisionInput).toContain('No public launch or production marketing announcement was executed');
+    expect(decisionInput).toContain('No customer contact was executed');
+    expect(decisionInput).toContain('No pricing change or spend was executed');
+    expect(decisionInput).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was executed');
+    expect(readme).toContain('Maintainer Launch Decision Input v0.1');
+    expect(releaseChecklist).toContain('Maintainer Launch Decision Input v0.1');
+    expect(testingStrategy).toContain('Maintainer Launch Decision Input v0.1');
+    expect(acceptanceChecklist).toContain('Maintainer Launch Decision Input v0.1');
+    expect(decisionLog).toContain('Maintainer launch decision input');
+    expect(devLog).toContain('Maintainer Launch Decision Input v0.1');
+
+    await expectPath('docs/operations/maintainer-launch-decision-input-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

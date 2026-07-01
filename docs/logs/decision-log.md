@@ -1,5 +1,44 @@
 # 决策日志
 
+## 2026年7月1日 - Solo maintainer branch protection adjustment
+
+### 决策
+
+接受 ADR-0023，将 `main` branch protection 调整为独立开发者维护模式。
+
+### 原因
+
+- RepoAssure 当前由独立开发者维护。
+- 团队式 1 人 review gate 会导致 PR 作者无法合并自己的 PR。
+- GitHub 已在 PR #3 中拒绝 self-approval：`Review Can not approve your own pull request`。
+- 强制 `Quality Gates` 比强制第二个 GitHub 身份更符合当前维护阶段。
+
+### 影响
+
+- Required approving reviews 从 `1` 调整为 `0`。
+- `Quality Gates`、strict status checks、admin enforcement、conversation resolution、linear history、禁用 force pushes 和 branch deletion 均保留。
+- 本决策不授权直推 `main`、npm publish、GitHub release、public launch、production marketing announcement 或商业版 availability claims。
+
+## 2026年7月1日 - Protected PR workflow verification
+
+### 决策
+
+使用 `codex/protected-pr-workflow-v0.1` 分支和 GitHub PR 验证 `main` 的受保护协作闭环。
+
+### 原因
+
+- `main` 已启用 native branch protection。
+- 后续变更必须验证 PR、`Quality Gates`、review gate 和 merge gate 是否按预期工作。
+- 该验证不应通过弱化保护规则或直推 `main` 完成。
+
+### 影响
+
+- 新增 `docs/operations/protected-pr-workflow-verification-v0.1.md`。
+- 受保护流程验证通过 PR #3 执行，最新 CI 证据由 GitHub PR status 和 PR comment 记录。
+- GitHub 拒绝 self-approval，并返回 `Review Can not approve your own pull request`。
+- 当前 merge gate 正确等待外部 maintainer review，应由 maintainer review 完成，而不是绕过保护。
+- 本决策不执行 npm publish、GitHub release、public launch、production marketing announcement 或商业版 availability claims。
+
 ## 2026年7月1日 - Native branch protection enablement
 
 ### 决策

@@ -1679,6 +1679,56 @@ describe('project structure', () => {
     await expectPath('docs/operations/product-backlog-prioritization-v0.1.md');
   });
 
+  it('records target repo acceptance feedback loop spec without implementing runtime or launch actions', async () => {
+    const [
+      feedbackSpec,
+      readme,
+      releaseChecklist,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/target-repo-acceptance-feedback-loop-spec-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(feedbackSpec).toContain('Target Repo Acceptance Feedback Loop Spec v0.1');
+    expect(feedbackSpec).toContain('Status: target_repo_feedback_loop_specified_not_implemented');
+    expect(feedbackSpec).toContain('Source priority: `Product Backlog Prioritization v0.1 / Priority 1`');
+    expect(feedbackSpec).toContain('Launch authorization status: `not_authorized`');
+    expect(feedbackSpec).toContain('Implementation authorization: `spec_only`');
+    expect(feedbackSpec).toContain('Acceptance feedback summary contract');
+    expect(feedbackSpec).toContain('runStatus');
+    expect(feedbackSpec).toContain('targetRepoMetadataClass');
+    expect(feedbackSpec).toContain('acceptanceResult');
+    expect(feedbackSpec).toContain('blockerCategory');
+    expect(feedbackSpec).toContain('nextRecommendedProductAction');
+    expect(feedbackSpec).toContain('artifactLinks');
+    expect(feedbackSpec).toContain('redactionBoundary');
+    expect(feedbackSpec).toContain('maintainerTriageGuidance');
+    expect(feedbackSpec).toContain('AI IDE consumption order');
+    expect(feedbackSpec).toContain('TDD implementation order');
+    expect(feedbackSpec).toContain('No runtime implementation was executed');
+    expect(feedbackSpec).toContain('No target repo material was uploaded');
+    expect(feedbackSpec).toContain('No secrets or raw private repo content may be stored');
+    expect(feedbackSpec).toContain('No public launch or production marketing announcement was executed');
+    expect(feedbackSpec).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was executed');
+    expect(readme).toContain('Target Repo Acceptance Feedback Loop Spec v0.1');
+    expect(releaseChecklist).toContain('Target Repo Acceptance Feedback Loop Spec v0.1');
+    expect(testingStrategy).toContain('Target Repo Acceptance Feedback Loop Spec v0.1');
+    expect(acceptanceChecklist).toContain('Target Repo Acceptance Feedback Loop Spec v0.1');
+    expect(decisionLog).toContain('Target repo acceptance feedback loop spec');
+    expect(devLog).toContain('Target Repo Acceptance Feedback Loop Spec v0.1');
+
+    await expectPath('docs/operations/target-repo-acceptance-feedback-loop-spec-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

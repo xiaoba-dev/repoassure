@@ -1729,6 +1729,57 @@ describe('project structure', () => {
     await expectPath('docs/operations/target-repo-acceptance-feedback-loop-spec-v0.1.md');
   });
 
+  it('records target repo acceptance feedback loop runtime without launch actions', async () => {
+    const [
+      runtime,
+      readme,
+      releaseChecklist,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/target-repo-acceptance-feedback-loop-runtime-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(runtime).toContain('Target Repo Acceptance Feedback Loop Runtime v0.1');
+    expect(runtime).toContain('Status: target_repo_feedback_loop_runtime_implemented');
+    expect(runtime).toContain('Source spec: `Target Repo Acceptance Feedback Loop Spec v0.1`');
+    expect(runtime).toContain('Implementation status: `implemented_minimal_runtime`');
+    expect(runtime).toContain('Launch authorization status: `not_authorized`');
+    expect(runtime).toContain('target-repo-feedback-summary.json');
+    expect(runtime).toContain('repoassure.target-repo-feedback-summary.v1');
+    expect(runtime).toContain('packages/acceptance/src/target-repo-feedback-summary.ts');
+    expect(runtime).toContain('packages/acceptance/src/run-user-acceptance.ts');
+    expect(runtime).toContain('runStatus');
+    expect(runtime).toContain('targetRepoMetadataClass');
+    expect(runtime).toContain('acceptanceResult');
+    expect(runtime).toContain('blockerCategory');
+    expect(runtime).toContain('nextRecommendedProductAction');
+    expect(runtime).toContain('artifactLinks');
+    expect(runtime).toContain('redactionBoundary');
+    expect(runtime).toContain('maintainerTriageGuidance');
+    expect(runtime).toContain('relative artifact links');
+    expect(runtime).toContain('No target repo material was uploaded');
+    expect(runtime).toContain('No secrets or raw private repo content may be stored');
+    expect(runtime).toContain('No public launch or production marketing announcement was executed');
+    expect(runtime).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was executed');
+    expect(readme).toContain('Target Repo Acceptance Feedback Loop Runtime v0.1');
+    expect(releaseChecklist).toContain('Target Repo Acceptance Feedback Loop Runtime v0.1');
+    expect(testingStrategy).toContain('Target Repo Acceptance Feedback Loop Runtime v0.1');
+    expect(acceptanceChecklist).toContain('Target Repo Acceptance Feedback Loop Runtime v0.1');
+    expect(decisionLog).toContain('Target repo acceptance feedback loop runtime');
+    expect(devLog).toContain('Target Repo Acceptance Feedback Loop Runtime v0.1');
+
+    await expectPath('docs/operations/target-repo-acceptance-feedback-loop-runtime-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
@@ -3850,6 +3901,7 @@ describe('project structure', () => {
       'run-user-acceptance-handoff',
       'shell-quote',
       'shell-words',
+      'target-repo-feedback-summary',
       'user-acceptance',
       'user-acceptance-args',
       'user-acceptance-handoff',

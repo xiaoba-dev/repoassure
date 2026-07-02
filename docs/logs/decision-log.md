@@ -1,5 +1,24 @@
 # 决策日志
 
+## 2026年7月2日 - Target repo acceptance feedback loop runtime
+
+### 决策
+
+接受 Target Repo Acceptance Feedback Loop Runtime v0.1：按 Target Repo Acceptance Feedback Loop Spec v0.1 实现最小本地 runtime，让 browser 和 Python/CLI user acceptance runs 写入 run-scoped feedback summary。
+
+### 原因
+
+- Priority 1 的产品验证需要真实目标 repo run 后有一份 AI IDE 和 maintainer 都能快速消费的本地摘要。
+- `target-repo-feedback-summary.json` 将分散的 report、manifest、repair plan、generated tests、browser artifacts 和 triage guidance 串起来。
+- 使用 relative artifact links 和 redaction boundary 可以减少路径泄露与敏感信息风险。
+
+### 影响
+
+- 新增 `packages/acceptance/src/target-repo-feedback-summary.ts`。
+- 更新 `packages/acceptance/src/run-user-acceptance.ts`，browser 和 Python/CLI user acceptance runs 均写入 `target-repo-feedback-summary.json`。
+- 新增 `docs/operations/target-repo-acceptance-feedback-loop-runtime-v0.1.md` 和对应测试。
+- 本决策不上传目标 repo 材料，不存储 secrets 或 raw private repo content，不执行 npm publish、GitHub release、public launch、production marketing announcement、customer contact、pricing change、spend、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
+
 ## 2026年7月2日 - Target repo acceptance feedback loop spec
 
 ### 决策

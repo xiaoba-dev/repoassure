@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'node:url';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 
 import { formatAcceptanceFatalError } from './fatal-error.js';
 import {
@@ -19,6 +19,7 @@ import {
   type PythonCliProfile
 } from './python-cli-profile.js';
 import { redactSensitiveText } from './redaction.js';
+import { writeTargetRepoFeedbackSummaryArtifact } from './target-repo-feedback-summary.js';
 import { buildUserAcceptanceMarkdown, type UserAcceptanceCheck } from './user-acceptance.js';
 import {
   formatUserAcceptanceCommand,
@@ -225,7 +226,7 @@ export async function runUserAcceptance(
       ...(browserDriver ? { browserDriver } : {})
     });
     const validationBaseUrl = selectGeneratedTestValidationBaseUrl(options.url, managedBoot.baseUrl);
-    const checks = await buildUserAcceptanceArtifactChecks({
+    const artifactChecks = await buildUserAcceptanceArtifactChecks({
       repoRoot: options.repoRoot,
       reportPath: result.reportPath,
       findingsPath: result.findingsPath,
@@ -242,6 +243,30 @@ export async function runUserAcceptance(
       generatedTestTimeoutMs: options.generatedTestTimeoutMs ?? defaultGeneratedTestTimeoutMs,
       ...(validationBaseUrl ? { baseUrl: validationBaseUrl } : {})
     });
+    const feedbackSummary = await writeTargetRepoFeedbackSummaryArtifact({
+      generatedAt: new Date().toISOString(),
+      mode: options.mode,
+      repoRoot: options.repoRoot,
+      runDir: dirname(result.artifactBundle.manifestPath),
+      manifestPath: result.artifactBundle.manifestPath,
+      reportPath: result.reportPath,
+      findingsPath: result.findingsPath,
+      repairPlanPath: result.repairPlan.repairPlanPath,
+      repairPlanMarkdownPath: result.repairPlan.repairPlanMarkdownPath,
+      repairTaskPackagePath: result.repairPlan.repairTaskPackagePath,
+      repairTaskPackageMarkdownPath: result.repairPlan.repairTaskPackageMarkdownPath,
+      patchDiffPath: result.report.patchDiffPath,
+      generatedTestFiles: result.testGeneration.createdFiles,
+      artifactFiles: result.explore.artifactFiles,
+      checks: [
+        ...repoPreflightChecks,
+        ...artifactChecks
+      ]
+    });
+    const checks = [
+      ...artifactChecks,
+      buildTargetRepoFeedbackSummaryCheck(feedbackSummary.summaryPath)
+    ];
     const markdown = buildUserAcceptanceMarkdown({
       generatedAt: new Date().toISOString(),
       repoRoot: options.repoRoot,
@@ -320,6 +345,23 @@ async function runPythonCliUserAcceptance(
       ...executionChecks,
       ...buildPythonCliArtifactChecks(artifacts)
     ];
+    const feedbackSummary = await writeTargetRepoFeedbackSummaryArtifact({
+      generatedAt: new Date().toISOString(),
+      mode: options.mode,
+      repoRoot: options.repoRoot,
+      runDir: artifacts.runDir,
+      manifestPath: artifacts.manifestPath,
+      reportPath: artifacts.reportPath,
+      findingsPath: artifacts.pythonCliProfilePath,
+      repairPlanPath: artifacts.repairPlanPath,
+      repairPlanMarkdownPath: artifacts.repairPlanMarkdownPath,
+      repairTaskPackagePath: artifacts.repairTaskPackagePath,
+      repairTaskPackageMarkdownPath: artifacts.repairTaskPackageMarkdownPath,
+      generatedTestFiles: [],
+      artifactFiles: [],
+      checks
+    });
+    checks.push(buildTargetRepoFeedbackSummaryCheck(feedbackSummary.summaryPath));
     const markdown = buildUserAcceptanceMarkdown({
       generatedAt: new Date().toISOString(),
       repoRoot: options.repoRoot,
@@ -352,6 +394,15 @@ async function runPythonCliUserAcceptance(
 
     return 1;
   }
+}
+
+function buildTargetRepoFeedbackSummaryCheck(summaryPath: string): UserAcceptanceCheck {
+  return {
+    name: 'target-repo-feedback-summary.json 已生成',
+    required: true,
+    status: 'passed',
+    evidence: summaryPath
+  };
 }
 
 function buildPythonCliAcceptanceChecks(

@@ -1,5 +1,35 @@
 # 开发日志
 
+## 2026年7月2日 - Target Repo Acceptance Feedback Loop Runtime v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/target-repo-feedback-summary.ts`。
+- 更新 `packages/acceptance/src/run-user-acceptance.ts`，browser 和 Python/CLI user acceptance runs 写入 run-scoped `target-repo-feedback-summary.json`。
+- Summary schema 为 `repoassure.target-repo-feedback-summary.v1`。
+- Summary 包含 `runStatus`、`targetRepoMetadataClass`、`acceptanceResult`、`blockerCategory`、`nextRecommendedProductAction`、`artifactLinks`、`redactionBoundary` 和 `maintainerTriageGuidance`。
+- Summary 使用 relative artifact links，并从 manifest 记录 `artifacts.targetRepoFeedbackSummaryPath`。
+- 新增 `docs/operations/target-repo-acceptance-feedback-loop-runtime-v0.1.md`，级联更新 README、public release checklist、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：新增 `tests/unit/target-repo-feedback-summary.test.ts` 和 `tests/unit/user-acceptance.test.ts` runner 集成断言，测试因 `target-repo-feedback-summary.ts` 缺失、runner 未写 summary 按预期失败。
+- Green：实现 summary builder/writer、manifest backlink 和 browser/Python-CLI runner 接入。
+- Structure：更新 `tests/unit/project-structure.test.ts`，守护 runtime 文档和级联记录。
+
+### 边界
+
+- No target repo material was uploaded。
+- No secrets or raw private repo content may be stored。
+- No OTP、cookie、Access token、login query-state、reviewer credentials、env values、raw private source 或 absolute workstation paths may be stored in the summary。
+- No Action Authorization Receipt was produced。
+- No npm publication was executed。
+- No GitHub release was executed。
+- No public launch or production marketing announcement was executed。
+- No customer contact was executed。
+- No pricing change or spend was executed。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was executed。
+
 ## 2026年7月2日 - Target Repo Acceptance Feedback Loop Spec v0.1
 
 ### 完成内容

@@ -1,5 +1,34 @@
 # 开发日志
 
+## 2026年7月2日 - Target Repo Acceptance Feedback Loop Spec v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/target-repo-acceptance-feedback-loop-spec-v0.1.md`。
+- 记录 status `target_repo_feedback_loop_specified_not_implemented`。
+- 记录 source priority `Product Backlog Prioritization v0.1 / Priority 1`、implementation authorization `spec_only` 和 launch authorization status `not_authorized`。
+- 定义 future acceptance feedback summary contract：`runStatus`、`targetRepoMetadataClass`、`acceptanceResult`、`blockerCategory`、`nextRecommendedProductAction`、`artifactLinks`、`redactionBoundary` 和 `maintainerTriageGuidance`。
+- 定义 AI IDE consumption order 和后续 TDD implementation order。
+- 级联更新 README、public release checklist、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Target Repo Acceptance Feedback Loop Spec v0.1 文档和级联记录存在；测试因 `docs/operations/target-repo-acceptance-feedback-loop-spec-v0.1.md` 缺失按预期失败。
+- Green：新增 spec 文档和级联记录，明确本轮只锁定 contract，不实现 runtime。
+
+### 边界
+
+- No runtime implementation was executed。
+- No target repo material was uploaded。
+- No secrets or raw private repo content may be stored。
+- No Action Authorization Receipt was produced。
+- No npm publication was executed。
+- No GitHub release was executed。
+- No public launch or production marketing announcement was executed。
+- No customer contact was executed。
+- No pricing change or spend was executed。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was executed。
+
 ## 2026年7月2日 - Product Backlog Prioritization v0.1
 
 ### 完成内容

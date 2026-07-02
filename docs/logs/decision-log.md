@@ -1,5 +1,23 @@
 # 决策日志
 
+## 2026年7月2日 - Target repo acceptance feedback loop spec
+
+### 决策
+
+接受 Target Repo Acceptance Feedback Loop Spec v0.1：先把 Product Backlog Prioritization v0.1 的 Priority 1 落成可测试 contract，再进入 runtime 实现。
+
+### 原因
+
+- 真实目标 repo 运行反馈是验证 RepoAssure 产品价值的第一优先级。
+- AI IDE 和 maintainer 需要稳定、简短、可消费的 feedback summary，而不是只看分散 artifacts。
+- 在实现前先锁定字段、隐私边界、AI IDE consumption order 和 TDD implementation order，可以避免后续功能漂移。
+
+### 影响
+
+- 新增 `docs/operations/target-repo-acceptance-feedback-loop-spec-v0.1.md`。
+- Future implementation contract 包括 `runStatus`、`targetRepoMetadataClass`、`acceptanceResult`、`blockerCategory`、`nextRecommendedProductAction`、`artifactLinks`、`redactionBoundary` 和 `maintainerTriageGuidance`。
+- 本决策不实现 runtime，不上传目标 repo 材料，不存储 secrets 或 raw private repo content，不执行 npm publish、GitHub release、public launch、production marketing announcement、customer contact、pricing change、spend、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
+
 ## 2026年7月2日 - Product backlog prioritization
 
 ### 决策

@@ -191,6 +191,18 @@ export {
 } from './python-cli-artifacts.js';
 
 export {
+  buildTargetRepoFeedbackSummary,
+  writeTargetRepoFeedbackSummaryArtifact,
+  type TargetRepoFeedbackBlockerCategory,
+  type TargetRepoFeedbackNextAction,
+  type TargetRepoFeedbackRunStatus,
+  type TargetRepoFeedbackSummary,
+  type TargetRepoFeedbackSummaryInput,
+  type TargetRepoMetadataClass,
+  type WriteTargetRepoFeedbackSummaryResult
+} from './target-repo-feedback-summary.js';
+
+export {
   formatUserAcceptanceCommand,
   parseUserAcceptanceArgs,
   type UserAcceptanceCliOptions,

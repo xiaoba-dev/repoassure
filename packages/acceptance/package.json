@@ -110,6 +110,10 @@
       "types": "./dist/python-cli-artifacts.d.ts",
       "default": "./dist/python-cli-artifacts.js"
     },
+    "./target-repo-feedback-summary": {
+      "types": "./dist/target-repo-feedback-summary.d.ts",
+      "default": "./dist/target-repo-feedback-summary.js"
+    },
     "./user-acceptance-args": {
       "types": "./dist/user-acceptance-args.d.ts",
       "default": "./dist/user-acceptance-args.js"

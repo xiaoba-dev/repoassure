@@ -301,6 +301,95 @@ describe('user acceptance record', () => {
     expect(markdown).not.toContain('artifact-secret');
   });
 
+  it('writes target repo feedback summary during browser user acceptance runs', async () => {
+    const repoRoot = await mkdtemp(join(tmpdir(), 'repoassure-user-acceptance-feedback-'));
+    const outputPath = join(repoRoot, 'acceptance-record.md');
+    const runDir = join(repoRoot, '.hardening', 'runs', 'run-2026-07-02T00-00-00-000Z');
+    const manifestPath = join(runDir, 'manifest.json');
+    const reportPath = join(repoRoot, 'hardening-report.md');
+    const findingsPath = join(runDir, 'findings.json');
+    const repairPlanPath = join(runDir, 'repair-plan.json');
+    const repairPlanMarkdownPath = join(runDir, 'repair-plan.md');
+    const repairTaskPackagePath = join(runDir, 'repair-task-package.json');
+    const repairTaskPackageMarkdownPath = join(runDir, 'repair-task-package.md');
+    const patchDiffPath = join(runDir, 'patch.diff');
+    const generatedTestPath = join(repoRoot, 'tests', 'generated.spec.ts');
+    const screenshotPath = join(runDir, 'home.png');
+    await mkdir(join(repoRoot, 'tests'), { recursive: true });
+    await mkdir(runDir, { recursive: true });
+    await writeFile(join(repoRoot, 'package.json'), '{"scripts":{"dev":"vite"}}\n');
+    await Promise.all([
+      writeFile(manifestPath, '{"schemaVersion":1,"artifacts":{}}\n'),
+      writeFile(reportPath, '# Report\n'),
+      writeFile(findingsPath, '{"findings":[]}\n'),
+      writeFile(repairPlanPath, '{"tasks":[]}\n'),
+      writeFile(repairPlanMarkdownPath, '# Repair Plan\n'),
+      writeFile(repairTaskPackagePath, '{"tasks":[]}\n'),
+      writeFile(repairTaskPackageMarkdownPath, '# Repair Task Package\n'),
+      writeFile(patchDiffPath, ''),
+      writeFile(generatedTestPath, 'import { test } from "@playwright/test";\n'),
+      writeFile(screenshotPath, 'png')
+    ]);
+
+    const exitCode = await runUserAcceptance({
+      repoRoot,
+      mode: 'browser',
+      browser: true,
+      trace: false,
+      validateGeneratedTests: false,
+      criticalPaths: [],
+      decision: 'pending',
+      notes: '',
+      outputPath
+    }, {
+      createBrowserDriver: async () => ({
+        close: async () => {}
+      }),
+      runBootApp: async () => ({
+        url: 'http://127.0.0.1:5173',
+        stop: async () => {}
+      }),
+      runHardening: async () => ({
+        reportPath,
+        findingsPath,
+        artifactBundle: { manifestPath },
+        repairPlan: {
+          repairPlanPath,
+          repairPlanMarkdownPath,
+          repairTaskPackagePath,
+          repairTaskPackageMarkdownPath
+        },
+        testGeneration: { createdFiles: [generatedTestPath] },
+        explore: { artifactFiles: [screenshotPath] },
+        report: {
+          readinessScore: 92,
+          issueCounts: { P0: 0, P1: 0, P2: 1 },
+          patchDiffPath
+        }
+      })
+    });
+
+    const summaryPath = join(runDir, 'target-repo-feedback-summary.json');
+    const summary = JSON.parse(await readFile(summaryPath, 'utf8')) as {
+      runStatus: string;
+      targetRepoMetadataClass: string;
+      artifactLinks: { report: string; screenshots: string[] };
+    };
+    const manifest = JSON.parse(await readFile(manifestPath, 'utf8')) as {
+      artifacts: { targetRepoFeedbackSummaryPath?: string };
+    };
+    const markdown = await readFile(outputPath, 'utf8');
+
+    expect(exitCode).toBe(0);
+    expect(summary.runStatus).toBe('passed');
+    expect(summary.targetRepoMetadataClass).toBe('private_repo_redacted');
+    expect(summary.artifactLinks.report).toBe('../../../hardening-report.md');
+    expect(summary.artifactLinks.screenshots).toEqual(['home.png']);
+    expect(manifest.artifacts.targetRepoFeedbackSummaryPath).toBe(summaryPath);
+    expect(markdown).toContain('target-repo-feedback-summary.json 已生成');
+    expect(markdown).toContain(summaryPath);
+  });
+
   it('escapes summary table cells in user acceptance records', () => {
     const markdown = buildUserAcceptanceMarkdown({
       generatedAt: '2026-06-18T12:00:00.000Z',

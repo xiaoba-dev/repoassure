@@ -19,6 +19,7 @@ import {
   type PythonCliProfile
 } from './python-cli-profile.js';
 import { redactSensitiveText } from './redaction.js';
+import { writeAiIdeHandoffPackageArtifact } from './ai-ide-handoff-package.js';
 import { writeTargetRepoFeedbackSummaryArtifact } from './target-repo-feedback-summary.js';
 import { buildUserAcceptanceMarkdown, type UserAcceptanceCheck } from './user-acceptance.js';
 import {
@@ -263,9 +264,32 @@ export async function runUserAcceptance(
         ...artifactChecks
       ]
     });
+    const feedbackSummaryCheck = buildTargetRepoFeedbackSummaryCheck(feedbackSummary.summaryPath);
+    const handoffPackage = await writeAiIdeHandoffPackageArtifact({
+      generatedAt: new Date().toISOString(),
+      mode: options.mode,
+      runDir: dirname(result.artifactBundle.manifestPath),
+      manifestPath: result.artifactBundle.manifestPath,
+      targetRepoFeedbackSummaryPath: feedbackSummary.summaryPath,
+      reportPath: result.reportPath,
+      findingsPath: result.findingsPath,
+      repairPlanPath: result.repairPlan.repairPlanPath,
+      repairPlanMarkdownPath: result.repairPlan.repairPlanMarkdownPath,
+      repairTaskPackagePath: result.repairPlan.repairTaskPackagePath,
+      repairTaskPackageMarkdownPath: result.repairPlan.repairTaskPackageMarkdownPath,
+      patchDiffPath: result.report.patchDiffPath,
+      generatedTestFiles: result.testGeneration.createdFiles,
+      artifactFiles: result.explore.artifactFiles,
+      checks: [
+        ...repoPreflightChecks,
+        ...artifactChecks,
+        feedbackSummaryCheck
+      ]
+    });
     const checks = [
       ...artifactChecks,
-      buildTargetRepoFeedbackSummaryCheck(feedbackSummary.summaryPath)
+      feedbackSummaryCheck,
+      buildAiIdeHandoffPackageCheck(handoffPackage.handoffPackagePath)
     ];
     const markdown = buildUserAcceptanceMarkdown({
       generatedAt: new Date().toISOString(),
@@ -361,7 +385,27 @@ async function runPythonCliUserAcceptance(
       artifactFiles: [],
       checks
     });
-    checks.push(buildTargetRepoFeedbackSummaryCheck(feedbackSummary.summaryPath));
+    const feedbackSummaryCheck = buildTargetRepoFeedbackSummaryCheck(feedbackSummary.summaryPath);
+    const handoffPackage = await writeAiIdeHandoffPackageArtifact({
+      generatedAt: new Date().toISOString(),
+      mode: options.mode,
+      runDir: artifacts.runDir,
+      manifestPath: artifacts.manifestPath,
+      targetRepoFeedbackSummaryPath: feedbackSummary.summaryPath,
+      reportPath: artifacts.reportPath,
+      findingsPath: artifacts.pythonCliProfilePath,
+      repairPlanPath: artifacts.repairPlanPath,
+      repairPlanMarkdownPath: artifacts.repairPlanMarkdownPath,
+      repairTaskPackagePath: artifacts.repairTaskPackagePath,
+      repairTaskPackageMarkdownPath: artifacts.repairTaskPackageMarkdownPath,
+      generatedTestFiles: [],
+      artifactFiles: [],
+      checks: [
+        ...checks,
+        feedbackSummaryCheck
+      ]
+    });
+    checks.push(feedbackSummaryCheck, buildAiIdeHandoffPackageCheck(handoffPackage.handoffPackagePath));
     const markdown = buildUserAcceptanceMarkdown({
       generatedAt: new Date().toISOString(),
       repoRoot: options.repoRoot,
@@ -402,6 +446,15 @@ function buildTargetRepoFeedbackSummaryCheck(summaryPath: string): UserAcceptanc
     required: true,
     status: 'passed',
     evidence: summaryPath
+  };
+}
+
+function buildAiIdeHandoffPackageCheck(handoffPackagePath: string): UserAcceptanceCheck {
+  return {
+    name: 'ai-ide-handoff-package.json 已生成',
+    required: true,
+    status: 'passed',
+    evidence: handoffPackagePath
   };
 }
 

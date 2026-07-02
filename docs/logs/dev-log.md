@@ -1,5 +1,35 @@
 # 开发日志
 
+## 2026年7月3日 - AI IDE Handoff Material Quality Runtime v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/ai-ide-handoff-package.ts`。
+- 更新 `packages/acceptance/src/run-user-acceptance.ts`，browser 和 Python/CLI user acceptance runs 写入 run-scoped `ai-ide-handoff-package.json`。
+- Handoff package schema 为 `repoassure.ai-ide-handoff-package.v1`。
+- Handoff package 包含 `recommendedReadingOrder`、`artifactInventory`、`priorityActions`、`consumptionGuidance`、`qualityGates`、`redactionBoundary` 和 `sourceSummary`。
+- Handoff package 使用 relative artifact links，并从 manifest 记录 `artifacts.aiIdeHandoffPackagePath`。
+- 新增 `docs/operations/ai-ide-handoff-material-quality-runtime-v0.1.md`，级联更新 README、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：新增 `tests/unit/ai-ide-handoff-package.test.ts` 和 `tests/unit/user-acceptance.test.ts` runner 集成断言，测试因 `ai-ide-handoff-package.ts` 缺失、runner 未写 handoff package 按预期失败。
+- Green：实现 handoff package builder/writer、manifest backlink、browser runner 接入和 Python/CLI runner 接入。
+- Structure：更新 `tests/unit/project-structure.test.ts`，守护 runtime 文档和级联记录。
+
+### 边界
+
+- No target repo material was uploaded。
+- No secrets or raw private repo content may be stored。
+- No OTP、cookie、Access token、login query-state、reviewer credentials、env values、raw private source 或 absolute workstation paths may be stored in the handoff package。
+- No Action Authorization Receipt was produced。
+- No npm publication was executed。
+- No GitHub release was executed。
+- No public launch or production marketing announcement was executed。
+- No customer contact was executed。
+- No pricing change or spend was executed。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was executed。
+
 ## 2026年7月2日 - Target Repo Acceptance Feedback Loop Runtime v0.1
 
 ### 完成内容

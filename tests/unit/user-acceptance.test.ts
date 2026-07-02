@@ -1,4 +1,4 @@
-import { chmod, mkdir, mkdtemp, readFile, readlink, rm, stat, writeFile } from 'node:fs/promises';
+import { chmod, mkdir, mkdtemp, readdir, readFile, readlink, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -370,13 +370,22 @@ describe('user acceptance record', () => {
     });
 
     const summaryPath = join(runDir, 'target-repo-feedback-summary.json');
+    const handoffPackagePath = join(runDir, 'ai-ide-handoff-package.json');
     const summary = JSON.parse(await readFile(summaryPath, 'utf8')) as {
       runStatus: string;
       targetRepoMetadataClass: string;
       artifactLinks: { report: string; screenshots: string[] };
     };
+    const handoffPackage = JSON.parse(await readFile(handoffPackagePath, 'utf8')) as {
+      schemaVersion: string;
+      recommendedReadingOrder: Array<{ artifactKind: string; path: string }>;
+      sourceSummary: { targetRepoFeedbackSummary: string };
+    };
     const manifest = JSON.parse(await readFile(manifestPath, 'utf8')) as {
-      artifacts: { targetRepoFeedbackSummaryPath?: string };
+      artifacts: {
+        aiIdeHandoffPackagePath?: string;
+        targetRepoFeedbackSummaryPath?: string;
+      };
     };
     const markdown = await readFile(outputPath, 'utf8');
 
@@ -385,9 +394,18 @@ describe('user acceptance record', () => {
     expect(summary.targetRepoMetadataClass).toBe('private_repo_redacted');
     expect(summary.artifactLinks.report).toBe('../../../hardening-report.md');
     expect(summary.artifactLinks.screenshots).toEqual(['home.png']);
+    expect(handoffPackage.schemaVersion).toBe('repoassure.ai-ide-handoff-package.v1');
+    expect(handoffPackage.recommendedReadingOrder[0]).toMatchObject({
+      artifactKind: 'target_repo_feedback_summary',
+      path: 'target-repo-feedback-summary.json'
+    });
+    expect(handoffPackage.sourceSummary.targetRepoFeedbackSummary).toBe('target-repo-feedback-summary.json');
     expect(manifest.artifacts.targetRepoFeedbackSummaryPath).toBe(summaryPath);
+    expect(manifest.artifacts.aiIdeHandoffPackagePath).toBe(handoffPackagePath);
     expect(markdown).toContain('target-repo-feedback-summary.json 已生成');
+    expect(markdown).toContain('ai-ide-handoff-package.json 已生成');
     expect(markdown).toContain(summaryPath);
+    expect(markdown).toContain(handoffPackagePath);
   });
 
   it('escapes summary table cells in user acceptance records', () => {
@@ -971,6 +989,31 @@ describe('user acceptance record', () => {
       expect((await stat(join(repoRoot, '.hardening', 'run', 'python-cli-profile.json'))).isFile()).toBe(true);
       expect((await stat(join(repoRoot, 'hardening-report.md'))).isFile()).toBe(true);
       expect((await stat(join(repoRoot, '.hardening', 'runs'))).isDirectory()).toBe(true);
+      const [runId] = await readdir(join(repoRoot, '.hardening', 'runs'));
+      const runDir = join(repoRoot, '.hardening', 'runs', runId ?? '');
+      const handoffPackagePath = join(runDir, 'ai-ide-handoff-package.json');
+      const manifestPath = join(runDir, 'manifest.json');
+      const handoffPackage = JSON.parse(await readFile(handoffPackagePath, 'utf8')) as {
+        mode: string;
+        recommendedReadingOrder: Array<{ artifactKind: string; path: string }>;
+        sourceSummary: { targetRepoFeedbackSummary: string };
+      };
+      const manifest = JSON.parse(await readFile(manifestPath, 'utf8')) as {
+        artifacts: {
+          aiIdeHandoffPackagePath?: string;
+          targetRepoFeedbackSummaryPath?: string;
+        };
+      };
+
+      expect(record).toContain('| ai-ide-handoff-package.json 已生成 | 是 | 通过 |');
+      expect(handoffPackage.mode).toBe('cli');
+      expect(handoffPackage.recommendedReadingOrder[0]).toMatchObject({
+        artifactKind: 'target_repo_feedback_summary',
+        path: 'target-repo-feedback-summary.json'
+      });
+      expect(handoffPackage.sourceSummary.targetRepoFeedbackSummary).toBe('target-repo-feedback-summary.json');
+      expect(manifest.artifacts.targetRepoFeedbackSummaryPath).toBe(join(runDir, 'target-repo-feedback-summary.json'));
+      expect(manifest.artifacts.aiIdeHandoffPackagePath).toBe(handoffPackagePath);
     } finally {
       stdout.mockRestore();
       await rm(repoRoot, { recursive: true, force: true });

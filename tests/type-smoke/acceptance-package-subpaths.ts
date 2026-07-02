@@ -25,6 +25,7 @@ import * as pythonCliProfile from '@hardening-mcp/acceptance/python-cli-profile'
 import * as pythonCliChecks from '@hardening-mcp/acceptance/python-cli-checks';
 import * as pythonCliArtifacts from '@hardening-mcp/acceptance/python-cli-artifacts';
 import * as targetRepoFeedbackSummary from '@hardening-mcp/acceptance/target-repo-feedback-summary';
+import * as aiIdeHandoffPackage from '@hardening-mcp/acceptance/ai-ide-handoff-package';
 import * as userAcceptanceArgs from '@hardening-mcp/acceptance/user-acceptance-args';
 import * as shellQuote from '@hardening-mcp/acceptance/shell-quote';
 import * as shellWords from '@hardening-mcp/acceptance/shell-words';
@@ -66,6 +67,7 @@ const packageSubpathModules = [
   pythonCliChecks,
   pythonCliArtifacts,
   targetRepoFeedbackSummary,
+  aiIdeHandoffPackage,
   userAcceptanceArgs,
   shellQuote,
   shellWords,

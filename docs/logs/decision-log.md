@@ -1,5 +1,24 @@
 # 决策日志
 
+## 2026年7月3日 - AI IDE handoff material quality runtime
+
+### 决策
+
+接受 AI IDE Handoff Material Quality Runtime v0.1：按 Product Backlog Prioritization v0.1 / Priority 2 实现最小本地 runtime，让 browser 和 Python/CLI user acceptance runs 写入 run-scoped AI IDE handoff package。
+
+### 原因
+
+- 目标 repo acceptance run 现在已有 `target-repo-feedback-summary.json`，下一步需要一份更稳定的 AI IDE / maintainer 消费索引。
+- `ai-ide-handoff-package.json` 将推荐阅读顺序、artifact inventory、priority actions、consumption guidance、quality gates 和 source summary 固定成机器可读 contract。
+- 使用 relative artifact links 和 redaction boundary 可以减少路径泄露与敏感信息风险。
+
+### 影响
+
+- 新增 `packages/acceptance/src/ai-ide-handoff-package.ts`。
+- 更新 `packages/acceptance/src/run-user-acceptance.ts`，browser 和 Python/CLI user acceptance runs 均写入 `ai-ide-handoff-package.json`。
+- 新增 `docs/operations/ai-ide-handoff-material-quality-runtime-v0.1.md` 和对应测试。
+- 本决策不上传目标 repo 材料，不存储 secrets 或 raw private repo content，不执行 npm publish、GitHub release、public launch、production marketing announcement、customer contact、pricing change、spend、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
+
 ## 2026年7月2日 - Target repo acceptance feedback loop runtime
 
 ### 决策

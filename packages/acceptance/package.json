@@ -114,6 +114,10 @@
       "types": "./dist/target-repo-feedback-summary.d.ts",
       "default": "./dist/target-repo-feedback-summary.js"
     },
+    "./ai-ide-handoff-package": {
+      "types": "./dist/ai-ide-handoff-package.d.ts",
+      "default": "./dist/ai-ide-handoff-package.js"
+    },
     "./user-acceptance-args": {
       "types": "./dist/user-acceptance-args.d.ts",
       "default": "./dist/user-acceptance-args.js"

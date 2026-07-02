@@ -203,6 +203,20 @@ export {
 } from './target-repo-feedback-summary.js';
 
 export {
+  buildAiIdeHandoffPackage,
+  writeAiIdeHandoffPackageArtifact,
+  type AiIdeHandoffArtifactInventoryEntry,
+  type AiIdeHandoffArtifactKind,
+  type AiIdeHandoffPackage,
+  type AiIdeHandoffPackageInput,
+  type AiIdeHandoffPriority,
+  type AiIdeHandoffPriorityAction,
+  type AiIdeHandoffReadingEntry,
+  type AiIdeHandoffRunStatus,
+  type WriteAiIdeHandoffPackageResult
+} from './ai-ide-handoff-package.js';
+
+export {
   formatUserAcceptanceCommand,
   parseUserAcceptanceArgs,
   type UserAcceptanceCliOptions,

@@ -1780,6 +1780,53 @@ describe('project structure', () => {
     await expectPath('docs/operations/target-repo-acceptance-feedback-loop-runtime-v0.1.md');
   });
 
+  it('records AI IDE handoff material quality runtime without launch actions', async () => {
+    const [
+      runtime,
+      readme,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/ai-ide-handoff-material-quality-runtime-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(runtime).toContain('AI IDE Handoff Material Quality Runtime v0.1');
+    expect(runtime).toContain('ai_ide_handoff_material_quality_runtime_implemented');
+    expect(runtime).toContain('Product Backlog Prioritization v0.1 / Priority 2');
+    expect(runtime).toContain('Implementation status: `implemented_minimal_runtime`');
+    expect(runtime).toContain('Launch authorization status: `not_authorized`');
+    expect(runtime).toContain('ai-ide-handoff-package.json');
+    expect(runtime).toContain('repoassure.ai-ide-handoff-package.v1');
+    expect(runtime).toContain('artifacts.aiIdeHandoffPackagePath');
+    expect(runtime).toContain('recommendedReadingOrder');
+    expect(runtime).toContain('artifactInventory');
+    expect(runtime).toContain('priorityActions');
+    expect(runtime).toContain('consumptionGuidance');
+    expect(runtime).toContain('qualityGates');
+    expect(runtime).toContain('redactionBoundary');
+    expect(runtime).toContain('sourceSummary');
+    expect(runtime).toContain('packages/acceptance/src/ai-ide-handoff-package.ts');
+    expect(runtime).toContain('@hardening-mcp/acceptance/ai-ide-handoff-package');
+    expect(runtime).toContain('must not store secrets, raw private repo content');
+    expect(runtime).toContain('npm publication');
+    expect(runtime).toContain('hosted dashboard availability claims');
+    expect(readme).toContain('AI IDE handoff material quality runtime');
+    expect(readme).toContain('ai-ide-handoff-package.json');
+    expect(testingStrategy).toContain('AI IDE Handoff Material Quality Runtime v0.1');
+    expect(acceptanceChecklist).toContain('AI IDE Handoff Material Quality Runtime v0.1');
+    expect(decisionLog).toContain('AI IDE handoff material quality runtime');
+    expect(devLog).toContain('AI IDE Handoff Material Quality Runtime v0.1');
+
+    await expectPath('docs/operations/ai-ide-handoff-material-quality-runtime-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
@@ -3869,6 +3916,7 @@ describe('project structure', () => {
       .sort();
 
     expect(packageModuleNames).toEqual([
+      'ai-ide-handoff-package',
       'compatibility',
       'fatal-error',
       'goal-audit',

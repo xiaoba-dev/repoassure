@@ -1,5 +1,34 @@
 # 开发日志
 
+## 2026年7月3日 - Repair Task Actionability Runtime v0.1
+
+### 完成内容
+
+- 更新 `packages/repair-planner/src/repair-plan.ts`，为 executable repair task package 定义 `actionability` contract。
+- 更新 `packages/repair-planner/src/generate-repair-plan.ts`，让 `repair-task-package.json` / `.md` 输出 dependencies、suggestedVerificationCommands、patchApplicabilityEvidence、aiIdeExecutionPrompt、manualReviewBoundary、riskNotes 和 noAutoApplyBoundary。
+- 更新 `packages/acceptance/src/run-repair-handoff.ts`，让 `repair-handoff-package.json` / `.md` 输出同类 actionability 字段，并把 `tasks[].actionability` 加入 agentContract read order。
+- 新增 `docs/operations/repair-task-actionability-runtime-v0.1.md`，级联更新 README、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/repair-plan.test.ts` 和 `tests/unit/repair-handoff.test.ts`，测试因 actionability 字段缺失按预期失败；再更新 `tests/unit/project-structure.test.ts`，测试因 operation 文档缺失按预期失败。
+- Green：实现 repair task package 与 repair handoff package 的 actionability 字段、Markdown 输出和 no-auto-apply boundary。
+- Structure：更新 `tests/unit/project-structure.test.ts`，守护 runtime 文档和级联记录。
+
+### 边界
+
+- No target repo material was uploaded。
+- No automatic patch application was executed。
+- No target repository files were modified。
+- No branch、commit、issue、pull request 或 advisory was created。
+- No Action Authorization Receipt was produced。
+- No npm publication was executed。
+- No GitHub release was executed。
+- No public launch or production marketing announcement was executed。
+- No customer contact was executed。
+- No pricing change or spend was executed。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was executed。
+
 ## 2026年7月3日 - AI IDE Handoff Material Quality Runtime v0.1
 
 ### 完成内容

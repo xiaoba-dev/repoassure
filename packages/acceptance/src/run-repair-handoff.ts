@@ -64,8 +64,24 @@ export interface RepairHandoffTask {
     commands: string[];
     acceptanceCriteria: string[];
   };
+  actionability: RepairHandoffTaskActionability;
   risks: string[];
   handoffPrompt: string;
+}
+
+export interface RepairHandoffTaskActionability {
+  dependencies: string[];
+  suggestedVerificationCommands: Array<{ command: string; purpose: string; required: boolean }>;
+  patchApplicabilityEvidence: {
+    sourceEvidence: string[];
+    targetAreas: string[];
+    requiresManualReview: boolean;
+    notes: string[];
+  };
+  aiIdeExecutionPrompt: string;
+  manualReviewBoundary: string[];
+  riskNotes: string[];
+  noAutoApplyBoundary: string[];
 }
 
 export interface RepairHandoffAgentContract {
@@ -293,6 +309,7 @@ function buildRepairHandoffAgentContract(): RepairHandoffAgentContract {
       'tasks[].evidence',
       'tasks[].recommendedFix',
       'tasks[].verification.commands',
+      'tasks[].actionability',
       'tasks[].handoffPrompt'
     ],
     nextCommands: {
@@ -302,6 +319,7 @@ function buildRepairHandoffAgentContract(): RepairHandoffAgentContract {
     },
     boundaries: [
       'Does not modify target repository files.',
+      'Does not auto-apply patches or edit target repository files without maintainer review.',
       'Does not create branches, commits, issues, pull requests, or advisories.',
       'Read redacted evidence only; do not infer or reconstruct secrets.'
     ]
@@ -377,6 +395,7 @@ function buildCommandFailureTask(input: {
         'repair-handoff-package.json 不再包含当前 taskId。'
       ]
     },
+    actionability: buildCommandFailureActionability(taskId, command),
     risks: [
       '只修复命令输出中的表层症状可能掩盖真实行为缺陷。',
       '静态检查修复可能影响公共 API，需要同步运行项目测试。'
@@ -437,9 +456,98 @@ function buildCheckFailureTask(input: {
         '新的 repair handoff 不再包含当前 taskId。'
       ]
     },
+    actionability: buildCheckFailureActionability(taskId, name, input.check.required ?? false),
     risks: ['验收项可能依赖外部环境，修复前需要区分产品问题和环境阻塞。'],
     handoffPrompt: cleanText(`你是接手目标 repo 的修复 Agent。请修复验收项 ${name}。不要降低验收门槛；修复后重新运行 acceptance flow。`)
   };
+}
+
+function buildCommandFailureActionability(taskId: string, command: string): RepairHandoffTaskActionability {
+  return {
+    dependencies: ['none'],
+    suggestedVerificationCommands: [
+      {
+        command,
+        purpose: 'Re-run the failed acceptance command after the minimal repair.',
+        required: true
+      }
+    ].map((item) => ({
+      command: cleanText(item.command),
+      purpose: cleanText(item.purpose),
+      required: item.required
+    })),
+    patchApplicabilityEvidence: {
+      sourceEvidence: ['commandResult', 'sourceArtifacts'].map(cleanText),
+      targetAreas: [`command:${command}`].map(cleanText),
+      requiresManualReview: true,
+      notes: [
+        'Patch applicability depends on the failed command still reproducing in the target repo.',
+        'Review the generated diff before applying because RepoAssure handoff artifacts are advisory.'
+      ].map(cleanText)
+    },
+    aiIdeExecutionPrompt: cleanText(
+      `Do not auto-apply patches. Read evidence.commandResult and sourceArtifacts for ${taskId}, propose the smallest repair, then wait for maintainer review before editing target repo files.`
+    ),
+    manualReviewBoundary: buildManualReviewBoundary(),
+    riskNotes: [
+      `Command ${command} may fail for environment reasons as well as product defects.`,
+      'A passing single command does not replace the full acceptance flow.'
+    ].map(cleanText),
+    noAutoApplyBoundary: buildNoAutoApplyBoundary()
+  };
+}
+
+function buildCheckFailureActionability(
+  taskId: string,
+  checkName: string,
+  required: boolean
+): RepairHandoffTaskActionability {
+  return {
+    dependencies: ['none'],
+    suggestedVerificationCommands: [
+      {
+        command: 'pnpm user:accept -- --repo <repo> --decision pending',
+        purpose: 'Re-run the acceptance flow and confirm the failed check now passes.',
+        required: true
+      }
+    ],
+    patchApplicabilityEvidence: {
+      sourceEvidence: ['check', 'sourceArtifacts'].map(cleanText),
+      targetAreas: [`check:${checkName}`].map(cleanText),
+      requiresManualReview: true,
+      notes: [
+        'Patch applicability depends on the failed check still matching the target repo state.',
+        'Do not lower or remove acceptance checks to make the task disappear.'
+      ].map(cleanText)
+    },
+    aiIdeExecutionPrompt: cleanText(
+      `Do not auto-apply patches. Read evidence.check and sourceArtifacts for ${taskId}, keep the acceptance threshold intact, and wait for maintainer review before editing target repo files.`
+    ),
+    manualReviewBoundary: buildManualReviewBoundary(),
+    riskNotes: [
+      required
+        ? `Required acceptance check ${checkName} blocks delivery until fixed or explicitly accepted as risk.`
+        : `Optional acceptance check ${checkName} should be triaged without weakening the run policy.`,
+      'Acceptance checks can depend on local environment, credentials, or fixture setup.'
+    ].map(cleanText),
+    noAutoApplyBoundary: buildNoAutoApplyBoundary()
+  };
+}
+
+function buildManualReviewBoundary(): string[] {
+  return [
+    'Requires maintainer review before editing target repository files.',
+    'Requires maintainer review before creating branches, commits, issues, pull requests, or advisories.',
+    'Requires maintainer review before accepting any generated patch plan.'
+  ];
+}
+
+function buildNoAutoApplyBoundary(): string[] {
+  return [
+    'Do not auto-apply generated patches.',
+    'Do not edit target repository files without explicit maintainer approval.',
+    'Do not weaken tests, acceptance checks, or security evidence to make the task pass.'
+  ];
 }
 
 function isDuplicateCommandExecutionCheck(name: string | undefined, failedCommandValues: Set<string>): boolean {
@@ -462,6 +570,15 @@ function formatRepairHandoffTaskMarkdown(task: RepairHandoffTask): string {
 ### Verification
 
 ${task.verification.commands.map((command) => `- \`${command}\``).join('\n') || '- Re-run acceptance flow.'}
+
+### Actionability
+
+- Dependencies: ${task.actionability.dependencies.join(', ')}
+- Suggested verification: ${task.actionability.suggestedVerificationCommands.map((item) => `${item.command} (${item.purpose})`).join('；')}
+- Patch applicability: ${task.actionability.patchApplicabilityEvidence.notes.join('；')}
+- Manual review boundary: ${task.actionability.manualReviewBoundary.join('；')}
+- Risk notes: ${task.actionability.riskNotes.join('；')}
+- No-auto-apply boundary: ${task.actionability.noAutoApplyBoundary.join('；')}
 
 ### Handoff Prompt
 

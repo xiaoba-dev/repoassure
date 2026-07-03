@@ -1,5 +1,24 @@
 # 决策日志
 
+## 2026年7月3日 - Repair task actionability runtime
+
+### 决策
+
+接受 Repair Task Actionability Runtime v0.1：按 Product Backlog Prioritization v0.1 / Priority 3 实现最小本地 runtime，让 repair task package 和 repair handoff package 的任务具备更明确的 AI IDE / maintainer 执行判断字段。
+
+### 原因
+
+- 现有修复物料已经能列出任务，但 AI IDE 和 maintainer 还需要稳定字段判断任务依赖、验证命令、patch applicability evidence 和人工 review 边界。
+- `actionability` 元数据可以把 `dependencies`、`suggestedVerificationCommands`、`patchApplicabilityEvidence`、`aiIdeExecutionPrompt`、`manualReviewBoundary`、`riskNotes` 和 `noAutoApplyBoundary` 固定成机器可读 contract。
+- 明确 no-auto-apply boundary 可以减少 AI IDE 误把建议物料当成自动 patch 授权的风险。
+
+### 影响
+
+- 更新 `packages/repair-planner/src/generate-repair-plan.ts` 和 `packages/repair-planner/src/repair-plan.ts`。
+- 更新 `packages/acceptance/src/run-repair-handoff.ts`，repair handoff tasks 也写入 `actionability`。
+- 新增 `docs/operations/repair-task-actionability-runtime-v0.1.md` 和对应测试。
+- 本决策不自动应用 patch，不修改目标 repo，不创建 branch、commit、issue、pull request 或 advisory，不执行 npm publish、GitHub release、public launch、production marketing announcement、customer contact、pricing change、spend、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
+
 ## 2026年7月3日 - AI IDE handoff material quality runtime
 
 ### 决策

@@ -10,7 +10,33 @@ import {
   parseRepairExecuteArgs,
   runRepairExecute
 } from '../../packages/acceptance/src/run-repair-execute.js';
-import type { RepairHandoffPackage } from '../../packages/acceptance/src/run-repair-handoff.js';
+import type {
+  RepairHandoffPackage,
+  RepairHandoffTaskActionability
+} from '../../packages/acceptance/src/run-repair-handoff.js';
+
+function buildActionability(command: string): RepairHandoffTaskActionability {
+  return {
+    dependencies: ['none'],
+    suggestedVerificationCommands: [
+      {
+        command,
+        purpose: 'Re-run the failed acceptance command after the minimal repair.',
+        required: true
+      }
+    ],
+    patchApplicabilityEvidence: {
+      sourceEvidence: ['commandResult', 'sourceArtifacts'],
+      targetAreas: [`command:${command}`],
+      requiresManualReview: true,
+      notes: ['Review the generated diff before applying because RepoAssure handoff artifacts are advisory.']
+    },
+    aiIdeExecutionPrompt: 'Do not auto-apply patches.',
+    manualReviewBoundary: ['Requires maintainer review before editing target repository files.'],
+    riskNotes: [`Command ${command} may fail for environment reasons as well as product defects.`],
+    noAutoApplyBoundary: ['Do not auto-apply generated patches.']
+  };
+}
 
 function buildPackage(repoRoot: string): RepairHandoffPackage {
   return {
@@ -56,6 +82,7 @@ function buildPackage(repoRoot: string): RepairHandoffPackage {
           commands: ['ruff check .'],
           acceptanceCriteria: ['ruff exits zero']
         },
+        actionability: buildActionability('ruff check .'),
         risks: ['formatting can touch many files'],
         handoffPrompt: 'Fix ruff'
       },
@@ -76,6 +103,7 @@ function buildPackage(repoRoot: string): RepairHandoffPackage {
           commands: ['mypy .'],
           acceptanceCriteria: ['mypy exits zero']
         },
+        actionability: buildActionability('mypy .'),
         risks: ['type fixes can change behavior'],
         handoffPrompt: 'Fix mypy'
       }

@@ -158,6 +158,20 @@ describe('generateRepairPlan', () => {
           implementationSteps: string[];
         };
         verification: { acceptanceCriteria: string[]; commands: string[] };
+        actionability: {
+          dependencies: string[];
+          suggestedVerificationCommands: Array<{ command: string; purpose: string; required: boolean }>;
+          patchApplicabilityEvidence: {
+            sourceEvidence: string[];
+            targetAreas: string[];
+            requiresManualReview: boolean;
+            notes: string[];
+          };
+          aiIdeExecutionPrompt: string;
+          manualReviewBoundary: string[];
+          riskNotes: string[];
+          noAutoApplyBoundary: string[];
+        };
         handoffPrompt: string;
       }>;
     };
@@ -197,8 +211,26 @@ describe('generateRepairPlan', () => {
     expect(taskPackage.tasks[0]?.recommendedFix.changeScope.exclude).toContain('不要扩大到无关重构、格式化全仓代码或改变非相关业务行为。');
     expect(taskPackage.tasks[0]?.recommendedFix.implementationSteps).toContain('确认 acceptanceCriteria 全部满足后，再提交修复说明。');
     expect(taskPackage.tasks[0]?.verification.acceptanceCriteria.join('\n')).toContain('不再出现在重新生成的 findings 中');
+    expect(taskPackage.tasks[0]?.actionability).toMatchObject({
+      dependencies: ['none'],
+      patchApplicabilityEvidence: {
+        requiresManualReview: true
+      }
+    });
+    expect(taskPackage.tasks[0]?.actionability.suggestedVerificationCommands[0]).toMatchObject({
+      required: true
+    });
+    expect(taskPackage.tasks[0]?.actionability.suggestedVerificationCommands[0]?.command).toContain('HARDENING_BASE_URL=');
+    expect(taskPackage.tasks[0]?.actionability.patchApplicabilityEvidence.sourceEvidence.join('\n')).toContain('findings.json');
+    expect(taskPackage.tasks[0]?.actionability.patchApplicabilityEvidence.targetAreas.join('\n')).toContain('route:/dashboard');
+    expect(taskPackage.tasks[0]?.actionability.aiIdeExecutionPrompt).toContain('先不要自动应用 patch');
+    expect(taskPackage.tasks[0]?.actionability.manualReviewBoundary.join('\n')).toContain('maintainer review');
+    expect(taskPackage.tasks[0]?.actionability.riskNotes.join('\n')).toContain('P0');
+    expect(taskPackage.tasks[0]?.actionability.noAutoApplyBoundary.join('\n')).toContain('Do not auto-apply');
     expect(taskPackage.tasks[0]?.handoffPrompt).toContain('你是接手目标 repo 的修复 Agent');
     expect(taskPackageMarkdown).toContain('# Executable Repair Task Package');
+    expect(taskPackageMarkdown).toContain('### Actionability');
+    expect(taskPackageMarkdown).toContain('Do not auto-apply');
     expect(taskPackageMarkdown).toContain('### Handoff Prompt');
   });
 

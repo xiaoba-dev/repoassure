@@ -27,6 +27,12 @@ export interface PythonCliAcceptanceArtifacts {
   repairTaskPackageMarkdownPath: string;
 }
 
+interface PythonCliEnvironmentPrerequisite {
+  command: string;
+  issue: 'missing_command';
+  setupHint: string;
+}
+
 export async function writePythonCliAcceptanceArtifacts(input: PythonCliAcceptanceArtifactsInput): Promise<PythonCliAcceptanceArtifacts> {
   const generatedAt = input.generatedAt ?? new Date().toISOString();
   const runId = `run-${formatRunIdTimestamp(generatedAt)}`;
@@ -96,6 +102,8 @@ ${formatCommandList([...smokeCommands, ...staticCommands])}
 }
 
 function buildRepairPlan(input: PythonCliAcceptanceArtifactsInput, artifacts: PythonCliAcceptanceArtifacts): unknown {
+  const environmentPrerequisites = buildEnvironmentPrerequisites(input.commandResults ?? []);
+
   return {
     schemaVersion: 1,
     mode: 'cli',
@@ -113,11 +121,13 @@ function buildRepairPlan(input: PythonCliAcceptanceArtifactsInput, artifacts: Py
       staticCommands: input.staticCommands,
       commandResults: input.commandResults ?? []
     },
+    environmentPrerequisites,
     tasks: [
       {
         id: 'PYCLI-001',
         title: formatRepairTaskTitle(input.commandResults ?? []),
         priority: input.profile.blockers.length > 0 || hasFailedCommand(input.commandResults ?? []) ? 'P1' : 'P2',
+        guidance: formatRepairTaskGuidance(environmentPrerequisites),
         verificationCommands: formatCommandValues([...input.smokeCommands, ...input.staticCommands])
       }
     ]
@@ -129,16 +139,20 @@ function formatRepairPlanMarkdown(
   smokeCommands: PythonCliCheckCommand[],
   staticCommands: PythonCliCheckCommand[]
 ): string {
+  const verificationCommands = formatCommandValues([...smokeCommands, ...staticCommands]);
+
   return `# Python/CLI Repair Plan
 
 - Mode: cli
 - Project: ${profile.projectName ?? 'n/a'}
 - Blockers: ${profile.blockers.length}
-- Verification commands: ${formatCommandValues([...smokeCommands, ...staticCommands]).join('; ') || 'n/a'}
+- Verification commands: ${verificationCommands.join('; ') || 'n/a'}
 `;
 }
 
 function buildRepairTaskPackage(input: PythonCliAcceptanceArtifactsInput, artifacts: PythonCliAcceptanceArtifacts): unknown {
+  const environmentPrerequisites = buildEnvironmentPrerequisites(input.commandResults ?? []);
+
   return {
     schemaVersion: 1,
     mode: 'cli',
@@ -152,6 +166,7 @@ function buildRepairTaskPackage(input: PythonCliAcceptanceArtifactsInput, artifa
       reportPath: artifacts.reportPath,
       repairPlanPath: artifacts.repairPlanPath
     },
+    environmentPrerequisites,
     commandResults: input.commandResults ?? [],
     verificationCommands: formatCommandValues([...input.smokeCommands, ...input.staticCommands])
   };
@@ -170,6 +185,10 @@ Project: ${profile.projectName ?? 'n/a'}
 Use this package to improve Python CLI behavior, then verify with:
 
 ${formatCommandList([...smokeCommands, ...staticCommands])}
+
+## Python/CLI environment prerequisites
+
+${formatEnvironmentPrerequisiteList(commandResults)}
 
 ## Current Execution Results
 
@@ -255,7 +274,75 @@ function hasFailedCommand(results: PythonCliCheckCommandResult[]): boolean {
 }
 
 function formatRepairTaskTitle(results: PythonCliCheckCommandResult[]): string {
+  if (buildEnvironmentPrerequisites(results).length > 0) {
+    return 'Prepare Python/CLI environment before rerunning acceptance checks';
+  }
+
   return hasFailedCommand(results)
     ? 'Fix failing Python/CLI acceptance checks'
     : 'Review Python/CLI acceptance findings and harden CLI behavior';
+}
+
+function buildEnvironmentPrerequisites(results: PythonCliCheckCommandResult[]): PythonCliEnvironmentPrerequisite[] {
+  const seen = new Set<string>();
+  const prerequisites: PythonCliEnvironmentPrerequisite[] = [];
+
+  for (const result of results) {
+    if (!isMissingCommandResult(result) || seen.has(result.command)) {
+      continue;
+    }
+
+    seen.add(result.command);
+    prerequisites.push({
+      command: result.command,
+      issue: 'missing_command',
+      setupHint: formatPythonCliSetupHint(result.command)
+    });
+  }
+
+  return prerequisites;
+}
+
+function isMissingCommandResult(result: PythonCliCheckCommandResult): boolean {
+  const text = `${result.stderr} ${result.stdout}`.toLowerCase();
+
+  return result.exitCode !== 0
+    && !result.timedOut
+    && (
+      text.includes('enoent') ||
+      text.includes('command not found') ||
+      text.includes('not found:') ||
+      text.includes('no such file or directory')
+    );
+}
+
+function formatPythonCliSetupHint(command: string): string {
+  return [
+    `Command \`${command}\` was not available in PATH.`,
+    'Create or activate a local .venv, run `python -m pip install -e ".[dev]"` when the target repo exposes dev extras, or install the documented equivalent dependencies before rerunning acceptance.'
+  ].join(' ');
+}
+
+function formatRepairTaskGuidance(prerequisites: PythonCliEnvironmentPrerequisite[]): string[] {
+  if (prerequisites.length === 0) {
+    return [];
+  }
+
+  return [
+    'Create or activate the target repository .venv before changing product code.',
+    'Install the target package and dev tooling locally with python -m pip install -e ".[dev]" when available.',
+    `Rerun missing commands after setup: ${prerequisites.map((item) => item.command).join(', ')}.`
+  ];
+}
+
+function formatEnvironmentPrerequisiteList(results: PythonCliCheckCommandResult[]): string {
+  const prerequisites = buildEnvironmentPrerequisites(results);
+
+  if (prerequisites.length === 0) {
+    return '- None detected.';
+  }
+
+  return prerequisites
+    .map((prerequisite) => `- \`${prerequisite.command}\`: ${prerequisite.setupHint}`)
+    .join('\n');
 }

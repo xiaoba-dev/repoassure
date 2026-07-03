@@ -1,5 +1,5 @@
 import { access, readdir, readFile } from 'node:fs/promises';
-import { basename, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 
 export type Framework = 'nextjs' | 'vite' | 'react' | 'unknown';
 export type PackageManager = 'npm' | 'pnpm' | 'yarn' | 'bun' | 'unknown';
@@ -183,6 +183,22 @@ function parseWorkspacePatterns(value: unknown): string[] {
 }
 
 async function detectPackageManager(root: string, packageJson: PackageJsonShape | null): Promise<PackageManager> {
+  const localPackageManager = await detectPackageManagerInDirectory(root);
+
+  if (localPackageManager !== 'unknown') {
+    return localPackageManager;
+  }
+
+  const packageManagerField = parsePackageManagerField(packageJson?.packageManager ?? null);
+
+  if (packageManagerField !== 'unknown') {
+    return packageManagerField;
+  }
+
+  return await detectAncestorWorkspacePackageManager(root);
+}
+
+async function detectPackageManagerInDirectory(root: string): Promise<PackageManager> {
   if (await exists(join(root, 'pnpm-lock.yaml'))) {
     return 'pnpm';
   }
@@ -199,7 +215,42 @@ async function detectPackageManager(root: string, packageJson: PackageJsonShape 
     return 'bun';
   }
 
-  return parsePackageManagerField(packageJson?.packageManager ?? null);
+  return 'unknown';
+}
+
+async function detectAncestorWorkspacePackageManager(root: string): Promise<PackageManager> {
+  let current = dirname(root);
+
+  while (current !== dirname(current)) {
+    if (await hasWorkspaceContext(current)) {
+      const localPackageManager = await detectPackageManagerInDirectory(current);
+
+      if (localPackageManager !== 'unknown') {
+        return localPackageManager;
+      }
+
+      const packageJson = await readPackageJson(current, []);
+      const packageManagerField = parsePackageManagerField(packageJson?.packageManager ?? null);
+
+      if (packageManagerField !== 'unknown') {
+        return packageManagerField;
+      }
+    }
+
+    current = dirname(current);
+  }
+
+  return 'unknown';
+}
+
+async function hasWorkspaceContext(root: string): Promise<boolean> {
+  if (await exists(join(root, 'pnpm-workspace.yaml'))) {
+    return true;
+  }
+
+  const packageJson = await readPackageJson(root, []);
+
+  return Boolean(packageJson && packageJson.workspaces.length > 0);
 }
 
 function parsePackageManagerField(value: string | null): PackageManager {

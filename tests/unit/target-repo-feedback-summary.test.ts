@@ -124,4 +124,39 @@ describe('target repo feedback summary', () => {
     expect(summary.targetRepoMetadataClass).toBe('private_repo_redacted');
     expect(manifest.artifacts.targetRepoFeedbackSummaryPath).toBe(result.summaryPath);
   });
+
+  it('classifies missing Python CLI tools as environment blockers with setup guidance', () => {
+    const checks: UserAcceptanceCheck[] = [
+      {
+        name: 'Python CLI check 执行: agent-reach --help',
+        required: true,
+        status: 'failed',
+        evidence: 'exit=1 stderr=spawn agent-reach ENOENT'
+      },
+      {
+        name: 'repair-plan.json 已生成',
+        required: true,
+        status: 'passed',
+        evidence: '/tmp/run/repair-plan.json'
+      }
+    ];
+
+    const summary = buildTargetRepoFeedbackSummary({
+      generatedAt: '2026-07-03T00:00:00.000Z',
+      mode: 'cli',
+      repoRoot: '/private/tmp/agent-reach',
+      runDir: '/private/tmp/agent-reach/.hardening/runs/run-2026-07-03T00-00-00-000Z',
+      manifestPath: '/private/tmp/agent-reach/.hardening/runs/run-2026-07-03T00-00-00-000Z/manifest.json',
+      repairPlanPath: '/private/tmp/agent-reach/.hardening/runs/run-2026-07-03T00-00-00-000Z/repair-plan.json',
+      generatedTestFiles: [],
+      artifactFiles: [],
+      checks
+    });
+
+    expect(summary.runStatus).toBe('blocked');
+    expect(summary.blockerCategory).toBe('environment');
+    expect(summary.nextRecommendedProductAction).toBe('document_target_stack');
+    expect(summary.maintainerTriageGuidance).toContain('Python/CLI environment');
+    expect(summary.maintainerTriageGuidance).toContain('.venv');
+  });
 });

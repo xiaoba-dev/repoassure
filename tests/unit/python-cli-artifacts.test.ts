@@ -56,4 +56,57 @@ describe('python cli artifacts', () => {
       await rm(repoRoot, { recursive: true, force: true });
     }
   });
+
+  it('adds actionable environment prerequisite guidance for missing CLI and Python tooling', async () => {
+    const repoRoot = await mkdtemp(join(tmpdir(), 'hardening-python-cli-missing-tools-'));
+    const profile: PythonCliProfile = {
+      repoRoot,
+      pyprojectPath: join(repoRoot, 'pyproject.toml'),
+      projectName: 'agent-reach',
+      requiresPython: '>=3.11',
+      dependencies: ['requests'],
+      optionalDependencies: { dev: ['pytest', 'ruff', 'mypy'] },
+      consoleScripts: { 'agent-reach': 'agent_reach.cli:main' },
+      blockers: [],
+      confidence: 'high'
+    };
+
+    try {
+      const smokeCommands = buildPythonCliSmokeCommands(profile);
+      const staticCommands = detectPythonCliStaticCheckCommands(profile);
+      const artifacts = await writePythonCliAcceptanceArtifacts({
+        repoRoot,
+        profile,
+        smokeCommands,
+        staticCommands,
+        commandResults: [
+          { command: 'agent-reach', args: ['--help'], exitCode: 1, stdout: '', stderr: 'spawn agent-reach ENOENT', timedOut: false },
+          { command: 'pytest', args: [], exitCode: 1, stdout: '', stderr: 'spawn pytest ENOENT', timedOut: false },
+          { command: 'ruff', args: ['check', '.'], exitCode: 1, stdout: '', stderr: 'spawn ruff ENOENT', timedOut: false },
+          { command: 'mypy', args: ['.'], exitCode: 1, stdout: '', stderr: 'spawn mypy ENOENT', timedOut: false }
+        ],
+        generatedAt: '2026-07-03T00:00:00.000Z'
+      });
+
+      const repairPlan = JSON.parse(await readFile(artifacts.repairPlanPath, 'utf8')) as {
+        environmentPrerequisites?: Array<{ command: string; setupHint: string }>;
+        tasks: Array<{ title: string; guidance?: string[] }>;
+      };
+      const repairTaskPackage = await readFile(artifacts.repairTaskPackageMarkdownPath, 'utf8');
+
+      expect(repairPlan.environmentPrerequisites).toEqual([
+        expect.objectContaining({ command: 'agent-reach', setupHint: expect.stringContaining('python -m pip install -e') }),
+        expect.objectContaining({ command: 'pytest', setupHint: expect.stringContaining('python -m pip install -e') }),
+        expect.objectContaining({ command: 'ruff', setupHint: expect.stringContaining('python -m pip install -e') }),
+        expect.objectContaining({ command: 'mypy', setupHint: expect.stringContaining('python -m pip install -e') })
+      ]);
+      expect(repairPlan.tasks[0]?.title).toBe('Prepare Python/CLI environment before rerunning acceptance checks');
+      expect(repairPlan.tasks[0]?.guidance?.join(' ')).toContain('.venv');
+      expect(repairTaskPackage).toContain('Python/CLI environment prerequisites');
+      expect(repairTaskPackage).toContain('agent-reach');
+      expect(repairTaskPackage).toContain('pytest');
+    } finally {
+      await rm(repoRoot, { recursive: true, force: true });
+    }
+  });
 });

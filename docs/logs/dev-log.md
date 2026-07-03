@@ -12780,3 +12780,26 @@ Phase 0：项目初始化。
 - No GitHub release was authorized。
 - No public launch or production marketing announcement was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
+## 2026年7月3日 - Real Target Campaign Follow-up Hardening v0.2
+
+### 完成内容
+
+- 新增 `docs/operations/real-target-campaign-followup-hardening-v0.2.md`。
+- 将 `agent-reach` Python/CLI 缺失 entrypoint、`pytest`、`ruff`、`mypy` 场景转成 `Python/CLI environment prerequisites` repair guidance。
+- 将缺命令 feedback summary 归类为 `environment` blocker、`blocked` run status，并推荐 `document_target_stack`。
+- 让 browser analyzer 在直接分析 nested UI package 时读取 parent pnpm workspace context，并推断 `pnpm dev`。
+- 级联更新 README、acceptance checklist、testing strategy、decision log 和 dev log。
+
+### TDD 记录
+
+- Red：先新增 `target-repo-feedback-summary.test.ts`、`python-cli-artifacts.test.ts`、`analyze-repo.test.ts` 和 `project-structure.test.ts` 覆盖真实目标 follow-up 缺口；测试分别因旧分类、缺少环境前置条件、缺少 parent workspace package manager 和文档缺失按预期失败。
+- Green：实现最小分类、repair artifact 输出和 analyzer parent workspace context 推断，并补齐级联文档。
+
+### 边界
+
+- No target repo material was uploaded。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。

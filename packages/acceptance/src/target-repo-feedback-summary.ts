@@ -188,6 +188,15 @@ function classifyBlockerCategory(checks: UserAcceptanceCheck[]): TargetRepoFeedb
     return 'generated_test_validation';
   }
 
+  if (
+    text.includes('enoent') ||
+    text.includes('command not found') ||
+    text.includes('not found:') ||
+    text.includes('no such file or directory')
+  ) {
+    return 'environment';
+  }
+
   if (text.includes('browser') || text.includes('explor')) {
     return 'browser_exploration';
   }
@@ -229,6 +238,10 @@ function recommendNextAction(
 
   if (blockerCategory === 'user_input_required') {
     return 'request_user_input';
+  }
+
+  if (blockerCategory === 'environment') {
+    return 'document_target_stack';
   }
 
   if (blockerCategory === 'browser_exploration') {
@@ -312,6 +325,10 @@ function formatMaintainerTriageGuidance(blockerCategory: TargetRepoFeedbackBlock
 
   if (blockerCategory === 'user_input_required') {
     return 'Treat this as a user-input request unless repeated valid target repos show the same failure.';
+  }
+
+  if (blockerCategory === 'environment') {
+    return 'Treat this as a Python/CLI environment prerequisite issue when the evidence shows ENOENT, command not found, timeout, or missing tool output. Check that the target repo has a documented setup path, create or activate .venv, install the project and dev extras with python -m pip install -e ".[dev]" when available, then rerun the linked acceptance commands before filing a product bug.';
   }
 
   return `Triage this as a possible product bug or docs task in area ${blockerCategory}; inspect linked artifacts before creating follow-up work.`;

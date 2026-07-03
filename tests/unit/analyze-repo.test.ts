@@ -543,6 +543,28 @@ describe('analyzeRepo', () => {
     expect(profile.confidence).toBe('high');
   });
 
+  it('uses parent pnpm workspace context when analyzing a nested web app package directly', async () => {
+    const root = await createRepo({
+      'package.json': JSON.stringify({
+        packageManager: 'pnpm@10.12.1'
+      }),
+      'pnpm-workspace.yaml': ['packages:', '  - "apps/*"'].join('\n'),
+      'pnpm-lock.yaml': 'lockfileVersion: 9.0',
+      'apps/openclaw-ui/package.json': JSON.stringify({
+        name: 'openclaw-ui',
+        scripts: { dev: 'vite --host 127.0.0.1' }
+      }),
+      'apps/openclaw-ui/vite.config.ts': 'export default {}'
+    });
+
+    const profile = await analyzeRepo({ root: join(root, 'apps/openclaw-ui') });
+
+    expect(profile.framework).toBe('vite');
+    expect(profile.packageManager).toBe('pnpm');
+    expect(profile.recommendedStartCommand).toBe('pnpm dev');
+    expect(profile.confidence).toBe('high');
+  });
+
   it('prefers lockfile package manager over package.json metadata', async () => {
     const root = await createRepo({
       'package.json': JSON.stringify({

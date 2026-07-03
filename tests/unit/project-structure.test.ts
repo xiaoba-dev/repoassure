@@ -2008,6 +2008,43 @@ describe('project structure', () => {
     await expectPath('docs/operations/real-target-validation-campaign-v0.1.md');
   });
 
+  it('records real target campaign follow-up hardening without uploading target artifacts', async () => {
+    const [
+      operation,
+      readme,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/real-target-campaign-followup-hardening-v0.2.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(operation).toContain('Real Target Campaign Follow-up Hardening v0.2');
+    expect(operation).toContain('Status: followup_hardening_implemented');
+    expect(operation).toContain('Python/CLI environment prerequisites');
+    expect(operation).toContain('agent-reach');
+    expect(operation).toContain('openclaw-ui');
+    expect(operation).toContain('parent pnpm workspace context');
+    expect(operation).toContain('document_target_stack');
+    expect(operation).toContain('No target repo material was uploaded');
+    expect(operation).toContain('No npm publication was executed');
+    expect(operation).toContain('No public launch or production marketing announcement was executed');
+    expect(readme).toContain('Real Target Campaign Follow-up Hardening v0.2');
+    expect(readme).toContain('Python/CLI environment prerequisites');
+    expect(testingStrategy).toContain('Real Target Campaign Follow-up Hardening v0.2');
+    expect(acceptanceChecklist).toContain('Real Target Campaign Follow-up Hardening v0.2');
+    expect(decisionLog).toContain('Real target campaign follow-up hardening');
+    expect(devLog).toContain('Real Target Campaign Follow-up Hardening v0.2');
+
+    await expectPath('docs/operations/real-target-campaign-followup-hardening-v0.2.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

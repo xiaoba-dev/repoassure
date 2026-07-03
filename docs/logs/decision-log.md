@@ -1,5 +1,24 @@
 # 决策日志
 
+## 2026年7月3日 - User validation evidence loop runtime
+
+### 决策
+
+接受 User Validation Evidence Loop Runtime v0.1：按 Product Backlog Prioritization v0.1 / Priority 4 实现最小本地 runtime，让 browser 和 Python/CLI user acceptance runs 生成可审计、可回放、可被 AI IDE 消费的 user validation evidence loop。
+
+### 原因
+
+- 真实 reviewer / maintainer 反馈不能只停留在非结构化 notes，需要可回放的 evidence package。
+- `user-validation-evidence-loop.json` 将 `feedbackEvents`、`evidenceSources`、`triage`、`qualityGates`、`redactionBoundary` 和 `nonAuthorizationBoundary` 固定成机器可读 contract。
+- 明确 non-authorization boundary 可以避免把 reviewer feedback、changes requested、accept risk 或 defer 误解为 public launch 或商业版 availability 授权。
+
+### 影响
+
+- 新增 `packages/acceptance/src/user-validation-evidence-loop.ts`。
+- 更新 `packages/acceptance/src/run-user-acceptance.ts`，browser 和 Python/CLI user acceptance runs 均写入 `user-validation-evidence-loop.json`。
+- 新增 `docs/operations/user-validation-evidence-loop-runtime-v0.1.md` 和对应测试。
+- 本决策不上传 reviewer feedback、target repo material 或 private artifacts，不存储 reviewer PII、raw email、OTP、cookie、Access token、login query-state、reviewer credentials、secrets 或 raw private repo content，不执行 npm publish、GitHub release、public launch、production marketing announcement、customer contact、pricing change、spend、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
+
 ## 2026年7月3日 - Repair task actionability runtime
 
 ### 决策

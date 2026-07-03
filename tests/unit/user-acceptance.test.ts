@@ -371,6 +371,7 @@ describe('user acceptance record', () => {
 
     const summaryPath = join(runDir, 'target-repo-feedback-summary.json');
     const handoffPackagePath = join(runDir, 'ai-ide-handoff-package.json');
+    const evidenceLoopPath = join(runDir, 'user-validation-evidence-loop.json');
     const summary = JSON.parse(await readFile(summaryPath, 'utf8')) as {
       runStatus: string;
       targetRepoMetadataClass: string;
@@ -381,10 +382,17 @@ describe('user acceptance record', () => {
       recommendedReadingOrder: Array<{ artifactKind: string; path: string }>;
       sourceSummary: { targetRepoFeedbackSummary: string };
     };
+    const evidenceLoop = JSON.parse(await readFile(evidenceLoopPath, 'utf8')) as {
+      schemaVersion: string;
+      validationStatus: string;
+      evidenceSources: Array<{ kind: string; path: string }>;
+      triage: { nextAction: string; launchAuthorization: string };
+    };
     const manifest = JSON.parse(await readFile(manifestPath, 'utf8')) as {
       artifacts: {
         aiIdeHandoffPackagePath?: string;
         targetRepoFeedbackSummaryPath?: string;
+        userValidationEvidenceLoopPath?: string;
       };
     };
     const markdown = await readFile(outputPath, 'utf8');
@@ -400,12 +408,25 @@ describe('user acceptance record', () => {
       path: 'target-repo-feedback-summary.json'
     });
     expect(handoffPackage.sourceSummary.targetRepoFeedbackSummary).toBe('target-repo-feedback-summary.json');
+    expect(evidenceLoop.schemaVersion).toBe('repoassure.user-validation-evidence-loop.v1');
+    expect(evidenceLoop.validationStatus).toBe('pending');
+    expect(evidenceLoop.evidenceSources).toContainEqual(expect.objectContaining({
+      kind: 'ai_ide_handoff_package',
+      path: 'ai-ide-handoff-package.json'
+    }));
+    expect(evidenceLoop.triage).toMatchObject({
+      nextAction: 'wait_for_maintainer_decision',
+      launchAuthorization: 'not_authorized'
+    });
     expect(manifest.artifacts.targetRepoFeedbackSummaryPath).toBe(summaryPath);
     expect(manifest.artifacts.aiIdeHandoffPackagePath).toBe(handoffPackagePath);
+    expect(manifest.artifacts.userValidationEvidenceLoopPath).toBe(evidenceLoopPath);
     expect(markdown).toContain('target-repo-feedback-summary.json 已生成');
     expect(markdown).toContain('ai-ide-handoff-package.json 已生成');
+    expect(markdown).toContain('user-validation-evidence-loop.json 已生成');
     expect(markdown).toContain(summaryPath);
     expect(markdown).toContain(handoffPackagePath);
+    expect(markdown).toContain(evidenceLoopPath);
   });
 
   it('escapes summary table cells in user acceptance records', () => {
@@ -992,28 +1013,43 @@ describe('user acceptance record', () => {
       const [runId] = await readdir(join(repoRoot, '.hardening', 'runs'));
       const runDir = join(repoRoot, '.hardening', 'runs', runId ?? '');
       const handoffPackagePath = join(runDir, 'ai-ide-handoff-package.json');
+      const evidenceLoopPath = join(runDir, 'user-validation-evidence-loop.json');
       const manifestPath = join(runDir, 'manifest.json');
       const handoffPackage = JSON.parse(await readFile(handoffPackagePath, 'utf8')) as {
         mode: string;
         recommendedReadingOrder: Array<{ artifactKind: string; path: string }>;
         sourceSummary: { targetRepoFeedbackSummary: string };
       };
+      const evidenceLoop = JSON.parse(await readFile(evidenceLoopPath, 'utf8')) as {
+        mode: string;
+        validationStatus: string;
+        evidenceSources: Array<{ kind: string; path: string }>;
+      };
       const manifest = JSON.parse(await readFile(manifestPath, 'utf8')) as {
         artifacts: {
           aiIdeHandoffPackagePath?: string;
           targetRepoFeedbackSummaryPath?: string;
+          userValidationEvidenceLoopPath?: string;
         };
       };
 
       expect(record).toContain('| ai-ide-handoff-package.json 已生成 | 是 | 通过 |');
+      expect(record).toContain('| user-validation-evidence-loop.json 已生成 | 是 | 通过 |');
       expect(handoffPackage.mode).toBe('cli');
       expect(handoffPackage.recommendedReadingOrder[0]).toMatchObject({
         artifactKind: 'target_repo_feedback_summary',
         path: 'target-repo-feedback-summary.json'
       });
       expect(handoffPackage.sourceSummary.targetRepoFeedbackSummary).toBe('target-repo-feedback-summary.json');
+      expect(evidenceLoop.mode).toBe('cli');
+      expect(evidenceLoop.validationStatus).toBe('pending');
+      expect(evidenceLoop.evidenceSources).toContainEqual(expect.objectContaining({
+        kind: 'user_acceptance_record',
+        path: '../../../records/user-acceptance.md'
+      }));
       expect(manifest.artifacts.targetRepoFeedbackSummaryPath).toBe(join(runDir, 'target-repo-feedback-summary.json'));
       expect(manifest.artifacts.aiIdeHandoffPackagePath).toBe(handoffPackagePath);
+      expect(manifest.artifacts.userValidationEvidenceLoopPath).toBe(evidenceLoopPath);
     } finally {
       stdout.mockRestore();
       await rm(repoRoot, { recursive: true, force: true });

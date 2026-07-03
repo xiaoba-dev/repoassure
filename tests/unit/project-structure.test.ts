@@ -1872,6 +1872,52 @@ describe('project structure', () => {
     await expectPath('docs/operations/repair-task-actionability-runtime-v0.1.md');
   });
 
+  it('records user validation evidence loop runtime without launch actions', async () => {
+    const [
+      runtime,
+      readme,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/user-validation-evidence-loop-runtime-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(runtime).toContain('User Validation Evidence Loop Runtime v0.1');
+    expect(runtime).toContain('user_validation_evidence_loop_runtime_implemented');
+    expect(runtime).toContain('Product Backlog Prioritization v0.1 / Priority 4');
+    expect(runtime).toContain('Implementation status: `implemented_minimal_runtime`');
+    expect(runtime).toContain('Launch authorization status: `not_authorized`');
+    expect(runtime).toContain('user-validation-evidence-loop.json');
+    expect(runtime).toContain('repoassure.user-validation-evidence-loop.v1');
+    expect(runtime).toContain('artifacts.userValidationEvidenceLoopPath');
+    expect(runtime).toContain('feedbackEvents');
+    expect(runtime).toContain('evidenceSources');
+    expect(runtime).toContain('triage');
+    expect(runtime).toContain('qualityGates');
+    expect(runtime).toContain('redactionBoundary');
+    expect(runtime).toContain('nonAuthorizationBoundary');
+    expect(runtime).toContain('packages/acceptance/src/user-validation-evidence-loop.ts');
+    expect(runtime).toContain('@hardening-mcp/acceptance/user-validation-evidence-loop');
+    expect(runtime).toContain('No reviewer PII');
+    expect(runtime).toContain('npm publication');
+    expect(runtime).toContain('hosted dashboard availability claims');
+    expect(readme).toContain('User validation evidence loop runtime');
+    expect(readme).toContain('user-validation-evidence-loop.json');
+    expect(testingStrategy).toContain('User Validation Evidence Loop Runtime v0.1');
+    expect(acceptanceChecklist).toContain('User Validation Evidence Loop Runtime v0.1');
+    expect(decisionLog).toContain('User validation evidence loop runtime');
+    expect(devLog).toContain('User Validation Evidence Loop Runtime v0.1');
+
+    await expectPath('docs/operations/user-validation-evidence-loop-runtime-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
@@ -3999,7 +4045,8 @@ describe('project structure', () => {
       'user-acceptance-args',
       'user-acceptance-handoff',
       'user-acceptance-record',
-      'user-acceptance-runner-helpers'
+      'user-acceptance-runner-helpers',
+      'user-validation-evidence-loop'
     ]);
     expect([...acceptanceCompatibilityContract.packageOwnedModules].sort()).toEqual(packageModuleNames);
     expect(acceptancePackageSourceEntries.map((entry) => entry.moduleName).sort()).toEqual(packageModuleNames);

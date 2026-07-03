@@ -21,6 +21,7 @@ import {
 import { redactSensitiveText } from './redaction.js';
 import { writeAiIdeHandoffPackageArtifact } from './ai-ide-handoff-package.js';
 import { writeTargetRepoFeedbackSummaryArtifact } from './target-repo-feedback-summary.js';
+import { writeUserValidationEvidenceLoopArtifact } from './user-validation-evidence-loop.js';
 import { buildUserAcceptanceMarkdown, type UserAcceptanceCheck } from './user-acceptance.js';
 import {
   formatUserAcceptanceCommand,
@@ -286,10 +287,29 @@ export async function runUserAcceptance(
         feedbackSummaryCheck
       ]
     });
+    const handoffPackageCheck = buildAiIdeHandoffPackageCheck(handoffPackage.handoffPackagePath);
+    const evidenceLoop = await writeUserValidationEvidenceLoopArtifact({
+      generatedAt: new Date().toISOString(),
+      mode: options.mode,
+      runDir: dirname(result.artifactBundle.manifestPath),
+      manifestPath: result.artifactBundle.manifestPath,
+      userAcceptanceRecordPath: options.outputPath,
+      targetRepoFeedbackSummaryPath: feedbackSummary.summaryPath,
+      aiIdeHandoffPackagePath: handoffPackage.handoffPackagePath,
+      decision: options.decision,
+      notes: options.notes,
+      checks: [
+        ...repoPreflightChecks,
+        ...artifactChecks,
+        feedbackSummaryCheck,
+        handoffPackageCheck
+      ]
+    });
     const checks = [
       ...artifactChecks,
       feedbackSummaryCheck,
-      buildAiIdeHandoffPackageCheck(handoffPackage.handoffPackagePath)
+      handoffPackageCheck,
+      buildUserValidationEvidenceLoopCheck(evidenceLoop.evidenceLoopPath)
     ];
     const markdown = buildUserAcceptanceMarkdown({
       generatedAt: new Date().toISOString(),
@@ -405,7 +425,24 @@ async function runPythonCliUserAcceptance(
         feedbackSummaryCheck
       ]
     });
-    checks.push(feedbackSummaryCheck, buildAiIdeHandoffPackageCheck(handoffPackage.handoffPackagePath));
+    const handoffPackageCheck = buildAiIdeHandoffPackageCheck(handoffPackage.handoffPackagePath);
+    const evidenceLoop = await writeUserValidationEvidenceLoopArtifact({
+      generatedAt: new Date().toISOString(),
+      mode: options.mode,
+      runDir: artifacts.runDir,
+      manifestPath: artifacts.manifestPath,
+      userAcceptanceRecordPath: options.outputPath,
+      targetRepoFeedbackSummaryPath: feedbackSummary.summaryPath,
+      aiIdeHandoffPackagePath: handoffPackage.handoffPackagePath,
+      decision: options.decision,
+      notes: options.notes,
+      checks: [
+        ...checks,
+        feedbackSummaryCheck,
+        handoffPackageCheck
+      ]
+    });
+    checks.push(feedbackSummaryCheck, handoffPackageCheck, buildUserValidationEvidenceLoopCheck(evidenceLoop.evidenceLoopPath));
     const markdown = buildUserAcceptanceMarkdown({
       generatedAt: new Date().toISOString(),
       repoRoot: options.repoRoot,
@@ -455,6 +492,15 @@ function buildAiIdeHandoffPackageCheck(handoffPackagePath: string): UserAcceptan
     required: true,
     status: 'passed',
     evidence: handoffPackagePath
+  };
+}
+
+function buildUserValidationEvidenceLoopCheck(evidenceLoopPath: string): UserAcceptanceCheck {
+  return {
+    name: 'user-validation-evidence-loop.json 已生成',
+    required: true,
+    status: 'passed',
+    evidence: evidenceLoopPath
   };
 }
 

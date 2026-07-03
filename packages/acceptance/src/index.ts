@@ -217,6 +217,21 @@ export {
 } from './ai-ide-handoff-package.js';
 
 export {
+  buildUserValidationEvidenceLoop,
+  writeUserValidationEvidenceLoopArtifact,
+  type UserValidationDecision,
+  type UserValidationEvidenceLoop,
+  type UserValidationEvidenceLoopInput,
+  type UserValidationEvidenceSource,
+  type UserValidationFeedbackEvent,
+  type UserValidationFeedbackItem,
+  type UserValidationNextAction,
+  type UserValidationSource,
+  type UserValidationStatus,
+  type WriteUserValidationEvidenceLoopResult
+} from './user-validation-evidence-loop.js';
+
+export {
   formatUserAcceptanceCommand,
   parseUserAcceptanceArgs,
   type UserAcceptanceCliOptions,

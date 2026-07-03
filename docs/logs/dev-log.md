@@ -1,5 +1,36 @@
 # 开发日志
 
+## 2026年7月3日 - User Validation Evidence Loop Runtime v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/user-validation-evidence-loop.ts`。
+- 更新 `packages/acceptance/src/run-user-acceptance.ts`，browser 和 Python/CLI user acceptance runs 写入 run-scoped `user-validation-evidence-loop.json`。
+- Evidence loop schema 为 `repoassure.user-validation-evidence-loop.v1`。
+- Evidence loop 包含 `feedbackEvents`、`evidenceSources`、`triage`、`qualityGates`、`redactionBoundary`、`nonAuthorizationBoundary` 和 `sourceSummary`。
+- Evidence loop 使用 relative artifact links，并从 manifest 记录 `artifacts.userValidationEvidenceLoopPath`。
+- 新增 `docs/operations/user-validation-evidence-loop-runtime-v0.1.md`，级联更新 README、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：新增 `tests/unit/user-validation-evidence-loop.test.ts` 和 `tests/unit/user-acceptance.test.ts` runner 集成断言，测试因 `user-validation-evidence-loop.ts` 缺失、runner 未写 evidence loop 按预期失败。
+- Red：更新 `tests/unit/project-structure.test.ts`，测试因 operation 文档和级联文档缺失按预期失败。
+- Green：实现 evidence loop builder/writer、manifest backlink、browser runner 接入和 Python/CLI runner 接入。
+- Structure：更新 `tests/unit/project-structure.test.ts`，守护 runtime 文档和级联记录。
+
+### 边界
+
+- No reviewer feedback was uploaded。
+- No target repo material or private artifacts were uploaded。
+- No reviewer PII、raw email、OTP、cookie、Access token、login query-state、reviewer credentials、secrets、raw private repo content、env values、raw private source 或 absolute workstation paths may be stored in the evidence loop package。
+- No Action Authorization Receipt was produced。
+- No npm publication was executed。
+- No GitHub release was executed。
+- No public launch or production marketing announcement was executed。
+- No customer contact was executed。
+- No pricing change or spend was executed。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was executed。
+
 ## 2026年7月3日 - Repair Task Actionability Runtime v0.1
 
 ### 完成内容

@@ -50,6 +50,7 @@
     "acceptance": "node packages/acceptance/dist/run-acceptance.js",
     "pregoal:audit": "pnpm build",
     "goal:audit": "node packages/acceptance/dist/run-goal-audit.js",
+    "campaign:summarize": "pnpm build:acceptance && node scripts/summarize-validation-campaign.mjs",
     "preuser:accept": "pnpm build",
     "user:accept": "node packages/acceptance/dist/run-user-acceptance.js",
     "preuser:handoff": "pnpm build",

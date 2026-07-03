@@ -122,6 +122,39 @@ describe('release readiness hygiene evidence', () => {
     expect(result.evidence.status).toBe('ready_evidence_only');
   });
 
+  it('does not treat launch authorization status text as an Authorization header secret', async () => {
+    const { generateReleaseHygieneEvidence } = await importReleaseHygieneModule();
+    const workspace = await buildWorkspace({ authorization: true });
+    const inputPath = join(workspace, 'tracked.txt');
+    const strategyDoc = join(workspace, 'docs', 'product', 'strategy', 'launch-boundary.md');
+    await writeFile(strategyDoc, 'Launch authorization: `not_authorized`\n');
+    await writeFile(inputPath, [
+      'package.json',
+      '.gitignore',
+      'LICENSE',
+      'CONTRIBUTING.md',
+      'SECURITY.md',
+      'docs/product/strategy/dependency-license-audit-v0.1.md',
+      'docs/product/strategy/public-release-authorization-v0.1.md',
+      'docs/product/strategy/public-release-checklist-v0.1.md',
+      'docs/product/strategy/public-release-notes-v0.1.md',
+      'docs/product/strategy/launch-boundary.md'
+    ].join('\n'));
+
+    const result = await generateReleaseHygieneEvidence({
+      cwd: workspace,
+      inputPath,
+      outputDir: join(workspace, 'artifacts', 'release-hygiene'),
+      generatedAt: '2026-07-03T09:30:00.000Z'
+    });
+
+    expect(result.evidence.checks).toContainEqual(expect.objectContaining({
+      id: 'sensitive-material-scan',
+      status: 'passed'
+    }));
+    expect(result.evidence.status).toBe('ready_evidence_only');
+  });
+
   it('keeps historical logs outside the default release hygiene scan scope', async () => {
     const { generateReleaseHygieneEvidence } = await importReleaseHygieneModule();
     const workspace = await buildWorkspace({ authorization: true });

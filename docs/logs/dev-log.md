@@ -1,5 +1,40 @@
 # 开发日志
 
+## 2026年7月3日 - Real Target Repo Validation Campaign v0.1
+
+### 完成内容
+
+- 在隔离 worktree 中执行真实目标 repo campaign，不触碰主工作区未提交改动。
+- 目标 `agent-reach` 使用 Python/CLI mode：evidence package 完整生成，但 CLI smoke / pytest / ruff / mypy 因目标环境未安装 entrypoint/tooling 失败，runStatus 为 failed，product action 为 `improve_repair_plan`。
+- 目标 `odinsight` 使用 browser mode：安装目标 npm 依赖后通过 acceptance，生成 hardening report、feedback summary、AI IDE handoff、user validation evidence loop、repair package、截图和 generated spec，runStatus 为 passed。
+- 目标 `openclaw-ui` 使用 browser mode：作为 complex monorepo UI 子应用生成 report、repair package、handoff 和 generated spec，但无可用 URL/start command，browser artifacts 失败；修复后 evidence 变为 `browser requested but no browser artifacts were generated; boot-result.json status=failed; details=No URL or start command is available`。
+- 新增 `packages/acceptance/src/campaign-summary.ts`，schema 为 `repoassure.validation-campaign-summary.v1`。
+- 新增 `scripts/summarize-validation-campaign.mjs` 和 `pnpm campaign:summarize`，生成 local `campaign-summary.json` / `.md`。
+- 新增 `docs/operations/real-target-validation-campaign-v0.1.md`，级联更新 README、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：新增 `tests/unit/user-acceptance.test.ts` missing browser artifact context 用例，测试因旧文案 `browser mode not requested or no artifacts` 按预期失败。
+- Green：在 `buildUserAcceptanceArtifactChecks` 中读取 `boot-result.json` context，并从 `run-user-acceptance` 传入 run-scoped `boot-result.json` 路径。
+- Red：新增 `tests/unit/campaign-summary.test.ts`，测试因 `campaign-summary` 模块缺失按预期失败。
+- Green：实现 campaign summary builder/writer 和 CLI wrapper，并修复 pnpm 传入 `--` 分隔符时的参数兼容。
+- Red：新增 `tests/unit/project-structure.test.ts` 结构级联测试，测试因 operation 文档缺失按预期失败。
+- Green：补齐 operation 文档和级联文档。
+
+### 边界
+
+- Real target evidence remains local only。
+- No target repo material was uploaded。
+- No private artifacts, reviewer feedback, customer data, secrets or raw private repo content were uploaded。
+- No raw email、OTP、cookie、Access token、login query-state、reviewer credentials、env values、raw private source 或 target repo raw content may be stored in committed docs。
+- No Action Authorization Receipt was produced。
+- No npm publication was executed。
+- No GitHub release was executed。
+- No public launch or production marketing announcement was executed。
+- No customer contact was executed。
+- No pricing change or spend was executed。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was executed。
+
 ## 2026年7月3日 - Release Readiness Hygiene Automation Runtime v0.1
 
 ### 完成内容

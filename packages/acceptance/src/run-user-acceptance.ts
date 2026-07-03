@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'node:url';
-import { dirname, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 
 import { formatAcceptanceFatalError } from './fatal-error.js';
 import {
@@ -228,6 +228,7 @@ export async function runUserAcceptance(
       ...(browserDriver ? { browserDriver } : {})
     });
     const validationBaseUrl = selectGeneratedTestValidationBaseUrl(options.url, managedBoot.baseUrl);
+    const runDir = dirname(result.artifactBundle.manifestPath);
     const artifactChecks = await buildUserAcceptanceArtifactChecks({
       repoRoot: options.repoRoot,
       reportPath: result.reportPath,
@@ -243,13 +244,14 @@ export async function runUserAcceptance(
       browser: options.browser,
       validateGeneratedTests: options.validateGeneratedTests,
       generatedTestTimeoutMs: options.generatedTestTimeoutMs ?? defaultGeneratedTestTimeoutMs,
-      ...(validationBaseUrl ? { baseUrl: validationBaseUrl } : {})
+      ...(validationBaseUrl ? { baseUrl: validationBaseUrl } : {}),
+      bootResultPath: join(runDir, 'boot-result.json')
     });
     const feedbackSummary = await writeTargetRepoFeedbackSummaryArtifact({
       generatedAt: new Date().toISOString(),
       mode: options.mode,
       repoRoot: options.repoRoot,
-      runDir: dirname(result.artifactBundle.manifestPath),
+      runDir,
       manifestPath: result.artifactBundle.manifestPath,
       reportPath: result.reportPath,
       findingsPath: result.findingsPath,
@@ -269,7 +271,7 @@ export async function runUserAcceptance(
     const handoffPackage = await writeAiIdeHandoffPackageArtifact({
       generatedAt: new Date().toISOString(),
       mode: options.mode,
-      runDir: dirname(result.artifactBundle.manifestPath),
+      runDir,
       manifestPath: result.artifactBundle.manifestPath,
       targetRepoFeedbackSummaryPath: feedbackSummary.summaryPath,
       reportPath: result.reportPath,
@@ -291,7 +293,7 @@ export async function runUserAcceptance(
     const evidenceLoop = await writeUserValidationEvidenceLoopArtifact({
       generatedAt: new Date().toISOString(),
       mode: options.mode,
-      runDir: dirname(result.artifactBundle.manifestPath),
+      runDir,
       manifestPath: result.artifactBundle.manifestPath,
       userAcceptanceRecordPath: options.outputPath,
       targetRepoFeedbackSummaryPath: feedbackSummary.summaryPath,

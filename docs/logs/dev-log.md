@@ -1,5 +1,36 @@
 # 开发日志
 
+## 2026年7月3日 - Release Readiness Hygiene Automation Runtime v0.1
+
+### 完成内容
+
+- 新增 `scripts/generate-release-hygiene-evidence.mjs`。
+- 新增 `pnpm release:hygiene`，默认生成 `artifacts/release-readiness-hygiene/release-readiness-hygiene.json` 和 `.md`。
+- Evidence package schema 为 `repoassure.release-readiness-hygiene.v1`。
+- Evidence package 汇总 `release:check`、`repo:hygiene`、`sensitive-material-scan`、`goal:audit` command boundary 和 `package.json` publication boundary。
+- Sensitive-material findings 写入前脱敏，不保存 raw email、secret、cookie、access token、customer data 或 raw private repo content。
+- 新增 `docs/operations/release-readiness-hygiene-automation-runtime-v0.1.md`，级联更新 README、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：新增 `tests/unit/release-hygiene-evidence.test.ts`，测试因 `scripts/generate-release-hygiene-evidence.mjs` 缺失按预期失败。
+- Red：更新 `tests/unit/project-structure.test.ts`，测试因 operation 文档和级联文档缺失按预期失败。
+- Green：实现 release hygiene evidence builder、CLI 输出、JSON/Markdown 写入、敏感材料脱敏和 `release:hygiene` script。
+- Structure：更新 `tests/unit/project-structure.test.ts`，守护 runtime 文档和级联记录。
+
+### 边界
+
+- No target repo material was uploaded。
+- No private artifacts, reviewer feedback, customer data, secrets or raw private repo content were uploaded。
+- No raw email、OTP、cookie、Access token、login query-state、reviewer credentials、env values、raw private source 或 absolute workstation paths may be stored in the evidence package。
+- No Action Authorization Receipt was produced。
+- No npm publication was executed。
+- No GitHub release was executed。
+- No public launch or production marketing announcement was executed。
+- No customer contact was executed。
+- No pricing change or spend was executed。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was executed。
+
 ## 2026年7月3日 - User Validation Evidence Loop Runtime v0.1
 
 ### 完成内容

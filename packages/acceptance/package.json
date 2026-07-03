@@ -118,6 +118,10 @@
       "types": "./dist/ai-ide-handoff-package.d.ts",
       "default": "./dist/ai-ide-handoff-package.js"
     },
+    "./user-validation-evidence-loop": {
+      "types": "./dist/user-validation-evidence-loop.d.ts",
+      "default": "./dist/user-validation-evidence-loop.js"
+    },
     "./user-acceptance-args": {
       "types": "./dist/user-acceptance-args.d.ts",
       "default": "./dist/user-acceptance-args.js"

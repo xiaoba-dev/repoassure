@@ -232,6 +232,16 @@ export {
 } from './user-validation-evidence-loop.js';
 
 export {
+  buildValidationCampaignSummary,
+  buildValidationCampaignSummaryMarkdown,
+  writeValidationCampaignSummary,
+  type ValidationCampaignSummary,
+  type ValidationCampaignSummaryInput,
+  type ValidationCampaignSummaryTarget,
+  type ValidationCampaignTargetInput
+} from './campaign-summary.js';
+
+export {
   formatUserAcceptanceCommand,
   parseUserAcceptanceArgs,
   type UserAcceptanceCliOptions,

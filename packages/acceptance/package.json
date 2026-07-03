@@ -122,6 +122,10 @@
       "types": "./dist/user-validation-evidence-loop.d.ts",
       "default": "./dist/user-validation-evidence-loop.js"
     },
+    "./campaign-summary": {
+      "types": "./dist/campaign-summary.d.ts",
+      "default": "./dist/campaign-summary.js"
+    },
     "./user-acceptance-args": {
       "types": "./dist/user-acceptance-args.d.ts",
       "default": "./dist/user-acceptance-args.js"

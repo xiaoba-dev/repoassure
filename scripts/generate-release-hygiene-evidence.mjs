@@ -197,7 +197,7 @@ function hasSecretLikeValue(value) {
   }
 
   return /\b(?:API[_-]?KEY|OPENAI_API_KEY|TOKEN|SECRET|PASSWORD)\s*=\s*[^\s]+/iu.test(value) ||
-    /\b(?:Cookie|Set-Cookie|Authorization)\s*:\s*[^\r\n]+/iu.test(value) ||
+    /^\s*(?:Cookie|Set-Cookie|Authorization)\s*:\s*[^\r\n]+/iu.test(value) ||
     /\b(?:sk|pk|ghp|gho|ghu|github_pat)_[A-Za-z0-9_-]{8,}/u.test(value);
 }
 

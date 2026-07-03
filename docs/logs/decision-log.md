@@ -1,5 +1,25 @@
 # 决策日志
 
+## 2026年7月3日 - Real target repo validation campaign
+
+### 决策
+
+接受 Real Target Repo Validation Campaign v0.1：用 3 个真实公开目标 repo 验证 RepoAssure 当前 browser / Python-CLI acceptance mode，并新增本地 campaign summary runtime，把多 repo evidence 汇总为 maintainer / AI IDE 可消费索引。
+
+### 原因
+
+- 单个 `user:accept` run 已能生成 target repo feedback、AI IDE handoff 和 user validation evidence loop，但多 repo campaign 缺少统一索引。
+- 真实目标运行暴露出 browser artifact 缺失时的失败文案不够可诊断，需要把 `boot-result.json` status/errors 带入验收记录。
+- campaign summary 可以把 `agent-reach`、`odinsight`、`openclaw-ui` 的 run status、blocker category 和 next product action 汇总为 `repoassure.validation-campaign-summary.v1`。
+
+### 影响
+
+- 新增 `packages/acceptance/src/campaign-summary.ts`。
+- 新增 `scripts/summarize-validation-campaign.mjs` 和 `pnpm campaign:summarize`。
+- 更新 `packages/acceptance/src/user-acceptance-runner-helpers.ts` 和 `packages/acceptance/src/run-user-acceptance.ts`，让 browser artifact 缺失 evidence 包含 `browser requested but no browser artifacts were generated` 与 `boot-result.json` context。
+- 新增 `docs/operations/real-target-validation-campaign-v0.1.md` 和对应测试级联。
+- 本决策不上传 target repo material、private artifacts、reviewer feedback、customer data、secrets 或 raw private repo content，不执行 npm publish、GitHub release、public launch、production marketing announcement、customer contact、pricing change、spend、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
+
 ## 2026年7月3日 - Release readiness hygiene automation runtime
 
 ### 决策

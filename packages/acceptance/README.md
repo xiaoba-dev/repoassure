@@ -22,6 +22,7 @@ Current package responsibilities:
 - Keep legacy user acceptance handoff runner helpers as re-export wrappers over `packages/acceptance/dist/run-user-acceptance-handoff.js`, with a package-exported direct-run helper so `dist/internal/acceptance/run-user-acceptance-handoff.js` remains executable.
 - Keep legacy goal audit runner helpers as re-export wrappers over `packages/acceptance/dist/run-goal-audit.js`, with a package-exported direct-run helper so `dist/internal/acceptance/run-goal-audit.js` remains executable.
 - Keep legacy user acceptance runner helpers as re-export wrappers over `packages/acceptance/dist/run-user-acceptance.js` and `packages/acceptance/dist/user-acceptance-runner-helpers.js`, with a package-exported direct-run helper so `dist/internal/acceptance/run-user-acceptance.js` remains executable.
+- Own the validation campaign summary runtime through `campaign-summary`, so multi-target real repo campaigns can produce local `repoassure.validation-campaign-summary.v1` indexes without copying target repo material into committed docs.
 - Run `goal:audit` through package-owned source collection, current-item composition, and Markdown rendering while preserving the generated output path.
 - Expose `buildCurrentGoalAuditItems()` plus legacy-compatible goal audit helper exports from the package goal audit runner for current item construction and compatibility with the legacy API shape.
 - Expose acceptance runner parse, help, command-formatting, direct-run detection, and CLI invocation helpers from the package root API.

@@ -33,6 +33,7 @@ import {
 } from '../../packages/acceptance/src/run-user-acceptance.js';
 import {
   buildGeneratedTestValidationCheck,
+  buildUserAcceptanceArtifactChecks,
   buildUserAcceptanceRepoPreflightChecks,
   ensureGeneratedTestPlaywrightDependency,
   formatGeneratedTestValidationFailureEvidence,
@@ -197,6 +198,69 @@ describe('user acceptance record', () => {
     expect(markdown).toContain('重新运行 `pnpm user:accept`');
     expect(markdown).toContain('用户需要将结论更新为 `accepted` 或 `changes_requested`');
     expect(markdown).toContain('不能仅凭该记录标记长期 goal complete');
+  });
+
+  it('explains missing browser artifacts with boot failure context', async () => {
+    const repoRoot = await mkdtemp(join(tmpdir(), 'repoassure-browser-artifact-context-'));
+    const runDir = join(repoRoot, '.hardening', 'runs', 'run-fixed');
+    const reportPath = join(repoRoot, 'hardening-report.md');
+    const findingsPath = join(runDir, 'findings.json');
+    const manifestPath = join(runDir, 'manifest.json');
+    const repairPlanPath = join(runDir, 'repair-plan.json');
+    const repairPlanMarkdownPath = join(runDir, 'repair-plan.md');
+    const repairTaskPackagePath = join(runDir, 'repair-task-package.json');
+    const repairTaskPackageMarkdownPath = join(runDir, 'repair-task-package.md');
+    const patchDiffPath = join(runDir, 'patch.diff');
+    const generatedTestPath = join(repoRoot, 'tests', 'hardening', 'generated-findings.spec.ts');
+    const bootResultPath = join(runDir, 'boot-result.json');
+
+    await mkdir(join(repoRoot, 'tests', 'hardening'), { recursive: true });
+    await mkdir(runDir, { recursive: true });
+    await Promise.all([
+      writeFile(reportPath, '# Report\n'),
+      writeFile(findingsPath, '{"findings":[]}\n'),
+      writeFile(manifestPath, '{"schemaVersion":1,"artifacts":{}}\n'),
+      writeFile(repairPlanPath, '{"schemaVersion":1}\n'),
+      writeFile(repairPlanMarkdownPath, '# Repair Plan\n'),
+      writeFile(repairTaskPackagePath, '{"schemaVersion":1,"tasks":[]}\n'),
+      writeFile(repairTaskPackageMarkdownPath, '# Repair Task Package\n'),
+      writeFile(patchDiffPath, ''),
+      writeFile(generatedTestPath, 'import { test } from "@playwright/test";\n'),
+      writeFile(bootResultPath, JSON.stringify({
+        status: 'failed',
+        url: null,
+        blockers: [],
+        errors: ['No URL or start command is available']
+      }))
+    ]);
+
+    const checks = await buildUserAcceptanceArtifactChecks({
+      repoRoot,
+      reportPath,
+      findingsPath,
+      manifestPath,
+      repairPlanPath,
+      repairPlanMarkdownPath,
+      repairTaskPackagePath,
+      repairTaskPackageMarkdownPath,
+      patchDiffPath,
+      generatedTestFiles: [generatedTestPath],
+      artifactFiles: [],
+      browser: true,
+      validateGeneratedTests: false,
+      generatedTestTimeoutMs: 120_000,
+      bootResultPath
+    });
+    const browserArtifactsCheck = checks.find((check) => check.name === 'browser artifacts 已生成');
+
+    expect(browserArtifactsCheck).toMatchObject({
+      required: true,
+      status: 'failed'
+    });
+    expect(browserArtifactsCheck?.evidence).toContain('browser requested but no browser artifacts were generated');
+    expect(browserArtifactsCheck?.evidence).toContain('boot-result.json status=failed');
+    expect(browserArtifactsCheck?.evidence).toContain('No URL or start command is available');
+    expect(browserArtifactsCheck?.evidence).not.toContain('browser mode not requested');
   });
 
   it('documents either the placeholder changes_requested path or the final accepted record', async () => {

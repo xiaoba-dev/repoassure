@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { mkdir, rm, rmdir, stat, symlink, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, rmdir, stat, symlink, writeFile } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -34,6 +34,7 @@ export interface UserAcceptanceArtifactChecksInput {
   validateGeneratedTests: boolean;
   generatedTestTimeoutMs: number;
   baseUrl?: string;
+  bootResultPath?: string;
 }
 
 export async function buildUserAcceptanceRepoPreflightChecks(
@@ -79,6 +80,11 @@ export async function buildUserAcceptanceArtifactChecks(input: UserAcceptanceArt
     && (await Promise.all(input.generatedTestFiles.map((path) => fileExists(path)))).every(Boolean);
   const browserArtifactsExist = input.artifactFiles.length > 0
     && (await Promise.all(input.artifactFiles.map((path) => fileExists(path)))).every(Boolean);
+  const browserArtifactsEvidence = await buildBrowserArtifactsEvidence({
+    browser: input.browser,
+    artifactFiles: input.artifactFiles,
+    ...(input.bootResultPath ? { bootResultPath: input.bootResultPath } : {})
+  });
   const generatedTestValidation = await buildGeneratedTestValidationCheck({
     repoRoot: input.repoRoot,
     generatedTestFiles: input.generatedTestFiles,
@@ -107,7 +113,7 @@ export async function buildUserAcceptanceArtifactChecks(input: UserAcceptanceArt
       name: 'browser artifacts 已生成',
       required: input.browser,
       status: input.browser ? browserArtifactsExist ? 'passed' : 'failed' : 'skipped',
-      evidence: input.artifactFiles.length > 0 ? input.artifactFiles.join(', ') : 'browser mode not requested or no artifacts'
+      evidence: browserArtifactsEvidence
     },
     {
       name: 'repo root 已记录',
@@ -116,6 +122,51 @@ export async function buildUserAcceptanceArtifactChecks(input: UserAcceptanceArt
       evidence: input.repoRoot
     }
   ];
+}
+
+async function buildBrowserArtifactsEvidence(input: {
+  browser: boolean;
+  artifactFiles: string[];
+  bootResultPath?: string;
+}): Promise<string> {
+  if (input.artifactFiles.length > 0) {
+    return input.artifactFiles.join(', ');
+  }
+
+  if (!input.browser) {
+    return 'browser mode not requested';
+  }
+
+  const bootContext = input.bootResultPath ? await readBootResultContext(input.bootResultPath) : '';
+  return [
+    'browser requested but no browser artifacts were generated',
+    bootContext || 'inspect boot-result.json and hardening flow logs'
+  ].join('; ');
+}
+
+async function readBootResultContext(bootResultPath: string): Promise<string> {
+  try {
+    const parsed = JSON.parse(await readFile(bootResultPath, 'utf8')) as {
+      status?: unknown;
+      errors?: unknown;
+      blockers?: unknown;
+    };
+    const status = typeof parsed.status === 'string' ? parsed.status : 'unknown';
+    const errors = Array.isArray(parsed.errors)
+      ? parsed.errors.filter((error): error is string => typeof error === 'string')
+      : [];
+    const blockers = Array.isArray(parsed.blockers)
+      ? parsed.blockers.filter((blocker): blocker is string => typeof blocker === 'string')
+      : [];
+    const details = [...errors, ...blockers].slice(0, 3).join('; ');
+
+    return redactSensitiveText([
+      `boot-result.json status=${status}`,
+      details ? `details=${details}` : ''
+    ].filter(Boolean).join('; '));
+  } catch (error) {
+    return redactSensitiveText(`boot-result.json unreadable: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 export async function buildGeneratedTestValidationCheck(input: {

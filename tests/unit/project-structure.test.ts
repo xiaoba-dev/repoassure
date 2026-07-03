@@ -1965,6 +1965,49 @@ describe('project structure', () => {
     await expectPath('docs/operations/release-readiness-hygiene-automation-runtime-v0.1.md');
   });
 
+  it('records real target validation campaign summary without uploading target artifacts', async () => {
+    const [
+      operation,
+      readme,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      packageJson
+    ] = await Promise.all([
+      readFile('docs/operations/real-target-validation-campaign-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('package.json', 'utf8')
+    ]);
+
+    expect(operation).toContain('Real Target Repo Validation & Product Hardening Campaign v0.1');
+    expect(operation).toContain('Status: campaign_executed_product_hardened');
+    expect(operation).toContain('repoassure.validation-campaign-summary.v1');
+    expect(operation).toContain('pnpm campaign:summarize');
+    expect(operation).toContain('agent-reach');
+    expect(operation).toContain('odinsight');
+    expect(operation).toContain('openclaw-ui');
+    expect(operation).toContain('Passed targets: `1`');
+    expect(operation).toContain('Failed targets: `2`');
+    expect(operation).toContain('browser requested but no browser artifacts were generated');
+    expect(operation).toContain('No target repo material was uploaded');
+    expect(operation).toContain('No npm publication was executed');
+    expect(operation).toContain('No public launch or production marketing announcement was executed');
+    expect(readme).toContain('Real Target Repo Validation Campaign v0.1');
+    expect(readme).toContain('campaign-summary.json');
+    expect(testingStrategy).toContain('Real Target Repo Validation Campaign v0.1');
+    expect(acceptanceChecklist).toContain('Real Target Repo Validation Campaign v0.1');
+    expect(decisionLog).toContain('Real target repo validation campaign');
+    expect(devLog).toContain('Real Target Repo Validation Campaign v0.1');
+    expect(packageJson).toContain('"campaign:summarize": "pnpm build:acceptance && node scripts/summarize-validation-campaign.mjs"');
+
+    await expectPath('docs/operations/real-target-validation-campaign-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
@@ -4055,6 +4098,7 @@ describe('project structure', () => {
 
     expect(packageModuleNames).toEqual([
       'ai-ide-handoff-package',
+      'campaign-summary',
       'compatibility',
       'fatal-error',
       'goal-audit',

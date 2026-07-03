@@ -1827,6 +1827,51 @@ describe('project structure', () => {
     await expectPath('docs/operations/ai-ide-handoff-material-quality-runtime-v0.1.md');
   });
 
+  it('records repair task actionability runtime without launch actions', async () => {
+    const [
+      runtime,
+      readme,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/repair-task-actionability-runtime-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(runtime).toContain('Repair Task Actionability Runtime v0.1');
+    expect(runtime).toContain('repair_task_actionability_runtime_implemented');
+    expect(runtime).toContain('Product Backlog Prioritization v0.1 / Priority 3');
+    expect(runtime).toContain('Implementation status: `implemented_minimal_runtime`');
+    expect(runtime).toContain('Launch authorization status: `not_authorized`');
+    expect(runtime).toContain('actionability');
+    expect(runtime).toContain('dependencies');
+    expect(runtime).toContain('suggestedVerificationCommands');
+    expect(runtime).toContain('patchApplicabilityEvidence');
+    expect(runtime).toContain('aiIdeExecutionPrompt');
+    expect(runtime).toContain('manualReviewBoundary');
+    expect(runtime).toContain('riskNotes');
+    expect(runtime).toContain('noAutoApplyBoundary');
+    expect(runtime).toContain('packages/repair-planner/src/generate-repair-plan.ts');
+    expect(runtime).toContain('packages/acceptance/src/run-repair-handoff.ts');
+    expect(runtime).toContain('Do not auto-apply');
+    expect(runtime).toContain('npm publication');
+    expect(runtime).toContain('hosted dashboard availability claims');
+    expect(readme).toContain('Repair task actionability runtime');
+    expect(readme).toContain('no-auto-apply boundary');
+    expect(testingStrategy).toContain('Repair Task Actionability Runtime v0.1');
+    expect(acceptanceChecklist).toContain('Repair Task Actionability Runtime v0.1');
+    expect(decisionLog).toContain('Repair task actionability runtime');
+    expect(devLog).toContain('Repair Task Actionability Runtime v0.1');
+
+    await expectPath('docs/operations/repair-task-actionability-runtime-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

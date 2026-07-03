@@ -54,7 +54,9 @@ describe('repair handoff', () => {
       }
     });
     expect(pkg.agentContract.boundaries).toContain('Does not modify target repository files.');
+    expect(pkg.agentContract.boundaries).toContain('Does not auto-apply patches or edit target repository files without maintainer review.');
     expect(pkg.agentContract.readOrder).toContain('tasks[].verification.commands');
+    expect(pkg.agentContract.readOrder).toContain('tasks[].actionability');
     expect(pkg.tasks.map((task) => task.taskId)).toEqual([
       'pycli-failed-ruff-check',
       'pycli-failed-mypy'
@@ -62,10 +64,29 @@ describe('repair handoff', () => {
     expect(pkg.tasks[0]?.objective).toContain('修复失败命令：ruff check .');
     expect(pkg.tasks[0]?.evidence.commandResult?.stdout).toContain('API_KEY=[REDACTED]');
     expect(pkg.tasks[0]?.evidence.commandResult?.stdout).not.toContain('sk-secret');
+    expect(pkg.tasks[0]?.actionability).toMatchObject({
+      dependencies: ['none'],
+      patchApplicabilityEvidence: {
+        requiresManualReview: true
+      }
+    });
+    expect(pkg.tasks[0]?.actionability.suggestedVerificationCommands[0]).toEqual({
+      command: 'ruff check .',
+      purpose: 'Re-run the failed acceptance command after the minimal repair.',
+      required: true
+    });
+    expect(pkg.tasks[0]?.actionability.patchApplicabilityEvidence.sourceEvidence.join('\n')).toContain('commandResult');
+    expect(pkg.tasks[0]?.actionability.patchApplicabilityEvidence.targetAreas.join('\n')).toContain('command:ruff check .');
+    expect(pkg.tasks[0]?.actionability.aiIdeExecutionPrompt).toContain('Do not auto-apply');
+    expect(pkg.tasks[0]?.actionability.manualReviewBoundary.join('\n')).toContain('maintainer review');
+    expect(pkg.tasks[0]?.actionability.riskNotes.join('\n')).toContain('ruff check .');
+    expect(pkg.tasks[0]?.actionability.noAutoApplyBoundary.join('\n')).toContain('Do not auto-apply');
     expect(pkg.tasks[0]?.verification.commands).toContain('ruff check .');
     expect(pkg.tasks[0]?.handoffPrompt).toContain('你是接手目标 repo 的修复 Agent');
     expect(formatRepairHandoffMarkdown(pkg)).toContain('# Repair Handoff Package');
     expect(formatRepairHandoffMarkdown(pkg)).toContain('pycli-failed-ruff-check');
+    expect(formatRepairHandoffMarkdown(pkg)).toContain('### Actionability');
+    expect(formatRepairHandoffMarkdown(pkg)).toContain('Do not auto-apply');
     expect(formatVerificationPlanMarkdown(pkg)).toContain('# Verification Plan');
     expect(formatVerificationPlanMarkdown(pkg)).toContain('ruff check .');
     expect(formatVerificationPlanMarkdown(pkg)).toContain('mypy .');

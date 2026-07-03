@@ -97,6 +97,7 @@ export interface ExecutableRepairTask {
   context: RepairTaskContext;
   recommendedFix: RepairTaskRecommendedFix;
   verification: RepairTaskPackageVerification;
+  actionability: RepairTaskActionability;
   handoffPrompt: string;
 }
 
@@ -121,6 +122,29 @@ export interface RepairTaskPackageVerification {
   commands: string[];
   generatedTests: string[];
   acceptanceCriteria: string[];
+}
+
+export interface RepairTaskActionability {
+  dependencies: string[];
+  suggestedVerificationCommands: RepairTaskSuggestedVerificationCommand[];
+  patchApplicabilityEvidence: RepairTaskPatchApplicabilityEvidence;
+  aiIdeExecutionPrompt: string;
+  manualReviewBoundary: string[];
+  riskNotes: string[];
+  noAutoApplyBoundary: string[];
+}
+
+export interface RepairTaskSuggestedVerificationCommand {
+  command: string;
+  purpose: string;
+  required: boolean;
+}
+
+export interface RepairTaskPatchApplicabilityEvidence {
+  sourceEvidence: string[];
+  targetAreas: string[];
+  requiresManualReview: boolean;
+  notes: string[];
 }
 
 export function severityRank(severity: FindingSeverity): number {

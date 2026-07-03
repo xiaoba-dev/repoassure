@@ -12,6 +12,7 @@ import {
   type RepairPlan,
   type RepairPlanGenerationResult,
   type RepairTaskPackage,
+  type RepairTaskActionability,
   type RepairTargetArea,
   type RepairTask,
   type RepairVerification
@@ -404,6 +405,7 @@ function buildRepairTaskPackage(plan: RepairPlan): RepairTaskPackage {
         generatedTests: task.verification.generatedTests,
         acceptanceCriteria: buildAcceptanceCriteria(task)
       },
+      actionability: buildRepairTaskActionability(task),
       handoffPrompt: buildHandoffPrompt(task)
     }))
   };
@@ -452,6 +454,58 @@ function buildAcceptanceCriteria(task: RepairTask): string[] {
   }
 
   return criteria.map(cleanText);
+}
+
+function buildRepairTaskActionability(task: RepairTask): RepairTaskActionability {
+  return {
+    dependencies: ['none'],
+    suggestedVerificationCommands: buildSuggestedVerificationCommands(task),
+    patchApplicabilityEvidence: {
+      sourceEvidence: task.evidence.map((item) => cleanText(item.path)),
+      targetAreas: task.targetAreas.map((area) => cleanText(`${area.kind}:${area.value}`)),
+      requiresManualReview: true,
+      notes: [
+        'Patch applicability depends on the target repo still matching the recorded evidence and target areas.',
+        'Review the final diff before applying because RepoAssure only generates advisory repair material.'
+      ].map(cleanText)
+    },
+    aiIdeExecutionPrompt: cleanText(
+      `先不要自动应用 patch。请读取 context.evidence、recommendedFix、verification 和 actionability，再为 ${task.taskId} 生成最小修复方案；如需修改代码，先等待 maintainer review 边界确认。`
+    ),
+    manualReviewBoundary: [
+      'Requires maintainer review before editing target repository files.',
+      'Requires maintainer review before creating branches, commits, issues, pull requests, or advisories.',
+      'Requires maintainer review before accepting any generated patch plan.'
+    ].map(cleanText),
+    riskNotes: [
+      `${task.severity} task may affect user-visible behavior or release readiness.`,
+      'Generated evidence may be stale if the target repo changed after the hardening run.',
+      'Verification commands can pass while adjacent user flows still require manual review.'
+    ].map(cleanText),
+    noAutoApplyBoundary: [
+      'Do not auto-apply generated patches.',
+      'Do not edit target repository files without explicit maintainer approval.',
+      'Do not weaken tests, acceptance checks, or security evidence to make the task pass.'
+    ].map(cleanText)
+  };
+}
+
+function buildSuggestedVerificationCommands(task: RepairTask): RepairTaskActionability['suggestedVerificationCommands'] {
+  if (task.verification.commands.length > 0) {
+    return task.verification.commands.map((command) => ({
+      command: cleanText(command),
+      purpose: 'Validate the repaired hardening finding with the command recorded in the source run.',
+      required: true
+    }));
+  }
+
+  return [
+    {
+      command: 'Run the target repo unit, lint, typecheck, build, and a new hardening run.',
+      purpose: 'Fallback verification when the source run did not record a concrete command.',
+      required: true
+    }
+  ];
 }
 
 function buildHandoffPrompt(task: RepairTask): string {
@@ -512,6 +566,15 @@ function buildRepairTaskPackageMarkdown(taskPackage: RepairTaskPackage): string 
         `- Do not: ${task.recommendedFix.changeScope.exclude.join('；')}`,
         `- Acceptance criteria: ${task.verification.acceptanceCriteria.join('；')}`,
         `- Verification: ${task.verification.commands.join(' && ') || 'Not recorded'}`,
+        '',
+        '### Actionability',
+        '',
+        `- Dependencies: ${task.actionability.dependencies.join(', ')}`,
+        `- Suggested verification: ${task.actionability.suggestedVerificationCommands.map((item) => `${item.command} (${item.purpose})`).join('；')}`,
+        `- Patch applicability: ${task.actionability.patchApplicabilityEvidence.notes.join('；')}`,
+        `- Manual review boundary: ${task.actionability.manualReviewBoundary.join('；')}`,
+        `- Risk notes: ${task.actionability.riskNotes.join('；')}`,
+        `- No-auto-apply boundary: ${task.actionability.noAutoApplyBoundary.join('；')}`,
         '',
         '### Handoff Prompt',
         '',

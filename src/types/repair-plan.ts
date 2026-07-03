@@ -14,12 +14,15 @@ export type {
   RepairSuggestedFile,
   RepairTargetArea,
   RepairTargetAreaKind,
+  RepairTaskActionability,
   RepairTask,
   RepairTaskContext,
+  RepairTaskPatchApplicabilityEvidence,
   RepairTaskPackage,
   RepairTaskPackageStatus,
   RepairTaskPackageVerification,
   RepairTaskRecommendedFix,
+  RepairTaskSuggestedVerificationCommand,
   RepairTaskStatus,
   RepairVerification
 } from '../../packages/repair-planner/dist/repair-plan.js';

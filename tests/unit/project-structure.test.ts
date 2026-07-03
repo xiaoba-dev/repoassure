@@ -1918,6 +1918,53 @@ describe('project structure', () => {
     await expectPath('docs/operations/user-validation-evidence-loop-runtime-v0.1.md');
   });
 
+  it('records release readiness hygiene automation runtime without launch actions', async () => {
+    const [
+      runtime,
+      readme,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      packageJson
+    ] = await Promise.all([
+      readFile('docs/operations/release-readiness-hygiene-automation-runtime-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('package.json', 'utf8')
+    ]);
+
+    expect(runtime).toContain('Release Readiness Hygiene Automation Runtime v0.1');
+    expect(runtime).toContain('release_readiness_hygiene_automation_runtime_implemented');
+    expect(runtime).toContain('Product Backlog Prioritization v0.1 / Priority 5');
+    expect(runtime).toContain('Implementation status: `implemented_minimal_runtime`');
+    expect(runtime).toContain('Launch authorization status: `not_authorized`');
+    expect(runtime).toContain('release-readiness-hygiene.json');
+    expect(runtime).toContain('repoassure.release-readiness-hygiene.v1');
+    expect(runtime).toContain('pnpm release:hygiene');
+    expect(runtime).toContain('scripts/generate-release-hygiene-evidence.mjs');
+    expect(runtime).toContain('release:check');
+    expect(runtime).toContain('repo:hygiene');
+    expect(runtime).toContain('sensitive-material-scan');
+    expect(runtime).toContain('goal:audit');
+    expect(runtime).toContain('package.json keeps `private: true`');
+    expect(runtime).toContain('No npm publication was executed');
+    expect(runtime).toContain('No GitHub release was executed');
+    expect(runtime).toContain('No public launch or production marketing announcement was executed');
+    expect(readme).toContain('Release readiness hygiene automation runtime');
+    expect(readme).toContain('release-readiness-hygiene.json');
+    expect(testingStrategy).toContain('Release Readiness Hygiene Automation Runtime v0.1');
+    expect(acceptanceChecklist).toContain('Release Readiness Hygiene Automation Runtime v0.1');
+    expect(decisionLog).toContain('Release readiness hygiene automation runtime');
+    expect(devLog).toContain('Release Readiness Hygiene Automation Runtime v0.1');
+    expect(packageJson).toContain('"release:hygiene": "node scripts/generate-release-hygiene-evidence.mjs"');
+
+    await expectPath('docs/operations/release-readiness-hygiene-automation-runtime-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

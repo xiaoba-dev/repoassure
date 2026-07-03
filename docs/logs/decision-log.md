@@ -1,5 +1,24 @@
 # 决策日志
 
+## 2026年7月3日 - Release readiness hygiene automation runtime
+
+### 决策
+
+接受 Release Readiness Hygiene Automation Runtime v0.1：按 Product Backlog Prioritization v0.1 / Priority 5 实现最小本地 runtime，用 `pnpm release:hygiene` 生成 maintainer / AI IDE 可审阅的 release hygiene evidence package。
+
+### 原因
+
+- `release:check`、`repo:hygiene`、敏感材料扫描和 `goal:audit` 以前是分散命令，需要一份可回放的本地 evidence package 串起来。
+- `release-readiness-hygiene.json` 将 release readiness、repo hygiene、sensitive-material-scan、goal audit command boundary 和 package publication boundary 固定成机器可读 contract。
+- 明确 non-authorization boundary 可以避免把 hygiene evidence 误解为 npm publication、GitHub release、public launch 或商业版 availability 授权。
+
+### 影响
+
+- 新增 `scripts/generate-release-hygiene-evidence.mjs`。
+- 新增 `pnpm release:hygiene`。
+- 新增 `docs/operations/release-readiness-hygiene-automation-runtime-v0.1.md` 和对应测试。
+- 本决策不上传 target repo material、private artifacts、reviewer feedback、customer data、secrets 或 raw private repo content，不执行 npm publish、GitHub release、public launch、production marketing announcement、customer contact、pricing change、spend、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
+
 ## 2026年7月3日 - User validation evidence loop runtime
 
 ### 决策

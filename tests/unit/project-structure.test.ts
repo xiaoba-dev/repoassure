@@ -1291,6 +1291,58 @@ describe('project structure', () => {
     await expectPath('docs/operations/public-release-post-merge-hygiene-v0.1.md');
   });
 
+  it('records current public source release final verification without reopening launch gates', async () => {
+    const [verification, readme, releaseChecklist, testingStrategy, acceptanceChecklist, decisionLog, devLog, contributing] =
+      await Promise.all([
+        readFile('docs/operations/public-source-release-final-verification-v0.1.md', 'utf8'),
+        readFile('README.md', 'utf8'),
+        readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+        readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+        readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+        readFile('docs/logs/decision-log.md', 'utf8'),
+        readFile('docs/logs/dev-log.md', 'utf8'),
+        readFile('CONTRIBUTING.md', 'utf8')
+      ]);
+
+    expect(verification).toContain('Public Source Release Final Verification v0.1');
+    expect(verification).toContain('Status: public_source_verified_launch_still_blocked');
+    expect(verification).toContain('Repository visibility: `PUBLIC`');
+    expect(verification).toContain('Latest main head: `e58095fea34d1f8f56941086df1b5be6abf685ce`');
+    expect(verification).toContain('Latest main CI run: `28738066002`');
+    expect(verification).toContain('Public read access verification: `git ls-remote` returned `e58095fea34d1f8f56941086df1b5be6abf685ce HEAD`');
+    expect(verification).toContain('Required status check: `Quality Gates`');
+    expect(verification).toContain('Strict status checks: `true`');
+    expect(verification).toContain('Admin enforcement: `true`');
+    expect(verification).toContain('Conversation resolution: `true`');
+    expect(verification).toContain('Linear history: `true`');
+    expect(verification).toContain('Required approving reviews: disabled for solo maintainer mode');
+    expect(verification).toContain('Remote git tags: none found');
+    expect(verification).toContain('GitHub releases: none found');
+    expect(verification).toContain('npm package `hardening-mcp`: not found');
+    expect(verification).toContain('Package publication boundary: `package.json` keeps `private: true`');
+    expect(verification).toContain('`pnpm release:check`: passed');
+    expect(verification).toContain('`pnpm repo:hygiene`: passed');
+    expect(verification).toContain('`pnpm release:hygiene`: passed');
+    expect(verification).toContain('`REPOASSURE_WEBSITE_URL=https://repoassure.com pnpm verify:website`: passed');
+    expect(verification).toContain('`REPOASSURE_WEBSITE_URL=https://www.repoassure.com pnpm verify:website`: passed');
+    expect(verification).toContain('No npm publication was executed');
+    expect(verification).toContain('No GitHub release was executed');
+    expect(verification).toContain('No public launch or production marketing announcement was executed');
+    expect(verification).toContain('No customer contact was executed');
+    expect(verification).toContain('No pricing change or spend was executed');
+    expect(verification).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was executed');
+    expect(readme).toContain('Public Source Release Final Verification v0.1');
+    expect(releaseChecklist).toContain('Public Source Release Final Verification v0.1');
+    expect(testingStrategy).toContain('Public Source Release Final Verification v0.1');
+    expect(acceptanceChecklist).toContain('Public Source Release Final Verification v0.1');
+    expect(decisionLog).toContain('Public source release final verification');
+    expect(devLog).toContain('Public Source Release Final Verification v0.1');
+    expect(contributing).toContain('The repository is public for source review and contribution');
+    expect(contributing).not.toContain('repository remains private');
+
+    await expectPath('docs/operations/public-source-release-final-verification-v0.1.md');
+  });
+
   it('records public launch boundary decision without executing launch actions', async () => {
     const [
       decision,

@@ -232,6 +232,19 @@ export {
 } from './user-validation-evidence-loop.js';
 
 export {
+  buildAiIdeRepairExecutionPlaybook,
+  buildAiIdeRepairExecutionPlaybookMarkdown,
+  writeAiIdeRepairExecutionPlaybook,
+  type AiIdeRepairExecutionPlaybook,
+  type AiIdeRepairPlaybookArtifactKind,
+  type AiIdeRepairPlaybookExecutionStep,
+  type AiIdeRepairPlaybookInput,
+  type AiIdeRepairPlaybookReadEntry,
+  type WriteAiIdeRepairPlaybookInput,
+  type WriteAiIdeRepairPlaybookResult
+} from './ai-ide-repair-playbook.js';
+
+export {
   buildValidationCampaignSummary,
   buildValidationCampaignSummaryMarkdown,
   writeValidationCampaignSummary,

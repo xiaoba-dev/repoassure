@@ -14,16 +14,21 @@ describe('validation campaign summary', () => {
     const root = await mkdtemp(join(tmpdir(), 'repoassure-campaign-summary-'));
     const browserRepo = join(root, 'browser-app');
     const cliRepo = join(root, 'python-cli');
+    const blockedRepo = join(root, 'blocked-web-app');
     const browserRunDir = join(browserRepo, '.hardening', 'runs', 'run-2026-07-03T10-00-00-000Z');
     const cliRunDir = join(cliRepo, '.hardening', 'runs', 'run-2026-07-03T10-05-00-000Z');
+    const blockedRunDir = join(blockedRepo, '.hardening', 'runs', 'run-2026-07-03T10-06-00-000Z');
     const browserRecordPath = join(root, 'artifacts', 'browser-app.md');
     const cliRecordPath = join(root, 'artifacts', 'python-cli.md');
+    const blockedRecordPath = join(root, 'artifacts', 'blocked-web-app.md');
 
     await mkdir(browserRunDir, { recursive: true });
     await mkdir(cliRunDir, { recursive: true });
+    await mkdir(blockedRunDir, { recursive: true });
     await mkdir(join(root, 'artifacts'), { recursive: true });
     await writeFile(browserRecordPath, '# Browser app\nAPI_KEY=sk-secret\n');
     await writeFile(cliRecordPath, '# Python CLI\n');
+    await writeFile(blockedRecordPath, '# Blocked web app\n');
     await writeFile(join(browserRunDir, 'target-repo-feedback-summary.json'), JSON.stringify({
       schema: 'repoassure.target-repo-feedback-summary.v1',
       mode: 'browser',
@@ -52,21 +57,36 @@ describe('validation campaign summary', () => {
         screenshots: []
       }
     }));
+    await writeFile(join(blockedRunDir, 'target-repo-feedback-summary.json'), JSON.stringify({
+      schema: 'repoassure.target-repo-feedback-summary.v1',
+      mode: 'browser',
+      runStatus: 'blocked',
+      acceptanceResult: { requiredChecksFailed: 1 },
+      blockerCategory: 'environment',
+      nextRecommendedProductAction: 'document_target_stack',
+      artifactLinks: {
+        report: '../../../hardening-report.md',
+        repairTaskPackage: 'repair-task-package.json',
+        screenshots: []
+      }
+    }));
 
     const summary = await buildValidationCampaignSummary({
       generatedAt: '2026-07-03T10:10:00.000Z',
       targets: [
         { targetId: 'browser-app', repoRoot: browserRepo, acceptanceRecordPath: browserRecordPath },
-        { targetId: 'python-cli', repoRoot: cliRepo, acceptanceRecordPath: cliRecordPath }
+        { targetId: 'python-cli', repoRoot: cliRepo, acceptanceRecordPath: cliRecordPath },
+        { targetId: 'blocked-web-app', repoRoot: blockedRepo, acceptanceRecordPath: blockedRecordPath }
       ]
     });
     const serialized = JSON.stringify(summary);
 
     expect(summary.schemaVersion).toBe('repoassure.validation-campaign-summary.v1');
-    expect(summary.campaignStatus.totalTargets).toBe(2);
+    expect(summary.campaignStatus.totalTargets).toBe(3);
     expect(summary.campaignStatus.passedTargets).toBe(1);
     expect(summary.campaignStatus.failedTargets).toBe(1);
-    expect(summary.campaignStatus.productFollowUpActions).toEqual(['improve_repair_plan']);
+    expect(summary.campaignStatus.blockedTargets).toBe(1);
+    expect(summary.campaignStatus.productFollowUpActions).toEqual(['improve_repair_plan', 'document_target_stack']);
     expect(summary.targets).toEqual([
       expect.objectContaining({
         targetId: 'browser-app',
@@ -85,6 +105,13 @@ describe('validation campaign summary', () => {
         runStatus: 'failed',
         blockerCategory: 'unknown',
         nextRecommendedProductAction: 'improve_repair_plan'
+      }),
+      expect.objectContaining({
+        targetId: 'blocked-web-app',
+        mode: 'browser',
+        runStatus: 'blocked',
+        blockerCategory: 'environment',
+        nextRecommendedProductAction: 'document_target_stack'
       })
     ]);
     expect(serialized).not.toContain('sk-secret');
@@ -94,11 +121,13 @@ describe('validation campaign summary', () => {
       generatedAt: '2026-07-03T10:10:00.000Z',
       targets: [
         { targetId: 'browser-app', repoRoot: browserRepo, acceptanceRecordPath: browserRecordPath },
-        { targetId: 'python-cli', repoRoot: cliRepo, acceptanceRecordPath: cliRecordPath }
+        { targetId: 'python-cli', repoRoot: cliRepo, acceptanceRecordPath: cliRecordPath },
+        { targetId: 'blocked-web-app', repoRoot: blockedRepo, acceptanceRecordPath: blockedRecordPath }
       ]
     });
 
     await expect(readFile(written.jsonPath, 'utf8')).resolves.toContain('repoassure.validation-campaign-summary.v1');
+    await expect(readFile(written.markdownPath, 'utf8')).resolves.toContain('- Blocked targets: 1');
     await expect(readFile(written.markdownPath, 'utf8')).resolves.toContain('| python-cli | cli | failed |');
   });
 });

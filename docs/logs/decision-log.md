@@ -1,5 +1,25 @@
 # 决策日志
 
+## 2026年7月5日 - Real target validation campaign v0.2
+
+### 决策
+
+接受 Real Target Validation Campaign v0.2：在 Real Target Campaign Follow-up Hardening v0.2 合并后，复跑 `agent-reach`、`odinsight` 和 `openclaw-ui` 三个真实目标 repo，并把新发现的 browser/Node 环境误分诊缺口转成 TDD 产品修复。
+
+### 原因
+
+- v0.1 的两个失败目标需要验证是否从“产品不清楚”变成“目标环境前置条件清楚”。
+- `agent-reach` 仍 blocked，但 now correctly classified as `environment` / `document_target_stack`，且 repair material 给出 Python/CLI environment prerequisites。
+- `openclaw-ui` 已能从 nested Vite UI package 和 parent pnpm workspace context 推断 `pnpm dev`，新的失败证据是目标 repo 未安装 `vite`。
+- v0.2 发现 browser/Node 缺工具时维护者指南误用 Python/CLI 文案，因此需要栈感知 triage guidance 和 `Prepare target app environment` repair task。
+
+### 影响
+
+- 更新 `packages/acceptance/src/target-repo-feedback-summary.ts`，browser 环境失败输出 Node/Web app environment prerequisite guidance。
+- 更新 `packages/repair-planner/src/generate-repair-plan.ts`，boot 失败且缺本地 dev tooling 时生成 P1 `Prepare target app environment` repair task。
+- 新增 `docs/operations/real-target-validation-campaign-v0.2.md` 和对应测试级联。
+- 本决策不上传 target repo material、private artifacts、reviewer feedback、customer data、secrets 或 raw private repo content，不执行 npm publish、GitHub release、public launch、production marketing announcement、customer contact、pricing change、spend、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
+
 ## 2026年7月3日 - Real target repo validation campaign
 
 ### 决策

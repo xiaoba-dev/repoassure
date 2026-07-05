@@ -245,7 +245,7 @@ describe('generateRepairPlan', () => {
     );
     await writeFile(join(runDir, 'boot-result.json'), JSON.stringify({ status: 'failed', url: null, blockers: [], errors: [] }));
 
-    const result = await legacyGenerateRepairPlan({
+    const result = await packageGenerateRepairPlan({
       repoRoot,
       runDir,
       sourceManifestPath: join(runDir, 'manifest.json'),
@@ -259,6 +259,68 @@ describe('generateRepairPlan', () => {
     expect(plan.summary.totalTasks).toBe(0);
     expect(plan.tasks).toEqual([]);
     await expect(readFile(result.repairTaskPackageMarkdownPath, 'utf8')).resolves.toContain('No Executable Repair Tasks');
+  });
+
+  it('generates an environment prerequisite task when browser boot fails before findings are available', async () => {
+    const repoRoot = await mkdtemp(join(tmpdir(), 'hardening-repair-env-repo-'));
+    const runDir = await createRunDir();
+    await mkdir(runDir, { recursive: true });
+    await writeFile(join(runDir, 'findings.json'), JSON.stringify({ findings: [] }));
+    await writeFile(
+      join(runDir, 'test-generation.json'),
+      JSON.stringify({
+        createdFiles: ['tests/hardening/generated-findings.spec.ts'],
+        testCommand: 'npx playwright test tests/hardening/generated-findings.spec.ts --reporter=line',
+        validationStatus: 'skipped',
+        errors: []
+      })
+    );
+    await writeFile(
+      join(runDir, 'boot-result.json'),
+      JSON.stringify({
+        status: 'failed',
+        url: null,
+        blockers: [],
+        errors: [
+          'Process exited before becoming reachable: 1',
+          '$ vite',
+          'sh: vite: command not found'
+        ]
+      })
+    );
+
+    const result = await packageGenerateRepairPlan({
+      repoRoot,
+      runDir,
+      sourceManifestPath: join(runDir, 'manifest.json'),
+      runId: 'run-env'
+    });
+    const plan = JSON.parse(await readFile(result.repairPlanPath, 'utf8')) as {
+      summary: { totalTasks: number; p1: number };
+      tasks: Array<{
+        taskId: string;
+        severity: string;
+        title: string;
+        rootCauseHypothesis: string;
+        repairIntent: string;
+        evidence: Array<{ type: string; summary: string }>;
+        verification: { commands: string[]; generatedTests: string[] };
+      }>;
+    };
+    const taskPackageMarkdown = await readFile(result.repairTaskPackageMarkdownPath, 'utf8');
+
+    expect(result.taskCount).toBe(1);
+    expect(result.highestSeverity).toBe('P1');
+    expect(plan.summary).toMatchObject({ totalTasks: 1, p1: 1 });
+    expect(plan.tasks[0]?.taskId).toBe('p1-environment-prepare-target-app-environment');
+    expect(plan.tasks[0]?.title).toBe('Prepare target app environment');
+    expect(plan.tasks[0]?.rootCauseHypothesis).toContain('vite: command not found');
+    expect(plan.tasks[0]?.repairIntent).toContain('pnpm install');
+    expect(plan.tasks[0]?.evidence[0]?.type).toBe('boot');
+    expect(plan.tasks[0]?.verification.generatedTests).toEqual(['tests/hardening/generated-findings.spec.ts']);
+    expect(taskPackageMarkdown).toContain('Prepare target app environment');
+    expect(taskPackageMarkdown).toContain('pnpm install');
+    expect(taskPackageMarkdown).not.toContain('No Executable Repair Tasks');
   });
 });
 

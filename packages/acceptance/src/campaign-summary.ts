@@ -41,6 +41,7 @@ export interface ValidationCampaignSummary {
   campaignStatus: {
     totalTargets: number;
     passedTargets: number;
+    blockedTargets: number;
     failedTargets: number;
     missingEvidenceTargets: number;
     productFollowUpActions: string[];
@@ -62,6 +63,7 @@ export async function buildValidationCampaignSummary(input: ValidationCampaignSu
     campaignStatus: {
       totalTargets: targets.length,
       passedTargets: targets.filter((target) => target.runStatus === 'passed').length,
+      blockedTargets: targets.filter((target) => target.runStatus === 'blocked').length,
       failedTargets: targets.filter((target) => target.runStatus === 'failed').length,
       missingEvidenceTargets: targets.filter((target) => target.runStatus === 'missing_evidence').length,
       productFollowUpActions
@@ -109,6 +111,7 @@ export function buildValidationCampaignSummaryMarkdown(summary: ValidationCampai
     '',
     `- Total targets: ${summary.campaignStatus.totalTargets}`,
     `- Passed targets: ${summary.campaignStatus.passedTargets}`,
+    `- Blocked targets: ${summary.campaignStatus.blockedTargets}`,
     `- Failed targets: ${summary.campaignStatus.failedTargets}`,
     `- Missing evidence targets: ${summary.campaignStatus.missingEvidenceTargets}`,
     `- Product follow-up actions: ${summary.campaignStatus.productFollowUpActions.length > 0 ? summary.campaignStatus.productFollowUpActions.join(', ') : 'none'}`,

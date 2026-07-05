@@ -124,7 +124,7 @@ export function buildTargetRepoFeedbackSummary(input: TargetRepoFeedbackSummaryI
     nextRecommendedProductAction: recommendNextAction(blockerCategory, input.checks),
     artifactLinks: buildArtifactLinks(input),
     redactionBoundary: 'No secrets or raw private repo content may be stored. Do not store OTP, cookie, Access token, login query-state, reviewer credentials, env values, raw private source, or absolute workstation paths.',
-    maintainerTriageGuidance: formatMaintainerTriageGuidance(blockerCategory)
+    maintainerTriageGuidance: formatMaintainerTriageGuidance(blockerCategory, input)
   };
 }
 
@@ -318,7 +318,10 @@ function hasPassedCheck(checks: UserAcceptanceCheck[], name: string): boolean {
   return checks.some((check) => check.name === name && check.status === 'passed');
 }
 
-function formatMaintainerTriageGuidance(blockerCategory: TargetRepoFeedbackBlockerCategory): string {
+function formatMaintainerTriageGuidance(
+  blockerCategory: TargetRepoFeedbackBlockerCategory,
+  input: TargetRepoFeedbackSummaryInput
+): string {
   if (blockerCategory === 'none') {
     return 'No product bug is implied by this run. Maintainer may inspect artifacts for learning and mark no follow-up action.';
   }
@@ -328,10 +331,37 @@ function formatMaintainerTriageGuidance(blockerCategory: TargetRepoFeedbackBlock
   }
 
   if (blockerCategory === 'environment') {
+    if (isBrowserAppEnvironmentFailure(input)) {
+      return 'Treat this as a Node/Web app environment prerequisite issue when browser evidence shows command not found, missing dev tooling, or a boot process that exits before becoming reachable. Check that the target repo dependencies are installed from the correct workspace root, run pnpm install, npm install, or yarn install as appropriate, confirm local tooling such as vite is available, then rerun the linked browser acceptance command before filing a product bug.';
+    }
+
     return 'Treat this as a Python/CLI environment prerequisite issue when the evidence shows ENOENT, command not found, timeout, or missing tool output. Check that the target repo has a documented setup path, create or activate .venv, install the project and dev extras with python -m pip install -e ".[dev]" when available, then rerun the linked acceptance commands before filing a product bug.';
   }
 
   return `Triage this as a possible product bug or docs task in area ${blockerCategory}; inspect linked artifacts before creating follow-up work.`;
+}
+
+function isBrowserAppEnvironmentFailure(input: TargetRepoFeedbackSummaryInput): boolean {
+  if (input.mode !== 'browser') {
+    return false;
+  }
+
+  const evidence = input.checks
+    .filter((check) => check.required && check.status === 'failed')
+    .map((check) => `${check.name} ${check.evidence}`)
+    .join('\n')
+    .toLowerCase();
+
+  return (
+    evidence.includes('browser') ||
+    evidence.includes('boot-result.json') ||
+    evidence.includes('vite') ||
+    evidence.includes('webpack') ||
+    evidence.includes('next') ||
+    evidence.includes('npm') ||
+    evidence.includes('pnpm') ||
+    evidence.includes('yarn')
+  );
 }
 
 async function linkFeedbackSummaryFromManifest(manifestPath: string, summaryPath: string): Promise<void> {

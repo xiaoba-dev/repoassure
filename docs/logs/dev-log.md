@@ -1,5 +1,41 @@
 # 开发日志
 
+## 2026年7月5日 - Real Target Validation Campaign v0.2
+
+### 完成内容
+
+- 在隔离 worktree 中基于当前 `main` 复跑真实目标 repo campaign，不触碰主工作区未提交改动。
+- 目标 `agent-reach` 使用 Python/CLI mode：evidence package 完整生成，CLI entrypoint / pytest / ruff / mypy 因目标环境未安装而 blocked；runStatus 为 `blocked`，blockerCategory 为 `environment`，product action 为 `document_target_stack`。
+- 目标 `odinsight` 使用 browser mode：在目标依赖安装后通过 acceptance，并验证 generated Playwright spec；runStatus 为 `passed`，product action 为 `no_action`。
+- 目标 `openclaw-ui` 使用 browser mode：analyzer 成功从 nested Vite UI package 和 parent pnpm workspace context 推断 `pnpm dev`；browser boot 因目标 repo 未安装 `vite` blocked，runStatus 为 `blocked`，product action 为 `document_target_stack`。
+- 生成本地 `artifacts/validation-campaign-v02/summary/campaign-summary.json` / `.md`，结果为 3 个目标、1 个通过、2 个 blocked、0 个 failed。
+- 新增 browser/Node 环境失败栈感知 triage guidance，避免误输出 Python/CLI 指南。
+- 新增 P1 `Prepare target app environment` repair task，让 AI IDE 先安装目标依赖、确认 `vite` 等 dev tooling，再 rerun browser acceptance。
+- 新增 `docs/operations/real-target-validation-campaign-v0.2.md`，级联更新 README、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：新增 `tests/unit/target-repo-feedback-summary.test.ts` browser/Node missing tooling 用例，测试因旧输出仍包含 Python/CLI environment guidance 按预期失败。
+- Green：更新 `target-repo-feedback-summary`，browser mode 环境失败输出 Node/Web app environment prerequisite guidance。
+- Red：新增 `tests/unit/repair-plan.test.ts` boot failure no findings 用例，测试因 repair plan 没有 environment task 按预期失败。
+- Green：更新 `repair-planner`，缺本地 dev tooling 的 boot failure 生成 `Prepare target app environment` repair task。
+- Red：新增 `tests/unit/project-structure.test.ts` 结构级联测试，测试因 v0.2 operation 文档缺失按预期失败。
+- Green：补齐 operation 文档和级联文档。
+
+### 边界
+
+- Real target evidence remains local only。
+- No target repo material was uploaded。
+- No private artifacts, reviewer feedback, customer data, secrets or raw private repo content were uploaded。
+- No raw email、OTP、cookie、Access token、login query-state、reviewer credentials、env values、raw private source 或 target repo raw content may be stored in committed docs。
+- No Action Authorization Receipt was produced。
+- No npm publication was executed。
+- No GitHub release was executed。
+- No public launch or production marketing announcement was executed。
+- No customer contact was executed。
+- No pricing change or spend was executed。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was executed。
+
 ## 2026年7月3日 - Real Target Repo Validation Campaign v0.1
 
 ### 完成内容

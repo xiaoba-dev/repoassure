@@ -159,4 +159,42 @@ describe('target repo feedback summary', () => {
     expect(summary.maintainerTriageGuidance).toContain('Python/CLI environment');
     expect(summary.maintainerTriageGuidance).toContain('.venv');
   });
+
+  it('classifies missing browser app tooling as a Node environment blocker with stack-specific guidance', () => {
+    const checks: UserAcceptanceCheck[] = [
+      {
+        name: 'browser artifacts 已生成',
+        required: true,
+        status: 'failed',
+        evidence: 'browser requested but no browser artifacts were generated; boot-result.json status=failed; details=Process exited before becoming reachable: 1; $ vite; sh: vite: command not found'
+      },
+      {
+        name: 'repair-plan.json 已生成',
+        required: true,
+        status: 'passed',
+        evidence: '/tmp/run/repair-plan.json'
+      }
+    ];
+
+    const summary = buildTargetRepoFeedbackSummary({
+      generatedAt: '2026-07-05T00:00:00.000Z',
+      mode: 'browser',
+      repoRoot: '/private/tmp/openclaw/ui',
+      runDir: '/private/tmp/openclaw/ui/.hardening/runs/run-2026-07-05T00-00-00-000Z',
+      manifestPath: '/private/tmp/openclaw/ui/.hardening/runs/run-2026-07-05T00-00-00-000Z/manifest.json',
+      repairPlanPath: '/private/tmp/openclaw/ui/.hardening/runs/run-2026-07-05T00-00-00-000Z/repair-plan.json',
+      generatedTestFiles: ['tests/hardening/generated-findings.spec.ts'],
+      artifactFiles: [],
+      checks
+    });
+
+    expect(summary.runStatus).toBe('blocked');
+    expect(summary.blockerCategory).toBe('environment');
+    expect(summary.nextRecommendedProductAction).toBe('document_target_stack');
+    expect(summary.maintainerTriageGuidance).toContain('Node/Web app environment');
+    expect(summary.maintainerTriageGuidance).toContain('pnpm install');
+    expect(summary.maintainerTriageGuidance).toContain('vite');
+    expect(summary.maintainerTriageGuidance).not.toContain('Python/CLI');
+    expect(summary.maintainerTriageGuidance).not.toContain('.venv');
+  });
 });

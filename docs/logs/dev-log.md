@@ -12891,3 +12891,33 @@ Phase 0：项目初始化。
 - No customer contact was authorized。
 - No pricing change or spend was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
+## 2026年7月5日 - AI IDE Repair Execution Playbook v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/ai-ide-repair-playbook.ts`。
+- 新增 `repoassure.ai-ide-repair-execution-playbook.v1`，从 `campaign-summary.json` 的 `prioritizedActionQueue` 生成本地 execution plan。
+- 每个 execution step 串联 `target-repo-feedback-summary.json`、`ai-ide-handoff-package.json`、`repair-task-package.json` 和 `user-validation-evidence-loop.json`。
+- 新增 `ai-ide-repair-playbook.json` / `ai-ide-repair-playbook.md` 输出。
+- 新增 `pnpm playbook:generate` 和 `scripts/generate-ai-ide-repair-playbook.mjs`。
+- 级联更新 README、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/ai-ide-repair-playbook.test.ts`，测试因 `packages/acceptance/src/ai-ide-repair-playbook.ts` 缺失按预期失败。
+- Green：实现最小 playbook builder、Markdown formatter、writer、package export 和 type-smoke 子路径覆盖。
+- Red：再更新 `tests/unit/project-structure.test.ts`，要求 operation 文档、脚本入口和级联记录存在；测试因 `docs/operations/ai-ide-repair-execution-playbook-v0.1.md` 缺失按预期失败。
+- Green：新增 operation packet、脚本入口和级联文档。
+
+### 边界
+
+- No target repo material was uploaded。
+- No target repo branch, commit, pull request, issue, or advisory was created。
+- No target repo patch was automatically applied。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No customer contact was authorized。
+- No pricing change or spend was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。

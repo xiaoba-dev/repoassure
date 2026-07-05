@@ -305,3 +305,20 @@ Private Preview External Reviewer Feedback Intake v0.1 is verified through struc
 The structure test requires `docs/operations/private-preview-external-reviewer-feedback-intake-v0.1.md` and cascade docs to record `Intake status: waiting_for_reviewer_feedback`, `Feedback received: no`, `external-reviewer-1`, `external-reviewer-2`, the sensitive material redaction gate, `No reviewer feedback was invented`, `No feedback triage was started`, and `No external issue was created`.
 
 The test intentionally does not assert any reviewer decision such as accepted or changes_requested because no real reviewer feedback exists yet. Triage remains blocked until redacted real feedback is received.
+
+## AI IDE Repair Execution Playbook v0.1
+
+AI IDE Repair Execution Playbook v0.1 is verified through unit, structure, package build, and command smoke gates.
+
+Required checks:
+
+```text
+pnpm vitest run tests/unit/ai-ide-repair-playbook.test.ts
+pnpm vitest run tests/unit/project-structure.test.ts -t "AI IDE repair execution playbook"
+pnpm build:packages
+pnpm playbook:generate -- --campaign-summary <campaign-summary.json> --output <dir>
+```
+
+The unit test verifies `repoassure.ai-ide-repair-execution-playbook.v1`, `ai-ide-repair-playbook.json`, `ai-ide-repair-playbook.md`, ordered links to `ai-ide-handoff-package.json`, `repair-task-package.json`, and `user-validation-evidence-loop.json`, verification checklist propagation, sensitive path segment redaction, maintainer review boundary, and non-authorization boundary.
+
+This runtime must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, or advisories, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.

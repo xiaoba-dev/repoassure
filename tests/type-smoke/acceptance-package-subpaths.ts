@@ -27,6 +27,7 @@ import * as pythonCliArtifacts from '@hardening-mcp/acceptance/python-cli-artifa
 import * as targetRepoFeedbackSummary from '@hardening-mcp/acceptance/target-repo-feedback-summary';
 import * as aiIdeHandoffPackage from '@hardening-mcp/acceptance/ai-ide-handoff-package';
 import * as userValidationEvidenceLoop from '@hardening-mcp/acceptance/user-validation-evidence-loop';
+import * as aiIdeRepairPlaybook from '@hardening-mcp/acceptance/ai-ide-repair-playbook';
 import * as campaignSummary from '@hardening-mcp/acceptance/campaign-summary';
 import * as userAcceptanceArgs from '@hardening-mcp/acceptance/user-acceptance-args';
 import * as shellQuote from '@hardening-mcp/acceptance/shell-quote';
@@ -71,6 +72,7 @@ const packageSubpathModules = [
   targetRepoFeedbackSummary,
   aiIdeHandoffPackage,
   userValidationEvidenceLoop,
+  aiIdeRepairPlaybook,
   campaignSummary,
   userAcceptanceArgs,
   shellQuote,

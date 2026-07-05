@@ -147,12 +147,70 @@ function buildRepairTasks(input: {
     runDir: input.runDir,
     finding
   }));
+  const environmentTasks = buildEnvironmentRepairTask({
+    runDir: input.runDir,
+    bootResult: input.bootResult,
+    testGeneration: input.testGeneration
+  });
 
-  return [...hardeningTasks, ...securityTasks]
+  return [...environmentTasks, ...hardeningTasks, ...securityTasks]
     .sort((left, right) => {
       const severity = severityRank(left.severity) - severityRank(right.severity);
       return severity === 0 ? left.taskId.localeCompare(right.taskId) : severity;
     });
+}
+
+function buildEnvironmentRepairTask(input: {
+  runDir: string;
+  bootResult: BootResultSummary;
+  testGeneration: TestGenerationSummary;
+}): RepairTask[] {
+  if (!isEnvironmentBootFailure(input.bootResult)) {
+    return [];
+  }
+
+  const bootEvidence = input.bootResult.errors.join(' | ') || input.bootResult.blockers.join(' | ') || 'Target app boot failed before becoming reachable.';
+  const verification = buildVerification(input.testGeneration, input.bootResult);
+
+  return [
+    {
+      taskId: 'p1-environment-prepare-target-app-environment',
+      severity: 'P1',
+      status: 'todo',
+      title: 'Prepare target app environment',
+      rootCauseHypothesis: cleanText(`Boot evidence indicates the target app environment is incomplete: ${bootEvidence}`),
+      repairIntent: 'Install target repo dependencies from the correct workspace root, for example pnpm install, npm install, or yarn install, then confirm required local dev tooling is available before rerunning browser acceptance.',
+      findingIds: ['boot-environment-prerequisite'],
+      evidence: [
+        {
+          type: 'boot',
+          path: join(input.runDir, 'boot-result.json'),
+          summary: cleanText(`Boot status: ${input.bootResult.status} ${bootEvidence}`)
+        }
+      ],
+      targetAreas: [{ kind: 'unknown', value: 'target app environment' }],
+      suggestedFiles: [],
+      verification,
+      agentPrompt: cleanText(
+        `请先修复目标 repo 运行环境，不要修改业务代码。根据 boot-result.json 安装依赖并确认 dev tooling 可用；完成后重新运行 browser acceptance。Boot evidence: ${bootEvidence}`
+      )
+    }
+  ];
+}
+
+function isEnvironmentBootFailure(bootResult: BootResultSummary): boolean {
+  if (bootResult.status !== 'failed') {
+    return false;
+  }
+
+  const text = [...bootResult.errors, ...bootResult.blockers].join('\n').toLowerCase();
+
+  return (
+    text.includes('command not found') ||
+    text.includes('enoent') ||
+    text.includes('not found:') ||
+    text.includes('no such file or directory')
+  );
 }
 
 function buildRepairTask(input: {

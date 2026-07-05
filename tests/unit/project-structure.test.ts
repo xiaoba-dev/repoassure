@@ -2045,6 +2045,47 @@ describe('project structure', () => {
     await expectPath('docs/operations/real-target-campaign-followup-hardening-v0.2.md');
   });
 
+  it('records real target validation campaign v0.2 execution and product follow-up closure', async () => {
+    const [
+      operation,
+      readme,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/real-target-validation-campaign-v0.2.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(operation).toContain('Real Target Validation Campaign v0.2');
+    expect(operation).toContain('Status: campaign_executed_product_gap_closed');
+    expect(operation).toContain('Passed targets: `1`');
+    expect(operation).toContain('Blocked targets: `2`');
+    expect(operation).toContain('Failed targets: `0`');
+    expect(operation).toContain('agent-reach');
+    expect(operation).toContain('odinsight');
+    expect(operation).toContain('openclaw-ui');
+    expect(operation).toContain('Node/Web app environment prerequisite');
+    expect(operation).toContain('Prepare target app environment');
+    expect(operation).toContain('v0.1 had 1 passed / 2 failed; v0.2 has 1 passed / 2 blocked / 0 failed');
+    expect(operation).toContain('No target repo material was uploaded');
+    expect(operation).toContain('No npm publication was executed');
+    expect(operation).toContain('No public launch or production marketing announcement was executed');
+    expect(readme).toContain('Real Target Validation Campaign v0.2');
+    expect(readme).toContain('Prepare target app environment');
+    expect(testingStrategy).toContain('Real Target Validation Campaign v0.2');
+    expect(acceptanceChecklist).toContain('Real Target Validation Campaign v0.2');
+    expect(decisionLog).toContain('Real target validation campaign v0.2');
+    expect(devLog).toContain('Real Target Validation Campaign v0.2');
+
+    await expectPath('docs/operations/real-target-validation-campaign-v0.2.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

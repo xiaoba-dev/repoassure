@@ -2138,6 +2138,46 @@ describe('project structure', () => {
     await expectPath('docs/operations/real-target-validation-campaign-v0.2.md');
   });
 
+  it('records product validation action queue runtime without launch actions', async () => {
+    const [
+      operation,
+      readme,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/product-validation-action-queue-runtime-v0.3.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(operation).toContain('Product Validation Action Queue Runtime v0.3');
+    expect(operation).toContain('Status: product_validation_action_queue_implemented');
+    expect(operation).toContain('prioritizedActionQueue');
+    expect(operation).toContain('P0-improve-repair-plan');
+    expect(operation).toContain('P1-document-target-stack');
+    expect(operation).toContain('ownerSurface');
+    expect(operation).toContain('recommendedVerification');
+    expect(operation).toContain('evidenceRefs');
+    expect(operation).toContain('repoassure.validation-campaign-summary.v1');
+    expect(operation).toContain('No target repo material was uploaded');
+    expect(operation).toContain('No npm publication was executed');
+    expect(operation).toContain('No GitHub release was executed');
+    expect(operation).toContain('No public launch or production marketing announcement was executed');
+    expect(readme).toContain('Product Validation Action Queue Runtime v0.3');
+    expect(readme).toContain('prioritizedActionQueue');
+    expect(testingStrategy).toContain('Product Validation Action Queue Runtime v0.3');
+    expect(acceptanceChecklist).toContain('Product Validation Action Queue Runtime v0.3');
+    expect(decisionLog).toContain('Product validation action queue runtime');
+    expect(devLog).toContain('Product Validation Action Queue Runtime v0.3');
+
+    await expectPath('docs/operations/product-validation-action-queue-runtime-v0.3.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

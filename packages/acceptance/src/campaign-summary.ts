@@ -35,6 +35,26 @@ export interface ValidationCampaignSummaryTarget {
   };
 }
 
+export type ValidationCampaignActionPriority = 'P0' | 'P1' | 'P2';
+export type ValidationCampaignActionOwnerSurface =
+  | 'repoassure_product'
+  | 'maintainer_or_target_repo'
+  | 'ai_ide_or_agent'
+  | 'maintainer';
+
+export interface ValidationCampaignActionItem {
+  id: string;
+  priority: ValidationCampaignActionPriority;
+  action: string;
+  ownerSurface: ValidationCampaignActionOwnerSurface;
+  targetIds: string[];
+  affectedModes: string[];
+  blockerCategories: string[];
+  recommendedVerification: string[];
+  evidenceRefs: string[];
+  nonAuthorizationBoundary: string;
+}
+
 export interface ValidationCampaignSummary {
   schemaVersion: 'repoassure.validation-campaign-summary.v1';
   generatedAt: string;
@@ -46,6 +66,7 @@ export interface ValidationCampaignSummary {
     missingEvidenceTargets: number;
     productFollowUpActions: string[];
   };
+  prioritizedActionQueue: ValidationCampaignActionItem[];
   targets: ValidationCampaignSummaryTarget[];
   redactionBoundary: string;
   nonAuthorizationBoundary: string;
@@ -68,6 +89,7 @@ export async function buildValidationCampaignSummary(input: ValidationCampaignSu
       missingEvidenceTargets: targets.filter((target) => target.runStatus === 'missing_evidence').length,
       productFollowUpActions
     },
+    prioritizedActionQueue: buildPrioritizedActionQueue(targets),
     targets,
     redactionBoundary: 'Local-only campaign index. Do not copy target repo source, secrets, reviewer credentials, customer data, OTP, cookies, access tokens, or raw private artifacts into this summary.',
     nonAuthorizationBoundary: 'This readiness evidence does not authorize public launch, npm publish, GitHub release, repository visibility changes, hosted dashboard claims, SaaS availability claims, pricing changes, spend, or customer contact.'
@@ -116,6 +138,19 @@ export function buildValidationCampaignSummaryMarkdown(summary: ValidationCampai
     `- Missing evidence targets: ${summary.campaignStatus.missingEvidenceTargets}`,
     `- Product follow-up actions: ${summary.campaignStatus.productFollowUpActions.length > 0 ? summary.campaignStatus.productFollowUpActions.join(', ') : 'none'}`,
     '',
+    '## Prioritized Action Queue',
+    '',
+    '| Priority | Action | Owner | Targets | Verification |',
+    '| --- | --- | --- | --- | --- |',
+    ...summary.prioritizedActionQueue.map((item) => `| ${[
+      item.priority,
+      item.action,
+      item.ownerSurface,
+      item.targetIds.join(', '),
+      item.recommendedVerification.join(' / ')
+    ].map(markdownCell).join(' | ')} |`),
+    ...(summary.prioritizedActionQueue.length === 0 ? ['| n/a | none | n/a | n/a | n/a |'] : []),
+    '',
     '## Targets',
     '',
     '| Target | Mode | Run status | Blocker | Product action | Latest run |',
@@ -128,6 +163,131 @@ export function buildValidationCampaignSummaryMarkdown(summary: ValidationCampai
     `- ${summary.nonAuthorizationBoundary}`,
     ''
   ].join('\n');
+}
+
+function buildPrioritizedActionQueue(targets: ValidationCampaignSummaryTarget[]): ValidationCampaignActionItem[] {
+  const actionableTargets = targets.filter((target) => (
+    target.nextRecommendedProductAction !== 'no_action'
+    && target.nextRecommendedProductAction !== 'missing_evidence'
+  ));
+  const grouped = new Map<string, ValidationCampaignSummaryTarget[]>();
+
+  for (const target of actionableTargets) {
+    const group = grouped.get(target.nextRecommendedProductAction) ?? [];
+    group.push(target);
+    grouped.set(target.nextRecommendedProductAction, group);
+  }
+
+  return [...grouped.entries()]
+    .map(([action, group]) => buildActionItem(action, group))
+    .sort(compareActionItems);
+}
+
+function buildActionItem(action: string, targets: ValidationCampaignSummaryTarget[]): ValidationCampaignActionItem {
+  const priority = classifyActionPriority(action, targets);
+
+  return {
+    id: `${priority}-${slugifyAction(action)}`,
+    priority,
+    action,
+    ownerSurface: classifyOwnerSurface(action),
+    targetIds: uniqueSorted(targets.map((target) => target.targetId)),
+    affectedModes: uniqueSorted(targets.map((target) => target.mode)),
+    blockerCategories: uniqueSorted(targets.map((target) => target.blockerCategory)),
+    recommendedVerification: buildRecommendedVerification(action, targets),
+    evidenceRefs: targets
+      .map((target) => target.evidence.targetRepoFeedbackSummary)
+      .filter((path): path is string => Boolean(path)),
+    nonAuthorizationBoundary: 'This action item is product validation work only; it does not authorize public launch, npm publish, GitHub release, customer contact, pricing/spend, or commercial availability claims.'
+  };
+}
+
+function classifyActionPriority(
+  action: string,
+  targets: ValidationCampaignSummaryTarget[]
+): ValidationCampaignActionPriority {
+  if (
+    action === 'improve_repair_plan'
+    || action === 'improve_generated_tests'
+    || action === 'improve_detector'
+    || targets.some((target) => target.runStatus === 'failed')
+  ) {
+    return 'P0';
+  }
+
+  if (
+    action === 'document_target_stack'
+    || action === 'request_user_input'
+    || targets.some((target) => target.runStatus === 'blocked')
+  ) {
+    return 'P1';
+  }
+
+  return 'P2';
+}
+
+function classifyOwnerSurface(action: string): ValidationCampaignActionOwnerSurface {
+  switch (action) {
+    case 'improve_repair_plan':
+    case 'improve_generated_tests':
+    case 'improve_detector':
+      return 'repoassure_product';
+    case 'document_target_stack':
+    case 'request_user_input':
+      return 'maintainer_or_target_repo';
+    case 'inspect_artifacts':
+      return 'ai_ide_or_agent';
+    default:
+      return 'maintainer';
+  }
+}
+
+function buildRecommendedVerification(
+  action: string,
+  targets: ValidationCampaignSummaryTarget[]
+): string[] {
+  const targetList = uniqueSorted(targets.map((target) => target.targetId)).join(', ');
+
+  if (action === 'document_target_stack') {
+    return [
+      `Document target runtime prerequisites for ${targetList}.`,
+      'Install or confirm target dependencies and local tooling.',
+      'Rerun the affected target repo acceptance command, then regenerate the campaign summary.'
+    ];
+  }
+
+  if (action === 'request_user_input') {
+    return [
+      `Ask maintainer for missing target repo input for ${targetList}.`,
+      'Rerun the affected target repo acceptance command after input is corrected.',
+      'Regenerate the campaign summary and confirm the action leaves the queue.'
+    ];
+  }
+
+  return [
+    `Inspect repair task package evidence for ${targetList}.`,
+    'Add or update focused unit coverage before changing runtime behavior.',
+    'Rerun the affected target repo acceptance command, then regenerate the campaign summary.'
+  ];
+}
+
+function compareActionItems(a: ValidationCampaignActionItem, b: ValidationCampaignActionItem): number {
+  const priorityRank: Record<ValidationCampaignActionPriority, number> = { P0: 0, P1: 1, P2: 2 };
+  const priorityDiff = priorityRank[a.priority] - priorityRank[b.priority];
+
+  if (priorityDiff !== 0) {
+    return priorityDiff;
+  }
+
+  return a.action.localeCompare(b.action);
+}
+
+function uniqueSorted(values: string[]): string[] {
+  return [...new Set(values.filter(Boolean))].sort();
+}
+
+function slugifyAction(action: string): string {
+  return action.replaceAll('_', '-');
 }
 
 async function buildTargetSummary(input: ValidationCampaignTargetInput): Promise<ValidationCampaignSummaryTarget> {

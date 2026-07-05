@@ -12864,3 +12864,30 @@ Phase 0：项目初始化。
 - No customer contact was authorized。
 - No pricing change or spend was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
+## 2026年7月5日 - Product Validation Action Queue Runtime v0.3
+
+### 完成内容
+
+- 在 `packages/acceptance/src/campaign-summary.ts` 中新增 `prioritizedActionQueue`。
+- 按 `nextRecommendedProductAction` 聚合 campaign target，生成 `P0-improve-repair-plan`、`P1-document-target-stack` 等行动项。
+- 行动项记录 priority、ownerSurface、targetIds、affectedModes、blockerCategories、recommendedVerification、evidenceRefs 和 nonAuthorizationBoundary。
+- `campaign-summary.md` 新增 `Prioritized Action Queue` section。
+- 新增 `docs/operations/product-validation-action-queue-runtime-v0.3.md`，并级联更新 README、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/campaign-summary.test.ts`，要求 summary 输出 `prioritizedActionQueue` 和 Markdown `Prioritized Action Queue`；测试因字段缺失按预期失败。
+- Green：实现最小 action queue 聚合逻辑并重跑 `campaign-summary.test.ts` 通过。
+- Red：再更新 `tests/unit/project-structure.test.ts`，要求 operation 文档和级联记录存在；测试因 `docs/operations/product-validation-action-queue-runtime-v0.3.md` 缺失按预期失败。
+- Green：新增 operation packet 并更新级联文档。
+
+### 边界
+
+- No target repo material was uploaded。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No customer contact was authorized。
+- No pricing change or spend was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。

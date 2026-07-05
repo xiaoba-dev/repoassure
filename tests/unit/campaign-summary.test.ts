@@ -87,6 +87,40 @@ describe('validation campaign summary', () => {
     expect(summary.campaignStatus.failedTargets).toBe(1);
     expect(summary.campaignStatus.blockedTargets).toBe(1);
     expect(summary.campaignStatus.productFollowUpActions).toEqual(['improve_repair_plan', 'document_target_stack']);
+    expect(summary.prioritizedActionQueue).toEqual([
+      {
+        id: 'P0-improve-repair-plan',
+        priority: 'P0',
+        action: 'improve_repair_plan',
+        ownerSurface: 'repoassure_product',
+        targetIds: ['python-cli'],
+        affectedModes: ['cli'],
+        blockerCategories: ['unknown'],
+        recommendedVerification: [
+          'Inspect repair task package evidence for python-cli.',
+          'Add or update focused unit coverage before changing runtime behavior.',
+          'Rerun the affected target repo acceptance command, then regenerate the campaign summary.'
+        ],
+        evidenceRefs: [join(cliRunDir, 'target-repo-feedback-summary.json')],
+        nonAuthorizationBoundary: 'This action item is product validation work only; it does not authorize public launch, npm publish, GitHub release, customer contact, pricing/spend, or commercial availability claims.'
+      },
+      {
+        id: 'P1-document-target-stack',
+        priority: 'P1',
+        action: 'document_target_stack',
+        ownerSurface: 'maintainer_or_target_repo',
+        targetIds: ['blocked-web-app'],
+        affectedModes: ['browser'],
+        blockerCategories: ['environment'],
+        recommendedVerification: [
+          'Document target runtime prerequisites for blocked-web-app.',
+          'Install or confirm target dependencies and local tooling.',
+          'Rerun the affected target repo acceptance command, then regenerate the campaign summary.'
+        ],
+        evidenceRefs: [join(blockedRunDir, 'target-repo-feedback-summary.json')],
+        nonAuthorizationBoundary: 'This action item is product validation work only; it does not authorize public launch, npm publish, GitHub release, customer contact, pricing/spend, or commercial availability claims.'
+      }
+    ]);
     expect(summary.targets).toEqual([
       expect.objectContaining({
         targetId: 'browser-app',
@@ -127,7 +161,10 @@ describe('validation campaign summary', () => {
     });
 
     await expect(readFile(written.jsonPath, 'utf8')).resolves.toContain('repoassure.validation-campaign-summary.v1');
+    await expect(readFile(written.jsonPath, 'utf8')).resolves.toContain('prioritizedActionQueue');
     await expect(readFile(written.markdownPath, 'utf8')).resolves.toContain('- Blocked targets: 1');
+    await expect(readFile(written.markdownPath, 'utf8')).resolves.toContain('## Prioritized Action Queue');
+    await expect(readFile(written.markdownPath, 'utf8')).resolves.toContain('| P0 | improve_repair_plan | repoassure_product | python-cli |');
     await expect(readFile(written.markdownPath, 'utf8')).resolves.toContain('| python-cli | cli | failed |');
   });
 });

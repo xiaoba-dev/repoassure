@@ -12839,3 +12839,28 @@ Phase 0：项目初始化。
 - No GitHub release was authorized。
 - No public launch or production marketing announcement was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
+## 2026年7月5日 - Public Source Release Final Verification v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/public-source-release-final-verification-v0.1.md`。
+- 记录当前状态：`Status: public_source_verified_launch_still_blocked`。
+- 复核 repository visibility `PUBLIC`、latest main head `e58095fea34d1f8f56941086df1b5be6abf685ce`、latest main CI run `28738066002`、public read access、branch protection solo maintainer profile、remote tags / GitHub releases / npm package absent、`package.json` `"private": true`。
+- 记录 `pnpm release:check`、`pnpm repo:hygiene`、`pnpm release:hygiene`、`REPOASSURE_WEBSITE_URL=https://repoassure.com pnpm verify:website` 和 `REPOASSURE_WEBSITE_URL=https://www.repoassure.com pnpm verify:website` 通过。
+- 级联更新 README、public release checklist、testing strategy、acceptance checklist 和 decision log。
+- 修正 `CONTRIBUTING.md` 中 private 阶段旧表述。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Public Source Release Final Verification v0.1 文档、级联记录和 CONTRIBUTING public 状态存在；测试因 `docs/operations/public-source-release-final-verification-v0.1.md` 缺失按预期失败。
+- Green：新增 final verification operation packet，并更新级联文档和 CONTRIBUTING。
+
+### 边界
+
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No customer contact was authorized。
+- No pricing change or spend was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。

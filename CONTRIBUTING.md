@@ -1,6 +1,6 @@
 # Contributing
 
-RepoAssure is currently prepared for a future public source release, but the repository remains private until the public release checklist is complete and publication is explicitly authorized.
+The repository is public for source review and contribution. Package publication, GitHub releases, public launch announcements, customer contact, pricing/spend, and SaaS / Team Cloud / Enterprise availability claims still require separate explicit maintainer authorization.
 
 ## Contribution Policy
 

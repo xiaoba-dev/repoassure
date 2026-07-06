@@ -12921,3 +12921,34 @@ Phase 0：项目初始化。
 - No customer contact was authorized。
 - No pricing change or spend was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
+## 2026年7月6日 - AI IDE Playbook Real Campaign Consumption Validation v0.1
+
+### 完成内容
+
+- 扩展 `packages/acceptance/src/ai-ide-repair-playbook.ts`，让 playbook 输出 `campaignContext.targetStatusMatrix`。
+- 为每个 `executionPlan[]` 增加 `targetContexts`，记录 targetId、mode、runStatus、blockerCategory、nextRecommendedProductAction、latestRunId 和 requiredChecksFailed。
+- 新增 `aiIdeConsumptionChecklist`，明确 AI IDE 应先读 campaign target matrix、再按 readOrder 读取 artifact、再执行 verification checklist。
+- Markdown 输出新增 `Campaign Target Matrix` 和 `AI IDE consumption checklist`。
+- 新增 `tests/integration/playbook-generate.test.ts`，使用 `pnpm playbook:generate` 验证真实/近真实 campaign summary 能生成 JSON / Markdown playbook，并验证敏感路径脱敏。
+- 新增 `docs/operations/ai-ide-playbook-real-campaign-consumption-validation-v0.1.md`，并级联更新 README、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/ai-ide-repair-playbook.test.ts`，要求真实 campaign fixture 输出 `campaignContext.targetStatusMatrix`、`targetContexts` 和 `aiIdeConsumptionChecklist`；测试因 `campaignContext` 缺失按预期失败。
+- Green：实现最小 campaign context、target context 和 checklist，并重跑 playbook 单测通过。
+- Smoke：新增 `tests/integration/playbook-generate.test.ts`，通过 `pnpm playbook:generate` 生成 `ai-ide-repair-playbook.json` / `.md` 并验证 schema、Markdown 和 redaction boundary。
+- Red：再更新 `tests/unit/project-structure.test.ts`，要求本 operation 文档和级联记录存在；测试因 operation 文档缺失按预期失败。
+- Green：新增 operation packet 和级联文档。
+
+### 边界
+
+- No target repo material was uploaded。
+- No target repo branch, commit, pull request, issue, or advisory was created。
+- No target repo patch was automatically applied。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No customer contact was authorized。
+- No pricing change or spend was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。

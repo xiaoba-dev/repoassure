@@ -2230,6 +2230,49 @@ describe('project structure', () => {
     await expectPath('docs/operations/ai-ide-repair-execution-playbook-v0.1.md');
   });
 
+  it('records AI IDE playbook real campaign consumption validation without target repo mutations or launch actions', async () => {
+    const [
+      operation,
+      readme,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/ai-ide-playbook-real-campaign-consumption-validation-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(operation).toContain('AI IDE Playbook Real Campaign Consumption Validation v0.1');
+    expect(operation).toContain('Status: ai_ide_playbook_real_campaign_consumption_validated');
+    expect(operation).toContain('campaignContext.targetStatusMatrix');
+    expect(operation).toContain('targetContexts');
+    expect(operation).toContain('aiIdeConsumptionChecklist');
+    expect(operation).toContain('passed / blocked / failed');
+    expect(operation).toContain('environment blocker');
+    expect(operation).toContain('P0-improve-repair-plan');
+    expect(operation).toContain('P1-document-target-stack');
+    expect(operation).toContain('pnpm playbook:generate');
+    expect(operation).toContain('tests/integration/playbook-generate.test.ts');
+    expect(operation).toContain('No target repo material was uploaded');
+    expect(operation).toContain('No target repo branch, commit, pull request, issue, or advisory was created');
+    expect(operation).toContain('No npm publication was executed');
+    expect(operation).toContain('No GitHub release was executed');
+    expect(operation).toContain('No public launch or production marketing announcement was executed');
+    expect(readme).toContain('AI IDE Playbook Real Campaign Consumption Validation v0.1');
+    expect(readme).toContain('campaignContext.targetStatusMatrix');
+    expect(testingStrategy).toContain('AI IDE Playbook Real Campaign Consumption Validation v0.1');
+    expect(acceptanceChecklist).toContain('AI IDE Playbook Real Campaign Consumption Validation v0.1');
+    expect(decisionLog).toContain('AI IDE playbook real campaign consumption validation');
+    expect(devLog).toContain('AI IDE Playbook Real Campaign Consumption Validation v0.1');
+
+    await expectPath('docs/operations/ai-ide-playbook-real-campaign-consumption-validation-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

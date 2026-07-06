@@ -322,3 +322,21 @@ pnpm playbook:generate -- --campaign-summary <campaign-summary.json> --output <d
 The unit test verifies `repoassure.ai-ide-repair-execution-playbook.v1`, `ai-ide-repair-playbook.json`, `ai-ide-repair-playbook.md`, ordered links to `ai-ide-handoff-package.json`, `repair-task-package.json`, and `user-validation-evidence-loop.json`, verification checklist propagation, sensitive path segment redaction, maintainer review boundary, and non-authorization boundary.
 
 This runtime must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, or advisories, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.
+
+## AI IDE Playbook Real Campaign Consumption Validation v0.1
+
+AI IDE Playbook Real Campaign Consumption Validation v0.1 verifies the playbook against a real-campaign-shaped fixture with passed / blocked / failed target status, an environment blocker, and repair-plan action queue items.
+
+Required checks:
+
+```text
+pnpm vitest run tests/unit/ai-ide-repair-playbook.test.ts
+pnpm vitest run tests/integration/playbook-generate.test.ts
+pnpm vitest run tests/unit/project-structure.test.ts -t "real campaign consumption"
+```
+
+The unit contract checks `campaignContext.targetStatusMatrix`, `executionPlan[].targetContexts`, `aiIdeConsumptionChecklist`, readable campaign target matrix Markdown, verification checklist propagation, and sensitive path segment redaction.
+
+The integration smoke invokes `pnpm playbook:generate` and verifies `ai-ide-repair-playbook.json` / `.md` are generated from a local campaign summary without target repo source or private artifacts.
+
+This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, or advisories, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.

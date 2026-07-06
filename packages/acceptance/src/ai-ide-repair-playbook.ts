@@ -36,12 +36,34 @@ export interface AiIdeRepairPlaybookReadEntry {
   reason: string;
 }
 
+export interface AiIdeRepairPlaybookTargetContext {
+  targetId: string;
+  repoRootName: string;
+  latestRunId: string | null;
+  mode: string;
+  runStatus: string;
+  blockerCategory: string;
+  nextRecommendedProductAction: string;
+  requiredChecksFailed: number | null;
+}
+
+export interface AiIdeRepairPlaybookCampaignContext {
+  totalTargets: number;
+  passedTargets: number;
+  blockedTargets: number;
+  failedTargets: number;
+  missingEvidenceTargets: number;
+  productFollowUpActions: string[];
+  targetStatusMatrix: AiIdeRepairPlaybookTargetContext[];
+}
+
 export interface AiIdeRepairPlaybookExecutionStep {
   sourceActionId: string;
   priority: ValidationCampaignActionPriority;
   ownerSurface: ValidationCampaignActionOwnerSurface;
   action: string;
   targetIds: string[];
+  targetContexts: AiIdeRepairPlaybookTargetContext[];
   affectedModes: string[];
   blockerCategories: string[];
   readOrder: AiIdeRepairPlaybookReadEntry[];
@@ -54,7 +76,9 @@ export interface AiIdeRepairExecutionPlaybook {
   schemaVersion: 'repoassure.ai-ide-repair-execution-playbook.v1';
   generatedAt: string;
   sourceCampaignSummary: string;
+  campaignContext: AiIdeRepairPlaybookCampaignContext;
   executionPlan: AiIdeRepairPlaybookExecutionStep[];
+  aiIdeConsumptionChecklist: string[];
   executionGuardrails: string[];
   redactionBoundary: string;
   nonAuthorizationBoundary: string;
@@ -73,10 +97,17 @@ export function buildAiIdeRepairExecutionPlaybook(
     schemaVersion: 'repoassure.ai-ide-repair-execution-playbook.v1',
     generatedAt: sanitize(input.generatedAt ?? new Date().toISOString()),
     sourceCampaignSummary: sanitizePath(input.campaignSummaryPath),
+    campaignContext: buildCampaignContext(input.campaignSummary),
     executionPlan: input.campaignSummary.prioritizedActionQueue.map((action) => buildExecutionStep(
       action,
       input.campaignSummary.targets
     )),
+    aiIdeConsumptionChecklist: [
+      'Review campaignContext.targetStatusMatrix before editing target repos.',
+      'Read each executionPlan item in readOrder before opening repair-task-package.json.',
+      'Treat blocked or environment targets as prerequisite work unless maintainer explicitly asks for product runtime changes.',
+      'Run verificationChecklist after maintainer-approved target changes, then regenerate the campaign summary and playbook.'
+    ],
     executionGuardrails: [
       'Do not upload target repo source, secrets, reviewer credentials, customer data, or raw private artifacts.',
       'Do not automatically modify target repos, apply patches, create branches, commits, pull requests, issues, or advisories from this playbook.',
@@ -116,6 +147,20 @@ export function buildAiIdeRepairExecutionPlaybookMarkdown(
     `Generated at: ${playbook.generatedAt}`,
     `Source campaign summary: ${playbook.sourceCampaignSummary}`,
     '',
+    '## Campaign Target Matrix',
+    '',
+    '| Target | Mode | Run status | Blocker | Product action | Latest run |',
+    '| --- | --- | --- | --- | --- | --- |',
+    ...playbook.campaignContext.targetStatusMatrix.map((target) => `| ${[
+      target.targetId,
+      target.mode,
+      target.runStatus,
+      target.blockerCategory,
+      target.nextRecommendedProductAction,
+      target.latestRunId ?? 'n/a'
+    ].map((value) => escapeMarkdownTableCell(value)).join(' | ')} |`),
+    ...(playbook.campaignContext.targetStatusMatrix.length === 0 ? ['| n/a | n/a | n/a | n/a | n/a | n/a |'] : []),
+    '',
     '## Execution Plan',
     '',
     '| Priority | Action item | Owner | Targets | Required reading | Verification |',
@@ -129,6 +174,10 @@ export function buildAiIdeRepairExecutionPlaybookMarkdown(
       step.verificationChecklist.join(' / ')
     ].map((value) => escapeMarkdownTableCell(value)).join(' | ')} |`),
     ...(playbook.executionPlan.length === 0 ? ['| n/a | No prioritized action queue items | n/a | n/a | n/a | n/a |'] : []),
+    '',
+    '## AI IDE consumption checklist',
+    '',
+    ...playbook.aiIdeConsumptionChecklist.map((item) => `- ${item}`),
     '',
     '## Maintainer review boundary',
     '',
@@ -159,12 +208,38 @@ function buildExecutionStep(
     ownerSurface: action.ownerSurface,
     action: sanitize(action.action),
     targetIds: action.targetIds.map(sanitize),
+    targetContexts: actionTargets.map(buildTargetContext),
     affectedModes: action.affectedModes.map(sanitize),
     blockerCategories: action.blockerCategories.map(sanitize),
     readOrder: actionTargets.flatMap(buildReadOrder),
     verificationChecklist: action.recommendedVerification.map(sanitize),
     maintainerReviewBoundary: 'Stop for maintainer review before modifying target repo files, applying patches, creating branches, commits, pull requests, issues, or advisories.',
     nonAuthorizationBoundary: sanitize(action.nonAuthorizationBoundary)
+  };
+}
+
+function buildCampaignContext(summary: ValidationCampaignSummary): AiIdeRepairPlaybookCampaignContext {
+  return {
+    totalTargets: summary.campaignStatus.totalTargets,
+    passedTargets: summary.campaignStatus.passedTargets,
+    blockedTargets: summary.campaignStatus.blockedTargets,
+    failedTargets: summary.campaignStatus.failedTargets,
+    missingEvidenceTargets: summary.campaignStatus.missingEvidenceTargets,
+    productFollowUpActions: summary.campaignStatus.productFollowUpActions.map(sanitize),
+    targetStatusMatrix: summary.targets.map(buildTargetContext)
+  };
+}
+
+function buildTargetContext(target: ValidationCampaignSummaryTarget): AiIdeRepairPlaybookTargetContext {
+  return {
+    targetId: sanitize(target.targetId),
+    repoRootName: sanitize(target.repoRootName),
+    latestRunId: target.latestRunId ? sanitize(target.latestRunId) : null,
+    mode: sanitize(target.mode),
+    runStatus: sanitize(target.runStatus),
+    blockerCategory: sanitize(target.blockerCategory),
+    nextRecommendedProductAction: sanitize(target.nextRecommendedProductAction),
+    requiredChecksFailed: target.requiredChecksFailed
   };
 }
 

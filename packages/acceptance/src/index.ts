@@ -237,9 +237,11 @@ export {
   writeAiIdeRepairExecutionPlaybook,
   type AiIdeRepairExecutionPlaybook,
   type AiIdeRepairPlaybookArtifactKind,
+  type AiIdeRepairPlaybookCampaignContext,
   type AiIdeRepairPlaybookExecutionStep,
   type AiIdeRepairPlaybookInput,
   type AiIdeRepairPlaybookReadEntry,
+  type AiIdeRepairPlaybookTargetContext,
   type WriteAiIdeRepairPlaybookInput,
   type WriteAiIdeRepairPlaybookResult
 } from './ai-ide-repair-playbook.js';

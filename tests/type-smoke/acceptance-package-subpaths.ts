@@ -28,6 +28,7 @@ import * as targetRepoFeedbackSummary from '@hardening-mcp/acceptance/target-rep
 import * as aiIdeHandoffPackage from '@hardening-mcp/acceptance/ai-ide-handoff-package';
 import * as userValidationEvidenceLoop from '@hardening-mcp/acceptance/user-validation-evidence-loop';
 import * as aiIdeRepairPlaybook from '@hardening-mcp/acceptance/ai-ide-repair-playbook';
+import * as aiIdePlaybookConsumptionReport from '@hardening-mcp/acceptance/ai-ide-playbook-consumption-report';
 import * as campaignSummary from '@hardening-mcp/acceptance/campaign-summary';
 import * as userAcceptanceArgs from '@hardening-mcp/acceptance/user-acceptance-args';
 import * as shellQuote from '@hardening-mcp/acceptance/shell-quote';
@@ -73,6 +74,7 @@ const packageSubpathModules = [
   aiIdeHandoffPackage,
   userValidationEvidenceLoop,
   aiIdeRepairPlaybook,
+  aiIdePlaybookConsumptionReport,
   campaignSummary,
   userAcceptanceArgs,
   shellQuote,

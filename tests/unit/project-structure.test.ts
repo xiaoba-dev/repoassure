@@ -2273,6 +2273,57 @@ describe('project structure', () => {
     await expectPath('docs/operations/ai-ide-playbook-real-campaign-consumption-validation-v0.1.md');
   });
 
+  it('records AI IDE playbook consumption dry-run report without target repo mutations or launch actions', async () => {
+    const [
+      operation,
+      readme,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      packageJson,
+      script
+    ] = await Promise.all([
+      readFile('docs/operations/ai-ide-playbook-consumption-dry-run-report-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('package.json', 'utf8'),
+      readFile('scripts/generate-ai-ide-playbook-consumption-report.mjs', 'utf8')
+    ]);
+
+    expect(operation).toContain('AI IDE Playbook Consumption Dry-Run Report v0.1');
+    expect(operation).toContain('Status: ai_ide_playbook_consumption_dry_run_report_implemented');
+    expect(operation).toContain('ai-ide-playbook-consumption-report.json');
+    expect(operation).toContain('ai-ide-playbook-consumption-report.md');
+    expect(operation).toContain('repoassure.ai-ide-playbook-consumption-report.v1');
+    expect(operation).toContain('pnpm playbook:consume');
+    expect(operation).toContain('campaignUnderstanding');
+    expect(operation).toContain('repairTaskUnderstanding');
+    expect(operation).toContain('readOrderCompliance');
+    expect(operation).toContain('dryRunDecision.blockedActions');
+    expect(operation).toContain('tests/integration/playbook-consume.test.ts');
+    expect(operation).toContain('No target repo material was uploaded');
+    expect(operation).toContain('No target repo branch, commit, pull request, issue, advisory, or file mutation was created');
+    expect(operation).toContain('No npm publication was executed');
+    expect(operation).toContain('No GitHub release was executed');
+    expect(operation).toContain('No public launch or production marketing announcement was executed');
+    expect(readme).toContain('AI IDE Playbook Consumption Dry-Run Report v0.1');
+    expect(readme).toContain('ai-ide-playbook-consumption-report.json');
+    expect(testingStrategy).toContain('AI IDE Playbook Consumption Dry-Run Report v0.1');
+    expect(acceptanceChecklist).toContain('AI IDE Playbook Consumption Dry-Run Report v0.1');
+    expect(decisionLog).toContain('AI IDE playbook consumption dry-run report');
+    expect(devLog).toContain('AI IDE Playbook Consumption Dry-Run Report v0.1');
+    expect(packageJson).toContain('"playbook:consume": "pnpm build:acceptance && node scripts/generate-ai-ide-playbook-consumption-report.mjs"');
+    expect(script).toContain('writeAiIdePlaybookConsumptionReport');
+    expect(script).toContain('--playbook');
+    expect(script).toContain('--output');
+
+    await expectPath('docs/operations/ai-ide-playbook-consumption-dry-run-report-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
@@ -4363,6 +4414,7 @@ describe('project structure', () => {
 
     expect(packageModuleNames).toEqual([
       'ai-ide-handoff-package',
+      'ai-ide-playbook-consumption-report',
       'ai-ide-repair-playbook',
       'campaign-summary',
       'compatibility',

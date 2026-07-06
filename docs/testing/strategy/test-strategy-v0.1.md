@@ -340,3 +340,21 @@ The unit contract checks `campaignContext.targetStatusMatrix`, `executionPlan[].
 The integration smoke invokes `pnpm playbook:generate` and verifies `ai-ide-repair-playbook.json` / `.md` are generated from a local campaign summary without target repo source or private artifacts.
 
 This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, or advisories, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.
+
+## AI IDE Playbook Consumption Dry-Run Report v0.1
+
+AI IDE Playbook Consumption Dry-Run Report v0.1 verifies that a local AI IDE consumer can transform `ai-ide-repair-playbook.json` into a bounded understanding report before any target repo repair starts.
+
+Required checks:
+
+```text
+pnpm vitest run tests/unit/ai-ide-playbook-consumption-report.test.ts
+pnpm vitest run tests/integration/playbook-consume.test.ts
+pnpm vitest run tests/unit/project-structure.test.ts -t "playbook consumption dry-run report"
+```
+
+The unit contract checks `repoassure.ai-ide-playbook-consumption-report.v1`, `campaignUnderstanding`, `repairTaskUnderstanding`, `readOrderCompliance`, `dryRunDecision.blockedActions`, Markdown readability, maintainer review boundary propagation, and sensitive path segment redaction.
+
+The integration smoke invokes `pnpm playbook:consume` and verifies `ai-ide-playbook-consumption-report.json` / `.md` are generated from a local playbook without target repo source or private artifacts.
+
+This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.

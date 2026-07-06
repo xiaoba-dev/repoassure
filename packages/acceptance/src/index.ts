@@ -247,6 +247,23 @@ export {
 } from './ai-ide-repair-playbook.js';
 
 export {
+  buildAiIdePlaybookConsumptionReport,
+  buildAiIdePlaybookConsumptionReportMarkdown,
+  writeAiIdePlaybookConsumptionReport,
+  type AiIdePlaybookBlockedAction,
+  type AiIdePlaybookCampaignUnderstanding,
+  type AiIdePlaybookConsumptionReport,
+  type AiIdePlaybookConsumptionReportInput,
+  type AiIdePlaybookDryRunDecision,
+  type AiIdePlaybookReadOrderCompliance,
+  type AiIdePlaybookRepairTaskUnderstanding,
+  type AiIdePlaybookTargetDisposition,
+  type AiIdePlaybookTargetHandling,
+  type WriteAiIdePlaybookConsumptionReportInput,
+  type WriteAiIdePlaybookConsumptionReportResult
+} from './ai-ide-playbook-consumption-report.js';
+
+export {
   buildValidationCampaignSummary,
   buildValidationCampaignSummaryMarkdown,
   writeValidationCampaignSummary,

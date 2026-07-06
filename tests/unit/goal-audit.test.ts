@@ -1340,6 +1340,23 @@ describe('goal audit', () => {
     expect(pathChecks).toContain('/repo/dist/adapters/cli/index.js');
   });
 
+  it('classifies persisted accepted user acceptance evidence without requiring historical temp repo paths to exist', async () => {
+    const items = await buildGoalAuditItemsFromWorkspace({
+      root: process.cwd(),
+      pathExists: async () => true,
+      pathExistsSync: () => false
+    });
+    const userAcceptanceItem = items.find((item) => (
+      item.category === '用户验收'
+      && item.requirement === '用户确认 MVP 符合预期'
+    ));
+
+    expect(userAcceptanceItem).toEqual(expect.objectContaining({
+      status: 'passed',
+      evidence: ['docs/acceptance/user-acceptance-record.md records a passing run and accepted user decision']
+    }));
+  });
+
   it('tracks legacy dist acceptance declaration outputs as package compatibility evidence', () => {
     expect(LEGACY_ACCEPTANCE_DIST_DECLARATION_SOURCE_SPECS.map((spec) => spec.path)).toEqual([
       'dist/internal/acceptance/fatal-error.d.ts',

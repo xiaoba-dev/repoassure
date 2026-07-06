@@ -12985,3 +12985,36 @@ Phase 0：项目初始化。
 - No customer contact was authorized。
 - No pricing change or spend was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
+## 2026年7月6日 - AI IDE Repair Decision Package v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/ai-ide-repair-decision-package.ts`。
+- 新增 `repoassure.ai-ide-repair-decision-package.v1`，从本地 `ai-ide-playbook-consumption-report.json` 生成 maintainer repair decision package。
+- 决策包输出 `decisionSummary`、`decisionItems`、`targetReviewSummary`、`maintainerDecisionChecklist`、inherited blocked actions、maintainer review boundary、redaction boundary 和 non-authorization boundary。
+- 新增 `ai-ide-repair-decision-package.json` / `ai-ide-repair-decision-package.md` 输出。
+- 新增 `pnpm playbook:decide` 和 `scripts/generate-ai-ide-repair-decision-package.mjs`。
+- 新增 `tests/integration/playbook-decide.test.ts`，验证 CLI smoke、schema、Markdown 和敏感路径脱敏。
+- 新增 `docs/operations/ai-ide-repair-decision-package-v0.1.md`，并级联更新 README、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/ai-ide-repair-decision-package.test.ts`，测试因 `packages/acceptance/src/ai-ide-repair-decision-package.ts` 缺失按预期失败。
+- Green：实现最小 decision package builder、Markdown renderer、writer、package export 和 type-smoke 子路径覆盖。
+- Red：新增 `tests/integration/playbook-decide.test.ts`，测试因 `pnpm playbook:decide` 不存在按预期失败。
+- Green：新增 CLI 脚本和 package script。
+- Red：更新 `tests/unit/project-structure.test.ts`，要求本 operation 文档、脚本入口和级联记录存在；测试因 operation 文档缺失按预期失败。
+- Green：新增 operation packet 和级联文档。
+
+### 边界
+
+- No target repo material was uploaded。
+- No target repo branch, commit, pull request, issue, advisory, or file mutation was created。
+- No target repo patch was automatically applied。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No customer contact was authorized。
+- No pricing change or spend was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。

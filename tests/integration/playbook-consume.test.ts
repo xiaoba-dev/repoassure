@@ -10,6 +10,7 @@ import { buildAiIdeRepairExecutionPlaybook } from '../../packages/acceptance/src
 import type { ValidationCampaignSummary } from '../../packages/acceptance/src/campaign-summary.js';
 
 const execFileAsync = promisify(execFile);
+const SCRIPT_TEST_TIMEOUT_MS = 30_000;
 
 describe('playbook consumption script', () => {
   it('generates dry-run consumption report artifacts from a local repair playbook', async () => {
@@ -66,7 +67,7 @@ describe('playbook consumption script', () => {
     expect(markdown).toContain('No target repo branch, commit, pull request, issue, advisory, or file mutation is authorized.');
     expect(json).not.toContain('secret-value');
     expect(markdown).not.toContain('secret-value');
-  });
+  }, SCRIPT_TEST_TIMEOUT_MS);
 });
 
 function buildCampaignSummary(

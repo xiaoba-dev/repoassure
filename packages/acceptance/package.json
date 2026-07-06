@@ -134,6 +134,10 @@
       "types": "./dist/ai-ide-repair-decision-package.d.ts",
       "default": "./dist/ai-ide-repair-decision-package.js"
     },
+    "./ai-ide-repair-approval-receipt": {
+      "types": "./dist/ai-ide-repair-approval-receipt.d.ts",
+      "default": "./dist/ai-ide-repair-approval-receipt.js"
+    },
     "./campaign-summary": {
       "types": "./dist/campaign-summary.d.ts",
       "default": "./dist/campaign-summary.js"

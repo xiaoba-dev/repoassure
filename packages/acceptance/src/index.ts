@@ -280,6 +280,20 @@ export {
 } from './ai-ide-repair-decision-package.js';
 
 export {
+  buildAiIdeRepairApprovalReceipt,
+  buildAiIdeRepairApprovalReceiptMarkdown,
+  writeAiIdeRepairApprovalReceipt,
+  type AiIdeRepairApprovalDecision,
+  type AiIdeRepairApprovalDecisionInput,
+  type AiIdeRepairApprovalReceipt,
+  type AiIdeRepairApprovalReceiptInput,
+  type AiIdeRepairApprovalReceiptItem,
+  type AiIdeRepairApprovalReceiptSummary,
+  type WriteAiIdeRepairApprovalReceiptInput,
+  type WriteAiIdeRepairApprovalReceiptResult
+} from './ai-ide-repair-approval-receipt.js';
+
+export {
   buildValidationCampaignSummary,
   buildValidationCampaignSummaryMarkdown,
   writeValidationCampaignSummary,

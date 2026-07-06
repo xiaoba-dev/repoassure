@@ -376,3 +376,21 @@ The unit contract checks `repoassure.ai-ide-repair-decision-package.v1`, `decisi
 The integration smoke invokes `pnpm playbook:decide` and verifies `ai-ide-repair-decision-package.json` / `.md` are generated from a local consumption report without target repo source or private artifacts.
 
 This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.
+
+## AI IDE Repair Approval Receipt v0.1
+
+AI IDE Repair Approval Receipt v0.1 verifies that local maintainer approval decisions can be recorded from `ai-ide-repair-decision-package.json` before any separate repair execution starts.
+
+Required checks:
+
+```text
+pnpm vitest run tests/unit/ai-ide-repair-approval-receipt.test.ts
+pnpm vitest run tests/integration/playbook-approve.test.ts
+pnpm vitest run tests/unit/project-structure.test.ts -t "AI IDE repair approval receipt"
+```
+
+The unit contract checks `repoassure.ai-ide-repair-approval-receipt.v1`, `receiptSummary`, `approvalItems`, `maintainerApprovalChecklist`, Markdown readability, inherited blocked actions, maintainer review boundary propagation, and sensitive path segment redaction.
+
+The integration smoke invokes `pnpm playbook:approve` and verifies `ai-ide-repair-approval-receipt.json` / `.md` are generated from a local decision package and local approval decisions without target repo source or private artifacts.
+
+This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.

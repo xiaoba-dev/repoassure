@@ -54,6 +54,7 @@
     "playbook:generate": "pnpm build:acceptance && node scripts/generate-ai-ide-repair-playbook.mjs",
     "playbook:consume": "pnpm build:acceptance && node scripts/generate-ai-ide-playbook-consumption-report.mjs",
     "playbook:decide": "pnpm build:acceptance && node scripts/generate-ai-ide-repair-decision-package.mjs",
+    "playbook:approve": "pnpm build:acceptance && node scripts/generate-ai-ide-repair-approval-receipt.mjs",
     "preuser:accept": "pnpm build",
     "user:accept": "node packages/acceptance/dist/run-user-acceptance.js",
     "preuser:handoff": "pnpm build",

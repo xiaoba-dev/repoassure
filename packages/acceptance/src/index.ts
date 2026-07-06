@@ -294,6 +294,19 @@ export {
 } from './ai-ide-repair-approval-receipt.js';
 
 export {
+  buildAiIdeApprovedRepairExecutionPlan,
+  buildAiIdeApprovedRepairExecutionPlanMarkdown,
+  writeAiIdeApprovedRepairExecutionPlan,
+  type AiIdeApprovedRepairExecutionExcludedItem,
+  type AiIdeApprovedRepairExecutionItem,
+  type AiIdeApprovedRepairExecutionPlan,
+  type AiIdeApprovedRepairExecutionPlanInput,
+  type AiIdeApprovedRepairExecutionSummary,
+  type WriteAiIdeApprovedRepairExecutionPlanInput,
+  type WriteAiIdeApprovedRepairExecutionPlanResult
+} from './ai-ide-approved-repair-execution-plan.js';
+
+export {
   buildValidationCampaignSummary,
   buildValidationCampaignSummaryMarkdown,
   writeValidationCampaignSummary,

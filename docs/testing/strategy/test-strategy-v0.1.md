@@ -394,3 +394,21 @@ The unit contract checks `repoassure.ai-ide-repair-approval-receipt.v1`, `receip
 The integration smoke invokes `pnpm playbook:approve` and verifies `ai-ide-repair-approval-receipt.json` / `.md` are generated from a local decision package and local approval decisions without target repo source or private artifacts.
 
 This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.
+
+## AI IDE Approved Repair Execution Plan v0.1
+
+AI IDE Approved Repair Execution Plan v0.1 verifies that local approval receipt evidence can be narrowed to approved manual repair candidates before any separate repair execution goal starts.
+
+Required checks:
+
+```text
+pnpm vitest run tests/unit/ai-ide-approved-repair-execution-plan.test.ts
+pnpm vitest run tests/integration/playbook-plan-approved.test.ts
+pnpm vitest run tests/unit/project-structure.test.ts -t "records AI IDE approved repair execution plan"
+```
+
+The unit contract checks `repoassure.ai-ide-approved-repair-execution-plan.v1`, `executionSummary`, `approvedExecutionItems`, `excludedApprovalItems`, `executionChecklist`, `rollbackAndReviewChecklist`, Markdown readability, inherited blocked actions, maintainer review boundary propagation, and sensitive path segment redaction.
+
+The integration smoke invokes `pnpm playbook:plan-approved` and verifies `ai-ide-approved-repair-execution-plan.json` / `.md` are generated from a local approval receipt without target repo source or private artifacts.
+
+This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.

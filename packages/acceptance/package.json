@@ -138,6 +138,10 @@
       "types": "./dist/ai-ide-repair-approval-receipt.d.ts",
       "default": "./dist/ai-ide-repair-approval-receipt.js"
     },
+    "./ai-ide-approved-repair-execution-plan": {
+      "types": "./dist/ai-ide-approved-repair-execution-plan.d.ts",
+      "default": "./dist/ai-ide-approved-repair-execution-plan.js"
+    },
     "./campaign-summary": {
       "types": "./dist/campaign-summary.d.ts",
       "default": "./dist/campaign-summary.js"

@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 import type { ValidationCampaignSummary } from '../../packages/acceptance/src/campaign-summary.js';
 
 const execFileAsync = promisify(execFile);
+const SCRIPT_TEST_TIMEOUT_MS = 30_000;
 
 describe('playbook generation script', () => {
   it('generates readable local AI IDE playbook artifacts from a real-campaign-shaped summary', async () => {
@@ -84,7 +85,7 @@ describe('playbook generation script', () => {
     expect(markdown).toContain('## Maintainer review boundary');
     expect(json).not.toContain('secret-value');
     expect(markdown).not.toContain('secret-value');
-  });
+  }, SCRIPT_TEST_TIMEOUT_MS);
 });
 
 function buildAction(

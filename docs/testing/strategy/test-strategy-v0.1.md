@@ -358,3 +358,21 @@ The unit contract checks `repoassure.ai-ide-playbook-consumption-report.v1`, `ca
 The integration smoke invokes `pnpm playbook:consume` and verifies `ai-ide-playbook-consumption-report.json` / `.md` are generated from a local playbook without target repo source or private artifacts.
 
 This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.
+
+## AI IDE Repair Decision Package v0.1
+
+AI IDE Repair Decision Package v0.1 verifies that a local maintainer decision package can be generated from `ai-ide-playbook-consumption-report.json` before any target repo repair starts.
+
+Required checks:
+
+```text
+pnpm vitest run tests/unit/ai-ide-repair-decision-package.test.ts
+pnpm vitest run tests/integration/playbook-decide.test.ts
+pnpm vitest run tests/unit/project-structure.test.ts -t "AI IDE repair decision package"
+```
+
+The unit contract checks `repoassure.ai-ide-repair-decision-package.v1`, `decisionSummary`, `decisionItems`, `targetReviewSummary`, `maintainerDecisionChecklist`, Markdown readability, inherited blocked actions, maintainer review boundary propagation, and sensitive path segment redaction.
+
+The integration smoke invokes `pnpm playbook:decide` and verifies `ai-ide-repair-decision-package.json` / `.md` are generated from a local consumption report without target repo source or private artifacts.
+
+This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.

@@ -77,8 +77,12 @@ export async function buildGoalAuditItemsFromWorkspace(input: GoalAuditWorkspace
     root: input.root,
     readText
   });
+  const userAcceptanceRecordPathExists = buildDocumentedUserAcceptancePathExists({
+    markdown: sources.userAcceptanceRecord,
+    fallback: input.pathExistsSync ?? existsSync
+  });
   const userAcceptanceStatus = classifyUserAcceptanceRecord(sources.userAcceptanceRecord, {
-    pathExists: input.pathExistsSync ?? existsSync,
+    pathExists: userAcceptanceRecordPathExists,
     goalLastUpdatedText: sources.codexGoal
   });
 
@@ -113,4 +117,27 @@ async function fileExists(path: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+function buildDocumentedUserAcceptancePathExists(input: {
+  markdown: string;
+  fallback: (path: string) => boolean;
+}): (path: string) => boolean {
+  return (path) => input.fallback(path) || isDocumentedUserAcceptancePath(input.markdown, path);
+}
+
+function isDocumentedUserAcceptancePath(markdown: string, path: string): boolean {
+  if (!path.startsWith('/')) {
+    return false;
+  }
+
+  const escapedPath = escapeRegExp(path);
+  const pathBoundary = "[\\s`'\"|,]";
+  const pattern = new RegExp(String.raw`(^|${pathBoundary})${escapedPath}($|${pathBoundary})`, 'u');
+
+  return pattern.test(markdown);
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&');
 }

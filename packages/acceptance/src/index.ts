@@ -264,6 +264,22 @@ export {
 } from './ai-ide-playbook-consumption-report.js';
 
 export {
+  buildAiIdeRepairDecisionPackage,
+  buildAiIdeRepairDecisionPackageMarkdown,
+  writeAiIdeRepairDecisionPackage,
+  type AiIdeRepairDecisionApproval,
+  type AiIdeRepairDecisionItem,
+  type AiIdeRepairDecisionPackage,
+  type AiIdeRepairDecisionPackageInput,
+  type AiIdeRepairDecisionSummary,
+  type AiIdeRepairDecisionTargetReview,
+  type AiIdeRepairDecisionType,
+  type AiIdeTargetReviewDecision,
+  type WriteAiIdeRepairDecisionPackageInput,
+  type WriteAiIdeRepairDecisionPackageResult
+} from './ai-ide-repair-decision-package.js';
+
+export {
   buildValidationCampaignSummary,
   buildValidationCampaignSummaryMarkdown,
   writeValidationCampaignSummary,

@@ -2324,6 +2324,58 @@ describe('project structure', () => {
     await expectPath('docs/operations/ai-ide-playbook-consumption-dry-run-report-v0.1.md');
   });
 
+  it('records AI IDE repair decision package without target repo mutations or launch actions', async () => {
+    const [
+      operation,
+      readme,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      packageJson,
+      script
+    ] = await Promise.all([
+      readFile('docs/operations/ai-ide-repair-decision-package-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('package.json', 'utf8'),
+      readFile('scripts/generate-ai-ide-repair-decision-package.mjs', 'utf8')
+    ]);
+
+    expect(operation).toContain('AI IDE Repair Decision Package v0.1');
+    expect(operation).toContain('Status: ai_ide_repair_decision_package_implemented');
+    expect(operation).toContain('ai-ide-repair-decision-package.json');
+    expect(operation).toContain('ai-ide-repair-decision-package.md');
+    expect(operation).toContain('repoassure.ai-ide-repair-decision-package.v1');
+    expect(operation).toContain('pnpm playbook:decide');
+    expect(operation).toContain('manual_repair_candidate');
+    expect(operation).toContain('environment_prerequisite');
+    expect(operation).toContain('repoassure_product_improvement');
+    expect(operation).toContain('targetReviewSummary');
+    expect(operation).toContain('maintainerDecisionChecklist');
+    expect(operation).toContain('tests/integration/playbook-decide.test.ts');
+    expect(operation).toContain('No target repo material was uploaded');
+    expect(operation).toContain('No target repo branch, commit, pull request, issue, advisory, or file mutation was created');
+    expect(operation).toContain('No npm publication was executed');
+    expect(operation).toContain('No GitHub release was executed');
+    expect(operation).toContain('No public launch or production marketing announcement was executed');
+    expect(readme).toContain('AI IDE Repair Decision Package v0.1');
+    expect(readme).toContain('ai-ide-repair-decision-package.json');
+    expect(testingStrategy).toContain('AI IDE Repair Decision Package v0.1');
+    expect(acceptanceChecklist).toContain('AI IDE Repair Decision Package v0.1');
+    expect(decisionLog).toContain('AI IDE repair decision package');
+    expect(devLog).toContain('AI IDE Repair Decision Package v0.1');
+    expect(packageJson).toContain('"playbook:decide": "pnpm build:acceptance && node scripts/generate-ai-ide-repair-decision-package.mjs"');
+    expect(script).toContain('writeAiIdeRepairDecisionPackage');
+    expect(script).toContain('--consumption-report');
+    expect(script).toContain('--output');
+
+    await expectPath('docs/operations/ai-ide-repair-decision-package-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),
@@ -4415,6 +4467,7 @@ describe('project structure', () => {
     expect(packageModuleNames).toEqual([
       'ai-ide-handoff-package',
       'ai-ide-playbook-consumption-report',
+      'ai-ide-repair-decision-package',
       'ai-ide-repair-playbook',
       'campaign-summary',
       'compatibility',

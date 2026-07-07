@@ -307,6 +307,27 @@ export {
 } from './ai-ide-approved-repair-execution-plan.js';
 
 export {
+  buildAiIdeRepairExecutionEvidenceReport,
+  buildAiIdeRepairExecutionEvidenceReportMarkdown,
+  writeAiIdeRepairExecutionEvidenceReport,
+  type AiIdeRepairExecutionBoundaryEvidenceInput,
+  type AiIdeRepairExecutionBoundaryReport,
+  type AiIdeRepairExecutionEvidenceInput,
+  type AiIdeRepairExecutionEvidenceItemInput,
+  type AiIdeRepairExecutionEvidenceItemReport,
+  type AiIdeRepairExecutionEvidenceReport,
+  type AiIdeRepairExecutionEvidenceReportInput,
+  type AiIdeRepairExecutionEvidenceStatus,
+  type AiIdeRepairExecutionEvidenceSummary,
+  type AiIdeRepairExecutionMaintainerReviewStatus,
+  type AiIdeRepairExecutionReadOrderCompliance,
+  type AiIdeRepairExecutionVerificationResult,
+  type AiIdeRepairExecutionVerificationStatus,
+  type WriteAiIdeRepairExecutionEvidenceReportInput,
+  type WriteAiIdeRepairExecutionEvidenceReportResult
+} from './ai-ide-repair-execution-evidence-report.js';
+
+export {
   buildValidationCampaignSummary,
   buildValidationCampaignSummaryMarkdown,
   writeValidationCampaignSummary,

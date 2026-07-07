@@ -142,6 +142,10 @@
       "types": "./dist/ai-ide-approved-repair-execution-plan.d.ts",
       "default": "./dist/ai-ide-approved-repair-execution-plan.js"
     },
+    "./ai-ide-repair-execution-evidence-report": {
+      "types": "./dist/ai-ide-repair-execution-evidence-report.d.ts",
+      "default": "./dist/ai-ide-repair-execution-evidence-report.js"
+    },
     "./campaign-summary": {
       "types": "./dist/campaign-summary.d.ts",
       "default": "./dist/campaign-summary.js"

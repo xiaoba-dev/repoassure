@@ -13147,3 +13147,38 @@ Phase 0：项目初始化。
 - No customer contact was authorized。
 - No pricing change or spend was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
+## 2026年7月8日 - AI IDE Repair Evidence Bundle Manifest v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/ai-ide-repair-evidence-bundle-manifest.ts`。
+- 新增 `repoassure.ai-ide-repair-evidence-bundle-manifest.v1`，从本地 playbook、consumption report、decision package、approval receipt、approved execution plan 和 execution evidence report 生成统一 bundle manifest。
+- manifest 记录 artifact reading order、artifact inventory、schema/version、SHA-256 provenance、`bundleSummary`、`nextActions`、approval boundary、execution evidence boundary、redaction boundary、non-authorization boundary 和 inherited blocked actions。
+- 新增 `ai-ide-repair-evidence-bundle-manifest.json` / `ai-ide-repair-evidence-bundle-manifest.md` 输出。
+- 新增 `pnpm playbook:bundle` 和 `scripts/generate-ai-ide-repair-evidence-bundle-manifest.mjs`。
+- 新增 `tests/unit/ai-ide-repair-evidence-bundle-manifest.test.ts` 与 `tests/integration/playbook-bundle.test.ts`，验证 unit contract、CLI smoke、schema、Markdown 和敏感路径脱敏。
+- 新增 `docs/operations/ai-ide-repair-evidence-bundle-manifest-v0.1.md`，并级联更新 README、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/ai-ide-repair-evidence-bundle-manifest.test.ts`，测试因 `packages/acceptance/src/ai-ide-repair-evidence-bundle-manifest.ts` 缺失按预期失败。
+- Green：实现最小 bundle manifest builder、Markdown renderer、writer、package export 和 type-smoke 子路径覆盖。
+- Red：新增 `tests/integration/playbook-bundle.test.ts`，测试因 `pnpm playbook:bundle` 不存在按预期失败。
+- Green：新增 CLI 脚本和 package script。
+- Red：补充 CLI 缺失 `--output` 的失败路径测试，确认错误信息错误显示为 `--output-dir is required`。
+- Green：将 CLI required flag 校验改为显式参数名映射，确保用户看到文档化的 `--output is required`。
+- Red：更新 `tests/unit/project-structure.test.ts`，要求本 operation 文档、脚本入口和级联记录存在；测试因 operation 文档缺失按预期失败。
+- Green：新增 operation packet 和级联文档。
+
+### 边界
+
+- No target repo material was uploaded。
+- No target repo branch, commit, pull request, issue, advisory, or file mutation was created。
+- No target repo patch was automatically applied。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No customer contact was authorized。
+- No pricing change or spend was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。

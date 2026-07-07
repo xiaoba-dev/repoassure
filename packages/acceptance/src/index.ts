@@ -328,6 +328,23 @@ export {
 } from './ai-ide-repair-execution-evidence-report.js';
 
 export {
+  buildAiIdeRepairEvidenceBundleManifest,
+  buildAiIdeRepairEvidenceBundleManifestMarkdown,
+  writeAiIdeRepairEvidenceBundleManifest,
+  type AiIdeRepairEvidenceBundleArtifact,
+  type AiIdeRepairEvidenceBundleArtifactInput,
+  type AiIdeRepairEvidenceBundleArtifactKind,
+  type AiIdeRepairEvidenceBundleBoundaries,
+  type AiIdeRepairEvidenceBundleManifest,
+  type AiIdeRepairEvidenceBundleManifestInput,
+  type AiIdeRepairEvidenceBundleReadingOrderItem,
+  type AiIdeRepairEvidenceBundleStatus,
+  type AiIdeRepairEvidenceBundleSummary,
+  type WriteAiIdeRepairEvidenceBundleManifestInput,
+  type WriteAiIdeRepairEvidenceBundleManifestResult
+} from './ai-ide-repair-evidence-bundle-manifest.js';
+
+export {
   buildValidationCampaignSummary,
   buildValidationCampaignSummaryMarkdown,
   writeValidationCampaignSummary,

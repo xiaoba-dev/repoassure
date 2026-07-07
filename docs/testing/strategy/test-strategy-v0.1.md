@@ -359,6 +359,24 @@ The integration smoke invokes `pnpm playbook:consume` and verifies `ai-ide-playb
 
 This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.
 
+## AI IDE Repair Evidence Bundle Manifest v0.1
+
+AI IDE Repair Evidence Bundle Manifest v0.1 verifies that the six local repair evidence artifacts can be indexed as one AI IDE entry point before maintainer review.
+
+Required checks:
+
+```text
+pnpm vitest run tests/unit/ai-ide-repair-evidence-bundle-manifest.test.ts
+pnpm vitest run tests/integration/playbook-bundle.test.ts
+pnpm vitest run tests/unit/project-structure.test.ts -t "repair evidence bundle manifest"
+```
+
+The unit contract checks `repoassure.ai-ide-repair-evidence-bundle-manifest.v1`, artifact reading order, artifact inventory, SHA-256 provenance, `bundleSummary`, `verified_pending_maintainer_review`, `nextActions`, approval boundary, execution evidence boundary, redaction boundary, non-authorization boundary, inherited blocked actions, Markdown readability, and sensitive path segment redaction.
+
+The integration smoke invokes `pnpm playbook:bundle` and verifies `ai-ide-repair-evidence-bundle-manifest.json` / `.md` are generated from local repair evidence artifacts without target repo source or private artifacts.
+
+This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.
+
 ## AI IDE Repair Evidence End-to-End Campaign Fixture v0.1
 
 AI IDE Repair Evidence End-to-End Campaign Fixture v0.1 verifies that a no-private-source local `campaign-summary.json` fixture can move through the full AI IDE repair evidence chain:

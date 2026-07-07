@@ -412,3 +412,21 @@ The unit contract checks `repoassure.ai-ide-approved-repair-execution-plan.v1`, 
 The integration smoke invokes `pnpm playbook:plan-approved` and verifies `ai-ide-approved-repair-execution-plan.json` / `.md` are generated from a local approval receipt without target repo source or private artifacts.
 
 This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.
+
+## AI IDE Repair Execution Evidence Report v0.1
+
+AI IDE Repair Execution Evidence Report v0.1 verifies that local evidence from a separately authorized manual repair attempt can be recorded against `ai-ide-approved-repair-execution-plan.json`.
+
+Required checks:
+
+```text
+pnpm vitest run tests/unit/ai-ide-repair-execution-evidence-report.test.ts
+pnpm vitest run tests/integration/playbook-evidence.test.ts
+pnpm vitest run tests/unit/project-structure.test.ts -t "records AI IDE repair execution evidence report"
+```
+
+The unit contract checks `repoassure.ai-ide-repair-execution-evidence-report.v1`, `evidenceSummary`, `itemReports`, `boundaryReport`, `executionEvidenceChecklist`, `rollbackAndReviewChecklist`, Markdown readability, inherited blocked actions, maintainer review boundary propagation, and sensitive path segment redaction.
+
+The integration smoke invokes `pnpm playbook:evidence` and verifies `ai-ide-repair-execution-evidence-report.json` / `.md` are generated from a local approved execution plan and local evidence input without target repo source or private artifacts.
+
+This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.

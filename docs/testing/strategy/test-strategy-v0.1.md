@@ -359,6 +359,27 @@ The integration smoke invokes `pnpm playbook:consume` and verifies `ai-ide-playb
 
 This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.
 
+## AI IDE Repair Evidence End-to-End Campaign Fixture v0.1
+
+AI IDE Repair Evidence End-to-End Campaign Fixture v0.1 verifies that a no-private-source local `campaign-summary.json` fixture can move through the full AI IDE repair evidence chain:
+
+```text
+campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence
+```
+
+Required checks:
+
+```text
+pnpm vitest run tests/integration/playbook-e2e-repair-evidence.test.ts
+pnpm vitest run tests/unit/project-structure.test.ts -t "repair evidence end-to-end"
+```
+
+The integration contract uses `fixtures/ai-ide-repair-evidence-campaign/campaign-summary.json` and invokes `pnpm playbook:generate`, `pnpm playbook:consume`, `pnpm playbook:decide`, `pnpm playbook:approve`, `pnpm playbook:plan-approved`, and `pnpm playbook:evidence` in one temporary output directory.
+
+The test verifies every generated JSON / Markdown artifact can be consumed by the next stage, one manual repair candidate is approved into the execution plan, evidence records one verified item with zero boundary violations, read order compliance is complete, and a secret-like temporary path segment is redacted from all generated handoff artifacts.
+
+This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.
+
 ## AI IDE Repair Decision Package v0.1
 
 AI IDE Repair Decision Package v0.1 verifies that a local maintainer decision package can be generated from `ai-ide-playbook-consumption-report.json` before any target repo repair starts.

@@ -2533,6 +2533,62 @@ describe('project structure', () => {
     await expectPath('docs/operations/ai-ide-repair-execution-evidence-report-v0.1.md');
   });
 
+  it('records AI IDE repair evidence end-to-end campaign fixture without target repo mutations or launch actions', async () => {
+    const [
+      operation,
+      readme,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      fixture,
+      integrationTest
+    ] = await Promise.all([
+      readFile('docs/operations/ai-ide-repair-evidence-e2e-campaign-fixture-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('fixtures/ai-ide-repair-evidence-campaign/campaign-summary.json', 'utf8'),
+      readFile('tests/integration/playbook-e2e-repair-evidence.test.ts', 'utf8')
+    ]);
+
+    expect(operation).toContain('AI IDE Repair Evidence End-to-End Campaign Fixture v0.1');
+    expect(operation).toContain('Status: ai_ide_repair_evidence_e2e_campaign_fixture_validated');
+    expect(operation).toContain('fixtures/ai-ide-repair-evidence-campaign/campaign-summary.json');
+    expect(operation).toContain('tests/integration/playbook-e2e-repair-evidence.test.ts');
+    expect(operation).toContain('pnpm playbook:generate');
+    expect(operation).toContain('pnpm playbook:consume');
+    expect(operation).toContain('pnpm playbook:decide');
+    expect(operation).toContain('pnpm playbook:approve');
+    expect(operation).toContain('pnpm playbook:plan-approved');
+    expect(operation).toContain('pnpm playbook:evidence');
+    expect(operation).toContain('ai-ide-repair-playbook.json');
+    expect(operation).toContain('ai-ide-playbook-consumption-report.json');
+    expect(operation).toContain('ai-ide-repair-decision-package.json');
+    expect(operation).toContain('ai-ide-repair-approval-receipt.json');
+    expect(operation).toContain('ai-ide-approved-repair-execution-plan.json');
+    expect(operation).toContain('ai-ide-repair-execution-evidence-report.json');
+    expect(operation).toContain('No target repo material was uploaded');
+    expect(operation).toContain('No target repo branch, commit, pull request, issue, advisory, or file mutation was created');
+    expect(operation).toContain('No public launch or production marketing announcement was executed');
+    expect(readme).toContain('AI IDE Repair Evidence End-to-End Campaign Fixture v0.1');
+    expect(readme).toContain('fixtures/ai-ide-repair-evidence-campaign/campaign-summary.json');
+    expect(testingStrategy).toContain('AI IDE Repair Evidence End-to-End Campaign Fixture v0.1');
+    expect(acceptanceChecklist).toContain('AI IDE Repair Evidence End-to-End Campaign Fixture v0.1');
+    expect(decisionLog).toContain('AI IDE repair evidence end-to-end campaign fixture');
+    expect(devLog).toContain('AI IDE Repair Evidence End-to-End Campaign Fixture v0.1');
+    expect(fixture).toContain('"id": "P1-fix-target-regression"');
+    expect(fixture).toContain('"ownerSurface": "maintainer_or_target_repo"');
+    expect(fixture).not.toContain('secret-value');
+    expect(integrationTest).toContain('playbook:generate');
+    expect(integrationTest).toContain('playbook:evidence');
+    expect(integrationTest).toContain('secret-value');
+
+    await expectPath('docs/operations/ai-ide-repair-evidence-e2e-campaign-fixture-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

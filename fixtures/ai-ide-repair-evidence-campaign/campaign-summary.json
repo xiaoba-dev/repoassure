@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "repoassure.validation-campaign-summary.v1",
+  "generatedAt": "2026-07-07T10:00:00.000Z",
+  "campaignStatus": {
+    "totalTargets": 2,
+    "passedTargets": 1,
+    "blockedTargets": 0,
+    "failedTargets": 1,
+    "missingEvidenceTargets": 0,
+    "productFollowUpActions": [
+      "fix_target_regression"
+    ]
+  },
+  "prioritizedActionQueue": [
+    {
+      "id": "P1-fix-target-regression",
+      "priority": "P1",
+      "action": "fix_target_regression",
+      "ownerSurface": "maintainer_or_target_repo",
+      "targetIds": [
+        "agent-reach"
+      ],
+      "affectedModes": [
+        "cli"
+      ],
+      "blockerCategories": [
+        "unknown"
+      ],
+      "recommendedVerification": [
+        "Read target-repo-feedback-summary.json before patch planning.",
+        "Read repair-task-package.json before patch planning.",
+        "Rerun acceptance for agent-reach after maintainer-reviewed repair."
+      ],
+      "evidenceRefs": [
+        "__FIXTURE_ROOT__/agent-reach/.hardening/runs/run-2026-07-07T10-00-00-000Z/target-repo-feedback-summary.json",
+        "__FIXTURE_ROOT__/agent-reach/.hardening/runs/run-2026-07-07T10-00-00-000Z/repair-task-package.json"
+      ],
+      "nonAuthorizationBoundary": "This action item is local readiness evidence only; it does not authorize target repo mutation, branch creation, commits, pull requests, issues, advisories, npm publish, GitHub release, public launch, customer contact, or commercial availability claims."
+    }
+  ],
+  "targets": [
+    {
+      "targetId": "agent-reach",
+      "repoRootName": "Agent-Reach",
+      "latestRunId": "run-2026-07-07T10-00-00-000Z",
+      "mode": "cli",
+      "runStatus": "failed",
+      "blockerCategory": "unknown",
+      "nextRecommendedProductAction": "fix_target_regression",
+      "requiredChecksFailed": 1,
+      "evidence": {
+        "acceptanceRecord": "__FIXTURE_ROOT__/agent-reach/.hardening/runs/run-2026-07-07T10-00-00-000Z/acceptance-record.md",
+        "runDir": "__FIXTURE_ROOT__/agent-reach/.hardening/runs/run-2026-07-07T10-00-00-000Z",
+        "targetRepoFeedbackSummary": "__FIXTURE_ROOT__/agent-reach/.hardening/runs/run-2026-07-07T10-00-00-000Z/target-repo-feedback-summary.json",
+        "aiIdeHandoffPackage": "__FIXTURE_ROOT__/agent-reach/.hardening/runs/run-2026-07-07T10-00-00-000Z/ai-ide-handoff-package.json",
+        "userValidationEvidenceLoop": "__FIXTURE_ROOT__/agent-reach/.hardening/runs/run-2026-07-07T10-00-00-000Z/user-validation-evidence-loop.json",
+        "report": "__FIXTURE_ROOT__/agent-reach/.hardening/runs/run-2026-07-07T10-00-00-000Z/hardening-report.md",
+        "repairTaskPackage": "__FIXTURE_ROOT__/agent-reach/.hardening/runs/run-2026-07-07T10-00-00-000Z/repair-task-package.json",
+        "screenshots": []
+      }
+    },
+    {
+      "targetId": "odinsight",
+      "repoRootName": "odinsight",
+      "latestRunId": "run-2026-07-07T09-30-00-000Z",
+      "mode": "browser",
+      "runStatus": "passed",
+      "blockerCategory": "none",
+      "nextRecommendedProductAction": "no_action",
+      "requiredChecksFailed": 0,
+      "evidence": {
+        "acceptanceRecord": "__FIXTURE_ROOT__/odinsight/.hardening/runs/run-2026-07-07T09-30-00-000Z/acceptance-record.md",
+        "runDir": "__FIXTURE_ROOT__/odinsight/.hardening/runs/run-2026-07-07T09-30-00-000Z",
+        "targetRepoFeedbackSummary": "__FIXTURE_ROOT__/odinsight/.hardening/runs/run-2026-07-07T09-30-00-000Z/target-repo-feedback-summary.json",
+        "aiIdeHandoffPackage": "__FIXTURE_ROOT__/odinsight/.hardening/runs/run-2026-07-07T09-30-00-000Z/ai-ide-handoff-package.json",
+        "userValidationEvidenceLoop": "__FIXTURE_ROOT__/odinsight/.hardening/runs/run-2026-07-07T09-30-00-000Z/user-validation-evidence-loop.json",
+        "report": "__FIXTURE_ROOT__/odinsight/.hardening/runs/run-2026-07-07T09-30-00-000Z/hardening-report.md",
+        "repairTaskPackage": "__FIXTURE_ROOT__/odinsight/.hardening/runs/run-2026-07-07T09-30-00-000Z/repair-task-package.json",
+        "screenshots": []
+      }
+    }
+  ],
+  "redactionBoundary": "Fixture paths are local-only and must be redacted before JSON or Markdown artifacts are used as handoff evidence.",
+  "nonAuthorizationBoundary": "This fixture is readiness evidence only. It does not authorize target repo branch creation, commits, pull requests, issues, advisories, file mutation, npm publish, GitHub release, public launch, customer contact, or commercial availability claims."
+}

@@ -13118,3 +13118,32 @@ Phase 0：项目初始化。
 - No customer contact was authorized。
 - No pricing change or spend was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
+## 2026年7月7日 - AI IDE Repair Evidence End-to-End Campaign Fixture v0.1
+
+### 完成内容
+
+- 新增 `fixtures/ai-ide-repair-evidence-campaign/campaign-summary.json`，提供不含私密源码的本地 campaign fixture。
+- 新增 `tests/integration/playbook-e2e-repair-evidence.test.ts`，连续执行 `pnpm playbook:generate`、`pnpm playbook:consume`、`pnpm playbook:decide`、`pnpm playbook:approve`、`pnpm playbook:plan-approved` 和 `pnpm playbook:evidence`。
+- 验证 `campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence` 全链路 artifact 消费。
+- 覆盖 `manual_repair_candidate`、approval receipt、approved execution plan、execution evidence report、read order compliance、boundary violations、secret-like path redaction 和 non-authorization boundary。
+- 新增 `docs/operations/ai-ide-repair-evidence-e2e-campaign-fixture-v0.1.md`，并级联更新 README、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先新增 `tests/integration/playbook-e2e-repair-evidence.test.ts`，测试因 `fixtures/ai-ide-repair-evidence-campaign/campaign-summary.json` 缺失按预期失败。
+- Green：新增 campaign fixture 并重跑 integration test 通过。
+- Red：更新 `tests/unit/project-structure.test.ts`，要求本 operation 文档和级联记录存在；测试因 operation 文档缺失按预期失败。
+- Green：新增 operation packet 和级联文档。
+
+### 边界
+
+- No target repo material was uploaded。
+- No target repo branch, commit, pull request, issue, advisory, or file mutation was created。
+- No target repo patch was automatically applied。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No customer contact was authorized。
+- No pricing change or spend was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。

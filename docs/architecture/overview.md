@@ -60,6 +60,7 @@ flowchart LR
 | [ADR-0025](../adr/0025-ai-ide-repair-evidence-consumer-contract.md) | AI IDE repair evidence bundle consumer contract | `pnpm playbook:contract` converts the local bundle manifest into a consumer contract with artifact read sequence, verification checklist, maintainer review boundary, redaction boundary, non-authorization boundary, and blocked actions |
 | [ADR-0028](../adr/0028-target-repo-repair-goal-proposal-package.md) | Target repo repair goal proposal package | `pnpm playbook:proposal` converts replay readiness into a local proposal package with allowed repair scope, artifact read order, repair task breakdown, verification commands, maintainer approval boundary, and blocked actions |
 | [ADR-0029](../adr/0029-target-repo-repair-goal-authorization-receipt.md) | Target repo repair goal authorization receipt | `pnpm playbook:authorize` converts a proposal package and maintainer approve/reject/defer/accept_risk decisions into a local receipt with approved scope, rejected/deferred/risk-accepted items, verification requirements, and non-authorization boundaries |
+| [ADR-0030](../adr/0030-authorized-target-repo-repair-goal-task-package.md) | Authorized target repo repair goal task package | `pnpm playbook:target-repair-goal` converts an authorization receipt into a local AI IDE task package with approved repair goals, excluded authorization items, verification checklist, maintainer review boundary, and blocked actions |
 
 ## Source-of-truth gateways
 

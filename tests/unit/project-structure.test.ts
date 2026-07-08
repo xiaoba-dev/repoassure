@@ -3110,6 +3110,97 @@ describe('project structure', () => {
     await expectPath('docs/operations/target-repo-repair-goal-authorization-receipt-v0.1.md');
   });
 
+  it('records authorized target repo repair goal task package without executing target repo repairs', async () => {
+    const [
+      adr,
+      adrIndex,
+      operation,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      packageJson,
+      acceptancePackageJson,
+      compatibility,
+      indexSource,
+      taskPackageSource,
+      script,
+      unitTest,
+      integrationTest,
+      e2eTest,
+      typeSmoke
+    ] = await Promise.all([
+      readFile('docs/adr/0030-authorized-target-repo-repair-goal-task-package.md', 'utf8'),
+      readFile('docs/adr/README.md', 'utf8'),
+      readFile('docs/operations/authorized-target-repo-repair-goal-task-package-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('package.json', 'utf8'),
+      readFile('packages/acceptance/package.json', 'utf8'),
+      readFile('packages/acceptance/src/compatibility.ts', 'utf8'),
+      readFile('packages/acceptance/src/index.ts', 'utf8'),
+      readFile('packages/acceptance/src/ai-ide-authorized-target-repo-repair-goal-task-package.ts', 'utf8'),
+      readFile('scripts/generate-ai-ide-authorized-target-repo-repair-goal-task-package.mjs', 'utf8'),
+      readFile('tests/unit/ai-ide-authorized-target-repo-repair-goal-task-package.test.ts', 'utf8'),
+      readFile('tests/integration/playbook-target-repair-goal.test.ts', 'utf8'),
+      readFile('tests/integration/playbook-e2e-repair-evidence.test.ts', 'utf8'),
+      readFile('tests/type-smoke/acceptance-package-subpaths.ts', 'utf8')
+    ]);
+
+    expect(adr).toContain('ADR-0030: Authorized Target Repo Repair Goal Task Package');
+    expect(adr).toContain('authorized target repo repair goal task package');
+    expect(adr).toContain('does not execute target repo file mutation');
+    expect(adrIndex).toContain('[0030](0030-authorized-target-repo-repair-goal-task-package.md)');
+    expect(operation).toContain('Authorized Target Repo Repair Goal Task Package v0.1');
+    expect(operation).toContain('Status: authorized_target_repo_repair_goal_task_package_implemented');
+    expect(operation).toContain('ai-ide-authorized-target-repo-repair-goal-task-package.json');
+    expect(operation).toContain('ai-ide-authorized-target-repo-repair-goal-task-package.md');
+    expect(operation).toContain('repoassure.ai-ide-authorized-target-repo-repair-goal-task-package.v1');
+    expect(operation).toContain('pnpm playbook:target-repair-goal');
+    expect(operation).toContain('No target repo material was uploaded');
+    expect(operation).toContain('No target repo branch, commit, pull request, issue, advisory, or file mutation was created');
+    expect(operation).toContain('No public launch or production marketing announcement was executed');
+    expect(readme).toContain('Authorized Target Repo Repair Goal Task Package v0.1');
+    expect(readme).toContain('pnpm playbook:target-repair-goal -- --from-dir <dir>');
+    expect(prd).toContain('Authorized Target Repo Repair Goal Task Package v0.1');
+    expect(spec).toContain('playbook:target-repair-goal');
+    expect(plan).toContain('Authorized Target Repo Repair Goal Task Package v0.1');
+    expect(architecture).toContain('ADR-0030');
+    expect(testingStrategy).toContain('Authorized Target Repo Repair Goal Task Package v0.1');
+    expect(acceptanceChecklist).toContain('Authorized Target Repo Repair Goal Task Package v0.1');
+    expect(decisionLog).toContain('authorized target repo repair goal task package');
+    expect(devLog).toContain('Authorized Target Repo Repair Goal Task Package v0.1');
+    expect(packageJson).toContain('"playbook:target-repair-goal": "pnpm build:acceptance && node scripts/generate-ai-ide-authorized-target-repo-repair-goal-task-package.mjs"');
+    expect(acceptancePackageJson).toContain('"./ai-ide-authorized-target-repo-repair-goal-task-package"');
+    expect(compatibility).toContain('ai-ide-authorized-target-repo-repair-goal-task-package');
+    expect(indexSource).toContain('buildAiIdeAuthorizedTargetRepoRepairGoalTaskPackage');
+    expect(taskPackageSource).toContain('ready_for_separate_target_repo_repair_goal');
+    expect(taskPackageSource).toContain('does not execute target repo file mutation');
+    expect(script).toContain('writeAiIdeAuthorizedTargetRepoRepairGoalTaskPackageFromDirectory');
+    expect(script).toContain('--authorization-receipt');
+    expect(script).toContain('--from-dir');
+    expect(unitTest).toContain('repoassure.ai-ide-authorized-target-repo-repair-goal-task-package.v1');
+    expect(integrationTest).toContain('playbook:target-repair-goal');
+    expect(e2eTest).toContain('playbook:target-repair-goal');
+    expect(e2eTest).toContain('ready_for_separate_target_repo_repair_goal');
+    expect(typeSmoke).toContain('ai-ide-authorized-target-repo-repair-goal-task-package');
+
+    await expectPath('docs/adr/0030-authorized-target-repo-repair-goal-task-package.md');
+    await expectPath('docs/operations/authorized-target-repo-repair-goal-task-package-v0.1.md');
+  });
+
   it('records Autopilot-compatible documentation architecture without moving existing source documents', async () => {
     const [
       adr,
@@ -5275,6 +5366,7 @@ describe('project structure', () => {
 
     expect(packageModuleNames).toEqual([
       'ai-ide-approved-repair-execution-plan',
+      'ai-ide-authorized-target-repo-repair-goal-task-package',
       'ai-ide-handoff-package',
       'ai-ide-playbook-consumption-report',
       'ai-ide-repair-approval-receipt',

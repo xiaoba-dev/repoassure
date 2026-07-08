@@ -15,14 +15,15 @@ Recent completed work includes:
 - AI IDE Repair Evidence Bundle Consumer Contract v0.1.
 - Target Repo Repair Goal Proposal Package v0.1.
 - Target Repo Repair Goal Authorization Receipt v0.1.
+- Authorized Target Repo Repair Goal Task Package v0.1.
 - Public release and branch protection governance.
 - Public website private preview and custom-domain work.
 
 ## Next Codex Goal
 
-Target Repo Repair Goal Authorization Receipt v0.1
+Authorized Target Repo Repair Goal Task Package v0.1
 
-Plain-language explanation: convert a target repo repair goal proposal package plus maintainer approve / reject / defer / accept risk decisions into a local authorization receipt, without mutating the target repo or treating the receipt as direct repair execution.
+Plain-language explanation: convert a local target repo repair goal authorization receipt into an AI IDE-readable task package for a later separate target repo repair goal, without mutating the target repo or treating the package as direct repair execution.
 
 ## Execution Rules
 
@@ -51,6 +52,7 @@ Plain-language explanation: convert a target repo repair goal proposal package p
 - ADR-0025: AI IDE repair evidence bundle consumer contract.
 - ADR-0028: Target repo repair goal proposal package.
 - ADR-0029: Target repo repair goal authorization receipt.
+- ADR-0030: Authorized target repo repair goal task package.
 ## AI IDE Repair Execution Replay Readiness v0.1
 
 Status: implemented.
@@ -87,3 +89,13 @@ Status: implemented.
 - Extend the near-real campaign E2E fixture through authorization receipt generation.
 - Verify with unit, integration, type-smoke, E2E, and structure cascade tests.
 - Keep the receipt local-first and non-executing for target repo mutation, release, launch, customer contact, and commercial claims.
+
+## Authorized Target Repo Repair Goal Task Package v0.1
+
+Status: implemented.
+
+- Add authorized target repo repair goal task package schema and writer under `packages/acceptance`.
+- Add `pnpm playbook:target-repair-goal` CLI.
+- Extend the near-real campaign E2E fixture through target repair goal task package generation.
+- Verify with unit, integration, type-smoke, E2E, and structure cascade tests.
+- Keep the package local-first and non-executing for target repo mutation, branch, commit, pull request, issue, advisory, release, launch, customer contact, and commercial claims.

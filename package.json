@@ -62,6 +62,7 @@
     "playbook:replay": "pnpm build:acceptance && node scripts/generate-ai-ide-repair-execution-replay-readiness.mjs",
     "playbook:proposal": "pnpm build:acceptance && node scripts/generate-ai-ide-target-repo-repair-goal-proposal-package.mjs",
     "playbook:authorize": "pnpm build:acceptance && node scripts/generate-ai-ide-target-repo-repair-goal-authorization-receipt.mjs",
+    "playbook:target-repair-goal": "pnpm build:acceptance && node scripts/generate-ai-ide-authorized-target-repo-repair-goal-task-package.mjs",
     "preuser:accept": "pnpm build",
     "user:accept": "node packages/acceptance/dist/run-user-acceptance.js",
     "preuser:handoff": "pnpm build",

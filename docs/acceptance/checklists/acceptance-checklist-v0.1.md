@@ -240,5 +240,12 @@
 
 - [ ] The near-real campaign fixture validates campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle -> contract -> replay.
 - [ ] The final replay readiness artifact reaches `ready_for_maintainer_replay_review`.
+
+## Target Repo Repair Goal Proposal Package v0.1
+
+- [ ] `pnpm playbook:proposal -- --from-dir <dir>` generates JSON and Markdown proposal package artifacts.
+- [ ] The proposal package reaches `ready_for_maintainer_goal_authorization` only after replay readiness is maintainer-review ready.
+- [ ] The package includes artifact read order, allowed repair scope, repair task breakdown, verification commands, maintainer approval boundary, redaction boundary, non-authorization boundary, and blocked actions.
+- [ ] The package is treated as a proposal only, not target repo repair, release, launch, customer contact, or commercial availability authorization.
 - [ ] Sanitized-summary redaction boundary wording is accepted only when it still names sensitive evidence subjects.
 - [ ] The validation does not mutate target repo files or authorize release, launch, customer contact, or commercial availability claims.

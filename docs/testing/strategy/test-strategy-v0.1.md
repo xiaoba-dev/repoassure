@@ -519,3 +519,13 @@ Coverage uses the testing pyramid:
 - Unit: `tests/unit/ai-ide-repair-execution-replay-readiness.test.ts` validates real campaign sanitized-summary redaction boundary wording.
 - Integration: `tests/integration/playbook-e2e-repair-evidence.test.ts` validates campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle -> contract -> replay.
 - Structure: `tests/unit/project-structure.test.ts` guards ADR-0027, operation docs, and documentation cascade.
+
+## Target Repo Repair Goal Proposal Package v0.1
+
+Coverage uses the testing pyramid:
+
+- Unit: `tests/unit/ai-ide-target-repo-repair-goal-proposal-package.test.ts` validates schema, proposal readiness, artifact read order, allowed repair scope, repair task breakdown, verification commands, boundaries, writers, directory discovery, blocked readiness, and redaction.
+- Integration: `tests/integration/playbook-proposal.test.ts` verifies `pnpm playbook:proposal` writes JSON/Markdown from a local replay readiness directory and reports the documented missing-input flag.
+- E2E: `tests/integration/playbook-e2e-repair-evidence.test.ts` validates campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle -> contract -> replay -> proposal.
+- Type smoke: `tests/type-smoke/acceptance-package-subpaths.ts` guards `@hardening-mcp/acceptance/ai-ide-target-repo-repair-goal-proposal-package`.
+- Structure: `tests/unit/project-structure.test.ts` guards ADR-0028, operation docs, package exports, CLI script, and documentation cascade.

@@ -148,6 +148,12 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       '--from-dir',
       outputDir
     ]);
+    await runScript([
+      'playbook:proposal',
+      '--',
+      '--from-dir',
+      outputDir
+    ]);
 
     const outputs = await readArtifacts(outputDir);
 
@@ -173,6 +179,7 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     expect(outputs.bundle.schemaVersion).toBe('repoassure.ai-ide-repair-evidence-bundle-manifest.v1');
     expect(outputs.contract.schemaVersion).toBe('repoassure.ai-ide-repair-evidence-consumer-contract.v1');
     expect(outputs.replay.schemaVersion).toBe('repoassure.ai-ide-repair-execution-replay-readiness.v1');
+    expect(outputs.proposal.schemaVersion).toBe('repoassure.ai-ide-target-repo-repair-goal-proposal-package.v1');
     expect(outputs.bundle.bundleSummary).toMatchObject({
       currentStatus: 'verified_pending_maintainer_review',
       verifiedItems: 1,
@@ -183,6 +190,15 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     expect(outputs.replay.replayReadiness).toBe('ready_for_maintainer_replay_review');
     expect(outputs.replay.boundaryReplay.blockedActionsEnforced).toBe(true);
     expect(outputs.replay.nextReviewDecision.decision).toBe('maintainer_review_ready');
+    expect(outputs.proposal.proposalReadiness).toBe('ready_for_maintainer_goal_authorization');
+    expect(outputs.proposal.artifactReadOrder).toHaveLength(7);
+    expect(outputs.proposal.repairTaskBreakdown.map((task) => task.taskId)).toContain('T2-apply-maintainer-approved-repair');
+    expect(outputs.proposal.verificationCommands[0]).toMatchObject({
+      command: '<maintainer-provided target repo verification command>',
+      executionMode: 'proposed_not_executed'
+    });
+    expect(outputs.proposal.blockedActions).toContain('target_repo_file_mutation');
+    expect(outputs.proposal.blockedActions).toContain('public_launch');
     expect(outputs.bundle.readingOrder.map((item) => item.fileName)).toEqual([
       'ai-ide-repair-playbook.json',
       'ai-ide-playbook-consumption-report.json',
@@ -206,6 +222,9 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     expect(outputs.contractMarkdown).toContain('# RepoAssure AI IDE Repair Evidence Consumer Contract');
     expect(outputs.replayMarkdown).toContain('# RepoAssure AI IDE Repair Execution Replay Readiness');
     expect(outputs.replayMarkdown).toContain('## Next Review Decision');
+    expect(outputs.proposalMarkdown).toContain('# RepoAssure AI IDE Target Repo Repair Goal Proposal Package');
+    expect(outputs.proposalMarkdown).toContain('## Repair Task Breakdown');
+    expect(outputs.proposalMarkdown).toContain('## Maintainer Approval Boundary');
     expect(outputs.evidenceMarkdown).toContain(
       'No target repo branch, commit, pull request, issue, advisory, or file mutation is executed by this report.'
     );
@@ -228,7 +247,9 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       'ai-ide-repair-execution-replay-readiness.json',
       'ai-ide-repair-execution-replay-readiness.md',
       'ai-ide-repair-playbook.json',
-      'ai-ide-repair-playbook.md'
+      'ai-ide-repair-playbook.md',
+      'ai-ide-target-repo-repair-goal-proposal-package.json',
+      'ai-ide-target-repo-repair-goal-proposal-package.md'
     ]);
   }, SCRIPT_TEST_TIMEOUT_MS);
 });
@@ -286,10 +307,19 @@ async function readArtifacts(outputDir: string): Promise<{
     boundaryReplay: { blockedActionsEnforced: boolean };
     nextReviewDecision: { decision: string };
   };
+  proposal: {
+    schemaVersion: string;
+    proposalReadiness: string;
+    artifactReadOrder: Array<{ fileName: string }>;
+    repairTaskBreakdown: Array<{ taskId: string }>;
+    verificationCommands: Array<{ command: string; executionMode: string }>;
+    blockedActions: string[];
+  };
   evidenceMarkdown: string;
   bundleMarkdown: string;
   contractMarkdown: string;
   replayMarkdown: string;
+  proposalMarkdown: string;
 }> {
   return {
     playbook: JSON.parse(await readFile(join(outputDir, 'ai-ide-repair-playbook.json'), 'utf8')) as { schemaVersion: string },
@@ -335,10 +365,19 @@ async function readArtifacts(outputDir: string): Promise<{
       boundaryReplay: { blockedActionsEnforced: boolean };
       nextReviewDecision: { decision: string };
     },
+    proposal: JSON.parse(await readFile(join(outputDir, 'ai-ide-target-repo-repair-goal-proposal-package.json'), 'utf8')) as {
+      schemaVersion: string;
+      proposalReadiness: string;
+      artifactReadOrder: Array<{ fileName: string }>;
+      repairTaskBreakdown: Array<{ taskId: string }>;
+      verificationCommands: Array<{ command: string; executionMode: string }>;
+      blockedActions: string[];
+    },
     evidenceMarkdown: await readFile(join(outputDir, 'ai-ide-repair-execution-evidence-report.md'), 'utf8'),
     bundleMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-bundle-manifest.md'), 'utf8'),
     contractMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-consumer-contract.md'), 'utf8'),
-    replayMarkdown: await readFile(join(outputDir, 'ai-ide-repair-execution-replay-readiness.md'), 'utf8')
+    replayMarkdown: await readFile(join(outputDir, 'ai-ide-repair-execution-replay-readiness.md'), 'utf8'),
+    proposalMarkdown: await readFile(join(outputDir, 'ai-ide-target-repo-repair-goal-proposal-package.md'), 'utf8')
   };
 }
 
@@ -360,6 +399,8 @@ async function listExpectedArtifactNames(outputDir: string): Promise<string[]> {
     'ai-ide-repair-evidence-consumer-contract.md',
     'ai-ide-repair-execution-replay-readiness.json',
     'ai-ide-repair-execution-replay-readiness.md',
+    'ai-ide-target-repo-repair-goal-proposal-package.json',
+    'ai-ide-target-repo-repair-goal-proposal-package.md',
     'ai-ide-repair-playbook.json',
     'ai-ide-repair-playbook.md'
   ];

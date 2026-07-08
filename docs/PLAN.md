@@ -13,14 +13,15 @@ Recent completed work includes:
 - AI IDE repair evidence bundle manifest.
 - AI IDE repair evidence bundle E2E automation.
 - AI IDE Repair Evidence Bundle Consumer Contract v0.1.
+- Target Repo Repair Goal Proposal Package v0.1.
 - Public release and branch protection governance.
 - Public website private preview and custom-domain work.
 
 ## Next Codex Goal
 
-AI IDE Repair Execution Replay Readiness v0.1
+Target Repo Repair Goal Proposal Package v0.1
 
-Plain-language explanation: verify that a maintainer or AI IDE can replay the generated consumer contract and evidence bundle into a next-step repair readiness review without mutating the target repo or treating local evidence as release authorization.
+Plain-language explanation: convert replay readiness into a maintainer-reviewable target repo repair goal proposal package, without mutating the target repo or treating local evidence as repair execution authorization.
 
 ## Execution Rules
 
@@ -47,6 +48,7 @@ Plain-language explanation: verify that a maintainer or AI IDE can replay the ge
 - ADR-0015: Public release readiness boundary.
 - ADR-0024: Autopilot-compatible documentation architecture.
 - ADR-0025: AI IDE repair evidence bundle consumer contract.
+- ADR-0028: Target repo repair goal proposal package.
 ## AI IDE Repair Execution Replay Readiness v0.1
 
 Status: implemented.
@@ -63,3 +65,13 @@ Status: implemented.
 - Extend the near-real campaign E2E fixture through bundle, contract, and replay readiness.
 - Verify sanitized-boundary wording used by generated campaign evidence.
 - Keep validation local-first and non-authorizing for target repo mutation, release, launch, customer contact, and commercial claims.
+
+## Target Repo Repair Goal Proposal Package v0.1
+
+Status: implemented.
+
+- Add proposal package schema and writer under `packages/acceptance`.
+- Add `pnpm playbook:proposal` CLI.
+- Extend the near-real campaign E2E fixture through proposal package generation.
+- Verify with unit, integration, type-smoke, E2E, and structure cascade tests.
+- Keep the package local-first and non-authorizing for target repo mutation, release, launch, customer contact, and commercial claims.

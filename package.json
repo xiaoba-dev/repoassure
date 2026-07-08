@@ -60,6 +60,7 @@
     "playbook:bundle": "pnpm build:acceptance && node scripts/generate-ai-ide-repair-evidence-bundle-manifest.mjs",
     "playbook:contract": "pnpm build:acceptance && node scripts/generate-ai-ide-repair-evidence-consumer-contract.mjs",
     "playbook:replay": "pnpm build:acceptance && node scripts/generate-ai-ide-repair-execution-replay-readiness.mjs",
+    "playbook:proposal": "pnpm build:acceptance && node scripts/generate-ai-ide-target-repo-repair-goal-proposal-package.mjs",
     "preuser:accept": "pnpm build",
     "user:accept": "node packages/acceptance/dist/run-user-acceptance.js",
     "preuser:handoff": "pnpm build",

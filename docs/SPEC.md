@@ -22,6 +22,7 @@ Implementation should preserve compatibility paths while continuing the phased m
 - Public website app.
 - Local-only generated artifacts and acceptance records.
 - `playbook:contract` for AI IDE repair evidence consumer contracts.
+- `playbook:proposal` for target repo repair goal proposal packages.
 
 ## Current Architecture Boundaries
 
@@ -48,6 +49,7 @@ Implementation should preserve compatibility paths while continuing the phased m
 - ADR-0014 for distribution and repair loop readiness.
 - ADR-0024 for Autopilot-compatible documentation architecture.
 - ADR-0025 for AI IDE repair evidence bundle consumer contract.
+- ADR-0028 for target repo repair goal proposal package.
 ## AI IDE Repair Execution Replay Readiness v0.1
 
 `pnpm playbook:replay -- --from-dir <dir>` reads `ai-ide-repair-evidence-consumer-contract.json` and writes `ai-ide-repair-execution-replay-readiness.json` / `.md`.
@@ -59,3 +61,9 @@ The schema is `repoassure.ai-ide-repair-execution-replay-readiness.v1`. Required
 The E2E fixture validates `campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle -> contract -> replay`.
 
 The real campaign validation must assert bundle -> contract -> replay artifact generation, `ready_for_maintainer_replay_review`, blocked action enforcement, Markdown readability, redaction of secret-like path material, and non-authorization boundaries.
+
+## Target Repo Repair Goal Proposal Package v0.1
+
+`pnpm playbook:proposal -- --from-dir <dir>` reads `ai-ide-repair-execution-replay-readiness.json` and writes `ai-ide-target-repo-repair-goal-proposal-package.json` / `.md`.
+
+The schema is `repoassure.ai-ide-target-repo-repair-goal-proposal-package.v1`. Required sections are `proposalReadiness`, `sourceReplayReadiness`, `prerequisites`, `artifactReadOrder`, `allowedRepairScope`, `repairTaskBreakdown`, `verificationCommands`, `maintainerApprovalBoundary`, `nonAuthorizationBoundary`, `redactionBoundary`, and `blockedActions`.

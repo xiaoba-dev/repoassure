@@ -382,6 +382,25 @@ export {
 } from './ai-ide-repair-execution-replay-readiness.js';
 
 export {
+  buildAiIdeTargetRepoRepairGoalProposalPackage,
+  buildAiIdeTargetRepoRepairGoalProposalPackageMarkdown,
+  writeAiIdeTargetRepoRepairGoalProposalPackage,
+  writeAiIdeTargetRepoRepairGoalProposalPackageFromDirectory,
+  type AiIdeTargetRepoRepairAllowedScope,
+  type AiIdeTargetRepoRepairGoalProposalAuthorizationStatus,
+  type AiIdeTargetRepoRepairGoalProposalPackage,
+  type AiIdeTargetRepoRepairGoalProposalPackageInput,
+  type AiIdeTargetRepoRepairGoalProposalReadOrderItem,
+  type AiIdeTargetRepoRepairGoalProposalReadiness,
+  type AiIdeTargetRepoRepairGoalProposalSourceReplayReadiness,
+  type AiIdeTargetRepoRepairGoalProposalTask,
+  type AiIdeTargetRepoRepairGoalProposalVerificationCommand,
+  type WriteAiIdeTargetRepoRepairGoalProposalPackageFromDirectoryInput,
+  type WriteAiIdeTargetRepoRepairGoalProposalPackageInput,
+  type WriteAiIdeTargetRepoRepairGoalProposalPackageResult
+} from './ai-ide-target-repo-repair-goal-proposal-package.js';
+
+export {
   buildValidationCampaignSummary,
   buildValidationCampaignSummaryMarkdown,
   writeValidationCampaignSummary,

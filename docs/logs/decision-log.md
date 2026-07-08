@@ -1,5 +1,24 @@
 # 决策日志
 
+## 2026年7月8日 - AI IDE repair execution replay readiness
+
+### 决策
+
+接受 AI IDE Repair Execution Replay Readiness v0.1：在 AI IDE repair evidence consumer contract 之后新增本地 replay readiness 报告，让 maintainer 或 AI IDE 在任何目标 repo 修复 goal 之前先回放检查 artifact read sequence、verification checklist、blocked actions 和 review boundaries。
+
+### 原因
+
+- Consumer contract 已能说明怎么读 evidence bundle，但还缺少一份“我已经按顺序回放并确认边界”的 readiness evidence。
+- `ai-ide-repair-execution-replay-readiness.json` 将 `sourceConsumerContract`、`artifactReplay`、`verificationReplay`、`boundaryReplay` 和 `nextReviewDecision` 固定成机器可读 contract。
+- 明确 non-authorization boundary 可以避免把 replay readiness 误解为 target repo mutation、release、launch、customer contact 或商业版 availability 授权。
+
+### 影响
+
+- 新增 `packages/acceptance/src/ai-ide-repair-execution-replay-readiness.ts`。
+- 新增 `scripts/generate-ai-ide-repair-execution-replay-readiness.mjs` 和 `pnpm playbook:replay`。
+- 新增 `docs/adr/0026-ai-ide-repair-execution-replay-readiness.md` 与 `docs/operations/ai-ide-repair-execution-replay-readiness-v0.1.md`。
+- 本决策不上传 target repo material、private artifacts、reviewer feedback、customer data、secrets 或 raw private repo content，不执行 target repo mutation、npm publish、GitHub release、public launch、production marketing announcement、customer contact、pricing change、spend、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
+
 ## 2026年7月5日 - Real target validation campaign v0.2
 
 ### 决策

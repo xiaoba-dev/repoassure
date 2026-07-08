@@ -362,6 +362,26 @@ export {
 } from './ai-ide-repair-evidence-consumer-contract.js';
 
 export {
+  buildAiIdeRepairExecutionReplayReadiness,
+  buildAiIdeRepairExecutionReplayReadinessMarkdown,
+  writeAiIdeRepairExecutionReplayReadiness,
+  writeAiIdeRepairExecutionReplayReadinessFromDirectory,
+  type AiIdeRepairExecutionBoundaryReplay,
+  type AiIdeRepairExecutionReplayArtifact,
+  type AiIdeRepairExecutionReplayNextDecision,
+  type AiIdeRepairExecutionReplayNextReviewDecision,
+  type AiIdeRepairExecutionReplayReadinessInput,
+  type AiIdeRepairExecutionReplayReadinessReport,
+  type AiIdeRepairExecutionReplayReadinessStatus,
+  type AiIdeRepairExecutionReplaySourceConsumerContract,
+  type AiIdeRepairExecutionReplayStatus,
+  type AiIdeRepairExecutionVerificationReplay,
+  type WriteAiIdeRepairExecutionReplayReadinessFromDirectoryInput,
+  type WriteAiIdeRepairExecutionReplayReadinessInput,
+  type WriteAiIdeRepairExecutionReplayReadinessResult
+} from './ai-ide-repair-execution-replay-readiness.js';
+
+export {
   buildValidationCampaignSummary,
   buildValidationCampaignSummaryMarkdown,
   writeValidationCampaignSummary,

@@ -35,6 +35,7 @@ import * as aiIdeApprovedRepairExecutionPlan from '@hardening-mcp/acceptance/ai-
 import * as aiIdeRepairExecutionEvidenceReport from '@hardening-mcp/acceptance/ai-ide-repair-execution-evidence-report';
 import * as aiIdeRepairEvidenceBundleManifest from '@hardening-mcp/acceptance/ai-ide-repair-evidence-bundle-manifest';
 import * as aiIdeRepairEvidenceConsumerContract from '@hardening-mcp/acceptance/ai-ide-repair-evidence-consumer-contract';
+import * as aiIdeRepairExecutionReplayReadiness from '@hardening-mcp/acceptance/ai-ide-repair-execution-replay-readiness';
 import * as campaignSummary from '@hardening-mcp/acceptance/campaign-summary';
 import * as userAcceptanceArgs from '@hardening-mcp/acceptance/user-acceptance-args';
 import * as shellQuote from '@hardening-mcp/acceptance/shell-quote';
@@ -87,6 +88,7 @@ const packageSubpathModules = [
   aiIdeRepairExecutionEvidenceReport,
   aiIdeRepairEvidenceBundleManifest,
   aiIdeRepairEvidenceConsumerContract,
+  aiIdeRepairExecutionReplayReadiness,
   campaignSummary,
   userAcceptanceArgs,
   shellQuote,

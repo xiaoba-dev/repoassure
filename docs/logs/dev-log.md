@@ -1,5 +1,37 @@
 # 开发日志
 
+## 2026年7月8日 - AI IDE Repair Execution Replay Readiness v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/ai-ide-repair-execution-replay-readiness.ts`。
+- 新增 `scripts/generate-ai-ide-repair-execution-replay-readiness.mjs` 和 `pnpm playbook:replay`。
+- Replay readiness schema 为 `repoassure.ai-ide-repair-execution-replay-readiness.v1`。
+- Replay readiness report 包含 `sourceConsumerContract`、`artifactReplay`、`verificationReplay`、`boundaryReplay`、`nextReviewDecision`、`blockedActions` 和 inherited boundaries。
+- 新增 `docs/adr/0026-ai-ide-repair-execution-replay-readiness.md` 与 `docs/operations/ai-ide-repair-execution-replay-readiness-v0.1.md`，级联更新 README、PRD、SPEC、PLAN、architecture overview、testing strategy、acceptance checklist 和 decision log。
+
+### TDD 记录
+
+- Red：新增 `tests/unit/ai-ide-repair-execution-replay-readiness.test.ts`，测试因 replay readiness 模块缺失按预期失败。
+- Green：实现 replay readiness builder、Markdown renderer、file writer 和 directory discovery。
+- Red：新增 `tests/integration/playbook-replay.test.ts`，测试因 CLI script 和 `playbook:replay` 缺失按预期失败。
+- Green：实现 CLI script、root script、package subpath export、compatibility module list、type smoke import 和 root export。
+- Red：新增 `tests/unit/project-structure.test.ts` 结构级联测试，测试因 ADR-0026 和 operation 文档缺失按预期失败。
+- Green：补齐 ADR、operation 文档和级联文档。
+
+### 边界
+
+- No target repo material was uploaded。
+- No target repo branch, commit, pull request, issue, advisory, or file mutation was created。
+- No target repo patch was automatically applied。
+- No Action Authorization Receipt was produced。
+- No npm publication was executed。
+- No GitHub release was executed。
+- No public launch or production marketing announcement was executed。
+- No customer contact was executed。
+- No pricing change or spend was executed。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was executed。
+
 ## 2026年7月5日 - Real Target Validation Campaign v0.2
 
 ### 完成内容

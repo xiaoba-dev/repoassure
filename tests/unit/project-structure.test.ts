@@ -2778,6 +2778,89 @@ describe('project structure', () => {
     await expectPath('docs/operations/ai-ide-repair-evidence-consumer-contract-v0.1.md');
   });
 
+  it('records AI IDE repair execution replay readiness without target repo mutations or launch actions', async () => {
+    const [
+      adr,
+      adrIndex,
+      operation,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      packageJson,
+      acceptancePackageJson,
+      compatibility,
+      indexSource,
+      script,
+      unitTest,
+      integrationTest
+    ] = await Promise.all([
+      readFile('docs/adr/0026-ai-ide-repair-execution-replay-readiness.md', 'utf8'),
+      readFile('docs/adr/README.md', 'utf8'),
+      readFile('docs/operations/ai-ide-repair-execution-replay-readiness-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('package.json', 'utf8'),
+      readFile('packages/acceptance/package.json', 'utf8'),
+      readFile('packages/acceptance/src/compatibility.ts', 'utf8'),
+      readFile('packages/acceptance/src/index.ts', 'utf8'),
+      readFile('scripts/generate-ai-ide-repair-execution-replay-readiness.mjs', 'utf8'),
+      readFile('tests/unit/ai-ide-repair-execution-replay-readiness.test.ts', 'utf8'),
+      readFile('tests/integration/playbook-replay.test.ts', 'utf8')
+    ]);
+
+    expect(adr).toContain('ADR-0026: AI IDE Repair Execution Replay Readiness');
+    expect(adr).toContain('replay readiness');
+    expect(adr).toContain('does not authorize target repo mutation');
+    expect(adrIndex).toContain('[0026](0026-ai-ide-repair-execution-replay-readiness.md)');
+    expect(operation).toContain('AI IDE Repair Execution Replay Readiness v0.1');
+    expect(operation).toContain('Status: ai_ide_repair_execution_replay_readiness_implemented');
+    expect(operation).toContain('ai-ide-repair-execution-replay-readiness.json');
+    expect(operation).toContain('ai-ide-repair-execution-replay-readiness.md');
+    expect(operation).toContain('repoassure.ai-ide-repair-execution-replay-readiness.v1');
+    expect(operation).toContain('pnpm playbook:replay');
+    expect(operation).toContain('artifactReplay');
+    expect(operation).toContain('verificationReplay');
+    expect(operation).toContain('boundaryReplay');
+    expect(operation).toContain('No target repo material was uploaded');
+    expect(operation).toContain('No target repo branch, commit, pull request, issue, advisory, or file mutation was created');
+    expect(operation).toContain('No public launch or production marketing announcement was executed');
+    expect(readme).toContain('AI IDE Repair Execution Replay Readiness v0.1');
+    expect(readme).toContain('pnpm playbook:replay -- --from-dir <dir>');
+    expect(prd).toContain('AI IDE Repair Execution Replay Readiness v0.1');
+    expect(spec).toContain('playbook:replay');
+    expect(plan).toContain('AI IDE Repair Execution Replay Readiness v0.1');
+    expect(architecture).toContain('ADR-0026');
+    expect(testingStrategy).toContain('AI IDE Repair Execution Replay Readiness v0.1');
+    expect(acceptanceChecklist).toContain('AI IDE Repair Execution Replay Readiness v0.1');
+    expect(decisionLog).toContain('AI IDE repair execution replay readiness');
+    expect(devLog).toContain('AI IDE Repair Execution Replay Readiness v0.1');
+    expect(packageJson).toContain('"playbook:replay": "pnpm build:acceptance && node scripts/generate-ai-ide-repair-execution-replay-readiness.mjs"');
+    expect(acceptancePackageJson).toContain('"./ai-ide-repair-execution-replay-readiness"');
+    expect(compatibility).toContain('ai-ide-repair-execution-replay-readiness');
+    expect(indexSource).toContain('buildAiIdeRepairExecutionReplayReadiness');
+    expect(script).toContain('writeAiIdeRepairExecutionReplayReadinessFromDirectory');
+    expect(script).toContain('--contract');
+    expect(script).toContain('--from-dir');
+    expect(unitTest).toContain('repoassure.ai-ide-repair-execution-replay-readiness.v1');
+    expect(integrationTest).toContain('playbook:replay');
+
+    await expectPath('docs/adr/0026-ai-ide-repair-execution-replay-readiness.md');
+    await expectPath('docs/operations/ai-ide-repair-execution-replay-readiness-v0.1.md');
+  });
+
   it('records Autopilot-compatible documentation architecture without moving existing source documents', async () => {
     const [
       adr,
@@ -4950,6 +5033,7 @@ describe('project structure', () => {
       'ai-ide-repair-evidence-bundle-manifest',
       'ai-ide-repair-evidence-consumer-contract',
       'ai-ide-repair-execution-evidence-report',
+      'ai-ide-repair-execution-replay-readiness',
       'ai-ide-repair-playbook',
       'campaign-summary',
       'compatibility',

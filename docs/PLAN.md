@@ -47,3 +47,11 @@ Plain-language explanation: verify that a maintainer or AI IDE can replay the ge
 - ADR-0015: Public release readiness boundary.
 - ADR-0024: Autopilot-compatible documentation architecture.
 - ADR-0025: AI IDE repair evidence bundle consumer contract.
+## AI IDE Repair Execution Replay Readiness v0.1
+
+Status: implemented.
+
+- Add replay readiness schema and writer under `packages/acceptance`.
+- Add `pnpm playbook:replay` CLI.
+- Verify with unit, integration, and structure cascade tests.
+- Keep the report local-first and non-authorizing for target repo mutation, release, launch, customer contact, and commercial claims.

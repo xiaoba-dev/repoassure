@@ -2695,6 +2695,81 @@ describe('project structure', () => {
     await expectPath('docs/operations/ai-ide-repair-evidence-bundle-e2e-automation-v0.1.md');
   });
 
+  it('records Autopilot-compatible documentation architecture without moving existing source documents', async () => {
+    const [
+      adr,
+      adrIndex,
+      prd,
+      spec,
+      design,
+      plan,
+      taxonomy,
+      readme,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/adr/0024-autopilot-compatible-documentation-architecture.md', 'utf8'),
+      readFile('docs/adr/README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/DESIGN.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/specs/docs-taxonomy-spec-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(adr).toContain('ADR-0024: Autopilot-Compatible Documentation Architecture');
+    expect(adr).toContain('Source-of-truth gateway');
+    expect(adr).toContain('Do not move existing detailed documents');
+    expect(adr).toContain('docs/PRD.md');
+    expect(adr).toContain('docs/SPEC.md');
+    expect(adr).toContain('docs/DESIGN.md');
+    expect(adr).toContain('docs/PLAN.md');
+    expect(adrIndex).toContain('[0024](0024-autopilot-compatible-documentation-architecture.md)');
+    expect(prd).toContain('RepoAssure PRD Gateway');
+    expect(prd).toContain('Product intent source-of-truth gateway');
+    expect(prd).toContain('docs/product/specs/mvp-spec-v0.3.md');
+    expect(prd).toContain('docs/product/strategy/commercialization-strategy-v0.1.md');
+    expect(spec).toContain('RepoAssure SPEC Gateway');
+    expect(spec).toContain('Solution and implementation boundary source-of-truth gateway');
+    expect(spec).toContain('docs/architecture/specs/monorepo-structure-spec-v0.1.md');
+    expect(spec).toContain('docs/architecture/specs/security-assurance-lane-spec-v0.1.md');
+    expect(design).toContain('RepoAssure DESIGN Gateway');
+    expect(design).toContain('Design source-of-truth gateway');
+    expect(design).toContain('docs/design/design-system-v0.1.md');
+    expect(plan).toContain('RepoAssure PLAN Gateway');
+    expect(plan).toContain('Execution order source-of-truth gateway');
+    expect(plan).toContain('Next Codex Goal');
+    expect(plan).toContain('AI IDE Repair Evidence Bundle Consumer Contract v0.1');
+    expect(taxonomy).toContain('Autopilot-compatible source-of-truth gateways');
+    expect(taxonomy).toContain('`docs/PRD.md`');
+    expect(taxonomy).toContain('`docs/SPEC.md`');
+    expect(taxonomy).toContain('`docs/DESIGN.md`');
+    expect(taxonomy).toContain('`docs/PLAN.md`');
+    expect(taxonomy).toContain('Detailed documents remain in their existing canonical directories');
+    expect(readme).toContain('Autopilot-compatible source-of-truth gateways');
+    expect(architecture).toContain('ADR-0024');
+    expect(architecture).toContain('Source-of-truth gateways');
+    expect(testingStrategy).toContain('Autopilot-Compatible Documentation Architecture v0.1');
+    expect(acceptanceChecklist).toContain('Autopilot-Compatible Documentation Architecture v0.1');
+    expect(decisionLog).toContain('Autopilot-compatible documentation architecture');
+    expect(devLog).toContain('Autopilot-Compatible Documentation Architecture v0.1');
+
+    await expectPath('docs/adr/0024-autopilot-compatible-documentation-architecture.md');
+    await expectPath('docs/PRD.md');
+    await expectPath('docs/SPEC.md');
+    await expectPath('docs/DESIGN.md');
+    await expectPath('docs/PLAN.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

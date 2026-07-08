@@ -22,6 +22,8 @@ Browser exploration 的单元测试覆盖截图 artifact、trace artifact、runt
 
 Report generation 的单元和集成测试覆盖 readiness score、issue counts、Markdown report、带 `HARDENING_BASE_URL` 的 generated test verification command、敏感值脱敏，以及非空 `patch.diff`。`patch.diff` 当前验证 remediation plan、generated test diffs 和 diff 内容脱敏，不验证自动业务代码修复。
 
+Autopilot-Compatible Documentation Architecture v0.1 的测试继续限于 structure-level tests，不搬迁现有详细文档、不改变产品方向、不执行发布动作、不触碰目标 repo：`project-structure.test.ts` 守护 ADR-0024、ADR index、`docs/PRD.md`、`docs/SPEC.md`、`docs/DESIGN.md`、`docs/PLAN.md`、docs taxonomy、README、architecture overview、acceptance checklist、testing strategy、decision log 和 dev log 的级联，要求四个 gateway 指向现有 product specs、architecture specs、design docs、operations docs、goals、acceptance outputs、testing strategy 和 logs。
+
 v0.3 distribution and repair loop readiness 的测试必须覆盖 GitHub Action wrapper 结构、local CLI invocation、默认不上传私有 artifact、repair task package / repair handoff / validation-only / patch plan 的 agent-consumption contract，以及 public-release readiness checks。任何未来 auto-fix、PR creation 或 hosted artifact storage 行为都必须先有 ADR，再进入测试策略。
 
 当前 v0.3 测试覆盖：`project-structure.test.ts` 守护 `.github/actions/repoassure/action.yml`、safe example workflow 和文档入口；`repair-handoff.test.ts`、`repair-execute.test.ts`、`repair-patch-plan.test.ts` 守护 `agentContract` schema、读取顺序、下一步命令和不自动改源码边界；`public-release-readiness.test.ts` 守护 `pnpm release:check` 的 automated public-release prerequisites、tracked artifact/secret hygiene、manual authorization gate 和 CLI 输出；`goal-audit.test.ts` 守护 v0.3 交付物进入 `pnpm goal:audit`。

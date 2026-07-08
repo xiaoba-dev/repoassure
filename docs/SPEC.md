@@ -1,0 +1,48 @@
+# RepoAssure SPEC Gateway
+
+Status: Accepted
+Owner: maintainer
+Purpose: Solution and implementation boundary source-of-truth gateway
+
+## Solution Boundary
+
+RepoAssure's open core is a local-first artifact generation and repair-evidence system exposed through CLI, MCP Server, and GitHub Action workflows.
+
+Implementation should preserve compatibility paths while continuing the phased monorepo migration toward package-owned modules.
+
+## Current Implementation Surfaces
+
+- CLI and MCP adapters.
+- Shared tool wrappers and domain modules.
+- `@hardening-mcp/acceptance`
+- `@hardening-mcp/shared`
+- `@hardening-mcp/security-assurance`
+- `@hardening-mcp/browser-explorer`
+- `@hardening-mcp/repair-planner`
+- Public website app.
+- Local-only generated artifacts and acceptance records.
+
+## Current Architecture Boundaries
+
+- Local-first execution by default.
+- No target repo source upload by default.
+- Generated artifacts are evidence and handoff material, not automatic execution authorization.
+- Hosted dashboard, Team Cloud, Enterprise governance, and integrations remain roadmap surfaces until separately implemented.
+
+## Governing Specification Sources
+
+- `docs/architecture/overview.md`
+- `docs/architecture/specs/monorepo-structure-spec-v0.1.md`
+- `docs/architecture/specs/docs-taxonomy-spec-v0.1.md`
+- `docs/architecture/specs/private-github-engineering-baseline-v0.1.md`
+- `docs/architecture/specs/security-assurance-lane-spec-v0.1.md`
+- `docs/architecture/specs/team-cloud-enterprise-architecture-v0.1.md`
+- `docs/architecture/specs/project-intelligence-console-architecture-v0.1.md`
+- `docs/product/specs/mvp-spec-v0.3.md`
+
+## Related ADRs
+
+- ADR-0001 through ADR-0008 for local-first, CLI/MCP, artifact, repair-plan, monorepo, package-build, taxonomy, and repository acceptance scope.
+- ADR-0013 for Security Assurance Lane.
+- ADR-0014 for distribution and repair loop readiness.
+- ADR-0024 for Autopilot-compatible documentation architecture.

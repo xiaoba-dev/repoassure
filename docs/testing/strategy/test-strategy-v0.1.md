@@ -377,6 +377,23 @@ The integration smoke invokes `pnpm playbook:bundle` and verifies `ai-ide-repair
 
 This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.
 
+## AI IDE Repair Evidence Bundle E2E Automation v0.1
+
+AI IDE Repair Evidence Bundle E2E Automation v0.1 verifies that the existing campaign evidence chain can append a single-directory bundle generation step:
+
+```text
+pnpm vitest run tests/unit/ai-ide-repair-evidence-bundle-manifest.test.ts
+pnpm vitest run tests/integration/playbook-bundle.test.ts
+pnpm vitest run tests/integration/playbook-e2e-repair-evidence.test.ts
+pnpm vitest run tests/unit/project-structure.test.ts -t "bundle E2E automation"
+```
+
+The unit layer checks `writeAiIdeRepairEvidenceBundleManifestFromDirectory`, canonical artifact name discovery, default same-directory output, reading order, status classification, Markdown readability, and sensitive path segment redaction.
+
+The integration layer checks `pnpm playbook:bundle -- --from-dir <dir>` and the real/near-real `campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle manifest` path.
+
+This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.
+
 ## AI IDE Repair Evidence End-to-End Campaign Fixture v0.1
 
 AI IDE Repair Evidence End-to-End Campaign Fixture v0.1 verifies that a no-private-source local `campaign-summary.json` fixture can move through the full AI IDE repair evidence chain:

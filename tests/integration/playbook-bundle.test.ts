@@ -73,6 +73,48 @@ describe('repair evidence bundle manifest script', () => {
     expect(markdown).not.toContain('secret-value');
   }, SCRIPT_TEST_TIMEOUT_MS);
 
+  it('generates a bundle manifest by discovering repair evidence artifacts from one directory', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-playbook-bundle-from-dir-'));
+    const secretRoot = join(root, 'campaign-TOKEN=secret-value');
+
+    await writeArtifacts(secretRoot);
+
+    const { stdout, stderr } = await execFileAsync(
+      'pnpm',
+      [
+        'playbook:bundle',
+        '--',
+        '--from-dir',
+        secretRoot
+      ],
+      { cwd: process.cwd(), timeout: SCRIPT_TEST_TIMEOUT_MS }
+    );
+    const jsonPath = join(secretRoot, 'ai-ide-repair-evidence-bundle-manifest.json');
+    const markdownPath = join(secretRoot, 'ai-ide-repair-evidence-bundle-manifest.md');
+    const json = await readFile(jsonPath, 'utf8');
+    const markdown = await readFile(markdownPath, 'utf8');
+    const manifest = JSON.parse(json) as {
+      bundleSummary: { currentStatus: string };
+      readingOrder: Array<{ fileName: string }>;
+    };
+
+    expect(stderr).toBe('');
+    expect(stdout).toContain(`Wrote ${jsonPath}`);
+    expect(stdout).toContain(`Wrote ${markdownPath}`);
+    expect(manifest.bundleSummary.currentStatus).toBe('verified_pending_maintainer_review');
+    expect(manifest.readingOrder.map((item) => item.fileName)).toEqual([
+      'ai-ide-repair-playbook.json',
+      'ai-ide-playbook-consumption-report.json',
+      'ai-ide-repair-decision-package.json',
+      'ai-ide-repair-approval-receipt.json',
+      'ai-ide-approved-repair-execution-plan.json',
+      'ai-ide-repair-execution-evidence-report.json'
+    ]);
+    expect(markdown).toContain('## Reading Order');
+    expect(json).not.toContain('secret-value');
+    expect(markdown).not.toContain('secret-value');
+  }, SCRIPT_TEST_TIMEOUT_MS);
+
   it('reports the documented CLI flag name when output is missing', async () => {
     const root = await mkdtemp(join(tmpdir(), 'repoassure-playbook-bundle-missing-output-'));
     const artifactPaths = await writeArtifacts(root);

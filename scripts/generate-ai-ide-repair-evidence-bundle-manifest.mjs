@@ -1,14 +1,19 @@
 #!/usr/bin/env node
-import { writeAiIdeRepairEvidenceBundleManifest } from '../packages/acceptance/dist/ai-ide-repair-evidence-bundle-manifest.js';
+import {
+  writeAiIdeRepairEvidenceBundleManifest,
+  writeAiIdeRepairEvidenceBundleManifestFromDirectory
+} from '../packages/acceptance/dist/ai-ide-repair-evidence-bundle-manifest.js';
 
 function printHelp() {
   console.log(`RepoAssure AI IDE repair evidence bundle manifest
 
 Usage:
   pnpm playbook:bundle -- --playbook <path> --consumption-report <path> --decision-package <path> --approval-receipt <path> --execution-plan <path> --evidence-report <path> --output <dir>
+  pnpm playbook:bundle -- --from-dir <dir> [--output <dir>]
 
 Example:
   pnpm playbook:bundle -- --playbook artifacts/campaign/ai-ide-repair-playbook.json --consumption-report artifacts/campaign/ai-ide-playbook-consumption-report.json --decision-package artifacts/campaign/ai-ide-repair-decision-package.json --approval-receipt artifacts/campaign/ai-ide-repair-approval-receipt.json --execution-plan artifacts/campaign/ai-ide-approved-repair-execution-plan.json --evidence-report artifacts/campaign/ai-ide-repair-execution-evidence-report.json --output artifacts/campaign
+  pnpm playbook:bundle -- --from-dir artifacts/campaign
 `);
 }
 
@@ -24,7 +29,8 @@ function parseArgs(argv) {
     approvalReceiptPath: '',
     executionPlanPath: '',
     evidenceReportPath: '',
-    outputDir: ''
+    outputDir: '',
+    fromDir: ''
   };
   const requiredFlags = {
     playbookPath: '--playbook',
@@ -86,10 +92,20 @@ function parseArgs(argv) {
       continue;
     }
 
+    if (arg === '--from-dir') {
+      parsed.fromDir = argv[index + 1] ?? '';
+      index += 1;
+      continue;
+    }
+
     throw new Error(`Unknown argument: ${arg}`);
   }
 
-  for (const [key, value] of Object.entries(parsed)) {
+  if (parsed.fromDir) {
+    return parsed;
+  }
+
+  for (const [key, value] of Object.entries(parsed).filter(([key]) => key !== 'fromDir')) {
     if (!value) {
       throw new Error(`${requiredFlags[key]} is required`);
     }
@@ -100,15 +116,20 @@ function parseArgs(argv) {
 
 try {
   const options = parseArgs(process.argv.slice(2));
-  const result = await writeAiIdeRepairEvidenceBundleManifest({
-    playbookPath: options.playbookPath,
-    consumptionReportPath: options.consumptionReportPath,
-    decisionPackagePath: options.decisionPackagePath,
-    approvalReceiptPath: options.approvalReceiptPath,
-    executionPlanPath: options.executionPlanPath,
-    evidenceReportPath: options.evidenceReportPath,
-    outputDir: options.outputDir
-  });
+  const result = options.fromDir
+    ? await writeAiIdeRepairEvidenceBundleManifestFromDirectory({
+      inputDir: options.fromDir,
+      ...(options.outputDir ? { outputDir: options.outputDir } : {})
+    })
+    : await writeAiIdeRepairEvidenceBundleManifest({
+      playbookPath: options.playbookPath,
+      consumptionReportPath: options.consumptionReportPath,
+      decisionPackagePath: options.decisionPackagePath,
+      approvalReceiptPath: options.approvalReceiptPath,
+      executionPlanPath: options.executionPlanPath,
+      evidenceReportPath: options.evidenceReportPath,
+      outputDir: options.outputDir
+    });
 
   console.log(`Wrote ${result.jsonPath}`);
   console.log(`Wrote ${result.markdownPath}`);

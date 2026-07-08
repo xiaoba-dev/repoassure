@@ -41,6 +41,12 @@ export interface WriteAiIdeRepairEvidenceBundleManifestInput {
   outputDir: string;
 }
 
+export interface WriteAiIdeRepairEvidenceBundleManifestFromDirectoryInput {
+  generatedAt?: string;
+  inputDir: string;
+  outputDir?: string;
+}
+
 export interface AiIdeRepairEvidenceBundleArtifact {
   artifactKind: AiIdeRepairEvidenceBundleArtifactKind;
   fileName: string;
@@ -160,6 +166,21 @@ export async function writeAiIdeRepairEvidenceBundleManifest(
   await writeFile(markdownPath, buildAiIdeRepairEvidenceBundleManifestMarkdown(manifest));
 
   return { jsonPath, markdownPath, manifest };
+}
+
+export async function writeAiIdeRepairEvidenceBundleManifestFromDirectory(
+  input: WriteAiIdeRepairEvidenceBundleManifestFromDirectoryInput
+): Promise<WriteAiIdeRepairEvidenceBundleManifestResult> {
+  return writeAiIdeRepairEvidenceBundleManifest({
+    ...(input.generatedAt ? { generatedAt: input.generatedAt } : {}),
+    playbookPath: join(input.inputDir, 'ai-ide-repair-playbook.json'),
+    consumptionReportPath: join(input.inputDir, 'ai-ide-playbook-consumption-report.json'),
+    decisionPackagePath: join(input.inputDir, 'ai-ide-repair-decision-package.json'),
+    approvalReceiptPath: join(input.inputDir, 'ai-ide-repair-approval-receipt.json'),
+    executionPlanPath: join(input.inputDir, 'ai-ide-approved-repair-execution-plan.json'),
+    evidenceReportPath: join(input.inputDir, 'ai-ide-repair-execution-evidence-report.json'),
+    outputDir: input.outputDir ?? input.inputDir
+  });
 }
 
 export function buildAiIdeRepairEvidenceBundleManifestMarkdown(

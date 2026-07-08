@@ -130,6 +130,12 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       '--output',
       outputDir
     ]);
+    await runScript([
+      'playbook:bundle',
+      '--',
+      '--from-dir',
+      outputDir
+    ]);
 
     const outputs = await readArtifacts(outputDir);
 
@@ -152,6 +158,20 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       verifiedItems: 1,
       boundaryViolations: 0
     });
+    expect(outputs.bundle.schemaVersion).toBe('repoassure.ai-ide-repair-evidence-bundle-manifest.v1');
+    expect(outputs.bundle.bundleSummary).toMatchObject({
+      currentStatus: 'verified_pending_maintainer_review',
+      verifiedItems: 1,
+      boundaryViolations: 0
+    });
+    expect(outputs.bundle.readingOrder.map((item) => item.fileName)).toEqual([
+      'ai-ide-repair-playbook.json',
+      'ai-ide-playbook-consumption-report.json',
+      'ai-ide-repair-decision-package.json',
+      'ai-ide-repair-approval-receipt.json',
+      'ai-ide-approved-repair-execution-plan.json',
+      'ai-ide-repair-execution-evidence-report.json'
+    ]);
     expect(outputs.evidence.itemReports).toEqual([
       expect.objectContaining({
         sourceActionId: 'P1-fix-target-regression',
@@ -162,6 +182,8 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     expect(outputs.consumption.dryRunDecision.blockedActions).toContain('target_repo_file_mutation');
     expect(outputs.evidenceMarkdown).toContain('# RepoAssure AI IDE Repair Execution Evidence Report');
     expect(outputs.evidenceMarkdown).toContain('## Boundary Report');
+    expect(outputs.bundleMarkdown).toContain('# RepoAssure AI IDE Repair Evidence Bundle Manifest');
+    expect(outputs.bundleMarkdown).toContain('## Artifact Inventory');
     expect(outputs.evidenceMarkdown).toContain(
       'No target repo branch, commit, pull request, issue, advisory, or file mutation is executed by this report.'
     );
@@ -175,6 +197,8 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       'ai-ide-repair-approval-receipt.md',
       'ai-ide-repair-decision-package.json',
       'ai-ide-repair-decision-package.md',
+      'ai-ide-repair-evidence-bundle-manifest.json',
+      'ai-ide-repair-evidence-bundle-manifest.md',
       'ai-ide-repair-execution-evidence-report.json',
       'ai-ide-repair-execution-evidence-report.md',
       'ai-ide-repair-playbook.json',
@@ -220,7 +244,13 @@ async function readArtifacts(outputDir: string): Promise<{
       nonAuthorizationBoundaryMaintained: boolean;
     }>;
   };
+  bundle: {
+    schemaVersion: string;
+    bundleSummary: { currentStatus: string; verifiedItems: number; boundaryViolations: number };
+    readingOrder: Array<{ fileName: string }>;
+  };
   evidenceMarkdown: string;
+  bundleMarkdown: string;
 }> {
   return {
     playbook: JSON.parse(await readFile(join(outputDir, 'ai-ide-repair-playbook.json'), 'utf8')) as { schemaVersion: string },
@@ -250,7 +280,13 @@ async function readArtifacts(outputDir: string): Promise<{
         nonAuthorizationBoundaryMaintained: boolean;
       }>;
     },
-    evidenceMarkdown: await readFile(join(outputDir, 'ai-ide-repair-execution-evidence-report.md'), 'utf8')
+    bundle: JSON.parse(await readFile(join(outputDir, 'ai-ide-repair-evidence-bundle-manifest.json'), 'utf8')) as {
+      schemaVersion: string;
+      bundleSummary: { currentStatus: string; verifiedItems: number; boundaryViolations: number };
+      readingOrder: Array<{ fileName: string }>;
+    },
+    evidenceMarkdown: await readFile(join(outputDir, 'ai-ide-repair-execution-evidence-report.md'), 'utf8'),
+    bundleMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-bundle-manifest.md'), 'utf8')
   };
 }
 
@@ -266,6 +302,8 @@ async function listExpectedArtifactNames(outputDir: string): Promise<string[]> {
     'ai-ide-repair-decision-package.md',
     'ai-ide-repair-execution-evidence-report.json',
     'ai-ide-repair-execution-evidence-report.md',
+    'ai-ide-repair-evidence-bundle-manifest.json',
+    'ai-ide-repair-evidence-bundle-manifest.md',
     'ai-ide-repair-playbook.json',
     'ai-ide-repair-playbook.md'
   ];

@@ -59,6 +59,7 @@ flowchart LR
 | [ADR-0024](../adr/0024-autopilot-compatible-documentation-architecture.md) | Autopilot-compatible documentation architecture | `docs/PRD.md`, `docs/SPEC.md`, `docs/DESIGN.md`, and `docs/PLAN.md` are source-of-truth gateways over the existing detailed docs taxonomy; existing detailed documents are not moved |
 | [ADR-0025](../adr/0025-ai-ide-repair-evidence-consumer-contract.md) | AI IDE repair evidence bundle consumer contract | `pnpm playbook:contract` converts the local bundle manifest into a consumer contract with artifact read sequence, verification checklist, maintainer review boundary, redaction boundary, non-authorization boundary, and blocked actions |
 | [ADR-0028](../adr/0028-target-repo-repair-goal-proposal-package.md) | Target repo repair goal proposal package | `pnpm playbook:proposal` converts replay readiness into a local proposal package with allowed repair scope, artifact read order, repair task breakdown, verification commands, maintainer approval boundary, and blocked actions |
+| [ADR-0029](../adr/0029-target-repo-repair-goal-authorization-receipt.md) | Target repo repair goal authorization receipt | `pnpm playbook:authorize` converts a proposal package and maintainer approve/reject/defer/accept_risk decisions into a local receipt with approved scope, rejected/deferred/risk-accepted items, verification requirements, and non-authorization boundaries |
 
 ## Source-of-truth gateways
 

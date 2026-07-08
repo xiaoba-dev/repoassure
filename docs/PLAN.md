@@ -14,14 +14,15 @@ Recent completed work includes:
 - AI IDE repair evidence bundle E2E automation.
 - AI IDE Repair Evidence Bundle Consumer Contract v0.1.
 - Target Repo Repair Goal Proposal Package v0.1.
+- Target Repo Repair Goal Authorization Receipt v0.1.
 - Public release and branch protection governance.
 - Public website private preview and custom-domain work.
 
 ## Next Codex Goal
 
-Target Repo Repair Goal Proposal Package v0.1
+Target Repo Repair Goal Authorization Receipt v0.1
 
-Plain-language explanation: convert replay readiness into a maintainer-reviewable target repo repair goal proposal package, without mutating the target repo or treating local evidence as repair execution authorization.
+Plain-language explanation: convert a target repo repair goal proposal package plus maintainer approve / reject / defer / accept risk decisions into a local authorization receipt, without mutating the target repo or treating the receipt as direct repair execution.
 
 ## Execution Rules
 
@@ -49,6 +50,7 @@ Plain-language explanation: convert replay readiness into a maintainer-reviewabl
 - ADR-0024: Autopilot-compatible documentation architecture.
 - ADR-0025: AI IDE repair evidence bundle consumer contract.
 - ADR-0028: Target repo repair goal proposal package.
+- ADR-0029: Target repo repair goal authorization receipt.
 ## AI IDE Repair Execution Replay Readiness v0.1
 
 Status: implemented.
@@ -75,3 +77,13 @@ Status: implemented.
 - Extend the near-real campaign E2E fixture through proposal package generation.
 - Verify with unit, integration, type-smoke, E2E, and structure cascade tests.
 - Keep the package local-first and non-authorizing for target repo mutation, release, launch, customer contact, and commercial claims.
+
+## Target Repo Repair Goal Authorization Receipt v0.1
+
+Status: implemented.
+
+- Add authorization receipt schema and writer under `packages/acceptance`.
+- Add `pnpm playbook:authorize` CLI.
+- Extend the near-real campaign E2E fixture through authorization receipt generation.
+- Verify with unit, integration, type-smoke, E2E, and structure cascade tests.
+- Keep the receipt local-first and non-executing for target repo mutation, release, launch, customer contact, and commercial claims.

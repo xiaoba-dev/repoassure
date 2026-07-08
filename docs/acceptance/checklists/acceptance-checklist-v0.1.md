@@ -249,3 +249,12 @@
 - [ ] The package is treated as a proposal only, not target repo repair, release, launch, customer contact, or commercial availability authorization.
 - [ ] Sanitized-summary redaction boundary wording is accepted only when it still names sensitive evidence subjects.
 - [ ] The validation does not mutate target repo files or authorize release, launch, customer contact, or commercial availability claims.
+
+## Target Repo Repair Goal Authorization Receipt v0.1
+
+- [ ] `pnpm playbook:authorize -- --from-dir <dir> --decisions <authorization-decisions.json>` generates JSON and Markdown authorization receipt artifacts.
+- [ ] The receipt supports approve, reject, defer, and accept_risk decisions against proposal package scope.
+- [ ] Approved scope is marked `authorizedForSeparateTargetRepoRepairGoal` only when proposal readiness and allowed repair scope match.
+- [ ] Rejected, deferred, and risk-accepted items are not treated as target repo repair authorization.
+- [ ] The receipt includes source proposal provenance, decision summary, verification requirements, maintainer approval boundary, redaction boundary, non-authorization boundary, and blocked actions.
+- [ ] The validation does not mutate target repo files or authorize release, launch, customer contact, or commercial availability claims.

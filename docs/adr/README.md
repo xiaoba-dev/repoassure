@@ -34,6 +34,7 @@ ADR records long-lived architecture decisions. Use `docs/logs/decision-log.md` f
 | [0026](0026-ai-ide-repair-execution-replay-readiness.md) | Accepted | AI IDE repair execution replay readiness |
 | [0027](0027-ai-ide-repair-replay-real-campaign-validation.md) | Accepted | AI IDE repair replay real campaign validation |
 | [0028](0028-target-repo-repair-goal-proposal-package.md) | Accepted | Target repo repair goal proposal package |
+| [0029](0029-target-repo-repair-goal-authorization-receipt.md) | Accepted | Target repo repair goal authorization receipt |
 
 ## Template
 

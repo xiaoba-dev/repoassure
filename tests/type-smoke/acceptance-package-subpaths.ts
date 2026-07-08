@@ -39,6 +39,7 @@ import * as aiIdeRepairExecutionReplayReadiness from '@hardening-mcp/acceptance/
 import * as aiIdeTargetRepoRepairGoalProposalPackage from '@hardening-mcp/acceptance/ai-ide-target-repo-repair-goal-proposal-package';
 import * as aiIdeTargetRepoRepairGoalAuthorizationReceipt from '@hardening-mcp/acceptance/ai-ide-target-repo-repair-goal-authorization-receipt';
 import * as aiIdeAuthorizedTargetRepoRepairGoalTaskPackage from '@hardening-mcp/acceptance/ai-ide-authorized-target-repo-repair-goal-task-package';
+import * as aiIdeTargetRepoRepairGoalExecutionEvidenceIntakeReport from '@hardening-mcp/acceptance/ai-ide-target-repo-repair-goal-execution-evidence-intake-report';
 import * as campaignSummary from '@hardening-mcp/acceptance/campaign-summary';
 import * as userAcceptanceArgs from '@hardening-mcp/acceptance/user-acceptance-args';
 import * as shellQuote from '@hardening-mcp/acceptance/shell-quote';
@@ -95,6 +96,7 @@ const packageSubpathModules = [
   aiIdeTargetRepoRepairGoalProposalPackage,
   aiIdeTargetRepoRepairGoalAuthorizationReceipt,
   aiIdeAuthorizedTargetRepoRepairGoalTaskPackage,
+  aiIdeTargetRepoRepairGoalExecutionEvidenceIntakeReport,
   campaignSummary,
   userAcceptanceArgs,
   shellQuote,

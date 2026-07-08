@@ -180,6 +180,51 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       '--from-dir',
       outputDir
     ]);
+    const targetRepairGoalTaskPackage = JSON.parse(
+      await readFile(join(outputDir, 'ai-ide-authorized-target-repo-repair-goal-task-package.json'), 'utf8')
+    ) as {
+      approvedRepairGoals: Array<{ goalId: string }>;
+    };
+    const targetRepairEvidencePath = join(outputDir, 'target-repo-repair-goal-execution-evidence-input.json');
+    await writeFile(targetRepairEvidencePath, `${JSON.stringify({
+      executionResults: [
+        {
+          goalId: targetRepairGoalTaskPackage.approvedRepairGoals[0]?.goalId,
+          executionStatus: 'verified',
+          actualMutationSummary: {
+            filesChanged: 2,
+            linesAdded: 14,
+            linesRemoved: 3,
+            summary: 'Fixture target repo repair goal changed only maintainer-approved files.',
+            evidenceRefs: ['target diff summary', 'verification log']
+          },
+          verificationResults: [
+            {
+              command: 'pnpm test',
+              status: 'passed',
+              evidence: 'Fixture target repo tests passed after separate repair goal.'
+            },
+            {
+              command: 'pnpm lint',
+              status: 'passed',
+              evidence: 'Fixture target repo lint passed after separate repair goal.'
+            }
+          ],
+          maintainerReviewStatus: 'pending_review',
+          notes: 'No target repo branch, commit, pull request, issue, advisory, or release was created by RepoAssure.'
+        }
+      ],
+      boundaryEvidence: {
+        unauthorizedActions: [],
+        notes: 'Fixture imports evidence from a separately authorized target repo repair goal.'
+      }
+    }, null, 2)}\n`);
+    await runScript([
+      'playbook:target-repair-evidence',
+      '--',
+      '--from-dir',
+      outputDir
+    ]);
 
     const outputs = await readArtifacts(outputDir);
 
@@ -246,6 +291,22 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     ]);
     expect(outputs.targetRepairGoal.blockedActions).toContain('target_repo_file_mutation');
     expect(outputs.targetRepairGoal.blockedActions).toContain('public_launch');
+    expect(outputs.targetRepairEvidence.schemaVersion).toBe('repoassure.ai-ide-target-repo-repair-goal-execution-evidence-intake-report.v1');
+    expect(outputs.targetRepairEvidence.intakeStatus).toBe('ready_for_maintainer_review');
+    expect(outputs.targetRepairEvidence.executionSummary).toMatchObject({
+      verifiedGoals: 1,
+      boundaryViolations: 0,
+      filesChanged: 2
+    });
+    expect(outputs.targetRepairEvidence.goalReports).toEqual([
+      expect.objectContaining({
+        goalId: 'target-repo-repair-goal-target_repo_manual_repair_goal',
+        verificationStatus: 'passed',
+        nonAuthorizationBoundaryMaintained: true
+      })
+    ]);
+    expect(outputs.targetRepairEvidence.blockedActions).toContain('target_repo_commit_creation');
+    expect(outputs.targetRepairEvidence.blockedActions).toContain('public_launch');
     expect(outputs.bundle.readingOrder.map((item) => item.fileName)).toEqual([
       'ai-ide-repair-playbook.json',
       'ai-ide-playbook-consumption-report.json',
@@ -278,6 +339,9 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     expect(outputs.targetRepairGoalMarkdown).toContain('# RepoAssure AI IDE Authorized Target Repo Repair Goal Task Package');
     expect(outputs.targetRepairGoalMarkdown).toContain('## Approved Repair Goals');
     expect(outputs.targetRepairGoalMarkdown).toContain('## Non-Authorization Boundary');
+    expect(outputs.targetRepairEvidenceMarkdown).toContain('# RepoAssure AI IDE Target Repo Repair Goal Execution Evidence Intake Report');
+    expect(outputs.targetRepairEvidenceMarkdown).toContain('## Goal Reports');
+    expect(outputs.targetRepairEvidenceMarkdown).toContain('## Boundary Report');
     expect(outputs.evidenceMarkdown).toContain(
       'No target repo branch, commit, pull request, issue, advisory, or file mutation is executed by this report.'
     );
@@ -305,6 +369,8 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       'ai-ide-repair-playbook.md',
       'ai-ide-target-repo-repair-goal-authorization-receipt.json',
       'ai-ide-target-repo-repair-goal-authorization-receipt.md',
+      'ai-ide-target-repo-repair-goal-execution-evidence-intake-report.json',
+      'ai-ide-target-repo-repair-goal-execution-evidence-intake-report.md',
       'ai-ide-target-repo-repair-goal-proposal-package.json',
       'ai-ide-target-repo-repair-goal-proposal-package.md'
     ]);
@@ -385,6 +451,17 @@ async function readArtifacts(outputDir: string): Promise<{
     approvedRepairGoals: Array<{ goalId: string; executionMode: string }>;
     blockedActions: string[];
   };
+  targetRepairEvidence: {
+    schemaVersion: string;
+    intakeStatus: string;
+    executionSummary: { verifiedGoals: number; boundaryViolations: number; filesChanged: number };
+    goalReports: Array<{
+      goalId: string;
+      verificationStatus: string;
+      nonAuthorizationBoundaryMaintained: boolean;
+    }>;
+    blockedActions: string[];
+  };
   evidenceMarkdown: string;
   bundleMarkdown: string;
   contractMarkdown: string;
@@ -392,6 +469,7 @@ async function readArtifacts(outputDir: string): Promise<{
   proposalMarkdown: string;
   authorizationMarkdown: string;
   targetRepairGoalMarkdown: string;
+  targetRepairEvidenceMarkdown: string;
 }> {
   return {
     playbook: JSON.parse(await readFile(join(outputDir, 'ai-ide-repair-playbook.json'), 'utf8')) as { schemaVersion: string },
@@ -458,13 +536,25 @@ async function readArtifacts(outputDir: string): Promise<{
       approvedRepairGoals: Array<{ goalId: string; executionMode: string }>;
       blockedActions: string[];
     },
+    targetRepairEvidence: JSON.parse(await readFile(join(outputDir, 'ai-ide-target-repo-repair-goal-execution-evidence-intake-report.json'), 'utf8')) as {
+      schemaVersion: string;
+      intakeStatus: string;
+      executionSummary: { verifiedGoals: number; boundaryViolations: number; filesChanged: number };
+      goalReports: Array<{
+        goalId: string;
+        verificationStatus: string;
+        nonAuthorizationBoundaryMaintained: boolean;
+      }>;
+      blockedActions: string[];
+    },
     evidenceMarkdown: await readFile(join(outputDir, 'ai-ide-repair-execution-evidence-report.md'), 'utf8'),
     bundleMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-bundle-manifest.md'), 'utf8'),
     contractMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-consumer-contract.md'), 'utf8'),
     replayMarkdown: await readFile(join(outputDir, 'ai-ide-repair-execution-replay-readiness.md'), 'utf8'),
     proposalMarkdown: await readFile(join(outputDir, 'ai-ide-target-repo-repair-goal-proposal-package.md'), 'utf8'),
     authorizationMarkdown: await readFile(join(outputDir, 'ai-ide-target-repo-repair-goal-authorization-receipt.md'), 'utf8'),
-    targetRepairGoalMarkdown: await readFile(join(outputDir, 'ai-ide-authorized-target-repo-repair-goal-task-package.md'), 'utf8')
+    targetRepairGoalMarkdown: await readFile(join(outputDir, 'ai-ide-authorized-target-repo-repair-goal-task-package.md'), 'utf8'),
+    targetRepairEvidenceMarkdown: await readFile(join(outputDir, 'ai-ide-target-repo-repair-goal-execution-evidence-intake-report.md'), 'utf8')
   };
 }
 
@@ -488,6 +578,8 @@ async function listExpectedArtifactNames(outputDir: string): Promise<string[]> {
     'ai-ide-repair-execution-replay-readiness.md',
     'ai-ide-authorized-target-repo-repair-goal-task-package.json',
     'ai-ide-authorized-target-repo-repair-goal-task-package.md',
+    'ai-ide-target-repo-repair-goal-execution-evidence-intake-report.json',
+    'ai-ide-target-repo-repair-goal-execution-evidence-intake-report.md',
     'ai-ide-target-repo-repair-goal-authorization-receipt.json',
     'ai-ide-target-repo-repair-goal-authorization-receipt.md',
     'ai-ide-target-repo-repair-goal-proposal-package.json',

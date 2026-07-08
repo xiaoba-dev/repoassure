@@ -3201,6 +3201,98 @@ describe('project structure', () => {
     await expectPath('docs/operations/authorized-target-repo-repair-goal-task-package-v0.1.md');
   });
 
+  it('records target repo repair goal execution evidence intake without executing target repo actions', async () => {
+    const [
+      adr,
+      adrIndex,
+      operation,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      packageJson,
+      acceptancePackageJson,
+      compatibility,
+      indexSource,
+      intakeSource,
+      script,
+      unitTest,
+      integrationTest,
+      e2eTest,
+      typeSmoke
+    ] = await Promise.all([
+      readFile('docs/adr/0031-target-repo-repair-goal-execution-evidence-intake.md', 'utf8'),
+      readFile('docs/adr/README.md', 'utf8'),
+      readFile('docs/operations/target-repo-repair-goal-execution-evidence-intake-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('package.json', 'utf8'),
+      readFile('packages/acceptance/package.json', 'utf8'),
+      readFile('packages/acceptance/src/compatibility.ts', 'utf8'),
+      readFile('packages/acceptance/src/index.ts', 'utf8'),
+      readFile('packages/acceptance/src/ai-ide-target-repo-repair-goal-execution-evidence-intake-report.ts', 'utf8'),
+      readFile('scripts/generate-ai-ide-target-repo-repair-goal-execution-evidence-intake-report.mjs', 'utf8'),
+      readFile('tests/unit/ai-ide-target-repo-repair-goal-execution-evidence-intake-report.test.ts', 'utf8'),
+      readFile('tests/integration/playbook-target-repair-evidence.test.ts', 'utf8'),
+      readFile('tests/integration/playbook-e2e-repair-evidence.test.ts', 'utf8'),
+      readFile('tests/type-smoke/acceptance-package-subpaths.ts', 'utf8')
+    ]);
+
+    expect(adr).toContain('ADR-0031: Target Repo Repair Goal Execution Evidence Intake');
+    expect(adr).toContain('target repo repair goal execution evidence intake');
+    expect(adr).toContain('does not create target repo branch');
+    expect(adrIndex).toContain('[0031](0031-target-repo-repair-goal-execution-evidence-intake.md)');
+    expect(operation).toContain('Target Repo Repair Goal Execution Evidence Intake v0.1');
+    expect(operation).toContain('Status: target_repo_repair_goal_execution_evidence_intake_implemented');
+    expect(operation).toContain('ai-ide-target-repo-repair-goal-execution-evidence-intake-report.json');
+    expect(operation).toContain('ai-ide-target-repo-repair-goal-execution-evidence-intake-report.md');
+    expect(operation).toContain('repoassure.ai-ide-target-repo-repair-goal-execution-evidence-intake-report.v1');
+    expect(operation).toContain('pnpm playbook:target-repair-evidence');
+    expect(operation).toContain('No target repo material was uploaded');
+    expect(operation).toContain('No target repo branch, commit, pull request, issue, advisory, or file mutation was created by RepoAssure');
+    expect(operation).toContain('No public launch or production marketing announcement was executed');
+    expect(readme).toContain('Target Repo Repair Goal Execution Evidence Intake v0.1');
+    expect(readme).toContain('pnpm playbook:target-repair-evidence -- --from-dir <dir>');
+    expect(prd).toContain('Target Repo Repair Goal Execution Evidence Intake v0.1');
+    expect(spec).toContain('playbook:target-repair-evidence');
+    expect(plan).toContain('Target Repo Repair Goal Execution Evidence Intake v0.1');
+    expect(architecture).toContain('ADR-0031');
+    expect(testingStrategy).toContain('Target Repo Repair Goal Execution Evidence Intake v0.1');
+    expect(acceptanceChecklist).toContain('Target Repo Repair Goal Execution Evidence Intake v0.1');
+    expect(decisionLog).toContain('target repo repair goal execution evidence intake');
+    expect(devLog).toContain('Target Repo Repair Goal Execution Evidence Intake v0.1');
+    expect(packageJson).toContain('"playbook:target-repair-evidence": "pnpm build:acceptance && node scripts/generate-ai-ide-target-repo-repair-goal-execution-evidence-intake-report.mjs"');
+    expect(acceptancePackageJson).toContain('"./ai-ide-target-repo-repair-goal-execution-evidence-intake-report"');
+    expect(compatibility).toContain('ai-ide-target-repo-repair-goal-execution-evidence-intake-report');
+    expect(indexSource).toContain('buildAiIdeTargetRepoRepairGoalExecutionEvidenceIntakeReport');
+    expect(intakeSource).toContain('ready_for_maintainer_review');
+    expect(intakeSource).toContain('does not create target repo branch');
+    expect(script).toContain('writeAiIdeTargetRepoRepairGoalExecutionEvidenceIntakeReportFromDirectory');
+    expect(script).toContain('--task-package');
+    expect(script).toContain('--evidence');
+    expect(script).toContain('--from-dir');
+    expect(unitTest).toContain('repoassure.ai-ide-target-repo-repair-goal-execution-evidence-intake-report.v1');
+    expect(integrationTest).toContain('playbook:target-repair-evidence');
+    expect(e2eTest).toContain('playbook:target-repair-evidence');
+    expect(e2eTest).toContain('ready_for_maintainer_review');
+    expect(typeSmoke).toContain('ai-ide-target-repo-repair-goal-execution-evidence-intake-report');
+
+    await expectPath('docs/adr/0031-target-repo-repair-goal-execution-evidence-intake.md');
+    await expectPath('docs/operations/target-repo-repair-goal-execution-evidence-intake-v0.1.md');
+  });
+
   it('records Autopilot-compatible documentation architecture without moving existing source documents', async () => {
     const [
       adr,
@@ -5377,6 +5469,7 @@ describe('project structure', () => {
       'ai-ide-repair-execution-replay-readiness',
       'ai-ide-repair-playbook',
       'ai-ide-target-repo-repair-goal-authorization-receipt',
+      'ai-ide-target-repo-repair-goal-execution-evidence-intake-report',
       'ai-ide-target-repo-repair-goal-proposal-package',
       'campaign-summary',
       'compatibility',

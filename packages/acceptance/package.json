@@ -170,6 +170,10 @@
       "types": "./dist/ai-ide-authorized-target-repo-repair-goal-task-package.d.ts",
       "default": "./dist/ai-ide-authorized-target-repo-repair-goal-task-package.js"
     },
+    "./ai-ide-target-repo-repair-goal-execution-evidence-intake-report": {
+      "types": "./dist/ai-ide-target-repo-repair-goal-execution-evidence-intake-report.d.ts",
+      "default": "./dist/ai-ide-target-repo-repair-goal-execution-evidence-intake-report.js"
+    },
     "./campaign-summary": {
       "types": "./dist/campaign-summary.d.ts",
       "default": "./dist/campaign-summary.js"

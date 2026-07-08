@@ -25,6 +25,7 @@ Implementation should preserve compatibility paths while continuing the phased m
 - `playbook:proposal` for target repo repair goal proposal packages.
 - `playbook:authorize` for target repo repair goal authorization receipts.
 - `playbook:target-repair-goal` for authorized target repo repair goal task packages.
+- `playbook:target-repair-evidence` for target repo repair goal execution evidence intake reports.
 
 ## Current Architecture Boundaries
 
@@ -54,6 +55,7 @@ Implementation should preserve compatibility paths while continuing the phased m
 - ADR-0028 for target repo repair goal proposal package.
 - ADR-0029 for target repo repair goal authorization receipt.
 - ADR-0030 for authorized target repo repair goal task package.
+- ADR-0031 for target repo repair goal execution evidence intake.
 ## AI IDE Repair Execution Replay Readiness v0.1
 
 `pnpm playbook:replay -- --from-dir <dir>` reads `ai-ide-repair-evidence-consumer-contract.json` and writes `ai-ide-repair-execution-replay-readiness.json` / `.md`.
@@ -83,3 +85,9 @@ The schema is `repoassure.ai-ide-target-repo-repair-goal-authorization-receipt.v
 `pnpm playbook:target-repair-goal -- --from-dir <dir>` reads `ai-ide-target-repo-repair-goal-authorization-receipt.json` and writes `ai-ide-authorized-target-repo-repair-goal-task-package.json` / `.md`.
 
 The schema is `repoassure.ai-ide-authorized-target-repo-repair-goal-task-package.v1`. Required sections are `taskPackageStatus`, `sourceAuthorizationReceipt`, `approvedRepairGoals`, `excludedAuthorizationItems`, `verificationChecklist`, `maintainerReviewBoundary`, `nonAuthorizationBoundary`, `redactionBoundary`, and `blockedActions`.
+
+## Target Repo Repair Goal Execution Evidence Intake v0.1
+
+`pnpm playbook:target-repair-evidence -- --from-dir <dir>` reads `ai-ide-authorized-target-repo-repair-goal-task-package.json` and `target-repo-repair-goal-execution-evidence-input.json`, then writes `ai-ide-target-repo-repair-goal-execution-evidence-intake-report.json` / `.md`.
+
+The schema is `repoassure.ai-ide-target-repo-repair-goal-execution-evidence-intake-report.v1`. Required sections are `intakeStatus`, `sourceTaskPackage`, `executionSummary`, `goalReports`, `boundaryReport`, `reviewChecklist`, `maintainerReviewBoundary`, `nonAuthorizationBoundary`, `redactionBoundary`, and `blockedActions`.

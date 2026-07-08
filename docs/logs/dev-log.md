@@ -13442,3 +13442,38 @@ Phase 0：项目初始化。
 - No customer contact was authorized。
 - No pricing change or spend was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
+## 2026年7月9日 - Target Repo Repair Goal Execution Evidence Intake v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/ai-ide-target-repo-repair-goal-execution-evidence-intake-report.ts`。
+- 新增 `repoassure.ai-ide-target-repo-repair-goal-execution-evidence-intake-report.v1`。
+- 新增 `ai-ide-target-repo-repair-goal-execution-evidence-intake-report.json` / `ai-ide-target-repo-repair-goal-execution-evidence-intake-report.md` 输出。
+- 新增 `pnpm playbook:target-repair-evidence` 和 `scripts/generate-ai-ide-target-repo-repair-goal-execution-evidence-intake-report.mjs`。
+- 新增 package export `@hardening-mcp/acceptance/ai-ide-target-repo-repair-goal-execution-evidence-intake-report`。
+- `tests/integration/playbook-e2e-repair-evidence.test.ts` 现在覆盖 `campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle -> contract -> replay -> proposal -> authorization receipt -> target repair goal task package -> target repair evidence intake`。
+- 新增 `docs/adr/0031-target-repo-repair-goal-execution-evidence-intake.md` 和 `docs/operations/target-repo-repair-goal-execution-evidence-intake-v0.1.md`，并级联更新 README、PRD、SPEC、PLAN、architecture overview、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/ai-ide-target-repo-repair-goal-execution-evidence-intake-report.test.ts`，测试因模块缺失按预期失败。
+- Green：实现 intake report builder、Markdown renderer、writer 和目录发现。
+- Red：新增 `tests/integration/playbook-target-repair-evidence.test.ts`，测试因 `pnpm playbook:target-repair-evidence` 和脚本不存在按预期失败。
+- Green：新增 CLI 脚本、package script、package export、compatibility contract entry 和 type-smoke import。
+- Red：扩展 E2E campaign fixture 到 `playbook:target-repair-evidence`。
+- Green：补齐 E2E target repair evidence intake 生成和 artifact 断言。
+- Red：更新 `tests/unit/project-structure.test.ts`，要求 ADR-0031、operation 文档和级联记录存在；测试因文档缺失按预期失败。
+- Green：新增 ADR、operation packet 和级联文档。
+
+### 边界
+
+- No target repo material was uploaded。
+- No target repo branch, commit, pull request, issue, advisory, or file mutation was created by RepoAssure。
+- No target repo patch was automatically applied by RepoAssure。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No customer contact was authorized。
+- No pricing change or spend was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。

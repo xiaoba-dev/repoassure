@@ -16,14 +16,15 @@ Recent completed work includes:
 - Target Repo Repair Goal Proposal Package v0.1.
 - Target Repo Repair Goal Authorization Receipt v0.1.
 - Authorized Target Repo Repair Goal Task Package v0.1.
+- Target Repo Repair Goal Execution Evidence Intake v0.1.
 - Public release and branch protection governance.
 - Public website private preview and custom-domain work.
 
 ## Next Codex Goal
 
-Authorized Target Repo Repair Goal Task Package v0.1
+Target Repo Repair Goal Execution Evidence Intake v0.1
 
-Plain-language explanation: convert a local target repo repair goal authorization receipt into an AI IDE-readable task package for a later separate target repo repair goal, without mutating the target repo or treating the package as direct repair execution.
+Plain-language explanation: import local evidence returned by a separately authorized target repo repair goal into a normalized maintainer-review report, without RepoAssure mutating the target repo or treating the report as release or merge authorization.
 
 ## Execution Rules
 
@@ -53,6 +54,7 @@ Plain-language explanation: convert a local target repo repair goal authorizatio
 - ADR-0028: Target repo repair goal proposal package.
 - ADR-0029: Target repo repair goal authorization receipt.
 - ADR-0030: Authorized target repo repair goal task package.
+- ADR-0031: Target repo repair goal execution evidence intake.
 ## AI IDE Repair Execution Replay Readiness v0.1
 
 Status: implemented.
@@ -99,3 +101,13 @@ Status: implemented.
 - Extend the near-real campaign E2E fixture through target repair goal task package generation.
 - Verify with unit, integration, type-smoke, E2E, and structure cascade tests.
 - Keep the package local-first and non-executing for target repo mutation, branch, commit, pull request, issue, advisory, release, launch, customer contact, and commercial claims.
+
+## Target Repo Repair Goal Execution Evidence Intake v0.1
+
+Status: implemented.
+
+- Add target repo repair goal execution evidence intake schema and writer under `packages/acceptance`.
+- Add `pnpm playbook:target-repair-evidence` CLI.
+- Extend the near-real campaign E2E fixture through target repair evidence intake.
+- Verify with unit, integration, type-smoke, E2E, and structure cascade tests.
+- Keep the report local-first and non-executing for target repo mutation, branch, commit, pull request, issue, advisory, release, launch, customer contact, and commercial claims.

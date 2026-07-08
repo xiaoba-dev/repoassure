@@ -14,7 +14,7 @@ RepoAssure is not positioned as another AI IDE, a general-purpose vulnerability 
 
 - Local CLI, MCP Server, and GitHub Action wrapper for repo acceptance.
 - Browser and Python/CLI acceptance modes.
-- Local hardening reports, repair plans, repair task packages, handoff packages, execution evidence, patch plans, validation campaign summaries, AI IDE repair evidence bundles, and AI IDE Repair Evidence Bundle Consumer Contract v0.1 outputs.
+- Local hardening reports, repair plans, repair task packages, handoff packages, execution evidence, patch plans, validation campaign summaries, AI IDE repair evidence bundles, AI IDE Repair Evidence Bundle Consumer Contract v0.1 outputs, replay readiness outputs, and Target Repo Repair Goal Proposal Package v0.1 outputs.
 - Public website and private-preview release readiness surfaces.
 - Open-core local artifact contract with Team Cloud and Enterprise as future commercial roadmap surfaces.
 
@@ -45,6 +45,7 @@ RepoAssure is not positioned as another AI IDE, a general-purpose vulnerability 
 - ADR-0017: Public website and internal Project Intelligence Console.
 - ADR-0024: Autopilot-compatible documentation architecture.
 - ADR-0025: AI IDE repair evidence bundle consumer contract.
+- ADR-0028: Target repo repair goal proposal package.
 ## AI IDE Repair Execution Replay Readiness v0.1
 
 RepoAssure must let a maintainer or AI IDE replay-check repair evidence before opening a target-repo repair goal. The v0.1 product requirement is a local `playbook:replay` workflow that reads the AI IDE repair evidence consumer contract and emits JSON/Markdown readiness evidence covering artifact replay, verification replay, boundary replay, and the next maintainer review decision.
@@ -52,3 +53,7 @@ RepoAssure must let a maintainer or AI IDE replay-check repair evidence before o
 ## AI IDE Repair Replay Real Campaign Validation v0.1
 
 RepoAssure must validate the complete AI IDE repair evidence chain on a real-campaign-shaped fixture before treating replay readiness as usable product evidence. The validation requirement is bundle -> contract -> replay coverage from the existing campaign fixture, including blocked-action enforcement, redaction boundary handling, and maintainer review readiness.
+
+## Target Repo Repair Goal Proposal Package v0.1
+
+RepoAssure must let a maintainer or AI IDE convert replay readiness into a local target repo repair goal proposal package before any actual target repo repair goal is authorized. The v0.1 product requirement is a local `playbook:proposal` workflow that emits JSON/Markdown evidence with allowed repair scope, prerequisites, artifact read order, repair task breakdown, verification commands, maintainer approval boundary, and non-authorization boundary.

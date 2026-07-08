@@ -58,6 +58,7 @@ flowchart LR
 | [ADR-0018](../adr/0018-public-website-localization-strategy.md) | Public website localization strategy | Public website i18n should start with English and Simplified Chinese, keep Japanese and Korean as roadmap locales, and add localized forbidden-claim checks without localizing product artifacts by default |
 | [ADR-0024](../adr/0024-autopilot-compatible-documentation-architecture.md) | Autopilot-compatible documentation architecture | `docs/PRD.md`, `docs/SPEC.md`, `docs/DESIGN.md`, and `docs/PLAN.md` are source-of-truth gateways over the existing detailed docs taxonomy; existing detailed documents are not moved |
 | [ADR-0025](../adr/0025-ai-ide-repair-evidence-consumer-contract.md) | AI IDE repair evidence bundle consumer contract | `pnpm playbook:contract` converts the local bundle manifest into a consumer contract with artifact read sequence, verification checklist, maintainer review boundary, redaction boundary, non-authorization boundary, and blocked actions |
+| [ADR-0028](../adr/0028-target-repo-repair-goal-proposal-package.md) | Target repo repair goal proposal package | `pnpm playbook:proposal` converts replay readiness into a local proposal package with allowed repair scope, artifact read order, repair task breakdown, verification commands, maintainer approval boundary, and blocked actions |
 
 ## Source-of-truth gateways
 
@@ -261,3 +262,7 @@ ADR-0026 adds the AI IDE repair execution replay readiness layer after ADR-0025'
 ## ADR-0027 Real Campaign Replay Validation
 
 ADR-0027 validates the full AI IDE repair evidence chain against a near-real campaign fixture: campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle -> contract -> replay. This proves the architecture layers work together before any separate target-repo repair goal and keeps the result local-first and non-authorizing.
+
+## ADR-0028 Target Repo Repair Goal Proposal Package
+
+ADR-0028 adds a proposal layer after replay readiness: replay readiness -> target repo repair goal proposal package. The package is a local maintainer/AI IDE handoff artifact with prerequisites, artifact read order, allowed repair scope, repair task breakdown, verification commands, maintainer approval boundary, redaction boundary, non-authorization boundary, and blocked actions. It does not authorize target repo mutation or public/commercial release actions.

@@ -437,6 +437,31 @@ export {
 } from './ai-ide-authorized-target-repo-repair-goal-task-package.js';
 
 export {
+  buildAiIdeTargetRepoRepairGoalExecutionEvidenceIntakeReport,
+  buildAiIdeTargetRepoRepairGoalExecutionEvidenceIntakeReportMarkdown,
+  writeAiIdeTargetRepoRepairGoalExecutionEvidenceIntakeReport,
+  writeAiIdeTargetRepoRepairGoalExecutionEvidenceIntakeReportFromDirectory,
+  type AiIdeTargetRepoRepairGoalActualMutationSummary,
+  type AiIdeTargetRepoRepairGoalBoundaryEvidenceInput,
+  type AiIdeTargetRepoRepairGoalBoundaryReport,
+  type AiIdeTargetRepoRepairGoalExecutionEvidenceInput,
+  type AiIdeTargetRepoRepairGoalExecutionEvidenceIntakeReport,
+  type AiIdeTargetRepoRepairGoalExecutionEvidenceIntakeReportInput,
+  type AiIdeTargetRepoRepairGoalExecutionIntakeStatus,
+  type AiIdeTargetRepoRepairGoalExecutionResultInput,
+  type AiIdeTargetRepoRepairGoalExecutionStatus,
+  type AiIdeTargetRepoRepairGoalExecutionSummary,
+  type AiIdeTargetRepoRepairGoalMaintainerReviewStatus,
+  type AiIdeTargetRepoRepairGoalReport,
+  type AiIdeTargetRepoRepairGoalSourceTaskPackage,
+  type AiIdeTargetRepoRepairGoalVerificationResult,
+  type AiIdeTargetRepoRepairGoalVerificationStatus,
+  type WriteAiIdeTargetRepoRepairGoalExecutionEvidenceIntakeReportFromDirectoryInput,
+  type WriteAiIdeTargetRepoRepairGoalExecutionEvidenceIntakeReportInput,
+  type WriteAiIdeTargetRepoRepairGoalExecutionEvidenceIntakeReportResult
+} from './ai-ide-target-repo-repair-goal-execution-evidence-intake-report.js';
+
+export {
   buildValidationCampaignSummary,
   buildValidationCampaignSummaryMarkdown,
   writeValidationCampaignSummary,

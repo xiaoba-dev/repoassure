@@ -266,3 +266,11 @@
 - [ ] Rejected, deferred, and risk-accepted authorization items remain excluded from target repo repair execution.
 - [ ] The package includes source authorization provenance, repair goal instructions, verification checklist, maintainer review boundary, redaction boundary, non-authorization boundary, and blocked actions.
 - [ ] The validation does not mutate target repo files or authorize branch, commit, pull request, issue, advisory, release, launch, customer contact, or commercial availability claims.
+
+## Target Repo Repair Goal Execution Evidence Intake v0.1
+
+- [ ] `pnpm playbook:target-repair-evidence -- --from-dir <dir>` generates JSON and Markdown intake report artifacts.
+- [ ] The report reaches `ready_for_maintainer_review` only when every approved repair goal is verified and boundary evidence has no unauthorized actions.
+- [ ] Blocked, failed, not_started, or boundary-violation evidence remains unresolved until a new evidence report is generated.
+- [ ] The report includes source task package provenance, mutation summary, verification results, boundary report, review checklist, redaction boundary, non-authorization boundary, and blocked actions.
+- [ ] The validation does not mutate target repo files or authorize branch, commit, pull request, issue, advisory, release, launch, customer contact, or commercial availability claims.

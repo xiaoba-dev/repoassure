@@ -553,3 +553,15 @@ Coverage uses the testing pyramid:
 - Structure: `tests/unit/project-structure.test.ts` guards ADR-0030, operation docs, package exports, CLI script, and documentation cascade.
 
 This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.
+
+## Target Repo Repair Goal Execution Evidence Intake v0.1
+
+Coverage uses the testing pyramid:
+
+- Unit: `tests/unit/ai-ide-target-repo-repair-goal-execution-evidence-intake-report.test.ts` validates schema, source task package provenance, ready/blocked/boundary-violation statuses, mutation summary, verification results, boundaries, writers, directory discovery, and redaction.
+- Integration: `tests/integration/playbook-target-repair-evidence.test.ts` verifies `pnpm playbook:target-repair-evidence` writes JSON/Markdown from a local task package directory and reports documented missing-input flags.
+- E2E: `tests/integration/playbook-e2e-repair-evidence.test.ts` validates campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle -> contract -> replay -> proposal -> authorization receipt -> target repair goal task package -> target repair evidence intake.
+- Type smoke: `tests/type-smoke/acceptance-package-subpaths.ts` guards `@hardening-mcp/acceptance/ai-ide-target-repo-repair-goal-execution-evidence-intake-report`.
+- Structure: `tests/unit/project-structure.test.ts` guards ADR-0031, operation docs, package exports, CLI script, and documentation cascade.
+
+This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.

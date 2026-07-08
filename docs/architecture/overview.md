@@ -257,3 +257,7 @@ flowchart LR
 ## ADR-0026 Replay Readiness Layer
 
 ADR-0026 adds the AI IDE repair execution replay readiness layer after ADR-0025's consumer contract. The flow is: repair evidence bundle manifest -> consumer contract -> replay readiness report. The replay readiness report is review evidence only; it confirms read-order replay, checklist replay, blocked-action enforcement, redaction, non-authorization, and maintainer review boundaries before any separate target-repo repair goal.
+
+## ADR-0027 Real Campaign Replay Validation
+
+ADR-0027 validates the full AI IDE repair evidence chain against a near-real campaign fixture: campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle -> contract -> replay. This proves the architecture layers work together before any separate target-repo repair goal and keeps the result local-first and non-authorizing.

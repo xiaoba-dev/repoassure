@@ -425,3 +425,9 @@ pnpm playbook:replay -- --from-dir <dir>
 ```
 
 This writes `ai-ide-repair-execution-replay-readiness.json` and `ai-ide-repair-execution-replay-readiness.md`. The report confirms artifact replay, verification replay, boundary replay, and the next maintainer review decision. It is readiness evidence only and does not authorize target repo mutation, publication, launch, customer contact, or commercial availability claims.
+
+## AI IDE Repair Replay Real Campaign Validation v0.1
+
+The near-real campaign fixture now validates the full local chain: campaign summary -> playbook -> consumption report -> decision package -> approval receipt -> approved execution plan -> execution evidence -> bundle -> contract -> replay readiness.
+
+This proves `playbook:bundle`, `playbook:contract`, and `playbook:replay` work together before any separate target repo repair goal. The validation remains local-first readiness evidence only; it does not authorize target repo mutation, release, launch, customer contact, or commercial availability claims.

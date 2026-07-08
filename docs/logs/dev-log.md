@@ -1,5 +1,37 @@
 # 开发日志
 
+## 2026年7月8日 - AI IDE Repair Replay Real Campaign Validation v0.1
+
+### 完成内容
+
+- 扩展 `tests/integration/playbook-e2e-repair-evidence.test.ts`，近真实 campaign fixture 现在覆盖 `campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle -> contract -> replay`。
+- 最终验证 `ai-ide-repair-evidence-consumer-contract.json` 和 `ai-ide-repair-execution-replay-readiness.json` 均生成。
+- 修复 replay readiness redaction boundary 检查，使其支持真实 campaign 生成的 `sanitized summaries only; never store secrets` 等价措辞。
+- 新增 `docs/adr/0027-ai-ide-repair-replay-real-campaign-validation.md` 与 `docs/operations/ai-ide-repair-replay-real-campaign-validation-v0.1.md`，级联更新 README、PRD、SPEC、PLAN、architecture overview、testing strategy、acceptance checklist 和 decision log。
+
+### TDD 记录
+
+- Red：扩展 E2E campaign fixture，要求 contract/replay artifacts；测试因缺少 `ai-ide-repair-evidence-consumer-contract.json` 按预期失败。
+- Green：在 E2E 链路加入 `playbook:contract` 和 `playbook:replay`。
+- Red：E2E 继续失败，因为真实 campaign redaction boundary 使用 sanitized/never-store wording，旧 checker 返回 `review_required`。
+- Red：新增单元测试覆盖 sanitized-summary wording，测试因 redaction boundary checker 过窄按预期失败。
+- Green：更新 checker，保守接受 redacted/sanitized/never-store 且仍包含 sensitive subject 的边界文案。
+- Red：新增结构级联测试，测试因 ADR-0027 和 operation 文档缺失按预期失败。
+- Green：补齐 ADR、operation 文档和级联文档。
+
+### 边界
+
+- No target repo material was uploaded。
+- No target repo branch, commit, pull request, issue, advisory, or file mutation was created。
+- No target repo patch was automatically applied。
+- No Action Authorization Receipt was produced。
+- No npm publication was executed。
+- No GitHub release was executed。
+- No public launch or production marketing announcement was executed。
+- No customer contact was executed。
+- No pricing change or spend was executed。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was executed。
+
 ## 2026年7月8日 - AI IDE Repair Execution Replay Readiness v0.1
 
 ### 完成内容

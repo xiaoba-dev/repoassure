@@ -53,3 +53,9 @@ Implementation should preserve compatibility paths while continuing the phased m
 `pnpm playbook:replay -- --from-dir <dir>` reads `ai-ide-repair-evidence-consumer-contract.json` and writes `ai-ide-repair-execution-replay-readiness.json` / `.md`.
 
 The schema is `repoassure.ai-ide-repair-execution-replay-readiness.v1`. Required sections are `sourceConsumerContract`, `artifactReplay`, `verificationReplay`, `boundaryReplay`, `nextReviewDecision`, `blockedActions`, and inherited review/redaction/non-authorization boundaries.
+
+## AI IDE Repair Replay Real Campaign Validation v0.1
+
+The E2E fixture validates `campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle -> contract -> replay`.
+
+The real campaign validation must assert bundle -> contract -> replay artifact generation, `ready_for_maintainer_replay_review`, blocked action enforcement, Markdown readability, redaction of secret-like path material, and non-authorization boundaries.

@@ -2861,6 +2861,72 @@ describe('project structure', () => {
     await expectPath('docs/operations/ai-ide-repair-execution-replay-readiness-v0.1.md');
   });
 
+  it('records AI IDE repair replay real campaign validation without target repo mutations or launch actions', async () => {
+    const [
+      adr,
+      adrIndex,
+      operation,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      e2eTest,
+      replaySource,
+      unitTest
+    ] = await Promise.all([
+      readFile('docs/adr/0027-ai-ide-repair-replay-real-campaign-validation.md', 'utf8'),
+      readFile('docs/adr/README.md', 'utf8'),
+      readFile('docs/operations/ai-ide-repair-replay-real-campaign-validation-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('tests/integration/playbook-e2e-repair-evidence.test.ts', 'utf8'),
+      readFile('packages/acceptance/src/ai-ide-repair-execution-replay-readiness.ts', 'utf8'),
+      readFile('tests/unit/ai-ide-repair-execution-replay-readiness.test.ts', 'utf8')
+    ]);
+
+    expect(adr).toContain('ADR-0027: AI IDE Repair Replay Real Campaign Validation');
+    expect(adr).toContain('real campaign replay validation');
+    expect(adr).toContain('does not authorize target repo mutation');
+    expect(adrIndex).toContain('[0027](0027-ai-ide-repair-replay-real-campaign-validation.md)');
+    expect(operation).toContain('AI IDE Repair Replay Real Campaign Validation v0.1');
+    expect(operation).toContain('Status: ai_ide_repair_replay_real_campaign_validation_implemented');
+    expect(operation).toContain('campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle -> contract -> replay');
+    expect(operation).toContain('ai-ide-repair-evidence-consumer-contract.json');
+    expect(operation).toContain('ai-ide-repair-execution-replay-readiness.json');
+    expect(operation).toContain('No target repo material was uploaded');
+    expect(operation).toContain('No target repo branch, commit, pull request, issue, advisory, or file mutation was created');
+    expect(operation).toContain('No public launch or production marketing announcement was executed');
+    expect(readme).toContain('AI IDE Repair Replay Real Campaign Validation v0.1');
+    expect(prd).toContain('AI IDE Repair Replay Real Campaign Validation v0.1');
+    expect(spec).toContain('bundle -> contract -> replay');
+    expect(plan).toContain('AI IDE Repair Replay Real Campaign Validation v0.1');
+    expect(architecture).toContain('ADR-0027');
+    expect(testingStrategy).toContain('AI IDE Repair Replay Real Campaign Validation v0.1');
+    expect(acceptanceChecklist).toContain('AI IDE Repair Replay Real Campaign Validation v0.1');
+    expect(decisionLog).toContain('AI IDE repair replay real campaign validation');
+    expect(devLog).toContain('AI IDE Repair Replay Real Campaign Validation v0.1');
+    expect(e2eTest).toContain('playbook:contract');
+    expect(e2eTest).toContain('playbook:replay');
+    expect(e2eTest).toContain('ready_for_maintainer_replay_review');
+    expect(replaySource).toContain('describesRedactionBoundary');
+    expect(unitTest).toContain('sanitized-summary wording');
+
+    await expectPath('docs/adr/0027-ai-ide-repair-replay-real-campaign-validation.md');
+    await expectPath('docs/operations/ai-ide-repair-replay-real-campaign-validation-v0.1.md');
+  });
+
   it('records Autopilot-compatible documentation architecture without moving existing source documents', async () => {
     const [
       adr,

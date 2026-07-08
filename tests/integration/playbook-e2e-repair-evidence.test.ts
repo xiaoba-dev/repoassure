@@ -136,6 +136,18 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       '--from-dir',
       outputDir
     ]);
+    await runScript([
+      'playbook:contract',
+      '--',
+      '--from-dir',
+      outputDir
+    ]);
+    await runScript([
+      'playbook:replay',
+      '--',
+      '--from-dir',
+      outputDir
+    ]);
 
     const outputs = await readArtifacts(outputDir);
 
@@ -159,11 +171,18 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       boundaryViolations: 0
     });
     expect(outputs.bundle.schemaVersion).toBe('repoassure.ai-ide-repair-evidence-bundle-manifest.v1');
+    expect(outputs.contract.schemaVersion).toBe('repoassure.ai-ide-repair-evidence-consumer-contract.v1');
+    expect(outputs.replay.schemaVersion).toBe('repoassure.ai-ide-repair-execution-replay-readiness.v1');
     expect(outputs.bundle.bundleSummary).toMatchObject({
       currentStatus: 'verified_pending_maintainer_review',
       verifiedItems: 1,
       boundaryViolations: 0
     });
+    expect(outputs.contract.consumerReadiness).toBe('ready_for_ai_ide_consumption');
+    expect(outputs.contract.artifactReadSequence).toHaveLength(6);
+    expect(outputs.replay.replayReadiness).toBe('ready_for_maintainer_replay_review');
+    expect(outputs.replay.boundaryReplay.blockedActionsEnforced).toBe(true);
+    expect(outputs.replay.nextReviewDecision.decision).toBe('maintainer_review_ready');
     expect(outputs.bundle.readingOrder.map((item) => item.fileName)).toEqual([
       'ai-ide-repair-playbook.json',
       'ai-ide-playbook-consumption-report.json',
@@ -184,6 +203,9 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     expect(outputs.evidenceMarkdown).toContain('## Boundary Report');
     expect(outputs.bundleMarkdown).toContain('# RepoAssure AI IDE Repair Evidence Bundle Manifest');
     expect(outputs.bundleMarkdown).toContain('## Artifact Inventory');
+    expect(outputs.contractMarkdown).toContain('# RepoAssure AI IDE Repair Evidence Consumer Contract');
+    expect(outputs.replayMarkdown).toContain('# RepoAssure AI IDE Repair Execution Replay Readiness');
+    expect(outputs.replayMarkdown).toContain('## Next Review Decision');
     expect(outputs.evidenceMarkdown).toContain(
       'No target repo branch, commit, pull request, issue, advisory, or file mutation is executed by this report.'
     );
@@ -199,8 +221,12 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       'ai-ide-repair-decision-package.md',
       'ai-ide-repair-evidence-bundle-manifest.json',
       'ai-ide-repair-evidence-bundle-manifest.md',
+      'ai-ide-repair-evidence-consumer-contract.json',
+      'ai-ide-repair-evidence-consumer-contract.md',
       'ai-ide-repair-execution-evidence-report.json',
       'ai-ide-repair-execution-evidence-report.md',
+      'ai-ide-repair-execution-replay-readiness.json',
+      'ai-ide-repair-execution-replay-readiness.md',
       'ai-ide-repair-playbook.json',
       'ai-ide-repair-playbook.md'
     ]);
@@ -249,8 +275,21 @@ async function readArtifacts(outputDir: string): Promise<{
     bundleSummary: { currentStatus: string; verifiedItems: number; boundaryViolations: number };
     readingOrder: Array<{ fileName: string }>;
   };
+  contract: {
+    schemaVersion: string;
+    consumerReadiness: string;
+    artifactReadSequence: Array<{ fileName: string }>;
+  };
+  replay: {
+    schemaVersion: string;
+    replayReadiness: string;
+    boundaryReplay: { blockedActionsEnforced: boolean };
+    nextReviewDecision: { decision: string };
+  };
   evidenceMarkdown: string;
   bundleMarkdown: string;
+  contractMarkdown: string;
+  replayMarkdown: string;
 }> {
   return {
     playbook: JSON.parse(await readFile(join(outputDir, 'ai-ide-repair-playbook.json'), 'utf8')) as { schemaVersion: string },
@@ -285,8 +324,21 @@ async function readArtifacts(outputDir: string): Promise<{
       bundleSummary: { currentStatus: string; verifiedItems: number; boundaryViolations: number };
       readingOrder: Array<{ fileName: string }>;
     },
+    contract: JSON.parse(await readFile(join(outputDir, 'ai-ide-repair-evidence-consumer-contract.json'), 'utf8')) as {
+      schemaVersion: string;
+      consumerReadiness: string;
+      artifactReadSequence: Array<{ fileName: string }>;
+    },
+    replay: JSON.parse(await readFile(join(outputDir, 'ai-ide-repair-execution-replay-readiness.json'), 'utf8')) as {
+      schemaVersion: string;
+      replayReadiness: string;
+      boundaryReplay: { blockedActionsEnforced: boolean };
+      nextReviewDecision: { decision: string };
+    },
     evidenceMarkdown: await readFile(join(outputDir, 'ai-ide-repair-execution-evidence-report.md'), 'utf8'),
-    bundleMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-bundle-manifest.md'), 'utf8')
+    bundleMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-bundle-manifest.md'), 'utf8'),
+    contractMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-consumer-contract.md'), 'utf8'),
+    replayMarkdown: await readFile(join(outputDir, 'ai-ide-repair-execution-replay-readiness.md'), 'utf8')
   };
 }
 
@@ -304,6 +356,10 @@ async function listExpectedArtifactNames(outputDir: string): Promise<string[]> {
     'ai-ide-repair-execution-evidence-report.md',
     'ai-ide-repair-evidence-bundle-manifest.json',
     'ai-ide-repair-evidence-bundle-manifest.md',
+    'ai-ide-repair-evidence-consumer-contract.json',
+    'ai-ide-repair-evidence-consumer-contract.md',
+    'ai-ide-repair-execution-replay-readiness.json',
+    'ai-ide-repair-execution-replay-readiness.md',
     'ai-ide-repair-playbook.json',
     'ai-ide-repair-playbook.md'
   ];

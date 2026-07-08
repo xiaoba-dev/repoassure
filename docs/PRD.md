@@ -14,7 +14,7 @@ RepoAssure is not positioned as another AI IDE, a general-purpose vulnerability 
 
 - Local CLI, MCP Server, and GitHub Action wrapper for repo acceptance.
 - Browser and Python/CLI acceptance modes.
-- Local hardening reports, repair plans, repair task packages, handoff packages, execution evidence, patch plans, validation campaign summaries, and AI IDE repair evidence bundles.
+- Local hardening reports, repair plans, repair task packages, handoff packages, execution evidence, patch plans, validation campaign summaries, AI IDE repair evidence bundles, and AI IDE Repair Evidence Bundle Consumer Contract v0.1 outputs.
 - Public website and private-preview release readiness surfaces.
 - Open-core local artifact contract with Team Cloud and Enterprise as future commercial roadmap surfaces.
 
@@ -44,3 +44,4 @@ RepoAssure is not positioned as another AI IDE, a general-purpose vulnerability 
 - ADR-0016: Team Cloud and Enterprise commercial edition boundary.
 - ADR-0017: Public website and internal Project Intelligence Console.
 - ADR-0024: Autopilot-compatible documentation architecture.
+- ADR-0025: AI IDE repair evidence bundle consumer contract.

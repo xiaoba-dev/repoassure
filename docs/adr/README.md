@@ -30,6 +30,7 @@ ADR records long-lived architecture decisions. Use `docs/logs/decision-log.md` f
 | [0022](0022-equivalent-release-control.md) | Accepted | Equivalent release control |
 | [0023](0023-solo-maintainer-branch-protection.md) | Accepted | Solo maintainer branch protection |
 | [0024](0024-autopilot-compatible-documentation-architecture.md) | Accepted | Autopilot-compatible documentation architecture |
+| [0025](0025-ai-ide-repair-evidence-consumer-contract.md) | Accepted | AI IDE repair evidence bundle consumer contract |
 
 ## Template
 

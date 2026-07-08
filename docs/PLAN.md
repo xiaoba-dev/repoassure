@@ -12,14 +12,15 @@ Recent completed work includes:
 
 - AI IDE repair evidence bundle manifest.
 - AI IDE repair evidence bundle E2E automation.
+- AI IDE Repair Evidence Bundle Consumer Contract v0.1.
 - Public release and branch protection governance.
 - Public website private preview and custom-domain work.
 
 ## Next Codex Goal
 
-AI IDE Repair Evidence Bundle Consumer Contract v0.1
+AI IDE Repair Execution Replay Readiness v0.1
 
-Plain-language explanation: define and verify that an AI IDE can read only the bundle manifest and still know the artifact reading order, repair/evidence status, verification checklist, maintainer review boundary, and forbidden actions.
+Plain-language explanation: verify that a maintainer or AI IDE can replay the generated consumer contract and evidence bundle into a next-step repair readiness review without mutating the target repo or treating local evidence as release authorization.
 
 ## Execution Rules
 
@@ -45,3 +46,4 @@ Plain-language explanation: define and verify that an AI IDE can read only the b
 - ADR-0014: Distribution and repair loop readiness.
 - ADR-0015: Public release readiness boundary.
 - ADR-0024: Autopilot-compatible documentation architecture.
+- ADR-0025: AI IDE repair evidence bundle consumer contract.

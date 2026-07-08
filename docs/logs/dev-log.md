@@ -12865,6 +12865,39 @@ Phase 0：项目初始化。
 - No pricing change or spend was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
 
+## 2026年7月8日 - AI IDE Repair Evidence Bundle Consumer Contract v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/ai-ide-repair-evidence-consumer-contract.ts`。
+- 新增 `repoassure.ai-ide-repair-evidence-consumer-contract.v1`，从本地 bundle manifest 生成 AI IDE consumer contract。
+- contract 记录 source manifest、`artifactReadSequence`、artifact roles、`verificationChecklist`、`maintainerReviewBoundary`、redaction boundary、non-authorization boundary 和 blocked actions。
+- 新增 `ai-ide-repair-evidence-consumer-contract.json` / `ai-ide-repair-evidence-consumer-contract.md` 输出。
+- 新增 `pnpm playbook:contract` 和 `scripts/generate-ai-ide-repair-evidence-consumer-contract.mjs`。
+- 新增 `tests/unit/ai-ide-repair-evidence-consumer-contract.test.ts` 与 `tests/integration/playbook-contract.test.ts`。
+- 新增 ADR-0025 和 operation packet，并级联更新 README、PRD、SPEC、PLAN、architecture overview、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/ai-ide-repair-evidence-consumer-contract.test.ts`，测试因 consumer contract module 缺失按预期失败。
+- Green：实现最小 contract builder、Markdown renderer、writer、directory discovery、package export 和 root export。
+- Red：新增 `tests/integration/playbook-contract.test.ts`，测试因 `pnpm playbook:contract` 和 CLI script 缺失按预期失败。
+- Green：新增 CLI script 和 package script。
+- Red：更新 `tests/unit/project-structure.test.ts`，要求 ADR-0025、operation 文档和级联记录存在；测试因 ADR 缺失按预期失败。
+- Green：新增 ADR、operation packet 和级联文档。
+
+### 边界
+
+- No target repo material was uploaded。
+- No target repo branch, commit, pull request, issue, advisory, or file mutation was created。
+- No target repo patch was automatically applied。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No customer contact was authorized。
+- No pricing change or spend was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
 ## 2026年7月8日 - Autopilot-Compatible Documentation Architecture v0.1
 
 ### 完成内容

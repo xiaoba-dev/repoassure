@@ -331,6 +331,7 @@ export {
   buildAiIdeRepairEvidenceBundleManifest,
   buildAiIdeRepairEvidenceBundleManifestMarkdown,
   writeAiIdeRepairEvidenceBundleManifest,
+  writeAiIdeRepairEvidenceBundleManifestFromDirectory,
   type AiIdeRepairEvidenceBundleArtifact,
   type AiIdeRepairEvidenceBundleArtifactInput,
   type AiIdeRepairEvidenceBundleArtifactKind,
@@ -343,6 +344,22 @@ export {
   type WriteAiIdeRepairEvidenceBundleManifestInput,
   type WriteAiIdeRepairEvidenceBundleManifestResult
 } from './ai-ide-repair-evidence-bundle-manifest.js';
+
+export {
+  buildAiIdeRepairEvidenceConsumerContract,
+  buildAiIdeRepairEvidenceConsumerContractMarkdown,
+  writeAiIdeRepairEvidenceConsumerContract,
+  writeAiIdeRepairEvidenceConsumerContractFromDirectory,
+  type AiIdeRepairEvidenceConsumerArtifactReadItem,
+  type AiIdeRepairEvidenceConsumerArtifactRole,
+  type AiIdeRepairEvidenceConsumerContract,
+  type AiIdeRepairEvidenceConsumerContractInput,
+  type AiIdeRepairEvidenceConsumerReadiness,
+  type AiIdeRepairEvidenceConsumerSourceManifest,
+  type WriteAiIdeRepairEvidenceConsumerContractFromDirectoryInput,
+  type WriteAiIdeRepairEvidenceConsumerContractInput,
+  type WriteAiIdeRepairEvidenceConsumerContractResult
+} from './ai-ide-repair-evidence-consumer-contract.js';
 
 export {
   buildValidationCampaignSummary,

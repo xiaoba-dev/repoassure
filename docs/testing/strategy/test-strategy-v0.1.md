@@ -504,3 +504,10 @@ The unit contract checks `repoassure.ai-ide-repair-execution-evidence-report.v1`
 The integration smoke invokes `pnpm playbook:evidence` and verifies `ai-ide-repair-execution-evidence-report.json` / `.md` are generated from a local approved execution plan and local evidence input without target repo source or private artifacts.
 
 This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.
+## AI IDE Repair Execution Replay Readiness v0.1
+
+Coverage uses the testing pyramid:
+
+- Unit: `tests/unit/ai-ide-repair-execution-replay-readiness.test.ts` validates schema, replay fields, boundaries, Markdown, writers, and redaction.
+- Integration: `tests/integration/playbook-replay.test.ts` verifies `pnpm playbook:replay` writes JSON/Markdown from a local consumer contract directory.
+- Structure: `tests/unit/project-structure.test.ts` guards ADR, operations docs, package exports, CLI script, and documentation cascade.

@@ -229,3 +229,9 @@
   - 当前状态：新增 ADR-0024、`docs/PRD.md`、`docs/SPEC.md`、`docs/DESIGN.md` 和 `docs/PLAN.md`；状态为 `autopilot_compatible_documentation_architecture_implemented`。四个 gateway 分别作为 product intent、solution boundary、design direction 和 execution order 的 source-of-truth gateway；详细文档仍保留在现有 docs taxonomy 中，不搬迁 product specs、architecture specs、design docs、operations docs、goals、acceptance outputs、testing strategy 或 logs。该调整不改变产品方向、不发布、不触碰目标 repo、不授权 npm publication、GitHub release、public launch、customer contact、pricing/spend 或商业版 availability claims。
 - [x] AI IDE Repair Evidence Bundle Consumer Contract v0.1
   - 当前状态：新增 ADR-0025、`docs/operations/ai-ide-repair-evidence-consumer-contract-v0.1.md`、`packages/acceptance/src/ai-ide-repair-evidence-consumer-contract.ts`、`scripts/generate-ai-ide-repair-evidence-consumer-contract.mjs` 和 `pnpm playbook:contract`；状态为 `ai_ide_repair_evidence_consumer_contract_implemented`。`playbook:contract -- --from-dir <dir>` 会从本地 bundle manifest 生成 `ai-ide-repair-evidence-consumer-contract.json` / `.md`，记录 `artifactReadSequence`、artifact roles、`verificationChecklist`、`maintainerReviewBoundary`、redaction boundary、non-authorization boundary 和 blocked actions。该 contract 不上传 target repo material，不自动修改目标 repo，不创建 branch/commit/PR/issue/advisory/file mutation，不授权 npm publication、GitHub release、public launch、production marketing announcement、customer contact、pricing/spend、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
+## AI IDE Repair Execution Replay Readiness v0.1
+
+- [ ] `pnpm playbook:replay -- --from-dir <dir>` generates JSON and Markdown replay readiness artifacts.
+- [ ] `artifactReplay`, `verificationReplay`, `boundaryReplay`, and `nextReviewDecision` are present.
+- [ ] Blocked actions still include target repo file mutation, branch creation, and commit creation.
+- [ ] The replay readiness report is treated as review evidence only, not target repo repair, release, launch, or commercial availability authorization.

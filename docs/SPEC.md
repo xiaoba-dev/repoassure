@@ -48,3 +48,8 @@ Implementation should preserve compatibility paths while continuing the phased m
 - ADR-0014 for distribution and repair loop readiness.
 - ADR-0024 for Autopilot-compatible documentation architecture.
 - ADR-0025 for AI IDE repair evidence bundle consumer contract.
+## AI IDE Repair Execution Replay Readiness v0.1
+
+`pnpm playbook:replay -- --from-dir <dir>` reads `ai-ide-repair-evidence-consumer-contract.json` and writes `ai-ide-repair-execution-replay-readiness.json` / `.md`.
+
+The schema is `repoassure.ai-ide-repair-execution-replay-readiness.v1`. Required sections are `sourceConsumerContract`, `artifactReplay`, `verificationReplay`, `boundaryReplay`, `nextReviewDecision`, `blockedActions`, and inherited review/redaction/non-authorization boundaries.

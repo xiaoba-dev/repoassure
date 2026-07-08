@@ -416,3 +416,12 @@ AI IDE / Agent 应优先读取 `.hardening/latest/manifest.json`，再按 `files
 - `docs/logs/decision-log.md`
 - `docs/goals/completed/2026-06-20-structure-refactor.md`
 - `docs/goals/completed/2026-06-20-repair-plan-v0.2.md`
+## AI IDE Repair Execution Replay Readiness v0.1
+
+After generating the AI IDE repair evidence consumer contract, maintainers can generate a replay readiness report:
+
+```bash
+pnpm playbook:replay -- --from-dir <dir>
+```
+
+This writes `ai-ide-repair-execution-replay-readiness.json` and `ai-ide-repair-execution-replay-readiness.md`. The report confirms artifact replay, verification replay, boundary replay, and the next maintainer review decision. It is readiness evidence only and does not authorize target repo mutation, publication, launch, customer contact, or commercial availability claims.

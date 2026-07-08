@@ -45,3 +45,6 @@ RepoAssure is not positioned as another AI IDE, a general-purpose vulnerability 
 - ADR-0017: Public website and internal Project Intelligence Console.
 - ADR-0024: Autopilot-compatible documentation architecture.
 - ADR-0025: AI IDE repair evidence bundle consumer contract.
+## AI IDE Repair Execution Replay Readiness v0.1
+
+RepoAssure must let a maintainer or AI IDE replay-check repair evidence before opening a target-repo repair goal. The v0.1 product requirement is a local `playbook:replay` workflow that reads the AI IDE repair evidence consumer contract and emits JSON/Markdown readiness evidence covering artifact replay, verification replay, boundary replay, and the next maintainer review decision.

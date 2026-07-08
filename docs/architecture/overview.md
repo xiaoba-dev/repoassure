@@ -254,3 +254,6 @@ flowchart LR
 | Integration | CLI、tool artifact、boot 子进程、MCP protocol、run 编排 |
 | E2E | data URL 完整链路、可选真实 browser hardening run |
 | Benchmark | 5 个本地半真实 repo，完整 `run --browser`，并实际执行 generated Playwright specs |
+## ADR-0026 Replay Readiness Layer
+
+ADR-0026 adds the AI IDE repair execution replay readiness layer after ADR-0025's consumer contract. The flow is: repair evidence bundle manifest -> consumer contract -> replay readiness report. The replay readiness report is review evidence only; it confirms read-order replay, checklist replay, blocked-action enforcement, redaction, non-authorization, and maintainer review boundaries before any separate target-repo repair goal.

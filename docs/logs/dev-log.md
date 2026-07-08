@@ -12865,6 +12865,33 @@ Phase 0：项目初始化。
 - No pricing change or spend was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
 
+## 2026年7月8日 - Autopilot-Compatible Documentation Architecture v0.1
+
+### 完成内容
+
+- 新增 ADR-0024，记录 Autopilot-compatible source-of-truth gateway 决策。
+- 新增 `docs/PRD.md`、`docs/SPEC.md`、`docs/DESIGN.md` 和 `docs/PLAN.md`，分别承接 product intent、solution boundary、design direction 和 execution order。
+- 更新 ADR index、docs taxonomy、README、architecture overview、testing strategy、acceptance checklist 和 decision log。
+- 更新 `tests/unit/project-structure.test.ts`，守护 gateway 文件和级联关系。
+
+### TDD 记录
+
+- Red：新增 `project-structure.test.ts` 用例，要求 ADR-0024 和四个 gateway 文件存在；测试因 ADR 文件缺失按预期失败。
+- Green：补齐 ADR、gateway 文件和文档级联，使 structure-level contract 可验证。
+
+### 边界
+
+- Existing detailed documents were not moved。
+- Product direction was not changed。
+- No target repo material was uploaded。
+- No target repo branch, commit, pull request, issue, advisory, or file mutation was created。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No customer contact was authorized。
+- No pricing change or spend was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
 ## 2026年7月5日 - Product Validation Action Queue Runtime v0.3
 
 ### 完成内容

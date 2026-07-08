@@ -21,6 +21,10 @@ Define a stable `docs/` taxonomy so humans, Codex, AI IDEs, and automation can q
 
 ```text
 docs/
+  PRD.md
+  SPEC.md
+  DESIGN.md
+  PLAN.md
   adr/
   architecture/
     overview.md
@@ -50,6 +54,7 @@ docs/
 
 | Document class | Directory | Pattern | Example |
 | --- | --- | --- | --- |
+| Autopilot-compatible source-of-truth gateways | `docs/` | `PRD.md`, `SPEC.md`, `DESIGN.md`, `PLAN.md` | `docs/PRD.md` |
 | ADR | `docs/adr/` | `NNNN-short-title.md` | `0007-documentation-taxonomy-and-naming.md` |
 | Architecture overview | `docs/architecture/` | `overview.md` | `overview.md` |
 | Architecture spec | `docs/architecture/specs/` | `<subject>-spec-vX.Y.md` | `monorepo-structure-spec-v0.1.md` |
@@ -89,6 +94,8 @@ docs/
 | `docs/goals/codex-goal-repair-plan-v0.2.md` | `docs/goals/completed/2026-06-20-repair-plan-v0.2.md` | Migrated |
 
 ## Compatibility Exceptions
+
+`docs/PRD.md`, `docs/SPEC.md`, `docs/DESIGN.md`, and `docs/PLAN.md` are source-of-truth gateway documents. They provide Autopilot-compatible entrypoints and current-state summaries. Detailed documents remain in their existing canonical directories and should not be moved merely to satisfy gateway discovery.
 
 Do not move generated acceptance outputs until the owning commands support compatibility paths:
 

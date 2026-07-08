@@ -13182,3 +13182,34 @@ Phase 0：项目初始化。
 - No customer contact was authorized。
 - No pricing change or spend was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
+## 2026年7月8日 - AI IDE Repair Evidence Bundle E2E Automation v0.1
+
+### 完成内容
+
+- 新增 `writeAiIdeRepairEvidenceBundleManifestFromDirectory`，支持从一个本地目录自动发现六份 repair evidence artifacts。
+- `pnpm playbook:bundle` 新增 `--from-dir <dir>` 模式，并继续保留显式六路径模式。
+- `tests/integration/playbook-e2e-repair-evidence.test.ts` 现在覆盖 `campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle manifest`。
+- `tests/integration/playbook-bundle.test.ts` 增加 `--from-dir` CLI smoke。
+- 新增 `docs/operations/ai-ide-repair-evidence-bundle-e2e-automation-v0.1.md`，并级联更新 README、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：新增 `tests/unit/ai-ide-repair-evidence-bundle-manifest.test.ts` 的目录发现用例，测试因 `writeAiIdeRepairEvidenceBundleManifestFromDirectory` 缺失按预期失败。
+- Green：实现目录发现 writer，按 canonical artifact filenames 读取并默认输出到同一目录。
+- Red：新增 `tests/integration/playbook-bundle.test.ts` 的 `--from-dir` CLI 用例，测试因 `Unknown argument: --from-dir` 按预期失败。
+- Green：扩展 CLI 参数解析，支持 `--from-dir <dir>` 和可选 `--output <dir>`。
+- Red：更新 `tests/unit/project-structure.test.ts`，要求本 operation 文档和级联记录存在；测试因 operation 文档缺失按预期失败。
+- Green：新增 operation packet 和级联文档。
+
+### 边界
+
+- No target repo material was uploaded。
+- No target repo branch, commit, pull request, issue, advisory, or file mutation was created。
+- No target repo patch was automatically applied。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No customer contact was authorized。
+- No pricing change or spend was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。

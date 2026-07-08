@@ -2645,6 +2645,56 @@ describe('project structure', () => {
     await expectPath('docs/operations/ai-ide-repair-evidence-bundle-manifest-v0.1.md');
   });
 
+  it('records AI IDE repair evidence bundle E2E automation without target repo mutations or launch actions', async () => {
+    const [
+      operation,
+      readme,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      script,
+      unitTest,
+      integrationTest,
+      e2eTest
+    ] = await Promise.all([
+      readFile('docs/operations/ai-ide-repair-evidence-bundle-e2e-automation-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('scripts/generate-ai-ide-repair-evidence-bundle-manifest.mjs', 'utf8'),
+      readFile('tests/unit/ai-ide-repair-evidence-bundle-manifest.test.ts', 'utf8'),
+      readFile('tests/integration/playbook-bundle.test.ts', 'utf8'),
+      readFile('tests/integration/playbook-e2e-repair-evidence.test.ts', 'utf8')
+    ]);
+
+    expect(operation).toContain('AI IDE Repair Evidence Bundle E2E Automation v0.1');
+    expect(operation).toContain('Status: ai_ide_repair_evidence_bundle_e2e_automation_implemented');
+    expect(operation).toContain('pnpm playbook:bundle -- --from-dir <dir>');
+    expect(operation).toContain('campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle manifest');
+    expect(operation).toContain('ai-ide-repair-evidence-bundle-manifest.json');
+    expect(operation).toContain('ai-ide-repair-evidence-bundle-manifest.md');
+    expect(operation).toContain('tests/integration/playbook-e2e-repair-evidence.test.ts');
+    expect(operation).toContain('No target repo material was uploaded');
+    expect(operation).toContain('No target repo branch, commit, pull request, issue, advisory, or file mutation was created');
+    expect(operation).toContain('No public launch or production marketing announcement was executed');
+    expect(readme).toContain('AI IDE Repair Evidence Bundle E2E Automation v0.1');
+    expect(readme).toContain('pnpm playbook:bundle -- --from-dir <dir>');
+    expect(testingStrategy).toContain('AI IDE Repair Evidence Bundle E2E Automation v0.1');
+    expect(acceptanceChecklist).toContain('AI IDE Repair Evidence Bundle E2E Automation v0.1');
+    expect(decisionLog).toContain('AI IDE repair evidence bundle E2E automation');
+    expect(devLog).toContain('AI IDE Repair Evidence Bundle E2E Automation v0.1');
+    expect(script).toContain('--from-dir');
+    expect(script).toContain('writeAiIdeRepairEvidenceBundleManifestFromDirectory');
+    expect(unitTest).toContain('writeAiIdeRepairEvidenceBundleManifestFromDirectory');
+    expect(integrationTest).toContain('--from-dir');
+    expect(e2eTest).toContain('ai-ide-repair-evidence-bundle-manifest.json');
+
+    await expectPath('docs/operations/ai-ide-repair-evidence-bundle-e2e-automation-v0.1.md');
+  });
+
   it('records public website release candidate closure without publishing or deploying', async () => {
     const [handoff, readme, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-website-release-candidate-handoff-v0.1.md', 'utf8'),

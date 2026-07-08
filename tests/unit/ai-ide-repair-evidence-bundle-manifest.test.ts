@@ -7,7 +7,8 @@ import { describe, expect, it } from 'vitest';
 import {
   buildAiIdeRepairEvidenceBundleManifest,
   buildAiIdeRepairEvidenceBundleManifestMarkdown,
-  writeAiIdeRepairEvidenceBundleManifest
+  writeAiIdeRepairEvidenceBundleManifest,
+  writeAiIdeRepairEvidenceBundleManifestFromDirectory
 } from '../../packages/acceptance/src/ai-ide-repair-evidence-bundle-manifest.js';
 
 describe('AI IDE repair evidence bundle manifest', () => {
@@ -106,6 +107,35 @@ describe('AI IDE repair evidence bundle manifest', () => {
     expect(result.manifest.bundleSummary.currentStatus).toBe('verified_pending_maintainer_review');
     expect(json).toContain('repoassure.ai-ide-repair-evidence-bundle-manifest.v1');
     expect(markdown).toContain('ai-ide-repair-execution-evidence-report.json');
+    expect(json).not.toContain('secret-value');
+    expect(markdown).not.toContain('secret-value');
+  });
+
+  it('discovers the repair evidence artifact chain from one local directory', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-repair-evidence-bundle-dir-'));
+    const secretRoot = join(root, 'campaign-TOKEN=secret-value');
+
+    await writeBundleArtifactFiles(secretRoot);
+
+    const result = await writeAiIdeRepairEvidenceBundleManifestFromDirectory({
+      generatedAt: '2026-07-08T10:00:00.000Z',
+      inputDir: secretRoot
+    });
+    const json = await readFile(result.jsonPath, 'utf8');
+    const markdown = await readFile(result.markdownPath, 'utf8');
+
+    expect(result.jsonPath).toBe(join(secretRoot, 'ai-ide-repair-evidence-bundle-manifest.json'));
+    expect(result.markdownPath).toBe(join(secretRoot, 'ai-ide-repair-evidence-bundle-manifest.md'));
+    expect(result.manifest.readingOrder.map((item) => item.fileName)).toEqual([
+      'ai-ide-repair-playbook.json',
+      'ai-ide-playbook-consumption-report.json',
+      'ai-ide-repair-decision-package.json',
+      'ai-ide-repair-approval-receipt.json',
+      'ai-ide-approved-repair-execution-plan.json',
+      'ai-ide-repair-execution-evidence-report.json'
+    ]);
+    expect(result.manifest.bundleSummary.currentStatus).toBe('verified_pending_maintainer_review');
+    expect(markdown).toContain('## Reading Order');
     expect(json).not.toContain('secret-value');
     expect(markdown).not.toContain('secret-value');
   });

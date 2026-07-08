@@ -58,6 +58,7 @@
     "playbook:plan-approved": "pnpm build:acceptance && node scripts/generate-ai-ide-approved-repair-execution-plan.mjs",
     "playbook:evidence": "pnpm build:acceptance && node scripts/generate-ai-ide-repair-execution-evidence-report.mjs",
     "playbook:bundle": "pnpm build:acceptance && node scripts/generate-ai-ide-repair-evidence-bundle-manifest.mjs",
+    "playbook:contract": "pnpm build:acceptance && node scripts/generate-ai-ide-repair-evidence-consumer-contract.mjs",
     "preuser:accept": "pnpm build",
     "user:accept": "node packages/acceptance/dist/run-user-acceptance.js",
     "preuser:handoff": "pnpm build",

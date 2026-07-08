@@ -57,6 +57,7 @@ flowchart LR
 | [ADR-0017](../adr/0017-public-website-and-project-intelligence-console.md) | Public website and internal project intelligence console | `docs/product/specs/public-website-spec-v0.1.md` defines the external responsive private-preview site; `specs/project-intelligence-console-architecture-v0.1.md` defines a local-only Project Intelligence Console over generated graph snapshots |
 | [ADR-0018](../adr/0018-public-website-localization-strategy.md) | Public website localization strategy | Public website i18n should start with English and Simplified Chinese, keep Japanese and Korean as roadmap locales, and add localized forbidden-claim checks without localizing product artifacts by default |
 | [ADR-0024](../adr/0024-autopilot-compatible-documentation-architecture.md) | Autopilot-compatible documentation architecture | `docs/PRD.md`, `docs/SPEC.md`, `docs/DESIGN.md`, and `docs/PLAN.md` are source-of-truth gateways over the existing detailed docs taxonomy; existing detailed documents are not moved |
+| [ADR-0025](../adr/0025-ai-ide-repair-evidence-consumer-contract.md) | AI IDE repair evidence bundle consumer contract | `pnpm playbook:contract` converts the local bundle manifest into a consumer contract with artifact read sequence, verification checklist, maintainer review boundary, redaction boundary, non-authorization boundary, and blocked actions |
 
 ## Source-of-truth gateways
 
@@ -224,6 +225,8 @@ ADR-0021 定义 private preview hosting fallback decision：当前现有 Vercel 
 ADR-0022 定义 equivalent release control：当 GitHub private repo branch protection / repository rulesets 仍不可用时，可以把替代门禁设计为 exact release commit SHA、RepoAssure CI / Quality Gates、local full test、release hygiene、sensitive-material scan 和 maintainer closure approval 的证据包。该控制目前只完成设计，未执行 closure；Public Source Release Execution 仍被阻塞，且不能为了启用 branch protection 而公开仓库。
 
 ADR-0024 定义 Autopilot-compatible documentation architecture：`docs/PRD.md`、`docs/SPEC.md`、`docs/DESIGN.md` 和 `docs/PLAN.md` 是 Project Autopilot 与 AI IDE 的稳定 source-of-truth gateway。现有详细文档继续保留在 `docs/product/`、`docs/architecture/`、`docs/design/`、`docs/acceptance/`、`docs/operations/`、`docs/goals/` 和 `docs/logs/`；gateway 只提供权威入口和当前状态摘要，不复制或搬迁全部内容。
+
+ADR-0025 定义 AI IDE repair evidence bundle consumer contract：`pnpm playbook:contract -- --from-dir <dir>` 从本地 `ai-ide-repair-evidence-bundle-manifest.json` 生成 `ai-ide-repair-evidence-consumer-contract.json` / `.md`。该 contract 明确 artifact read sequence、verification checklist、maintainer review boundary、redaction boundary、non-authorization boundary 和 blocked actions；它不授权 target repo mutation、publication、launch、customer contact、pricing/spend 或 commercial availability claims。
 
 Project Intelligence Console 是内部独立站，规划见 `docs/product/specs/project-intelligence-console-spec-v0.1.md` 和 `docs/architecture/specs/project-intelligence-console-architecture-v0.1.md`。它应从本地 docs、code、tests、goals 和 logs 生成 Docs Graph、Code Graph、Project Progress Graph，并把 snapshots 写入 `artifacts/project-graph/`，默认 local-only、No hosted service dependency。
 

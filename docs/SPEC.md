@@ -21,6 +21,7 @@ Implementation should preserve compatibility paths while continuing the phased m
 - `@hardening-mcp/repair-planner`
 - Public website app.
 - Local-only generated artifacts and acceptance records.
+- `playbook:contract` for AI IDE repair evidence consumer contracts.
 
 ## Current Architecture Boundaries
 
@@ -46,3 +47,4 @@ Implementation should preserve compatibility paths while continuing the phased m
 - ADR-0013 for Security Assurance Lane.
 - ADR-0014 for distribution and repair loop readiness.
 - ADR-0024 for Autopilot-compatible documentation architecture.
+- ADR-0025 for AI IDE repair evidence bundle consumer contract.

@@ -394,6 +394,22 @@ The unit layer checks `writeAiIdeRepairEvidenceBundleManifestFromDirectory`, can
 
 The integration layer checks `pnpm playbook:bundle -- --from-dir <dir>` and the real/near-real `campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle manifest` path.
 
+## AI IDE Repair Evidence Bundle Consumer Contract v0.1
+
+AI IDE Repair Evidence Bundle Consumer Contract v0.1 verifies that an AI IDE can consume the bundle manifest through an explicit contract instead of relying on chat context.
+
+Required focused checks:
+
+```text
+pnpm vitest run tests/unit/ai-ide-repair-evidence-consumer-contract.test.ts
+pnpm vitest run tests/integration/playbook-contract.test.ts
+pnpm vitest run tests/unit/project-structure.test.ts -t "AI IDE repair evidence bundle consumer contract"
+```
+
+The unit layer verifies `repoassure.ai-ide-repair-evidence-consumer-contract.v1`, `artifactReadSequence`, artifact roles, `verificationChecklist`, maintainer review boundary, redaction boundary, non-authorization boundary, blocked actions, JSON/Markdown output, and secret redaction.
+
+The integration layer checks `pnpm playbook:contract -- --from-dir <dir>` and the documented missing-input failure path. This contract remains local-first and does not authorize target repo mutation, branch/commit/PR/issue/advisory creation, npm publication, GitHub release, public launch, customer contact, pricing/spend, or commercial availability claims.
+
 This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.
 
 ## AI IDE Repair Evidence End-to-End Campaign Fixture v0.1

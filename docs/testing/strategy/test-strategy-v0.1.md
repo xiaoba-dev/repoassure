@@ -529,3 +529,15 @@ Coverage uses the testing pyramid:
 - E2E: `tests/integration/playbook-e2e-repair-evidence.test.ts` validates campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle -> contract -> replay -> proposal.
 - Type smoke: `tests/type-smoke/acceptance-package-subpaths.ts` guards `@hardening-mcp/acceptance/ai-ide-target-repo-repair-goal-proposal-package`.
 - Structure: `tests/unit/project-structure.test.ts` guards ADR-0028, operation docs, package exports, CLI script, and documentation cascade.
+
+## Target Repo Repair Goal Authorization Receipt v0.1
+
+Coverage uses the testing pyramid:
+
+- Unit: `tests/unit/ai-ide-target-repo-repair-goal-authorization-receipt.test.ts` validates schema, source proposal provenance, approve/reject/defer/accept_risk decisions, approved scope, rejected/deferred/risk-accepted items, verification requirements, boundaries, writers, directory discovery, and redaction.
+- Integration: `tests/integration/playbook-authorization.test.ts` verifies `pnpm playbook:authorize` writes JSON/Markdown from a local proposal package directory and reports documented missing-input flags.
+- E2E: `tests/integration/playbook-e2e-repair-evidence.test.ts` validates campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle -> contract -> replay -> proposal -> authorization receipt.
+- Type smoke: `tests/type-smoke/acceptance-package-subpaths.ts` guards `@hardening-mcp/acceptance/ai-ide-target-repo-repair-goal-authorization-receipt`.
+- Structure: `tests/unit/project-structure.test.ts` guards ADR-0029, operation docs, package exports, CLI script, and documentation cascade.
+
+This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.

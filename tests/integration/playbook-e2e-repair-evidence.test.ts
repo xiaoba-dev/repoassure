@@ -154,6 +154,26 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       '--from-dir',
       outputDir
     ]);
+    const authorizationDecisionsPath = join(outputDir, 'target-repo-repair-goal-authorization-decisions.json');
+    await writeFile(authorizationDecisionsPath, `${JSON.stringify({
+      decisions: [
+        {
+          scopeId: 'target_repo_manual_repair_goal',
+          decision: 'approve',
+          evidence: 'Fixture maintainer approved opening a separate target repo repair goal after reviewing proposal package.',
+          approverRole: 'target_repo_maintainer',
+          verificationRequirements: ['pnpm test', 'pnpm lint']
+        }
+      ]
+    }, null, 2)}\n`);
+    await runScript([
+      'playbook:authorize',
+      '--',
+      '--from-dir',
+      outputDir,
+      '--decisions',
+      authorizationDecisionsPath
+    ]);
 
     const outputs = await readArtifacts(outputDir);
 
@@ -180,6 +200,7 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     expect(outputs.contract.schemaVersion).toBe('repoassure.ai-ide-repair-evidence-consumer-contract.v1');
     expect(outputs.replay.schemaVersion).toBe('repoassure.ai-ide-repair-execution-replay-readiness.v1');
     expect(outputs.proposal.schemaVersion).toBe('repoassure.ai-ide-target-repo-repair-goal-proposal-package.v1');
+    expect(outputs.authorization.schemaVersion).toBe('repoassure.ai-ide-target-repo-repair-goal-authorization-receipt.v1');
     expect(outputs.bundle.bundleSummary).toMatchObject({
       currentStatus: 'verified_pending_maintainer_review',
       verifiedItems: 1,
@@ -199,6 +220,16 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     });
     expect(outputs.proposal.blockedActions).toContain('target_repo_file_mutation');
     expect(outputs.proposal.blockedActions).toContain('public_launch');
+    expect(outputs.authorization.authorizationStatus).toBe('approved_for_separate_target_repo_repair_goal');
+    expect(outputs.authorization.decisionSummary.approvedTargetRepairGoalScopes).toBe(1);
+    expect(outputs.authorization.approvedScope).toEqual([
+      expect.objectContaining({
+        scopeId: 'target_repo_manual_repair_goal',
+        authorizedForSeparateTargetRepoRepairGoal: true
+      })
+    ]);
+    expect(outputs.authorization.blockedActions).toContain('target_repo_file_mutation');
+    expect(outputs.authorization.blockedActions).toContain('public_launch');
     expect(outputs.bundle.readingOrder.map((item) => item.fileName)).toEqual([
       'ai-ide-repair-playbook.json',
       'ai-ide-playbook-consumption-report.json',
@@ -225,6 +256,9 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     expect(outputs.proposalMarkdown).toContain('# RepoAssure AI IDE Target Repo Repair Goal Proposal Package');
     expect(outputs.proposalMarkdown).toContain('## Repair Task Breakdown');
     expect(outputs.proposalMarkdown).toContain('## Maintainer Approval Boundary');
+    expect(outputs.authorizationMarkdown).toContain('# RepoAssure AI IDE Target Repo Repair Goal Authorization Receipt');
+    expect(outputs.authorizationMarkdown).toContain('## Approved Scope');
+    expect(outputs.authorizationMarkdown).toContain('## Non-Authorization Boundary');
     expect(outputs.evidenceMarkdown).toContain(
       'No target repo branch, commit, pull request, issue, advisory, or file mutation is executed by this report.'
     );
@@ -248,6 +282,8 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       'ai-ide-repair-execution-replay-readiness.md',
       'ai-ide-repair-playbook.json',
       'ai-ide-repair-playbook.md',
+      'ai-ide-target-repo-repair-goal-authorization-receipt.json',
+      'ai-ide-target-repo-repair-goal-authorization-receipt.md',
       'ai-ide-target-repo-repair-goal-proposal-package.json',
       'ai-ide-target-repo-repair-goal-proposal-package.md'
     ]);
@@ -315,11 +351,19 @@ async function readArtifacts(outputDir: string): Promise<{
     verificationCommands: Array<{ command: string; executionMode: string }>;
     blockedActions: string[];
   };
+  authorization: {
+    schemaVersion: string;
+    authorizationStatus: string;
+    decisionSummary: { approvedTargetRepairGoalScopes: number };
+    approvedScope: Array<{ scopeId: string; authorizedForSeparateTargetRepoRepairGoal: boolean }>;
+    blockedActions: string[];
+  };
   evidenceMarkdown: string;
   bundleMarkdown: string;
   contractMarkdown: string;
   replayMarkdown: string;
   proposalMarkdown: string;
+  authorizationMarkdown: string;
 }> {
   return {
     playbook: JSON.parse(await readFile(join(outputDir, 'ai-ide-repair-playbook.json'), 'utf8')) as { schemaVersion: string },
@@ -373,11 +417,19 @@ async function readArtifacts(outputDir: string): Promise<{
       verificationCommands: Array<{ command: string; executionMode: string }>;
       blockedActions: string[];
     },
+    authorization: JSON.parse(await readFile(join(outputDir, 'ai-ide-target-repo-repair-goal-authorization-receipt.json'), 'utf8')) as {
+      schemaVersion: string;
+      authorizationStatus: string;
+      decisionSummary: { approvedTargetRepairGoalScopes: number };
+      approvedScope: Array<{ scopeId: string; authorizedForSeparateTargetRepoRepairGoal: boolean }>;
+      blockedActions: string[];
+    },
     evidenceMarkdown: await readFile(join(outputDir, 'ai-ide-repair-execution-evidence-report.md'), 'utf8'),
     bundleMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-bundle-manifest.md'), 'utf8'),
     contractMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-consumer-contract.md'), 'utf8'),
     replayMarkdown: await readFile(join(outputDir, 'ai-ide-repair-execution-replay-readiness.md'), 'utf8'),
-    proposalMarkdown: await readFile(join(outputDir, 'ai-ide-target-repo-repair-goal-proposal-package.md'), 'utf8')
+    proposalMarkdown: await readFile(join(outputDir, 'ai-ide-target-repo-repair-goal-proposal-package.md'), 'utf8'),
+    authorizationMarkdown: await readFile(join(outputDir, 'ai-ide-target-repo-repair-goal-authorization-receipt.md'), 'utf8')
   };
 }
 
@@ -399,6 +451,8 @@ async function listExpectedArtifactNames(outputDir: string): Promise<string[]> {
     'ai-ide-repair-evidence-consumer-contract.md',
     'ai-ide-repair-execution-replay-readiness.json',
     'ai-ide-repair-execution-replay-readiness.md',
+    'ai-ide-target-repo-repair-goal-authorization-receipt.json',
+    'ai-ide-target-repo-repair-goal-authorization-receipt.md',
     'ai-ide-target-repo-repair-goal-proposal-package.json',
     'ai-ide-target-repo-repair-goal-proposal-package.md',
     'ai-ide-repair-playbook.json',

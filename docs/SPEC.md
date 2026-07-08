@@ -23,6 +23,7 @@ Implementation should preserve compatibility paths while continuing the phased m
 - Local-only generated artifacts and acceptance records.
 - `playbook:contract` for AI IDE repair evidence consumer contracts.
 - `playbook:proposal` for target repo repair goal proposal packages.
+- `playbook:authorize` for target repo repair goal authorization receipts.
 
 ## Current Architecture Boundaries
 
@@ -50,6 +51,7 @@ Implementation should preserve compatibility paths while continuing the phased m
 - ADR-0024 for Autopilot-compatible documentation architecture.
 - ADR-0025 for AI IDE repair evidence bundle consumer contract.
 - ADR-0028 for target repo repair goal proposal package.
+- ADR-0029 for target repo repair goal authorization receipt.
 ## AI IDE Repair Execution Replay Readiness v0.1
 
 `pnpm playbook:replay -- --from-dir <dir>` reads `ai-ide-repair-evidence-consumer-contract.json` and writes `ai-ide-repair-execution-replay-readiness.json` / `.md`.
@@ -67,3 +69,9 @@ The real campaign validation must assert bundle -> contract -> replay artifact g
 `pnpm playbook:proposal -- --from-dir <dir>` reads `ai-ide-repair-execution-replay-readiness.json` and writes `ai-ide-target-repo-repair-goal-proposal-package.json` / `.md`.
 
 The schema is `repoassure.ai-ide-target-repo-repair-goal-proposal-package.v1`. Required sections are `proposalReadiness`, `sourceReplayReadiness`, `prerequisites`, `artifactReadOrder`, `allowedRepairScope`, `repairTaskBreakdown`, `verificationCommands`, `maintainerApprovalBoundary`, `nonAuthorizationBoundary`, `redactionBoundary`, and `blockedActions`.
+
+## Target Repo Repair Goal Authorization Receipt v0.1
+
+`pnpm playbook:authorize -- --from-dir <dir> --decisions <authorization-decisions.json>` reads `ai-ide-target-repo-repair-goal-proposal-package.json` and maintainer decision input, then writes `ai-ide-target-repo-repair-goal-authorization-receipt.json` / `.md`.
+
+The schema is `repoassure.ai-ide-target-repo-repair-goal-authorization-receipt.v1`. Required sections are `authorizationStatus`, `sourceProposalPackage`, `decisionSummary`, `authorizationItems`, `approvedScope`, `rejectedItems`, `deferredItems`, `riskAcceptedItems`, `verificationRequirements`, `maintainerApprovalBoundary`, `nonAuthorizationBoundary`, `redactionBoundary`, and `blockedActions`.

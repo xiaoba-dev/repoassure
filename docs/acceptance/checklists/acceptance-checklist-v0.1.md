@@ -235,3 +235,10 @@
 - [ ] `artifactReplay`, `verificationReplay`, `boundaryReplay`, and `nextReviewDecision` are present.
 - [ ] Blocked actions still include target repo file mutation, branch creation, and commit creation.
 - [ ] The replay readiness report is treated as review evidence only, not target repo repair, release, launch, or commercial availability authorization.
+
+## AI IDE Repair Replay Real Campaign Validation v0.1
+
+- [ ] The near-real campaign fixture validates campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle -> contract -> replay.
+- [ ] The final replay readiness artifact reaches `ready_for_maintainer_replay_review`.
+- [ ] Sanitized-summary redaction boundary wording is accepted only when it still names sensitive evidence subjects.
+- [ ] The validation does not mutate target repo files or authorize release, launch, customer contact, or commercial availability claims.

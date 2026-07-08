@@ -1,5 +1,24 @@
 # 决策日志
 
+## 2026年7月8日 - AI IDE repair replay real campaign validation
+
+### 决策
+
+接受 AI IDE Repair Replay Real Campaign Validation v0.1：把近真实 campaign fixture 从 bundle manifest 继续延伸到 consumer contract 和 replay readiness，形成 `campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle -> contract -> replay` 的完整本地验证链。
+
+### 原因
+
+- ADR-0025 和 ADR-0026 已分别实现 consumer contract 与 replay readiness，但需要真实/近真实 campaign 证明两个层可以和上游 repair evidence chain 连续工作。
+- E2E 暴露出 replay readiness 对 redaction boundary 文案过窄，只识别 `redact`，不识别生成证据中的 `sanitized summaries only; never store secrets` 等价隐私边界。
+- 修复后，complete verified fixture 可以生成 `ready_for_maintainer_replay_review`，为后续 target repo repair goal proposal 提供本地 readiness evidence。
+
+### 影响
+
+- 更新 `tests/integration/playbook-e2e-repair-evidence.test.ts`，E2E 现在运行 `playbook:contract` 和 `playbook:replay`。
+- 更新 `packages/acceptance/src/ai-ide-repair-execution-replay-readiness.ts`，支持真实 campaign sanitized-boundary wording。
+- 新增 `docs/adr/0027-ai-ide-repair-replay-real-campaign-validation.md` 与 `docs/operations/ai-ide-repair-replay-real-campaign-validation-v0.1.md`。
+- 本决策不上传 target repo material、private artifacts、reviewer feedback、customer data、secrets 或 raw private repo content，不执行 target repo mutation、npm publish、GitHub release、public launch、production marketing announcement、customer contact、pricing change、spend、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
+
 ## 2026年7月8日 - AI IDE repair execution replay readiness
 
 ### 决策

@@ -261,11 +261,30 @@ function buildBoundaryReplay(
 
   return {
     maintainerReviewBoundaryMaintained: maintainerReviewBoundary.includes('maintainer review'),
-    redactionBoundaryMaintained: redactionBoundary.includes('redact'),
+    redactionBoundaryMaintained: describesRedactionBoundary(redactionBoundary),
     nonAuthorizationBoundaryMaintained: nonAuthorizationBoundary.includes('does not authorize'),
     blockedActionsEnforced: REQUIRED_BLOCKED_ACTIONS.every((action) => blockedActions.includes(action)),
     unauthorizedActions: []
   };
+}
+
+function describesRedactionBoundary(redactionBoundary: string): boolean {
+  const hasRedactionAction =
+    redactionBoundary.includes('redact') ||
+    redactionBoundary.includes('sanitized') ||
+    redactionBoundary.includes('sanitize') ||
+    redactionBoundary.includes('never store');
+  const hasSensitiveSubject =
+    redactionBoundary.includes('secret') ||
+    redactionBoundary.includes('token') ||
+    redactionBoundary.includes('credential') ||
+    redactionBoundary.includes('customer data') ||
+    redactionBoundary.includes('private source') ||
+    redactionBoundary.includes('reviewer pii') ||
+    redactionBoundary.includes('artifact path') ||
+    redactionBoundary.includes('evidence');
+
+  return hasRedactionAction && hasSensitiveSubject;
 }
 
 function classifyReplayReadiness(

@@ -118,6 +118,22 @@ describe('AI IDE repair execution replay readiness', () => {
     expect(json).not.toContain('secret-value');
     expect(markdown).not.toContain('secret-value');
   });
+
+  it('treats sanitized-summary wording as a maintained redaction boundary', () => {
+    const contract = {
+      ...buildConsumerContract(),
+      redactionBoundary: 'Local-only execution guidance. Store artifact references and sanitized summaries only; never store secrets, raw private source, reviewer PII, credentials, cookies, tokens, or customer data.'
+    };
+    const report = buildAiIdeRepairExecutionReplayReadiness({
+      generatedAt: '2026-07-08T12:00:00.000Z',
+      contractPath: '/private/tmp/repoassure-campaign/ai-ide-repair-evidence-consumer-contract.json',
+      contract
+    });
+
+    expect(report.boundaryReplay.redactionBoundaryMaintained).toBe(true);
+    expect(report.replayReadiness).toBe('ready_for_maintainer_replay_review');
+    expect(report.nextReviewDecision.decision).toBe('maintainer_review_ready');
+  });
 });
 
 function buildConsumerContract(): AiIdeRepairEvidenceConsumerContract {

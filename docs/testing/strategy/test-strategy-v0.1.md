@@ -511,3 +511,11 @@ Coverage uses the testing pyramid:
 - Unit: `tests/unit/ai-ide-repair-execution-replay-readiness.test.ts` validates schema, replay fields, boundaries, Markdown, writers, and redaction.
 - Integration: `tests/integration/playbook-replay.test.ts` verifies `pnpm playbook:replay` writes JSON/Markdown from a local consumer contract directory.
 - Structure: `tests/unit/project-structure.test.ts` guards ADR, operations docs, package exports, CLI script, and documentation cascade.
+
+## AI IDE Repair Replay Real Campaign Validation v0.1
+
+Coverage uses the testing pyramid:
+
+- Unit: `tests/unit/ai-ide-repair-execution-replay-readiness.test.ts` validates real campaign sanitized-summary redaction boundary wording.
+- Integration: `tests/integration/playbook-e2e-repair-evidence.test.ts` validates campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle -> contract -> replay.
+- Structure: `tests/unit/project-structure.test.ts` guards ADR-0027, operation docs, and documentation cascade.

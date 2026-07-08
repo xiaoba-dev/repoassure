@@ -55,3 +55,11 @@ Status: implemented.
 - Add `pnpm playbook:replay` CLI.
 - Verify with unit, integration, and structure cascade tests.
 - Keep the report local-first and non-authorizing for target repo mutation, release, launch, customer contact, and commercial claims.
+
+## AI IDE Repair Replay Real Campaign Validation v0.1
+
+Status: implemented.
+
+- Extend the near-real campaign E2E fixture through bundle, contract, and replay readiness.
+- Verify sanitized-boundary wording used by generated campaign evidence.
+- Keep validation local-first and non-authorizing for target repo mutation, release, launch, customer contact, and commercial claims.

@@ -419,6 +419,24 @@ export {
 } from './ai-ide-target-repo-repair-goal-authorization-receipt.js';
 
 export {
+  buildAiIdeAuthorizedTargetRepoRepairGoalTaskPackage,
+  buildAiIdeAuthorizedTargetRepoRepairGoalTaskPackageMarkdown,
+  writeAiIdeAuthorizedTargetRepoRepairGoalTaskPackage,
+  writeAiIdeAuthorizedTargetRepoRepairGoalTaskPackageFromDirectory,
+  type AiIdeAuthorizedTargetRepoRepairGoalExcludedItem,
+  type AiIdeAuthorizedTargetRepoRepairGoalExecutionMode,
+  type AiIdeAuthorizedTargetRepoRepairGoalMutationPermission,
+  type AiIdeAuthorizedTargetRepoRepairGoalSourceAuthorizationReceipt,
+  type AiIdeAuthorizedTargetRepoRepairGoalTask,
+  type AiIdeAuthorizedTargetRepoRepairGoalTaskPackage,
+  type AiIdeAuthorizedTargetRepoRepairGoalTaskPackageInput,
+  type AiIdeAuthorizedTargetRepoRepairGoalTaskPackageStatus,
+  type WriteAiIdeAuthorizedTargetRepoRepairGoalTaskPackageFromDirectoryInput,
+  type WriteAiIdeAuthorizedTargetRepoRepairGoalTaskPackageInput,
+  type WriteAiIdeAuthorizedTargetRepoRepairGoalTaskPackageResult
+} from './ai-ide-authorized-target-repo-repair-goal-task-package.js';
+
+export {
   buildValidationCampaignSummary,
   buildValidationCampaignSummaryMarkdown,
   writeValidationCampaignSummary,

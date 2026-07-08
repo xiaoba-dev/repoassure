@@ -258,3 +258,11 @@
 - [ ] Rejected, deferred, and risk-accepted items are not treated as target repo repair authorization.
 - [ ] The receipt includes source proposal provenance, decision summary, verification requirements, maintainer approval boundary, redaction boundary, non-authorization boundary, and blocked actions.
 - [ ] The validation does not mutate target repo files or authorize release, launch, customer contact, or commercial availability claims.
+
+## Authorized Target Repo Repair Goal Task Package v0.1
+
+- [ ] `pnpm playbook:target-repair-goal -- --from-dir <dir>` generates JSON and Markdown task package artifacts.
+- [ ] Only authorization receipt items with `authorizedForSeparateTargetRepoRepairGoal` become approved repair goals.
+- [ ] Rejected, deferred, and risk-accepted authorization items remain excluded from target repo repair execution.
+- [ ] The package includes source authorization provenance, repair goal instructions, verification checklist, maintainer review boundary, redaction boundary, non-authorization boundary, and blocked actions.
+- [ ] The validation does not mutate target repo files or authorize branch, commit, pull request, issue, advisory, release, launch, customer contact, or commercial availability claims.

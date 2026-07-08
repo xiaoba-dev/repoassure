@@ -24,6 +24,7 @@ Implementation should preserve compatibility paths while continuing the phased m
 - `playbook:contract` for AI IDE repair evidence consumer contracts.
 - `playbook:proposal` for target repo repair goal proposal packages.
 - `playbook:authorize` for target repo repair goal authorization receipts.
+- `playbook:target-repair-goal` for authorized target repo repair goal task packages.
 
 ## Current Architecture Boundaries
 
@@ -52,6 +53,7 @@ Implementation should preserve compatibility paths while continuing the phased m
 - ADR-0025 for AI IDE repair evidence bundle consumer contract.
 - ADR-0028 for target repo repair goal proposal package.
 - ADR-0029 for target repo repair goal authorization receipt.
+- ADR-0030 for authorized target repo repair goal task package.
 ## AI IDE Repair Execution Replay Readiness v0.1
 
 `pnpm playbook:replay -- --from-dir <dir>` reads `ai-ide-repair-evidence-consumer-contract.json` and writes `ai-ide-repair-execution-replay-readiness.json` / `.md`.
@@ -75,3 +77,9 @@ The schema is `repoassure.ai-ide-target-repo-repair-goal-proposal-package.v1`. R
 `pnpm playbook:authorize -- --from-dir <dir> --decisions <authorization-decisions.json>` reads `ai-ide-target-repo-repair-goal-proposal-package.json` and maintainer decision input, then writes `ai-ide-target-repo-repair-goal-authorization-receipt.json` / `.md`.
 
 The schema is `repoassure.ai-ide-target-repo-repair-goal-authorization-receipt.v1`. Required sections are `authorizationStatus`, `sourceProposalPackage`, `decisionSummary`, `authorizationItems`, `approvedScope`, `rejectedItems`, `deferredItems`, `riskAcceptedItems`, `verificationRequirements`, `maintainerApprovalBoundary`, `nonAuthorizationBoundary`, `redactionBoundary`, and `blockedActions`.
+
+## Authorized Target Repo Repair Goal Task Package v0.1
+
+`pnpm playbook:target-repair-goal -- --from-dir <dir>` reads `ai-ide-target-repo-repair-goal-authorization-receipt.json` and writes `ai-ide-authorized-target-repo-repair-goal-task-package.json` / `.md`.
+
+The schema is `repoassure.ai-ide-authorized-target-repo-repair-goal-task-package.v1`. Required sections are `taskPackageStatus`, `sourceAuthorizationReceipt`, `approvedRepairGoals`, `excludedAuthorizationItems`, `verificationChecklist`, `maintainerReviewBoundary`, `nonAuthorizationBoundary`, `redactionBoundary`, and `blockedActions`.

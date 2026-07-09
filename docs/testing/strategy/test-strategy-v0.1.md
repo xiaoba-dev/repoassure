@@ -565,3 +565,15 @@ Coverage uses the testing pyramid:
 - Structure: `tests/unit/project-structure.test.ts` guards ADR-0031, operation docs, package exports, CLI script, and documentation cascade.
 
 This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.
+
+## Target Repair Evidence Review Decision Package v0.1
+
+Coverage uses the testing pyramid:
+
+- Unit: `tests/unit/ai-ide-target-repair-evidence-review-decision-package.test.ts` validates schema, source intake provenance, accept / changes_requested / defer / accept_risk decisions, accepted evidence scope, unresolved review decisions, writers, directory discovery, boundaries, and redaction.
+- Integration: `tests/integration/playbook-target-repair-review.test.ts` verifies `pnpm playbook:target-repair-review` writes JSON/Markdown from a local intake report directory and reports documented missing-input flags.
+- E2E: `tests/integration/playbook-e2e-repair-evidence.test.ts` validates campaign-summary -> playbook -> consume -> decide -> approve -> plan-approved -> evidence -> bundle -> contract -> replay -> proposal -> authorization receipt -> target repair goal task package -> target repair evidence intake -> target repair evidence review decision package.
+- Type smoke: `tests/type-smoke/acceptance-package-subpaths.ts` guards `@hardening-mcp/acceptance/ai-ide-target-repair-evidence-review-decision-package`.
+- Structure: `tests/unit/project-structure.test.ts` guards ADR-0032, operation docs, package exports, CLI script, and documentation cascade.
+
+This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.

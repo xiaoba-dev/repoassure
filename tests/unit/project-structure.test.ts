@@ -3293,6 +3293,97 @@ describe('project structure', () => {
     await expectPath('docs/operations/target-repo-repair-goal-execution-evidence-intake-v0.1.md');
   });
 
+  it('records target repair evidence review decisions without executing target repo actions', async () => {
+    const [
+      adr,
+      adrIndex,
+      operation,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      packageJson,
+      acceptancePackageJson,
+      compatibility,
+      indexSource,
+      reviewSource,
+      script,
+      unitTest,
+      integrationTest,
+      e2eTest,
+      typeSmoke
+    ] = await Promise.all([
+      readFile('docs/adr/0032-target-repair-evidence-review-decision-package.md', 'utf8'),
+      readFile('docs/adr/README.md', 'utf8'),
+      readFile('docs/operations/target-repair-evidence-review-decision-package-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('package.json', 'utf8'),
+      readFile('packages/acceptance/package.json', 'utf8'),
+      readFile('packages/acceptance/src/compatibility.ts', 'utf8'),
+      readFile('packages/acceptance/src/index.ts', 'utf8'),
+      readFile('packages/acceptance/src/ai-ide-target-repair-evidence-review-decision-package.ts', 'utf8'),
+      readFile('scripts/generate-ai-ide-target-repair-evidence-review-decision-package.mjs', 'utf8'),
+      readFile('tests/unit/ai-ide-target-repair-evidence-review-decision-package.test.ts', 'utf8'),
+      readFile('tests/integration/playbook-target-repair-review.test.ts', 'utf8'),
+      readFile('tests/integration/playbook-e2e-repair-evidence.test.ts', 'utf8'),
+      readFile('tests/type-smoke/acceptance-package-subpaths.ts', 'utf8')
+    ]);
+
+    expect(adr).toContain('ADR-0032: Target Repair Evidence Review Decision Package');
+    expect(adr).toContain('target repair evidence review decision package');
+    expect(adr).toContain('does not modify target repo files');
+    expect(adrIndex).toContain('[0032](0032-target-repair-evidence-review-decision-package.md)');
+    expect(operation).toContain('Target Repair Evidence Review Decision Package v0.1');
+    expect(operation).toContain('Status: target_repair_evidence_review_decision_package_implemented');
+    expect(operation).toContain('ai-ide-target-repair-evidence-review-decision-package.json');
+    expect(operation).toContain('ai-ide-target-repair-evidence-review-decision-package.md');
+    expect(operation).toContain('repoassure.ai-ide-target-repair-evidence-review-decision-package.v1');
+    expect(operation).toContain('pnpm playbook:target-repair-review');
+    expect(operation).toContain('No target repo branch, commit, pull request, issue, advisory, or file mutation was created by RepoAssure');
+    expect(operation).toContain('No public launch or production marketing announcement was executed');
+    expect(readme).toContain('Target Repair Evidence Review Decision Package v0.1');
+    expect(readme).toContain('pnpm playbook:target-repair-review -- --from-dir <dir>');
+    expect(prd).toContain('Target Repair Evidence Review Decision Package v0.1');
+    expect(spec).toContain('playbook:target-repair-review');
+    expect(plan).toContain('Target Repair Evidence Review Decision Package v0.1');
+    expect(architecture).toContain('ADR-0032');
+    expect(testingStrategy).toContain('Target Repair Evidence Review Decision Package v0.1');
+    expect(acceptanceChecklist).toContain('Target Repair Evidence Review Decision Package v0.1');
+    expect(decisionLog).toContain('target repair evidence review decision package');
+    expect(devLog).toContain('Target Repair Evidence Review Decision Package v0.1');
+    expect(packageJson).toContain('"playbook:target-repair-review": "pnpm build:acceptance && node scripts/generate-ai-ide-target-repair-evidence-review-decision-package.mjs"');
+    expect(acceptancePackageJson).toContain('"./ai-ide-target-repair-evidence-review-decision-package"');
+    expect(compatibility).toContain('ai-ide-target-repair-evidence-review-decision-package');
+    expect(indexSource).toContain('buildAiIdeTargetRepairEvidenceReviewDecisionPackage');
+    expect(reviewSource).toContain('repoassure.ai-ide-target-repair-evidence-review-decision-package.v1');
+    expect(reviewSource).toContain('does not modify target repo files');
+    expect(script).toContain('writeAiIdeTargetRepairEvidenceReviewDecisionPackageFromDirectory');
+    expect(script).toContain('--intake-report');
+    expect(script).toContain('--decisions');
+    expect(script).toContain('--from-dir');
+    expect(unitTest).toContain('repoassure.ai-ide-target-repair-evidence-review-decision-package.v1');
+    expect(integrationTest).toContain('playbook:target-repair-review');
+    expect(e2eTest).toContain('playbook:target-repair-review');
+    expect(e2eTest).toContain('accepted_for_target_repo_acceptance');
+    expect(typeSmoke).toContain('ai-ide-target-repair-evidence-review-decision-package');
+
+    await expectPath('docs/adr/0032-target-repair-evidence-review-decision-package.md');
+    await expectPath('docs/operations/target-repair-evidence-review-decision-package-v0.1.md');
+  });
+
   it('records Autopilot-compatible documentation architecture without moving existing source documents', async () => {
     const [
       adr,
@@ -5468,6 +5559,7 @@ describe('project structure', () => {
       'ai-ide-repair-execution-evidence-report',
       'ai-ide-repair-execution-replay-readiness',
       'ai-ide-repair-playbook',
+      'ai-ide-target-repair-evidence-review-decision-package',
       'ai-ide-target-repo-repair-goal-authorization-receipt',
       'ai-ide-target-repo-repair-goal-execution-evidence-intake-report',
       'ai-ide-target-repo-repair-goal-proposal-package',

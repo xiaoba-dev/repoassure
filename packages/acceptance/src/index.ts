@@ -462,6 +462,31 @@ export {
 } from './ai-ide-target-repo-repair-goal-execution-evidence-intake-report.js';
 
 export {
+  buildAiIdeTargetRepairEvidenceReviewDecisionPackage,
+  buildAiIdeTargetRepairEvidenceReviewDecisionPackageMarkdown,
+  writeAiIdeTargetRepairEvidenceReviewDecisionPackage,
+  writeAiIdeTargetRepairEvidenceReviewDecisionPackageFromDirectory,
+  type AiIdeTargetRepairEvidenceAcceptedScope,
+  type AiIdeTargetRepairEvidenceChangeRequest,
+  type AiIdeTargetRepairEvidenceDeferredItem,
+  type AiIdeTargetRepairEvidenceNextRepairGoalRecommendation,
+  type AiIdeTargetRepairEvidenceReviewDecision,
+  type AiIdeTargetRepairEvidenceReviewDecisionInput,
+  type AiIdeTargetRepairEvidenceReviewDecisionInputItem,
+  type AiIdeTargetRepairEvidenceReviewDecisionPackage,
+  type AiIdeTargetRepairEvidenceReviewDecisionPackageInput,
+  type AiIdeTargetRepairEvidenceReviewDecisionReadiness,
+  type AiIdeTargetRepairEvidenceReviewDecisionSummary,
+  type AiIdeTargetRepairEvidenceReviewItem,
+  type AiIdeTargetRepairEvidenceReviewStatus,
+  type AiIdeTargetRepairEvidenceRiskAcceptedItem,
+  type AiIdeTargetRepairEvidenceSourceIntakeReport,
+  type WriteAiIdeTargetRepairEvidenceReviewDecisionPackageFromDirectoryInput,
+  type WriteAiIdeTargetRepairEvidenceReviewDecisionPackageInput,
+  type WriteAiIdeTargetRepairEvidenceReviewDecisionPackageResult
+} from './ai-ide-target-repair-evidence-review-decision-package.js';
+
+export {
   buildValidationCampaignSummary,
   buildValidationCampaignSummaryMarkdown,
   writeValidationCampaignSummary,

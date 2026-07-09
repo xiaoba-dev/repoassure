@@ -225,6 +225,25 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       '--from-dir',
       outputDir
     ]);
+    const targetRepairReviewDecisionsPath = join(outputDir, 'target-repair-evidence-review-decisions.json');
+    await writeFile(targetRepairReviewDecisionsPath, `${JSON.stringify({
+      decisions: [
+        {
+          goalId: targetRepairGoalTaskPackage.approvedRepairGoals[0]?.goalId,
+          decision: 'accept',
+          evidence: 'Fixture maintainer accepted target repair evidence after reading the intake report.',
+          reviewerRole: 'target_repo_maintainer',
+          acceptedEvidenceScope: ['verified mutation summary', 'passed pnpm test', 'passed pnpm lint'],
+          nextRepairGoalRecommendation: 'No additional repair goal is needed for this fixture scope.'
+        }
+      ]
+    }, null, 2)}\n`);
+    await runScript([
+      'playbook:target-repair-review',
+      '--',
+      '--from-dir',
+      outputDir
+    ]);
 
     const outputs = await readArtifacts(outputDir);
 
@@ -307,6 +326,20 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     ]);
     expect(outputs.targetRepairEvidence.blockedActions).toContain('target_repo_commit_creation');
     expect(outputs.targetRepairEvidence.blockedActions).toContain('public_launch');
+    expect(outputs.targetRepairReview.schemaVersion).toBe('repoassure.ai-ide-target-repair-evidence-review-decision-package.v1');
+    expect(outputs.targetRepairReview.reviewStatus).toBe('accepted_for_target_repo_acceptance');
+    expect(outputs.targetRepairReview.decisionSummary).toMatchObject({
+      acceptedGoals: 1,
+      unreviewedGoals: 0
+    });
+    expect(outputs.targetRepairReview.acceptedEvidenceScope).toEqual([
+      expect.objectContaining({
+        goalId: 'target-repo-repair-goal-target_repo_manual_repair_goal',
+        acceptedEvidenceScope: ['verified mutation summary', 'passed pnpm test', 'passed pnpm lint']
+      })
+    ]);
+    expect(outputs.targetRepairReview.blockedActions).toContain('target_repo_pull_request_creation');
+    expect(outputs.targetRepairReview.blockedActions).toContain('hosted_dashboard_availability_claim');
     expect(outputs.bundle.readingOrder.map((item) => item.fileName)).toEqual([
       'ai-ide-repair-playbook.json',
       'ai-ide-playbook-consumption-report.json',
@@ -342,6 +375,9 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     expect(outputs.targetRepairEvidenceMarkdown).toContain('# RepoAssure AI IDE Target Repo Repair Goal Execution Evidence Intake Report');
     expect(outputs.targetRepairEvidenceMarkdown).toContain('## Goal Reports');
     expect(outputs.targetRepairEvidenceMarkdown).toContain('## Boundary Report');
+    expect(outputs.targetRepairReviewMarkdown).toContain('# RepoAssure AI IDE Target Repair Evidence Review Decision Package');
+    expect(outputs.targetRepairReviewMarkdown).toContain('## Review Decisions');
+    expect(outputs.targetRepairReviewMarkdown).toContain('## Non-Authorization Boundary');
     expect(outputs.evidenceMarkdown).toContain(
       'No target repo branch, commit, pull request, issue, advisory, or file mutation is executed by this report.'
     );
@@ -367,6 +403,8 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       'ai-ide-repair-execution-replay-readiness.md',
       'ai-ide-repair-playbook.json',
       'ai-ide-repair-playbook.md',
+      'ai-ide-target-repair-evidence-review-decision-package.json',
+      'ai-ide-target-repair-evidence-review-decision-package.md',
       'ai-ide-target-repo-repair-goal-authorization-receipt.json',
       'ai-ide-target-repo-repair-goal-authorization-receipt.md',
       'ai-ide-target-repo-repair-goal-execution-evidence-intake-report.json',
@@ -462,6 +500,13 @@ async function readArtifacts(outputDir: string): Promise<{
     }>;
     blockedActions: string[];
   };
+  targetRepairReview: {
+    schemaVersion: string;
+    reviewStatus: string;
+    decisionSummary: { acceptedGoals: number; unreviewedGoals: number };
+    acceptedEvidenceScope: Array<{ goalId: string; acceptedEvidenceScope: string[] }>;
+    blockedActions: string[];
+  };
   evidenceMarkdown: string;
   bundleMarkdown: string;
   contractMarkdown: string;
@@ -470,6 +515,7 @@ async function readArtifacts(outputDir: string): Promise<{
   authorizationMarkdown: string;
   targetRepairGoalMarkdown: string;
   targetRepairEvidenceMarkdown: string;
+  targetRepairReviewMarkdown: string;
 }> {
   return {
     playbook: JSON.parse(await readFile(join(outputDir, 'ai-ide-repair-playbook.json'), 'utf8')) as { schemaVersion: string },
@@ -547,6 +593,13 @@ async function readArtifacts(outputDir: string): Promise<{
       }>;
       blockedActions: string[];
     },
+    targetRepairReview: JSON.parse(await readFile(join(outputDir, 'ai-ide-target-repair-evidence-review-decision-package.json'), 'utf8')) as {
+      schemaVersion: string;
+      reviewStatus: string;
+      decisionSummary: { acceptedGoals: number; unreviewedGoals: number };
+      acceptedEvidenceScope: Array<{ goalId: string; acceptedEvidenceScope: string[] }>;
+      blockedActions: string[];
+    },
     evidenceMarkdown: await readFile(join(outputDir, 'ai-ide-repair-execution-evidence-report.md'), 'utf8'),
     bundleMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-bundle-manifest.md'), 'utf8'),
     contractMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-consumer-contract.md'), 'utf8'),
@@ -554,7 +607,8 @@ async function readArtifacts(outputDir: string): Promise<{
     proposalMarkdown: await readFile(join(outputDir, 'ai-ide-target-repo-repair-goal-proposal-package.md'), 'utf8'),
     authorizationMarkdown: await readFile(join(outputDir, 'ai-ide-target-repo-repair-goal-authorization-receipt.md'), 'utf8'),
     targetRepairGoalMarkdown: await readFile(join(outputDir, 'ai-ide-authorized-target-repo-repair-goal-task-package.md'), 'utf8'),
-    targetRepairEvidenceMarkdown: await readFile(join(outputDir, 'ai-ide-target-repo-repair-goal-execution-evidence-intake-report.md'), 'utf8')
+    targetRepairEvidenceMarkdown: await readFile(join(outputDir, 'ai-ide-target-repo-repair-goal-execution-evidence-intake-report.md'), 'utf8'),
+    targetRepairReviewMarkdown: await readFile(join(outputDir, 'ai-ide-target-repair-evidence-review-decision-package.md'), 'utf8')
   };
 }
 
@@ -584,6 +638,8 @@ async function listExpectedArtifactNames(outputDir: string): Promise<string[]> {
     'ai-ide-target-repo-repair-goal-authorization-receipt.md',
     'ai-ide-target-repo-repair-goal-proposal-package.json',
     'ai-ide-target-repo-repair-goal-proposal-package.md',
+    'ai-ide-target-repair-evidence-review-decision-package.json',
+    'ai-ide-target-repair-evidence-review-decision-package.md',
     'ai-ide-repair-playbook.json',
     'ai-ide-repair-playbook.md'
   ];

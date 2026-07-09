@@ -26,6 +26,7 @@ Implementation should preserve compatibility paths while continuing the phased m
 - `playbook:authorize` for target repo repair goal authorization receipts.
 - `playbook:target-repair-goal` for authorized target repo repair goal task packages.
 - `playbook:target-repair-evidence` for target repo repair goal execution evidence intake reports.
+- `playbook:target-repair-review` for target repair evidence review decision packages.
 
 ## Current Architecture Boundaries
 
@@ -56,6 +57,7 @@ Implementation should preserve compatibility paths while continuing the phased m
 - ADR-0029 for target repo repair goal authorization receipt.
 - ADR-0030 for authorized target repo repair goal task package.
 - ADR-0031 for target repo repair goal execution evidence intake.
+- ADR-0032 for target repair evidence review decision package.
 ## AI IDE Repair Execution Replay Readiness v0.1
 
 `pnpm playbook:replay -- --from-dir <dir>` reads `ai-ide-repair-evidence-consumer-contract.json` and writes `ai-ide-repair-execution-replay-readiness.json` / `.md`.
@@ -91,3 +93,9 @@ The schema is `repoassure.ai-ide-authorized-target-repo-repair-goal-task-package
 `pnpm playbook:target-repair-evidence -- --from-dir <dir>` reads `ai-ide-authorized-target-repo-repair-goal-task-package.json` and `target-repo-repair-goal-execution-evidence-input.json`, then writes `ai-ide-target-repo-repair-goal-execution-evidence-intake-report.json` / `.md`.
 
 The schema is `repoassure.ai-ide-target-repo-repair-goal-execution-evidence-intake-report.v1`. Required sections are `intakeStatus`, `sourceTaskPackage`, `executionSummary`, `goalReports`, `boundaryReport`, `reviewChecklist`, `maintainerReviewBoundary`, `nonAuthorizationBoundary`, `redactionBoundary`, and `blockedActions`.
+
+## Target Repair Evidence Review Decision Package v0.1
+
+`pnpm playbook:target-repair-review -- --from-dir <dir>` reads `ai-ide-target-repo-repair-goal-execution-evidence-intake-report.json` and `target-repair-evidence-review-decisions.json`, then writes `ai-ide-target-repair-evidence-review-decision-package.json` / `.md`.
+
+The schema is `repoassure.ai-ide-target-repair-evidence-review-decision-package.v1`. Required sections are `reviewStatus`, `sourceIntakeReport`, `decisionSummary`, `reviewItems`, `acceptedEvidenceScope`, `changeRequestedItems`, `deferredItems`, `riskAcceptedItems`, `nextRepairGoalRecommendations`, `maintainerReviewBoundary`, `nonAuthorizationBoundary`, `redactionBoundary`, and `blockedActions`.

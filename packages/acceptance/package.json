@@ -174,6 +174,10 @@
       "types": "./dist/ai-ide-target-repo-repair-goal-execution-evidence-intake-report.d.ts",
       "default": "./dist/ai-ide-target-repo-repair-goal-execution-evidence-intake-report.js"
     },
+    "./ai-ide-target-repair-evidence-review-decision-package": {
+      "types": "./dist/ai-ide-target-repair-evidence-review-decision-package.d.ts",
+      "default": "./dist/ai-ide-target-repair-evidence-review-decision-package.js"
+    },
     "./campaign-summary": {
       "types": "./dist/campaign-summary.d.ts",
       "default": "./dist/campaign-summary.js"

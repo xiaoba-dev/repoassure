@@ -274,3 +274,11 @@
 - [ ] Blocked, failed, not_started, or boundary-violation evidence remains unresolved until a new evidence report is generated.
 - [ ] The report includes source task package provenance, mutation summary, verification results, boundary report, review checklist, redaction boundary, non-authorization boundary, and blocked actions.
 - [ ] The validation does not mutate target repo files or authorize branch, commit, pull request, issue, advisory, release, launch, customer contact, or commercial availability claims.
+
+## Target Repair Evidence Review Decision Package v0.1
+
+- [ ] `pnpm playbook:target-repair-review -- --from-dir <dir>` generates JSON and Markdown review decision package artifacts.
+- [ ] The package supports `accept`, `changes_requested`, `defer`, and `accept_risk` review decisions.
+- [ ] Accepted evidence scope, change-requested items, deferred items, risk-accepted items, and next repair goal recommendations are present and redacted.
+- [ ] Missing review decisions or non-ready intake reports remain `blocked_or_incomplete`.
+- [ ] The validation does not mutate target repo files or authorize branch, commit, pull request, issue, advisory, release, launch, customer contact, or commercial availability claims.

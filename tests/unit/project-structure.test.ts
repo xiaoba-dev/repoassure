@@ -3526,10 +3526,10 @@ describe('project structure', () => {
     expect(adrIndex).toContain('[0034](0034-blocked-goal-recovery-consumption-contract.md)');
     expect(operation).toContain('Blocked Goal Recovery Consumption Validation v0.1');
     expect(operation).toContain('repoassure.blocked-goal-recovery-consumption-report.v1');
-    expect(operation).toContain('pnpm goal:recover:consume');
+    expect(operation).toContain('pnpm --silent goal:recover:consume');
     expect(operation).toContain('does not execute recovery commands');
     expect(readme).toContain('Blocked Goal Recovery Consumption Validation v0.1');
-    expect(readme).toContain('pnpm goal:recover:consume -- --from-dir <dir>');
+    expect(readme).toContain('pnpm --silent goal:recover:consume -- --from-dir <dir>');
     expect(prd).toContain('Blocked Goal Recovery Consumption Validation v0.1');
     expect(spec).toContain('goal:recover:consume');
     expect(plan).toContain('Blocked Goal Recovery Consumption Validation v0.1');

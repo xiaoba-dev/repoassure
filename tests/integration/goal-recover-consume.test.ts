@@ -22,7 +22,7 @@ describe('blocked goal recovery consumption script', () => {
 
     const { stdout, stderr } = await execFileAsync(
       'pnpm',
-      ['goal:recover:consume', '--', '--from-dir', secretRoot],
+      ['--silent', 'goal:recover:consume', '--', '--from-dir', secretRoot],
       { cwd: process.cwd(), timeout: SCRIPT_TEST_TIMEOUT_MS }
     );
     const jsonPath = join(secretRoot, 'blocked-goal-recovery-consumption-report.json');
@@ -38,8 +38,10 @@ describe('blocked goal recovery consumption script', () => {
     };
 
     expect(stderr).toBe('');
-    expect(stdout).toContain(`Wrote ${jsonPath}`);
-    expect(stdout).toContain(`Wrote ${markdownPath}`);
+    expect(stdout).toContain('Wrote ');
+    expect(stdout).toContain('blocked-goal-recovery-consumption-report.json');
+    expect(stdout).toContain('blocked-goal-recovery-consumption-report.md');
+    expect(stdout).not.toContain('secret-value');
     expect(report.schemaVersion).toBe('repoassure.blocked-goal-recovery-consumption-report.v1');
     expect(report.resumeReadiness).toBe('waiting_for_maintainer_or_external_action');
     expect(report.actionQueue.map((item) => item.actionType)).toEqual([
@@ -52,6 +54,22 @@ describe('blocked goal recovery consumption script', () => {
     expect(markdown).toContain('## Resume Checklist');
     expect(json).not.toContain('secret-value');
     expect(markdown).not.toContain('secret-value');
+  }, SCRIPT_TEST_TIMEOUT_MS);
+
+  it('redacts secret-like package paths from CLI errors', async () => {
+    await expect(execFileAsync(
+      'node',
+      [
+        'scripts/generate-blocked-goal-recovery-consumption-report.mjs',
+        '--package',
+        '/private/tmp/goal-TOKEN=secret-value/missing.json',
+        '--output',
+        '/private/tmp/recovery-output'
+      ],
+      { cwd: process.cwd(), timeout: SCRIPT_TEST_TIMEOUT_MS }
+    )).rejects.toMatchObject({
+      stderr: expect.not.stringContaining('secret-value')
+    });
   }, SCRIPT_TEST_TIMEOUT_MS);
 
   it('reports documented CLI flags when the recovery package is missing', async () => {

@@ -8,14 +8,14 @@ Date: 2026-07-13
 RepoAssure can now consume a local blocked-goal recovery package as a bounded AI IDE and maintainer review report:
 
 ```bash
-pnpm goal:recover:consume -- --from-dir <dir>
+pnpm --silent goal:recover:consume -- --from-dir <dir>
 ```
 
 The command reads `blocked-goal-recovery-package.json` and writes `blocked-goal-recovery-consumption-report.json` / `.md` using schema `repoassure.blocked-goal-recovery-consumption-report.v1`.
 
 ## Consumption Contract
 
-The report contains source package SHA-256 provenance, resume readiness, evidence read order, automatic retry / maintainer decision / external prerequisite action items, a resume checklist, boundary compliance, and inherited review, redaction, non-authorization, and blocked-action boundaries.
+The report contains raw source-file SHA-256 provenance, resume readiness derived from normalized blockers, evidence read order, automatic retry / maintainer decision / external prerequisite action items, reviewed resume commands, a resume checklist, boundary compliance, and inherited review, redaction, non-authorization, and blocked-action boundaries. Malformed packages are rejected, complete blocked-action preservation is checked, and CLI stdout/stderr redacts secret-like path values.
 
 | Recovery package status | Consumption readiness |
 | --- | --- |

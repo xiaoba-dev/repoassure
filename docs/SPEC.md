@@ -114,8 +114,8 @@ The package supports blocker categories `environment`, `external_service`, `auth
 
 ## Blocked Goal Recovery Consumption Validation v0.1
 
-`pnpm goal:recover:consume -- --from-dir <dir>` reads `blocked-goal-recovery-package.json` and writes `blocked-goal-recovery-consumption-report.json` / `.md`.
+`pnpm --silent goal:recover:consume -- --from-dir <dir>` reads `blocked-goal-recovery-package.json` and writes `blocked-goal-recovery-consumption-report.json` / `.md`. Silent package-manager output prevents the lifecycle runner from echoing sensitive argv before the CLI applies redaction.
 
-The schema is `repoassure.blocked-goal-recovery-consumption-report.v1`. Required sections are `sourceRecoveryPackage`, `resumeReadiness`, `evidenceReadOrder`, `actionQueue`, `resumeChecklist`, `boundaryCompliance`, `maintainerReviewBoundary`, `redactionBoundary`, `nonAuthorizationBoundary`, and `blockedActions`.
+The schema is `repoassure.blocked-goal-recovery-consumption-report.v1`. Required sections are `sourceRecoveryPackage`, `resumeReadiness`, `evidenceReadOrder`, `actionQueue`, `resumeChecklist`, `resumeCommands`, `boundaryCompliance`, `maintainerReviewBoundary`, `redactionBoundary`, `nonAuthorizationBoundary`, and `blockedActions`. `sourceRecoveryPackage.sha256` hashes the raw source file bytes.
 
-The action queue classifies `automatic_retry_candidate`, `maintainer_decision_required`, and `external_prerequisite_required` items. The report records `recoveryCommandsExecuted: false`; it does not execute recovery commands or authorize external actions.
+The action queue classifies `automatic_retry_candidate`, `maintainer_decision_required`, and `external_prerequisite_required` items. Resume readiness is derived from normalized blocker evidence rather than trusted from a status flag, and `blockedActionsPreserved` requires the complete recovery-package non-authorization set. The report records `recoveryCommandsExecuted: false`; it does not execute recovery commands or authorize external actions.

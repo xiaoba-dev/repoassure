@@ -440,6 +440,13 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     expect(outputs.blockedGoalRecoveryConsumption.schemaVersion).toBe('repoassure.blocked-goal-recovery-consumption-report.v1');
     expect(outputs.blockedGoalRecoveryConsumption.resumeReadiness).toBe('waiting_for_maintainer_or_external_action');
     expect(outputs.blockedGoalRecoveryConsumption.boundaryCompliance.recoveryCommandsExecuted).toBe(false);
+    expect(outputs.blockedGoalRecoveryConsumption.boundaryCompliance.blockedActionsPreserved).toBe(true);
+    expect(outputs.blockedGoalRecoveryConsumption.resumeCommands).toEqual([
+      expect.objectContaining({
+        command: 'codex resume goal',
+        purpose: 'Resume the blocked fixture goal after maintainer decision.'
+      })
+    ]);
     expect(outputs.blockedGoalRecoveryConsumption.blockedActions).toContain('target_repo_pull_request_creation');
     expect(outputs.bundle.readingOrder.map((item) => item.fileName)).toEqual([
       'ai-ide-repair-playbook.json',
@@ -485,6 +492,7 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     expect(outputs.blockedGoalRecoveryConsumptionMarkdown).toContain('# RepoAssure Blocked Goal Recovery Consumption Report');
     expect(outputs.blockedGoalRecoveryConsumptionMarkdown).toContain('## Recovery Action Queue');
     expect(outputs.blockedGoalRecoveryConsumptionMarkdown).toContain('## Resume Checklist');
+    expect(outputs.blockedGoalRecoveryConsumptionMarkdown).toContain('## Reviewed Resume Commands');
     expect(outputs.evidenceMarkdown).toContain(
       'No target repo branch, commit, pull request, issue, advisory, or file mutation is executed by this report.'
     );
@@ -648,7 +656,8 @@ async function readArtifacts(outputDir: string): Promise<{
   blockedGoalRecoveryConsumption: {
     schemaVersion: string;
     resumeReadiness: string;
-    boundaryCompliance: { recoveryCommandsExecuted: boolean };
+    resumeCommands: Array<{ command: string; purpose: string }>;
+    boundaryCompliance: { recoveryCommandsExecuted: boolean; blockedActionsPreserved: boolean };
     blockedActions: string[];
   };
   evidenceMarkdown: string;
@@ -759,7 +768,8 @@ async function readArtifacts(outputDir: string): Promise<{
     blockedGoalRecoveryConsumption: JSON.parse(await readFile(join(outputDir, 'blocked-goal-recovery-consumption-report.json'), 'utf8')) as {
       schemaVersion: string;
       resumeReadiness: string;
-      boundaryCompliance: { recoveryCommandsExecuted: boolean };
+      resumeCommands: Array<{ command: string; purpose: string }>;
+      boundaryCompliance: { recoveryCommandsExecuted: boolean; blockedActionsPreserved: boolean };
       blockedActions: string[];
     },
     evidenceMarkdown: await readFile(join(outputDir, 'ai-ide-repair-execution-evidence-report.md'), 'utf8'),

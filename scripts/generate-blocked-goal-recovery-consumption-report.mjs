@@ -2,16 +2,17 @@
 import { join } from 'node:path';
 
 import { writeBlockedGoalRecoveryConsumptionReport } from '../packages/acceptance/dist/blocked-goal-recovery-consumption-report.js';
+import { redactSensitiveText } from '../packages/acceptance/dist/redaction.js';
 
 function printHelp() {
   console.log(`RepoAssure blocked goal recovery consumption report
 
 Usage:
-  pnpm goal:recover:consume -- --package <path> --output <dir>
-  pnpm goal:recover:consume -- --from-dir <dir> [--output <dir>]
+  pnpm --silent goal:recover:consume -- --package <path> --output <dir>
+  pnpm --silent goal:recover:consume -- --from-dir <dir> [--output <dir>]
 
 Example:
-  pnpm goal:recover:consume -- --from-dir artifacts/blocked-goal
+  pnpm --silent goal:recover:consume -- --from-dir artifacts/blocked-goal
 `);
 }
 
@@ -81,11 +82,19 @@ try {
     outputDir
   });
 
-  console.log(`Wrote ${result.jsonPath}`);
-  console.log(`Wrote ${result.markdownPath}`);
+  console.log(`Wrote ${redactOutputPath(result.jsonPath)}`);
+  console.log(`Wrote ${redactOutputPath(result.markdownPath)}`);
 } catch (error) {
-  console.error(error instanceof Error ? error.message : String(error));
+  console.error(redactSensitiveText(error instanceof Error ? error.message : String(error)));
   console.error('');
   printHelp();
   process.exit(1);
+}
+
+function redactOutputPath(value) {
+  return value
+    .replaceAll('\\', '/')
+    .split('/')
+    .map((segment) => redactSensitiveText(segment))
+    .join('/');
 }

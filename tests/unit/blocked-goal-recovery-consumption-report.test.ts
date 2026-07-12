@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -20,6 +21,7 @@ describe('blocked goal recovery consumption report', () => {
     const report = buildBlockedGoalRecoveryConsumptionReport({
       generatedAt: '2026-07-13T00:30:00.000Z',
       packagePath: '/private/tmp/goal-TOKEN=secret-value/blocked-goal-recovery-package.json',
+      sourcePackageText: JSON.stringify(recoveryPackage),
       recoveryPackage
     });
     const markdown = buildBlockedGoalRecoveryConsumptionReportMarkdown(report);
@@ -50,6 +52,12 @@ describe('blocked goal recovery consumption report', () => {
       'Complete every maintainer decision and external prerequisite before resuming.',
       'Run only the reviewed resume command after all recovery gates are satisfied.'
     ]));
+    expect(report.resumeCommands).toEqual([
+      {
+        command: 'codex resume goal',
+        purpose: 'Resume after all review gates pass.'
+      }
+    ]);
     expect(report.boundaryCompliance).toEqual({
       recoveryCommandsExecuted: false,
       blockedActionsPreserved: true
@@ -65,16 +73,23 @@ describe('blocked goal recovery consumption report', () => {
   });
 
   it('maps recovery package status to AI IDE resume readiness', () => {
+    const recoveryPackage = buildRecoveryPackage();
+    const retryablePackage = {
+      ...recoveryPackage,
+      recoveryStatus: 'retryable_with_automatic_actions' as const,
+      blockers: [recoveryPackage.blockers[0]!],
+      automaticRecoveryActions: recoveryPackage.blockers[0]!.automaticRecoveryActions,
+      maintainerDecisionRequests: [],
+      externalPrerequisites: []
+    };
     const retryable = buildBlockedGoalRecoveryConsumptionReport({
       packagePath: 'blocked-goal-recovery-package.json',
-      recoveryPackage: buildRecoveryPackage({
-        recoveryStatus: 'retryable_with_automatic_actions',
-        maintainerDecisionRequests: [],
-        externalPrerequisites: []
-      })
+      sourcePackageText: JSON.stringify(retryablePackage),
+      recoveryPackage: retryablePackage
     });
     const ready = buildBlockedGoalRecoveryConsumptionReport({
       packagePath: 'blocked-goal-recovery-package.json',
+      sourcePackageText: JSON.stringify(buildRecoveryPackage()),
       recoveryPackage: buildRecoveryPackage({
         recoveryStatus: 'ready_to_resume',
         blockers: [],
@@ -88,12 +103,28 @@ describe('blocked goal recovery consumption report', () => {
     expect(ready.resumeReadiness).toBe('ready_to_resume_after_review');
   });
 
+  it('derives readiness and boundary compliance from recovery evidence instead of trusting status flags', () => {
+    const inconsistent = buildRecoveryPackage({
+      recoveryStatus: 'ready_to_resume',
+      blockedActions: ['public_launch']
+    });
+    const report = buildBlockedGoalRecoveryConsumptionReport({
+      packagePath: 'blocked-goal-recovery-package.json',
+      sourcePackageText: JSON.stringify(inconsistent),
+      recoveryPackage: inconsistent
+    });
+
+    expect(report.resumeReadiness).toBe('waiting_for_maintainer_or_external_action');
+    expect(report.boundaryCompliance.blockedActionsPreserved).toBe(false);
+  });
+
   it('handles recovery packages without optional goal evidence references', () => {
     const recoveryPackage = buildRecoveryPackage();
     delete recoveryPackage.sourceProvenance.sourceGoal.evidenceRefs;
 
     const report = buildBlockedGoalRecoveryConsumptionReport({
       packagePath: 'blocked-goal-recovery-package.json',
+      sourcePackageText: JSON.stringify(recoveryPackage),
       recoveryPackage
     });
 
@@ -111,7 +142,8 @@ describe('blocked goal recovery consumption report', () => {
     const outputDir = join(root, 'output');
 
     await mkdir(secretRoot, { recursive: true });
-    await writeFile(packagePath, `${JSON.stringify(buildRecoveryPackage(), null, 2)}\n`);
+    const packageText = `${JSON.stringify(buildRecoveryPackage(), null, 2)}\n`;
+    await writeFile(packagePath, packageText);
 
     const result = await writeBlockedGoalRecoveryConsumptionReport({
       generatedAt: '2026-07-13T00:30:00.000Z',
@@ -124,9 +156,33 @@ describe('blocked goal recovery consumption report', () => {
     expect(result.jsonPath).toBe(join(outputDir, 'blocked-goal-recovery-consumption-report.json'));
     expect(result.markdownPath).toBe(join(outputDir, 'blocked-goal-recovery-consumption-report.md'));
     expect(json).toContain('repoassure.blocked-goal-recovery-consumption-report.v1');
+    expect(result.report.sourceRecoveryPackage.sha256).toBe(
+      createHash('sha256').update(packageText).digest('hex')
+    );
     expect(markdown).toContain('## Non-Authorization Boundary');
     expect(json).not.toContain('secret-value');
     expect(markdown).not.toContain('secret-value');
+  });
+
+  it('rejects malformed recovery package input before producing readiness evidence', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-goal-recovery-invalid-'));
+    const packagePath = join(root, 'blocked-goal-recovery-package.json');
+
+    await writeFile(packagePath, '{}\n');
+
+    await expect(writeBlockedGoalRecoveryConsumptionReport({
+      packagePath,
+      outputDir: root
+    })).rejects.toThrow('Invalid blocked goal recovery package');
+
+    const malformedActionPackage = buildRecoveryPackage();
+    malformedActionPackage.blockers[0]!.automaticRecoveryActions[0]!.command = 42 as unknown as string;
+    await writeFile(packagePath, `${JSON.stringify(malformedActionPackage)}\n`);
+
+    await expect(writeBlockedGoalRecoveryConsumptionReport({
+      packagePath,
+      outputDir: root
+    })).rejects.toThrow('Invalid blocked goal recovery package');
   });
 });
 

@@ -27,13 +27,13 @@
 - Consumes: package scripts and `scripts/*.mjs` command entrypoints.
 - Produces: a full-chain E2E test that builds `@hardening-mcp/acceptance` once and invokes each Node script without redundant compilation.
 
-- [ ] **Step 1: Confirm the existing Red**
+- [x] **Step 1: Confirm the existing Red**
 
 Run: `pnpm build && pnpm test`
 
 Expected: the full repair-evidence E2E test exceeds `120000ms` after the new recovery stage.
 
-- [ ] **Step 2: Add the minimal execution helper**
+- [x] **Step 2: Add the minimal execution helper**
 
 Replace the per-stage package-script invocation with a one-time build and direct script mapping:
 
@@ -59,7 +59,7 @@ const SCRIPT_PATHS = {
 
 Call `pnpm build:acceptance` once before the first stage, then call `node SCRIPT_PATHS[command]` with the original arguments after removing the package-script `--` separator.
 
-- [ ] **Step 3: Verify Green**
+- [x] **Step 3: Verify Green**
 
 Run: `pnpm exec vitest run tests/integration/playbook-e2e-repair-evidence.test.ts --maxWorkers=1`
 
@@ -75,7 +75,7 @@ Expected: 1 test passes within 120 seconds and all artifact assertions remain un
 - Consumes: `BlockedGoalRecoveryPackage` from `blocked-goal-recovery-package.ts`.
 - Produces: `buildBlockedGoalRecoveryConsumptionReport`, `buildBlockedGoalRecoveryConsumptionReportMarkdown`, and `writeBlockedGoalRecoveryConsumptionReport`.
 
-- [ ] **Step 1: Write the failing unit test**
+- [x] **Step 1: Write the failing unit test**
 
 ```ts
 const report = buildBlockedGoalRecoveryConsumptionReport({
@@ -96,13 +96,13 @@ expect(report.blockedActions).toContain('target_repo_file_mutation_by_repoassure
 expect(JSON.stringify(report)).not.toContain('secret');
 ```
 
-- [ ] **Step 2: Verify Red**
+- [x] **Step 2: Verify Red**
 
 Run: `pnpm exec vitest run tests/unit/blocked-goal-recovery-consumption-report.test.ts`
 
 Expected: fail because the consumption-report module does not exist.
 
-- [ ] **Step 3: Implement the minimal typed report**
+- [x] **Step 3: Implement the minimal typed report**
 
 Implement these stable interfaces:
 
@@ -125,6 +125,7 @@ export interface BlockedGoalRecoveryConsumptionReport {
   evidenceReadOrder: Array<{ label: string; path: string }>;
   actionQueue: Array<{ blockerId: string; actionType: BlockedGoalRecoveryActionType; instruction: string }>;
   resumeChecklist: string[];
+  resumeCommands: Array<{ command: string; purpose: string }>;
   boundaryCompliance: { recoveryCommandsExecuted: false; blockedActionsPreserved: boolean };
   maintainerReviewBoundary: string;
   redactionBoundary: string;
@@ -133,7 +134,7 @@ export interface BlockedGoalRecoveryConsumptionReport {
 }
 ```
 
-- [ ] **Step 4: Verify Green and refactor**
+- [x] **Step 4: Verify Green and refactor**
 
 Run: `pnpm exec vitest run tests/unit/blocked-goal-recovery-consumption-report.test.ts`
 
@@ -154,9 +155,9 @@ Expected: all tests pass with no secret-like values in JSON or Markdown.
 
 **Interfaces:**
 - Consumes: `blocked-goal-recovery-package.json` through `--package` or `--from-dir`.
-- Produces: `pnpm goal:recover:consume`, JSON/Markdown reports, package subpath export, and E2E evidence.
+- Produces: `pnpm --silent goal:recover:consume`, JSON/Markdown reports, package subpath export, and E2E evidence.
 
-- [ ] **Step 1: Write failing integration and contract tests**
+- [x] **Step 1: Write failing integration and contract tests**
 
 Assert that:
 
@@ -168,13 +169,13 @@ expect(markdown).toContain('## Resume Checklist');
 expect(json).not.toContain('secret-value');
 ```
 
-- [ ] **Step 2: Verify Red**
+- [x] **Step 2: Verify Red**
 
 Run: `pnpm exec vitest run tests/integration/goal-recover-consume.test.ts tests/unit/project-structure.test.ts --testNamePattern "blocked goal recovery consumption"`
 
 Expected: fail because the CLI, export, contract, and E2E output do not exist.
 
-- [ ] **Step 3: Implement adapters and exports**
+- [x] **Step 3: Implement adapters and exports**
 
 Add:
 
@@ -184,7 +185,7 @@ Add:
 
 Expose `./blocked-goal-recovery-consumption-report` from `@hardening-mcp/acceptance`, include it in compatibility/type-smoke contracts, and extend the E2E artifact inventory.
 
-- [ ] **Step 4: Verify Green**
+- [x] **Step 4: Verify Green**
 
 Run focused unit, integration, type-smoke, E2E, and structure tests.
 
@@ -207,15 +208,15 @@ Expected: all targeted tests pass.
 - Consumes: verified implementation and test evidence.
 - Produces: synchronized product intent, solution contract, execution state, operating guide, testing evidence, and next-goal state.
 
-- [ ] **Step 1: Add a failing structure cascade assertion**
+- [x] **Step 1: Add a failing structure cascade assertion**
 
 Require every listed document to contain `Blocked Goal Recovery Consumption Validation v0.1`, the schema id, CLI command, or the relevant boundary statement.
 
-- [ ] **Step 2: Verify Red, then update documents**
+- [x] **Step 2: Verify Red, then update documents**
 
 Run the focused structure test, update only the required sections, and rerun until Green.
 
-- [ ] **Step 3: Run the testing pyramid**
+- [x] **Step 3: Run the testing pyramid**
 
 Run in this order:
 

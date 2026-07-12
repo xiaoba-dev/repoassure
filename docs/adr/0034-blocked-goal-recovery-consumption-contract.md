@@ -12,12 +12,12 @@ ADR-0033 gives blocked goals a structured recovery package, but a maintainer or 
 Add a local blocked-goal recovery consumption report generated from `blocked-goal-recovery-package.json`.
 
 ```bash
-pnpm goal:recover:consume -- --from-dir <dir>
+pnpm --silent goal:recover:consume -- --from-dir <dir>
 ```
 
 It writes `blocked-goal-recovery-consumption-report.json` and `blocked-goal-recovery-consumption-report.md` using schema `repoassure.blocked-goal-recovery-consumption-report.v1`.
 
-The report defines resume readiness, evidence read order, a normalized recovery action queue, a resume checklist, boundary compliance, and inherited maintainer, redaction, non-authorization, and blocked-action boundaries.
+The report defines source-file SHA-256, resume readiness derived from normalized blockers, evidence read order, a normalized recovery action queue, reviewed resume commands, a resume checklist, boundary compliance, and inherited maintainer, redaction, non-authorization, and blocked-action boundaries. Boundary compliance requires the complete ADR-0033 blocked-action set.
 
 ## Boundaries
 

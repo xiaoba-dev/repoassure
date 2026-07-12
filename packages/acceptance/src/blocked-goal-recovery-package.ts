@@ -191,7 +191,7 @@ const RECOVERY_INPUT_JSON_NAME = 'blocked-goal-recovery-input.json';
 const RECOVERY_PACKAGE_JSON_NAME = 'blocked-goal-recovery-package.json';
 const RECOVERY_PACKAGE_MARKDOWN_NAME = 'blocked-goal-recovery-package.md';
 
-const NON_AUTHORIZATION_BLOCKED_ACTIONS = [
+export const BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS = [
   'target_repo_file_mutation_by_repoassure',
   'target_repo_branch_creation',
   'target_repo_commit_creation',
@@ -264,7 +264,7 @@ export function buildBlockedGoalRecoveryPackage(
     nonAuthorizationBoundary: sanitize(
       'This blocked goal recovery package does not modify target repo files, create target repo branch, commit, pull request, issue, advisory, publish npm, create GitHub release, run public launch, contact customers, authorize pricing/spend, or claim SaaS, Team Cloud, Enterprise, commercial, or hosted dashboard availability.'
     ),
-    blockedActions: [...NON_AUTHORIZATION_BLOCKED_ACTIONS].map(sanitize)
+    blockedActions: [...BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS].map(sanitize)
   };
 }
 

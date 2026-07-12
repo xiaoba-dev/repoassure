@@ -489,6 +489,7 @@ export {
 export {
   buildBlockedGoalRecoveryPackage,
   buildBlockedGoalRecoveryPackageMarkdown,
+  BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS,
   writeBlockedGoalRecoveryPackage,
   writeBlockedGoalRecoveryPackageFromDirectory,
   type BlockedGoalAutomaticRecoveryAction,

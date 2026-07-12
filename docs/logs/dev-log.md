@@ -13571,13 +13571,21 @@ Phase 0：项目初始化。
 - `pnpm build`：通过。
 - `pnpm typecheck`：通过。
 - `pnpm lint`：通过。
-- `pnpm test:unit`：57 files，700 tests，通过。
-- `pnpm test:integration`：28 files，55 tests，通过。
+- `pnpm test:unit`：57 files，702 tests，通过。
+- `pnpm test:integration`：28 files，56 tests，通过。
 - `pnpm test:e2e`：1 passed，1 skipped。
-- `pnpm test`：86 files passed，1 skipped；756 tests passed，1 skipped。
+- `pnpm test`：86 files passed，1 skipped；759 tests passed，1 skipped。
 - `pnpm repo:hygiene`：通过。
 - `pnpm release:check`：通过。
 - `pnpm goal:audit`：35/35，通过。
+
+### Independent Review Remediation
+
+- CLI 成功与失败输出统一脱敏；文档入口使用 `pnpm --silent goal:recover:consume`，避免 package-manager lifecycle echo 暴露 secret-like 路径参数。
+- Consumption report 保留经审阅的 `resumeCommands`，但只输出指令与用途，不执行任何恢复命令。
+- Resume readiness、action queue 和 blocked-action preservation 均从经运行时校验的 blocker 数据推导，不信任输入包中的聚合状态。
+- Source package SHA-256 直接基于原始文件字节计算，不再对重新序列化后的对象计算摘要。
+- 新增 malformed nested action、完整 blocked-action 集合、CLI error-path redaction 和 raw-byte digest 回归测试。
 
 ### 边界
 

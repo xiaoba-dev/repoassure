@@ -33,4 +33,4 @@
 
 - [x] Add ADR-0035 and operations guide; cascade README, PRD, SPEC, PLAN, architecture, testing, acceptance, decision log, dev log, and blocker log where applicable.
 - [x] Run build, typecheck, lint, unit, integration, E2E, full test, repo:hygiene, release:check, and goal:audit.
-- [ ] Complete independent review, commit, PR, CI, merge, main CI, checkpoint, and return to Autopilot.
+- [x] Complete independent review, commits, PR, and branch CI; the external campaign checkpoint must record merge and main CI before returning to Autopilot.

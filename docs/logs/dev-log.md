@@ -13636,6 +13636,8 @@ Phase 0：项目初始化。
 - External/automatic action allowed-decision 集合按 action type 做 canonical validation；unsupported maintainer options 在 consumption 阶段直接失败。
 - Reject/defer veto 优先于 missing command；CLI failure-path 测试同时要求 `ENOENT`、脱敏占位符和原 secret 缺失。
 - 最终复审发现 partially unsupported maintainer options 会被静默过滤；现已改为任一 unsupported option 即失败，并以 writer-level 测试证明失败前不生成 JSON/Markdown。
+- 最终独立复审：无剩余 findings；focused 25/25 和 acceptance typecheck 通过。
+- PR #46 首轮 GitHub Quality Gates：通过（1m43s）；收口提交后仍需最终 CI 与 main CI。
 
 ### 边界
 

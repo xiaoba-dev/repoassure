@@ -608,3 +608,8 @@ This validation must not upload target repo material, automatically modify targe
 
 - Unit covers exact intake SHA, accept/risk/changes/defer/missing/boundary outcomes, unknown/duplicate keys, redaction, source evidence restrictions, writer, Markdown, and command non-execution.
 - Integration covers local CLI output; E2E extends the campaign through review decisions; type-smoke and structure tests guard contracts and cascade.
+## Blocked Goal Recovery Resume Attempt Closure Receipt v0.1
+
+- Unit tests cover accepted, accepted-risk, stale SHA, fabricated or malformed review package, full upstream task/intake trust-chain binding, redaction, exact risk acknowledgement, and no-execution boundaries.
+- Integration smoke covers CLI JSON/Markdown output and secret-like path redaction.
+- Near-real campaign integration covers recovery through closure without executing commands or closing an external goal.

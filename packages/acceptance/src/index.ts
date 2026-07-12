@@ -589,6 +589,7 @@ export {
 } from './blocked-goal-recovery-resume-attempt-execution-evidence-intake.js';
 
 export {
+  assertBlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackage,
   buildBlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackage,
   buildBlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackageMarkdown,
   writeBlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackage,
@@ -605,6 +606,19 @@ export {
   type WriteBlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackageInput,
   type WriteBlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackageResult
 } from './blocked-goal-recovery-resume-attempt-evidence-review-decision-package.js';
+
+export {
+  buildBlockedGoalRecoveryResumeAttemptClosureReceipt,
+  buildBlockedGoalRecoveryResumeAttemptClosureReceiptMarkdown,
+  writeBlockedGoalRecoveryResumeAttemptClosureReceipt,
+  writeBlockedGoalRecoveryResumeAttemptClosureReceiptFromDirectory,
+  type BlockedGoalRecoveryResumeAttemptClosureInput,
+  type BlockedGoalRecoveryResumeAttemptClosureReceipt,
+  type BuildBlockedGoalRecoveryResumeAttemptClosureReceiptInput,
+  type WriteBlockedGoalRecoveryResumeAttemptClosureReceiptFromDirectoryInput,
+  type WriteBlockedGoalRecoveryResumeAttemptClosureReceiptInput,
+  type WriteBlockedGoalRecoveryResumeAttemptClosureReceiptResult
+} from './blocked-goal-recovery-resume-attempt-closure-receipt.js';
 
 export {
   buildValidationCampaignSummary,

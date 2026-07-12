@@ -198,6 +198,10 @@
       "types": "./dist/blocked-goal-recovery-resume-attempt-execution-evidence-intake.d.ts",
       "default": "./dist/blocked-goal-recovery-resume-attempt-execution-evidence-intake.js"
     },
+    "./blocked-goal-recovery-resume-attempt-closure-receipt": {
+      "types": "./dist/blocked-goal-recovery-resume-attempt-closure-receipt.d.ts",
+      "default": "./dist/blocked-goal-recovery-resume-attempt-closure-receipt.js"
+    },
     "./blocked-goal-recovery-resume-attempt-evidence-review-decision-package": {
       "types": "./dist/blocked-goal-recovery-resume-attempt-evidence-review-decision-package.d.ts",
       "default": "./dist/blocked-goal-recovery-resume-attempt-evidence-review-decision-package.js"

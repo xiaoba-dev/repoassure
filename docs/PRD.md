@@ -14,7 +14,7 @@ RepoAssure is not positioned as another AI IDE, a general-purpose vulnerability 
 
 - Local CLI, MCP Server, and GitHub Action wrapper for repo acceptance.
 - Browser and Python/CLI acceptance modes.
-- Local hardening reports, repair plans, repair task packages, handoff packages, execution evidence, patch plans, validation campaign summaries, AI IDE repair evidence bundles, AI IDE Repair Evidence Bundle Consumer Contract v0.1 outputs, replay readiness outputs, Target Repo Repair Goal Proposal Package v0.1 outputs, Target Repo Repair Goal Authorization Receipt v0.1 outputs, Authorized Target Repo Repair Goal Task Package v0.1 outputs, Target Repo Repair Goal Execution Evidence Intake v0.1 outputs, Target Repair Evidence Review Decision Package v0.1 outputs, Blocked Goal Recovery Package v0.1 outputs, and Blocked Goal Recovery Consumption Validation v0.1 outputs.
+- Local hardening reports, repair plans, repair task packages, handoff packages, execution evidence, patch plans, validation campaign summaries, AI IDE repair evidence bundles, AI IDE Repair Evidence Bundle Consumer Contract v0.1 outputs, replay readiness outputs, Target Repo Repair Goal Proposal Package v0.1 outputs, Target Repo Repair Goal Authorization Receipt v0.1 outputs, Authorized Target Repo Repair Goal Task Package v0.1 outputs, Target Repo Repair Goal Execution Evidence Intake v0.1 outputs, Target Repair Evidence Review Decision Package v0.1 outputs, Blocked Goal Recovery Package v0.1 outputs, Blocked Goal Recovery Consumption Validation v0.1 outputs, and Blocked Goal Recovery Resume Attempt Closure Receipt v0.1 outputs.
 - Public website and private-preview release readiness surfaces.
 - Open-core local artifact contract with Team Cloud and Enterprise as future commercial roadmap surfaces.
 
@@ -111,3 +111,7 @@ RepoAssure must import sanitized evidence from a separately executed resume atte
 ## Blocked Goal Recovery Resume Attempt Evidence Review Decision Package v0.1
 
 RepoAssure must let a maintainer explicitly accept, request changes, defer, or accept risk for each imported action, command, and verification result. Decisions bind to exact intake bytes. Boundary-violating evidence cannot be accepted. The package does not execute commands, close the source goal, or authorize external actions.
+
+## Blocked Goal Recovery Resume Attempt Closure Receipt v0.1
+
+RepoAssure must convert only an accepted or accepted-with-risk evidence review package into an exact-source-bound local closure receipt. Accepted risks must remain explicit and be acknowledged by evidence key. The receipt does not execute commands, close an external goal, or authorize external actions.

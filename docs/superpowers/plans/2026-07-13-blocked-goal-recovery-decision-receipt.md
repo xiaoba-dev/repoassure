@@ -19,9 +19,9 @@
 
 ### Task 2: Implement the decision receipt domain
 
-- [ ] Add failing unit tests for approve, reject, defer, accept-risk, missing, duplicate, unknown, and redacted decisions.
-- [ ] Implement typed receipt builder, raw-byte provenance, runtime validation, Markdown renderer, and local writer.
-- [ ] Verify decision status and separate-resume readiness are derived from evidence rather than trusted flags.
+- [x] Add failing unit tests for approve, reject, defer, accept-risk, missing, duplicate, unknown, and redacted decisions.
+- [x] Implement typed receipt builder, raw-byte provenance, runtime validation, Markdown renderer, and local writer.
+- [x] Verify decision status and separate-resume readiness are derived from evidence rather than trusted flags.
 
 ### Task 3: Add CLI and campaign integration
 

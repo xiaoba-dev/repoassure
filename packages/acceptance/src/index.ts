@@ -555,6 +555,21 @@ export {
 } from './blocked-goal-recovery-decision-receipt.js';
 
 export {
+  buildBlockedGoalRecoveryResumeAttemptTaskPackage,
+  buildBlockedGoalRecoveryResumeAttemptTaskPackageMarkdown,
+  writeBlockedGoalRecoveryResumeAttemptTaskPackage,
+  writeBlockedGoalRecoveryResumeAttemptTaskPackageFromDirectory,
+  type BlockedGoalRecoveryResumeAttemptActionTask,
+  type BlockedGoalRecoveryResumeAttemptCommandTask,
+  type BlockedGoalRecoveryResumeAttemptTaskPackage,
+  type BlockedGoalRecoveryResumeAttemptTaskPackageStatus,
+  type BuildBlockedGoalRecoveryResumeAttemptTaskPackageInput,
+  type WriteBlockedGoalRecoveryResumeAttemptTaskPackageFromDirectoryInput,
+  type WriteBlockedGoalRecoveryResumeAttemptTaskPackageInput,
+  type WriteBlockedGoalRecoveryResumeAttemptTaskPackageResult
+} from './blocked-goal-recovery-resume-attempt-task-package.js';
+
+export {
   buildValidationCampaignSummary,
   buildValidationCampaignSummaryMarkdown,
   writeValidationCampaignSummary,

@@ -128,7 +128,7 @@ function buildReceipt(
     receipt.decisionStatus = 'blocked_or_incomplete';
     receipt.resumeAttemptReadiness = 'blocked_by_boundary_violation';
   } else if (receipt.decisionStatus === 'rejected' || receipt.decisionStatus === 'deferred') {
-    const decision = receipt.decisionStatus === 'rejected' ? 'reject' : 'defer';
+    const decision: 'reject' | 'defer' = receipt.decisionStatus === 'rejected' ? 'reject' : 'defer';
     const item = { ...approvedItem, decision, rationale: `${decision} rationale` };
     receipt.decisionItems = [item];
     receipt.approvedActions = [];

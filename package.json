@@ -69,6 +69,7 @@
     "goal:recover:consume": "pnpm build:acceptance && node scripts/generate-blocked-goal-recovery-consumption-report.mjs",
     "goal:recover:decide": "pnpm build:acceptance && node scripts/generate-blocked-goal-recovery-decision-receipt.mjs",
     "goal:recover:prepare-resume": "pnpm build:acceptance && node scripts/generate-blocked-goal-recovery-resume-attempt-task-package.mjs",
+    "goal:recover:intake-resume-evidence": "pnpm build:acceptance && node scripts/generate-blocked-goal-recovery-resume-attempt-execution-evidence-intake.mjs",
     "preuser:accept": "pnpm build",
     "user:accept": "node packages/acceptance/dist/run-user-acceptance.js",
     "preuser:handoff": "pnpm build",

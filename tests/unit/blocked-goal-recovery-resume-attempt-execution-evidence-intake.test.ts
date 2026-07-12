@@ -8,7 +8,8 @@ import { describe, expect, it } from 'vitest';
 import {
   buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake,
   buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntakeMarkdown,
-  writeBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake
+  writeBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake,
+  type BlockedGoalRecoveryResumeAttemptExecutionEvidenceInput
 } from '../../packages/acceptance/src/blocked-goal-recovery-resume-attempt-execution-evidence-intake.js';
 import { BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS } from '../../packages/acceptance/src/blocked-goal-recovery-package.js';
 import type { BlockedGoalRecoveryResumeAttemptTaskPackage } from '../../packages/acceptance/src/blocked-goal-recovery-resume-attempt-task-package.js';
@@ -131,7 +132,7 @@ function buildEvidenceInput(text: string, options: {
   sourceSha256?: string; actionStatus?: 'passed' | 'failed' | 'blocked' | 'not_run';
   actionKey?: string; omitAction?: boolean; omitCommand?: boolean; duplicateAction?: boolean;
   unlistedCommandsExecuted?: boolean; summary?: string;
-} = {}) {
+} = {}): BlockedGoalRecoveryResumeAttemptExecutionEvidenceInput {
   const action = {
     actionKey: options.actionKey ?? 'automatic:B1:A1', status: options.actionStatus ?? 'passed',
     summary: options.summary ?? 'Action verified.', evidenceRefs: ['evidence/action.log']

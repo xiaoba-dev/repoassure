@@ -310,4 +310,6 @@
 - [x] Evidence intake alone remains unaccepted until the separate maintainer review decision package is generated.
 - [x] Blocked Goal Recovery Resume Attempt Evidence Review Decision Package v0.1 records exact-byte-bound per-item decisions and never executes commands.
 - [x] Boundary-violating evidence cannot be accepted; missing decisions remain blocked.
-- [ ] Blocked Goal Recovery Resume Attempt Closure Receipt v0.1 remains a separate non-executing goal.
+- [x] Blocked Goal Recovery Resume Attempt Closure Receipt v0.1 binds exact accepted review bytes and remains non-executing.
+- [x] Accepted-with-risk closure requires exact acknowledgement of every accepted-risk evidence key.
+- [x] Closure receipt records `externalGoalClosedByReceipt: false` and does not execute commands.

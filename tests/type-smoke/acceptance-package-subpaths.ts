@@ -45,6 +45,7 @@ import * as blockedGoalRecoveryPackage from '@hardening-mcp/acceptance/blocked-g
 import * as blockedGoalRecoveryConsumptionReport from '@hardening-mcp/acceptance/blocked-goal-recovery-consumption-report';
 import * as blockedGoalRecoveryDecisionReceipt from '@hardening-mcp/acceptance/blocked-goal-recovery-decision-receipt';
 import * as blockedGoalRecoveryResumeAttemptTaskPackage from '@hardening-mcp/acceptance/blocked-goal-recovery-resume-attempt-task-package';
+import * as blockedGoalRecoveryResumeAttemptClosureReceipt from '@hardening-mcp/acceptance/blocked-goal-recovery-resume-attempt-closure-receipt';
 import * as blockedGoalRecoveryResumeAttemptExecutionEvidenceIntake from '@hardening-mcp/acceptance/blocked-goal-recovery-resume-attempt-execution-evidence-intake';
 import * as blockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackage from '@hardening-mcp/acceptance/blocked-goal-recovery-resume-attempt-evidence-review-decision-package';
 import * as campaignSummary from '@hardening-mcp/acceptance/campaign-summary';
@@ -109,6 +110,7 @@ const packageSubpathModules = [
   blockedGoalRecoveryConsumptionReport,
   blockedGoalRecoveryDecisionReceipt,
   blockedGoalRecoveryResumeAttemptTaskPackage,
+  blockedGoalRecoveryResumeAttemptClosureReceipt,
   blockedGoalRecoveryResumeAttemptExecutionEvidenceIntake,
   blockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackage,
   campaignSummary,

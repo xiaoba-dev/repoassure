@@ -1685,3 +1685,7 @@ Receipt does not execute resume commands，不授权 target repo mutation、rele
 ## 2026-07-13 - blocked goal recovery resume attempt evidence review decisions
 
 接受 ADR-0038。Maintainer 必须对 exact-intake-bound action/command/verification evidence 逐项记录 accept、changes_requested、defer 或 accept_risk。Review package does not execute commands or close goals。
+
+## 2026-07-13 - blocked goal recovery resume attempt closure receipt
+
+接受 ADR-0039。只有 runtime-validated `accepted` / `accepted_with_risk` review package 可以生成 exact-byte-bound closure receipt；accepted risk 必须逐项确认。Receipt does not execute commands or close an external goal。

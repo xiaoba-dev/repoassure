@@ -276,3 +276,6 @@ ADR-0027 validates the full AI IDE repair evidence chain against a near-real cam
 ## ADR-0028 Target Repo Repair Goal Proposal Package
 
 ADR-0028 adds a proposal layer after replay readiness: replay readiness -> target repo repair goal proposal package. The package is a local maintainer/AI IDE handoff artifact with prerequisites, artifact read order, allowed repair scope, repair task breakdown, verification commands, maintainer approval boundary, redaction boundary, non-authorization boundary, and blocked actions. It does not authorize target repo mutation or public/commercial release actions.
+## Blocked Goal Recovery Closure Boundary
+
+`goal:recover:close-resume-attempt` is the terminal local evidence stage after resume evidence review. It validates exact source bytes and accepted scope, emits `repoassure.blocked-goal-recovery-resume-attempt-closure-receipt.v1`, and records `commandsExecutedByClosure: false` plus `externalGoalClosedByReceipt: false`. It does not execute commands or change external state.

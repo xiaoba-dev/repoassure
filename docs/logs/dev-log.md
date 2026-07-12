@@ -13615,10 +13615,10 @@ Phase 0：项目初始化。
 - `pnpm build`：通过。
 - `pnpm typecheck`：通过。
 - `pnpm lint`：通过。
-- `pnpm test:unit`：58 files，714 tests，通过。
+- `pnpm test:unit`：58 files，715 tests，通过。
 - `pnpm test:integration`：29 files，58 tests，通过。
 - `pnpm test:e2e`：1 passed，1 skipped。
-- `pnpm test`：88 files passed，1 skipped；773 tests passed，1 skipped。
+- `pnpm test`：88 files passed，1 skipped；774 tests passed，1 skipped。
 - `pnpm repo:hygiene`：通过。
 - `pnpm release:check`：通过。
 - `pnpm goal:audit`：35/35，通过。
@@ -13635,6 +13635,7 @@ Phase 0：项目初始化。
 - Decisions envelope 新增 mandatory source report SHA-256 binding，防止 stable ID 对应内容变化后复用旧决定。
 - External/automatic action allowed-decision 集合按 action type 做 canonical validation；unsupported maintainer options 在 consumption 阶段直接失败。
 - Reject/defer veto 优先于 missing command；CLI failure-path 测试同时要求 `ENOENT`、脱敏占位符和原 secret 缺失。
+- 最终复审发现 partially unsupported maintainer options 会被静默过滤；现已改为任一 unsupported option 即失败，并以 writer-level 测试证明失败前不生成 JSON/Markdown。
 
 ### 边界
 

@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { access, mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -202,6 +202,22 @@ describe('blocked goal recovery consumption report', () => {
       sourcePackageText: JSON.stringify(recoveryPackage),
       recoveryPackage
     })).toThrow('Invalid blocked goal recovery package');
+  });
+
+  it('rejects partially unsupported decision options before writing artifacts', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-goal-recovery-unsupported-options-'));
+    const packagePath = join(root, 'blocked-goal-recovery-package.json');
+    const outputDir = join(root, 'output');
+    const recoveryPackage = buildRecoveryPackage();
+    recoveryPackage.blockers[1]!.maintainerDecisionRequests[0]!.options = ['approve', 'launch_now'];
+    await writeFile(packagePath, `${JSON.stringify(recoveryPackage, null, 2)}\n`);
+
+    await expect(writeBlockedGoalRecoveryConsumptionReport({
+      packagePath,
+      outputDir
+    })).rejects.toThrow('Invalid blocked goal recovery package');
+    await expect(access(join(outputDir, 'blocked-goal-recovery-consumption-report.json'))).rejects.toThrow();
+    await expect(access(join(outputDir, 'blocked-goal-recovery-consumption-report.md'))).rejects.toThrow();
   });
 
   it('writes local json and markdown consumption artifacts', async () => {

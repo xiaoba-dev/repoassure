@@ -303,10 +303,12 @@ function buildActionQueue(
 }
 
 function normalizeAllowedDecisions(options: string[]): BlockedGoalRecoveryAllowedDecision[] {
-  const allowed = options.filter((option): option is BlockedGoalRecoveryAllowedDecision => (
-    option === 'approve' || option === 'reject' || option === 'defer' || option === 'accept_risk'
-  ));
+  const allowed = options.filter(isAllowedDecision);
   return [...new Set(allowed)];
+}
+
+function isAllowedDecision(option: string): option is BlockedGoalRecoveryAllowedDecision {
+  return option === 'approve' || option === 'reject' || option === 'defer' || option === 'accept_risk';
 }
 
 function assertBlockedGoalRecoveryPackage(value: unknown): asserts value is BlockedGoalRecoveryPackage {
@@ -342,7 +344,9 @@ function assertBlockedGoalRecoveryPackage(value: unknown): asserts value is Bloc
   if (!sameJson(recoveryPackage.automaticRecoveryActions, nestedAutomaticActions)
     || !sameJson(recoveryPackage.maintainerDecisionRequests, nestedDecisionRequests)
     || !sameJson(recoveryPackage.externalPrerequisites, nestedExternalPrerequisites)
-    || recoveryPackage.maintainerDecisionRequests.some((request) => normalizeAllowedDecisions(request.options).length === 0)
+    || recoveryPackage.maintainerDecisionRequests.some((request) => (
+      request.options.length === 0 || request.options.some((option) => !isAllowedDecision(option))
+    ))
     || recoveryPackage.maintainerReviewBoundary !== BLOCKED_GOAL_RECOVERY_MAINTAINER_REVIEW_BOUNDARY
     || recoveryPackage.nonAuthorizationBoundary !== BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BOUNDARY) {
     throw new Error('Invalid blocked goal recovery package');

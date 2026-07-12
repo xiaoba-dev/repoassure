@@ -5762,6 +5762,7 @@ describe('project structure', () => {
       'ai-ide-target-repo-repair-goal-execution-evidence-intake-report',
       'ai-ide-target-repo-repair-goal-proposal-package',
       'blocked-goal-recovery-consumption-report',
+      'blocked-goal-recovery-decision-receipt',
       'blocked-goal-recovery-package',
       'campaign-summary',
       'compatibility',

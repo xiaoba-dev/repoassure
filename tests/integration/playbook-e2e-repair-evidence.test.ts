@@ -684,6 +684,12 @@ async function readArtifacts(outputDir: string): Promise<{
     boundaryCompliance: { recoveryCommandsExecuted: boolean; blockedActionsPreserved: boolean };
     blockedActions: string[];
   };
+  blockedGoalRecoveryDecisionReceipt: {
+    schemaVersion: string;
+    decisionStatus: string;
+    boundaryCompliance: { resumeCommandsExecuted: boolean; sourceBoundaryPreserved: boolean };
+    blockedActions: string[];
+  };
   evidenceMarkdown: string;
   bundleMarkdown: string;
   contractMarkdown: string;

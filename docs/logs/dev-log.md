@@ -13610,6 +13610,20 @@ Phase 0：项目初始化。
 - Red：action queue 缺少 stable action identity；decision receipt module 与 CLI 不存在；structure test 缺少 ADR/operations cascade。
 - Green：实现 actionKey、receipt state machine、CLI、package contracts、campaign E2E 和治理文档。
 
+### Verification
+
+- `pnpm build`：通过。
+- `pnpm typecheck`：通过。
+- `pnpm lint`：通过。
+- `pnpm test:unit`：58 files，708 tests，通过。
+- `pnpm test:integration`：29 files，57 tests，通过。
+- `pnpm test:e2e`：1 passed，1 skipped。
+- `pnpm test`：88 files passed，1 skipped；766 tests passed，1 skipped。
+- `pnpm repo:hygiene`：通过。
+- `pnpm release:check`：通过。
+- `pnpm goal:audit`：35/35，通过。
+- 初次并行运行 build-owning gates 时出现共享 `dist` 读取竞态；改为 build/typecheck/unit/integration 串行后全部通过。
+
 ### 边界
 
 - Receipt does not execute recovery or resume commands。

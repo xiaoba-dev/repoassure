@@ -90,7 +90,7 @@ describe('blocked goal recovery consumption report', () => {
 
   it('handles recovery packages without optional goal evidence references', () => {
     const recoveryPackage = buildRecoveryPackage();
-    recoveryPackage.sourceProvenance.sourceGoal.evidenceRefs = undefined;
+    delete recoveryPackage.sourceProvenance.sourceGoal.evidenceRefs;
 
     const report = buildBlockedGoalRecoveryConsumptionReport({
       packagePath: 'blocked-goal-recovery-package.json',

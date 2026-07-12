@@ -2019,8 +2019,6 @@ describe('project structure', () => {
 
   it('records real target validation campaign summary without uploading target artifacts', async () => {
     const [
-      adr,
-      adrIndex,
       operation,
       readme,
       testingStrategy,
@@ -5736,6 +5734,7 @@ describe('project structure', () => {
       'ai-ide-target-repo-repair-goal-authorization-receipt',
       'ai-ide-target-repo-repair-goal-execution-evidence-intake-report',
       'ai-ide-target-repo-repair-goal-proposal-package',
+      'blocked-goal-recovery-consumption-report',
       'blocked-goal-recovery-package',
       'campaign-summary',
       'compatibility',

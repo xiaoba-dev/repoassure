@@ -13566,6 +13566,19 @@ Phase 0：项目初始化。
 - Green：一次构建修复 E2E 基线；实现 consumption builder、writer、Markdown、CLI、exports 和文档级联。
 - Refactor：保留原有 E2E 物料断言，将命令执行集中到稳定 script mapping。
 
+### Verification
+
+- `pnpm build`：通过。
+- `pnpm typecheck`：通过。
+- `pnpm lint`：通过。
+- `pnpm test:unit`：57 files，700 tests，通过。
+- `pnpm test:integration`：28 files，55 tests，通过。
+- `pnpm test:e2e`：1 passed，1 skipped。
+- `pnpm test`：86 files passed，1 skipped；756 tests passed，1 skipped。
+- `pnpm repo:hygiene`：通过。
+- `pnpm release:check`：通过。
+- `pnpm goal:audit`：35/35，通过。
+
 ### 边界
 
 - Recovery consumption report does not execute recovery commands。

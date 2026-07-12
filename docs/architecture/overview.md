@@ -193,6 +193,10 @@ flowchart TB
 | Shared Types | `src/types/` | findings、repair plan 等共享契约 |
 | Benchmark | `src/internal/benchmark/`、`scripts/run-benchmark.mjs` | benchmark 汇总与 `docs/logs/spike-results.md` 生成 |
 
+## Blocked Goal Recovery Decision Gate
+
+`@hardening-mcp/acceptance` now carries `blocked-goal-recovery-package -> consumption-report -> decision-receipt`. Stable `actionKey` values bind maintainer decisions to exact queue items. The receipt is a local evidence gate for Blocked Goal Recovery Resume Attempt Task Package v0.1; it does not execute resume commands or expand target repo, release, launch, customer, pricing/spend, visibility, or hosted/commercial authority.
+
 ## CLI 与 MCP 共享实现
 
 CLI 和 MCP 不各自实现业务逻辑。它们都调用 `src/tools/*`，而 tool wrappers 再调用 `src/domain/*`、`@hardening-mcp/shared`、`@hardening-mcp/security-assurance`、`@hardening-mcp/browser-explorer` 和 `@hardening-mcp/repair-planner`；迁移窗口内的旧 `src/shared/*` import 会通过 wrapper 指向 `packages/shared/dist/*`，旧 `src/domain/explore/*` import 会通过 wrapper 指向 `packages/browser-explorer/dist/*`，旧 `src/domain/repair-plan/*` 与 `src/types/repair-plan.ts` import 会通过 wrapper 指向 `packages/repair-planner/dist/*`。

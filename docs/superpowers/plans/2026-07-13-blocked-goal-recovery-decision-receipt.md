@@ -25,12 +25,12 @@
 
 ### Task 3: Add CLI and campaign integration
 
-- [ ] Add failing integration, package export, type-smoke, structure, and near-real E2E assertions.
-- [ ] Add `pnpm --silent goal:recover:decide`, CLI adapter, package subpath, compatibility entry, and artifact inventory.
-- [ ] Verify JSON/Markdown readability, error redaction, and no command execution.
+- [x] Add failing integration, package export, type-smoke, structure, and near-real E2E assertions.
+- [x] Add `pnpm --silent goal:recover:decide`, CLI adapter, package subpath, compatibility entry, and artifact inventory.
+- [x] Verify JSON/Markdown readability, error redaction, and no command execution.
 
 ### Task 4: Cascade governance and close delivery
 
-- [ ] Add ADR-0035 and operations guide; cascade README, PRD, SPEC, PLAN, architecture, testing, acceptance, decision log, dev log, and blocker log where applicable.
+- [x] Add ADR-0035 and operations guide; cascade README, PRD, SPEC, PLAN, architecture, testing, acceptance, decision log, dev log, and blocker log where applicable.
 - [ ] Run build, typecheck, lint, unit, integration, E2E, full test, repo:hygiene, release:check, and goal:audit.
 - [ ] Complete independent review, commit, PR, CI, merge, main CI, checkpoint, and return to Autopilot.

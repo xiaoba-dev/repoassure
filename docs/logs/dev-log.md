@@ -13596,3 +13596,21 @@ Phase 0：项目初始化。
 
 - Recovery consumption report does not execute recovery commands。
 - No target repo mutation、release、launch、customer contact、pricing/spend 或 commercial/hosted availability claim was authorized。
+## 2026年7月13日 - Blocked Goal Recovery Decision Receipt v0.1
+
+### 完成内容
+
+- Recovery action queue 新增稳定 `actionKey`。
+- 新增 `repoassure.blocked-goal-recovery-decision-receipt.v1`、typed builder/writer/Markdown、raw-byte SHA 和 runtime validation。
+- 新增 `pnpm --silent goal:recover:decide`、package export、compatibility/type-smoke contract 和 near-real campaign E2E stage。
+- 新增 ADR-0035、operations guide，并级联 README、PRD、SPEC、PLAN、architecture、testing、acceptance 和 decision log。
+
+### TDD 记录
+
+- Red：action queue 缺少 stable action identity；decision receipt module 与 CLI 不存在；structure test 缺少 ADR/operations cascade。
+- Green：实现 actionKey、receipt state machine、CLI、package contracts、campaign E2E 和治理文档。
+
+### 边界
+
+- Receipt does not execute recovery or resume commands。
+- No target repo mutation、publish、release、launch、customer contact、pricing/spend、repository visibility change 或 commercial/hosted availability claim was authorized。

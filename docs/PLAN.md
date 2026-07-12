@@ -20,14 +20,15 @@ Recent completed work includes:
 - Target Repair Evidence Review Decision Package v0.1.
 - Blocked Goal Recovery Package v0.1.
 - Blocked Goal Recovery Consumption Validation v0.1.
+- Blocked Goal Recovery Decision Receipt v0.1.
 - Public release and branch protection governance.
 - Public website private preview and custom-domain work.
 
 ## Next Codex Goal
 
-Blocked Goal Recovery Decision Receipt v0.1
+Blocked Goal Recovery Resume Attempt Task Package v0.1
 
-Plain-language explanation: record explicit maintainer decisions over a consumed blocked-goal recovery report before any separate resume attempt, without executing recovery commands or treating the receipt as target-repo, release, launch, customer, pricing, or commercial authorization.
+Plain-language explanation: convert an approved recovery decision receipt into a bounded task package for a later separate resume attempt, without running the resume command or expanding target-repo, release, launch, customer, pricing, or commercial authorization.
 
 ## Execution Rules
 
@@ -61,6 +62,16 @@ Plain-language explanation: record explicit maintainer decisions over a consumed
 - ADR-0032: Target repair evidence review decision package.
 - ADR-0033: Blocked goal recovery package.
 - ADR-0034: Blocked goal recovery consumption contract.
+- ADR-0035: Blocked goal recovery decision receipt.
+
+## Blocked Goal Recovery Decision Receipt v0.1
+
+Status: implemented.
+
+- Add stable action keys and a typed decision receipt under `packages/acceptance`.
+- Add `pnpm --silent goal:recover:decide` CLI.
+- Extend the near-real campaign through decision receipt generation.
+- Keep the receipt local-first and non-executing for resume commands, target repo mutation, release, launch, customer contact, pricing/spend, repository visibility, and commercial or hosted claims.
 ## AI IDE Repair Execution Replay Readiness v0.1
 
 Status: implemented.

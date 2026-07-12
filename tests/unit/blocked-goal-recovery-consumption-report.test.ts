@@ -193,6 +193,17 @@ describe('blocked goal recovery consumption report', () => {
     ]);
   });
 
+  it('rejects maintainer requests without supported decision options', () => {
+    const recoveryPackage = buildRecoveryPackage();
+    recoveryPackage.blockers[1]!.maintainerDecisionRequests[0]!.options = ['yes', 'no'];
+
+    expect(() => buildBlockedGoalRecoveryConsumptionReport({
+      packagePath: 'blocked-goal-recovery-package.json',
+      sourcePackageText: JSON.stringify(recoveryPackage),
+      recoveryPackage
+    })).toThrow('Invalid blocked goal recovery package');
+  });
+
   it('writes local json and markdown consumption artifacts', async () => {
     const root = await mkdtemp(join(tmpdir(), 'repoassure-goal-recovery-consume-'));
     const secretRoot = join(root, 'goal-TOKEN=secret-value');

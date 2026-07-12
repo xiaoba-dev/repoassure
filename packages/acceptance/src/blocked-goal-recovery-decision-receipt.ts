@@ -55,6 +55,7 @@ export interface BuildBlockedGoalRecoveryDecisionReceiptInput {
   generatedAt?: string;
   consumptionReportPath: string;
   sourceConsumptionReportText: string;
+  reviewedSourceSha256: string;
   consumptionReport: BlockedGoalRecoveryConsumptionReport;
   decisions: BlockedGoalRecoveryDecisionInputItem[];
   resumeCommandDecisions: BlockedGoalRecoveryResumeCommandDecisionInputItem[];
@@ -158,6 +159,10 @@ export function buildBlockedGoalRecoveryDecisionReceipt(
   if (!isDeepStrictEqual(parsedSource, input.consumptionReport)) {
     throw new Error('Invalid blocked goal recovery consumption report');
   }
+  const sourceSha256 = createHash('sha256').update(input.sourceConsumptionReportText).digest('hex');
+  if (input.reviewedSourceSha256 !== sourceSha256) {
+    throw new Error('Invalid blocked goal recovery decisions');
+  }
   assertDecisions(input.decisions, input.consumptionReport.actionQueue);
   assertResumeCommandDecisions(input.resumeCommandDecisions, input.consumptionReport.resumeCommands);
 
@@ -209,7 +214,7 @@ export function buildBlockedGoalRecoveryDecisionReceipt(
       schemaVersion: input.consumptionReport.schemaVersion,
       fileName: sanitize(basename(input.consumptionReportPath)),
       path: sanitizePath(input.consumptionReportPath),
-      sha256: createHash('sha256').update(input.sourceConsumptionReportText).digest('hex'),
+      sha256: sourceSha256,
       resumeReadiness: input.consumptionReport.resumeReadiness
     },
     decisionSummary: summarizeDecisions(decisionItems),
@@ -242,13 +247,15 @@ export async function writeBlockedGoalRecoveryDecisionReceipt(
   }
   if (!isRecord(decisionInput)
     || !Array.isArray(decisionInput.decisions)
-    || !Array.isArray(decisionInput.resumeCommandDecisions)) {
+    || !Array.isArray(decisionInput.resumeCommandDecisions)
+    || typeof decisionInput.sourceConsumptionReportSha256 !== 'string') {
     throw new Error('Invalid blocked goal recovery decisions');
   }
   const receipt = buildBlockedGoalRecoveryDecisionReceipt({
     ...(input.generatedAt ? { generatedAt: input.generatedAt } : {}),
     consumptionReportPath: input.consumptionReportPath,
     sourceConsumptionReportText,
+    reviewedSourceSha256: decisionInput.sourceConsumptionReportSha256,
     consumptionReport: consumptionReport as BlockedGoalRecoveryConsumptionReport,
     decisions: decisionInput.decisions as BlockedGoalRecoveryDecisionInputItem[],
     resumeCommandDecisions: decisionInput.resumeCommandDecisions as BlockedGoalRecoveryResumeCommandDecisionInputItem[]
@@ -439,21 +446,34 @@ function isDecisionValue(value: unknown): value is BlockedGoalRecoveryDecision {
 }
 
 function isConsumptionAction(value: unknown): value is BlockedGoalRecoveryConsumptionAction {
-  return isRecord(value)
-    && typeof value.actionKey === 'string'
-    && typeof value.blockerId === 'string'
-    && isActionType(value.actionType)
-    && isBoundActionKey(value.actionKey, value.blockerId, value.actionType)
-    && typeof value.instruction === 'string'
-    && typeof value.context === 'string'
-    && Array.isArray(value.allowedDecisions)
-    && value.allowedDecisions.length > 0
-    && value.allowedDecisions.every(isDecisionValue)
-    && new Set(value.allowedDecisions).size === value.allowedDecisions.length
-    && typeof value.prerequisiteCompletionRequired === 'boolean'
-    && (value.actionType === 'external_prerequisite_required'
+  if (!isRecord(value)
+    || typeof value.actionKey !== 'string'
+    || typeof value.blockerId !== 'string'
+    || !isActionType(value.actionType)
+    || !isBoundActionKey(value.actionKey, value.blockerId, value.actionType)
+    || typeof value.instruction !== 'string'
+    || typeof value.context !== 'string'
+    || !Array.isArray(value.allowedDecisions)
+    || value.allowedDecisions.length === 0
+    || !value.allowedDecisions.every(isDecisionValue)
+    || new Set(value.allowedDecisions).size !== value.allowedDecisions.length
+    || typeof value.prerequisiteCompletionRequired !== 'boolean'
+    || !(value.actionType === 'external_prerequisite_required'
       ? value.prerequisiteCompletionRequired
-      : !value.prerequisiteCompletionRequired);
+      : !value.prerequisiteCompletionRequired)) {
+    return false;
+  }
+  if (value.actionType === 'automatic_retry_candidate') {
+    return sameDecisionSet(value.allowedDecisions, ['approve', 'reject', 'defer', 'accept_risk']);
+  }
+  if (value.actionType === 'external_prerequisite_required') {
+    return sameDecisionSet(value.allowedDecisions, ['approve', 'defer']);
+  }
+  return true;
+}
+
+function sameDecisionSet(left: unknown[], right: BlockedGoalRecoveryDecision[]): boolean {
+  return left.length === right.length && right.every((item) => left.includes(item));
 }
 
 function isBoundActionKey(
@@ -515,11 +535,12 @@ function resolveDecisionStatus(
   boundaryPreserved: boolean,
   hasResumeCommand: boolean
 ): BlockedGoalRecoveryDecisionStatus {
-  if (!boundaryPreserved || !hasResumeCommand || items.length === 0) {
+  if (!boundaryPreserved || items.length === 0) {
     return 'blocked_or_incomplete';
   }
   if (items.some((item) => item.decision === 'reject')) return 'rejected';
   if (items.some((item) => item.decision === 'defer')) return 'deferred';
+  if (!hasResumeCommand) return 'blocked_or_incomplete';
   if (items.some((item) => item.decision === 'unreviewed')) return 'blocked_or_incomplete';
   const decisions = new Set(items.map((item) => item.decision));
   if (decisions.size === 1 && decisions.has('approve')) return 'approved_for_separate_resume_attempt';
@@ -533,10 +554,10 @@ function resolveResumeAttemptReadiness(
   hasReviewedResumeCommand: boolean
 ): BlockedGoalRecoveryResumeAttemptReadiness {
   if (!boundaryPreserved) return 'blocked_by_boundary_violation';
-  if (!hasReviewedResumeCommand) return 'blocked_by_missing_resume_command';
-  if (status === 'approved_for_separate_resume_attempt' || status === 'accepted_with_risk') return 'ready_for_separate_resume_attempt';
   if (status === 'rejected') return 'blocked_by_rejection';
   if (status === 'deferred') return 'blocked_by_deferral';
+  if (!hasReviewedResumeCommand) return 'blocked_by_missing_resume_command';
+  if (status === 'approved_for_separate_resume_attempt' || status === 'accepted_with_risk') return 'ready_for_separate_resume_attempt';
   if (status === 'mixed_decisions') return 'blocked_by_mixed_decisions';
   return 'blocked_by_missing_decision';
 }

@@ -11,6 +11,7 @@ Decision file example:
 
 ```json
 {
+  "sourceConsumptionReportSha256": "<sha256-of-exact-consumption-report-bytes>",
   "decisions": [
     {
       "actionKey": "automatic:B1-test:A1-rerun",
@@ -30,7 +31,7 @@ Decision file example:
 }
 ```
 
-`reject`, `defer`, and `accept_risk` decisions also require a non-empty `rationale`. An external prerequisite may only be approved with `prerequisiteStatus: completed`; risk acceptance cannot waive an unmet prerequisite. Every resume command requires its own decision by stable `commandId`.
+The source SHA is mandatory and binds the decisions to the exact report bytes reviewed. `reject`, `defer`, and `accept_risk` decisions also require a non-empty `rationale`. An external prerequisite may only be approved with `prerequisiteStatus: completed`; risk acceptance cannot waive an unmet prerequisite. Every resume command requires its own decision by stable `commandId`.
 
 ## Command
 

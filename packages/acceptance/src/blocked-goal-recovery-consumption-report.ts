@@ -342,6 +342,7 @@ function assertBlockedGoalRecoveryPackage(value: unknown): asserts value is Bloc
   if (!sameJson(recoveryPackage.automaticRecoveryActions, nestedAutomaticActions)
     || !sameJson(recoveryPackage.maintainerDecisionRequests, nestedDecisionRequests)
     || !sameJson(recoveryPackage.externalPrerequisites, nestedExternalPrerequisites)
+    || recoveryPackage.maintainerDecisionRequests.some((request) => normalizeAllowedDecisions(request.options).length === 0)
     || recoveryPackage.maintainerReviewBoundary !== BLOCKED_GOAL_RECOVERY_MAINTAINER_REVIEW_BOUNDARY
     || recoveryPackage.nonAuthorizationBoundary !== BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BOUNDARY) {
     throw new Error('Invalid blocked goal recovery package');

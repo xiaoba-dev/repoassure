@@ -22,6 +22,7 @@ describe('blocked goal recovery decision receipt', () => {
       generatedAt: '2026-07-13T04:00:00.000Z',
       consumptionReportPath: '/private/tmp/TOKEN=secret-value/blocked-goal-recovery-consumption-report.json',
       sourceConsumptionReportText: JSON.stringify(report),
+      reviewedSourceSha256: sourceSha(JSON.stringify(report)),
       consumptionReport: report,
       decisions: approvedActionDecisions(report),
       resumeCommandDecisions: approvedCommandDecisions(report)
@@ -56,6 +57,7 @@ describe('blocked goal recovery decision receipt', () => {
     const base = {
       consumptionReportPath: 'blocked-goal-recovery-consumption-report.json',
       sourceConsumptionReportText: JSON.stringify(report),
+      reviewedSourceSha256: sourceSha(JSON.stringify(report)),
       consumptionReport: report
     };
     const decide = (decisions: Array<{
@@ -112,6 +114,7 @@ describe('blocked goal recovery decision receipt', () => {
     const reportText = `${JSON.stringify(report, null, 2)}\n`;
     await writeFile(reportPath, reportText);
     await writeFile(decisionsPath, `${JSON.stringify({
+      sourceConsumptionReportSha256: sourceSha(reportText),
       decisions: approvedActionDecisions(report),
       resumeCommandDecisions: approvedCommandDecisions(report)
     }, null, 2)}\n`);
@@ -134,6 +137,7 @@ describe('blocked goal recovery decision receipt', () => {
     const build = (consumptionReport: typeof report) => () => buildBlockedGoalRecoveryDecisionReceipt({
       consumptionReportPath: 'blocked-goal-recovery-consumption-report.json',
       sourceConsumptionReportText: JSON.stringify(consumptionReport),
+      reviewedSourceSha256: sourceSha(JSON.stringify(consumptionReport)),
       consumptionReport,
       decisions: [],
       resumeCommandDecisions: []
@@ -157,6 +161,7 @@ describe('blocked goal recovery decision receipt', () => {
     expect(() => buildBlockedGoalRecoveryDecisionReceipt({
       consumptionReportPath: 'blocked-goal-recovery-consumption-report.json',
       sourceConsumptionReportText: JSON.stringify(report),
+      reviewedSourceSha256: sourceSha(JSON.stringify(report)),
       consumptionReport: { ...report, generatedAt: 'different' },
       decisions: [],
       resumeCommandDecisions: []
@@ -168,6 +173,7 @@ describe('blocked goal recovery decision receipt', () => {
     const receipt = buildBlockedGoalRecoveryDecisionReceipt({
       consumptionReportPath: 'blocked-goal-recovery-consumption-report.json',
       sourceConsumptionReportText: JSON.stringify(report),
+      reviewedSourceSha256: sourceSha(JSON.stringify(report)),
       consumptionReport: report,
       decisions: approvedActionDecisions(report),
       resumeCommandDecisions: []
@@ -182,6 +188,7 @@ describe('blocked goal recovery decision receipt', () => {
     const withoutCommandDecision = buildBlockedGoalRecoveryDecisionReceipt({
       consumptionReportPath: 'blocked-goal-recovery-consumption-report.json',
       sourceConsumptionReportText: JSON.stringify(report),
+      reviewedSourceSha256: sourceSha(JSON.stringify(report)),
       consumptionReport: report,
       decisions: approvedActionDecisions(report),
       resumeCommandDecisions: []
@@ -193,10 +200,57 @@ describe('blocked goal recovery decision receipt', () => {
     expect(() => buildBlockedGoalRecoveryDecisionReceipt({
       consumptionReportPath: 'blocked-goal-recovery-consumption-report.json',
       sourceConsumptionReportText: JSON.stringify(malformed),
+      reviewedSourceSha256: sourceSha(JSON.stringify(malformed)),
       consumptionReport: malformed,
       decisions: [],
       resumeCommandDecisions: []
     })).toThrow('Invalid blocked goal recovery consumption report');
+  });
+
+  it('binds decisions to source SHA and enforces canonical external policy and veto precedence', () => {
+    const report = buildConsumptionReport();
+    expect(() => buildBlockedGoalRecoveryDecisionReceipt({
+      consumptionReportPath: 'blocked-goal-recovery-consumption-report.json',
+      sourceConsumptionReportText: JSON.stringify(report),
+      reviewedSourceSha256: '0'.repeat(64),
+      consumptionReport: report,
+      decisions: approvedActionDecisions(report),
+      resumeCommandDecisions: approvedCommandDecisions(report)
+    })).toThrow('Invalid blocked goal recovery decisions');
+
+    const externalIndex = report.actionQueue.findIndex((action) => action.actionType === 'external_prerequisite_required');
+    const tamperedExternal = {
+      ...report,
+      actionQueue: report.actionQueue.map((action, index) => index === externalIndex
+        ? { ...action, allowedDecisions: ['approve', 'defer', 'accept_risk'] as Array<'approve' | 'defer' | 'accept_risk'> }
+        : action)
+    };
+    expect(() => buildBlockedGoalRecoveryDecisionReceipt({
+      consumptionReportPath: 'blocked-goal-recovery-consumption-report.json',
+      sourceConsumptionReportText: JSON.stringify(tamperedExternal),
+      reviewedSourceSha256: sourceSha(JSON.stringify(tamperedExternal)),
+      consumptionReport: tamperedExternal,
+      decisions: [],
+      resumeCommandDecisions: []
+    })).toThrow('Invalid blocked goal recovery consumption report');
+
+    const commandless = { ...report, resumeCommands: [] };
+    const receipt = buildBlockedGoalRecoveryDecisionReceipt({
+      consumptionReportPath: 'blocked-goal-recovery-consumption-report.json',
+      sourceConsumptionReportText: JSON.stringify(commandless),
+      reviewedSourceSha256: sourceSha(JSON.stringify(commandless)),
+      consumptionReport: commandless,
+      decisions: [{
+        actionKey: commandless.actionQueue[0]!.actionKey,
+        decision: 'reject',
+        evidence: 'Rejected.',
+        reviewerRole: 'maintainer',
+        rationale: 'Unsafe.'
+      }],
+      resumeCommandDecisions: []
+    });
+    expect(receipt.decisionStatus).toBe('rejected');
+    expect(receipt.resumeAttemptReadiness).toBe('blocked_by_rejection');
   });
 });
 
@@ -249,4 +303,8 @@ function approvedCommandDecisions(report: ReturnType<typeof buildConsumptionRepo
     evidence: `Reviewed ${command.commandId}`,
     reviewerRole: 'maintainer'
   }));
+}
+
+function sourceSha(text: string): string {
+  return createHash('sha256').update(text).digest('hex');
 }

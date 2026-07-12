@@ -1,4 +1,5 @@
 import { execFile } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -333,13 +334,16 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       '--from-dir',
       outputDir
     ]);
-    const recoveryConsumptionReport = JSON.parse(
-      await readFile(join(outputDir, 'blocked-goal-recovery-consumption-report.json'), 'utf8')
-    ) as {
+    const recoveryConsumptionReportText = await readFile(
+      join(outputDir, 'blocked-goal-recovery-consumption-report.json'),
+      'utf8'
+    );
+    const recoveryConsumptionReport = JSON.parse(recoveryConsumptionReportText) as {
       actionQueue: Array<{ actionKey: string }>;
       resumeCommands: Array<{ commandId: string }>;
     };
     await writeFile(join(outputDir, 'blocked-goal-recovery-decisions.json'), `${JSON.stringify({
+      sourceConsumptionReportSha256: createHash('sha256').update(recoveryConsumptionReportText).digest('hex'),
       decisions: recoveryConsumptionReport.actionQueue.map((action) => ({
         actionKey: action.actionKey,
         decision: 'approve',

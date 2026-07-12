@@ -18,6 +18,7 @@ Adopt Blocked Goal Recovery Decision Receipt v0.1.
 - Source allowed decisions are enforced. External prerequisite approval requires explicit completion evidence and cannot be waived with accept-risk.
 - Resume commands require separate command-level decisions.
 - The receipt hashes the raw source report bytes and derives decision status and separate-resume readiness from reviewed evidence.
+- The decisions envelope must declare the same raw report SHA-256, preventing stale decisions from approving modified action or command content.
 - A ready receipt is evidence for a later, separate resume attempt. It does not execute any resume command.
 
 ## Consequences

@@ -1,4 +1,5 @@
 import { execFile } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -18,8 +19,10 @@ describe('blocked goal recovery decision receipt script', () => {
     const secretRoot = join(root, 'goal-TOKEN=secret-value');
     await mkdir(secretRoot, { recursive: true });
     const report = buildReport();
-    await writeFile(join(secretRoot, 'blocked-goal-recovery-consumption-report.json'), `${JSON.stringify(report, null, 2)}\n`);
+    const reportText = `${JSON.stringify(report, null, 2)}\n`;
+    await writeFile(join(secretRoot, 'blocked-goal-recovery-consumption-report.json'), reportText);
     await writeFile(join(secretRoot, 'blocked-goal-recovery-decisions.json'), `${JSON.stringify({
+      sourceConsumptionReportSha256: createHash('sha256').update(reportText).digest('hex'),
       decisions: report.actionQueue.map((action) => ({
         actionKey: action.actionKey,
         decision: 'approve',
@@ -68,7 +71,7 @@ describe('blocked goal recovery decision receipt script', () => {
       ],
       { cwd: process.cwd(), timeout: TIMEOUT_MS }
     )).rejects.toMatchObject({
-      stderr: expect.not.stringContaining('secret-value')
+      stderr: expect.stringMatching(/^(?![\s\S]*secret-value)(?=[\s\S]*ENOENT)(?=[\s\S]*TOKEN=\[REDACTED\])[\s\S]*$/u)
     });
   }, TIMEOUT_MS);
 });

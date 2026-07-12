@@ -29,7 +29,7 @@ Each consumption action gains an `actionKey` so decisions remain deterministic w
 - maintainer decision: `maintainer:<encodedBlockerId>:<opaqueActionId>`
 - external prerequisite: `external:<encodedBlockerId>:<opaqueActionId>`
 
-Maintainer/external actions receive content-stable opaque IDs rather than order-dependent ordinals. Resume commands receive stable `commandId` values. Decision input items reference exactly one source action or command ID. Duplicate, unknown, malformed, colliding, or contradictory inputs are rejected.
+Maintainer/external actions receive content-stable opaque IDs rather than order-dependent ordinals. Resume commands receive stable `commandId` values. The decisions envelope declares the SHA-256 of the exact consumption-report bytes reviewed. Decision input items reference exactly one source action or command ID. Duplicate, unknown, malformed, colliding, stale-SHA, or contradictory inputs are rejected.
 
 ## Decision Contract
 

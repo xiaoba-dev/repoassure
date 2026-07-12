@@ -244,6 +244,69 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       '--from-dir',
       outputDir
     ]);
+    await writeFile(join(outputDir, 'blocked-goal-recovery-input.json'), `${JSON.stringify({
+      sourceGoal: {
+        title: 'Fixture blocked goal recovery',
+        status: 'blocked',
+        objective: 'Recover a blocked fixture goal without leaking TOKEN=secret-value.',
+        evidenceRefs: ['docs/logs/blockers.md']
+      },
+      sourceAudit: {
+        path: 'docs/acceptance/goal-completion-audit.md',
+        status: 'blocked_or_incomplete',
+        summary: 'Fixture goal audit still has one blocker.'
+      },
+      sourceLogs: [
+        {
+          path: 'docs/logs/blockers.md',
+          summary: 'Fixture blocker is recorded locally.'
+        }
+      ],
+      blockers: [
+        {
+          blockerId: 'B1-fixture-timeout',
+          category: 'test_instability',
+          status: 'retryable',
+          summary: 'Fixture full test exceeded default timeout.',
+          attemptedActions: ['Ran full test once.'],
+          evidenceRefs: ['Test timed out in 5000ms.'],
+          automaticRecoveryActions: [
+            {
+              actionId: 'A1-rerun-timeout',
+              command: 'pnpm test -- --testTimeout=15000',
+              rationale: 'Rerun using the known integration timeout profile.'
+            }
+          ]
+        },
+        {
+          blockerId: 'B2-fixture-authorization',
+          category: 'maintainer_decision_required',
+          status: 'blocked',
+          summary: 'Maintainer must choose whether to resume the fixture goal.',
+          attemptedActions: ['Recorded resume options.'],
+          evidenceRefs: ['docs/logs/decision-log.md'],
+          maintainerDecisionRequests: [
+            {
+              requestedDecision: 'Approve resume, defer, or accept risk.',
+              options: ['approve', 'defer', 'accept_risk']
+            }
+          ]
+        }
+      ],
+      resumeCommands: [
+        {
+          command: 'codex resume goal',
+          purpose: 'Resume the blocked fixture goal after maintainer decision.'
+        }
+      ],
+      redactionBoundary: 'Use sanitized local summaries only.'
+    }, null, 2)}\n`);
+    await runScript([
+      'goal:recover',
+      '--',
+      '--from-dir',
+      outputDir
+    ]);
 
     const outputs = await readArtifacts(outputDir);
 
@@ -340,6 +403,15 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     ]);
     expect(outputs.targetRepairReview.blockedActions).toContain('target_repo_pull_request_creation');
     expect(outputs.targetRepairReview.blockedActions).toContain('hosted_dashboard_availability_claim');
+    expect(outputs.blockedGoalRecovery.schemaVersion).toBe('repoassure.blocked-goal-recovery-package.v1');
+    expect(outputs.blockedGoalRecovery.recoveryStatus).toBe('requires_maintainer_or_external_action');
+    expect(outputs.blockedGoalRecovery.blockerSummary).toMatchObject({
+      totalBlockers: 2,
+      automaticRecoveryActions: 1,
+      maintainerDecisionRequests: 1
+    });
+    expect(outputs.blockedGoalRecovery.blockedActions).toContain('target_repo_pull_request_creation');
+    expect(outputs.blockedGoalRecovery.blockedActions).toContain('hosted_dashboard_availability_claim');
     expect(outputs.bundle.readingOrder.map((item) => item.fileName)).toEqual([
       'ai-ide-repair-playbook.json',
       'ai-ide-playbook-consumption-report.json',
@@ -378,6 +450,9 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     expect(outputs.targetRepairReviewMarkdown).toContain('# RepoAssure AI IDE Target Repair Evidence Review Decision Package');
     expect(outputs.targetRepairReviewMarkdown).toContain('## Review Decisions');
     expect(outputs.targetRepairReviewMarkdown).toContain('## Non-Authorization Boundary');
+    expect(outputs.blockedGoalRecoveryMarkdown).toContain('# RepoAssure Blocked Goal Recovery Package');
+    expect(outputs.blockedGoalRecoveryMarkdown).toContain('## Blockers');
+    expect(outputs.blockedGoalRecoveryMarkdown).toContain('## Resume Commands');
     expect(outputs.evidenceMarkdown).toContain(
       'No target repo branch, commit, pull request, issue, advisory, or file mutation is executed by this report.'
     );
@@ -410,7 +485,9 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       'ai-ide-target-repo-repair-goal-execution-evidence-intake-report.json',
       'ai-ide-target-repo-repair-goal-execution-evidence-intake-report.md',
       'ai-ide-target-repo-repair-goal-proposal-package.json',
-      'ai-ide-target-repo-repair-goal-proposal-package.md'
+      'ai-ide-target-repo-repair-goal-proposal-package.md',
+      'blocked-goal-recovery-package.json',
+      'blocked-goal-recovery-package.md'
     ]);
   }, SCRIPT_TEST_TIMEOUT_MS);
 });
@@ -507,6 +584,16 @@ async function readArtifacts(outputDir: string): Promise<{
     acceptedEvidenceScope: Array<{ goalId: string; acceptedEvidenceScope: string[] }>;
     blockedActions: string[];
   };
+  blockedGoalRecovery: {
+    schemaVersion: string;
+    recoveryStatus: string;
+    blockerSummary: {
+      totalBlockers: number;
+      automaticRecoveryActions: number;
+      maintainerDecisionRequests: number;
+    };
+    blockedActions: string[];
+  };
   evidenceMarkdown: string;
   bundleMarkdown: string;
   contractMarkdown: string;
@@ -516,6 +603,7 @@ async function readArtifacts(outputDir: string): Promise<{
   targetRepairGoalMarkdown: string;
   targetRepairEvidenceMarkdown: string;
   targetRepairReviewMarkdown: string;
+  blockedGoalRecoveryMarkdown: string;
 }> {
   return {
     playbook: JSON.parse(await readFile(join(outputDir, 'ai-ide-repair-playbook.json'), 'utf8')) as { schemaVersion: string },
@@ -600,6 +688,16 @@ async function readArtifacts(outputDir: string): Promise<{
       acceptedEvidenceScope: Array<{ goalId: string; acceptedEvidenceScope: string[] }>;
       blockedActions: string[];
     },
+    blockedGoalRecovery: JSON.parse(await readFile(join(outputDir, 'blocked-goal-recovery-package.json'), 'utf8')) as {
+      schemaVersion: string;
+      recoveryStatus: string;
+      blockerSummary: {
+        totalBlockers: number;
+        automaticRecoveryActions: number;
+        maintainerDecisionRequests: number;
+      };
+      blockedActions: string[];
+    },
     evidenceMarkdown: await readFile(join(outputDir, 'ai-ide-repair-execution-evidence-report.md'), 'utf8'),
     bundleMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-bundle-manifest.md'), 'utf8'),
     contractMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-consumer-contract.md'), 'utf8'),
@@ -608,7 +706,8 @@ async function readArtifacts(outputDir: string): Promise<{
     authorizationMarkdown: await readFile(join(outputDir, 'ai-ide-target-repo-repair-goal-authorization-receipt.md'), 'utf8'),
     targetRepairGoalMarkdown: await readFile(join(outputDir, 'ai-ide-authorized-target-repo-repair-goal-task-package.md'), 'utf8'),
     targetRepairEvidenceMarkdown: await readFile(join(outputDir, 'ai-ide-target-repo-repair-goal-execution-evidence-intake-report.md'), 'utf8'),
-    targetRepairReviewMarkdown: await readFile(join(outputDir, 'ai-ide-target-repair-evidence-review-decision-package.md'), 'utf8')
+    targetRepairReviewMarkdown: await readFile(join(outputDir, 'ai-ide-target-repair-evidence-review-decision-package.md'), 'utf8'),
+    blockedGoalRecoveryMarkdown: await readFile(join(outputDir, 'blocked-goal-recovery-package.md'), 'utf8')
   };
 }
 
@@ -640,6 +739,8 @@ async function listExpectedArtifactNames(outputDir: string): Promise<string[]> {
     'ai-ide-target-repo-repair-goal-proposal-package.md',
     'ai-ide-target-repair-evidence-review-decision-package.json',
     'ai-ide-target-repair-evidence-review-decision-package.md',
+    'blocked-goal-recovery-package.json',
+    'blocked-goal-recovery-package.md',
     'ai-ide-repair-playbook.json',
     'ai-ide-repair-playbook.md'
   ];

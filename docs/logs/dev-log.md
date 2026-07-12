@@ -13512,3 +13512,38 @@ Phase 0：项目初始化。
 - No customer contact was authorized。
 - No pricing change or spend was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
+## 2026年7月12日 - Blocked Goal Recovery Package v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/blocked-goal-recovery-package.ts`。
+- 新增 `repoassure.blocked-goal-recovery-package.v1`。
+- 新增 `blocked-goal-recovery-package.json` / `blocked-goal-recovery-package.md` 输出。
+- 新增 `pnpm goal:recover` 和 `scripts/generate-blocked-goal-recovery-package.mjs`。
+- 新增 package export `@hardening-mcp/acceptance/blocked-goal-recovery-package`。
+- `tests/integration/playbook-e2e-repair-evidence.test.ts` 现在覆盖 target repair evidence review decision package 之后的 blocked goal recovery package generation。
+- 新增 `docs/adr/0033-blocked-goal-recovery-package.md` 和 `docs/operations/blocked-goal-recovery-package-v0.1.md`，并级联更新 README、PRD、SPEC、PLAN、architecture overview、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/blocked-goal-recovery-package.test.ts`，测试因模块缺失按预期失败。
+- Green：实现 recovery package builder、Markdown renderer、writer 和目录发现。
+- Red：新增 `tests/integration/goal-recover.test.ts`，测试因 `pnpm goal:recover` 和脚本不存在按预期失败。
+- Green：新增 CLI 脚本、package script、package export、compatibility contract entry 和 type-smoke import。
+- Red：扩展 E2E campaign fixture 到 `goal:recover`。
+- Green：补齐 E2E blocked goal recovery package 生成和 artifact 断言。
+- Red：更新 `tests/unit/project-structure.test.ts`，要求 ADR-0033、operation 文档和级联记录存在；测试因文档缺失按预期失败。
+- Green：新增 ADR、operation packet 和级联文档。
+
+### 边界
+
+- No target repo material was uploaded。
+- No target repo branch, commit, pull request, issue, advisory, or file mutation was created by RepoAssure。
+- No target repo patch was automatically applied by RepoAssure。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No customer contact was authorized。
+- No pricing change or spend was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。

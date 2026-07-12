@@ -178,6 +178,10 @@
       "types": "./dist/ai-ide-target-repair-evidence-review-decision-package.d.ts",
       "default": "./dist/ai-ide-target-repair-evidence-review-decision-package.js"
     },
+    "./blocked-goal-recovery-package": {
+      "types": "./dist/blocked-goal-recovery-package.d.ts",
+      "default": "./dist/blocked-goal-recovery-package.js"
+    },
     "./campaign-summary": {
       "types": "./dist/campaign-summary.d.ts",
       "default": "./dist/campaign-summary.js"

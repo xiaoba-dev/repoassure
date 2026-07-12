@@ -3384,6 +3384,96 @@ describe('project structure', () => {
     await expectPath('docs/operations/target-repair-evidence-review-decision-package-v0.1.md');
   });
 
+  it('records blocked goal recovery package without executing blocked goal actions', async () => {
+    const [
+      adr,
+      adrIndex,
+      operation,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      packageJson,
+      acceptancePackageJson,
+      compatibility,
+      indexSource,
+      recoverySource,
+      script,
+      unitTest,
+      integrationTest,
+      e2eTest,
+      typeSmoke
+    ] = await Promise.all([
+      readFile('docs/adr/0033-blocked-goal-recovery-package.md', 'utf8'),
+      readFile('docs/adr/README.md', 'utf8'),
+      readFile('docs/operations/blocked-goal-recovery-package-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('package.json', 'utf8'),
+      readFile('packages/acceptance/package.json', 'utf8'),
+      readFile('packages/acceptance/src/compatibility.ts', 'utf8'),
+      readFile('packages/acceptance/src/index.ts', 'utf8'),
+      readFile('packages/acceptance/src/blocked-goal-recovery-package.ts', 'utf8'),
+      readFile('scripts/generate-blocked-goal-recovery-package.mjs', 'utf8'),
+      readFile('tests/unit/blocked-goal-recovery-package.test.ts', 'utf8'),
+      readFile('tests/integration/goal-recover.test.ts', 'utf8'),
+      readFile('tests/integration/playbook-e2e-repair-evidence.test.ts', 'utf8'),
+      readFile('tests/type-smoke/acceptance-package-subpaths.ts', 'utf8')
+    ]);
+
+    expect(adr).toContain('ADR-0033: Blocked Goal Recovery Package');
+    expect(adr).toContain('blocked goal recovery package');
+    expect(adr).toContain('does not modify target repo files');
+    expect(adrIndex).toContain('[0033](0033-blocked-goal-recovery-package.md)');
+    expect(operation).toContain('Blocked Goal Recovery Package v0.1');
+    expect(operation).toContain('Status: blocked_goal_recovery_package_implemented');
+    expect(operation).toContain('blocked-goal-recovery-package.json');
+    expect(operation).toContain('blocked-goal-recovery-package.md');
+    expect(operation).toContain('repoassure.blocked-goal-recovery-package.v1');
+    expect(operation).toContain('pnpm goal:recover');
+    expect(operation).toContain('No target repo branch, commit, pull request, issue, advisory, or file mutation was created by RepoAssure');
+    expect(operation).toContain('No public launch or production marketing announcement was executed');
+    expect(readme).toContain('Blocked Goal Recovery Package v0.1');
+    expect(readme).toContain('pnpm goal:recover -- --from-dir <dir>');
+    expect(prd).toContain('Blocked Goal Recovery Package v0.1');
+    expect(spec).toContain('goal:recover');
+    expect(plan).toContain('Blocked Goal Recovery Package v0.1');
+    expect(architecture).toContain('ADR-0033');
+    expect(testingStrategy).toContain('Blocked Goal Recovery Package v0.1');
+    expect(acceptanceChecklist).toContain('Blocked Goal Recovery Package v0.1');
+    expect(decisionLog).toContain('blocked goal recovery package');
+    expect(devLog).toContain('Blocked Goal Recovery Package v0.1');
+    expect(packageJson).toContain('"goal:recover": "pnpm build:acceptance && node scripts/generate-blocked-goal-recovery-package.mjs"');
+    expect(acceptancePackageJson).toContain('"./blocked-goal-recovery-package"');
+    expect(compatibility).toContain('blocked-goal-recovery-package');
+    expect(indexSource).toContain('buildBlockedGoalRecoveryPackage');
+    expect(recoverySource).toContain('repoassure.blocked-goal-recovery-package.v1');
+    expect(recoverySource).toContain('does not modify target repo files');
+    expect(script).toContain('writeBlockedGoalRecoveryPackageFromDirectory');
+    expect(script).toContain('--input');
+    expect(script).toContain('--from-dir');
+    expect(unitTest).toContain('repoassure.blocked-goal-recovery-package.v1');
+    expect(integrationTest).toContain('goal:recover');
+    expect(e2eTest).toContain('goal:recover');
+    expect(e2eTest).toContain('requires_maintainer_or_external_action');
+    expect(typeSmoke).toContain('blocked-goal-recovery-package');
+
+    await expectPath('docs/adr/0033-blocked-goal-recovery-package.md');
+    await expectPath('docs/operations/blocked-goal-recovery-package-v0.1.md');
+  });
+
   it('records Autopilot-compatible documentation architecture without moving existing source documents', async () => {
     const [
       adr,
@@ -5563,6 +5653,7 @@ describe('project structure', () => {
       'ai-ide-target-repo-repair-goal-authorization-receipt',
       'ai-ide-target-repo-repair-goal-execution-evidence-intake-report',
       'ai-ide-target-repo-repair-goal-proposal-package',
+      'blocked-goal-recovery-package',
       'campaign-summary',
       'compatibility',
       'fatal-error',

@@ -487,6 +487,38 @@ export {
 } from './ai-ide-target-repair-evidence-review-decision-package.js';
 
 export {
+  buildBlockedGoalRecoveryPackage,
+  buildBlockedGoalRecoveryPackageMarkdown,
+  writeBlockedGoalRecoveryPackage,
+  writeBlockedGoalRecoveryPackageFromDirectory,
+  type BlockedGoalAutomaticRecoveryAction,
+  type BlockedGoalAutomaticRecoveryActionInput,
+  type BlockedGoalBlocker,
+  type BlockedGoalBlockerCategory,
+  type BlockedGoalBlockerInput,
+  type BlockedGoalBlockerStatus,
+  type BlockedGoalBlockerSummary,
+  type BlockedGoalExternalPrerequisite,
+  type BlockedGoalExternalPrerequisiteInput,
+  type BlockedGoalInputProvenance,
+  type BlockedGoalMaintainerDecisionRequest,
+  type BlockedGoalMaintainerDecisionRequestInput,
+  type BlockedGoalRecoveryInput,
+  type BlockedGoalRecoveryPackage,
+  type BlockedGoalRecoveryStatus,
+  type BlockedGoalResumeCommand,
+  type BlockedGoalResumeCommandInput,
+  type BlockedGoalSourceAuditInput,
+  type BlockedGoalSourceGoalInput,
+  type BlockedGoalSourceLogInput,
+  type BlockedGoalSourceProvenance,
+  type BuildBlockedGoalRecoveryPackageInput,
+  type WriteBlockedGoalRecoveryPackageFromDirectoryInput,
+  type WriteBlockedGoalRecoveryPackageInput,
+  type WriteBlockedGoalRecoveryPackageResult
+} from './blocked-goal-recovery-package.js';
+
+export {
   buildValidationCampaignSummary,
   buildValidationCampaignSummaryMarkdown,
   writeValidationCampaignSummary,

@@ -140,9 +140,9 @@ const DECISIONS_JSON_NAME = 'blocked-goal-recovery-decisions.json';
 const RECEIPT_JSON_NAME = 'blocked-goal-recovery-decision-receipt.json';
 const RECEIPT_MARKDOWN_NAME = 'blocked-goal-recovery-decision-receipt.md';
 
-const MAINTAINER_REVIEW_BOUNDARY =
+export const BLOCKED_GOAL_RECOVERY_DECISION_RECEIPT_MAINTAINER_REVIEW_BOUNDARY =
   'This receipt records maintainer decisions over recovery actions; it does not execute a resume command or authorize any action outside a separate reviewed resume attempt.';
-const NON_AUTHORIZATION_BOUNDARY =
+export const BLOCKED_GOAL_RECOVERY_DECISION_RECEIPT_NON_AUTHORIZATION_BOUNDARY =
   'This receipt does not execute recovery commands, modify target repo files, create target repo branch, commit, pull request, issue, or advisory, publish npm, create GitHub release, run public launch, contact customers, change pricing/spend, change repository visibility, or claim SaaS, Team Cloud, Enterprise, commercial, or hosted dashboard availability.';
 
 export function buildBlockedGoalRecoveryDecisionReceipt(
@@ -225,9 +225,9 @@ export function buildBlockedGoalRecoveryDecisionReceipt(
     riskAcceptedActions: decisionItems.filter((item) => item.decision === 'accept_risk'),
     resumeCommandDecisionItems,
     boundaryCompliance: { resumeCommandsExecuted: false, sourceBoundaryPreserved },
-    maintainerReviewBoundary: MAINTAINER_REVIEW_BOUNDARY,
+    maintainerReviewBoundary: BLOCKED_GOAL_RECOVERY_DECISION_RECEIPT_MAINTAINER_REVIEW_BOUNDARY,
     redactionBoundary: sanitize(input.consumptionReport.redactionBoundary),
-    nonAuthorizationBoundary: NON_AUTHORIZATION_BOUNDARY,
+    nonAuthorizationBoundary: BLOCKED_GOAL_RECOVERY_DECISION_RECEIPT_NON_AUTHORIZATION_BOUNDARY,
     blockedActions
   };
 }

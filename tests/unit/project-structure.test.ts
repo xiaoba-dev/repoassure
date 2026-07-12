@@ -5790,6 +5790,7 @@ describe('project structure', () => {
       'blocked-goal-recovery-consumption-report',
       'blocked-goal-recovery-decision-receipt',
       'blocked-goal-recovery-package',
+      'blocked-goal-recovery-resume-attempt-task-package',
       'campaign-summary',
       'compatibility',
       'fatal-error',

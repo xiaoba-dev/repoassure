@@ -592,7 +592,7 @@ This validation must not upload target repo material, automatically modify targe
 
 ## Blocked Goal Recovery Resume Attempt Task Package v0.1
 
-- Unit: full receipt runtime validation, raw text/object binding, exact-byte SHA, approved/risk task mapping, blocked empty-scope outcomes, writer, Markdown, and redaction.
+- Unit: full canonical receipt runtime validation, raw text/object binding, independently reviewed exact-byte SHA, approved/risk task mapping, stale hash, unbound IDs, invalid action decisions, external prerequisite bypass attempts, unsafe/empty executable text, blocked empty-scope outcomes, writer, Markdown, and redaction.
 - Integration: `pnpm --silent goal:recover:prepare-resume`, directory and explicit-path inputs, JSON/Markdown output, CLI failure redaction, and `commandsExecuted: false`.
 - E2E: near-real campaign continues through recovery package, consumption, decision receipt, and bounded resume attempt task package.
 - Contract: package exports, compatibility inventory, type-smoke imports, operation docs, ADR-0036, and documentation cascade are guarded.

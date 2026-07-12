@@ -5,7 +5,18 @@ Status: Implemented
 ## Input
 
 - `blocked-goal-recovery-decision-receipt.json`
+- `blocked-goal-recovery-resume-attempt-task-input.json`, containing `sourceDecisionReceiptSha256` for the exact independently reviewed receipt bytes
 - The receipt must be internally canonical and ready for a separate resume attempt.
+
+Task-input example:
+
+```json
+{
+  "sourceDecisionReceiptSha256": "<sha256-of-exact-reviewed-receipt-bytes>"
+}
+```
+
+The SHA is review binding evidence, not a digital signature or independent identity proof. Protect the local input and receipt with the same repository/worktree controls used for other maintainer decision material.
 
 ## Command
 
@@ -16,7 +27,7 @@ pnpm --silent goal:recover:prepare-resume -- --from-dir <dir>
 Explicit paths are also supported:
 
 ```bash
-pnpm --silent goal:recover:prepare-resume -- --receipt <path> --output <dir>
+pnpm --silent goal:recover:prepare-resume -- --receipt <path> --reviewed-sha256 <sha256> --output <dir>
 ```
 
 ## Outputs

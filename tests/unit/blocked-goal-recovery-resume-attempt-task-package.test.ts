@@ -13,7 +13,11 @@ import {
 import {
   BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS
 } from '../../packages/acceptance/src/blocked-goal-recovery-package.js';
-import type { BlockedGoalRecoveryDecisionReceipt } from '../../packages/acceptance/src/blocked-goal-recovery-decision-receipt.js';
+import {
+  BLOCKED_GOAL_RECOVERY_DECISION_RECEIPT_MAINTAINER_REVIEW_BOUNDARY,
+  BLOCKED_GOAL_RECOVERY_DECISION_RECEIPT_NON_AUTHORIZATION_BOUNDARY,
+  type BlockedGoalRecoveryDecisionReceipt
+} from '../../packages/acceptance/src/blocked-goal-recovery-decision-receipt.js';
 
 describe('blocked goal recovery resume attempt task package', () => {
   it('converts approved evidence into a bounded non-executing task package', () => {
@@ -23,6 +27,7 @@ describe('blocked goal recovery resume attempt task package', () => {
       generatedAt: '2026-07-13T05:00:00.000Z',
       receiptPath: '/private/tmp/TOKEN=secret-value/blocked-goal-recovery-decision-receipt.json',
       sourceReceiptText: text,
+      reviewedSourceSha256: sha256(text),
       receipt
     });
     const markdown = buildBlockedGoalRecoveryResumeAttemptTaskPackageMarkdown(taskPackage);
@@ -59,6 +64,7 @@ describe('blocked goal recovery resume attempt task package', () => {
       const taskPackage = buildBlockedGoalRecoveryResumeAttemptTaskPackage({
         receiptPath: 'blocked-goal-recovery-decision-receipt.json',
         sourceReceiptText: JSON.stringify(item.receipt),
+        reviewedSourceSha256: sha256(JSON.stringify(item.receipt)),
         receipt: item.receipt
       });
       expect(taskPackage.taskPackageStatus).toBe('blocked_by_decision_receipt');
@@ -73,6 +79,7 @@ describe('blocked goal recovery resume attempt task package', () => {
     expect(() => buildBlockedGoalRecoveryResumeAttemptTaskPackage({
       receiptPath: 'blocked-goal-recovery-decision-receipt.json',
       sourceReceiptText: JSON.stringify(receipt),
+      reviewedSourceSha256: sha256(JSON.stringify(receipt)),
       receipt: { ...receipt, generatedAt: 'different' }
     })).toThrow('Invalid blocked goal recovery decision receipt');
 
@@ -80,11 +87,87 @@ describe('blocked goal recovery resume attempt task package', () => {
     const receiptPath = join(root, 'blocked-goal-recovery-decision-receipt.json');
     const receiptText = `${JSON.stringify(receipt, null, 2)}\n`;
     await writeFile(receiptPath, receiptText);
-    const result = await writeBlockedGoalRecoveryResumeAttemptTaskPackage({ receiptPath, outputDir: root });
+    const result = await writeBlockedGoalRecoveryResumeAttemptTaskPackage({
+      receiptPath,
+      reviewedSourceSha256: sha256(receiptText),
+      outputDir: root
+    });
     const json = await readFile(result.jsonPath, 'utf8');
 
     expect(result.taskPackage.sourceDecisionReceipt.sha256).toBe(createHash('sha256').update(receiptText).digest('hex'));
     expect(json).toContain('repoassure.blocked-goal-recovery-resume-attempt-task-package.v1');
+  });
+
+  it('rejects stale review hashes, non-canonical actions, unsafe executable text, and empty commands', () => {
+    const receipt = buildReceipt();
+    const text = JSON.stringify(receipt);
+    expect(() => buildBlockedGoalRecoveryResumeAttemptTaskPackage({
+      receiptPath: 'receipt.json', sourceReceiptText: text,
+      reviewedSourceSha256: 'b'.repeat(64), receipt
+    })).toThrow('Invalid blocked goal recovery resume attempt task input');
+
+    const invalidReceipts: BlockedGoalRecoveryDecisionReceipt[] = [
+      mutateReceipt(receipt, (copy) => {
+        copy.decisionItems[0]!.allowedDecisions = ['reject'];
+      }),
+      mutateReceipt(receipt, (copy) => {
+        copy.decisionItems[0]!.actionKey = 'unbound-action';
+        copy.approvedActions[0]!.actionKey = 'unbound-action';
+      }),
+      mutateReceipt(receipt, (copy) => {
+        copy.decisionItems[0]!.instruction = "printf 'a  b'";
+        copy.approvedActions[0]!.instruction = "printf 'a  b'";
+      }),
+      mutateReceipt(receipt, (copy) => {
+        copy.resumeCommandDecisionItems[0]!.command = 'TOKEN=secret-value';
+      }),
+      mutateReceipt(receipt, (copy) => {
+        copy.resumeCommandDecisionItems[0]!.command = '   ';
+      }),
+      mutateReceipt(receipt, (copy) => {
+        copy.resumeCommandDecisionItems[0]!.commandId = 'resume-TOKEN=secret-value';
+      }),
+      mutateReceipt(receipt, (copy) => {
+        copy.resumeCommandDecisionItems[0]!.command = 'TOKEN=[REDACTED]';
+      }),
+      mutateReceipt(receipt, (copy) => {
+        const item = copy.decisionItems[0]!;
+        item.actionKey = 'external:B1:A1';
+        item.actionType = 'external_prerequisite_required';
+        item.allowedDecisions = ['approve', 'defer'];
+        item.prerequisiteCompletionRequired = true;
+        item.prerequisiteStatus = 'not_applicable';
+        item.decision = 'defer';
+        item.rationale = 'Wait.';
+        copy.approvedActions = [];
+        copy.deferredActions = [item];
+        copy.decisionSummary = { totalActions: 1, reviewed: 1, approved: 0, rejected: 0, deferred: 1, acceptedRisk: 0, unreviewed: 0 };
+        copy.decisionStatus = 'deferred';
+        copy.resumeAttemptReadiness = 'blocked_by_deferral';
+      }),
+      mutateReceipt(receipt, (copy) => {
+        const item = copy.decisionItems[0]!;
+        item.actionKey = 'external:B1:A1';
+        item.actionType = 'external_prerequisite_required';
+        item.allowedDecisions = ['approve', 'defer'];
+        item.prerequisiteCompletionRequired = true;
+        item.prerequisiteStatus = 'unmet';
+        item.decision = 'accept_risk';
+        item.rationale = 'Waive it.';
+        copy.approvedActions = [];
+        copy.riskAcceptedActions = [item];
+        copy.decisionSummary = { totalActions: 1, reviewed: 1, approved: 0, rejected: 0, deferred: 0, acceptedRisk: 1, unreviewed: 0 };
+        copy.decisionStatus = 'accepted_with_risk';
+      })
+    ];
+
+    for (const invalid of invalidReceipts) {
+      const invalidText = JSON.stringify(invalid);
+      expect(() => buildBlockedGoalRecoveryResumeAttemptTaskPackage({
+        receiptPath: 'receipt.json', sourceReceiptText: invalidText,
+        reviewedSourceSha256: sha256(invalidText), receipt: invalid
+      })).toThrow('Invalid blocked goal recovery decision receipt');
+    }
   });
 });
 
@@ -117,9 +200,9 @@ function buildReceipt(
       decision: 'approve', evidence: 'Command reviewed.', reviewerRole: 'maintainer', rationale: ''
     }],
     boundaryCompliance: { resumeCommandsExecuted: false, sourceBoundaryPreserved: true },
-    maintainerReviewBoundary: 'Receipt records decisions and does not execute commands.',
+    maintainerReviewBoundary: BLOCKED_GOAL_RECOVERY_DECISION_RECEIPT_MAINTAINER_REVIEW_BOUNDARY,
     redactionBoundary: 'Use sanitized local evidence.',
-    nonAuthorizationBoundary: 'Receipt does not execute recovery commands or authorize external actions.',
+    nonAuthorizationBoundary: BLOCKED_GOAL_RECOVERY_DECISION_RECEIPT_NON_AUTHORIZATION_BOUNDARY,
     blockedActions: [...BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS],
     ...overrides
   };
@@ -153,4 +236,17 @@ function buildReceipt(
     };
   }
   return receipt;
+}
+
+function sha256(value: string): string {
+  return createHash('sha256').update(value).digest('hex');
+}
+
+function mutateReceipt(
+  receipt: BlockedGoalRecoveryDecisionReceipt,
+  mutate: (copy: BlockedGoalRecoveryDecisionReceipt) => void
+): BlockedGoalRecoveryDecisionReceipt {
+  const copy = structuredClone(receipt);
+  mutate(copy);
+  return copy;
 }

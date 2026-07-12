@@ -10,6 +10,10 @@ import type {
   BlockedGoalRecoveryResumeCommandDecisionItem
 } from './blocked-goal-recovery-decision-receipt.js';
 import {
+  BLOCKED_GOAL_RECOVERY_DECISION_RECEIPT_MAINTAINER_REVIEW_BOUNDARY,
+  BLOCKED_GOAL_RECOVERY_DECISION_RECEIPT_NON_AUTHORIZATION_BOUNDARY
+} from './blocked-goal-recovery-decision-receipt.js';
+import {
   BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS
 } from './blocked-goal-recovery-package.js';
 import { escapeMarkdownTableCell } from './markdown.js';
@@ -24,12 +28,14 @@ export interface BuildBlockedGoalRecoveryResumeAttemptTaskPackageInput {
   generatedAt?: string;
   receiptPath: string;
   sourceReceiptText: string;
+  reviewedSourceSha256: string;
   receipt: BlockedGoalRecoveryDecisionReceipt;
 }
 
 export interface WriteBlockedGoalRecoveryResumeAttemptTaskPackageInput {
   generatedAt?: string;
   receiptPath: string;
+  reviewedSourceSha256: string;
   outputDir: string;
 }
 
@@ -97,6 +103,7 @@ export interface WriteBlockedGoalRecoveryResumeAttemptTaskPackageResult {
 }
 
 const RECEIPT_JSON_NAME = 'blocked-goal-recovery-decision-receipt.json';
+const TASK_INPUT_JSON_NAME = 'blocked-goal-recovery-resume-attempt-task-input.json';
 const TASK_PACKAGE_JSON_NAME = 'blocked-goal-recovery-resume-attempt-task-package.json';
 const TASK_PACKAGE_MARKDOWN_NAME = 'blocked-goal-recovery-resume-attempt-task-package.md';
 
@@ -119,6 +126,10 @@ export function buildBlockedGoalRecoveryResumeAttemptTaskPackage(
   if (!isDeepStrictEqual(parsedSource, input.receipt)) {
     throw invalidReceipt();
   }
+  const sourceSha256 = createHash('sha256').update(input.sourceReceiptText).digest('hex');
+  if (input.reviewedSourceSha256 !== sourceSha256) {
+    throw new Error('Invalid blocked goal recovery resume attempt task input');
+  }
 
   const blockedReasons = resolveBlockedReasons(input.receipt);
   const isReady = blockedReasons.length === 0;
@@ -137,7 +148,7 @@ export function buildBlockedGoalRecoveryResumeAttemptTaskPackage(
       schemaVersion: input.receipt.schemaVersion,
       fileName: sanitize(basename(input.receiptPath)),
       path: sanitizePath(input.receiptPath),
-      sha256: createHash('sha256').update(input.sourceReceiptText).digest('hex'),
+      sha256: sourceSha256,
       decisionStatus: input.receipt.decisionStatus,
       resumeAttemptReadiness: input.receipt.resumeAttemptReadiness
     },
@@ -194,6 +205,7 @@ export async function writeBlockedGoalRecoveryResumeAttemptTaskPackage(
     ...(input.generatedAt ? { generatedAt: input.generatedAt } : {}),
     receiptPath: input.receiptPath,
     sourceReceiptText,
+    reviewedSourceSha256: input.reviewedSourceSha256,
     receipt
   });
   const jsonPath = join(input.outputDir, TASK_PACKAGE_JSON_NAME);
@@ -207,9 +219,22 @@ export async function writeBlockedGoalRecoveryResumeAttemptTaskPackage(
 export async function writeBlockedGoalRecoveryResumeAttemptTaskPackageFromDirectory(
   input: WriteBlockedGoalRecoveryResumeAttemptTaskPackageFromDirectoryInput
 ): Promise<WriteBlockedGoalRecoveryResumeAttemptTaskPackageResult> {
+  const taskInputText = await readFile(join(input.inputDir, TASK_INPUT_JSON_NAME), 'utf8');
+  let taskInput: unknown;
+  try {
+    taskInput = JSON.parse(taskInputText);
+  } catch {
+    throw new Error('Invalid blocked goal recovery resume attempt task input');
+  }
+  if (!isRecord(taskInput)
+    || typeof taskInput.sourceDecisionReceiptSha256 !== 'string'
+    || !/^[a-f0-9]{64}$/u.test(taskInput.sourceDecisionReceiptSha256)) {
+    throw new Error('Invalid blocked goal recovery resume attempt task input');
+  }
   return writeBlockedGoalRecoveryResumeAttemptTaskPackage({
     ...(input.generatedAt ? { generatedAt: input.generatedAt } : {}),
     receiptPath: join(input.inputDir, RECEIPT_JSON_NAME),
+    reviewedSourceSha256: taskInput.sourceDecisionReceiptSha256,
     outputDir: input.outputDir ?? input.inputDir
   });
 }
@@ -301,7 +326,7 @@ function buildActionTask(
     actionKey: sanitize(item.actionKey),
     blockerId: sanitize(item.blockerId),
     actionType: item.actionType,
-    instruction: sanitize(item.instruction),
+    instruction: item.instruction,
     context: sanitize(item.context),
     sourceDecision: item.decision as 'approve' | 'accept_risk',
     sourceEvidence: sanitize(item.evidence),
@@ -316,7 +341,7 @@ function buildCommandTask(
   return {
     order: index + 1,
     commandId: sanitize(item.commandId),
-    command: sanitize(item.command),
+    command: item.command,
     purpose: sanitize(item.purpose),
     sourceDecision: item.decision as 'approve' | 'accept_risk',
     sourceEvidence: sanitize(item.evidence),
@@ -346,9 +371,9 @@ function assertDecisionReceipt(value: unknown): asserts value is BlockedGoalReco
     || !isRecord(value.boundaryCompliance)
     || value.boundaryCompliance.resumeCommandsExecuted !== false
     || typeof value.boundaryCompliance.sourceBoundaryPreserved !== 'boolean'
-    || typeof value.maintainerReviewBoundary !== 'string'
+    || value.maintainerReviewBoundary !== BLOCKED_GOAL_RECOVERY_DECISION_RECEIPT_MAINTAINER_REVIEW_BOUNDARY
     || typeof value.redactionBoundary !== 'string'
-    || typeof value.nonAuthorizationBoundary !== 'string'
+    || value.nonAuthorizationBoundary !== BLOCKED_GOAL_RECOVERY_DECISION_RECEIPT_NON_AUTHORIZATION_BOUNDARY
     || !Array.isArray(value.blockedActions)
     || !value.blockedActions.every((item) => typeof item === 'string')) {
     throw invalidReceipt();
@@ -374,6 +399,7 @@ function assertDecisionReceipt(value: unknown): asserts value is BlockedGoalReco
     || !sameActions(receipt.riskAcceptedActions, receipt.decisionItems.filter((item) => item.decision === 'accept_risk'))
     || receipt.decisionStatus !== expectedStatus
     || receipt.resumeAttemptReadiness !== expectedReadiness
+    || receipt.blockedActions.length !== BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS.length
     || !BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS.every((item) => receipt.blockedActions.includes(item))) {
     throw invalidReceipt();
   }
@@ -402,13 +428,14 @@ function deriveReadiness(status: string, receipt: BlockedGoalRecoveryDecisionRec
 }
 
 function isDecisionItem(value: unknown): value is BlockedGoalRecoveryDecisionItem {
-  return isRecord(value)
-    && typeof value.actionKey === 'string' && value.actionKey.length > 0
-    && typeof value.blockerId === 'string'
+  if (!(isRecord(value)
+    && typeof value.actionKey === 'string' && canonicalIdentifier(value.actionKey)
+    && typeof value.blockerId === 'string' && canonicalIdentifier(value.blockerId)
     && (value.actionType === 'automatic_retry_candidate' || value.actionType === 'maintainer_decision_required' || value.actionType === 'external_prerequisite_required')
     && typeof value.instruction === 'string'
     && typeof value.context === 'string'
-    && Array.isArray(value.allowedDecisions) && value.allowedDecisions.every(isDecision)
+    && Array.isArray(value.allowedDecisions) && value.allowedDecisions.length > 0 && value.allowedDecisions.every(isDecision)
+    && new Set(value.allowedDecisions).size === value.allowedDecisions.length
     && typeof value.prerequisiteCompletionRequired === 'boolean'
     && isRecordedDecision(value.decision)
     && typeof value.evidence === 'string'
@@ -417,14 +444,31 @@ function isDecisionItem(value: unknown): value is BlockedGoalRecoveryDecisionIte
     && (value.prerequisiteStatus === 'completed' || value.prerequisiteStatus === 'unmet' || value.prerequisiteStatus === 'not_applicable')
     && (value.decision === 'unreviewed' || (value.evidence.trim().length > 0 && value.reviewerRole.trim().length > 0))
     && (value.decision === 'approve' || value.decision === 'unreviewed' || value.rationale.trim().length > 0)
-    && !(value.prerequisiteCompletionRequired && value.decision === 'approve' && value.prerequisiteStatus !== 'completed');
+    && canonicalExecutable(value.instruction))) {
+    return false;
+  }
+  if (!isBoundActionKey(value.actionKey, value.blockerId, value.actionType)) return false;
+  if (value.decision !== 'unreviewed' && !value.allowedDecisions.includes(value.decision)) return false;
+  if (value.actionType === 'automatic_retry_candidate') {
+    return !value.prerequisiteCompletionRequired
+      && value.prerequisiteStatus === 'not_applicable'
+      && sameDecisionSet(value.allowedDecisions, ['approve', 'reject', 'defer', 'accept_risk']);
+  }
+  if (value.actionType === 'external_prerequisite_required') {
+    return value.prerequisiteCompletionRequired
+      && sameDecisionSet(value.allowedDecisions, ['approve', 'defer'])
+      && value.decision !== 'accept_risk'
+      && (value.prerequisiteStatus === 'completed' || value.prerequisiteStatus === 'unmet')
+      && !(value.decision === 'approve' && value.prerequisiteStatus !== 'completed');
+  }
+  return !value.prerequisiteCompletionRequired && value.prerequisiteStatus === 'not_applicable';
 }
 
 function isCommandDecisionItem(value: unknown): value is BlockedGoalRecoveryResumeCommandDecisionItem {
   return isRecord(value)
-    && typeof value.commandId === 'string' && value.commandId.length > 0
-    && typeof value.command === 'string'
-    && typeof value.purpose === 'string'
+    && typeof value.commandId === 'string' && canonicalIdentifier(value.commandId)
+    && typeof value.command === 'string' && canonicalExecutable(value.command)
+    && typeof value.purpose === 'string' && value.purpose.trim().length > 0
     && isRecordedDecision(value.decision)
     && typeof value.evidence === 'string'
     && typeof value.reviewerRole === 'string'
@@ -435,11 +479,41 @@ function isCommandDecisionItem(value: unknown): value is BlockedGoalRecoveryResu
 
 function isSourceReceipt(value: unknown): boolean {
   return isRecord(value)
-    && typeof value.schemaVersion === 'string'
+    && value.schemaVersion === 'repoassure.blocked-goal-recovery-consumption-report.v1'
     && typeof value.fileName === 'string'
     && typeof value.path === 'string'
     && typeof value.sha256 === 'string' && /^[a-f0-9]{64}$/u.test(value.sha256)
-    && typeof value.resumeReadiness === 'string';
+    && (value.resumeReadiness === 'ready_to_resume_after_review'
+      || value.resumeReadiness === 'automatic_retry_candidates_available'
+      || value.resumeReadiness === 'waiting_for_maintainer_or_external_action');
+}
+
+function isBoundActionKey(actionKey: string, blockerId: string, actionType: string): boolean {
+  const encodedBlockerId = encodeURIComponent(blockerId);
+  const prefix = actionType === 'automatic_retry_candidate'
+    ? 'automatic'
+    : actionType === 'maintainer_decision_required' ? 'maintainer' : 'external';
+  const [actualPrefix, actualBlockerId, opaqueId, ...extra] = actionKey.split(':');
+  return actualPrefix === prefix
+    && actualBlockerId === encodedBlockerId
+    && typeof opaqueId === 'string'
+    && opaqueId.length > 0
+    && extra.length === 0;
+}
+
+function sameDecisionSet(left: unknown[], right: string[]): boolean {
+  return left.length === right.length && right.every((item) => left.includes(item));
+}
+
+function canonicalExecutable(value: string): boolean {
+  return value.length > 0
+    && value.trim().length > 0
+    && sanitize(value) === value
+    && !/\[REDACTED\]/iu.test(value);
+}
+
+function canonicalIdentifier(value: string): boolean {
+  return value.length > 0 && sanitize(value) === value;
 }
 
 function isDecisionSummary(value: unknown): boolean {

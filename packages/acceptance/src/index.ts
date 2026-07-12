@@ -535,6 +535,8 @@ export {
 } from './blocked-goal-recovery-consumption-report.js';
 
 export {
+  BLOCKED_GOAL_RECOVERY_DECISION_RECEIPT_MAINTAINER_REVIEW_BOUNDARY,
+  BLOCKED_GOAL_RECOVERY_DECISION_RECEIPT_NON_AUTHORIZATION_BOUNDARY,
   buildBlockedGoalRecoveryDecisionReceipt,
   buildBlockedGoalRecoveryDecisionReceiptMarkdown,
   writeBlockedGoalRecoveryDecisionReceipt,

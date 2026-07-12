@@ -20,10 +20,14 @@ describe('blocked goal recovery prepare resume script', () => {
     const secretRoot = join(root, 'goal-TOKEN=secret-value');
     await mkdir(secretRoot, { recursive: true });
     const receipt = buildReceipt();
+    const receiptText = `${JSON.stringify(receipt, null, 2)}\n`;
     await writeFile(
       join(secretRoot, 'blocked-goal-recovery-decision-receipt.json'),
-      `${JSON.stringify(receipt, null, 2)}\n`
+      receiptText
     );
+    await writeFile(join(secretRoot, 'blocked-goal-recovery-resume-attempt-task-input.json'), `${JSON.stringify({
+      sourceDecisionReceiptSha256: createHash('sha256').update(receiptText).digest('hex')
+    }, null, 2)}\n`);
 
     const { stdout, stderr } = await execFileAsync(
       'pnpm',

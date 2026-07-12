@@ -364,6 +364,13 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       '--from-dir',
       outputDir
     ]);
+    const recoveryDecisionReceiptText = await readFile(
+      join(outputDir, 'blocked-goal-recovery-decision-receipt.json'),
+      'utf8'
+    );
+    await writeFile(join(outputDir, 'blocked-goal-recovery-resume-attempt-task-input.json'), `${JSON.stringify({
+      sourceDecisionReceiptSha256: createHash('sha256').update(recoveryDecisionReceiptText).digest('hex')
+    }, null, 2)}\n`);
     await runScript([
       'goal:recover:prepare-resume',
       '--',

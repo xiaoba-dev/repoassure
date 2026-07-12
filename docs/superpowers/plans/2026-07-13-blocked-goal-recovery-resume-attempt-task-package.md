@@ -15,5 +15,5 @@
 ### Task 3: Governance and delivery
 
 - [x] Add ADR-0036 and operations guide; cascade README, PRD, SPEC, PLAN, architecture, testing, acceptance, decision log, and dev log.
-- [ ] Run build, typecheck, lint, unit, integration, E2E, full test, hygiene, release check, and goal audit.
+- [x] Run build, typecheck, lint, unit, integration, E2E, full test, hygiene, release check, and goal audit.
 - [ ] Complete independent review, PR, branch CI, merge, main CI, checkpoint, and Campaign return before the 07:15 large-goal freeze.

@@ -66,6 +66,7 @@
     "playbook:target-repair-evidence": "pnpm build:acceptance && node scripts/generate-ai-ide-target-repo-repair-goal-execution-evidence-intake-report.mjs",
     "playbook:target-repair-review": "pnpm build:acceptance && node scripts/generate-ai-ide-target-repair-evidence-review-decision-package.mjs",
     "goal:recover": "pnpm build:acceptance && node scripts/generate-blocked-goal-recovery-package.mjs",
+    "goal:recover:consume": "pnpm build:acceptance && node scripts/generate-blocked-goal-recovery-consumption-report.mjs",
     "preuser:accept": "pnpm build",
     "user:accept": "node packages/acceptance/dist/run-user-acceptance.js",
     "preuser:handoff": "pnpm build",

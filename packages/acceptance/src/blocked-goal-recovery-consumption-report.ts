@@ -5,7 +5,9 @@ import { join } from 'node:path';
 import { escapeMarkdownTableCell } from './markdown.js';
 import { redactSensitiveText } from './redaction.js';
 import {
+  BLOCKED_GOAL_RECOVERY_MAINTAINER_REVIEW_BOUNDARY,
   BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS,
+  BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BOUNDARY,
   type BlockedGoalRecoveryPackage
 } from './blocked-goal-recovery-package.js';
 
@@ -75,6 +77,7 @@ export interface WriteBlockedGoalRecoveryConsumptionReportResult {
 export function buildBlockedGoalRecoveryConsumptionReport(
   input: BuildBlockedGoalRecoveryConsumptionReportInput
 ): BlockedGoalRecoveryConsumptionReport {
+  assertBlockedGoalRecoveryPackage(input.recoveryPackage);
   const actionQueue = buildActionQueue(input.recoveryPackage);
   const blockedActionsPreserved = BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS.every(
     (action) => input.recoveryPackage.blockedActions.includes(action)
@@ -105,9 +108,9 @@ export function buildBlockedGoalRecoveryConsumptionReport(
       recoveryCommandsExecuted: false,
       blockedActionsPreserved
     },
-    maintainerReviewBoundary: sanitize(input.recoveryPackage.maintainerReviewBoundary),
+    maintainerReviewBoundary: sanitize(BLOCKED_GOAL_RECOVERY_MAINTAINER_REVIEW_BOUNDARY),
     redactionBoundary: sanitize(input.recoveryPackage.redactionBoundary),
-    nonAuthorizationBoundary: sanitize(input.recoveryPackage.nonAuthorizationBoundary),
+    nonAuthorizationBoundary: sanitize(BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BOUNDARY),
     blockedActions: input.recoveryPackage.blockedActions.map(sanitize)
   };
 }
@@ -212,7 +215,9 @@ function deriveResumeReadiness(
   }
 
   if (recoveryPackage.blockers.length === 0) {
-    return 'ready_to_resume_after_review';
+    return recoveryPackage.resumeCommands.length > 0
+      ? 'ready_to_resume_after_review'
+      : 'waiting_for_maintainer_or_external_action';
   }
 
   const hasReviewGate = actionQueue.some((item) => (
@@ -303,6 +308,23 @@ function assertBlockedGoalRecoveryPackage(value: unknown): asserts value is Bloc
     || typeof value.nonAuthorizationBoundary !== 'string') {
     throw new Error('Invalid blocked goal recovery package');
   }
+
+  const recoveryPackage = value as unknown as BlockedGoalRecoveryPackage;
+  const nestedAutomaticActions = recoveryPackage.blockers.flatMap((blocker) => blocker.automaticRecoveryActions);
+  const nestedDecisionRequests = recoveryPackage.blockers.flatMap((blocker) => blocker.maintainerDecisionRequests);
+  const nestedExternalPrerequisites = recoveryPackage.blockers.flatMap((blocker) => blocker.externalPrerequisites);
+
+  if (!sameJson(recoveryPackage.automaticRecoveryActions, nestedAutomaticActions)
+    || !sameJson(recoveryPackage.maintainerDecisionRequests, nestedDecisionRequests)
+    || !sameJson(recoveryPackage.externalPrerequisites, nestedExternalPrerequisites)
+    || recoveryPackage.maintainerReviewBoundary !== BLOCKED_GOAL_RECOVERY_MAINTAINER_REVIEW_BOUNDARY
+    || recoveryPackage.nonAuthorizationBoundary !== BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BOUNDARY) {
+    throw new Error('Invalid blocked goal recovery package');
+  }
+}
+
+function sameJson(left: unknown, right: unknown): boolean {
+  return JSON.stringify(left) === JSON.stringify(right);
 }
 
 function isNormalizedBlocker(value: unknown): boolean {

@@ -13571,10 +13571,10 @@ Phase 0：项目初始化。
 - `pnpm build`：通过。
 - `pnpm typecheck`：通过。
 - `pnpm lint`：通过。
-- `pnpm test:unit`：57 files，702 tests，通过。
+- `pnpm test:unit`：57 files，704 tests，通过。
 - `pnpm test:integration`：28 files，56 tests，通过。
 - `pnpm test:e2e`：1 passed，1 skipped。
-- `pnpm test`：86 files passed，1 skipped；759 tests passed，1 skipped。
+- `pnpm test`：86 files passed，1 skipped；761 tests passed，1 skipped。
 - `pnpm repo:hygiene`：通过。
 - `pnpm release:check`：通过。
 - `pnpm goal:audit`：35/35，通过。
@@ -13586,6 +13586,9 @@ Phase 0：项目初始化。
 - Resume readiness、action queue 和 blocked-action preservation 均从经运行时校验的 blocker 数据推导，不信任输入包中的聚合状态。
 - Source package SHA-256 直接基于原始文件字节计算，不再对重新序列化后的对象计算摘要。
 - 新增 malformed nested action、完整 blocked-action 集合、CLI error-path redaction 和 raw-byte digest 回归测试。
+- 二次独立复审后增加 top-level action aggregates 与 nested blocker actions 的严格一致性校验，防止矛盾输入产生 false readiness。
+- 无 blocker 但缺少 reviewed resume command 的包保持 `waiting_for_maintainer_or_external_action`，不再利用空数组 `every()` 结果进入自动重试状态。
+- Maintainer review 与 non-authorization 文本改为 canonical contract 并在消费前严格校验；blocked actions 明确新增 `pricing_change` 与 `spend_authorization`。
 
 ### 边界
 

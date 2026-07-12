@@ -118,6 +118,64 @@ describe('blocked goal recovery consumption report', () => {
     expect(report.boundaryCompliance.blockedActionsPreserved).toBe(false);
   });
 
+  it('rejects inconsistent action aggregates and keeps commandless recovery waiting', () => {
+    const source = buildRecoveryPackage();
+    const inconsistent = buildRecoveryPackage({
+      blockers: [],
+      automaticRecoveryActions: [],
+      maintainerDecisionRequests: source.maintainerDecisionRequests,
+      externalPrerequisites: []
+    });
+
+    expect(() => buildBlockedGoalRecoveryConsumptionReport({
+      packagePath: 'blocked-goal-recovery-package.json',
+      sourcePackageText: JSON.stringify(inconsistent),
+      recoveryPackage: inconsistent
+    })).toThrow('Invalid blocked goal recovery package');
+
+    const commandless = buildRecoveryPackage({
+      recoveryStatus: 'ready_to_resume',
+      blockers: [],
+      automaticRecoveryActions: [],
+      maintainerDecisionRequests: [],
+      externalPrerequisites: [],
+      resumeCommands: []
+    });
+    const report = buildBlockedGoalRecoveryConsumptionReport({
+      packagePath: 'blocked-goal-recovery-package.json',
+      sourcePackageText: JSON.stringify(commandless),
+      recoveryPackage: commandless
+    });
+
+    expect(report.resumeReadiness).toBe('waiting_for_maintainer_or_external_action');
+  });
+
+  it('preserves pricing and spend boundaries without trusting inherited authorization text', () => {
+    const recoveryPackage = buildRecoveryPackage({
+      maintainerReviewBoundary: 'Recovery is already approved.',
+      nonAuthorizationBoundary: 'Pricing changes are authorized.'
+    });
+
+    expect(() => buildBlockedGoalRecoveryConsumptionReport({
+      packagePath: 'blocked-goal-recovery-package.json',
+      sourcePackageText: JSON.stringify(recoveryPackage),
+      recoveryPackage
+    })).toThrow('Invalid blocked goal recovery package');
+
+    const report = buildBlockedGoalRecoveryConsumptionReport({
+      packagePath: 'blocked-goal-recovery-package.json',
+      sourcePackageText: JSON.stringify(buildRecoveryPackage()),
+      recoveryPackage: buildRecoveryPackage()
+    });
+
+    expect(report.blockedActions).toEqual(expect.arrayContaining([
+      'pricing_change',
+      'spend_authorization'
+    ]));
+    expect(report.nonAuthorizationBoundary).toContain('authorize pricing/spend');
+    expect(report.maintainerReviewBoundary).toContain('does not decide or execute');
+  });
+
   it('handles recovery packages without optional goal evidence references', () => {
     const recoveryPackage = buildRecoveryPackage();
     delete recoveryPackage.sourceProvenance.sourceGoal.evidenceRefs;

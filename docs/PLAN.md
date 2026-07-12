@@ -23,14 +23,15 @@ Recent completed work includes:
 - Blocked Goal Recovery Decision Receipt v0.1.
 - Blocked Goal Recovery Resume Attempt Task Package v0.1.
 - Blocked Goal Recovery Resume Attempt Execution Evidence Intake v0.1.
+- Blocked Goal Recovery Resume Attempt Evidence Review Decision Package v0.1.
 - Public release and branch protection governance.
 - Public website private preview and custom-domain work.
 
 ## Next Codex Goal
 
-Blocked Goal Recovery Resume Attempt Evidence Review Decision Package v0.1
+Blocked Goal Recovery Resume Attempt Closure Receipt v0.1
 
-Plain-language explanation: let a maintainer explicitly accept, request changes, defer, or accept risk over the imported resume-attempt evidence without executing commands or authorizing unrelated work.
+Plain-language explanation: convert an accepted evidence review package into a final local closure receipt without executing commands or changing external state.
 
 ## Execution Rules
 
@@ -67,6 +68,15 @@ Plain-language explanation: let a maintainer explicitly accept, request changes,
 - ADR-0035: Blocked goal recovery decision receipt.
 - ADR-0036: Blocked goal recovery resume attempt task package.
 - ADR-0037: Blocked goal recovery resume attempt execution evidence intake.
+- ADR-0038: Blocked goal recovery resume attempt evidence review decision package.
+
+## Blocked Goal Recovery Resume Attempt Evidence Review Decision Package v0.1
+
+Status: implemented.
+
+- Add typed local review decisions and `pnpm --silent goal:recover:review-resume-evidence`.
+- Bind decisions to exact intake bytes and preserve maintainer/non-authorization boundaries.
+- Extend campaign validation without executing commands or closing goals.
 
 ## Blocked Goal Recovery Resume Attempt Execution Evidence Intake v0.1
 

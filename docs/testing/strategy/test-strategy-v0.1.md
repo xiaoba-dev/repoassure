@@ -603,3 +603,8 @@ This validation must not upload target repo material, automatically modify targe
 - Unit covers exact SHA, complete/failed/incomplete/source-not-ready/boundary outcomes, task coverage, malformed IDs, redaction, writer, Markdown, and command non-execution.
 - Integration covers local CLI JSON/Markdown output and failure-path redaction.
 - E2E extends the near-real campaign through evidence intake; type-smoke and structure tests guard exports and documentation cascade.
+
+## Blocked Goal Recovery Resume Attempt Evidence Review Decision Package v0.1
+
+- Unit covers exact intake SHA, accept/risk/changes/defer/missing/boundary outcomes, unknown/duplicate keys, redaction, source evidence restrictions, writer, Markdown, and command non-execution.
+- Integration covers local CLI output; E2E extends the campaign through review decisions; type-smoke and structure tests guard contracts and cascade.

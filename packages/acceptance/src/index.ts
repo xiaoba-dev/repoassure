@@ -572,6 +572,7 @@ export {
 } from './blocked-goal-recovery-resume-attempt-task-package.js';
 
 export {
+  assertBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake,
   buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake,
   buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntakeMarkdown,
   writeBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake,
@@ -586,6 +587,24 @@ export {
   type WriteBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntakeInput,
   type WriteBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntakeResult
 } from './blocked-goal-recovery-resume-attempt-execution-evidence-intake.js';
+
+export {
+  buildBlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackage,
+  buildBlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackageMarkdown,
+  writeBlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackage,
+  writeBlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackageFromDirectory,
+  type BlockedGoalRecoveryResumeAttemptEvidenceRecordedDecision,
+  type BlockedGoalRecoveryResumeAttemptEvidenceReviewDecision,
+  type BlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionInput,
+  type BlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionInputItem,
+  type BlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackage,
+  type BlockedGoalRecoveryResumeAttemptEvidenceReviewItem,
+  type BlockedGoalRecoveryResumeAttemptEvidenceReviewStatus,
+  type BuildBlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackageInput,
+  type WriteBlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackageFromDirectoryInput,
+  type WriteBlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackageInput,
+  type WriteBlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackageResult
+} from './blocked-goal-recovery-resume-attempt-evidence-review-decision-package.js';
 
 export {
   buildValidationCampaignSummary,

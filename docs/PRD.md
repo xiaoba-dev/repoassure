@@ -107,3 +107,7 @@ Non-ready or boundary-invalid receipts must produce no executable scope. The pac
 ## Blocked Goal Recovery Resume Attempt Execution Evidence Intake v0.1
 
 RepoAssure must import sanitized evidence from a separately executed resume attempt, bind it to the exact task package, and distinguish complete, failed/blocked, incomplete, boundary-violating, and source-not-ready outcomes. Complete evidence is only ready for maintainer review; it is not accepted automatically. The intake does not execute commands or authorize external actions.
+
+## Blocked Goal Recovery Resume Attempt Evidence Review Decision Package v0.1
+
+RepoAssure must let a maintainer explicitly accept, request changes, defer, or accept risk for each imported action, command, and verification result. Decisions bind to exact intake bytes. Boundary-violating evidence cannot be accepted. The package does not execute commands, close the source goal, or authorize external actions.

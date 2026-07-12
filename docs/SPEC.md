@@ -135,3 +135,7 @@ The schema is `repoassure.blocked-goal-recovery-resume-attempt-task-package.v1`.
 ## Blocked Goal Recovery Resume Attempt Execution Evidence Intake v0.1
 
 `pnpm --silent goal:recover:intake-resume-evidence -- --from-dir <dir>` reads the task package and execution evidence input, then writes `blocked-goal-recovery-resume-attempt-execution-evidence-intake.json` / `.md`. Schema `repoassure.blocked-goal-recovery-resume-attempt-execution-evidence-intake.v1` requires exact source SHA, attempt metadata, action/command/verification results, unresolved task IDs, boundary compliance, review checklist, maintainer review boundary, redaction boundary, non-authorization boundary, and blocked actions. The intake validates IDs and evidence but does not execute commands or accept results.
+
+## Blocked Goal Recovery Resume Attempt Evidence Review Decision Package v0.1
+
+`pnpm --silent goal:recover:review-resume-evidence -- --from-dir <dir>` reads the original resume-attempt task package, execution evidence intake, and review decisions, then writes JSON/Markdown schema `repoassure.blocked-goal-recovery-resume-attempt-evidence-review-decision-package.v1`. It revalidates the exact task package SHA-256 and complete typed action/command/verification inventory before applying exact-intake-bound decisions. It requires stable evidence keys, per-item decisions, decision summary, accepted/unresolved scope, boundary compliance, review and non-authorization boundaries, and blocked actions. It does not execute commands or close a goal.

@@ -111,6 +111,109 @@ export function buildBlockedGoalRecoveryResumeAttemptVerificationCheckId(check: 
   return `verification-${createHash('sha256').update(check).digest('hex').slice(0, 16)}`;
 }
 
+export function assertBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake(
+  value: unknown
+): asserts value is BlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake {
+  if (!isRecord(value)
+    || value.schemaVersion !== 'repoassure.blocked-goal-recovery-resume-attempt-execution-evidence-intake.v1'
+    || !canonicalTextValue(value.generatedAt) || !isIntakeStatus(value.intakeStatus)
+    || !isRecord(value.sourceTaskPackage)
+    || value.sourceTaskPackage.schemaVersion !== 'repoassure.blocked-goal-recovery-resume-attempt-task-package.v1'
+    || !canonicalTextValue(value.sourceTaskPackage.fileName) || !canonicalPathValue(value.sourceTaskPackage.path)
+    || typeof value.sourceTaskPackage.sha256 !== 'string' || !/^[a-f0-9]{64}$/u.test(value.sourceTaskPackage.sha256)
+    || !isTaskPackageStatus(value.sourceTaskPackage.taskPackageStatus)
+    || !hasExactKeys(value.sourceTaskPackage, ['schemaVersion', 'fileName', 'path', 'sha256', 'taskPackageStatus'])
+    || !isRecord(value.attempt) || !canonicalIdentifier(value.attempt.attemptId)
+    || !canonicalTextValue(value.attempt.startedAt) || !canonicalTextValue(value.attempt.completedAt)
+    || !hasExactKeys(value.attempt, ['attemptId', 'startedAt', 'completedAt'])
+    || !Array.isArray(value.actionResults) || !value.actionResults.every(isIntakeActionResult)
+    || !Array.isArray(value.resumeCommandResults) || !value.resumeCommandResults.every(isIntakeCommandResult)
+    || !Array.isArray(value.verificationResults) || !value.verificationResults.every(isIntakeVerificationResult)
+    || !Array.isArray(value.unresolvedTaskIds) || !value.unresolvedTaskIds.every(canonicalIdentifier)
+    || !unique(value.unresolvedTaskIds)
+    || !isRecord(value.boundaryCompliance) || value.boundaryCompliance.commandsExecutedByIntake !== false
+    || typeof value.boundaryCompliance.unlistedCommandsExecuted !== 'boolean'
+    || typeof value.boundaryCompliance.blockedActionsPreserved !== 'boolean'
+    || typeof value.boundaryCompliance.targetRepoMutationByRepoAssure !== 'boolean'
+    || typeof value.boundaryCompliance.sourceBoundaryPreserved !== 'boolean'
+    || !hasExactKeys(value.boundaryCompliance, [
+      'commandsExecutedByIntake', 'unlistedCommandsExecuted', 'blockedActionsPreserved',
+      'targetRepoMutationByRepoAssure', 'sourceBoundaryPreserved'
+    ])
+    || !Array.isArray(value.reviewChecklist) || !value.reviewChecklist.every(canonicalTextValue)
+    || !canonicalTextValue(value.maintainerReviewBoundary) || !canonicalTextValue(value.redactionBoundary)
+    || !canonicalTextValue(value.nonAuthorizationBoundary)
+    || !Array.isArray(value.blockedActions) || !hasCanonicalBlockedActions(value.blockedActions)
+    || !hasExactKeys(value, [
+      'schemaVersion', 'generatedAt', 'intakeStatus', 'sourceTaskPackage', 'attempt', 'actionResults',
+      'resumeCommandResults', 'verificationResults', 'unresolvedTaskIds', 'boundaryCompliance',
+      'reviewChecklist', 'maintainerReviewBoundary', 'redactionBoundary', 'nonAuthorizationBoundary', 'blockedActions'
+    ])) throw new Error('Invalid blocked goal recovery resume attempt execution evidence intake');
+
+  const intake = value as unknown as BlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake;
+  const allResults = [...intake.actionResults, ...intake.resumeCommandResults, ...intake.verificationResults];
+  const expectedStatus: BlockedGoalRecoveryResumeAttemptExecutionEvidenceIntakeStatus =
+    (!intake.boundaryCompliance.sourceBoundaryPreserved
+      || intake.boundaryCompliance.unlistedCommandsExecuted
+      || !intake.boundaryCompliance.blockedActionsPreserved
+      || intake.boundaryCompliance.targetRepoMutationByRepoAssure)
+      ? 'boundary_violation'
+      : intake.sourceTaskPackage.taskPackageStatus === 'blocked_by_decision_receipt'
+        ? 'source_not_ready'
+        : allResults.some((item) => item.status === 'failed' || item.status === 'blocked')
+          ? 'failed_or_blocked'
+          : intake.unresolvedTaskIds.length > 0 || intake.verificationResults.length === 0
+            || allResults.some((item) => item.status === 'not_run')
+            ? 'incomplete'
+            : 'complete_for_maintainer_review';
+  if (intake.intakeStatus !== expectedStatus
+    || !unique(intake.actionResults.map((item) => item.actionKey))
+    || !unique(intake.resumeCommandResults.map((item) => item.commandId))
+    || !unique(intake.verificationResults.map((item) => item.checkId))) {
+    throw new Error('Invalid blocked goal recovery resume attempt execution evidence intake');
+  }
+}
+
+export function assertBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntakeSourceBinding(
+  intake: BlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake,
+  sourceTaskPackageText: string
+): void {
+  let parsedTaskPackage: unknown;
+  try { parsedTaskPackage = JSON.parse(sourceTaskPackageText); } catch { throw invalidTaskPackage(); }
+  assertTaskPackage(parsedTaskPackage);
+  const taskPackage = parsedTaskPackage;
+  const expectedActionKeys = taskPackage.actionTasks.map((item) => item.actionKey);
+  const expectedCommandIds = taskPackage.resumeCommandTasks.map((item) => item.commandId);
+  const expectedCheckIds = taskPackage.verificationChecklist.map(buildBlockedGoalRecoveryResumeAttemptVerificationCheckId);
+  const expectedTaskKeys = [
+    ...expectedActionKeys.map((item) => `action:${item}`),
+    ...expectedCommandIds.map((item) => `command:${item}`),
+    ...expectedCheckIds.map((item) => `verification:${item}`)
+  ];
+  const representedResultKeys = [
+    ...intake.actionResults.map((item) => `action:${item.actionKey}`),
+    ...intake.resumeCommandResults.map((item) => `command:${item.commandId}`),
+    ...intake.verificationResults.map((item) => `verification:${item.checkId}`)
+  ];
+  const representedTaskKeys = [...representedResultKeys];
+  for (const unresolvedId of intake.unresolvedTaskIds) {
+    representedTaskKeys.push(...expectedTaskKeys.filter((key) =>
+      key.slice(key.indexOf(':') + 1) === unresolvedId && !representedResultKeys.includes(key)
+    ));
+  }
+  const sourceSha256 = createHash('sha256').update(sourceTaskPackageText).digest('hex');
+  if (intake.sourceTaskPackage.sha256 !== sourceSha256
+    || intake.sourceTaskPackage.taskPackageStatus !== taskPackage.taskPackageStatus
+    || intake.actionResults.some((item) => !expectedActionKeys.includes(item.actionKey))
+    || intake.resumeCommandResults.some((item) => !expectedCommandIds.includes(item.commandId))
+    || intake.verificationResults.some((item) => !expectedCheckIds.includes(item.checkId))
+    || !unique(representedTaskKeys)
+    || representedTaskKeys.length !== expectedTaskKeys.length
+    || expectedTaskKeys.some((item) => !representedTaskKeys.includes(item))) {
+    throw new Error('Invalid blocked goal recovery resume attempt execution evidence intake');
+  }
+}
+
 export function buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake(
   input: BuildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntakeInput
 ): BlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake {
@@ -131,13 +234,13 @@ export function buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake(
   const actionIds = new Set(input.evidenceInput.actionResults.map((item) => item.actionKey));
   const commandIds = new Set(input.evidenceInput.resumeCommandResults.map((item) => item.commandId));
   const checkIds = new Set(input.evidenceInput.verificationResults.map((item) => item.checkId));
-  const unresolvedTaskIds = [
+  const unresolvedTaskIds = [...new Set([
     ...input.taskPackage.actionTasks.filter((item) => !actionIds.has(item.actionKey)).map((item) => item.actionKey),
     ...input.taskPackage.resumeCommandTasks.filter((item) => !commandIds.has(item.commandId)).map((item) => item.commandId),
     ...input.taskPackage.verificationChecklist
       .map(buildBlockedGoalRecoveryResumeAttemptVerificationCheckId)
       .filter((item) => !checkIds.has(item))
-  ];
+  ])];
   const sourceBoundaryPreserved = input.taskPackage.boundaryCompliance.commandsExecuted === false
     && input.taskPackage.boundaryCompliance.sourceBoundaryPreserved
     && hasCanonicalBlockedActions(input.taskPackage.blockedActions);
@@ -391,6 +494,21 @@ function isCommandResult(value: unknown): boolean {
 function isVerificationResult(value: unknown): boolean {
   return isResult(value) && canonicalIdentifier(value.checkId)
     && hasExactKeys(value, ['checkId', 'status', 'summary', 'evidenceRefs']);
+}
+
+function isIntakeActionResult(value: unknown): boolean { return isActionResult(value); }
+function isIntakeCommandResult(value: unknown): boolean { return isCommandResult(value); }
+function isIntakeVerificationResult(value: unknown): boolean { return isVerificationResult(value); }
+
+function isIntakeStatus(value: unknown): value is BlockedGoalRecoveryResumeAttemptExecutionEvidenceIntakeStatus {
+  return value === 'complete_for_maintainer_review' || value === 'failed_or_blocked'
+    || value === 'incomplete' || value === 'boundary_violation' || value === 'source_not_ready';
+}
+
+function isTaskPackageStatus(value: unknown): boolean {
+  return value === 'ready_for_separate_resume_attempt'
+    || value === 'ready_with_accepted_risk'
+    || value === 'blocked_by_decision_receipt';
 }
 
 function isResult(value: unknown): value is Record<string, unknown> & BlockedGoalRecoveryResumeAttemptExecutionResultInput {

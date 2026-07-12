@@ -2019,6 +2019,8 @@ describe('project structure', () => {
 
   it('records real target validation campaign summary without uploading target artifacts', async () => {
     const [
+      adr,
+      adrIndex,
       operation,
       readme,
       testingStrategy,
@@ -3472,6 +3474,87 @@ describe('project structure', () => {
 
     await expectPath('docs/adr/0033-blocked-goal-recovery-package.md');
     await expectPath('docs/operations/blocked-goal-recovery-package-v0.1.md');
+  });
+
+  it('records blocked goal recovery consumption validation without executing recovery actions', async () => {
+    const [
+      adr,
+      adrIndex,
+      operation,
+      readme,
+      prd,
+      spec,
+      plan,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      packageJson,
+      acceptancePackageJson,
+      compatibility,
+      indexSource,
+      consumptionSource,
+      script,
+      unitTest,
+      integrationTest,
+      e2eTest,
+      typeSmoke
+    ] = await Promise.all([
+      readFile('docs/adr/0034-blocked-goal-recovery-consumption-contract.md', 'utf8'),
+      readFile('docs/adr/README.md', 'utf8'),
+      readFile('docs/operations/blocked-goal-recovery-consumption-validation-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('package.json', 'utf8'),
+      readFile('packages/acceptance/package.json', 'utf8'),
+      readFile('packages/acceptance/src/compatibility.ts', 'utf8'),
+      readFile('packages/acceptance/src/index.ts', 'utf8'),
+      readFile('packages/acceptance/src/blocked-goal-recovery-consumption-report.ts', 'utf8'),
+      readFile('scripts/generate-blocked-goal-recovery-consumption-report.mjs', 'utf8'),
+      readFile('tests/unit/blocked-goal-recovery-consumption-report.test.ts', 'utf8'),
+      readFile('tests/integration/goal-recover-consume.test.ts', 'utf8'),
+      readFile('tests/integration/playbook-e2e-repair-evidence.test.ts', 'utf8'),
+      readFile('tests/type-smoke/acceptance-package-subpaths.ts', 'utf8')
+    ]);
+
+    expect(adr).toContain('ADR-0034: Blocked Goal Recovery Consumption Contract');
+    expect(adr).toContain('does not execute recovery commands');
+    expect(adrIndex).toContain('[0034](0034-blocked-goal-recovery-consumption-contract.md)');
+    expect(operation).toContain('Blocked Goal Recovery Consumption Validation v0.1');
+    expect(operation).toContain('repoassure.blocked-goal-recovery-consumption-report.v1');
+    expect(operation).toContain('pnpm goal:recover:consume');
+    expect(operation).toContain('does not execute recovery commands');
+    expect(readme).toContain('Blocked Goal Recovery Consumption Validation v0.1');
+    expect(readme).toContain('pnpm goal:recover:consume -- --from-dir <dir>');
+    expect(prd).toContain('Blocked Goal Recovery Consumption Validation v0.1');
+    expect(spec).toContain('goal:recover:consume');
+    expect(plan).toContain('Blocked Goal Recovery Consumption Validation v0.1');
+    expect(plan).not.toMatch(/## Next Codex Goal\s+\nBlocked Goal Recovery Package v0\.1/u);
+    expect(testingStrategy).toContain('Blocked Goal Recovery Consumption Validation v0.1');
+    expect(acceptanceChecklist).toContain('Blocked Goal Recovery Consumption Validation v0.1');
+    expect(decisionLog).toContain('blocked goal recovery consumption');
+    expect(devLog).toContain('Blocked Goal Recovery Consumption Validation v0.1');
+    expect(packageJson).toContain('"goal:recover:consume": "pnpm build:acceptance && node scripts/generate-blocked-goal-recovery-consumption-report.mjs"');
+    expect(acceptancePackageJson).toContain('"./blocked-goal-recovery-consumption-report"');
+    expect(compatibility).toContain('blocked-goal-recovery-consumption-report');
+    expect(indexSource).toContain('buildBlockedGoalRecoveryConsumptionReport');
+    expect(consumptionSource).toContain('repoassure.blocked-goal-recovery-consumption-report.v1');
+    expect(consumptionSource).toContain('recoveryCommandsExecuted: false');
+    expect(script).toContain('writeBlockedGoalRecoveryConsumptionReport');
+    expect(unitTest).toContain('automatic_retry_candidate');
+    expect(integrationTest).toContain('goal:recover:consume');
+    expect(e2eTest).toContain('goal:recover:consume');
+    expect(e2eTest).toContain('blocked-goal-recovery-consumption-report.json');
+    expect(typeSmoke).toContain('blocked-goal-recovery-consumption-report');
+
+    await expectPath('docs/operations/blocked-goal-recovery-consumption-validation-v0.1.md');
+    await expectPath('docs/adr/0034-blocked-goal-recovery-consumption-contract.md');
   });
 
   it('records Autopilot-compatible documentation architecture without moving existing source documents', async () => {

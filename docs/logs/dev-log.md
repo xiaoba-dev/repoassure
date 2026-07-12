@@ -672,6 +672,7 @@
 - No GitHub release was authorized。
 - No public launch or production marketing announcement was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
 - Public Source Release Execution v0.1 必须作为单独 goal 获得明确执行授权。
 
 ## 2026年7月1日 - Equivalent Release Control Design v0.1
@@ -13547,3 +13548,25 @@ Phase 0：项目初始化。
 - No customer contact was authorized。
 - No pricing change or spend was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
+## 2026年7月13日 - Blocked Goal Recovery Consumption Validation v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/blocked-goal-recovery-consumption-report.ts`。
+- 新增 `repoassure.blocked-goal-recovery-consumption-report.v1` 和 JSON/Markdown 输出。
+- 新增 `pnpm goal:recover:consume`、CLI script、package export、compatibility contract 和 type-smoke。
+- E2E chain 扩展到 `goal:recover -> goal:recover:consume`。
+- 将 E2E 每阶段重复 `build:acceptance` 改为一次构建后直接运行脚本，运行时间从120秒超时降到10秒以内。
+- 新增 ADR-0034 和 operations 文档，并级联更新 README、PRD、SPEC、PLAN、architecture overview、testing strategy、acceptance checklist 和 decision log。
+
+### TDD 记录
+
+- Red：完整 E2E chain 在 PR #44 后超过120秒；unit test 因 consumption module 缺失失败；integration 和 structure tests 因 CLI、export 与文档缺失失败。
+- Green：一次构建修复 E2E 基线；实现 consumption builder、writer、Markdown、CLI、exports 和文档级联。
+- Refactor：保留原有 E2E 物料断言，将命令执行集中到稳定 script mapping。
+
+### 边界
+
+- Recovery consumption report does not execute recovery commands。
+- No target repo mutation、release、launch、customer contact、pricing/spend 或 commercial/hosted availability claim was authorized。

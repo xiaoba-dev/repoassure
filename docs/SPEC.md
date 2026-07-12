@@ -28,6 +28,7 @@ Implementation should preserve compatibility paths while continuing the phased m
 - `playbook:target-repair-evidence` for target repo repair goal execution evidence intake reports.
 - `playbook:target-repair-review` for target repair evidence review decision packages.
 - `goal:recover` for blocked goal recovery packages.
+- `goal:recover:consume` for blocked goal recovery consumption reports.
 
 ## Current Architecture Boundaries
 
@@ -60,6 +61,7 @@ Implementation should preserve compatibility paths while continuing the phased m
 - ADR-0031 for target repo repair goal execution evidence intake.
 - ADR-0032 for target repair evidence review decision package.
 - ADR-0033 for blocked goal recovery package.
+- ADR-0034 for blocked goal recovery consumption contract.
 ## AI IDE Repair Execution Replay Readiness v0.1
 
 `pnpm playbook:replay -- --from-dir <dir>` reads `ai-ide-repair-evidence-consumer-contract.json` and writes `ai-ide-repair-execution-replay-readiness.json` / `.md`.
@@ -109,3 +111,11 @@ The schema is `repoassure.ai-ide-target-repair-evidence-review-decision-package.
 The schema is `repoassure.blocked-goal-recovery-package.v1`. Required sections are `recoveryStatus`, `sourceProvenance`, `blockerSummary`, `blockers`, `automaticRecoveryActions`, `maintainerDecisionRequests`, `externalPrerequisites`, `resumeCommands`, `maintainerReviewBoundary`, `nonAuthorizationBoundary`, `redactionBoundary`, and `blockedActions`.
 
 The package supports blocker categories `environment`, `external_service`, `authorization_required`, `maintainer_decision_required`, `technical_unknown`, `test_instability`, `security_or_compliance`, and `product_scope`; blocker statuses `blocked`, `incomplete`, `deferred`, and `retryable`; and recovery statuses `ready_to_resume`, `retryable_with_automatic_actions`, and `requires_maintainer_or_external_action`.
+
+## Blocked Goal Recovery Consumption Validation v0.1
+
+`pnpm goal:recover:consume -- --from-dir <dir>` reads `blocked-goal-recovery-package.json` and writes `blocked-goal-recovery-consumption-report.json` / `.md`.
+
+The schema is `repoassure.blocked-goal-recovery-consumption-report.v1`. Required sections are `sourceRecoveryPackage`, `resumeReadiness`, `evidenceReadOrder`, `actionQueue`, `resumeChecklist`, `boundaryCompliance`, `maintainerReviewBoundary`, `redactionBoundary`, `nonAuthorizationBoundary`, and `blockedActions`.
+
+The action queue classifies `automatic_retry_candidate`, `maintainer_decision_required`, and `external_prerequisite_required` items. The report records `recoveryCommandsExecuted: false`; it does not execute recovery commands or authorize external actions.

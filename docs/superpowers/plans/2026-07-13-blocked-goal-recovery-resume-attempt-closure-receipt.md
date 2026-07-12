@@ -14,4 +14,5 @@
 ### Task 3: Governance and acceptance
 
 - [x] Add ADR-0039, operations guide, and cascade updates.
-- [ ] Run independent review, full testing pyramid, PR CI, merge, and main CI.
+- [x] Run independent review, full testing pyramid, and initial PR CI.
+- [ ] Merge after final PR CI and verify main CI.

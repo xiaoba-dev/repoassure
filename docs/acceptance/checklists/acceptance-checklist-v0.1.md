@@ -304,4 +304,7 @@
 - [x] Missing action or command decisions block readiness; duplicate/unknown/malformed IDs and stale source SHA fail validation; action-type canonical decisions and external completion evidence are enforced; approve/reject/defer/accept-risk outcomes and veto precedence are covered by unit and campaign tests.
 - [x] Blocked Goal Recovery Resume Attempt Task Package v0.1 emits `repoassure.blocked-goal-recovery-resume-attempt-task-package.v1` through `pnpm --silent goal:recover:prepare-resume`, binds exact receipt bytes, and includes only approved or risk-accepted scope.
 - [x] Rejected, deferred, incomplete, mixed, unreviewed, missing-command, malformed, or boundary-invalid receipts emit no action or command scope; all generated command execution flags remain false.
-- [ ] Blocked Goal Recovery Resume Attempt Execution Evidence Intake v0.1 remains a separate goal; this task package does not execute or prove a resume attempt.
+- [x] Blocked Goal Recovery Resume Attempt Task Package v0.1 alone does not execute or prove a resume attempt; evidence is imported through the separate intake contract.
+- [x] Blocked Goal Recovery Resume Attempt Execution Evidence Intake v0.1 binds exact task package bytes, validates action/command/verification evidence, and never executes commands.
+- [x] Complete evidence remains ready for maintainer review rather than automatically accepted; boundary violations take precedence.
+- [ ] Blocked Goal Recovery Resume Attempt Evidence Review Decision Package v0.1 remains the next separate maintainer decision goal.

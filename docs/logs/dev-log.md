@@ -13644,6 +13644,13 @@ Phase 0：项目初始化。
 - Receipt does not execute recovery or resume commands。
 - No target repo mutation、publish、release、launch、customer contact、pricing/spend、repository visibility change 或 commercial/hosted availability claim was authorized。
 
+## 2026年7月13日 - Blocked Goal Recovery Resume Attempt Execution Evidence Intake v0.1
+
+- Red：evidence intake module、CLI、exports 与 ADR 不存在。
+- Green：实现 exact task SHA、typed results、boundary-first status、writer/Markdown、CLI redaction、campaign E2E 和文档级联。
+- Focused unit 4/4、CLI 2/2、campaign/export 18/18、typecheck 通过。
+- Intake does not execute commands or accept evidence；完整测试金字塔、独立复审和 CI 待收口。
+
 ## 2026年7月13日 - Blocked Goal Recovery Resume Attempt Task Package v0.1
 
 ### 完成内容

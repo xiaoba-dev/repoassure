@@ -13649,7 +13649,12 @@ Phase 0：项目初始化。
 - Red：evidence intake module、CLI、exports 与 ADR 不存在。
 - Green：实现 exact task SHA、typed results、boundary-first status、writer/Markdown、CLI redaction、campaign E2E 和文档级联。
 - Focused unit 4/4、CLI 2/2、campaign/export 18/18、typecheck 通过。
-- Intake does not execute commands or accept evidence；完整测试金字塔、独立复审和 CI 待收口。
+- 首轮独立复审发现 3 high / 2 medium：额外字段泄漏、task source 矛盾、verification/evidence 不完整、boundary precedence、command exit-code 矛盾。
+- TDD 修复 strict object keys、显式字段复制、receipt/task status mapping、content-derived verification IDs 与全覆盖、nonempty evidence、boundary-first status 和 exit-code consistency。
+- 后续复审补充 blocked status/readiness/reason 及 boundary readiness/sourceBoundaryPreserved 双向一致性；均已增加对抗测试并 fail closed。
+- 最终独立复审：无 actionable findings。
+- 修复后 typecheck、lint、unit 726/726、integration 62/62、E2E 1 passed / 1 skipped、full suite 789 passed / 1 skipped、hygiene、release check 和 goal audit 35/35 通过。
+- Intake does not execute commands or accept evidence；PR CI 和 main CI 待收口。
 
 ## 2026年7月13日 - Blocked Goal Recovery Resume Attempt Task Package v0.1
 

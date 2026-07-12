@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake,
   buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntakeMarkdown,
+  buildBlockedGoalRecoveryResumeAttemptVerificationCheckId,
   writeBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake,
   type BlockedGoalRecoveryResumeAttemptExecutionEvidenceInput
 } from '../../packages/acceptance/src/blocked-goal-recovery-resume-attempt-execution-evidence-intake.js';
@@ -50,7 +51,14 @@ describe('blocked goal recovery resume attempt execution evidence intake', () =>
       taskPackagePath: 'task.json', sourceTaskPackageText: text, taskPackage,
       evidenceInput: buildEvidenceInput(text, { unlistedCommandsExecuted: true })
     });
-    const blockedPackage = buildTaskPackage({ taskPackageStatus: 'blocked_by_decision_receipt', actionTasks: [], resumeCommandTasks: [], blockedReasons: ['source_rejected'] });
+    const blockedPackage = buildTaskPackage({
+      taskPackageStatus: 'blocked_by_decision_receipt', actionTasks: [], resumeCommandTasks: [],
+      blockedReasons: ['source_rejected'],
+      sourceDecisionReceipt: {
+        ...taskPackage.sourceDecisionReceipt,
+        decisionStatus: 'rejected', resumeAttemptReadiness: 'blocked_by_rejection'
+      }
+    });
     const blockedText = JSON.stringify(blockedPackage);
     const sourceNotReady = buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake({
       taskPackagePath: 'task.json', sourceTaskPackageText: blockedText, taskPackage: blockedPackage,
@@ -70,13 +78,80 @@ describe('blocked goal recovery resume attempt execution evidence intake', () =>
       buildEvidenceInput(text, { sourceSha256: 'b'.repeat(64) }),
       buildEvidenceInput(text, { actionKey: 'automatic:B1:unknown' }),
       buildEvidenceInput(text, { duplicateAction: true }),
-      buildEvidenceInput(text, { summary: 'TOKEN=secret-value' })
+      buildEvidenceInput(text, { summary: 'TOKEN=secret-value' }),
+      buildEvidenceInput(text, { verificationCheckId: 'unknown-check' }),
+      buildEvidenceInput(text, { emptyEvidenceRefs: true }),
+      buildEvidenceInput(text, { commandExitCode: 1 }),
+      buildEvidenceInput(text, { extraResultField: true })
     ];
     for (const evidenceInput of cases) {
       expect(() => buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake({
         taskPackagePath: 'task.json', sourceTaskPackageText: text, taskPackage, evidenceInput
       })).toThrow('Invalid blocked goal recovery resume attempt execution evidence');
     }
+  });
+
+  it('rejects contradictory source state and gives boundary violations highest priority', () => {
+    const contradictory = buildTaskPackage();
+    contradictory.sourceDecisionReceipt.decisionStatus = 'rejected';
+    const contradictoryText = JSON.stringify(contradictory);
+    expect(() => buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake({
+      taskPackagePath: 'task.json', sourceTaskPackageText: contradictoryText, taskPackage: contradictory,
+      evidenceInput: buildEvidenceInput(contradictoryText)
+    })).toThrow('Invalid blocked goal recovery resume attempt task package');
+
+    const contradictoryBoundary = buildTaskPackage({
+      taskPackageStatus: 'blocked_by_decision_receipt', actionTasks: [], resumeCommandTasks: [],
+      blockedReasons: ['source_boundary_violation'],
+      sourceDecisionReceipt: {
+        ...buildTaskPackage().sourceDecisionReceipt,
+        decisionStatus: 'blocked_or_incomplete', resumeAttemptReadiness: 'blocked_by_boundary_violation'
+      },
+      boundaryCompliance: { commandsExecuted: false, sourceBoundaryPreserved: true }
+    });
+    const contradictoryBoundaryText = JSON.stringify(contradictoryBoundary);
+    expect(() => buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake({
+      taskPackagePath: 'task.json', sourceTaskPackageText: contradictoryBoundaryText,
+      taskPackage: contradictoryBoundary,
+      evidenceInput: buildEvidenceInput(contradictoryBoundaryText, { omitAction: true, omitCommand: true })
+    })).toThrow('Invalid blocked goal recovery resume attempt task package');
+
+    const mismatchedBlocked = buildTaskPackage({
+      taskPackageStatus: 'blocked_by_decision_receipt', actionTasks: [], resumeCommandTasks: [],
+      blockedReasons: ['source_rejected'],
+      sourceDecisionReceipt: {
+        ...buildTaskPackage().sourceDecisionReceipt,
+        decisionStatus: 'rejected', resumeAttemptReadiness: 'blocked_by_deferral'
+      }
+    });
+    const mismatchedText = JSON.stringify(mismatchedBlocked);
+    expect(() => buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake({
+      taskPackagePath: 'task.json', sourceTaskPackageText: mismatchedText, taskPackage: mismatchedBlocked,
+      evidenceInput: buildEvidenceInput(mismatchedText, { omitAction: true, omitCommand: true })
+    })).toThrow('Invalid blocked goal recovery resume attempt task package');
+
+    const blockedPackage = buildTaskPackage({
+      taskPackageStatus: 'blocked_by_decision_receipt', actionTasks: [], resumeCommandTasks: [],
+      blockedReasons: ['source_rejected'],
+      sourceDecisionReceipt: {
+        ...buildTaskPackage().sourceDecisionReceipt,
+        decisionStatus: 'rejected', resumeAttemptReadiness: 'blocked_by_rejection'
+      }
+    });
+    const wrongReason = structuredClone(blockedPackage);
+    wrongReason.blockedReasons = ['source_deferred'];
+    const wrongReasonText = JSON.stringify(wrongReason);
+    expect(() => buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake({
+      taskPackagePath: 'task.json', sourceTaskPackageText: wrongReasonText, taskPackage: wrongReason,
+      evidenceInput: buildEvidenceInput(wrongReasonText, { omitAction: true, omitCommand: true })
+    })).toThrow('Invalid blocked goal recovery resume attempt task package');
+
+    const blockedText = JSON.stringify(blockedPackage);
+    const intake = buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake({
+      taskPackagePath: 'task.json', sourceTaskPackageText: blockedText, taskPackage: blockedPackage,
+      evidenceInput: buildEvidenceInput(blockedText, { omitAction: true, omitCommand: true, unlistedCommandsExecuted: true })
+    });
+    expect(intake.intakeStatus).toBe('boundary_violation');
   });
 
   it('writes exact source provenance and redacted local artifacts', async () => {
@@ -132,19 +207,25 @@ function buildEvidenceInput(text: string, options: {
   sourceSha256?: string; actionStatus?: 'passed' | 'failed' | 'blocked' | 'not_run';
   actionKey?: string; omitAction?: boolean; omitCommand?: boolean; duplicateAction?: boolean;
   unlistedCommandsExecuted?: boolean; summary?: string;
+  verificationCheckId?: string; emptyEvidenceRefs?: boolean; commandExitCode?: number | null;
+  extraResultField?: boolean;
 } = {}): BlockedGoalRecoveryResumeAttemptExecutionEvidenceInput {
   const action = {
     actionKey: options.actionKey ?? 'automatic:B1:A1', status: options.actionStatus ?? 'passed',
-    summary: options.summary ?? 'Action verified.', evidenceRefs: ['evidence/action.log']
+    summary: options.summary ?? 'Action verified.', evidenceRefs: options.emptyEvidenceRefs ? [] : ['evidence/action.log'],
+    ...(options.extraResultField ? { debug: 'TOKEN=secret-value' } : {})
   };
   return {
     sourceTaskPackageSha256: options.sourceSha256 ?? sha256(text),
     attemptId: 'attempt-1', startedAt: '2026-07-13T05:41:00.000Z', completedAt: '2026-07-13T05:42:00.000Z',
     actionResults: options.omitAction ? [] : options.duplicateAction ? [action, action] : [action],
     resumeCommandResults: options.omitCommand ? [] : [{
-      commandId: 'resume-1', status: 'passed', exitCode: 0, summary: 'Resume command completed.', evidenceRefs: ['evidence/resume.log']
+      commandId: 'resume-1', status: 'passed', exitCode: options.commandExitCode ?? 0, summary: 'Resume command completed.', evidenceRefs: ['evidence/resume.log']
     }],
-    verificationResults: [{ checkId: 'tests', status: 'passed', summary: 'Tests passed.', evidenceRefs: ['evidence/tests.log'] }],
+    verificationResults: [{
+      checkId: options.verificationCheckId ?? buildBlockedGoalRecoveryResumeAttemptVerificationCheckId('Run tests.'),
+      status: 'passed', summary: 'Tests passed.', evidenceRefs: ['evidence/tests.log']
+    }],
     boundaryEvidence: {
       unlistedCommandsExecuted: options.unlistedCommandsExecuted ?? false,
       blockedActionsPreserved: true,

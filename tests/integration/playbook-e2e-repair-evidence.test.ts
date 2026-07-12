@@ -382,13 +382,17 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     const resumeTask = JSON.parse(resumeTaskText) as {
       actionTasks: Array<{ actionKey: string }>;
       resumeCommandTasks: Array<{ commandId: string }>;
+      verificationChecklist: string[];
     };
     await writeFile(join(outputDir, 'blocked-goal-recovery-resume-attempt-execution-evidence-input.json'), `${JSON.stringify({
       sourceTaskPackageSha256: createHash('sha256').update(resumeTaskText).digest('hex'),
       attemptId: 'fixture-attempt', startedAt: '2026-07-13T05:40:00.000Z', completedAt: '2026-07-13T05:41:00.000Z',
       actionResults: resumeTask.actionTasks.map((item) => ({ actionKey: item.actionKey, status: 'passed', summary: 'Fixture action passed.', evidenceRefs: ['evidence/action.log'] })),
       resumeCommandResults: resumeTask.resumeCommandTasks.map((item) => ({ commandId: item.commandId, status: 'passed', exitCode: 0, summary: 'Fixture command passed.', evidenceRefs: ['evidence/resume.log'] })),
-      verificationResults: [{ checkId: 'fixture-tests', status: 'passed', summary: 'Fixture tests passed.', evidenceRefs: ['evidence/tests.log'] }],
+      verificationResults: resumeTask.verificationChecklist.map((check) => ({
+        checkId: `verification-${createHash('sha256').update(check).digest('hex').slice(0, 16)}`,
+        status: 'passed', summary: 'Fixture verification passed.', evidenceRefs: ['evidence/tests.log']
+      })),
       boundaryEvidence: { unlistedCommandsExecuted: false, blockedActionsPreserved: true, targetRepoMutationByRepoAssure: false },
       redactionBoundary: 'Sanitized fixture evidence only.'
     }, null, 2)}\n`);

@@ -7,6 +7,7 @@ import { promisify } from 'node:util';
 
 import { describe, expect, it } from 'vitest';
 
+import { buildBlockedGoalRecoveryResumeAttemptVerificationCheckId } from '../../packages/acceptance/src/blocked-goal-recovery-resume-attempt-execution-evidence-intake.js';
 import { BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS } from '../../packages/acceptance/src/blocked-goal-recovery-package.js';
 import type { BlockedGoalRecoveryResumeAttemptTaskPackage } from '../../packages/acceptance/src/blocked-goal-recovery-resume-attempt-task-package.js';
 
@@ -25,7 +26,7 @@ describe('blocked goal recovery resume evidence intake script', () => {
       attemptId: 'attempt-1', startedAt: '2026-07-13T05:40:00.000Z', completedAt: '2026-07-13T05:41:00.000Z',
       actionResults: [{ actionKey: 'automatic:B1:A1', status: 'passed', summary: 'Passed.', evidenceRefs: ['evidence/action.log'] }],
       resumeCommandResults: [{ commandId: 'resume-1', status: 'passed', exitCode: 0, summary: 'Passed.', evidenceRefs: ['evidence/resume.log'] }],
-      verificationResults: [{ checkId: 'tests', status: 'passed', summary: 'Passed.', evidenceRefs: ['evidence/tests.log'] }],
+      verificationResults: [{ checkId: buildBlockedGoalRecoveryResumeAttemptVerificationCheckId('Run tests.'), status: 'passed', summary: 'Passed.', evidenceRefs: ['evidence/tests.log'] }],
       boundaryEvidence: { unlistedCommandsExecuted: false, blockedActionsPreserved: true, targetRepoMutationByRepoAssure: false },
       redactionBoundary: 'Sanitized evidence only.'
     }, null, 2)}\n`);

@@ -190,6 +190,10 @@
       "types": "./dist/blocked-goal-recovery-decision-receipt.d.ts",
       "default": "./dist/blocked-goal-recovery-decision-receipt.js"
     },
+    "./blocked-goal-recovery-resume-attempt-task-package": {
+      "types": "./dist/blocked-goal-recovery-resume-attempt-task-package.d.ts",
+      "default": "./dist/blocked-goal-recovery-resume-attempt-task-package.js"
+    },
     "./campaign-summary": {
       "types": "./dist/campaign-summary.d.ts",
       "default": "./dist/campaign-summary.js"

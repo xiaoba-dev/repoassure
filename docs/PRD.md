@@ -97,3 +97,9 @@ The local `goal:recover:consume` workflow emits JSON and Markdown with resume re
 RepoAssure must let a maintainer record `approve`, `reject`, `defer`, or `accept_risk` decisions for every stable recovery `actionKey` and stable resume `commandId` before any separate resume attempt. The decisions envelope must bind to the exact source report SHA-256. The local `goal:recover:decide` workflow emits JSON/Markdown with raw consumption-report provenance, decision summary, reviewed and unreviewed action/command items, external prerequisite completion evidence, separate-resume readiness, redaction boundary, non-authorization boundary, and blocked actions.
 
 The receipt does not execute recovery commands and does not authorize target repo mutation, release, launch, customer contact, pricing/spend, repository visibility changes, or commercial/hosted availability claims.
+
+## Blocked Goal Recovery Resume Attempt Task Package v0.1
+
+RepoAssure must convert a ready recovery decision receipt into a bounded local task package that an AI IDE can consume without guessing scope. The package must bind to the exact receipt bytes, include only approved or explicitly risk-accepted actions and resume commands, preserve source evidence and order, and expose prerequisites plus a verification checklist.
+
+Non-ready or boundary-invalid receipts must produce no executable scope. The package does not execute recovery commands and does not authorize target repo mutation, release, launch, customer contact, pricing/spend, repository visibility changes, or commercial/hosted availability claims. Execution evidence is deferred to Blocked Goal Recovery Resume Attempt Execution Evidence Intake v0.1.

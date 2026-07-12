@@ -13643,3 +13643,41 @@ Phase 0：项目初始化。
 
 - Receipt does not execute recovery or resume commands。
 - No target repo mutation、publish、release、launch、customer contact、pricing/spend、repository visibility change 或 commercial/hosted availability claim was authorized。
+
+## 2026年7月13日 - Blocked Goal Recovery Resume Attempt Task Package v0.1
+
+### 完成内容
+
+- 新增 `repoassure.blocked-goal-recovery-resume-attempt-task-package.v1` builder、writer、Markdown 和严格 receipt runtime validation。
+- 新增 `pnpm --silent goal:recover:prepare-resume`、package export、compatibility/type-smoke contract 和 near-real campaign E2E stage。
+- 新增 ADR-0036、operations guide，并级联 README、PRD、SPEC、PLAN、architecture、testing、acceptance 和 decision log。
+
+### TDD 记录
+
+- Red：task package module、CLI 和治理文档不存在；伪造不一致 receipt 被严格 validator 拒绝。
+- Green：实现 exact-byte provenance、ready/blocked state、bounded action/command queues、CLI redaction 和 campaign integration。
+- Refactor：非 ready receipt 统一输出空 scope，command task 与 package boundary 均固定 `executed: false`。
+
+### Verification
+
+- Focused unit：3/3 通过。
+- Focused integration/E2E：3/3 通过。
+- `pnpm typecheck`：通过。
+- `pnpm build`、`pnpm typecheck`、`pnpm lint`：通过。
+- `pnpm test:unit`：59 files，720 tests，通过（trust-boundary remediation 后）。
+- `pnpm test:integration`：30 files，60 tests，通过；受限沙箱首次阻止 localhost bind，非沙箱并发运行随后暴露既有 shared dist race，重新构建并以单 worker 确定性复核通过。
+- `pnpm test:e2e`：1 passed，1 skipped。
+- `pnpm test`：90 files passed，1 skipped；780 tests passed，1 skipped。
+- `pnpm repo:hygiene`、`pnpm release:check`：通过。
+- `pnpm goal:audit`：35/35，通过。
+- 首轮独立复审发现 2 high / 2 medium：receipt action canonical validation 不完整、approved executable text 被二次 sanitize 改写、source SHA 只有自产 provenance、空命令可进入 ready package。
+- TDD 修复：完整校验 action key / allowed decisions / prerequisite invariants / canonical boundaries；逐字保留已经验证的 executable text，并拒绝会被 sanitize 改写、含 secret-like 内容或为空的命令；新增独立 task-input reviewed SHA binding。
+- 二次复审补充 3 medium：sanitized ID collision、external prerequisite `not_applicable` 和 `[REDACTED]` executable placeholder；已增加对抗测试并 fail closed。
+- 第三次独立复审：无 actionable findings；reviewed SHA 的残余风险被限定并记录为 local integrity evidence，不是 digital signature 或 identity proof。
+- 修复后 focused 7/7、unit 720/720、integration 60/60、E2E 1 passed / 1 skipped、full suite 781 passed / 1 skipped 通过；typecheck、lint、hygiene、release check 和 goal audit 35/35 通过。
+- PR CI 和 main CI 待收口阶段记录。
+
+### 边界
+
+- Task package does not execute resume commands。
+- No target repo mutation、publish、release、launch、customer contact、pricing/spend、repository visibility change 或 commercial/hosted availability claim was authorized。

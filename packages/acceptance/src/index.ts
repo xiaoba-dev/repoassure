@@ -535,6 +535,8 @@ export {
 } from './blocked-goal-recovery-consumption-report.js';
 
 export {
+  BLOCKED_GOAL_RECOVERY_DECISION_RECEIPT_MAINTAINER_REVIEW_BOUNDARY,
+  BLOCKED_GOAL_RECOVERY_DECISION_RECEIPT_NON_AUTHORIZATION_BOUNDARY,
   buildBlockedGoalRecoveryDecisionReceipt,
   buildBlockedGoalRecoveryDecisionReceiptMarkdown,
   writeBlockedGoalRecoveryDecisionReceipt,
@@ -553,6 +555,21 @@ export {
   type WriteBlockedGoalRecoveryDecisionReceiptInput,
   type WriteBlockedGoalRecoveryDecisionReceiptResult
 } from './blocked-goal-recovery-decision-receipt.js';
+
+export {
+  buildBlockedGoalRecoveryResumeAttemptTaskPackage,
+  buildBlockedGoalRecoveryResumeAttemptTaskPackageMarkdown,
+  writeBlockedGoalRecoveryResumeAttemptTaskPackage,
+  writeBlockedGoalRecoveryResumeAttemptTaskPackageFromDirectory,
+  type BlockedGoalRecoveryResumeAttemptActionTask,
+  type BlockedGoalRecoveryResumeAttemptCommandTask,
+  type BlockedGoalRecoveryResumeAttemptTaskPackage,
+  type BlockedGoalRecoveryResumeAttemptTaskPackageStatus,
+  type BuildBlockedGoalRecoveryResumeAttemptTaskPackageInput,
+  type WriteBlockedGoalRecoveryResumeAttemptTaskPackageFromDirectoryInput,
+  type WriteBlockedGoalRecoveryResumeAttemptTaskPackageInput,
+  type WriteBlockedGoalRecoveryResumeAttemptTaskPackageResult
+} from './blocked-goal-recovery-resume-attempt-task-package.js';
 
 export {
   buildValidationCampaignSummary,

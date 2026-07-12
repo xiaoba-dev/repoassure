@@ -13656,6 +13656,20 @@ Phase 0：项目初始化。
 - 修复后 typecheck、lint、unit 726/726、integration 62/62、E2E 1 passed / 1 skipped、full suite 789 passed / 1 skipped、hygiene、release check 和 goal audit 35/35 通过。
 - Intake does not execute commands or accept evidence；PR CI 和 main CI 待收口。
 
+## 2026年7月13日 - Blocked Goal Recovery Resume Attempt Evidence Review Decision Package v0.1
+
+- Red：review decision module、CLI、exports 与 ADR 不存在。
+- Green：实现 exact intake SHA、stable evidence keys、decision state machine、writer/Markdown、CLI、campaign E2E 和文档级联。
+- 首轮独立复审发现 intake runtime validator 可接受内部自洽但被篡改的 boundary、exit code、status 和 rationale；TDD 增加对抗测试并实施 exact-key、状态重算、canonical rationale 与完整边界校验。
+- 二次复审发现完整性仍信任 intake 自报清单；评审现必须读取精确 source task package，并核对 raw-byte SHA-256、source status 及 action/command/verification 完整任务清单。
+- 三次复审发现跨类别 raw ID 碰撞；绑定逻辑改用 `action:`、`command:`、`verification:` typed keys，并对 unresolved raw ID 只补齐尚未表示的同名 typed task。
+- 最终独立复审：无 actionable findings；15 个 focused review tests 通过。
+- `pnpm typecheck`、`pnpm lint`：通过。
+- `pnpm test:unit`：61 files，732 tests，通过。
+- 全量并行测试在本机因多个 CLI build 并发出现 13 个 30 秒资源争用超时；`pnpm exec vitest run --maxWorkers=1` 确定性复核为 94 files passed / 1 skipped，796 tests passed / 1 skipped。
+- `pnpm repo:hygiene`、`pnpm release:check`：通过；`pnpm goal:audit`：35/35，通过。
+- Review package does not execute commands or close goals；PR CI 与 main CI 待收口。
+
 ## 2026年7月13日 - Blocked Goal Recovery Resume Attempt Task Package v0.1
 
 ### 完成内容

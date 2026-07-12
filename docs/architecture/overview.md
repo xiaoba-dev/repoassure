@@ -195,7 +195,7 @@ flowchart TB
 
 ## Blocked Goal Recovery Decision Gate
 
-`@hardening-mcp/acceptance` now carries `blocked-goal-recovery-package -> consumption-report -> decision-receipt -> resume-attempt-task-package -> execution-evidence-intake`. Stable IDs and exact-byte SHA-256 provenance bind every transition. The task package remains non-executing; the intake imports results from a separate attempt and marks complete evidence ready for review, not accepted. The chain does not expand target repo, release, launch, customer, pricing/spend, visibility, or hosted/commercial authority.
+`@hardening-mcp/acceptance` now carries `blocked-goal-recovery-package -> consumption-report -> decision-receipt -> resume-attempt-task-package -> execution-evidence-intake -> evidence-review-decision-package`. Stable IDs and exact-byte SHA-256 provenance bind every transition. Task/intake/review stages remain non-executing; acceptance is explicit but does not close a goal or expand external authority.
 
 ## CLI 与 MCP 共享实现
 

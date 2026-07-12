@@ -28,7 +28,8 @@ const SCRIPT_PATHS = {
   'goal:recover:consume': 'scripts/generate-blocked-goal-recovery-consumption-report.mjs',
   'goal:recover:decide': 'scripts/generate-blocked-goal-recovery-decision-receipt.mjs',
   'goal:recover:prepare-resume': 'scripts/generate-blocked-goal-recovery-resume-attempt-task-package.mjs',
-  'goal:recover:intake-resume-evidence': 'scripts/generate-blocked-goal-recovery-resume-attempt-execution-evidence-intake.mjs'
+  'goal:recover:intake-resume-evidence': 'scripts/generate-blocked-goal-recovery-resume-attempt-execution-evidence-intake.mjs',
+  'goal:recover:review-resume-evidence': 'scripts/generate-blocked-goal-recovery-resume-attempt-evidence-review-decision-package.mjs'
 } as const;
 const FIXTURE_PATH = join(
   process.cwd(),
@@ -397,6 +398,21 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       redactionBoundary: 'Sanitized fixture evidence only.'
     }, null, 2)}\n`);
     await runScript(['goal:recover:intake-resume-evidence', '--', '--from-dir', outputDir]);
+    const resumeIntakeText = await readFile(join(outputDir, 'blocked-goal-recovery-resume-attempt-execution-evidence-intake.json'), 'utf8');
+    const resumeIntake = JSON.parse(resumeIntakeText) as {
+      actionResults: Array<{ actionKey: string }>;
+      resumeCommandResults: Array<{ commandId: string }>;
+      verificationResults: Array<{ checkId: string }>;
+    };
+    await writeFile(join(outputDir, 'blocked-goal-recovery-resume-attempt-evidence-review-decisions.json'), `${JSON.stringify({
+      sourceEvidenceIntakeSha256: createHash('sha256').update(resumeIntakeText).digest('hex'),
+      decisions: [
+        ...resumeIntake.actionResults.map((item) => `action:${item.actionKey}`),
+        ...resumeIntake.resumeCommandResults.map((item) => `command:${item.commandId}`),
+        ...resumeIntake.verificationResults.map((item) => `verification:${item.checkId}`)
+      ].map((evidenceKey) => ({ evidenceKey, decision: 'accept', evidence: 'Fixture evidence reviewed.', reviewerRole: 'maintainer' }))
+    }, null, 2)}\n`);
+    await runScript(['goal:recover:review-resume-evidence', '--', '--from-dir', outputDir]);
 
     const outputs = await readArtifacts(outputDir);
 
@@ -527,6 +543,9 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     expect(outputs.blockedGoalRecoveryResumeAttemptEvidenceIntake.schemaVersion).toBe('repoassure.blocked-goal-recovery-resume-attempt-execution-evidence-intake.v1');
     expect(outputs.blockedGoalRecoveryResumeAttemptEvidenceIntake.intakeStatus).toBe('complete_for_maintainer_review');
     expect(outputs.blockedGoalRecoveryResumeAttemptEvidenceIntake.boundaryCompliance.commandsExecutedByIntake).toBe(false);
+    expect(outputs.blockedGoalRecoveryResumeAttemptEvidenceReview.schemaVersion).toBe('repoassure.blocked-goal-recovery-resume-attempt-evidence-review-decision-package.v1');
+    expect(outputs.blockedGoalRecoveryResumeAttemptEvidenceReview.reviewStatus).toBe('accepted');
+    expect(outputs.blockedGoalRecoveryResumeAttemptEvidenceReview.boundaryCompliance.commandsExecutedByReview).toBe(false);
     expect(outputs.bundle.readingOrder.map((item) => item.fileName)).toEqual([
       'ai-ide-repair-playbook.json',
       'ai-ide-playbook-consumption-report.json',
@@ -575,6 +594,7 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     expect(outputs.blockedGoalRecoveryResumeAttemptTaskPackageMarkdown).toContain('# RepoAssure Blocked Goal Recovery Resume Attempt Task Package');
     expect(outputs.blockedGoalRecoveryResumeAttemptTaskPackageMarkdown).toContain('## Verification Checklist');
     expect(outputs.blockedGoalRecoveryResumeAttemptEvidenceIntakeMarkdown).toContain('## Resume Command Results');
+    expect(outputs.blockedGoalRecoveryResumeAttemptEvidenceReviewMarkdown).toContain('## Evidence Review Decisions');
     expect(outputs.evidenceMarkdown).toContain(
       'No target repo branch, commit, pull request, issue, advisory, or file mutation is executed by this report.'
     );
@@ -614,6 +634,8 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       'blocked-goal-recovery-decision-receipt.md',
       'blocked-goal-recovery-package.json',
       'blocked-goal-recovery-package.md',
+      'blocked-goal-recovery-resume-attempt-evidence-review-decision-package.json',
+      'blocked-goal-recovery-resume-attempt-evidence-review-decision-package.md',
       'blocked-goal-recovery-resume-attempt-execution-evidence-intake.json',
       'blocked-goal-recovery-resume-attempt-execution-evidence-intake.md',
       'blocked-goal-recovery-resume-attempt-task-package.json',
@@ -766,6 +788,9 @@ async function readArtifacts(outputDir: string): Promise<{
     intakeStatus: string;
     boundaryCompliance: { commandsExecutedByIntake: boolean };
   };
+  blockedGoalRecoveryResumeAttemptEvidenceReview: {
+    schemaVersion: string; reviewStatus: string; boundaryCompliance: { commandsExecutedByReview: boolean };
+  };
   evidenceMarkdown: string;
   bundleMarkdown: string;
   contractMarkdown: string;
@@ -779,6 +804,7 @@ async function readArtifacts(outputDir: string): Promise<{
   blockedGoalRecoveryConsumptionMarkdown: string;
   blockedGoalRecoveryResumeAttemptTaskPackageMarkdown: string;
   blockedGoalRecoveryResumeAttemptEvidenceIntakeMarkdown: string;
+  blockedGoalRecoveryResumeAttemptEvidenceReviewMarkdown: string;
 }> {
   return {
     playbook: JSON.parse(await readFile(join(outputDir, 'ai-ide-repair-playbook.json'), 'utf8')) as { schemaVersion: string },
@@ -896,6 +922,9 @@ async function readArtifacts(outputDir: string): Promise<{
     blockedGoalRecoveryResumeAttemptEvidenceIntake: JSON.parse(await readFile(join(outputDir, 'blocked-goal-recovery-resume-attempt-execution-evidence-intake.json'), 'utf8')) as {
       schemaVersion: string; intakeStatus: string; boundaryCompliance: { commandsExecutedByIntake: boolean };
     },
+    blockedGoalRecoveryResumeAttemptEvidenceReview: JSON.parse(await readFile(join(outputDir, 'blocked-goal-recovery-resume-attempt-evidence-review-decision-package.json'), 'utf8')) as {
+      schemaVersion: string; reviewStatus: string; boundaryCompliance: { commandsExecutedByReview: boolean };
+    },
     evidenceMarkdown: await readFile(join(outputDir, 'ai-ide-repair-execution-evidence-report.md'), 'utf8'),
     bundleMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-bundle-manifest.md'), 'utf8'),
     contractMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-consumer-contract.md'), 'utf8'),
@@ -908,7 +937,8 @@ async function readArtifacts(outputDir: string): Promise<{
     blockedGoalRecoveryMarkdown: await readFile(join(outputDir, 'blocked-goal-recovery-package.md'), 'utf8'),
     blockedGoalRecoveryConsumptionMarkdown: await readFile(join(outputDir, 'blocked-goal-recovery-consumption-report.md'), 'utf8'),
     blockedGoalRecoveryResumeAttemptTaskPackageMarkdown: await readFile(join(outputDir, 'blocked-goal-recovery-resume-attempt-task-package.md'), 'utf8'),
-    blockedGoalRecoveryResumeAttemptEvidenceIntakeMarkdown: await readFile(join(outputDir, 'blocked-goal-recovery-resume-attempt-execution-evidence-intake.md'), 'utf8')
+    blockedGoalRecoveryResumeAttemptEvidenceIntakeMarkdown: await readFile(join(outputDir, 'blocked-goal-recovery-resume-attempt-execution-evidence-intake.md'), 'utf8'),
+    blockedGoalRecoveryResumeAttemptEvidenceReviewMarkdown: await readFile(join(outputDir, 'blocked-goal-recovery-resume-attempt-evidence-review-decision-package.md'), 'utf8')
   };
 }
 
@@ -950,6 +980,8 @@ async function listExpectedArtifactNames(outputDir: string): Promise<string[]> {
     'blocked-goal-recovery-resume-attempt-task-package.md',
     'blocked-goal-recovery-resume-attempt-execution-evidence-intake.json',
     'blocked-goal-recovery-resume-attempt-execution-evidence-intake.md',
+    'blocked-goal-recovery-resume-attempt-evidence-review-decision-package.json',
+    'blocked-goal-recovery-resume-attempt-evidence-review-decision-package.md',
     'ai-ide-repair-playbook.json',
     'ai-ide-repair-playbook.md'
   ];

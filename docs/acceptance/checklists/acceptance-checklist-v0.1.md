@@ -307,4 +307,7 @@
 - [x] Blocked Goal Recovery Resume Attempt Task Package v0.1 alone does not execute or prove a resume attempt; evidence is imported through the separate intake contract.
 - [x] Blocked Goal Recovery Resume Attempt Execution Evidence Intake v0.1 binds exact task package bytes, validates action/command/verification evidence, and never executes commands.
 - [x] Complete evidence remains ready for maintainer review rather than automatically accepted; boundary violations take precedence.
-- [ ] Blocked Goal Recovery Resume Attempt Evidence Review Decision Package v0.1 remains the next separate maintainer decision goal.
+- [x] Evidence intake alone remains unaccepted until the separate maintainer review decision package is generated.
+- [x] Blocked Goal Recovery Resume Attempt Evidence Review Decision Package v0.1 records exact-byte-bound per-item decisions and never executes commands.
+- [x] Boundary-violating evidence cannot be accepted; missing decisions remain blocked.
+- [ ] Blocked Goal Recovery Resume Attempt Closure Receipt v0.1 remains a separate non-executing goal.

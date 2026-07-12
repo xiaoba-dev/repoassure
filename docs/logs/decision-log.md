@@ -1681,3 +1681,7 @@ Receipt does not execute resume commands，不授权 target repo mutation、rele
 ## 2026-07-13 - blocked goal recovery resume attempt execution evidence intake
 
 接受 ADR-0037。Separate resume attempt 的证据必须绑定 exact task package，按 boundary violation 优先级推导 intake status。`complete_for_maintainer_review` 不是 acceptance；intake does not execute commands。下一步为 Blocked Goal Recovery Resume Attempt Evidence Review Decision Package v0.1。
+
+## 2026-07-13 - blocked goal recovery resume attempt evidence review decisions
+
+接受 ADR-0038。Maintainer 必须对 exact-intake-bound action/command/verification evidence 逐项记录 accept、changes_requested、defer 或 accept_risk。Review package does not execute commands or close goals。

@@ -10,4 +10,5 @@
 ### Task 2: Contracts and governance
 
 - [x] Add package export, type-smoke, campaign E2E, ADR-0038, operations guide, and documentation cascade.
-- [ ] Run full testing pyramid, independent review, PR/CI/merge, and main CI before the 07:15 large-goal freeze.
+- [x] Run the full testing pyramid, independent review, and initial PR CI before the 07:15 large-goal freeze.
+- [ ] Merge after final PR CI and verify main CI.

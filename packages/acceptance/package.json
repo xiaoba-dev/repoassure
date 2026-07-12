@@ -194,6 +194,10 @@
       "types": "./dist/blocked-goal-recovery-resume-attempt-task-package.d.ts",
       "default": "./dist/blocked-goal-recovery-resume-attempt-task-package.js"
     },
+    "./blocked-goal-recovery-resume-attempt-execution-evidence-intake": {
+      "types": "./dist/blocked-goal-recovery-resume-attempt-execution-evidence-intake.d.ts",
+      "default": "./dist/blocked-goal-recovery-resume-attempt-execution-evidence-intake.js"
+    },
     "./campaign-summary": {
       "types": "./dist/campaign-summary.d.ts",
       "default": "./dist/campaign-summary.js"

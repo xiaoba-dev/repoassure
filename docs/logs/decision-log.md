@@ -1677,3 +1677,7 @@ Receipt does not execute resume commands，不授权 target repo mutation、rele
 ### 边界
 
 只有 approve/accept_risk scope 可进入任务包；任何非 ready receipt 输出空队列。任务包 does not execute resume commands，不授权 target repo mutation、release、launch、customer contact、pricing/spend、repository visibility 或 commercial/hosted availability claims。下一步是独立的 Blocked Goal Recovery Resume Attempt Execution Evidence Intake v0.1。
+
+## 2026-07-13 - blocked goal recovery resume attempt execution evidence intake
+
+接受 ADR-0037。Separate resume attempt 的证据必须绑定 exact task package，按 boundary violation 优先级推导 intake status。`complete_for_maintainer_review` 不是 acceptance；intake does not execute commands。下一步为 Blocked Goal Recovery Resume Attempt Evidence Review Decision Package v0.1。

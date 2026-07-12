@@ -572,6 +572,22 @@ export {
 } from './blocked-goal-recovery-resume-attempt-task-package.js';
 
 export {
+  buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake,
+  buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntakeMarkdown,
+  writeBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake,
+  writeBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntakeFromDirectory,
+  type BlockedGoalRecoveryResumeAttemptEvidenceResultStatus,
+  type BlockedGoalRecoveryResumeAttemptExecutionEvidenceInput,
+  type BlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake,
+  type BlockedGoalRecoveryResumeAttemptExecutionEvidenceIntakeStatus,
+  type BlockedGoalRecoveryResumeAttemptExecutionResultInput,
+  type BuildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntakeInput,
+  type WriteBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntakeFromDirectoryInput,
+  type WriteBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntakeInput,
+  type WriteBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntakeResult
+} from './blocked-goal-recovery-resume-attempt-execution-evidence-intake.js';
+
+export {
   buildValidationCampaignSummary,
   buildValidationCampaignSummaryMarkdown,
   writeValidationCampaignSummary,

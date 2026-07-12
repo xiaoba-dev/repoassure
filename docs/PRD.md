@@ -103,3 +103,7 @@ The receipt does not execute recovery commands and does not authorize target rep
 RepoAssure must convert a ready recovery decision receipt into a bounded local task package that an AI IDE can consume without guessing scope. The package must bind to the exact receipt bytes, include only approved or explicitly risk-accepted actions and resume commands, preserve source evidence and order, and expose prerequisites plus a verification checklist.
 
 Non-ready or boundary-invalid receipts must produce no executable scope. The package does not execute recovery commands and does not authorize target repo mutation, release, launch, customer contact, pricing/spend, repository visibility changes, or commercial/hosted availability claims. Execution evidence is deferred to Blocked Goal Recovery Resume Attempt Execution Evidence Intake v0.1.
+
+## Blocked Goal Recovery Resume Attempt Execution Evidence Intake v0.1
+
+RepoAssure must import sanitized evidence from a separately executed resume attempt, bind it to the exact task package, and distinguish complete, failed/blocked, incomplete, boundary-violating, and source-not-ready outcomes. Complete evidence is only ready for maintainer review; it is not accepted automatically. The intake does not execute commands or authorize external actions.

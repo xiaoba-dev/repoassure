@@ -597,3 +597,9 @@ This validation must not upload target repo material, automatically modify targe
 - E2E: near-real campaign continues through recovery package, consumption, decision receipt, and bounded resume attempt task package.
 - Contract: package exports, compatibility inventory, type-smoke imports, operation docs, ADR-0036, and documentation cascade are guarded.
 - Pyramid gates: build, typecheck, lint, unit, integration, E2E, full suite, hygiene, release check, goal audit, independent review, PR CI, and main CI.
+
+## Blocked Goal Recovery Resume Attempt Execution Evidence Intake v0.1
+
+- Unit covers exact SHA, complete/failed/incomplete/source-not-ready/boundary outcomes, task coverage, malformed IDs, redaction, writer, Markdown, and command non-execution.
+- Integration covers local CLI JSON/Markdown output and failure-path redaction.
+- E2E extends the near-real campaign through evidence intake; type-smoke and structure tests guard exports and documentation cascade.

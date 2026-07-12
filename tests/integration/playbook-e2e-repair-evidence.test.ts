@@ -8,6 +8,23 @@ import { describe, expect, it } from 'vitest';
 
 const execFileAsync = promisify(execFile);
 const SCRIPT_TEST_TIMEOUT_MS = 120_000;
+const SCRIPT_PATHS = {
+  'playbook:generate': 'scripts/generate-ai-ide-repair-playbook.mjs',
+  'playbook:consume': 'scripts/generate-ai-ide-playbook-consumption-report.mjs',
+  'playbook:decide': 'scripts/generate-ai-ide-repair-decision-package.mjs',
+  'playbook:approve': 'scripts/generate-ai-ide-repair-approval-receipt.mjs',
+  'playbook:plan-approved': 'scripts/generate-ai-ide-approved-repair-execution-plan.mjs',
+  'playbook:evidence': 'scripts/generate-ai-ide-repair-execution-evidence-report.mjs',
+  'playbook:bundle': 'scripts/generate-ai-ide-repair-evidence-bundle-manifest.mjs',
+  'playbook:contract': 'scripts/generate-ai-ide-repair-evidence-consumer-contract.mjs',
+  'playbook:replay': 'scripts/generate-ai-ide-repair-execution-replay-readiness.mjs',
+  'playbook:proposal': 'scripts/generate-ai-ide-target-repo-repair-goal-proposal-package.mjs',
+  'playbook:authorize': 'scripts/generate-ai-ide-target-repo-repair-goal-authorization-receipt.mjs',
+  'playbook:target-repair-goal': 'scripts/generate-ai-ide-authorized-target-repo-repair-goal-task-package.mjs',
+  'playbook:target-repair-evidence': 'scripts/generate-ai-ide-target-repo-repair-goal-execution-evidence-intake-report.mjs',
+  'playbook:target-repair-review': 'scripts/generate-ai-ide-target-repair-evidence-review-decision-package.mjs',
+  'goal:recover': 'scripts/generate-blocked-goal-recovery-package.mjs'
+} as const;
 const FIXTURE_PATH = join(
   process.cwd(),
   'fixtures',
@@ -29,6 +46,7 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       `${(await readFile(FIXTURE_PATH, 'utf8')).replaceAll('__FIXTURE_ROOT__', secretFixtureRoot)}\n`
     );
 
+    await buildAcceptancePackage();
     await runScript([
       'playbook:generate',
       '--',
@@ -493,7 +511,24 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
 });
 
 async function runScript(args: string[]): Promise<void> {
-  const { stderr } = await execFileAsync('pnpm', args, {
+  const command = args[0] as keyof typeof SCRIPT_PATHS;
+  const scriptPath = SCRIPT_PATHS[command];
+
+  if (!scriptPath) {
+    throw new Error(`Unknown campaign script: ${String(args[0])}`);
+  }
+
+  const scriptArgs = args[1] === '--' ? args.slice(2) : args.slice(1);
+  const { stderr } = await execFileAsync('node', [scriptPath, ...scriptArgs], {
+    cwd: process.cwd(),
+    timeout: SCRIPT_TEST_TIMEOUT_MS
+  });
+
+  expect(stderr).toBe('');
+}
+
+async function buildAcceptancePackage(): Promise<void> {
+  const { stderr } = await execFileAsync('pnpm', ['build:acceptance'], {
     cwd: process.cwd(),
     timeout: SCRIPT_TEST_TIMEOUT_MS
   });

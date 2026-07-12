@@ -195,7 +195,7 @@ flowchart TB
 
 ## Blocked Goal Recovery Decision Gate
 
-`@hardening-mcp/acceptance` now carries `blocked-goal-recovery-package -> consumption-report -> decision-receipt`. Stable `actionKey` values bind maintainer decisions to exact queue items. The receipt is a local evidence gate for Blocked Goal Recovery Resume Attempt Task Package v0.1; it does not execute resume commands or expand target repo, release, launch, customer, pricing/spend, visibility, or hosted/commercial authority.
+`@hardening-mcp/acceptance` now carries `blocked-goal-recovery-package -> consumption-report -> decision-receipt -> resume-attempt-task-package`. Stable action/command IDs and exact-byte SHA-256 provenance bind every transition. The final package emits only approved or accepted-risk scope for a separate attempt; non-ready receipts emit empty queues. Every generated command remains `executed: false`, so the chain does not expand target repo, release, launch, customer, pricing/spend, visibility, or hosted/commercial authority.
 
 ## CLI 与 MCP 共享实现
 

@@ -302,4 +302,6 @@
 - [ ] The validation does not mutate target repo files or authorize branch, commit, pull request, issue, advisory, release, launch, customer contact, or commercial availability claims.
 - [x] Blocked Goal Recovery Decision Receipt v0.1 emits `repoassure.blocked-goal-recovery-decision-receipt.v1` through `pnpm --silent goal:recover:decide`, preserves raw provenance and pricing/spend boundaries, and does not execute resume commands.
 - [x] Missing action or command decisions block readiness; duplicate/unknown/malformed IDs and stale source SHA fail validation; action-type canonical decisions and external completion evidence are enforced; approve/reject/defer/accept-risk outcomes and veto precedence are covered by unit and campaign tests.
-- [ ] Blocked Goal Recovery Resume Attempt Task Package v0.1 remains the next separate goal and is not authorized by the decision receipt alone.
+- [x] Blocked Goal Recovery Resume Attempt Task Package v0.1 emits `repoassure.blocked-goal-recovery-resume-attempt-task-package.v1` through `pnpm --silent goal:recover:prepare-resume`, binds exact receipt bytes, and includes only approved or risk-accepted scope.
+- [x] Rejected, deferred, incomplete, mixed, unreviewed, missing-command, malformed, or boundary-invalid receipts emit no action or command scope; all generated command execution flags remain false.
+- [ ] Blocked Goal Recovery Resume Attempt Execution Evidence Intake v0.1 remains a separate goal; this task package does not execute or prove a resume attempt.

@@ -13643,3 +13643,29 @@ Phase 0：项目初始化。
 
 - Receipt does not execute recovery or resume commands。
 - No target repo mutation、publish、release、launch、customer contact、pricing/spend、repository visibility change 或 commercial/hosted availability claim was authorized。
+
+## 2026年7月13日 - Blocked Goal Recovery Resume Attempt Task Package v0.1
+
+### 完成内容
+
+- 新增 `repoassure.blocked-goal-recovery-resume-attempt-task-package.v1` builder、writer、Markdown 和严格 receipt runtime validation。
+- 新增 `pnpm --silent goal:recover:prepare-resume`、package export、compatibility/type-smoke contract 和 near-real campaign E2E stage。
+- 新增 ADR-0036、operations guide，并级联 README、PRD、SPEC、PLAN、architecture、testing、acceptance 和 decision log。
+
+### TDD 记录
+
+- Red：task package module、CLI 和治理文档不存在；伪造不一致 receipt 被严格 validator 拒绝。
+- Green：实现 exact-byte provenance、ready/blocked state、bounded action/command queues、CLI redaction 和 campaign integration。
+- Refactor：非 ready receipt 统一输出空 scope，command task 与 package boundary 均固定 `executed: false`。
+
+### Verification
+
+- Focused unit：3/3 通过。
+- Focused integration/E2E：3/3 通过。
+- `pnpm typecheck`：通过。
+- 完整测试金字塔、独立复审、PR CI 和 main CI：待收口阶段记录。
+
+### 边界
+
+- Task package does not execute resume commands。
+- No target repo mutation、publish、release、launch、customer contact、pricing/spend、repository visibility change 或 commercial/hosted availability claim was authorized。

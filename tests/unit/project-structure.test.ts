@@ -3582,6 +3582,32 @@ describe('project structure', () => {
     await expectPath('scripts/generate-blocked-goal-recovery-decision-receipt.mjs');
   });
 
+  it('records a bounded blocked goal recovery resume attempt task package', async () => {
+    const files = await Promise.all([
+      readFile('docs/adr/0036-blocked-goal-recovery-resume-attempt-task-package.md', 'utf8'),
+      readFile('docs/operations/blocked-goal-recovery-resume-attempt-task-package-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+    const joined = files.join('\n');
+
+    expect(joined).toContain('Blocked Goal Recovery Resume Attempt Task Package v0.1');
+    expect(joined).toContain('repoassure.blocked-goal-recovery-resume-attempt-task-package.v1');
+    expect(joined).toContain('pnpm --silent goal:recover:prepare-resume');
+    expect(joined).toContain('does not execute');
+    expect(joined).toContain('Blocked Goal Recovery Resume Attempt Execution Evidence Intake v0.1');
+
+    await expectPath('packages/acceptance/src/blocked-goal-recovery-resume-attempt-task-package.ts');
+    await expectPath('scripts/generate-blocked-goal-recovery-resume-attempt-task-package.mjs');
+  });
+
   it('records Autopilot-compatible documentation architecture without moving existing source documents', async () => {
     const [
       adr,

@@ -534,6 +534,24 @@ export {
 } from './blocked-goal-recovery-consumption-report.js';
 
 export {
+  buildBlockedGoalRecoveryDecisionReceipt,
+  buildBlockedGoalRecoveryDecisionReceiptMarkdown,
+  writeBlockedGoalRecoveryDecisionReceipt,
+  writeBlockedGoalRecoveryDecisionReceiptFromDirectory,
+  type BlockedGoalRecoveryDecision,
+  type BlockedGoalRecoveryDecisionInputItem,
+  type BlockedGoalRecoveryDecisionItem,
+  type BlockedGoalRecoveryDecisionReceipt,
+  type BlockedGoalRecoveryDecisionStatus,
+  type BlockedGoalRecoveryRecordedDecision,
+  type BlockedGoalRecoveryResumeAttemptReadiness,
+  type BuildBlockedGoalRecoveryDecisionReceiptInput,
+  type WriteBlockedGoalRecoveryDecisionReceiptFromDirectoryInput,
+  type WriteBlockedGoalRecoveryDecisionReceiptInput,
+  type WriteBlockedGoalRecoveryDecisionReceiptResult
+} from './blocked-goal-recovery-decision-receipt.js';
+
+export {
   buildValidationCampaignSummary,
   buildValidationCampaignSummaryMarkdown,
   writeValidationCampaignSummary,

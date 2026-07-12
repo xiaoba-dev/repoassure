@@ -24,7 +24,8 @@ const SCRIPT_PATHS = {
   'playbook:target-repair-evidence': 'scripts/generate-ai-ide-target-repo-repair-goal-execution-evidence-intake-report.mjs',
   'playbook:target-repair-review': 'scripts/generate-ai-ide-target-repair-evidence-review-decision-package.mjs',
   'goal:recover': 'scripts/generate-blocked-goal-recovery-package.mjs',
-  'goal:recover:consume': 'scripts/generate-blocked-goal-recovery-consumption-report.mjs'
+  'goal:recover:consume': 'scripts/generate-blocked-goal-recovery-consumption-report.mjs',
+  'goal:recover:decide': 'scripts/generate-blocked-goal-recovery-decision-receipt.mjs'
 } as const;
 const FIXTURE_PATH = join(
   process.cwd(),
@@ -332,6 +333,23 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       '--from-dir',
       outputDir
     ]);
+    const recoveryConsumptionReport = JSON.parse(
+      await readFile(join(outputDir, 'blocked-goal-recovery-consumption-report.json'), 'utf8')
+    ) as { actionQueue: Array<{ actionKey: string }> };
+    await writeFile(join(outputDir, 'blocked-goal-recovery-decisions.json'), `${JSON.stringify({
+      decisions: recoveryConsumptionReport.actionQueue.map((action) => ({
+        actionKey: action.actionKey,
+        decision: 'approve',
+        evidence: 'Fixture action reviewed locally.',
+        reviewerRole: 'maintainer'
+      }))
+    }, null, 2)}\n`);
+    await runScript([
+      'goal:recover:decide',
+      '--',
+      '--from-dir',
+      outputDir
+    ]);
 
     const outputs = await readArtifacts(outputDir);
 
@@ -448,6 +466,10 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       })
     ]);
     expect(outputs.blockedGoalRecoveryConsumption.blockedActions).toContain('target_repo_pull_request_creation');
+    expect(outputs.blockedGoalRecoveryDecisionReceipt.schemaVersion).toBe('repoassure.blocked-goal-recovery-decision-receipt.v1');
+    expect(outputs.blockedGoalRecoveryDecisionReceipt.decisionStatus).toBe('approved_for_separate_resume_attempt');
+    expect(outputs.blockedGoalRecoveryDecisionReceipt.boundaryCompliance.resumeCommandsExecuted).toBe(false);
+    expect(outputs.blockedGoalRecoveryDecisionReceipt.blockedActions).toContain('pricing_change');
     expect(outputs.bundle.readingOrder.map((item) => item.fileName)).toEqual([
       'ai-ide-repair-playbook.json',
       'ai-ide-playbook-consumption-report.json',
@@ -528,6 +550,8 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       'ai-ide-target-repo-repair-goal-proposal-package.md',
       'blocked-goal-recovery-consumption-report.json',
       'blocked-goal-recovery-consumption-report.md',
+      'blocked-goal-recovery-decision-receipt.json',
+      'blocked-goal-recovery-decision-receipt.md',
       'blocked-goal-recovery-package.json',
       'blocked-goal-recovery-package.md'
     ]);
@@ -772,6 +796,12 @@ async function readArtifacts(outputDir: string): Promise<{
       boundaryCompliance: { recoveryCommandsExecuted: boolean; blockedActionsPreserved: boolean };
       blockedActions: string[];
     },
+    blockedGoalRecoveryDecisionReceipt: JSON.parse(await readFile(join(outputDir, 'blocked-goal-recovery-decision-receipt.json'), 'utf8')) as {
+      schemaVersion: string;
+      decisionStatus: string;
+      boundaryCompliance: { resumeCommandsExecuted: boolean; sourceBoundaryPreserved: boolean };
+      blockedActions: string[];
+    },
     evidenceMarkdown: await readFile(join(outputDir, 'ai-ide-repair-execution-evidence-report.md'), 'utf8'),
     bundleMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-bundle-manifest.md'), 'utf8'),
     contractMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-consumer-contract.md'), 'utf8'),
@@ -816,6 +846,8 @@ async function listExpectedArtifactNames(outputDir: string): Promise<string[]> {
     'ai-ide-target-repair-evidence-review-decision-package.md',
     'blocked-goal-recovery-consumption-report.json',
     'blocked-goal-recovery-consumption-report.md',
+    'blocked-goal-recovery-decision-receipt.json',
+    'blocked-goal-recovery-decision-receipt.md',
     'blocked-goal-recovery-package.json',
     'blocked-goal-recovery-package.md',
     'ai-ide-repair-playbook.json',

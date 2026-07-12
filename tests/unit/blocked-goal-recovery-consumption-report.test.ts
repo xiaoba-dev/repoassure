@@ -43,9 +43,9 @@ describe('blocked goal recovery consumption report', () => {
       'external_prerequisite_required'
     ]);
     expect(report.actionQueue).toEqual([
-      expect.objectContaining({ blockerId: 'B1-test-timeout', instruction: 'pnpm test -- --testTimeout=15000' }),
-      expect.objectContaining({ blockerId: 'B2-review', instruction: 'Approve resume, defer, or accept risk.' }),
-      expect.objectContaining({ blockerId: 'B3-network', instruction: 'Network access is restored.' })
+      expect.objectContaining({ actionKey: 'automatic:B1-test-timeout:A1-rerun', blockerId: 'B1-test-timeout', instruction: 'pnpm test -- --testTimeout=15000' }),
+      expect.objectContaining({ actionKey: 'maintainer:B2-review:1', blockerId: 'B2-review', instruction: 'Approve resume, defer, or accept risk.' }),
+      expect.objectContaining({ actionKey: 'external:B3-network:1', blockerId: 'B3-network', instruction: 'Network access is restored.' })
     ]);
     expect(report.resumeChecklist).toEqual(expect.arrayContaining([
       'Read the recovery package and its source evidence in order.',

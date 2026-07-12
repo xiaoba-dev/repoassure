@@ -40,6 +40,7 @@ export interface BlockedGoalRecoveryEvidenceReadOrderItem {
 }
 
 export interface BlockedGoalRecoveryConsumptionAction {
+  actionKey: string;
   blockerId: string;
   actionType: BlockedGoalRecoveryActionType;
   instruction: string;
@@ -164,15 +165,16 @@ export function buildBlockedGoalRecoveryConsumptionReportMarkdown(
     '',
     '## Recovery Action Queue',
     '',
-    '| Blocker | Action type | Instruction | Context |',
-    '| --- | --- | --- | --- |',
+    '| Action key | Blocker | Action type | Instruction | Context |',
+    '| --- | --- | --- | --- | --- |',
     ...report.actionQueue.map((item) => `| ${[
+      item.actionKey,
       item.blockerId,
       item.actionType,
       item.instruction,
       item.context
     ].map(escapeMarkdownTableCell).join(' | ')} |`),
-    ...(report.actionQueue.length === 0 ? ['| n/a | n/a | n/a | n/a |'] : []),
+    ...(report.actionQueue.length === 0 ? ['| n/a | n/a | n/a | n/a | n/a |'] : []),
     '',
     '## Resume Checklist',
     '',
@@ -263,24 +265,27 @@ function buildActionQueue(
   recoveryPackage: BlockedGoalRecoveryPackage
 ): BlockedGoalRecoveryConsumptionAction[] {
   return [
-    ...recoveryPackage.blockers.flatMap((blocker) => blocker.automaticRecoveryActions).map((action) => ({
+    ...recoveryPackage.blockers.flatMap((blocker) => blocker.automaticRecoveryActions.map((action) => ({
+      actionKey: sanitize(`automatic:${action.blockerId}:${action.actionId}`),
       blockerId: sanitize(action.blockerId),
       actionType: 'automatic_retry_candidate' as const,
       instruction: sanitize(action.command),
       context: sanitize(action.rationale)
-    })),
-    ...recoveryPackage.blockers.flatMap((blocker) => blocker.maintainerDecisionRequests).map((request) => ({
+    }))),
+    ...recoveryPackage.blockers.flatMap((blocker) => blocker.maintainerDecisionRequests.map((request, index) => ({
+      actionKey: sanitize(`maintainer:${request.blockerId}:${index + 1}`),
       blockerId: sanitize(request.blockerId),
       actionType: 'maintainer_decision_required' as const,
       instruction: sanitize(request.requestedDecision),
       context: sanitize(`Options: ${request.options.join(', ')}`)
-    })),
-    ...recoveryPackage.blockers.flatMap((blocker) => blocker.externalPrerequisites).map((prerequisite) => ({
+    }))),
+    ...recoveryPackage.blockers.flatMap((blocker) => blocker.externalPrerequisites.map((prerequisite, index) => ({
+      actionKey: sanitize(`external:${prerequisite.blockerId}:${index + 1}`),
       blockerId: sanitize(prerequisite.blockerId),
       actionType: 'external_prerequisite_required' as const,
       instruction: sanitize(prerequisite.prerequisite),
       context: sanitize(`Owner: ${prerequisite.owner}`)
-    }))
+    })))
   ];
 }
 

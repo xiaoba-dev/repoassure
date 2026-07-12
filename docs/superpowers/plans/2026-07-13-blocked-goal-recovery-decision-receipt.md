@@ -13,9 +13,9 @@
 
 ### Task 1: Add stable action identity
 
-- [ ] Add failing unit assertions for deterministic `actionKey` values across automatic, maintainer, and external actions.
-- [ ] Implement minimal stable action identity in the consumption report.
-- [ ] Verify existing consumption JSON, Markdown, CLI, and E2E behavior remains compatible.
+- [x] Add failing unit assertions for deterministic `actionKey` values across automatic, maintainer, and external actions.
+- [x] Implement minimal stable action identity in the consumption report.
+- [x] Verify existing consumption JSON and Markdown behavior remains compatible; CLI and E2E are covered in Task 3.
 
 ### Task 2: Implement the decision receipt domain
 

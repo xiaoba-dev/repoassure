@@ -235,6 +235,6 @@ pnpm goal:audit
 
 Expected: all automated gates pass; release check may continue reporting public-release no-go if that is the accepted boundary, but the command itself must complete successfully.
 
-- [ ] **Step 4: Review, commit, PR, CI, and return to Autopilot**
+- [x] **Step 4: Review, commit, PR, CI, and return to Autopilot**
 
 Review the diff for secrets and scope, commit the child goal, push the campaign branch, create a PR, wait for CI, merge only after successful checks, verify `main` CI, then return evidence to Project Autopilot for next-goal derivation.

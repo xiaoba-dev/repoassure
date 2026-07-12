@@ -14,7 +14,7 @@ RepoAssure is not positioned as another AI IDE, a general-purpose vulnerability 
 
 - Local CLI, MCP Server, and GitHub Action wrapper for repo acceptance.
 - Browser and Python/CLI acceptance modes.
-- Local hardening reports, repair plans, repair task packages, handoff packages, execution evidence, patch plans, validation campaign summaries, AI IDE repair evidence bundles, AI IDE Repair Evidence Bundle Consumer Contract v0.1 outputs, replay readiness outputs, Target Repo Repair Goal Proposal Package v0.1 outputs, Target Repo Repair Goal Authorization Receipt v0.1 outputs, Authorized Target Repo Repair Goal Task Package v0.1 outputs, Target Repo Repair Goal Execution Evidence Intake v0.1 outputs, and Target Repair Evidence Review Decision Package v0.1 outputs.
+- Local hardening reports, repair plans, repair task packages, handoff packages, execution evidence, patch plans, validation campaign summaries, AI IDE repair evidence bundles, AI IDE Repair Evidence Bundle Consumer Contract v0.1 outputs, replay readiness outputs, Target Repo Repair Goal Proposal Package v0.1 outputs, Target Repo Repair Goal Authorization Receipt v0.1 outputs, Authorized Target Repo Repair Goal Task Package v0.1 outputs, Target Repo Repair Goal Execution Evidence Intake v0.1 outputs, Target Repair Evidence Review Decision Package v0.1 outputs, and Blocked Goal Recovery Package v0.1 outputs.
 - Public website and private-preview release readiness surfaces.
 - Open-core local artifact contract with Team Cloud and Enterprise as future commercial roadmap surfaces.
 
@@ -50,6 +50,7 @@ RepoAssure is not positioned as another AI IDE, a general-purpose vulnerability 
 - ADR-0030: Authorized target repo repair goal task package.
 - ADR-0031: Target repo repair goal execution evidence intake.
 - ADR-0032: Target repair evidence review decision package.
+- ADR-0033: Blocked goal recovery package.
 ## AI IDE Repair Execution Replay Readiness v0.1
 
 RepoAssure must let a maintainer or AI IDE replay-check repair evidence before opening a target-repo repair goal. The v0.1 product requirement is a local `playbook:replay` workflow that reads the AI IDE repair evidence consumer contract and emits JSON/Markdown readiness evidence covering artifact replay, verification replay, boundary replay, and the next maintainer review decision.
@@ -77,3 +78,9 @@ RepoAssure must let a maintainer or AI IDE import execution evidence returned by
 ## Target Repair Evidence Review Decision Package v0.1
 
 RepoAssure must let a maintainer record review decisions over imported target repair evidence before treating the evidence as accepted. The v0.1 product requirement is a local `playbook:target-repair-review` workflow that emits JSON/Markdown evidence with source intake report provenance, per-goal accept / changes_requested / defer / accept_risk decisions, accepted evidence scope, change-requested items, deferred items, risk-accepted items, next repair goal recommendations, maintainer review boundary, redaction boundary, non-authorization boundary, and blocked actions.
+
+## Blocked Goal Recovery Package v0.1
+
+RepoAssure must let a maintainer or AI IDE convert blocked, incomplete, deferred, or retryable goal states into a local recovery package before resuming work. The v0.1 product requirement is a local `goal:recover` workflow that emits JSON/Markdown evidence with source goal, audit, and log provenance; blocker classification; attempted actions; evidence refs; automatic recovery actions; maintainer decision requests; external prerequisites; resume commands; redaction boundary; non-authorization boundary; and blocked actions.
+
+The package is recovery evidence only. It must not upload target repo material, mutate target repo files, create branch/commit/pull request/issue/advisory, publish, launch, contact customers, change pricing/spend, or claim SaaS, Team Cloud, Enterprise, commercial, or hosted dashboard availability.

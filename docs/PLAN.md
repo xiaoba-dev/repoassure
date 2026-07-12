@@ -18,14 +18,15 @@ Recent completed work includes:
 - Authorized Target Repo Repair Goal Task Package v0.1.
 - Target Repo Repair Goal Execution Evidence Intake v0.1.
 - Target Repair Evidence Review Decision Package v0.1.
+- Blocked Goal Recovery Package v0.1.
 - Public release and branch protection governance.
 - Public website private preview and custom-domain work.
 
 ## Next Codex Goal
 
-Target Repair Evidence Review Decision Package v0.1
+Blocked Goal Recovery Package v0.1
 
-Plain-language explanation: record maintainer accept / changes_requested / defer / accept_risk decisions over imported target repair evidence, without RepoAssure mutating the target repo or treating the package as merge, release, launch, customer, or commercial authorization.
+Plain-language explanation: turn a blocked, incomplete, deferred, or retryable goal into a structured local recovery package, so the maintainer and AI IDE know what was tried, what is blocked, what can be retried, what needs external action, and what requires explicit maintainer decision before resuming.
 
 ## Execution Rules
 
@@ -57,6 +58,7 @@ Plain-language explanation: record maintainer accept / changes_requested / defer
 - ADR-0030: Authorized target repo repair goal task package.
 - ADR-0031: Target repo repair goal execution evidence intake.
 - ADR-0032: Target repair evidence review decision package.
+- ADR-0033: Blocked goal recovery package.
 ## AI IDE Repair Execution Replay Readiness v0.1
 
 Status: implemented.
@@ -123,3 +125,13 @@ Status: implemented.
 - Extend the near-real campaign E2E fixture through target repair evidence review decisions.
 - Verify with unit, integration, type-smoke, E2E, and structure cascade tests.
 - Keep the package local-first and non-executing for target repo mutation, branch, commit, pull request, issue, advisory, release, launch, customer contact, and commercial claims.
+
+## Blocked Goal Recovery Package v0.1
+
+Status: implemented.
+
+- Add blocked goal recovery package schema and writer under `packages/acceptance`.
+- Add `pnpm goal:recover` CLI.
+- Extend the near-real campaign E2E fixture through blocked goal recovery package generation.
+- Verify with unit, integration, type-smoke, E2E, and structure cascade tests.
+- Keep the package local-first and non-executing for target repo mutation, branch, commit, pull request, issue, advisory, release, launch, customer contact, pricing/spend, and commercial or hosted availability claims.

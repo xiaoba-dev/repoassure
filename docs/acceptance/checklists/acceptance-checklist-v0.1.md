@@ -259,6 +259,14 @@
 - [ ] The receipt includes source proposal provenance, decision summary, verification requirements, maintainer approval boundary, redaction boundary, non-authorization boundary, and blocked actions.
 - [ ] The validation does not mutate target repo files or authorize release, launch, customer contact, or commercial availability claims.
 
+## Blocked Goal Recovery Package v0.1
+
+- [ ] `pnpm goal:recover -- --from-dir <dir>` generates JSON and Markdown recovery package artifacts.
+- [ ] The package supports environment, external_service, authorization_required, maintainer_decision_required, technical_unknown, test_instability, security_or_compliance, and product_scope blocker categories.
+- [ ] The package supports blocked, incomplete, deferred, and retryable blocker statuses.
+- [ ] Automatic recovery actions, maintainer decision requests, external prerequisites, and resume commands are present and redacted.
+- [ ] The validation does not mutate target repo files or authorize branch, commit, pull request, issue, advisory, release, launch, customer contact, pricing/spend, or commercial availability claims.
+
 ## Authorized Target Repo Repair Goal Task Package v0.1
 
 - [ ] `pnpm playbook:target-repair-goal -- --from-dir <dir>` generates JSON and Markdown task package artifacts.

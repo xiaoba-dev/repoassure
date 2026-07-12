@@ -18,11 +18,19 @@ Decision file example:
       "evidence": "Retry command and evidence were reviewed.",
       "reviewerRole": "maintainer"
     }
+  ],
+  "resumeCommandDecisions": [
+    {
+      "commandId": "resume-0123456789abcdef",
+      "decision": "approve",
+      "evidence": "The exact resume command was reviewed.",
+      "reviewerRole": "maintainer"
+    }
   ]
 }
 ```
 
-`reject`, `defer`, and `accept_risk` decisions also require a non-empty `rationale`.
+`reject`, `defer`, and `accept_risk` decisions also require a non-empty `rationale`. An external prerequisite may only be approved with `prerequisiteStatus: completed`; risk acceptance cannot waive an unmet prerequisite. Every resume command requires its own decision by stable `commandId`.
 
 ## Command
 
@@ -36,7 +44,7 @@ pnpm --silent goal:recover:decide -- --from-dir <dir>
 - `blocked-goal-recovery-decision-receipt.md`
 - schema: `repoassure.blocked-goal-recovery-decision-receipt.v1`
 
-The receipt records raw-source SHA-256 provenance, per-action decisions, decision summary, separate-resume readiness, reviewed resume commands, and preserved blocked actions.
+The receipt records raw-source SHA-256 provenance, per-action decisions, decision summary, separate-resume readiness, command-level decision items, and preserved blocked actions.
 
 ## Interpretation
 

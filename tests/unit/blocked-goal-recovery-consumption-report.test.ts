@@ -44,8 +44,8 @@ describe('blocked goal recovery consumption report', () => {
     ]);
     expect(report.actionQueue).toEqual([
       expect.objectContaining({ actionKey: 'automatic:B1-test-timeout:A1-rerun', blockerId: 'B1-test-timeout', instruction: 'pnpm test -- --testTimeout=15000' }),
-      expect.objectContaining({ actionKey: 'maintainer:B2-review:1', blockerId: 'B2-review', instruction: 'Approve resume, defer, or accept risk.' }),
-      expect.objectContaining({ actionKey: 'external:B3-network:1', blockerId: 'B3-network', instruction: 'Network access is restored.' })
+      expect.objectContaining({ actionKey: expect.stringMatching(/^maintainer:B2-review:maintainer-/u), blockerId: 'B2-review', instruction: 'Approve resume, defer, or accept risk.' }),
+      expect.objectContaining({ actionKey: expect.stringMatching(/^external:B3-network:external-/u), blockerId: 'B3-network', instruction: 'Network access is restored.' })
     ]);
     expect(report.resumeChecklist).toEqual(expect.arrayContaining([
       'Read the recovery package and its source evidence in order.',
@@ -53,10 +53,10 @@ describe('blocked goal recovery consumption report', () => {
       'Run only the reviewed resume command after all recovery gates are satisfied.'
     ]));
     expect(report.resumeCommands).toEqual([
-      {
+      expect.objectContaining({
         command: 'codex resume goal',
         purpose: 'Resume after all review gates pass.'
-      }
+      })
     ]);
     expect(report.boundaryCompliance).toEqual({
       recoveryCommandsExecuted: false,

@@ -153,6 +153,44 @@ describe('blocked goal recovery package', () => {
     ]));
   });
 
+  it('derives stable opaque IDs and rejects duplicate explicit IDs', () => {
+    const build = (requests: Array<{ requestedDecision: string; options: string[]; actionId?: string }>) => (
+      buildBlockedGoalRecoveryPackage({
+        inputPath: 'blocked-goal-recovery-input.json',
+        input: {
+          sourceGoal: { title: 'Stable IDs', status: 'blocked', objective: 'Review actions.' },
+          blockers: [{
+            blockerId: 'B-TOKEN=secret-value',
+            category: 'maintainer_decision_required',
+            status: 'blocked',
+            summary: 'Review requests.',
+            maintainerDecisionRequests: requests
+          }],
+          resumeCommands: [{ command: 'codex resume goal', purpose: 'Resume after review.' }],
+          redactionBoundary: 'Use sanitized evidence.'
+        }
+      })
+    );
+    const left = build([
+      { requestedDecision: 'Approve A.', options: ['approve', 'defer'] },
+      { requestedDecision: 'Approve B.', options: ['approve', 'defer'] }
+    ]);
+    const right = build([
+      { requestedDecision: 'Approve B.', options: ['approve', 'defer'] },
+      { requestedDecision: 'Approve A.', options: ['approve', 'defer'] }
+    ]);
+    const idsByRequest = (value: typeof left) => Object.fromEntries(
+      value.maintainerDecisionRequests.map((item) => [item.requestedDecision, item.actionId])
+    );
+
+    expect(idsByRequest(left)).toEqual(idsByRequest(right));
+    expect(JSON.stringify(left)).not.toContain('secret-value');
+    expect(() => build([
+      { actionId: 'same-id', requestedDecision: 'Approve A.', options: ['approve'] },
+      { actionId: 'same-id', requestedDecision: 'Approve B.', options: ['approve'] }
+    ])).toThrow('duplicate action or command IDs');
+  });
+
   it('writes json and markdown recovery package artifacts from local files', async () => {
     const root = await mkdtemp(join(tmpdir(), 'repoassure-blocked-goal-recovery-'));
     const inputPath = join(root, 'blocked-goal-recovery-input.json');

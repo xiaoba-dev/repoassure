@@ -25,6 +25,12 @@ describe('blocked goal recovery decision receipt script', () => {
         decision: 'approve',
         evidence: 'Reviewed locally.',
         reviewerRole: 'maintainer'
+      })),
+      resumeCommandDecisions: report.resumeCommands.map((command) => ({
+        commandId: command.commandId,
+        decision: 'approve',
+        evidence: 'Resume command reviewed locally.',
+        reviewerRole: 'maintainer'
       }))
     }, null, 2)}\n`);
 
@@ -50,6 +56,20 @@ describe('blocked goal recovery decision receipt script', () => {
     expect(markdown).toContain('## Recovery Decisions');
     expect(markdown).toContain('Executed |');
     expect(json).not.toContain('secret-value');
+  }, TIMEOUT_MS);
+
+  it('redacts secret-like input paths from CLI failures', async () => {
+    await expect(execFileAsync(
+      'node',
+      [
+        'scripts/generate-blocked-goal-recovery-decision-receipt.mjs',
+        '--from-dir',
+        '/private/tmp/goal-TOKEN=secret-value/missing'
+      ],
+      { cwd: process.cwd(), timeout: TIMEOUT_MS }
+    )).rejects.toMatchObject({
+      stderr: expect.not.stringContaining('secret-value')
+    });
   }, TIMEOUT_MS);
 });
 

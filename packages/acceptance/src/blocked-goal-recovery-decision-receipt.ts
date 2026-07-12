@@ -1,13 +1,18 @@
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { basename, join } from 'node:path';
+import { isDeepStrictEqual } from 'node:util';
 
 import {
   type BlockedGoalRecoveryActionType,
   type BlockedGoalRecoveryConsumptionAction,
   type BlockedGoalRecoveryConsumptionReport
 } from './blocked-goal-recovery-consumption-report.js';
-import { BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS } from './blocked-goal-recovery-package.js';
+import {
+  BLOCKED_GOAL_RECOVERY_MAINTAINER_REVIEW_BOUNDARY,
+  BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS,
+  BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BOUNDARY
+} from './blocked-goal-recovery-package.js';
 import { escapeMarkdownTableCell } from './markdown.js';
 import { redactSensitiveText } from './redaction.js';
 
@@ -23,6 +28,7 @@ export type BlockedGoalRecoveryDecisionStatus =
 export type BlockedGoalRecoveryResumeAttemptReadiness =
   | 'ready_for_separate_resume_attempt'
   | 'blocked_by_missing_decision'
+  | 'blocked_by_missing_resume_command'
   | 'blocked_by_rejection'
   | 'blocked_by_deferral'
   | 'blocked_by_mixed_decisions'
@@ -30,6 +36,15 @@ export type BlockedGoalRecoveryResumeAttemptReadiness =
 
 export interface BlockedGoalRecoveryDecisionInputItem {
   actionKey: string;
+  decision: BlockedGoalRecoveryDecision;
+  evidence: string;
+  reviewerRole: string;
+  rationale?: string;
+  prerequisiteStatus?: 'completed' | 'unmet';
+}
+
+export interface BlockedGoalRecoveryResumeCommandDecisionInputItem {
+  commandId: string;
   decision: BlockedGoalRecoveryDecision;
   evidence: string;
   reviewerRole: string;
@@ -42,6 +57,7 @@ export interface BuildBlockedGoalRecoveryDecisionReceiptInput {
   sourceConsumptionReportText: string;
   consumptionReport: BlockedGoalRecoveryConsumptionReport;
   decisions: BlockedGoalRecoveryDecisionInputItem[];
+  resumeCommandDecisions: BlockedGoalRecoveryResumeCommandDecisionInputItem[];
 }
 
 export interface WriteBlockedGoalRecoveryDecisionReceiptInput {
@@ -58,6 +74,17 @@ export interface WriteBlockedGoalRecoveryDecisionReceiptFromDirectoryInput {
 }
 
 export interface BlockedGoalRecoveryDecisionItem extends BlockedGoalRecoveryConsumptionAction {
+  decision: BlockedGoalRecoveryRecordedDecision;
+  evidence: string;
+  reviewerRole: string;
+  rationale: string;
+  prerequisiteStatus: 'completed' | 'unmet' | 'not_applicable';
+}
+
+export interface BlockedGoalRecoveryResumeCommandDecisionItem {
+  commandId: string;
+  command: string;
+  purpose: string;
   decision: BlockedGoalRecoveryRecordedDecision;
   evidence: string;
   reviewerRole: string;
@@ -90,7 +117,7 @@ export interface BlockedGoalRecoveryDecisionReceipt {
   rejectedActions: BlockedGoalRecoveryDecisionItem[];
   deferredActions: BlockedGoalRecoveryDecisionItem[];
   riskAcceptedActions: BlockedGoalRecoveryDecisionItem[];
-  reviewedResumeCommands: Array<{ command: string; purpose: string }>;
+  resumeCommandDecisionItems: BlockedGoalRecoveryResumeCommandDecisionItem[];
   boundaryCompliance: {
     resumeCommandsExecuted: false;
     sourceBoundaryPreserved: boolean;
@@ -120,8 +147,19 @@ const NON_AUTHORIZATION_BOUNDARY =
 export function buildBlockedGoalRecoveryDecisionReceipt(
   input: BuildBlockedGoalRecoveryDecisionReceiptInput
 ): BlockedGoalRecoveryDecisionReceipt {
+  let parsedSource: unknown;
+  try {
+    parsedSource = JSON.parse(input.sourceConsumptionReportText);
+  } catch {
+    throw new Error('Invalid blocked goal recovery consumption report');
+  }
+  assertConsumptionReport(parsedSource);
   assertConsumptionReport(input.consumptionReport);
+  if (!isDeepStrictEqual(parsedSource, input.consumptionReport)) {
+    throw new Error('Invalid blocked goal recovery consumption report');
+  }
   assertDecisions(input.decisions, input.consumptionReport.actionQueue);
+  assertResumeCommandDecisions(input.resumeCommandDecisions, input.consumptionReport.resumeCommands);
 
   const decisionsByActionKey = new Map(input.decisions.map((item) => [item.actionKey, item]));
   const decisionItems = input.consumptionReport.actionQueue.map((action) => {
@@ -132,17 +170,41 @@ export function buildBlockedGoalRecoveryDecisionReceipt(
       evidence: sanitize(decision?.evidence ?? ''),
       reviewerRole: sanitize(decision?.reviewerRole ?? ''),
       rationale: sanitize(decision?.rationale ?? '')
+      ,prerequisiteStatus: decision?.prerequisiteStatus
+        ?? (action.prerequisiteCompletionRequired ? 'unmet' : 'not_applicable')
     } satisfies BlockedGoalRecoveryDecisionItem;
   });
+  const commandDecisionsById = new Map(input.resumeCommandDecisions.map((item) => [item.commandId, item]));
+  const resumeCommandDecisionItems = input.consumptionReport.resumeCommands.map((command) => {
+    const decision = commandDecisionsById.get(command.commandId);
+    return {
+      commandId: sanitize(command.commandId),
+      command: sanitize(command.command),
+      purpose: sanitize(command.purpose),
+      decision: decision?.decision ?? 'unreviewed',
+      evidence: sanitize(decision?.evidence ?? ''),
+      reviewerRole: sanitize(decision?.reviewerRole ?? ''),
+      rationale: sanitize(decision?.rationale ?? '')
+    } satisfies BlockedGoalRecoveryResumeCommandDecisionItem;
+  });
   const sourceBoundaryPreserved = hasPreservedBoundary(input.consumptionReport);
-  const decisionStatus = resolveDecisionStatus(decisionItems, sourceBoundaryPreserved);
+  const hasResumeCommand = resumeCommandDecisionItems.length > 0;
+  const decisionStatus = resolveDecisionStatus(
+    [...decisionItems, ...resumeCommandDecisionItems],
+    sourceBoundaryPreserved,
+    hasResumeCommand
+  );
   const blockedActions = [...BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS].map(sanitize);
 
   return {
     schemaVersion: 'repoassure.blocked-goal-recovery-decision-receipt.v1',
     generatedAt: sanitize(input.generatedAt ?? new Date().toISOString()),
     decisionStatus,
-    resumeAttemptReadiness: resolveResumeAttemptReadiness(decisionStatus, sourceBoundaryPreserved),
+    resumeAttemptReadiness: resolveResumeAttemptReadiness(
+      decisionStatus,
+      sourceBoundaryPreserved,
+      hasResumeCommand
+    ),
     sourceConsumptionReport: {
       schemaVersion: input.consumptionReport.schemaVersion,
       fileName: sanitize(basename(input.consumptionReportPath)),
@@ -156,10 +218,7 @@ export function buildBlockedGoalRecoveryDecisionReceipt(
     rejectedActions: decisionItems.filter((item) => item.decision === 'reject'),
     deferredActions: decisionItems.filter((item) => item.decision === 'defer'),
     riskAcceptedActions: decisionItems.filter((item) => item.decision === 'accept_risk'),
-    reviewedResumeCommands: input.consumptionReport.resumeCommands.map((item) => ({
-      command: sanitize(item.command),
-      purpose: sanitize(item.purpose)
-    })),
+    resumeCommandDecisionItems,
     boundaryCompliance: { resumeCommandsExecuted: false, sourceBoundaryPreserved },
     maintainerReviewBoundary: MAINTAINER_REVIEW_BOUNDARY,
     redactionBoundary: sanitize(input.consumptionReport.redactionBoundary),
@@ -181,7 +240,9 @@ export async function writeBlockedGoalRecoveryDecisionReceipt(
   } catch {
     throw new Error('Invalid blocked goal recovery decision input');
   }
-  if (!isRecord(decisionInput) || !Array.isArray(decisionInput.decisions)) {
+  if (!isRecord(decisionInput)
+    || !Array.isArray(decisionInput.decisions)
+    || !Array.isArray(decisionInput.resumeCommandDecisions)) {
     throw new Error('Invalid blocked goal recovery decisions');
   }
   const receipt = buildBlockedGoalRecoveryDecisionReceipt({
@@ -189,7 +250,8 @@ export async function writeBlockedGoalRecoveryDecisionReceipt(
     consumptionReportPath: input.consumptionReportPath,
     sourceConsumptionReportText,
     consumptionReport: consumptionReport as BlockedGoalRecoveryConsumptionReport,
-    decisions: decisionInput.decisions as BlockedGoalRecoveryDecisionInputItem[]
+    decisions: decisionInput.decisions as BlockedGoalRecoveryDecisionInputItem[],
+    resumeCommandDecisions: decisionInput.resumeCommandDecisions as BlockedGoalRecoveryResumeCommandDecisionInputItem[]
   });
   const jsonPath = join(input.outputDir, RECEIPT_JSON_NAME);
   const markdownPath = join(input.outputDir, RECEIPT_MARKDOWN_NAME);
@@ -240,12 +302,20 @@ export function buildBlockedGoalRecoveryDecisionReceiptMarkdown(
     ].map(escapeMarkdownTableCell).join(' | ')} |`),
     ...(receipt.decisionItems.length === 0 ? ['| n/a | n/a | n/a | n/a | n/a | n/a | n/a |'] : []),
     '',
-    '## Reviewed Resume Commands',
+    '## Resume Command Decisions',
     '',
-    '| Command | Purpose | Executed |',
-    '| --- | --- | --- |',
-    ...receipt.reviewedResumeCommands.map((item) => `| ${escapeMarkdownTableCell(item.command)} | ${escapeMarkdownTableCell(item.purpose)} | false |`),
-    ...(receipt.reviewedResumeCommands.length === 0 ? ['| n/a | n/a | false |'] : []),
+    '| Command ID | Command | Purpose | Decision | Evidence | Reviewer role | Executed |',
+    '| --- | --- | --- | --- | --- | --- | --- |',
+    ...receipt.resumeCommandDecisionItems.map((item) => `| ${[
+      item.commandId,
+      item.command,
+      item.purpose,
+      item.decision,
+      item.evidence || 'n/a',
+      item.reviewerRole || 'n/a',
+      'false'
+    ].map(escapeMarkdownTableCell).join(' | ')} |`),
+    ...(receipt.resumeCommandDecisionItems.length === 0 ? ['| n/a | n/a | n/a | n/a | n/a | n/a | false |'] : []),
     '',
     '## Maintainer Review Boundary',
     '',
@@ -269,17 +339,30 @@ export function buildBlockedGoalRecoveryDecisionReceiptMarkdown(
 function assertConsumptionReport(value: unknown): asserts value is BlockedGoalRecoveryConsumptionReport {
   if (!isRecord(value)
     || value.schemaVersion !== 'repoassure.blocked-goal-recovery-consumption-report.v1'
+    || typeof value.generatedAt !== 'string'
+    || !isRecord(value.sourceRecoveryPackage)
+    || typeof value.sourceRecoveryPackage.path !== 'string'
+    || typeof value.sourceRecoveryPackage.sha256 !== 'string'
+    || !/^[a-f0-9]{64}$/u.test(value.sourceRecoveryPackage.sha256)
+    || !isResumeReadiness(value.resumeReadiness)
+    || !Array.isArray(value.evidenceReadOrder)
+    || !value.evidenceReadOrder.every(isEvidenceReadOrderItem)
     || !Array.isArray(value.actionQueue)
     || !value.actionQueue.every(isConsumptionAction)
+    || new Set(value.actionQueue.map((item) => (item as BlockedGoalRecoveryConsumptionAction).actionKey)).size !== value.actionQueue.length
     || !Array.isArray(value.resumeCommands)
     || !value.resumeCommands.every(isResumeCommand)
+    || new Set(value.resumeCommands.map((item) => (item as { commandId: string }).commandId)).size !== value.resumeCommands.length
+    || !Array.isArray(value.resumeChecklist)
+    || !value.resumeChecklist.every((item) => typeof item === 'string')
     || !isRecord(value.boundaryCompliance)
     || value.boundaryCompliance.recoveryCommandsExecuted !== false
     || typeof value.boundaryCompliance.blockedActionsPreserved !== 'boolean'
     || !Array.isArray(value.blockedActions)
     || !value.blockedActions.every((item) => typeof item === 'string')
-    || typeof value.resumeReadiness !== 'string'
-    || typeof value.redactionBoundary !== 'string') {
+    || typeof value.redactionBoundary !== 'string'
+    || value.maintainerReviewBoundary !== BLOCKED_GOAL_RECOVERY_MAINTAINER_REVIEW_BOUNDARY
+    || value.nonAuthorizationBoundary !== BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BOUNDARY) {
     throw new Error('Invalid blocked goal recovery consumption report');
   }
 }
@@ -288,17 +371,57 @@ function assertDecisions(decisions: unknown, actions: BlockedGoalRecoveryConsump
   if (!Array.isArray(decisions) || !decisions.every(isDecision)) {
     throw new Error('Invalid blocked goal recovery decisions');
   }
-  const actionKeys = new Set(actions.map((item) => item.actionKey));
+  const actionsByKey = new Map(actions.map((item) => [item.actionKey, item]));
   const decisionKeys = decisions.map((item) => item.actionKey);
   if (new Set(decisionKeys).size !== decisionKeys.length
-    || decisionKeys.some((key) => !actionKeys.has(key))) {
+    || decisionKeys.some((key) => !actionsByKey.has(key))
+    || decisions.some((decision) => {
+      const action = actionsByKey.get(decision.actionKey);
+      return !action
+        || !action.allowedDecisions.includes(decision.decision)
+        || (action.prerequisiteCompletionRequired
+          && decision.decision === 'approve'
+          && decision.prerequisiteStatus !== 'completed');
+    })) {
     throw new Error('Invalid blocked goal recovery decisions');
+  }
+}
+
+function assertResumeCommandDecisions(
+  decisions: unknown,
+  commands: Array<{ commandId: string; command: string; purpose: string }>
+): asserts decisions is BlockedGoalRecoveryResumeCommandDecisionInputItem[] {
+  if (!Array.isArray(decisions) || !decisions.every(isResumeCommandDecision)) {
+    throw new Error('Invalid blocked goal recovery resume command decisions');
+  }
+  const commandIds = new Set(commands.map((item) => item.commandId));
+  const decisionIds = decisions.map((item) => item.commandId);
+  if (new Set(decisionIds).size !== decisionIds.length || decisionIds.some((id) => !commandIds.has(id))) {
+    throw new Error('Invalid blocked goal recovery resume command decisions');
   }
 }
 
 function isDecision(value: unknown): value is BlockedGoalRecoveryDecisionInputItem {
   if (!isRecord(value)
     || typeof value.actionKey !== 'string'
+    || !isDecisionValue(value.decision)
+    || typeof value.evidence !== 'string'
+    || value.evidence.trim().length === 0
+    || typeof value.reviewerRole !== 'string'
+    || value.reviewerRole.trim().length === 0
+    || (value.rationale !== undefined && typeof value.rationale !== 'string')
+    || (value.prerequisiteStatus !== undefined
+      && value.prerequisiteStatus !== 'completed'
+      && value.prerequisiteStatus !== 'unmet')) {
+    return false;
+  }
+  return value.decision === 'approve'
+    || (typeof value.rationale === 'string' && value.rationale.trim().length > 0);
+}
+
+function isResumeCommandDecision(value: unknown): value is BlockedGoalRecoveryResumeCommandDecisionInputItem {
+  if (!isRecord(value)
+    || typeof value.commandId !== 'string'
     || !isDecisionValue(value.decision)
     || typeof value.evidence !== 'string'
     || value.evidence.trim().length === 0
@@ -320,8 +443,36 @@ function isConsumptionAction(value: unknown): value is BlockedGoalRecoveryConsum
     && typeof value.actionKey === 'string'
     && typeof value.blockerId === 'string'
     && isActionType(value.actionType)
+    && isBoundActionKey(value.actionKey, value.blockerId, value.actionType)
     && typeof value.instruction === 'string'
-    && typeof value.context === 'string';
+    && typeof value.context === 'string'
+    && Array.isArray(value.allowedDecisions)
+    && value.allowedDecisions.length > 0
+    && value.allowedDecisions.every(isDecisionValue)
+    && new Set(value.allowedDecisions).size === value.allowedDecisions.length
+    && typeof value.prerequisiteCompletionRequired === 'boolean'
+    && (value.actionType === 'external_prerequisite_required'
+      ? value.prerequisiteCompletionRequired
+      : !value.prerequisiteCompletionRequired);
+}
+
+function isBoundActionKey(
+  actionKey: string,
+  blockerId: string,
+  actionType: BlockedGoalRecoveryActionType
+): boolean {
+  const encodedBlockerId = encodeURIComponent(blockerId);
+  if (actionType === 'automatic_retry_candidate') {
+    return actionKey.startsWith(`automatic:${encodedBlockerId}:`)
+      && actionKey.length > `automatic:${encodedBlockerId}:`.length;
+  }
+  const prefix = actionType === 'maintainer_decision_required' ? 'maintainer' : 'external';
+  const [actualPrefix, actualBlockerId, opaqueId, ...extra] = actionKey.split(':');
+  return actualPrefix === prefix
+    && actualBlockerId === encodedBlockerId
+    && typeof opaqueId === 'string'
+    && opaqueId.length > 0
+    && extra.length === 0;
 }
 
 function isActionType(value: unknown): value is BlockedGoalRecoveryActionType {
@@ -330,8 +481,27 @@ function isActionType(value: unknown): value is BlockedGoalRecoveryActionType {
     || value === 'external_prerequisite_required';
 }
 
-function isResumeCommand(value: unknown): value is { command: string; purpose: string } {
-  return isRecord(value) && typeof value.command === 'string' && typeof value.purpose === 'string';
+function isResumeCommand(value: unknown): value is { commandId: string; command: string; purpose: string } {
+  return isRecord(value)
+    && typeof value.commandId === 'string'
+    && value.commandId.length > 0
+    && typeof value.command === 'string'
+    && typeof value.purpose === 'string';
+}
+
+function isEvidenceReadOrderItem(value: unknown): boolean {
+  return isRecord(value)
+    && (value.label === 'recovery_package'
+      || value.label === 'goal_evidence'
+      || value.label === 'goal_audit'
+      || value.label === 'blocker_log')
+    && typeof value.path === 'string';
+}
+
+function isResumeReadiness(value: unknown): boolean {
+  return value === 'ready_to_resume_after_review'
+    || value === 'automatic_retry_candidates_available'
+    || value === 'waiting_for_maintainer_or_external_action';
 }
 
 function hasPreservedBoundary(report: BlockedGoalRecoveryConsumptionReport): boolean {
@@ -341,25 +511,29 @@ function hasPreservedBoundary(report: BlockedGoalRecoveryConsumptionReport): boo
 }
 
 function resolveDecisionStatus(
-  items: BlockedGoalRecoveryDecisionItem[],
-  boundaryPreserved: boolean
+  items: Array<{ decision: BlockedGoalRecoveryRecordedDecision }>,
+  boundaryPreserved: boolean,
+  hasResumeCommand: boolean
 ): BlockedGoalRecoveryDecisionStatus {
-  if (!boundaryPreserved || items.length === 0 || items.some((item) => item.decision === 'unreviewed')) {
+  if (!boundaryPreserved || !hasResumeCommand || items.length === 0) {
     return 'blocked_or_incomplete';
   }
+  if (items.some((item) => item.decision === 'reject')) return 'rejected';
+  if (items.some((item) => item.decision === 'defer')) return 'deferred';
+  if (items.some((item) => item.decision === 'unreviewed')) return 'blocked_or_incomplete';
   const decisions = new Set(items.map((item) => item.decision));
   if (decisions.size === 1 && decisions.has('approve')) return 'approved_for_separate_resume_attempt';
-  if (decisions.size === 1 && decisions.has('reject')) return 'rejected';
-  if (decisions.size === 1 && decisions.has('defer')) return 'deferred';
   if ([...decisions].every((item) => item === 'approve' || item === 'accept_risk')) return 'accepted_with_risk';
   return 'mixed_decisions';
 }
 
 function resolveResumeAttemptReadiness(
   status: BlockedGoalRecoveryDecisionStatus,
-  boundaryPreserved: boolean
+  boundaryPreserved: boolean,
+  hasReviewedResumeCommand: boolean
 ): BlockedGoalRecoveryResumeAttemptReadiness {
   if (!boundaryPreserved) return 'blocked_by_boundary_violation';
+  if (!hasReviewedResumeCommand) return 'blocked_by_missing_resume_command';
   if (status === 'approved_for_separate_resume_attempt' || status === 'accepted_with_risk') return 'ready_for_separate_resume_attempt';
   if (status === 'rejected') return 'blocked_by_rejection';
   if (status === 'deferred') return 'blocked_by_deferral';
@@ -387,7 +561,9 @@ function sanitizeAction(action: BlockedGoalRecoveryConsumptionAction): BlockedGo
     blockerId: sanitize(action.blockerId),
     actionType: action.actionType,
     instruction: sanitize(action.instruction),
-    context: sanitize(action.context)
+    context: sanitize(action.context),
+    allowedDecisions: [...action.allowedDecisions],
+    prerequisiteCompletionRequired: action.prerequisiteCompletionRequired
   };
 }
 

@@ -25,15 +25,15 @@ The receipt schema is `repoassure.blocked-goal-recovery-decision-receipt.v1`.
 
 Each consumption action gains an `actionKey` so decisions remain deterministic when one blocker contains multiple actions:
 
-- automatic retry: `automatic:<blockerId>:<actionId>`
-- maintainer decision: `maintainer:<blockerId>:<ordinal>`
-- external prerequisite: `external:<blockerId>:<ordinal>`
+- automatic retry: `automatic:<encodedBlockerId>:<opaqueActionId>`
+- maintainer decision: `maintainer:<encodedBlockerId>:<opaqueActionId>`
+- external prerequisite: `external:<encodedBlockerId>:<opaqueActionId>`
 
-Decision input items reference exactly one source `actionKey`. Duplicate, unknown, malformed, or contradictory inputs are rejected.
+Maintainer/external actions receive content-stable opaque IDs rather than order-dependent ordinals. Resume commands receive stable `commandId` values. Decision input items reference exactly one source action or command ID. Duplicate, unknown, malformed, colliding, or contradictory inputs are rejected.
 
 ## Decision Contract
 
-Each decision is one of `approve`, `reject`, `defer`, or `accept_risk` and records evidence plus reviewer role. Decision-specific rationale is required for reject, defer, and accept-risk outcomes. Missing decisions remain explicitly unreviewed and block readiness.
+Each decision is one of `approve`, `reject`, `defer`, or `accept_risk` and records evidence plus reviewer role. Decision-specific rationale is required for reject, defer, and accept-risk outcomes. Allowed action decisions are preserved from source evidence; external prerequisite approval requires explicit completion evidence and cannot be waived through accept-risk. Every resume command requires a separate command-level decision. Missing decisions remain explicitly unreviewed and block readiness.
 
 The receipt includes source provenance with a SHA-256 digest of the raw consumption report bytes, per-action review items, decision summary, approved/rejected/deferred/risk-accepted sets, reviewed resume commands, maintainer boundary, redaction boundary, non-authorization boundary, and blocked actions.
 

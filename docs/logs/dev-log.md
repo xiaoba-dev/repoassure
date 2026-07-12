@@ -13615,14 +13615,23 @@ Phase 0：项目初始化。
 - `pnpm build`：通过。
 - `pnpm typecheck`：通过。
 - `pnpm lint`：通过。
-- `pnpm test:unit`：58 files，708 tests，通过。
-- `pnpm test:integration`：29 files，57 tests，通过。
+- `pnpm test:unit`：58 files，712 tests，通过。
+- `pnpm test:integration`：29 files，58 tests，通过。
 - `pnpm test:e2e`：1 passed，1 skipped。
-- `pnpm test`：88 files passed，1 skipped；766 tests passed，1 skipped。
+- `pnpm test`：88 files passed，1 skipped；771 tests passed，1 skipped。
 - `pnpm repo:hygiene`：通过。
 - `pnpm release:check`：通过。
 - `pnpm goal:audit`：35/35，通过。
 - 初次并行运行 build-owning gates 时出现共享 `dist` 读取竞态；改为 build/typecheck/unit/integration 串行后全部通过。
+
+### Independent Review Remediation
+
+- Stable identity 不再使用 ordinal；maintainer request、external prerequisite 和 resume command 获得内容稳定 opaque ID，动态 segment 编码后进入 action key，重复 ID 被拒绝。
+- Consumption report 结构化保留 `allowedDecisions` 和 prerequisite completion requirement；external prerequisite 不能通过 accept-risk 绕过，approve 必须记录 `prerequisiteStatus: completed`。
+- Receipt validator 覆盖完整 source v1 schema、canonical boundaries、ID 唯一性和 raw text/object 一致性。
+- 状态优先级固定为 boundary violation、reject、defer、missing decision、accepted；已有 veto 不再被未审阅项掩盖。
+- Resume command 使用稳定 `commandId` 和独立 decision item；缺少 command review 时 readiness 保持 blocked。
+- 新增 CLI failure-path redaction、identity collision/order stability、source tampering、command review 和 veto precedence 回归测试。
 
 ### 边界
 

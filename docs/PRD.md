@@ -94,6 +94,6 @@ The local `goal:recover:consume` workflow emits JSON and Markdown with resume re
 
 ## Blocked Goal Recovery Decision Receipt v0.1
 
-RepoAssure must let a maintainer record `approve`, `reject`, `defer`, or `accept_risk` decisions for every stable recovery `actionKey` before any separate resume attempt. The local `goal:recover:decide` workflow emits JSON/Markdown with raw consumption-report provenance, decision summary, reviewed and unreviewed action items, separate-resume readiness, reviewed resume commands, redaction boundary, non-authorization boundary, and blocked actions.
+RepoAssure must let a maintainer record `approve`, `reject`, `defer`, or `accept_risk` decisions for every stable recovery `actionKey` and stable resume `commandId` before any separate resume attempt. The local `goal:recover:decide` workflow emits JSON/Markdown with raw consumption-report provenance, decision summary, reviewed and unreviewed action/command items, external prerequisite completion evidence, separate-resume readiness, redaction boundary, non-authorization boundary, and blocked actions.
 
 The receipt does not execute recovery commands and does not authorize target repo mutation, release, launch, customer contact, pricing/spend, repository visibility changes, or commercial/hosted availability claims.

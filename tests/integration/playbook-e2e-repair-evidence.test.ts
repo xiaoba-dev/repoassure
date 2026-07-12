@@ -335,12 +335,21 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     ]);
     const recoveryConsumptionReport = JSON.parse(
       await readFile(join(outputDir, 'blocked-goal-recovery-consumption-report.json'), 'utf8')
-    ) as { actionQueue: Array<{ actionKey: string }> };
+    ) as {
+      actionQueue: Array<{ actionKey: string }>;
+      resumeCommands: Array<{ commandId: string }>;
+    };
     await writeFile(join(outputDir, 'blocked-goal-recovery-decisions.json'), `${JSON.stringify({
       decisions: recoveryConsumptionReport.actionQueue.map((action) => ({
         actionKey: action.actionKey,
         decision: 'approve',
         evidence: 'Fixture action reviewed locally.',
+        reviewerRole: 'maintainer'
+      })),
+      resumeCommandDecisions: recoveryConsumptionReport.resumeCommands.map((command) => ({
+        commandId: command.commandId,
+        decision: 'approve',
+        evidence: 'Fixture resume command reviewed locally.',
         reviewerRole: 'maintainer'
       }))
     }, null, 2)}\n`);

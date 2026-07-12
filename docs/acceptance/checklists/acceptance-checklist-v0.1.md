@@ -301,5 +301,5 @@
 - [ ] Missing review decisions or non-ready intake reports remain `blocked_or_incomplete`.
 - [ ] The validation does not mutate target repo files or authorize branch, commit, pull request, issue, advisory, release, launch, customer contact, or commercial availability claims.
 - [x] Blocked Goal Recovery Decision Receipt v0.1 emits `repoassure.blocked-goal-recovery-decision-receipt.v1` through `pnpm --silent goal:recover:decide`, preserves raw provenance and pricing/spend boundaries, and does not execute resume commands.
-- [x] Missing decisions block readiness; duplicate or unknown action keys fail validation; approve/reject/defer/accept-risk outcomes are covered by unit and campaign tests.
+- [x] Missing action or command decisions block readiness; duplicate/unknown/malformed IDs fail validation; source allowed decisions and external completion evidence are enforced; approve/reject/defer/accept-risk outcomes and veto precedence are covered by unit and campaign tests.
 - [ ] Blocked Goal Recovery Resume Attempt Task Package v0.1 remains the next separate goal and is not authorized by the decision receipt alone.

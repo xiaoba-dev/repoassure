@@ -23,12 +23,8 @@ describe('blocked goal recovery decision receipt', () => {
       consumptionReportPath: '/private/tmp/TOKEN=secret-value/blocked-goal-recovery-consumption-report.json',
       sourceConsumptionReportText: JSON.stringify(report),
       consumptionReport: report,
-      decisions: report.actionQueue.map((action) => ({
-        actionKey: action.actionKey,
-        decision: 'approve' as const,
-        evidence: `Reviewed ${action.actionKey}`,
-        reviewerRole: 'maintainer'
-      }))
+      decisions: approvedActionDecisions(report),
+      resumeCommandDecisions: approvedCommandDecisions(report)
     });
     const markdown = buildBlockedGoalRecoveryDecisionReceiptMarkdown(receipt);
 
@@ -37,7 +33,9 @@ describe('blocked goal recovery decision receipt', () => {
     expect(receipt.resumeAttemptReadiness).toBe('ready_for_separate_resume_attempt');
     expect(receipt.decisionSummary).toMatchObject({ totalActions: 3, approved: 3, unreviewed: 0 });
     expect(receipt.approvedActions).toHaveLength(3);
-    expect(receipt.reviewedResumeCommands).toEqual(report.resumeCommands);
+    expect(receipt.resumeCommandDecisionItems).toEqual([
+      expect.objectContaining({ commandId: report.resumeCommands[0]!.commandId, decision: 'approve' })
+    ]);
     expect(receipt.boundaryCompliance).toEqual({
       resumeCommandsExecuted: false,
       sourceBoundaryPreserved: true
@@ -48,7 +46,7 @@ describe('blocked goal recovery decision receipt', () => {
       'spend_authorization'
     ]));
     expect(markdown).toContain('## Recovery Decisions');
-    expect(markdown).toContain('## Reviewed Resume Commands');
+    expect(markdown).toContain('## Resume Command Decisions');
     expect(JSON.stringify(receipt)).not.toContain('secret-value');
   });
 
@@ -66,33 +64,28 @@ describe('blocked goal recovery decision receipt', () => {
       evidence: string;
       reviewerRole: string;
       rationale?: string;
-    }>) => buildBlockedGoalRecoveryDecisionReceipt({ ...base, decisions });
+      prerequisiteStatus?: 'completed' | 'unmet';
+    }>) => buildBlockedGoalRecoveryDecisionReceipt({
+      ...base,
+      decisions,
+      resumeCommandDecisions: approvedCommandDecisions(report)
+    });
 
-    expect(decide(report.actionQueue.map((action) => ({
-      actionKey: action.actionKey,
-      decision: 'reject',
-      evidence: 'Rejected after review.',
-      reviewerRole: 'maintainer',
-      rationale: 'Recovery is unsafe.'
-    }))).decisionStatus).toBe('rejected');
+    expect(decide([
+      { actionKey: first!.actionKey, decision: 'reject', evidence: 'Rejected.', reviewerRole: 'maintainer', rationale: 'Unsafe.' }
+    ]).decisionStatus).toBe('rejected');
 
-    expect(decide(report.actionQueue.map((action) => ({
-      actionKey: action.actionKey,
-      decision: 'defer',
-      evidence: 'Deferred after review.',
-      reviewerRole: 'maintainer',
-      rationale: 'Wait for a maintenance window.'
-    }))).decisionStatus).toBe('deferred');
+    expect(decide([
+      { actionKey: first!.actionKey, decision: 'defer', evidence: 'Deferred.', reviewerRole: 'maintainer', rationale: 'Wait.' }
+    ]).decisionStatus).toBe('deferred');
 
-    const risk = decide(report.actionQueue.map((action) => ({
-      actionKey: action.actionKey,
-      decision: 'accept_risk',
-      evidence: 'Risk reviewed.',
-      reviewerRole: 'maintainer',
-      rationale: 'Residual risk is accepted for this separate attempt.'
-    })));
+    const risk = decide([
+      { actionKey: first!.actionKey, decision: 'accept_risk', evidence: 'Risk reviewed.', reviewerRole: 'maintainer', rationale: 'Risk accepted.' },
+      { actionKey: second!.actionKey, decision: 'approve', evidence: 'Approved.', reviewerRole: 'maintainer' },
+      { actionKey: third!.actionKey, decision: 'approve', evidence: 'Network restored.', reviewerRole: 'maintainer', prerequisiteStatus: 'completed' }
+    ]);
     expect(risk.decisionStatus).toBe('accepted_with_risk');
-    expect(risk.riskAcceptedActions).toHaveLength(3);
+    expect(risk.riskAcceptedActions).toHaveLength(1);
 
     const incomplete = decide([{ actionKey: first!.actionKey, decision: 'approve', evidence: 'Reviewed.', reviewerRole: 'maintainer' }]);
     expect(incomplete.decisionStatus).toBe('blocked_or_incomplete');
@@ -118,12 +111,10 @@ describe('blocked goal recovery decision receipt', () => {
     const report = buildConsumptionReport();
     const reportText = `${JSON.stringify(report, null, 2)}\n`;
     await writeFile(reportPath, reportText);
-    await writeFile(decisionsPath, `${JSON.stringify({ decisions: report.actionQueue.map((action) => ({
-      actionKey: action.actionKey,
-      decision: 'approve',
-      evidence: 'Reviewed locally.',
-      reviewerRole: 'maintainer'
-    })) }, null, 2)}\n`);
+    await writeFile(decisionsPath, `${JSON.stringify({
+      decisions: approvedActionDecisions(report),
+      resumeCommandDecisions: approvedCommandDecisions(report)
+    }, null, 2)}\n`);
 
     const result = await writeBlockedGoalRecoveryDecisionReceipt({
       consumptionReportPath: reportPath,
@@ -136,6 +127,76 @@ describe('blocked goal recovery decision receipt', () => {
     expect(result.receipt.sourceConsumptionReport.sha256).toBe(createHash('sha256').update(reportText).digest('hex'));
     expect(json).toContain('repoassure.blocked-goal-recovery-decision-receipt.v1');
     expect(markdown).toContain('# RepoAssure Blocked Goal Recovery Decision Receipt');
+  });
+
+  it('rejects duplicate or malformed source action identity and inherited boundary tampering', () => {
+    const report = buildConsumptionReport();
+    const build = (consumptionReport: typeof report) => () => buildBlockedGoalRecoveryDecisionReceipt({
+      consumptionReportPath: 'blocked-goal-recovery-consumption-report.json',
+      sourceConsumptionReportText: JSON.stringify(consumptionReport),
+      consumptionReport,
+      decisions: [],
+      resumeCommandDecisions: []
+    });
+    const duplicateActionKey = {
+      ...report,
+      actionQueue: [report.actionQueue[0]!, { ...report.actionQueue[1]!, actionKey: report.actionQueue[0]!.actionKey }]
+    };
+    const malformedActionKey = {
+      ...report,
+      actionQueue: [{ ...report.actionQueue[0]!, actionKey: 'maintainer:B1-test:1' }]
+    };
+    const tamperedBoundary = {
+      ...report,
+      nonAuthorizationBoundary: 'Resume and target repo mutation are authorized.'
+    };
+
+    expect(build(duplicateActionKey)).toThrow('Invalid blocked goal recovery consumption report');
+    expect(build(malformedActionKey)).toThrow('Invalid blocked goal recovery consumption report');
+    expect(build(tamperedBoundary)).toThrow('Invalid blocked goal recovery consumption report');
+    expect(() => buildBlockedGoalRecoveryDecisionReceipt({
+      consumptionReportPath: 'blocked-goal-recovery-consumption-report.json',
+      sourceConsumptionReportText: JSON.stringify(report),
+      consumptionReport: { ...report, generatedAt: 'different' },
+      decisions: [],
+      resumeCommandDecisions: []
+    })).toThrow('Invalid blocked goal recovery consumption report');
+  });
+
+  it('does not mark a commandless source ready for a separate resume attempt', () => {
+    const report = { ...buildConsumptionReport(), resumeCommands: [] };
+    const receipt = buildBlockedGoalRecoveryDecisionReceipt({
+      consumptionReportPath: 'blocked-goal-recovery-consumption-report.json',
+      sourceConsumptionReportText: JSON.stringify(report),
+      consumptionReport: report,
+      decisions: approvedActionDecisions(report),
+      resumeCommandDecisions: []
+    });
+
+    expect(receipt.decisionStatus).toBe('blocked_or_incomplete');
+    expect(receipt.resumeAttemptReadiness).toBe('blocked_by_missing_resume_command');
+  });
+
+  it('requires explicit resume-command review and validates the complete source schema', () => {
+    const report = buildConsumptionReport();
+    const withoutCommandDecision = buildBlockedGoalRecoveryDecisionReceipt({
+      consumptionReportPath: 'blocked-goal-recovery-consumption-report.json',
+      sourceConsumptionReportText: JSON.stringify(report),
+      consumptionReport: report,
+      decisions: approvedActionDecisions(report),
+      resumeCommandDecisions: []
+    });
+    expect(withoutCommandDecision.decisionStatus).toBe('blocked_or_incomplete');
+    expect(withoutCommandDecision.resumeCommandDecisionItems[0]!.decision).toBe('unreviewed');
+
+    const malformed = { ...report, sourceRecoveryPackage: { path: 'source.json', sha256: 'invalid' } };
+    expect(() => buildBlockedGoalRecoveryDecisionReceipt({
+      consumptionReportPath: 'blocked-goal-recovery-consumption-report.json',
+      sourceConsumptionReportText: JSON.stringify(malformed),
+      consumptionReport: malformed,
+      decisions: [],
+      resumeCommandDecisions: []
+    })).toThrow('Invalid blocked goal recovery consumption report');
   });
 });
 
@@ -169,4 +230,23 @@ function buildConsumptionReport() {
     sourcePackageText: JSON.stringify(recoveryPackage),
     recoveryPackage
   });
+}
+
+function approvedActionDecisions(report: ReturnType<typeof buildConsumptionReport>) {
+  return report.actionQueue.map((action) => ({
+    actionKey: action.actionKey,
+    decision: 'approve' as const,
+    evidence: `Reviewed ${action.actionKey}`,
+    reviewerRole: 'maintainer',
+    ...(action.prerequisiteCompletionRequired ? { prerequisiteStatus: 'completed' as const } : {})
+  }));
+}
+
+function approvedCommandDecisions(report: ReturnType<typeof buildConsumptionReport>) {
+  return report.resumeCommands.map((command) => ({
+    commandId: command.commandId,
+    decision: 'approve' as const,
+    evidence: `Reviewed ${command.commandId}`,
+    reviewerRole: 'maintainer'
+  }));
 }

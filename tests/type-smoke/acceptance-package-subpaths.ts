@@ -42,6 +42,7 @@ import * as aiIdeAuthorizedTargetRepoRepairGoalTaskPackage from '@hardening-mcp/
 import * as aiIdeTargetRepoRepairGoalExecutionEvidenceIntakeReport from '@hardening-mcp/acceptance/ai-ide-target-repo-repair-goal-execution-evidence-intake-report';
 import * as aiIdeTargetRepairEvidenceReviewDecisionPackage from '@hardening-mcp/acceptance/ai-ide-target-repair-evidence-review-decision-package';
 import * as blockedGoalRecoveryPackage from '@hardening-mcp/acceptance/blocked-goal-recovery-package';
+import * as blockedGoalRecoveryConsumptionReport from '@hardening-mcp/acceptance/blocked-goal-recovery-consumption-report';
 import * as campaignSummary from '@hardening-mcp/acceptance/campaign-summary';
 import * as userAcceptanceArgs from '@hardening-mcp/acceptance/user-acceptance-args';
 import * as shellQuote from '@hardening-mcp/acceptance/shell-quote';
@@ -101,6 +102,7 @@ const packageSubpathModules = [
   aiIdeTargetRepoRepairGoalExecutionEvidenceIntakeReport,
   aiIdeTargetRepairEvidenceReviewDecisionPackage,
   blockedGoalRecoveryPackage,
+  blockedGoalRecoveryConsumptionReport,
   campaignSummary,
   userAcceptanceArgs,
   shellQuote,

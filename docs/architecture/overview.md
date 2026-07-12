@@ -64,6 +64,7 @@ flowchart LR
 | [ADR-0031](../adr/0031-target-repo-repair-goal-execution-evidence-intake.md) | Target repo repair goal execution evidence intake | `pnpm playbook:target-repair-evidence` imports local execution evidence from a separate target repo repair goal into a maintainer-review report with mutation summary, verification results, boundary report, and blocked actions |
 | [ADR-0032](../adr/0032-target-repair-evidence-review-decision-package.md) | Target repair evidence review decision package | `pnpm playbook:target-repair-review` converts an intake report and maintainer review decisions into a local accept / changes_requested / defer / accept_risk decision package without target repo mutation |
 | [ADR-0033](../adr/0033-blocked-goal-recovery-package.md) | Blocked goal recovery package | `pnpm goal:recover` converts blocked/incomplete/deferred/retryable goal blocker evidence into a local recovery package with source provenance, blocker categories, attempted actions, automatic recovery actions, maintainer decision requests, external prerequisites, resume commands, redaction boundary, non-authorization boundary, and blocked actions |
+| [ADR-0034](../adr/0034-blocked-goal-recovery-consumption-contract.md) | Blocked goal recovery consumption | `pnpm goal:recover:consume` converts a recovery package into deterministic evidence read order, resume readiness, recovery action queue, resume checklist, and inherited non-authorization boundaries without executing recovery commands |
 
 ## Source-of-truth gateways
 

@@ -39,6 +39,7 @@ ADR records long-lived architecture decisions. Use `docs/logs/decision-log.md` f
 | [0031](0031-target-repo-repair-goal-execution-evidence-intake.md) | Accepted | Target repo repair goal execution evidence intake |
 | [0032](0032-target-repair-evidence-review-decision-package.md) | Accepted | Target repair evidence review decision package |
 | [0033](0033-blocked-goal-recovery-package.md) | Accepted | Blocked goal recovery package |
+| [0034](0034-blocked-goal-recovery-consumption-contract.md) | Accepted | Blocked goal recovery consumption contract |
 
 ## Template
 

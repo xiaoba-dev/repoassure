@@ -267,6 +267,16 @@
 - [ ] Automatic recovery actions, maintainer decision requests, external prerequisites, and resume commands are present and redacted.
 - [ ] The validation does not mutate target repo files or authorize branch, commit, pull request, issue, advisory, release, launch, customer contact, pricing/spend, or commercial availability claims.
 
+## Blocked Goal Recovery Consumption Validation v0.1
+
+- [ ] `pnpm --silent goal:recover:consume -- --from-dir <dir>` generates JSON and Markdown consumption reports without package-manager argv echo.
+- [ ] The report maps recovery package status to explicit resume readiness.
+- [ ] Evidence read order covers the recovery package, goal evidence, goal audit, and blocker logs when present.
+- [ ] The action queue distinguishes automatic retry candidates, maintainer decisions, and external prerequisites.
+- [ ] The report records `recoveryCommandsExecuted: false`, preserves blocked actions, and redacts secret-like path material.
+- [ ] The report retains reviewed resume commands, hashes raw source-file bytes, rejects malformed packages, and derives readiness from normalized blocker gates.
+- [ ] The validation does not execute recovery commands or authorize target repo mutation, release, launch, customer contact, pricing/spend, or commercial/hosted availability claims.
+
 ## Authorized Target Repo Repair Goal Task Package v0.1
 
 - [ ] `pnpm playbook:target-repair-goal -- --from-dir <dir>` generates JSON and Markdown task package artifacts.

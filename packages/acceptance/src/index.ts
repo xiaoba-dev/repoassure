@@ -489,6 +489,7 @@ export {
 export {
   buildBlockedGoalRecoveryPackage,
   buildBlockedGoalRecoveryPackageMarkdown,
+  BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS,
   writeBlockedGoalRecoveryPackage,
   writeBlockedGoalRecoveryPackageFromDirectory,
   type BlockedGoalAutomaticRecoveryAction,
@@ -517,6 +518,20 @@ export {
   type WriteBlockedGoalRecoveryPackageInput,
   type WriteBlockedGoalRecoveryPackageResult
 } from './blocked-goal-recovery-package.js';
+
+export {
+  buildBlockedGoalRecoveryConsumptionReport,
+  buildBlockedGoalRecoveryConsumptionReportMarkdown,
+  writeBlockedGoalRecoveryConsumptionReport,
+  type BlockedGoalRecoveryActionType,
+  type BlockedGoalRecoveryConsumptionAction,
+  type BlockedGoalRecoveryConsumptionReport,
+  type BlockedGoalRecoveryEvidenceReadOrderItem,
+  type BlockedGoalResumeReadiness,
+  type BuildBlockedGoalRecoveryConsumptionReportInput,
+  type WriteBlockedGoalRecoveryConsumptionReportInput,
+  type WriteBlockedGoalRecoveryConsumptionReportResult
+} from './blocked-goal-recovery-consumption-report.js';
 
 export {
   buildValidationCampaignSummary,

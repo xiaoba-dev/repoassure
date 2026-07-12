@@ -19,14 +19,15 @@ Recent completed work includes:
 - Target Repo Repair Goal Execution Evidence Intake v0.1.
 - Target Repair Evidence Review Decision Package v0.1.
 - Blocked Goal Recovery Package v0.1.
+- Blocked Goal Recovery Consumption Validation v0.1.
 - Public release and branch protection governance.
 - Public website private preview and custom-domain work.
 
 ## Next Codex Goal
 
-Blocked Goal Recovery Package v0.1
+Blocked Goal Recovery Decision Receipt v0.1
 
-Plain-language explanation: turn a blocked, incomplete, deferred, or retryable goal into a structured local recovery package, so the maintainer and AI IDE know what was tried, what is blocked, what can be retried, what needs external action, and what requires explicit maintainer decision before resuming.
+Plain-language explanation: record explicit maintainer decisions over a consumed blocked-goal recovery report before any separate resume attempt, without executing recovery commands or treating the receipt as target-repo, release, launch, customer, pricing, or commercial authorization.
 
 ## Execution Rules
 
@@ -59,6 +60,7 @@ Plain-language explanation: turn a blocked, incomplete, deferred, or retryable g
 - ADR-0031: Target repo repair goal execution evidence intake.
 - ADR-0032: Target repair evidence review decision package.
 - ADR-0033: Blocked goal recovery package.
+- ADR-0034: Blocked goal recovery consumption contract.
 ## AI IDE Repair Execution Replay Readiness v0.1
 
 Status: implemented.
@@ -135,3 +137,13 @@ Status: implemented.
 - Extend the near-real campaign E2E fixture through blocked goal recovery package generation.
 - Verify with unit, integration, type-smoke, E2E, and structure cascade tests.
 - Keep the package local-first and non-executing for target repo mutation, branch, commit, pull request, issue, advisory, release, launch, customer contact, pricing/spend, and commercial or hosted availability claims.
+
+## Blocked Goal Recovery Consumption Validation v0.1
+
+Status: implemented.
+
+- Add recovery consumption report schema and writer under `packages/acceptance`.
+- Add `pnpm goal:recover:consume` CLI.
+- Extend the near-real campaign E2E fixture through recovery consumption.
+- Verify resume readiness, evidence read order, action queue, resume checklist, Markdown readability, redaction, and non-authorization boundaries.
+- Keep the report local-first and non-executing for recovery commands, target repo mutation, release, launch, customer contact, pricing/spend, and commercial or hosted availability claims.

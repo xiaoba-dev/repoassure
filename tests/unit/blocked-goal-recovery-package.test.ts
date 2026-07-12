@@ -91,6 +91,8 @@ describe('blocked goal recovery package', () => {
     expect(recoveryPackage.nonAuthorizationBoundary).toContain('does not modify target repo files');
     expect(recoveryPackage.blockedActions).toContain('target_repo_pull_request_creation');
     expect(recoveryPackage.blockedActions).toContain('hosted_dashboard_availability_claim');
+    expect(recoveryPackage.blockedActions).toContain('pricing_change');
+    expect(recoveryPackage.blockedActions).toContain('spend_authorization');
     expect(markdown).toContain('# RepoAssure Blocked Goal Recovery Package');
     expect(markdown).toContain('## Blockers');
     expect(markdown).toContain('## Resume Commands');

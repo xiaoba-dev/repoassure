@@ -672,6 +672,7 @@
 - No GitHub release was authorized。
 - No public launch or production marketing announcement was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
 - Public Source Release Execution v0.1 必须作为单独 goal 获得明确执行授权。
 
 ## 2026年7月1日 - Equivalent Release Control Design v0.1
@@ -13547,3 +13548,51 @@ Phase 0：项目初始化。
 - No customer contact was authorized。
 - No pricing change or spend was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
+## 2026年7月13日 - Blocked Goal Recovery Consumption Validation v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/blocked-goal-recovery-consumption-report.ts`。
+- 新增 `repoassure.blocked-goal-recovery-consumption-report.v1` 和 JSON/Markdown 输出。
+- 新增 `pnpm goal:recover:consume`、CLI script、package export、compatibility contract 和 type-smoke。
+- E2E chain 扩展到 `goal:recover -> goal:recover:consume`。
+- 将 E2E 每阶段重复 `build:acceptance` 改为一次构建后直接运行脚本，运行时间从120秒超时降到10秒以内。
+- 新增 ADR-0034 和 operations 文档，并级联更新 README、PRD、SPEC、PLAN、architecture overview、testing strategy、acceptance checklist 和 decision log。
+
+### TDD 记录
+
+- Red：完整 E2E chain 在 PR #44 后超过120秒；unit test 因 consumption module 缺失失败；integration 和 structure tests 因 CLI、export 与文档缺失失败。
+- Green：一次构建修复 E2E 基线；实现 consumption builder、writer、Markdown、CLI、exports 和文档级联。
+- Refactor：保留原有 E2E 物料断言，将命令执行集中到稳定 script mapping。
+
+### Verification
+
+- `pnpm build`：通过。
+- `pnpm typecheck`：通过。
+- `pnpm lint`：通过。
+- `pnpm test:unit`：57 files，704 tests，通过。
+- `pnpm test:integration`：28 files，56 tests，通过。
+- `pnpm test:e2e`：1 passed，1 skipped。
+- `pnpm test`：86 files passed，1 skipped；761 tests passed，1 skipped。
+- `pnpm repo:hygiene`：通过。
+- `pnpm release:check`：通过。
+- `pnpm goal:audit`：35/35，通过。
+- Independent review：原始发现与二次边界发现均已修复，最终复审无剩余 actionable findings。
+- PR #45 首轮 GitHub Quality Gates：通过（1m46s）；合并前最终 CI 仍需在本收口提交后再次通过。
+
+### Independent Review Remediation
+
+- CLI 成功与失败输出统一脱敏；文档入口使用 `pnpm --silent goal:recover:consume`，避免 package-manager lifecycle echo 暴露 secret-like 路径参数。
+- Consumption report 保留经审阅的 `resumeCommands`，但只输出指令与用途，不执行任何恢复命令。
+- Resume readiness、action queue 和 blocked-action preservation 均从经运行时校验的 blocker 数据推导，不信任输入包中的聚合状态。
+- Source package SHA-256 直接基于原始文件字节计算，不再对重新序列化后的对象计算摘要。
+- 新增 malformed nested action、完整 blocked-action 集合、CLI error-path redaction 和 raw-byte digest 回归测试。
+- 二次独立复审后增加 top-level action aggregates 与 nested blocker actions 的严格一致性校验，防止矛盾输入产生 false readiness。
+- 无 blocker 但缺少 reviewed resume command 的包保持 `waiting_for_maintainer_or_external_action`，不再利用空数组 `every()` 结果进入自动重试状态。
+- Maintainer review 与 non-authorization 文本改为 canonical contract 并在消费前严格校验；blocked actions 明确新增 `pricing_change` 与 `spend_authorization`。
+
+### 边界
+
+- Recovery consumption report does not execute recovery commands。
+- No target repo mutation、release、launch、customer contact、pricing/spend 或 commercial/hosted availability claim was authorized。

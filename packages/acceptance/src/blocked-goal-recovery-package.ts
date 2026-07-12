@@ -191,7 +191,7 @@ const RECOVERY_INPUT_JSON_NAME = 'blocked-goal-recovery-input.json';
 const RECOVERY_PACKAGE_JSON_NAME = 'blocked-goal-recovery-package.json';
 const RECOVERY_PACKAGE_MARKDOWN_NAME = 'blocked-goal-recovery-package.md';
 
-const NON_AUTHORIZATION_BLOCKED_ACTIONS = [
+export const BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS = [
   'target_repo_file_mutation_by_repoassure',
   'target_repo_branch_creation',
   'target_repo_commit_creation',
@@ -202,9 +202,17 @@ const NON_AUTHORIZATION_BLOCKED_ACTIONS = [
   'github_release',
   'public_launch',
   'customer_contact',
+  'pricing_change',
+  'spend_authorization',
   'commercial_availability_claim',
   'hosted_dashboard_availability_claim'
 ] as const;
+
+export const BLOCKED_GOAL_RECOVERY_MAINTAINER_REVIEW_BOUNDARY =
+  'This package records blocker recovery evidence and resume guidance for maintainer review; it does not decide or execute blocked goal recovery by itself.';
+
+export const BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BOUNDARY =
+  'This blocked goal recovery package does not modify target repo files, create target repo branch, commit, pull request, issue, advisory, publish npm, create GitHub release, run public launch, contact customers, authorize pricing/spend, or claim SaaS, Team Cloud, Enterprise, commercial, or hosted dashboard availability.';
 
 export function buildBlockedGoalRecoveryPackage(
   input: BuildBlockedGoalRecoveryPackageInput
@@ -257,14 +265,10 @@ export function buildBlockedGoalRecoveryPackage(
     maintainerDecisionRequests,
     externalPrerequisites,
     resumeCommands: normalizeResumeCommands(input.input.resumeCommands ?? []),
-    maintainerReviewBoundary: sanitize(
-      'This package records blocker recovery evidence and resume guidance for maintainer review; it does not decide or execute blocked goal recovery by itself.'
-    ),
+    maintainerReviewBoundary: sanitize(BLOCKED_GOAL_RECOVERY_MAINTAINER_REVIEW_BOUNDARY),
     redactionBoundary: sanitize(input.input.redactionBoundary),
-    nonAuthorizationBoundary: sanitize(
-      'This blocked goal recovery package does not modify target repo files, create target repo branch, commit, pull request, issue, advisory, publish npm, create GitHub release, run public launch, contact customers, authorize pricing/spend, or claim SaaS, Team Cloud, Enterprise, commercial, or hosted dashboard availability.'
-    ),
-    blockedActions: [...NON_AUTHORIZATION_BLOCKED_ACTIONS].map(sanitize)
+    nonAuthorizationBoundary: sanitize(BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BOUNDARY),
+    blockedActions: [...BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS].map(sanitize)
   };
 }
 

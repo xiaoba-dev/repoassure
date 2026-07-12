@@ -186,6 +186,10 @@
       "types": "./dist/blocked-goal-recovery-consumption-report.d.ts",
       "default": "./dist/blocked-goal-recovery-consumption-report.js"
     },
+    "./blocked-goal-recovery-decision-receipt": {
+      "types": "./dist/blocked-goal-recovery-decision-receipt.d.ts",
+      "default": "./dist/blocked-goal-recovery-decision-receipt.js"
+    },
     "./campaign-summary": {
       "types": "./dist/campaign-summary.d.ts",
       "default": "./dist/campaign-summary.js"

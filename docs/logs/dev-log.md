@@ -13596,3 +13596,50 @@ Phase 0：项目初始化。
 
 - Recovery consumption report does not execute recovery commands。
 - No target repo mutation、release、launch、customer contact、pricing/spend 或 commercial/hosted availability claim was authorized。
+## 2026年7月13日 - Blocked Goal Recovery Decision Receipt v0.1
+
+### 完成内容
+
+- Recovery action queue 新增稳定 `actionKey`。
+- 新增 `repoassure.blocked-goal-recovery-decision-receipt.v1`、typed builder/writer/Markdown、raw-byte SHA 和 runtime validation。
+- 新增 `pnpm --silent goal:recover:decide`、package export、compatibility/type-smoke contract 和 near-real campaign E2E stage。
+- 新增 ADR-0035、operations guide，并级联 README、PRD、SPEC、PLAN、architecture、testing、acceptance 和 decision log。
+
+### TDD 记录
+
+- Red：action queue 缺少 stable action identity；decision receipt module 与 CLI 不存在；structure test 缺少 ADR/operations cascade。
+- Green：实现 actionKey、receipt state machine、CLI、package contracts、campaign E2E 和治理文档。
+
+### Verification
+
+- `pnpm build`：通过。
+- `pnpm typecheck`：通过。
+- `pnpm lint`：通过。
+- `pnpm test:unit`：58 files，715 tests，通过。
+- `pnpm test:integration`：29 files，58 tests，通过。
+- `pnpm test:e2e`：1 passed，1 skipped。
+- `pnpm test`：88 files passed，1 skipped；774 tests passed，1 skipped。
+- `pnpm repo:hygiene`：通过。
+- `pnpm release:check`：通过。
+- `pnpm goal:audit`：35/35，通过。
+- 初次并行运行 build-owning gates 时出现共享 `dist` 读取竞态；改为 build/typecheck/unit/integration 串行后全部通过。
+
+### Independent Review Remediation
+
+- Stable identity 不再使用 ordinal；maintainer request、external prerequisite 和 resume command 获得内容稳定 opaque ID，动态 segment 编码后进入 action key，重复 ID 被拒绝。
+- Consumption report 结构化保留 `allowedDecisions` 和 prerequisite completion requirement；external prerequisite 不能通过 accept-risk 绕过，approve 必须记录 `prerequisiteStatus: completed`。
+- Receipt validator 覆盖完整 source v1 schema、canonical boundaries、ID 唯一性和 raw text/object 一致性。
+- 状态优先级固定为 boundary violation、reject、defer、missing decision、accepted；已有 veto 不再被未审阅项掩盖。
+- Resume command 使用稳定 `commandId` 和独立 decision item；缺少 command review 时 readiness 保持 blocked。
+- 新增 CLI failure-path redaction、identity collision/order stability、source tampering、command review 和 veto precedence 回归测试。
+- Decisions envelope 新增 mandatory source report SHA-256 binding，防止 stable ID 对应内容变化后复用旧决定。
+- External/automatic action allowed-decision 集合按 action type 做 canonical validation；unsupported maintainer options 在 consumption 阶段直接失败。
+- Reject/defer veto 优先于 missing command；CLI failure-path 测试同时要求 `ENOENT`、脱敏占位符和原 secret 缺失。
+- 最终复审发现 partially unsupported maintainer options 会被静默过滤；现已改为任一 unsupported option 即失败，并以 writer-level 测试证明失败前不生成 JSON/Markdown。
+- 最终独立复审：无剩余 findings；focused 25/25 和 acceptance typecheck 通过。
+- PR #46 首轮 GitHub Quality Gates：通过（1m43s）；收口提交后仍需最终 CI 与 main CI。
+
+### 边界
+
+- Receipt does not execute recovery or resume commands。
+- No target repo mutation、publish、release、launch、customer contact、pricing/spend、repository visibility change 或 commercial/hosted availability claim was authorized。

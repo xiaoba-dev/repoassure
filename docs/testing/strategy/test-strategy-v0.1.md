@@ -583,3 +583,9 @@ Coverage uses the testing pyramid:
 - Structure: `tests/unit/project-structure.test.ts` guards ADR-0032, operation docs, package exports, CLI script, and documentation cascade.
 
 This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.
+## Blocked Goal Recovery Decision Receipt v0.1
+
+- Unit: order-independent opaque action/command identity; approve/reject/defer/accept-risk state machine; source allowed decisions; external completion evidence; veto precedence; missing, duplicate, unknown, malformed and redacted decisions; raw-byte/object consistency and SHA.
+- Integration: `pnpm --silent goal:recover:decide`, JSON/Markdown output, stdout/error redaction, and no command execution.
+- E2E: near-real campaign continues through recovery package, consumption report, decisions, and decision receipt.
+- Pyramid gates: build, typecheck, lint, unit, integration, E2E, full suite, hygiene, release check, goal audit, independent review, PR CI, and main CI.

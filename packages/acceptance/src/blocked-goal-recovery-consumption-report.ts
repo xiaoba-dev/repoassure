@@ -21,6 +21,8 @@ export type BlockedGoalRecoveryActionType =
   | 'maintainer_decision_required'
   | 'external_prerequisite_required';
 
+export type BlockedGoalRecoveryAllowedDecision = 'approve' | 'reject' | 'defer' | 'accept_risk';
+
 export interface BuildBlockedGoalRecoveryConsumptionReportInput {
   generatedAt?: string;
   packagePath: string;
@@ -40,10 +42,13 @@ export interface BlockedGoalRecoveryEvidenceReadOrderItem {
 }
 
 export interface BlockedGoalRecoveryConsumptionAction {
+  actionKey: string;
   blockerId: string;
   actionType: BlockedGoalRecoveryActionType;
   instruction: string;
   context: string;
+  allowedDecisions: BlockedGoalRecoveryAllowedDecision[];
+  prerequisiteCompletionRequired: boolean;
 }
 
 export interface BlockedGoalRecoveryConsumptionReport {
@@ -57,7 +62,7 @@ export interface BlockedGoalRecoveryConsumptionReport {
   evidenceReadOrder: BlockedGoalRecoveryEvidenceReadOrderItem[];
   actionQueue: BlockedGoalRecoveryConsumptionAction[];
   resumeChecklist: string[];
-  resumeCommands: Array<{ command: string; purpose: string }>;
+  resumeCommands: Array<{ commandId: string; command: string; purpose: string }>;
   boundaryCompliance: {
     recoveryCommandsExecuted: false;
     blockedActionsPreserved: boolean;
@@ -101,6 +106,7 @@ export function buildBlockedGoalRecoveryConsumptionReport(
       'Run only the reviewed resume command after all recovery gates are satisfied.'
     ],
     resumeCommands: input.recoveryPackage.resumeCommands.map((item) => ({
+      commandId: sanitize(item.commandId),
       command: sanitize(item.command),
       purpose: sanitize(item.purpose)
     })),
@@ -164,15 +170,18 @@ export function buildBlockedGoalRecoveryConsumptionReportMarkdown(
     '',
     '## Recovery Action Queue',
     '',
-    '| Blocker | Action type | Instruction | Context |',
-    '| --- | --- | --- | --- |',
+    '| Action key | Blocker | Action type | Instruction | Context | Allowed decisions | Completion evidence |',
+    '| --- | --- | --- | --- | --- | --- | --- |',
     ...report.actionQueue.map((item) => `| ${[
+      item.actionKey,
       item.blockerId,
       item.actionType,
       item.instruction,
-      item.context
+      item.context,
+      item.allowedDecisions.join(', '),
+      item.prerequisiteCompletionRequired ? 'required' : 'not required'
     ].map(escapeMarkdownTableCell).join(' | ')} |`),
-    ...(report.actionQueue.length === 0 ? ['| n/a | n/a | n/a | n/a |'] : []),
+    ...(report.actionQueue.length === 0 ? ['| n/a | n/a | n/a | n/a | n/a | n/a | n/a |'] : []),
     '',
     '## Resume Checklist',
     '',
@@ -263,25 +272,43 @@ function buildActionQueue(
   recoveryPackage: BlockedGoalRecoveryPackage
 ): BlockedGoalRecoveryConsumptionAction[] {
   return [
-    ...recoveryPackage.blockers.flatMap((blocker) => blocker.automaticRecoveryActions).map((action) => ({
+    ...recoveryPackage.blockers.flatMap((blocker) => blocker.automaticRecoveryActions.map((action) => ({
+      actionKey: `automatic:${encodeURIComponent(action.blockerId)}:${encodeURIComponent(action.actionId)}`,
       blockerId: sanitize(action.blockerId),
       actionType: 'automatic_retry_candidate' as const,
       instruction: sanitize(action.command),
-      context: sanitize(action.rationale)
-    })),
-    ...recoveryPackage.blockers.flatMap((blocker) => blocker.maintainerDecisionRequests).map((request) => ({
+      context: sanitize(action.rationale),
+      allowedDecisions: ['approve', 'reject', 'defer', 'accept_risk'] as BlockedGoalRecoveryAllowedDecision[],
+      prerequisiteCompletionRequired: false
+    }))),
+    ...recoveryPackage.blockers.flatMap((blocker) => blocker.maintainerDecisionRequests.map((request) => ({
+      actionKey: `maintainer:${encodeURIComponent(request.blockerId)}:${encodeURIComponent(request.actionId)}`,
       blockerId: sanitize(request.blockerId),
       actionType: 'maintainer_decision_required' as const,
       instruction: sanitize(request.requestedDecision),
-      context: sanitize(`Options: ${request.options.join(', ')}`)
-    })),
-    ...recoveryPackage.blockers.flatMap((blocker) => blocker.externalPrerequisites).map((prerequisite) => ({
+      context: sanitize(`Options: ${request.options.join(', ')}`),
+      allowedDecisions: normalizeAllowedDecisions(request.options),
+      prerequisiteCompletionRequired: false
+    }))),
+    ...recoveryPackage.blockers.flatMap((blocker) => blocker.externalPrerequisites.map((prerequisite) => ({
+      actionKey: `external:${encodeURIComponent(prerequisite.blockerId)}:${encodeURIComponent(prerequisite.actionId)}`,
       blockerId: sanitize(prerequisite.blockerId),
       actionType: 'external_prerequisite_required' as const,
       instruction: sanitize(prerequisite.prerequisite),
-      context: sanitize(`Owner: ${prerequisite.owner}`)
-    }))
+      context: sanitize(`Owner: ${prerequisite.owner}`),
+      allowedDecisions: ['approve', 'defer'] as BlockedGoalRecoveryAllowedDecision[],
+      prerequisiteCompletionRequired: true
+    })))
   ];
+}
+
+function normalizeAllowedDecisions(options: string[]): BlockedGoalRecoveryAllowedDecision[] {
+  const allowed = options.filter(isAllowedDecision);
+  return [...new Set(allowed)];
+}
+
+function isAllowedDecision(option: string): option is BlockedGoalRecoveryAllowedDecision {
+  return option === 'approve' || option === 'reject' || option === 'defer' || option === 'accept_risk';
 }
 
 function assertBlockedGoalRecoveryPackage(value: unknown): asserts value is BlockedGoalRecoveryPackage {
@@ -317,6 +344,9 @@ function assertBlockedGoalRecoveryPackage(value: unknown): asserts value is Bloc
   if (!sameJson(recoveryPackage.automaticRecoveryActions, nestedAutomaticActions)
     || !sameJson(recoveryPackage.maintainerDecisionRequests, nestedDecisionRequests)
     || !sameJson(recoveryPackage.externalPrerequisites, nestedExternalPrerequisites)
+    || recoveryPackage.maintainerDecisionRequests.some((request) => (
+      request.options.length === 0 || request.options.some((option) => !isAllowedDecision(option))
+    ))
     || recoveryPackage.maintainerReviewBoundary !== BLOCKED_GOAL_RECOVERY_MAINTAINER_REVIEW_BOUNDARY
     || recoveryPackage.nonAuthorizationBoundary !== BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BOUNDARY) {
     throw new Error('Invalid blocked goal recovery package');
@@ -386,6 +416,7 @@ function isAutomaticRecoveryAction(value: unknown): boolean {
 function isMaintainerDecisionRequest(value: unknown): boolean {
   return isRecord(value)
     && typeof value.blockerId === 'string'
+    && typeof value.actionId === 'string'
     && typeof value.requestedDecision === 'string'
     && isStringArray(value.options);
 }
@@ -393,12 +424,14 @@ function isMaintainerDecisionRequest(value: unknown): boolean {
 function isExternalPrerequisite(value: unknown): boolean {
   return isRecord(value)
     && typeof value.blockerId === 'string'
+    && typeof value.actionId === 'string'
     && typeof value.prerequisite === 'string'
     && typeof value.owner === 'string';
 }
 
 function isResumeCommand(value: unknown): boolean {
   return isRecord(value)
+    && typeof value.commandId === 'string'
     && typeof value.command === 'string'
     && typeof value.purpose === 'string';
 }

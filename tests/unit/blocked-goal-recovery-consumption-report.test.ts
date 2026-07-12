@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { access, mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -43,9 +43,9 @@ describe('blocked goal recovery consumption report', () => {
       'external_prerequisite_required'
     ]);
     expect(report.actionQueue).toEqual([
-      expect.objectContaining({ blockerId: 'B1-test-timeout', instruction: 'pnpm test -- --testTimeout=15000' }),
-      expect.objectContaining({ blockerId: 'B2-review', instruction: 'Approve resume, defer, or accept risk.' }),
-      expect.objectContaining({ blockerId: 'B3-network', instruction: 'Network access is restored.' })
+      expect.objectContaining({ actionKey: 'automatic:B1-test-timeout:A1-rerun', blockerId: 'B1-test-timeout', instruction: 'pnpm test -- --testTimeout=15000' }),
+      expect.objectContaining({ actionKey: expect.stringMatching(/^maintainer:B2-review:maintainer-/u), blockerId: 'B2-review', instruction: 'Approve resume, defer, or accept risk.' }),
+      expect.objectContaining({ actionKey: expect.stringMatching(/^external:B3-network:external-/u), blockerId: 'B3-network', instruction: 'Network access is restored.' })
     ]);
     expect(report.resumeChecklist).toEqual(expect.arrayContaining([
       'Read the recovery package and its source evidence in order.',
@@ -53,10 +53,10 @@ describe('blocked goal recovery consumption report', () => {
       'Run only the reviewed resume command after all recovery gates are satisfied.'
     ]));
     expect(report.resumeCommands).toEqual([
-      {
+      expect.objectContaining({
         command: 'codex resume goal',
         purpose: 'Resume after all review gates pass.'
-      }
+      })
     ]);
     expect(report.boundaryCompliance).toEqual({
       recoveryCommandsExecuted: false,
@@ -191,6 +191,33 @@ describe('blocked goal recovery consumption report', () => {
       'goal_audit',
       'blocker_log'
     ]);
+  });
+
+  it('rejects maintainer requests without supported decision options', () => {
+    const recoveryPackage = buildRecoveryPackage();
+    recoveryPackage.blockers[1]!.maintainerDecisionRequests[0]!.options = ['yes', 'no'];
+
+    expect(() => buildBlockedGoalRecoveryConsumptionReport({
+      packagePath: 'blocked-goal-recovery-package.json',
+      sourcePackageText: JSON.stringify(recoveryPackage),
+      recoveryPackage
+    })).toThrow('Invalid blocked goal recovery package');
+  });
+
+  it('rejects partially unsupported decision options before writing artifacts', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-goal-recovery-unsupported-options-'));
+    const packagePath = join(root, 'blocked-goal-recovery-package.json');
+    const outputDir = join(root, 'output');
+    const recoveryPackage = buildRecoveryPackage();
+    recoveryPackage.blockers[1]!.maintainerDecisionRequests[0]!.options = ['approve', 'launch_now'];
+    await writeFile(packagePath, `${JSON.stringify(recoveryPackage, null, 2)}\n`);
+
+    await expect(writeBlockedGoalRecoveryConsumptionReport({
+      packagePath,
+      outputDir
+    })).rejects.toThrow('Invalid blocked goal recovery package');
+    await expect(access(join(outputDir, 'blocked-goal-recovery-consumption-report.json'))).rejects.toThrow();
+    await expect(access(join(outputDir, 'blocked-goal-recovery-consumption-report.md'))).rejects.toThrow();
   });
 
   it('writes local json and markdown consumption artifacts', async () => {

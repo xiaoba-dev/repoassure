@@ -91,3 +91,9 @@ The package is recovery evidence only. It must not upload target repo material, 
 RepoAssure must let a maintainer or AI IDE consume `blocked-goal-recovery-package.json` without guessing which evidence to read, which recovery actions are automatic retry candidates, which decisions require maintainer input, or which external prerequisites remain unresolved.
 
 The local `goal:recover:consume` workflow emits JSON and Markdown with resume readiness, evidence read order, a recovery action queue, resume checklist, boundary compliance, maintainer review boundary, redaction boundary, non-authorization boundary, and blocked actions. The report does not execute recovery commands and does not authorize target repo mutation, release, launch, customer contact, pricing/spend, or commercial/hosted availability claims.
+
+## Blocked Goal Recovery Decision Receipt v0.1
+
+RepoAssure must let a maintainer record `approve`, `reject`, `defer`, or `accept_risk` decisions for every stable recovery `actionKey` and stable resume `commandId` before any separate resume attempt. The decisions envelope must bind to the exact source report SHA-256. The local `goal:recover:decide` workflow emits JSON/Markdown with raw consumption-report provenance, decision summary, reviewed and unreviewed action/command items, external prerequisite completion evidence, separate-resume readiness, redaction boundary, non-authorization boundary, and blocked actions.
+
+The receipt does not execute recovery commands and does not authorize target repo mutation, release, launch, customer contact, pricing/spend, repository visibility changes, or commercial/hosted availability claims.

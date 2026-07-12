@@ -51,16 +51,19 @@ export interface BlockedGoalAutomaticRecoveryActionInput {
 }
 
 export interface BlockedGoalMaintainerDecisionRequestInput {
+  actionId?: string;
   requestedDecision: string;
   options: string[];
 }
 
 export interface BlockedGoalExternalPrerequisiteInput {
+  actionId?: string;
   prerequisite: string;
   owner: string;
 }
 
 export interface BlockedGoalResumeCommandInput {
+  commandId?: string;
   command: string;
   purpose: string;
 }
@@ -137,17 +140,20 @@ export interface BlockedGoalAutomaticRecoveryAction {
 
 export interface BlockedGoalMaintainerDecisionRequest {
   blockerId: string;
+  actionId: string;
   requestedDecision: string;
   options: string[];
 }
 
 export interface BlockedGoalExternalPrerequisite {
   blockerId: string;
+  actionId: string;
   prerequisite: string;
   owner: string;
 }
 
 export interface BlockedGoalResumeCommand {
+  commandId: string;
   command: string;
   purpose: string;
 }
@@ -222,6 +228,8 @@ export function buildBlockedGoalRecoveryPackage(
   const automaticRecoveryActions = blockers.flatMap((blocker) => blocker.automaticRecoveryActions);
   const maintainerDecisionRequests = blockers.flatMap((blocker) => blocker.maintainerDecisionRequests);
   const externalPrerequisites = blockers.flatMap((blocker) => blocker.externalPrerequisites);
+  const resumeCommands = normalizeResumeCommands(input.input.resumeCommands ?? []);
+  assertUniqueRecoveryIds(blockers, resumeCommands);
   const blockerSummary = buildBlockerSummary(
     blockers,
     automaticRecoveryActions,
@@ -264,7 +272,7 @@ export function buildBlockedGoalRecoveryPackage(
     automaticRecoveryActions,
     maintainerDecisionRequests,
     externalPrerequisites,
-    resumeCommands: normalizeResumeCommands(input.input.resumeCommands ?? []),
+    resumeCommands,
     maintainerReviewBoundary: sanitize(BLOCKED_GOAL_RECOVERY_MAINTAINER_REVIEW_BOUNDARY),
     redactionBoundary: sanitize(input.input.redactionBoundary),
     nonAuthorizationBoundary: sanitize(BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BOUNDARY),
@@ -388,17 +396,23 @@ function normalizeBlocker(input: BlockedGoalBlockerInput): BlockedGoalBlocker {
     evidenceRefs: (input.evidenceRefs ?? []).map(sanitizePath),
     automaticRecoveryActions: (input.automaticRecoveryActions ?? []).map((action) => ({
       blockerId,
-      actionId: sanitize(action.actionId),
+      actionId: normalizeOpaqueId('automatic', action.actionId, [input.blockerId, action.command, action.rationale]),
       command: sanitize(action.command),
       rationale: sanitize(action.rationale)
     })),
     maintainerDecisionRequests: (input.maintainerDecisionRequests ?? []).map((request) => ({
       blockerId,
+      actionId: normalizeOpaqueId('maintainer', request.actionId, [
+        input.blockerId,
+        request.requestedDecision,
+        ...request.options
+      ]),
       requestedDecision: sanitize(request.requestedDecision),
       options: request.options.map(sanitize)
     })),
     externalPrerequisites: (input.externalPrerequisites ?? []).map((item) => ({
       blockerId,
+      actionId: normalizeOpaqueId('external', item.actionId, [input.blockerId, item.prerequisite, item.owner]),
       prerequisite: sanitize(item.prerequisite),
       owner: sanitize(item.owner)
     }))
@@ -407,13 +421,43 @@ function normalizeBlocker(input: BlockedGoalBlockerInput): BlockedGoalBlocker {
 
 function normalizeResumeCommands(commands: BlockedGoalResumeCommandInput[]): BlockedGoalResumeCommand[] {
   const normalized = commands.map((command) => ({
+    commandId: normalizeOpaqueId('resume', command.commandId, [command.command, command.purpose]),
     command: sanitize(command.command),
     purpose: sanitize(command.purpose)
   }));
 
   return normalized.length > 0
     ? normalized
-    : [{ command: 'codex resume goal', purpose: 'Resume the blocked Codex goal after blockers are resolved.' }];
+    : [{
+      commandId: normalizeOpaqueId('resume', undefined, [
+        'codex resume goal',
+        'Resume the blocked Codex goal after blockers are resolved.'
+      ]),
+      command: 'codex resume goal',
+      purpose: 'Resume the blocked Codex goal after blockers are resolved.'
+    }];
+}
+
+function assertUniqueRecoveryIds(
+  blockers: BlockedGoalBlocker[],
+  resumeCommands: BlockedGoalResumeCommand[]
+): void {
+  const actionKeys = blockers.flatMap((blocker) => [
+    ...blocker.automaticRecoveryActions.map((item) => `automatic:${blocker.blockerId}:${item.actionId}`),
+    ...blocker.maintainerDecisionRequests.map((item) => `maintainer:${blocker.blockerId}:${item.actionId}`),
+    ...blocker.externalPrerequisites.map((item) => `external:${blocker.blockerId}:${item.actionId}`)
+  ]);
+  const commandIds = resumeCommands.map((item) => item.commandId);
+  if (new Set(actionKeys).size !== actionKeys.length || new Set(commandIds).size !== commandIds.length) {
+    throw new Error('Invalid blocked goal recovery input: duplicate action or command IDs');
+  }
+}
+
+function normalizeOpaqueId(kind: string, explicitId: string | undefined, stableParts: string[]): string {
+  if (explicitId && /^[A-Za-z0-9._-]+$/u.test(explicitId) && sanitize(explicitId) === explicitId) {
+    return explicitId;
+  }
+  return `${kind}-${createHash('sha256').update(JSON.stringify([explicitId ?? '', ...stableParts])).digest('hex').slice(0, 16)}`;
 }
 
 function buildBlockerSummary(

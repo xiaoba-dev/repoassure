@@ -291,3 +291,7 @@ ADR-0028 adds a proposal layer after replay readiness: replay readiness -> targe
 ## Blocked Goal Recovery MCP Real Client Boundary
 
 `tests/support/real-mcp-client.ts` wraps the compiled adapter with the official SDK `Client` and `StdioClientTransport`. It is a validation boundary rather than a new domain layer: recovery logic stays in authoritative acceptance writers, while process initialization, redacted stderr, request timeout, and deterministic cleanup remain consumer-harness responsibilities.
+
+## External AI IDE Configuration Boundary
+
+`src/adapters/mcp/client-config.ts` renders strict Cursor, VS Code, and Codex local stdio envelopes. The generated command and app-entry argument are absolute and separate, so the consumer does not depend on a shell or RepoAssure cwd. `scripts/generate-mcp-client-config.mjs` dynamically loads built modules behind a fixed path-safe pre-build error, validates local build readiness, and writes configuration to stdout only; it does not write client configuration. External source-checkout fixture integration starts `apps/mcp-server/index.js` with the official SDK and preserves the existing no recovery/resume command execution and no external-state-change boundary. Actual IDE environment inheritance and sandbox behavior remain outside automated claims.

@@ -46,6 +46,9 @@ jobs:
       - name: Real stdio MCP client
         run: pnpm test:mcp-real-client
 
+      - name: External AI IDE MCP config
+        run: pnpm test:mcp-external-config
+
       - name: Typecheck
         run: pnpm typecheck
 

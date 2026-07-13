@@ -192,24 +192,30 @@ node dist/adapters/cli/index.js generate-tests <findingsPath> <outputDir> --smok
 
 ## 4. MCP 验收
 
-构建后使用 stdio MCP Server：
+构建后使用 stdio MCP Server，并生成与客户端匹配的配置：
 
 ```bash
+pnpm build
 node dist/adapters/mcp/index.js
+pnpm --silent mcp:config -- --client cursor
+pnpm --silent mcp:config -- --client vscode
+pnpm --silent mcp:config -- --client codex
 ```
 
-通用 MCP stdio 配置示例：
+Cursor 输出使用 `mcpServers` JSON：
 
 ```json
 {
   "mcpServers": {
-    "hardening-mcp": {
-      "command": "node",
-      "args": ["/absolute/path/to/hardening-mcp/dist/adapters/mcp/index.js"]
+    "repoassure": {
+      "command": "/absolute/path/to/node",
+      "args": ["/absolute/path/to/repoassure/apps/mcp-server/index.js"]
     }
   }
 }
 ```
+
+VS Code 输出使用顶层 `servers` 和 `type: "stdio"`；Codex 输出使用 `[mcp_servers.repoassure]` TOML。生成命令使用当前机器真实绝对路径，不需要手工拼接带空格路径。Generator does not write client configuration，也不会序列化 caller env；maintainer 必须自行决定是否合并到客户端。新空配置可使用完整输出；已有配置只能合并 `repoassure` entry，必须先检查同名 server/table，不能覆盖其他 servers、inputs 或 sandbox 设置。输出包含 workstation-specific 路径，应优先使用本机 user-level 配置，禁止提交、共享或记录到 CI 日志；project-level 配置必须保持 untracked。
 
 可用 tools：
 
@@ -239,11 +245,13 @@ node dist/adapters/mcp/index.js
 
 客户端验收步骤：
 
-1. 在 MCP client 中加入上述 `mcpServers.hardening-mcp` 配置，并将 `args` 改为本机绝对路径。
-2. 重启或刷新 MCP client。
-3. 确认 client 能列出 `analyze_repo`、`boot_app`、`stop_app`、`explore_app`、`generate_tests`、`generate_repair_plan`、`harden_report` 和 `run_hardening`。
-4. 调用 `analyze_repo` 指向一个本地 Web App repo，确认返回 structuredContent 且不包含 env value。
-5. 如独立调用 `boot_app`，记录返回的 `sessionId`，验收结束后调用 `stop_app` 清理进程。
+1. 运行 `pnpm --silent mcp:config -- --client <cursor|vscode|codex>`，审查 stdout 中的 Node.js 与 `apps/mcp-server/index.js` 绝对路径。
+2. 在 maintainer 明确同意后，将 stdout 中的 `repoassure` entry 合并到对应 MCP client 配置；仅当目标配置为空时才使用完整输出。若已有同名 entry，先审查并决定替换、保留或暂缓；该步骤不由 RepoAssure 自动执行。
+3. 重启或刷新 MCP client。
+4. 确认 client 能列出 `analyze_repo`、`boot_app`、`stop_app`、`explore_app`、`generate_tests`、`generate_repair_plan`、`harden_report`、`run_hardening` 和八个 blocked-goal recovery tools。
+5. 检查真实 IDE 启动日志和环境继承设置；自动测试只证明 SDK harness 不转发 sentinel，不证明客户端自身不会继承敏感环境。VS Code 用户可单独评估其 stdio sandbox 设置。
+6. 调用 `analyze_repo` 指向一个本地 Web App repo，确认返回 structuredContent 且不包含 env value；recovery 验收只使用已审查 fixture，does not execute recovery or resume commands。
+7. 如独立调用 `boot_app`，记录返回的 `sessionId`，验收结束后调用 `stop_app` 清理进程。
 
 ## 5. Benchmark 验收
 

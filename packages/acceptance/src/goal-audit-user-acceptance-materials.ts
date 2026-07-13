@@ -138,11 +138,14 @@ export const userAcceptanceMaterialRequirementSpecs: readonly UserAcceptanceMate
     needles: [
       '## 4. MCP 验收',
       'node dist/adapters/mcp/index.js',
-      '通用 MCP stdio 配置示例',
+      'pnpm --silent mcp:config -- --client cursor',
+      'pnpm --silent mcp:config -- --client vscode',
+      'pnpm --silent mcp:config -- --client codex',
       '"mcpServers"',
-      '"hardening-mcp"',
-      '"command": "node"',
-      '"/absolute/path/to/hardening-mcp/dist/adapters/mcp/index.js"',
+      '`servers`',
+      '[mcp_servers.repoassure]',
+      'apps/mcp-server/index.js',
+      'does not write client configuration',
       'MCP client 能列出以上 tools',
       'analyze_repo',
       'generate_repair_plan',
@@ -150,7 +153,7 @@ export const userAcceptanceMaterialRequirementSpecs: readonly UserAcceptanceMate
       'stop_app',
       '目标完成度审计已覆盖 MCP 配置示例和客户端验收步骤'
     ],
-    evidence: ['README and user acceptance guide provide an MCP stdio launch command, mcpServers JSON config, tool list including generate_repair_plan, and client validation steps; checklist records this as audited acceptance material']
+    evidence: ['README and user acceptance guide provide generated Cursor, VS Code, and Codex stdio configurations, the apps/mcp-server entry, non-writing boundary, tool discovery, and client validation steps; checklist records this as audited acceptance material']
   },
   {
     requirement: '安装步骤和环境前置条件',

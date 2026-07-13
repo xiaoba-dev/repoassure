@@ -322,3 +322,5 @@
 - [x] MCP transport integration reaches local closure while argument expansion, symlink output escape, and secret-like output paths fail closed or are redacted.
 - [x] Recovery MCP I/O rejects FIFO/non-regular/oversized inputs, directory identity replacement, and existing output symlinks without mutating external targets.
 - [x] `pnpm test:mcp-real-client` validates the compiled server through official SDK `StdioClientTransport`, including all eight tool discovery, reviewed lifecycle consumption, schema-safe errors, stderr redaction, timeout, and deterministic cleanup.
+- [x] `pnpm test:mcp-external-config` validates Cursor, VS Code, and Codex configurations from an external cwd, including a spaced source-checkout alias, `apps/mcp-server/index.js`, all eight recovery tools, SDK-harness environment isolation, path-safe pre-build failure, no client-config writes, and deterministic cleanup; actual IDE environment inheritance remains manual.
+- [x] Generated MCP configuration contains workstation-specific absolute paths and must remain user-level or untracked; it must not be committed, shared, or printed in CI logs.

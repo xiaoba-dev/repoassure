@@ -28,14 +28,15 @@ Recent completed work includes:
 - Blocked Goal Recovery Full Lifecycle Real Campaign Validation v0.1.
 - Blocked Goal Recovery MCP Surface v0.1.
 - Blocked Goal Recovery MCP Real Client Consumption Validation v0.1.
+- Blocked Goal Recovery MCP External AI IDE Configuration Validation v0.1.
 - Public release and branch protection governance.
 - Public website private preview and custom-domain work.
 
 ## Next Codex Goal
 
-Blocked Goal Recovery MCP External AI IDE Configuration Validation v0.1
+Parallel Test Runtime Build Isolation v0.1
 
-Plain-language explanation: validate a copy-pasteable AI IDE stdio configuration and the user-facing packaged server entry from an external fixture, without publishing a package or changing external state.
+Plain-language explanation: stop parallel integration tests from rebuilding and reading the same acceptance dist at the same time, so the standard full suite is repeatable before real AI IDE manual acceptance.
 
 ## Execution Rules
 
@@ -84,6 +85,15 @@ Status: implemented.
 - Expose eight explicit recovery lifecycle tools through MCP `tools/list` and `tools/call`.
 - Reuse authoritative acceptance writers and emit `repoassure.mcp-blocked-goal-recovery-tool-result.v1`.
 - Reject argument expansion and output real-path escape while preserving redaction and non-execution boundaries.
+
+## Blocked Goal Recovery MCP External AI IDE Configuration Validation v0.1
+
+Status: implemented.
+
+- Generate copy-pasteable Cursor, VS Code, and Codex local stdio configurations.
+- Point every configuration at the user-facing `apps/mcp-server/index.js` entry with absolute argv-safe paths.
+- Consume all three envelopes from an external workspace and path-with-spaces source-checkout alias with SDK-harness environment isolation, eight-tool discovery, and deterministic cleanup; defer actual IDE environment inheritance to manual acceptance.
+- Do not write client configuration, publish, execute recovery/resume commands, mutate target repos, or change external state.
 
 ## Blocked Goal Recovery Full Lifecycle Real Campaign Validation v0.1
 

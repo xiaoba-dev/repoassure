@@ -43,6 +43,9 @@ jobs:
       - name: Unit tests
         run: pnpm test:unit
 
+      - name: Real stdio MCP client
+        run: pnpm test:mcp-real-client
+
       - name: Typecheck
         run: pnpm typecheck
 

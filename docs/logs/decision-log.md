@@ -1697,3 +1697,7 @@ Receipt does not execute resume commands，不授权 target repo mutation、rele
 ## 2026-07-13 - blocked goal recovery MCP surface
 
 接受 ADR-0041。AI IDE 使用 8 个显式 MCP tools 消费 recovery lifecycle；adapter 只接受 directory arguments、复用 authoritative writers、限制 output real path，并返回统一 non-execution receipt。
+
+## 2026-07-13 - blocked goal recovery MCP real client validation
+
+采用官方 SDK `Client` + `StdioClientTransport` 作为 compiled MCP server 的必需 CI contract。Error result 不再写入与 success-only output schema 冲突的 `structuredContent`；可读错误保留在 text `content` 且 `isError: true`。该验证不执行恢复命令或改变外部状态。

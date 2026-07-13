@@ -27,14 +27,15 @@ Recent completed work includes:
 - Blocked Goal Recovery Resume Attempt Closure Receipt v0.1.
 - Blocked Goal Recovery Full Lifecycle Real Campaign Validation v0.1.
 - Blocked Goal Recovery MCP Surface v0.1.
+- Blocked Goal Recovery MCP Real Client Consumption Validation v0.1.
 - Public release and branch protection governance.
 - Public website private preview and custom-domain work.
 
 ## Next Codex Goal
 
-Blocked Goal Recovery MCP Real Client Consumption Validation v0.1
+Blocked Goal Recovery MCP External AI IDE Configuration Validation v0.1
 
-Plain-language explanation: validate the bounded recovery tools through a real stdio MCP client process and AI IDE-shaped consumption flow before treating the surface as externally consumable.
+Plain-language explanation: validate a copy-pasteable AI IDE stdio configuration and the user-facing packaged server entry from an external fixture, without publishing a package or changing external state.
 
 ## Execution Rules
 

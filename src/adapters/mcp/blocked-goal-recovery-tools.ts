@@ -261,7 +261,15 @@ async function assertContainedInputArtifacts(
   inputRoot: string
 ): Promise<void> {
   for (const fileName of requiredInputsByTool[toolName]) {
-    const artifactPath = await realpath(join(inputRoot, fileName));
+    let artifactPath: string;
+    try {
+      artifactPath = await realpath(join(inputRoot, fileName));
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+        throw new Error(`Missing input artifact: ${fileName}`, { cause: error });
+      }
+      throw error;
+    }
     if (artifactPath !== inputRoot && !artifactPath.startsWith(`${inputRoot}${sep}`)) {
       throw new Error(`Input artifact must resolve within inputDir: ${fileName}`);
     }

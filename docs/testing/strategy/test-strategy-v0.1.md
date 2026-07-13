@@ -629,3 +629,10 @@ This validation must not upload target repo material, automatically modify targe
 - MCP transport integration calls recovery package, consumption, decision, task, intake, review, and closure in raw-byte-bound order.
 - Near-real campaign integration calls `validate_blocked_goal_recovery_lifecycle` and verifies the common MCP response boundary.
 - Full gates include typecheck, lint, unit, integration, E2E, full Vitest, repo hygiene, release check, goal audit, independent review, PR CI, and main CI.
+
+## Blocked Goal Recovery MCP Real Client Consumption Validation v0.1
+
+- Contract: official SDK `Client` and `StdioClientTransport` initialize the compiled server and discover all eight recovery tools.
+- Integration: a real child process consumes package through closure, rejects an incomplete lifecycle campaign, successfully validates the near-real eight-outcome campaign, and proves success text/structured agreement plus client-readable standard errors.
+- Attack and resilience: missing artifact, unexpected argument, secret-like path, raw-secret stderr, bounded stderr capture, safe environment inheritance, request timeout, and enforced deterministic cleanup are covered.
+- CI: `pnpm test:mcp-real-client` builds required dist outputs and runs as a dedicated GitHub Quality Gates step.

@@ -3711,6 +3711,27 @@ describe('project structure', () => {
     await expectPath('src/adapters/mcp/blocked-goal-recovery-tools.ts');
   });
 
+  it('records real stdio MCP client consumption validation and its CI gate', async () => {
+    const files = await Promise.all([
+      readFile('docs/operations/blocked-goal-recovery-mcp-real-client-validation-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'), readFile('docs/PRD.md', 'utf8'), readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'), readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'), readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('package.json', 'utf8'), readFile('.github/workflows/ci.yml', 'utf8')
+    ]);
+    const joined = files.join('\n');
+    expect(joined).toContain('Blocked Goal Recovery MCP Real Client Consumption Validation v0.1');
+    expect(joined).toContain('StdioClientTransport');
+    expect(joined).toContain('pnpm test:mcp-real-client');
+    expect(joined).toContain('structuredContent');
+    expect(joined).toContain('deterministic cleanup');
+    expect(joined).toContain('does not execute');
+    await expectPath('tests/support/real-mcp-client.ts');
+    await expectPath('tests/integration/mcp-real-client.test.ts');
+  });
+
   it('records Autopilot-compatible documentation architecture without moving existing source documents', async () => {
     const [
       adr,

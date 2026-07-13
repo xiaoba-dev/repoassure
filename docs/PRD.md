@@ -123,3 +123,7 @@ RepoAssure must validate accepted, accepted-risk, blocked, failed, incomplete, e
 ## Blocked Goal Recovery MCP Surface v0.1
 
 RepoAssure must let AI IDE clients discover and call every blocked-goal recovery evidence stage over MCP without shell-specific orchestration. The product requirement is eight explicit tools with strict directory-only inputs, typed `repoassure.mcp-blocked-goal-recovery-tool-result.v1` responses, contained local outputs, client-readable redacted errors, and explicit proof that no commands, external state changes, or target repo mutations were performed by RepoAssure.
+
+## Blocked Goal Recovery MCP Real Client Consumption Validation v0.1
+
+The official SDK `Client` and `StdioClientTransport` must discover and consume the recovery surface through a compiled child process. Success content must satisfy the advertised schema; tool failures must remain readable without invalid `structuredContent`; startup failure, timeout, stderr redaction, and child cleanup must be deterministic. The validation does not execute recovery commands or authorize target repo or external-state changes.

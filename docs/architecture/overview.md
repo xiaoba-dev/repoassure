@@ -287,3 +287,7 @@ ADR-0028 adds a proposal layer after replay readiness: replay readiness -> targe
 ## Blocked Goal Recovery MCP Boundary
 
 `src/adapters/mcp/blocked-goal-recovery-tools.ts` is the bounded transport adapter above the authoritative acceptance writers. It publishes eight stage-specific tools, enforces exact directory-only arguments, contained fixed-input artifacts, and contained `outputDir` real paths, and wraps every result in `repoassure.mcp-blocked-goal-recovery-tool-result.v1`. The adapter does not expose a command execution parameter and does not execute commands or change external state.
+
+## Blocked Goal Recovery MCP Real Client Boundary
+
+`tests/support/real-mcp-client.ts` wraps the compiled adapter with the official SDK `Client` and `StdioClientTransport`. It is a validation boundary rather than a new domain layer: recovery logic stays in authoritative acceptance writers, while process initialization, redacted stderr, request timeout, and deterministic cleanup remain consumer-harness responsibilities.

@@ -34,9 +34,9 @@ Recent completed work includes:
 
 ## Next Codex Goal
 
-Parallel Test Runtime Build Isolation v0.1
+Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1
 
-Plain-language explanation: close independent-review findings, pass PR and merged-main CI, and only then advance to real AI IDE manual acceptance.
+Plain-language explanation: a maintainer validates one generated MCP configuration inside a real installed AI IDE, invokes only a non-executing fixture operation, and records redacted evidence. Automated SDK consumption is already complete but is not a substitute for this manual gate.
 
 ## Execution Rules
 
@@ -96,7 +96,7 @@ Status: implemented.
 
 ## Parallel Test Runtime Build Isolation v0.1
 
-Status: implementation complete; independent review and delivery validation in progress.
+Status: completed.
 
 - Build package and root runtime outputs before standard file-parallel Vitest collection.
 - Coordinate acceptance builds by source fingerprint and cross-process single-flight state under ignored local cache.
@@ -104,7 +104,7 @@ Status: implementation complete; independent review and delivery validation in p
 - Require repeated standard parallel full-suite evidence before real AI IDE manual acceptance.
 - Do not write client configuration, publish, execute recovery/resume commands, mutate target repos, or change external state.
 
-Queued next goal: Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1.
+PR #56 merged as `92ec9512e1132d4710f7b800e6ae907a720b7be5`; its PR quality gate and merged-main CI completed successfully on 2026-07-13. The next goal is Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1.
 
 ## Blocked Goal Recovery Full Lifecycle Real Campaign Validation v0.1
 

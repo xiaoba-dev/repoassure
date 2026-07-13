@@ -75,15 +75,17 @@ describe('acceptance build runtime contract', () => {
         readFile('docs/logs/blockers.md', 'utf8')
       ]);
 
-    expect(operation).toContain('Status: implementation complete; independent review and delivery validation in progress');
+    expect(operation).toContain('Status: completed');
     expect(operation).toContain('node_modules/.cache/repoassure');
     expect(operation).toContain('three consecutive');
-    expect(plan).toContain('Queued next goal: Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1');
+    expect(plan).toMatch(
+      /## Next Codex Goal\n\nBlocked Goal Recovery MCP Real AI IDE Manual Acceptance v0\.1/u
+    );
     expect(plan).toMatch(
       /## Blocked Goal Recovery MCP Surface v0\.1\n\nStatus: implemented\./u
     );
     expect(plan).toMatch(
-      /## Parallel Test Runtime Build Isolation v0\.1\n\nStatus: implementation complete; independent review and delivery validation in progress\./u
+      /## Parallel Test Runtime Build Isolation v0\.1\n\nStatus: completed\./u
     );
     expect(spec).toContain('acceptance build single-flight');
     expect(prd).toContain('repeatable standard parallel test evidence');

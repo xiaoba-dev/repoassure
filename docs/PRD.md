@@ -136,3 +136,7 @@ The official SDK `Client` and `StdioClientTransport` must discover and consume t
 ## Blocked Goal Recovery MCP External AI IDE Configuration Validation v0.1
 
 RepoAssure must generate copy-pasteable Cursor, VS Code, and Codex local stdio configurations that point to the user-facing `apps/mcp-server/index.js` entry with absolute argv-safe paths. Automated acceptance must consume every generated envelope from a repository-external workspace, discover all eight recovery tools, prove the SDK harness does not serialize or forward an unrelated test secret, enforce deterministic cleanup, and remain non-writing and non-executing for client settings, recovery commands, target repositories, and external state. Actual IDE environment inheritance is a manual acceptance item, not an automated claim.
+
+## Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1
+
+RepoAssure must provide a safe manual path for one installed AI IDE to consume its generated MCP configuration. The manual path must use a versioned disposable fixture with no recovery/resume commands or target-repository data, require discovery of all eight tools, allow only `create_blocked_goal_recovery`, and preserve explicit no-command, no-external-state, and no-target-mutation evidence. The maintainer must record a redacted accepted, changes_requested, or deferred decision; neither saving configuration nor passing SDK integration proves this requirement.

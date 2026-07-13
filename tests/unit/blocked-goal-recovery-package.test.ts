@@ -198,6 +198,20 @@ describe('blocked goal recovery package', () => {
     ]));
   });
 
+  it('allows a bounded fixture to opt out of the default resume command', () => {
+    const recoveryPackage = buildBlockedGoalRecoveryPackage({
+      generatedAt: '2026-07-13T00:00:00.000Z',
+      inputPath: 'blocked-goal-recovery-input.json',
+      input: buildRecoveryInput({
+        blockers: [],
+        resumeCommands: [],
+        includeDefaultResumeCommand: false
+      })
+    });
+
+    expect(recoveryPackage.resumeCommands).toEqual([]);
+  });
+
   it('derives stable opaque IDs and rejects duplicate explicit IDs', () => {
     const build = (requests: Array<{ requestedDecision: string; options: string[]; actionId?: string }>) => (
       buildBlockedGoalRecoveryPackage({

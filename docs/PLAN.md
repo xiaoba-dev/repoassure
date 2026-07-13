@@ -106,6 +106,15 @@ Status: completed.
 
 PR #56 merged as `92ec9512e1132d4710f7b800e6ae907a720b7be5`; its PR quality gate and merged-main CI completed successfully on 2026-07-13. The next goal is Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1.
 
+## Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1
+
+Status: awaiting maintainer evidence.
+
+- Generate a workstation-specific Cursor, VS Code, or Codex envelope without writing client settings.
+- Have a maintainer use one real installed client to discover eight tools and run only the disposable, non-executing recovery-package fixture.
+- Record redacted evidence and an explicit accepted, changes_requested, or deferred decision.
+- Automated SDK consumption remains supporting evidence only; it does not satisfy this gate.
+
 ## Blocked Goal Recovery Full Lifecycle Real Campaign Validation v0.1
 
 Status: implemented.

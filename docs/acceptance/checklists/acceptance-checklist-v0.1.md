@@ -336,3 +336,11 @@
 - [x] Typecheck, lint, repository hygiene, release check, build, and goal audit pass after final implementation changes.
 - [x] PR #56 quality gate and merged-main CI pass for `92ec9512e1132d4710f7b800e6ae907a720b7be5`.
 - [x] The build coordinator does not execute recovery commands, mutate a target repo, publish, launch, contact customers, change pricing/spend or visibility, or claim hosted/commercial availability.
+
+## Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1
+
+- [x] A bounded, non-writing maintainer runbook and redacted evidence template exist.
+- [x] The committed fixture contains no target-repository data or recovery/resume commands.
+- [ ] A maintainer has selected one installed Cursor, VS Code, or Codex client and recorded redacted tool-discovery evidence.
+- [ ] The selected client has called only the disposable `create_blocked_goal_recovery` fixture and recorded explicit no-command, no-external-state, and no-target-mutation flags.
+- [ ] The maintainer has recorded an explicit accepted, changes_requested, or deferred decision and whether the client configuration was retained or removed.

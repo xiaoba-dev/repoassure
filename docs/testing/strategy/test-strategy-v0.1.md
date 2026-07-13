@@ -655,3 +655,10 @@ This validation must not upload target repo material, automatically modify targe
 - Integration: `pnpm test:mcp-external-config` generates each configuration from a repository-external cwd, points it at `apps/mcp-server/index.js` through a path-with-spaces source-checkout alias, starts it through official SDK `StdioClientTransport`, discovers all eight recovery tools, and verifies deterministic child cleanup.
 - Security boundary: generated output contains no caller env values, the SDK harness uses its safe default environment, stderr remains empty, missing build modules produce a fixed path-safe error, and the generator does not write client configuration. Actual IDE environment inheritance remains a manual acceptance item.
 - CI: External AI IDE MCP config is an independent GitHub Quality Gates step after real stdio client validation.
+
+## Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1
+
+- Contract: `tests/unit/mcp-real-ai-ide-manual-acceptance.test.ts` guards the maintainer runbook, the redacted evidence template, the no-command fixture, the documented configuration generator, and the explicit manual-decision boundary.
+- Integration: `tests/integration/mcp-manual-acceptance-fixture.test.ts` starts the compiled app entry, copies the committed fixture to a temporary directory, and proves the one allowed call emits the explicit zero-side-effect flags with no resume commands. Existing `pnpm test:mcp-external-config` remains the integration proof for generated envelopes and real stdio process consumption.
+- Manual acceptance: one maintainer uses one installed client to discover all eight tools and call only `create_blocked_goal_recovery` against a disposable fixture. The returned boundary flags and an explicit redacted decision are required evidence.
+- Non-substitution: CI cannot claim installed-client UI behavior or environment inheritance. Missing, deferred, or changes-requested maintainer evidence keeps the gate open.

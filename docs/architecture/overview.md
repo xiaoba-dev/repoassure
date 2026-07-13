@@ -296,6 +296,10 @@ ADR-0028 adds a proposal layer after replay readiness: replay readiness -> targe
 
 `scripts/build-acceptance.ts` and `scripts/lib/acceptance-build-coordinator.ts` own the test-time acceptance build single-flight boundary. The standard `pnpm test` entry builds all package and root runtime outputs before Vitest collection, then retains file parallelism under an explicit four-worker process bound. Nested playbook and recovery package scripts can still call `build:acceptance`, but matching source fingerprints reuse ignored state under `node_modules/.cache/repoassure` instead of starting concurrent `tsc` writers against `packages/acceptance/dist`.
 
+### Real AI IDE Manual Acceptance
+
+The generated client configurations and SDK integration tests establish process-level compatibility. `examples/mcp-manual-acceptance/blocked-goal-recovery-input.json`, the manual operation runbook, and the redacted evidence template form a separate maintainer-controlled boundary for real client UI consumption. The fixture may produce local recovery-package artifacts in a disposable directory, but it carries no resume commands and the one allowed tool call reports no command execution, no external state change, and no target-repository mutation.
+
 The lock records its owner PID. Successful output state is written only after the compiler exits successfully and required entrypoints exist. Normal failures clear the lock; a later process can atomically quarantine a lock whose owner has exited. This layer coordinates local build processes only and does not change package exports, artifact schemas, target repo state, or external authority.
 
 ## External AI IDE Configuration Boundary

@@ -13784,3 +13784,11 @@ Phase 0：项目初始化。
 - Post-review final full evidence：最终 hard-link lock 版本连续三轮标准 four-worker file-parallel `pnpm test` 全部通过；每轮 104 files passed / 1 optional skipped，853 tests passed / 1 optional skipped，无 shared-dist failure、无 serialized fallback。
 - Second-review remediation：`writeFile(..., wx)` 仍可能短暂暴露 empty/partial owner JSON；新增 RED incomplete-lock regression 后，改为完整 candidate write + atomic hard-link publish，malformed lock fail closed，lease token owner-only release 保持不变。PLAN 状态错位通过章节级 contract 修正。
 - Delivery closure：PR #56 于 2026-07-13 合并为 `92ec9512e1132d4710f7b800e6ae907a720b7be5`；PR quality gate 与 merged-main `RepoAssure CI` 均为 success。此目标完成，后续为 maintainer-owned 的 Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1。
+
+## 2026年7月13日 - Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1
+
+- Red：新增 manual-acceptance documentation contract 后，因 operation runbook、redacted template 和 disposable fixture 不存在而失败。
+- Green：添加无 secrets、无 target repo data、无 resume commands 的 versioned fixture；operation 文档限制为一个真实安装 client、eight-tool discovery 和单一 `create_blocked_goal_recovery` 调用，并要求 explicit no-command/no-external-state/no-target-mutation response evidence。
+- TDD remediation：real MCP fixture test 发现空 `resumeCommands` 仍会产生 legacy default `codex resume goal`。新增 explicit `includeDefaultResumeCommand: false` opt-out；默认行为保持兼容，manual fixture 则可证明 generated package 不携带 resume commands。
+- Verification：manual contract、fixture、client-config unit/integration 共 23 tests passed；typecheck、lint、repo:hygiene、release:check 和 goal:audit passed。受限 sandbox 的 standard full suite 仅因 loopback listener 限制出现既有 boot/MCP chain failures；允许 loopback 的复跑为 106 files passed / 1 optional skipped，856 tests passed / 1 optional skipped。
+- Boundary：不自动写入 Cursor、VS Code 或 Codex configuration；不执行 recovery/resume commands、不修改目标仓库、不发布、不 launch、不联系客户、不改变 pricing/spend/visibility，也不声明 hosted/commercial availability。

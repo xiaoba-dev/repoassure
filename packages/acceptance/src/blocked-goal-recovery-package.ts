@@ -210,6 +210,7 @@ export interface BlockedGoalRecoveryInput {
   sourceLogs?: BlockedGoalSourceLogInput[];
   blockers?: BlockedGoalBlockerInput[];
   resumeCommands?: BlockedGoalResumeCommandInput[];
+  includeDefaultResumeCommand?: boolean;
   redactionBoundary: string;
 }
 
@@ -352,7 +353,10 @@ export function buildBlockedGoalRecoveryPackage(
   const automaticRecoveryActions = blockers.flatMap((blocker) => blocker.automaticRecoveryActions);
   const maintainerDecisionRequests = blockers.flatMap((blocker) => blocker.maintainerDecisionRequests);
   const externalPrerequisites = blockers.flatMap((blocker) => blocker.externalPrerequisites);
-  const resumeCommands = normalizeResumeCommands(input.input.resumeCommands ?? []);
+  const resumeCommands = normalizeResumeCommands(
+    input.input.resumeCommands ?? [],
+    input.input.includeDefaultResumeCommand !== false
+  );
   assertUniqueRecoveryIds(blockers, resumeCommands);
   const blockerSummary = buildBlockerSummary(
     blockers,
@@ -545,23 +549,26 @@ function normalizeBlocker(input: BlockedGoalBlockerInput): BlockedGoalBlocker {
   };
 }
 
-function normalizeResumeCommands(commands: BlockedGoalResumeCommandInput[]): BlockedGoalResumeCommand[] {
+function normalizeResumeCommands(
+  commands: BlockedGoalResumeCommandInput[],
+  includeDefaultResumeCommand: boolean
+): BlockedGoalResumeCommand[] {
   const normalized = commands.map((command) => ({
     commandId: normalizeOpaqueId('resume', command.commandId, [command.command, command.purpose]),
     command: sanitize(command.command),
     purpose: sanitize(command.purpose)
   }));
 
-  return normalized.length > 0
-    ? normalized
-    : [{
-      commandId: normalizeOpaqueId('resume', undefined, [
-        'codex resume goal',
-        'Resume the blocked Codex goal after blockers are resolved.'
-      ]),
-      command: 'codex resume goal',
-      purpose: 'Resume the blocked Codex goal after blockers are resolved.'
-    }];
+  if (normalized.length > 0 || !includeDefaultResumeCommand) return normalized;
+
+  return [{
+    commandId: normalizeOpaqueId('resume', undefined, [
+      'codex resume goal',
+      'Resume the blocked Codex goal after blockers are resolved.'
+    ]),
+    command: 'codex resume goal',
+    purpose: 'Resume the blocked Codex goal after blockers are resolved.'
+  }];
 }
 
 function assertUniqueRecoveryIds(

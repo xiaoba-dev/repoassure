@@ -1,0 +1,13 @@
+{
+  "sourceGoal": {
+    "title": "RepoAssure MCP manual acceptance fixture",
+    "status": "blocked",
+    "objective": "Confirm real AI IDE MCP tool discovery without executing recovery commands.",
+    "evidenceRefs": []
+  },
+  "sourceLogs": [],
+  "blockers": [],
+  "resumeCommands": [],
+  "includeDefaultResumeCommand": false,
+  "redactionBoundary": "Sanitized local manual-acceptance fixture only."
+}

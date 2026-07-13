@@ -1709,3 +1709,7 @@ Receipt does not execute resume commands，不授权 target repo mutation、rele
 ## 2026-07-13 - parallel test runtime build isolation
 
 在现有 monorepo package ownership 和测试策略内，将 `build:acceptance` 改为 source-and-build-implementation fingerprint cross-process single-flight，并让标准 `pnpm test` 先构建 package/root runtime outputs，再以四个 file-parallel workers 运行。缓存只存在于 ignored `node_modules/.cache/repoassure`；完整 candidate write + atomic hard-link lease publication、malformed-lock fail-closed、owner-token release、重建前 state invalidation 和完整 expected-output validation 防止失败或 owner process exit 产生可复用 partial output。该决策修复测试/构建运行时，不改变产品 schema、对外接口或授权边界，因此不新增 ADR。PR #56 与 merged-main CI 已在 2026-07-13 成功；下一 gate 为 Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1。
+
+## 2026-07-13 - blocked goal recovery MCP real AI IDE manual acceptance
+
+沿用 ADR-0041 和既有 external-config validation 的 local-only boundary，不为单一客户端 UI 行为新增 ADR。采用 versioned disposable fixture、明确允许的单一 `create_blocked_goal_recovery` 调用、response boundary flags 和 redacted maintainer evidence template 记录真实 IDE 证据。自动 SDK evidence 不能替代 installed-client acceptance；缺失、deferred 或 changes_requested evidence 不得被标记为完成。

@@ -487,6 +487,18 @@ export {
 } from './ai-ide-target-repair-evidence-review-decision-package.js';
 
 export {
+  buildBlockedGoalRecoveryLifecycleCampaignSummaryMarkdown,
+  writeBlockedGoalRecoveryLifecycleCampaignSummary,
+  type BlockedGoalRecoveryLifecycleCampaignInput,
+  type BlockedGoalRecoveryLifecycleCampaignScenarioInput,
+  type BlockedGoalRecoveryLifecycleCampaignScenarioSummary,
+  type BlockedGoalRecoveryLifecycleCampaignSummary,
+  type BlockedGoalRecoveryLifecycleOutcome,
+  type WriteBlockedGoalRecoveryLifecycleCampaignSummaryInput,
+  type WriteBlockedGoalRecoveryLifecycleCampaignSummaryResult
+} from './blocked-goal-recovery-lifecycle-campaign-summary.js';
+
+export {
   buildBlockedGoalRecoveryPackage,
   buildBlockedGoalRecoveryPackageMarkdown,
   BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS,

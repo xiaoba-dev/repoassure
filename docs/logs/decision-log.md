@@ -1689,3 +1689,7 @@ Receipt does not execute resume commands，不授权 target repo mutation、rele
 ## 2026-07-13 - blocked goal recovery resume attempt closure receipt
 
 接受 ADR-0039。只有 runtime-validated `accepted` / `accepted_with_risk` review package 可以生成 exact-byte-bound closure receipt；accepted risk 必须逐项确认。Receipt does not execute commands or close an external goal。
+
+## 2026-07-13 - blocked goal recovery full lifecycle campaign validation
+
+接受 ADR-0040。Recovery lifecycle campaign 必须从本地 artifact bytes 推导 outcome 和 trust-chain 状态；`rejected_tampered` 只有在篡改被拒绝时才通过。Validation does not execute commands or change external state。

@@ -91,6 +91,84 @@ const MAINTAINER_REVIEW_BOUNDARY =
 const NON_AUTHORIZATION_BOUNDARY =
   'This closure receipt does not execute recovery commands, modify target repo files, create target repo branch, commit, pull request, issue, or advisory, publish npm, create GitHub release, run public launch, contact customers, change pricing/spend, change repository visibility, or claim SaaS, Team Cloud, Enterprise, commercial, or hosted dashboard availability.';
 
+export function assertBlockedGoalRecoveryResumeAttemptClosureReceipt(
+  value: unknown
+): asserts value is BlockedGoalRecoveryResumeAttemptClosureReceipt {
+  if (!isRecord(value)
+    || value.schemaVersion !== 'repoassure.blocked-goal-recovery-resume-attempt-closure-receipt.v1'
+    || !canonicalValue(value.generatedAt)
+    || (value.closureStatus !== 'closed' && value.closureStatus !== 'closed_with_accepted_risk')
+    || !isRecord(value.sourceEvidenceReviewPackage)
+    || value.sourceEvidenceReviewPackage.schemaVersion
+      !== 'repoassure.blocked-goal-recovery-resume-attempt-evidence-review-decision-package.v1'
+    || !canonicalValue(value.sourceEvidenceReviewPackage.fileName)
+    || !canonicalValue(value.sourceEvidenceReviewPackage.path)
+    || typeof value.sourceEvidenceReviewPackage.sha256 !== 'string'
+    || !/^[a-f0-9]{64}$/u.test(value.sourceEvidenceReviewPackage.sha256)
+    || (value.sourceEvidenceReviewPackage.reviewStatus !== 'accepted'
+      && value.sourceEvidenceReviewPackage.reviewStatus !== 'accepted_with_risk')
+    || !exactKeys(value.sourceEvidenceReviewPackage, [
+      'schemaVersion', 'fileName', 'path', 'sha256', 'reviewStatus'
+    ])
+    || !canonicalValue(value.closureEvidence) || !canonicalValue(value.reviewerRole)
+    || !Array.isArray(value.closedEvidenceScope) || !value.closedEvidenceScope.every(canonicalValue)
+    || !Array.isArray(value.acceptedRiskEvidenceKeys) || !value.acceptedRiskEvidenceKeys.every(canonicalValue)
+    || new Set(value.acceptedRiskEvidenceKeys).size !== value.acceptedRiskEvidenceKeys.length
+    || !Array.isArray(value.residualRisks) || !value.residualRisks.every((item) =>
+      isRecord(item) && canonicalValue(item.evidenceKey) && canonicalValue(item.rationale)
+      && canonicalValue(item.decisionEvidence)
+      && exactKeys(item, ['evidenceKey', 'rationale', 'decisionEvidence'])
+    )
+    || !isVerificationSummary(value.verificationSummary)
+    || !isRecord(value.boundaryCompliance)
+    || value.boundaryCompliance.commandsExecutedByClosure !== false
+    || value.boundaryCompliance.externalGoalClosedByReceipt !== false
+    || value.boundaryCompliance.sourceBoundaryPreserved !== true
+    || !exactKeys(value.boundaryCompliance, [
+      'commandsExecutedByClosure', 'externalGoalClosedByReceipt', 'sourceBoundaryPreserved'
+    ])
+    || value.maintainerReviewBoundary !== MAINTAINER_REVIEW_BOUNDARY
+    || !canonicalValue(value.redactionBoundary)
+    || value.nonAuthorizationBoundary !== NON_AUTHORIZATION_BOUNDARY
+    || !hasCanonicalBlockedActions(value.blockedActions)
+    || !exactKeys(value, [
+      'schemaVersion', 'generatedAt', 'closureStatus', 'sourceEvidenceReviewPackage', 'closureEvidence',
+      'reviewerRole', 'closedEvidenceScope', 'acceptedRiskEvidenceKeys', 'residualRisks',
+      'verificationSummary', 'boundaryCompliance', 'maintainerReviewBoundary', 'redactionBoundary',
+      'nonAuthorizationBoundary', 'blockedActions'
+    ])) throw invalidClosureReceipt();
+}
+
+export function assertBlockedGoalRecoveryResumeAttemptClosureReceiptSourceBinding(
+  receipt: BlockedGoalRecoveryResumeAttemptClosureReceipt,
+  reviewPackage: BlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackage,
+  sourceReviewPackageText: string
+): void {
+  let parsedReviewPackage: unknown;
+  try { parsedReviewPackage = JSON.parse(sourceReviewPackageText); } catch { throw invalidReviewPackage(); }
+  assertBlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackage(parsedReviewPackage);
+  assertBlockedGoalRecoveryResumeAttemptClosureReceipt(receipt);
+  assertBlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackage(reviewPackage);
+  const riskItems = reviewPackage.reviewItems.filter((item) => item.decision === 'accept_risk');
+  const expectedResidualRisks = riskItems.map((item) => ({
+    evidenceKey: item.evidenceKey, rationale: item.rationale, decisionEvidence: item.decisionEvidence
+  }));
+  const expectedSummary = {
+    total: reviewPackage.decisionSummary.total,
+    accepted: reviewPackage.decisionSummary.accepted,
+    acceptedRisk: reviewPackage.decisionSummary.acceptedRisk
+  };
+  if (!isDeepStrictEqual(parsedReviewPackage, reviewPackage)
+    || (reviewPackage.reviewStatus !== 'accepted' && reviewPackage.reviewStatus !== 'accepted_with_risk')
+    || receipt.sourceEvidenceReviewPackage.sha256 !== createHash('sha256').update(sourceReviewPackageText).digest('hex')
+    || receipt.sourceEvidenceReviewPackage.reviewStatus !== reviewPackage.reviewStatus
+    || receipt.closureStatus !== (riskItems.length > 0 ? 'closed_with_accepted_risk' : 'closed')
+    || !isDeepStrictEqual(receipt.closedEvidenceScope, reviewPackage.acceptedEvidenceScope)
+    || !isDeepStrictEqual(receipt.acceptedRiskEvidenceKeys, riskItems.map((item) => item.evidenceKey))
+    || !isDeepStrictEqual(receipt.residualRisks, expectedResidualRisks)
+    || !isDeepStrictEqual(receipt.verificationSummary, expectedSummary)) throw invalidClosureReceipt();
+}
+
 export function buildBlockedGoalRecoveryResumeAttemptClosureReceipt(
   input: BuildBlockedGoalRecoveryResumeAttemptClosureReceiptInput
 ): BlockedGoalRecoveryResumeAttemptClosureReceipt {
@@ -105,7 +183,11 @@ export function buildBlockedGoalRecoveryResumeAttemptClosureReceipt(
   assertBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntakeSourceBinding(
     intake, input.sourceTaskPackageText
   );
-  assertReviewPackageSourceBinding(input.reviewPackage, intake, input.sourceIntakeText);
+  assertBlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackageSourceBinding(
+    input.reviewPackage,
+    intake,
+    input.sourceIntakeText
+  );
 
   const sourceSha256 = createHash('sha256').update(input.sourceReviewPackageText).digest('hex');
   const riskItems = input.reviewPackage.reviewItems.filter((item) => item.decision === 'accept_risk');
@@ -197,11 +279,15 @@ function parseAndValidateIntake(sourceIntakeText: string): BlockedGoalRecoveryRe
   return intake;
 }
 
-function assertReviewPackageSourceBinding(
+export function assertBlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackageSourceBinding(
   reviewPackage: BlockedGoalRecoveryResumeAttemptEvidenceReviewDecisionPackage,
   intake: BlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake,
   sourceIntakeText: string
 ): void {
+  let parsedIntake: unknown;
+  try { parsedIntake = JSON.parse(sourceIntakeText); } catch { throw invalidReviewPackage(); }
+  assertBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake(parsedIntake);
+  assertBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake(intake);
   const expectedSources = [
     ...intake.actionResults.map((item) => sourceItem('action', item.actionKey, item)),
     ...intake.resumeCommandResults.map((item) => sourceItem('command', item.commandId, item)),
@@ -212,7 +298,8 @@ function assertReviewPackageSourceBinding(
     sourceStatus: item.sourceStatus, sourceSummary: item.sourceSummary, sourceEvidenceRefs: item.sourceEvidenceRefs
   }));
   const intakeSha256 = createHash('sha256').update(sourceIntakeText).digest('hex');
-  if (reviewPackage.sourceEvidenceIntake.sha256 !== intakeSha256
+  if (!isDeepStrictEqual(parsedIntake, intake)
+    || reviewPackage.sourceEvidenceIntake.sha256 !== intakeSha256
     || reviewPackage.sourceEvidenceIntake.intakeStatus !== intake.intakeStatus
     || !isDeepStrictEqual(actualSources, expectedSources)) throw invalidReviewPackage();
 }
@@ -271,6 +358,19 @@ function exactKeys(value: Record<string, unknown>, expected: string[]): boolean 
   const actual = Object.keys(value).sort(); const sorted = [...expected].sort();
   return actual.length === sorted.length && actual.every((item, index) => item === sorted[index]);
 }
+function isVerificationSummary(value: unknown): value is { total: number; accepted: number; acceptedRisk: number } {
+  return isRecord(value)
+    && ['total', 'accepted', 'acceptedRisk'].every((key) =>
+      typeof value[key] === 'number' && Number.isInteger(value[key]) && value[key] >= 0
+    )
+    && exactKeys(value, ['total', 'accepted', 'acceptedRisk']);
+}
+function hasCanonicalBlockedActions(value: unknown): value is string[] {
+  return Array.isArray(value)
+    && value.length === BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS.length
+    && value.every((item) => typeof item === 'string')
+    && BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS.every((item) => value.includes(item));
+}
 function canonicalValue(value: unknown): value is string {
   return typeof value === 'string' && value.length > 0 && canonical(value) === value;
 }
@@ -284,4 +384,7 @@ function invalidReviewPackage(): Error {
 }
 function invalidClosureInput(): Error {
   return new Error('Invalid blocked goal recovery resume attempt closure input');
+}
+function invalidClosureReceipt(): Error {
+  return new Error('Invalid blocked goal recovery resume attempt closure receipt');
 }

@@ -182,6 +182,10 @@
       "types": "./dist/blocked-goal-recovery-package.d.ts",
       "default": "./dist/blocked-goal-recovery-package.js"
     },
+    "./blocked-goal-recovery-lifecycle-campaign-summary": {
+      "types": "./dist/blocked-goal-recovery-lifecycle-campaign-summary.d.ts",
+      "default": "./dist/blocked-goal-recovery-lifecycle-campaign-summary.js"
+    },
     "./blocked-goal-recovery-consumption-report": {
       "types": "./dist/blocked-goal-recovery-consumption-report.d.ts",
       "default": "./dist/blocked-goal-recovery-consumption-report.js"

@@ -42,6 +42,7 @@ import * as aiIdeAuthorizedTargetRepoRepairGoalTaskPackage from '@hardening-mcp/
 import * as aiIdeTargetRepoRepairGoalExecutionEvidenceIntakeReport from '@hardening-mcp/acceptance/ai-ide-target-repo-repair-goal-execution-evidence-intake-report';
 import * as aiIdeTargetRepairEvidenceReviewDecisionPackage from '@hardening-mcp/acceptance/ai-ide-target-repair-evidence-review-decision-package';
 import * as blockedGoalRecoveryPackage from '@hardening-mcp/acceptance/blocked-goal-recovery-package';
+import * as blockedGoalRecoveryLifecycleCampaignSummary from '@hardening-mcp/acceptance/blocked-goal-recovery-lifecycle-campaign-summary';
 import * as blockedGoalRecoveryConsumptionReport from '@hardening-mcp/acceptance/blocked-goal-recovery-consumption-report';
 import * as blockedGoalRecoveryDecisionReceipt from '@hardening-mcp/acceptance/blocked-goal-recovery-decision-receipt';
 import * as blockedGoalRecoveryResumeAttemptTaskPackage from '@hardening-mcp/acceptance/blocked-goal-recovery-resume-attempt-task-package';
@@ -107,6 +108,7 @@ const packageSubpathModules = [
   aiIdeTargetRepoRepairGoalExecutionEvidenceIntakeReport,
   aiIdeTargetRepairEvidenceReviewDecisionPackage,
   blockedGoalRecoveryPackage,
+  blockedGoalRecoveryLifecycleCampaignSummary,
   blockedGoalRecoveryConsumptionReport,
   blockedGoalRecoveryDecisionReceipt,
   blockedGoalRecoveryResumeAttemptTaskPackage,

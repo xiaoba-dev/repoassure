@@ -313,3 +313,7 @@
 - [x] Blocked Goal Recovery Resume Attempt Closure Receipt v0.1 binds exact accepted review bytes and remains non-executing.
 - [x] Accepted-with-risk closure requires exact acknowledgement of every accepted-risk evidence key.
 - [x] Closure receipt records `externalGoalClosedByReceipt: false` and does not execute commands.
+- [x] Blocked Goal Recovery Full Lifecycle Real Campaign Validation v0.1 covers accepted, accepted_with_risk, blocked, failed, incomplete, environment_blocker, boundary_violation, and rejected_tampered.
+- [x] Campaign validation derives trust-chain status from local artifact bytes and does not execute commands.
+- [x] Campaign summary does not change external state or expose target repo source and secrets.
+- [x] Campaign validation rejects shallow fabricated chains, symlink escapes, incomplete coverage, missing tamper evidence, secret-like values, and valid chains mislabeled as tampered.

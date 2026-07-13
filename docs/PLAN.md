@@ -25,14 +25,15 @@ Recent completed work includes:
 - Blocked Goal Recovery Resume Attempt Execution Evidence Intake v0.1.
 - Blocked Goal Recovery Resume Attempt Evidence Review Decision Package v0.1.
 - Blocked Goal Recovery Resume Attempt Closure Receipt v0.1.
+- Blocked Goal Recovery Full Lifecycle Real Campaign Validation v0.1.
 - Public release and branch protection governance.
 - Public website private preview and custom-domain work.
 
 ## Next Codex Goal
 
-Blocked Goal Recovery Full Lifecycle Real Campaign Validation v0.1
+Blocked Goal Recovery MCP Surface v0.1
 
-Plain-language explanation: validate the complete recovery-to-closure chain against a sanitized real-campaign-shaped evidence set before treating the lifecycle as operationally proven.
+Plain-language explanation: expose the validated recovery lifecycle to AI IDE clients through bounded MCP tools without executing recovery actions.
 
 ## Execution Rules
 
@@ -71,6 +72,15 @@ Plain-language explanation: validate the complete recovery-to-closure chain agai
 - ADR-0037: Blocked goal recovery resume attempt execution evidence intake.
 - ADR-0038: Blocked goal recovery resume attempt evidence review decision package.
 - ADR-0039: Blocked goal recovery resume attempt closure receipt.
+- ADR-0040: Blocked goal recovery full lifecycle campaign validation.
+
+## Blocked Goal Recovery Full Lifecycle Real Campaign Validation v0.1
+
+Status: implemented.
+
+- Add `repoassure.blocked-goal-recovery-lifecycle-campaign-summary.v1` and `goal:recover:validate-lifecycle`.
+- Cover accepted, risk, blocked, failed, incomplete, environment, boundary, and tampered outcomes.
+- Preserve local-only, redaction, no-command-execution, and no-external-state-change boundaries.
 
 ## Blocked Goal Recovery Resume Attempt Closure Receipt v0.1
 

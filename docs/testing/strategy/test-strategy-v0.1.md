@@ -620,3 +620,12 @@ This validation must not upload target repo material, automatically modify targe
 - Near-real E2E passes actual recovery-to-closure artifacts through the lifecycle validator.
 - `rejected_tampered` is considered passed only when the validator rejects the malformed chain.
 - Adversarial integration rejects symlink escapes, provider-token leakage, fabricated self-consistent chains, missing tamper evidence, incomplete outcome coverage, and valid chains mislabeled as tampered.
+
+## Blocked Goal Recovery MCP Surface v0.1
+
+- Unit tests cover the eight-name registry, strict input/output schemas, argument expansion, recursive redaction, boundary preservation, non-execution receipts, invalid directory types, input-artifact symlink escape, and output-directory symlink escape.
+- Adversarial unit tests cover non-blocking FIFO rejection, regular-file enforcement, the 8 MiB input cap, directory device/inode replacement rejection, existing output-symlink rejection without target mutation, typed credential redaction, stage payload schema binding, and fixed artifact suffix contracts.
+- Resource-amplification tests reject campaigns above 32 scenarios, reject duplicate artifact directories, and prove the scenario worker pool never exceeds four concurrent validations.
+- MCP transport integration calls recovery package, consumption, decision, task, intake, review, and closure in raw-byte-bound order.
+- Near-real campaign integration calls `validate_blocked_goal_recovery_lifecycle` and verifies the common MCP response boundary.
+- Full gates include typecheck, lint, unit, integration, E2E, full Vitest, repo hygiene, release check, goal audit, independent review, PR CI, and main CI.

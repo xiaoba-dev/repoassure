@@ -1,9 +1,13 @@
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
 
-import { BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS } from './blocked-goal-recovery-package.js';
+import {
+  BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS,
+  readBlockedGoalRecoveryLocalArtifact as readFile,
+  writeBlockedGoalRecoveryLocalArtifact as writeFile
+} from './blocked-goal-recovery-package.js';
 import type { BlockedGoalRecoveryResumeAttemptTaskPackage } from './blocked-goal-recovery-resume-attempt-task-package.js';
 import { escapeMarkdownTableCell } from './markdown.js';
 import { redactSensitiveText } from './redaction.js';

@@ -9,6 +9,12 @@ import { runGenerateTestsTool } from '../../tools/generate-tests-tool.js';
 import { runGenerateRepairPlanTool } from '../../tools/generate-repair-plan-tool.js';
 import { runHardenReportTool } from '../../tools/harden-report-tool.js';
 import { runHardeningTool } from '../../tools/run-hardening-tool.js';
+import {
+  isBlockedGoalRecoveryToolName,
+  listBlockedGoalRecoveryTools,
+  runBlockedGoalRecoveryTool,
+  type BlockedGoalRecoveryToolName
+} from './blocked-goal-recovery-tools.js';
 import { bootSessionStore } from './boot-session-store.js';
 
 type JsonObject = Record<string, unknown>;
@@ -21,7 +27,8 @@ type HardeningToolName =
   | 'generate_tests'
   | 'generate_repair_plan'
   | 'harden_report'
-  | 'run_hardening';
+  | 'run_hardening'
+  | BlockedGoalRecoveryToolName;
 
 export function listHardeningTools(): Tool[] {
   return [
@@ -184,7 +191,8 @@ export function listHardeningTools(): Tool[] {
         idempotentHint: false,
         openWorldHint: true
       }
-    }
+    },
+    ...listBlockedGoalRecoveryTools()
   ];
 }
 
@@ -203,6 +211,9 @@ export async function callHardeningTool(name: string, args: unknown): Promise<Ca
 }
 
 async function runNamedTool(name: HardeningToolName, args: JsonObject): Promise<JsonObject> {
+  if (isBlockedGoalRecoveryToolName(name)) {
+    return runBlockedGoalRecoveryTool(name, args);
+  }
   switch (name) {
     case 'analyze_repo':
       return toJsonObject(
@@ -309,7 +320,7 @@ async function runNamedTool(name: HardeningToolName, args: JsonObject): Promise<
 }
 
 function toToolResult(value: JsonObject): CallToolResult {
-  const safeValue = redactJsonObject(value);
+  const safeValue = redactMcpStructuredContent(value);
 
   return {
     content: [
@@ -414,33 +425,41 @@ function toJsonObject(value: unknown): JsonObject {
   return asRecord(value);
 }
 
-function redactJsonObject(value: JsonObject): JsonObject {
-  const redactedValue = JSON.parse(redactSensitiveText(JSON.stringify(value)));
-  restoreStructuredField(value, redactedValue, 'sessionId');
-
-  return asRecord(redactedValue);
+export function redactMcpStructuredContent(value: JsonObject): JsonObject {
+  return asRecord(redactJsonValue(value));
 }
 
-function restoreStructuredField(source: unknown, target: unknown, key: string): void {
-  if (Array.isArray(source) && Array.isArray(target)) {
-    source.forEach((sourceItem, index) => {
-      restoreStructuredField(sourceItem, target[index], key);
-    });
-    return;
+function redactJsonValue(value: unknown, key = ''): unknown {
+  if (key && key !== 'sessionId' && isSensitiveOutputKey(key)) {
+    return '[REDACTED]';
   }
-
-  if (!isObjectRecord(source) || !isObjectRecord(target)) {
-    return;
+  if (typeof value === 'string') {
+    if (key === 'sessionId') return value;
+    return redactSensitiveText(value);
   }
+  if (Array.isArray(value)) return value.map((item) => redactJsonValue(item));
+  if (!isObjectRecord(value)) return value;
+  return Object.fromEntries(Object.entries(value).map(([entryKey, entryValue]) => [
+    entryKey,
+    redactJsonValue(entryValue, entryKey)
+  ]));
+}
 
-  for (const [sourceKey, sourceValue] of Object.entries(source)) {
-    if (sourceKey === key && typeof sourceValue === 'string') {
-      target[sourceKey] = sourceValue;
-      continue;
-    }
-
-    restoreStructuredField(sourceValue, target[sourceKey], key);
+function isSensitiveOutputKey(key: string): boolean {
+  if (
+    key === 'nonAuthorizationBoundary'
+    || key === 'maintainerReviewBoundary'
+    || key === 'redactionBoundary'
+    || key === 'authorizationStatus'
+  ) {
+    return false;
   }
+  const normalized = key.toLowerCase().replace(/[^a-z0-9]/gu, '');
+  return normalized === 'authorization'
+    || normalized === 'proxyauthorization'
+    || normalized === 'cookie'
+    || normalized === 'setcookie'
+    || /(?:apikeys?|tokens?|secrets?|password|passcode|jwt|csrf|privatekey|servicerole)$/u.test(normalized);
 }
 
 function isObjectRecord(value: unknown): value is Record<string, unknown> {

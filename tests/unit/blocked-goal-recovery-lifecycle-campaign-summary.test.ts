@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import {
+  mapBlockedGoalRecoveryScenariosWithConcurrency,
   writeBlockedGoalRecoveryLifecycleCampaignSummary
 } from '../../packages/acceptance/src/blocked-goal-recovery-lifecycle-campaign-summary.js';
 import { BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS } from '../../packages/acceptance/src/blocked-goal-recovery-package.js';
@@ -16,6 +17,63 @@ const outcomes = [
 ] as const;
 
 describe('blocked goal recovery lifecycle campaign summary', () => {
+  it('never schedules more than four scenario validations concurrently', async () => {
+    let active = 0;
+    let maximumActive = 0;
+    const results = await mapBlockedGoalRecoveryScenariosWithConcurrency(
+      Array.from({ length: 12 }, (_, index) => index),
+      4,
+      async (value) => {
+        active += 1;
+        maximumActive = Math.max(maximumActive, active);
+        await new Promise((resolve) => setTimeout(resolve, 2));
+        active -= 1;
+        return value * 2;
+      }
+    );
+
+    expect(maximumActive).toBe(4);
+    expect(results).toEqual(Array.from({ length: 12 }, (_, index) => index * 2));
+  });
+
+  it('rejects campaigns with more than 32 scenarios before scheduling artifact reads', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-recovery-lifecycle-too-many-'));
+    const scenarios = Array.from({ length: 33 }, (_, index) => ({
+      scenarioId: `scenario-${index}`,
+      expectedOutcome: outcomes[index % outcomes.length]!,
+      artifactDir: `scenario-${index}`
+    }));
+    await writeCampaignInput(root, scenarios);
+
+    await expect(writeBlockedGoalRecoveryLifecycleCampaignSummary({ inputDir: root, outputDir: root }))
+      .rejects.toThrow('Invalid blocked goal recovery lifecycle campaign input');
+  });
+
+  it('rejects duplicate artifact directories before scheduling artifact reads', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-recovery-lifecycle-duplicate-dir-'));
+    await writeCampaignInput(root, outcomes.map((expectedOutcome, index) => ({
+      scenarioId: expectedOutcome,
+      expectedOutcome,
+      artifactDir: index < 2 ? 'shared' : expectedOutcome
+    })));
+
+    await expect(writeBlockedGoalRecoveryLifecycleCampaignSummary({ inputDir: root, outputDir: root }))
+      .rejects.toThrow('Invalid blocked goal recovery lifecycle campaign input');
+  });
+
+  it('rejects artifact directory aliases before scheduling artifact reads', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-recovery-lifecycle-alias-dir-'));
+    await writeCampaignInput(root, outcomes.map((expectedOutcome, index) => ({
+      scenarioId: expectedOutcome,
+      expectedOutcome,
+      artifactDir: index === 0 ? 'shared' : index === 1 ? './shared' : expectedOutcome
+    })));
+
+    await expect(writeBlockedGoalRecoveryLifecycleCampaignSummary({ inputDir: root, outputDir: root }))
+      .rejects.toThrow('Invalid blocked goal recovery lifecycle campaign input');
+  });
+
+
   it('rejects a self-consistent but fabricated full outcome matrix', async () => {
     const root = await mkdtemp(join(tmpdir(), 'repoassure-recovery-lifecycle-'));
     for (const outcome of outcomes) await writeScenario(join(root, outcome), outcome);

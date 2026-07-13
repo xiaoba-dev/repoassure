@@ -317,3 +317,7 @@
 - [x] Campaign validation derives trust-chain status from local artifact bytes and does not execute commands.
 - [x] Campaign summary does not change external state or expose target repo source and secrets.
 - [x] Campaign validation rejects shallow fabricated chains, symlink escapes, incomplete coverage, missing tamper evidence, secret-like values, and valid chains mislabeled as tampered.
+- [x] Blocked Goal Recovery MCP Surface v0.1 lists eight explicit lifecycle tools with strict directory-only schemas.
+- [x] Every recovery MCP call returns `repoassure.mcp-blocked-goal-recovery-tool-result.v1` and records commands, external state changes, and target repo mutation as false.
+- [x] MCP transport integration reaches local closure while argument expansion, symlink output escape, and secret-like output paths fail closed or are redacted.
+- [x] Recovery MCP I/O rejects FIFO/non-regular/oversized inputs, directory identity replacement, and existing output symlinks without mutating external targets.

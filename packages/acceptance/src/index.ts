@@ -502,6 +502,7 @@ export {
   buildBlockedGoalRecoveryPackage,
   buildBlockedGoalRecoveryPackageMarkdown,
   BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS,
+  withBlockedGoalRecoveryDirectoryGuards,
   writeBlockedGoalRecoveryPackage,
   writeBlockedGoalRecoveryPackageFromDirectory,
   type BlockedGoalAutomaticRecoveryAction,

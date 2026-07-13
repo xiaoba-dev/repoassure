@@ -16,7 +16,7 @@ export function createHardeningMcpServer(): Server {
         tools: {}
       },
       instructions:
-        'Use these tools to analyze local AI-generated web apps, boot them, explore runtime behavior, generate regression tests, and write hardening reports.'
+        'Use these tools to analyze local AI-generated apps, generate hardening evidence, and consume blocked-goal recovery artifacts. Recovery tools write local evidence but do not execute recovery or resume commands.'
     }
   );
 

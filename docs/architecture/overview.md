@@ -283,3 +283,7 @@ ADR-0028 adds a proposal layer after replay readiness: replay readiness -> targe
 ## Blocked Goal Recovery Lifecycle Campaign Boundary
 
 `goal:recover:validate-lifecycle` reads the seven-stage local artifact chain and emits `repoassure.blocked-goal-recovery-lifecycle-campaign-summary.v1`. It dispatches authoritative stage validators, verifies cross-stage inventory and raw-byte SHA bindings, enforces real-path containment and the shared redaction boundary, and requires the complete eight-outcome matrix. It does not execute commands or change external state.
+
+## Blocked Goal Recovery MCP Boundary
+
+`src/adapters/mcp/blocked-goal-recovery-tools.ts` is the bounded transport adapter above the authoritative acceptance writers. It publishes eight stage-specific tools, enforces exact directory-only arguments, contained fixed-input artifacts, and contained `outputDir` real paths, and wraps every result in `repoassure.mcp-blocked-goal-recovery-tool-result.v1`. The adapter does not expose a command execution parameter and does not execute commands or change external state.

@@ -13735,3 +13735,16 @@ Phase 0：项目初始化。
 - Final verification：unit 63 files / 742 tests passed；integration 34 files / 65 tests passed；E2E 1 passed / 1 optional skipped；full Vitest 98 files / 808 tests passed / 1 skipped；typecheck、lint、repo:hygiene、release:check、goal:audit 35/35 passed。
 - Delivery：PR #51 quality gates passed and squash-merged as `58255fb`；main CI run `29217295221` passed repository hygiene、unit、typecheck、lint、build and goal audit。
 - Validation does not execute recovery commands or change external state；完整门禁、独立复审和 CI 待收口。
+
+## 2026年7月13日 - Blocked Goal Recovery MCP Surface v0.1
+
+- Red：MCP registry 只有 8 个 P0 hardening tools，recovery lifecycle 没有 discoverable tools、strict schemas 或统一 output receipt。
+- Green：新增 8 个 stage-specific tools、`repoassure.mcp-blocked-goal-recovery-tool-result.v1`、directory containment、recursive MCP redaction 和 authoritative writer delegation。
+- Integration：真实 MCP transport 从 package 运行到 closure；near-real eight-outcome campaign 通过 lifecycle MCP tool 验证。
+- Boundary：MCP does not execute recovery/resume commands、mutate target repos、change external state、publish、launch、contact customers、change pricing/spend or claim commercial/hosted availability。
+- Independent review remediation：新增 output symlink attack、非字符串 credential redaction 和 strict output schema 测试；底层 writer 改为 `O_NOFOLLOW` 输入读取与 same-directory atomic output replacement，MCP 拒绝已有 output symlink，并把会覆盖固定本地证据文件的工具如实标记为 `destructiveHint: true`。
+- Second independent review remediation：针对 FIFO hang、oversized input 和 parent-directory replacement 两个 P1，新增 `O_NONBLOCK`、regular-file/8 MiB checks、AsyncLocalStorage-scoped device/inode directory guards 与确定性竞态测试；输出 schema 进一步绑定 stage payload schema version 和固定 artifact suffix。聚焦测试 31/31 通过，typecheck 通过。
+- Third review remediation：读取改为 pre-open/opened-file inode binding 与 `MAX + 1` bounded loop，输出 temp file 绑定 opened/path inode；八个 stage payload schema 固定完整 top-level field set、禁止额外字段，并把 artifact regex 收紧到完整 path segment。ADR 明确 same-OS-user ABA race 属于需要 OS account/sandbox 隔离的 residual threat，不再声称 Node path APIs 提供 `openat` 等价保证。
+- Final review remediation：lifecycle campaign 限制为最多 32 scenarios、禁止重复 `artifactDir`，并以 concurrency 4 worker pool 替换无界 `Promise.all`；单元测试覆盖超量、重复目录和实时最大并发。
+- Final review P2 closure：禁止 `artifactDir` 中的 empty / `.` / `..` path segments，关闭 `shared` 与 `./shared` 等路径别名绕过去重的空间。
+- Final verification：independent review reports no P0/P1；focused lifecycle 8/8、focused recovery/MCP 39/39、full Vitest 98 files / 825 tests passed with 1 optional file/test skipped；typecheck and lint passed。Repo hygiene、release check、goal audit、PR CI 与 main CI 在交付阶段收口。

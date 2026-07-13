@@ -7,6 +7,8 @@ import { promisify } from 'node:util';
 
 import { describe, expect, it } from 'vitest';
 
+import { callHardeningTool } from '../../src/adapters/mcp/tool-registry.js';
+
 const execFileAsync = promisify(execFile);
 const SCRIPT_TEST_TIMEOUT_MS = 120_000;
 const SCRIPT_PATHS = {
@@ -524,14 +526,30 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     const tamperedDir = join(lifecycleDir, 'rejected_tampered');
     await writeFile(join(tamperedDir, 'blocked-goal-recovery-package.json'), '{ malformed recovery artifact\n');
 
-    await writeFile(join(lifecycleDir, 'blocked-goal-recovery-lifecycle-campaign-input.json'), `${JSON.stringify({
+    await writeFile(join(root, 'blocked-goal-recovery-lifecycle-campaign-input.json'), `${JSON.stringify({
       schemaVersion: 'repoassure.blocked-goal-recovery-lifecycle-campaign-input.v1',
       campaignId: 'near-real-recovery-lifecycle',
       scenarios: lifecycleOutcomes.map((expectedOutcome) => ({
-        scenarioId: expectedOutcome, expectedOutcome, artifactDir: expectedOutcome
+        scenarioId: expectedOutcome,
+        expectedOutcome,
+        artifactDir: `recovery-lifecycle-campaign/${expectedOutcome}`
       }))
     }, null, 2)}\n`);
-    await runScript(['goal:recover:validate-lifecycle', '--', '--from-dir', lifecycleDir, '--output', outputDir]);
+    const lifecycleMcpResult = await callHardeningTool('validate_blocked_goal_recovery_lifecycle', {
+      inputDir: root,
+      outputDir
+    });
+    expect(lifecycleMcpResult.isError).toBe(false);
+    expect(lifecycleMcpResult.structuredContent).toMatchObject({
+      schemaVersion: 'repoassure.mcp-blocked-goal-recovery-tool-result.v1',
+      toolName: 'validate_blocked_goal_recovery_lifecycle',
+      stage: 'lifecycle_campaign_summary',
+      boundaryCompliance: {
+        commandsExecuted: false,
+        externalStateChanged: false,
+        targetRepoMutation: false
+      }
+    });
 
     const symlinkCampaignDir = join(root, 'symlink-lifecycle-campaign');
     await mkdir(symlinkCampaignDir, { recursive: true });

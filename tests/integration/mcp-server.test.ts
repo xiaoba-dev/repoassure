@@ -1,4 +1,5 @@
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -120,7 +121,176 @@ describe('hardening MCP server', () => {
       await server.close();
     }
   }, 45000);
+
+  it('runs the blocked goal recovery evidence lifecycle over MCP without executing commands', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-mcp-recovery-'));
+    const { server, transport } = await connectMcpServer();
+
+    try {
+      await writeJson(root, 'blocked-goal-recovery-input.json', {
+        sourceGoal: {
+          title: 'MCP lifecycle fixture', status: 'blocked',
+          objective: 'Validate local recovery artifacts over MCP.', evidenceRefs: []
+        },
+        sourceLogs: [], blockers: [],
+        resumeCommands: [{ command: 'codex resume goal', purpose: 'Separate reviewed attempt.' }],
+        redactionBoundary: 'Sanitized local fixture evidence only.'
+      });
+
+      const recovery = await callTool(transport, 30, 'create_blocked_goal_recovery', { inputDir: root });
+      expectRecoveryToolResult(recovery, 'create_blocked_goal_recovery', 'repoassure.blocked-goal-recovery-package.v1');
+
+      const consumption = await callTool(transport, 31, 'consume_blocked_goal_recovery', { inputDir: root });
+      expectRecoveryToolResult(
+        consumption,
+        'consume_blocked_goal_recovery',
+        'repoassure.blocked-goal-recovery-consumption-report.v1'
+      );
+      const consumptionText = await readFile(join(root, 'blocked-goal-recovery-consumption-report.json'), 'utf8');
+      const consumptionArtifact = JSON.parse(consumptionText) as {
+        actionQueue: Array<{ actionKey: string }>;
+        resumeCommands: Array<{ commandId: string }>;
+      };
+      await writeJson(root, 'blocked-goal-recovery-decisions.json', {
+        sourceConsumptionReportSha256: sha256(consumptionText),
+        decisions: consumptionArtifact.actionQueue.map((item) => ({
+          actionKey: item.actionKey, decision: 'approve', evidence: 'Reviewed.', reviewerRole: 'maintainer'
+        })),
+        resumeCommandDecisions: consumptionArtifact.resumeCommands.map((item) => ({
+          commandId: item.commandId, decision: 'approve', evidence: 'Reviewed.', reviewerRole: 'maintainer'
+        }))
+      });
+
+      const decision = await callTool(transport, 32, 'record_blocked_goal_recovery_decision', { inputDir: root });
+      expectRecoveryToolResult(
+        decision,
+        'record_blocked_goal_recovery_decision',
+        'repoassure.blocked-goal-recovery-decision-receipt.v1'
+      );
+      const decisionText = await readFile(join(root, 'blocked-goal-recovery-decision-receipt.json'), 'utf8');
+      await writeJson(root, 'blocked-goal-recovery-resume-attempt-task-input.json', {
+        sourceDecisionReceiptSha256: sha256(decisionText)
+      });
+
+      const task = await callTool(transport, 33, 'prepare_blocked_goal_resume_attempt', { inputDir: root });
+      expectRecoveryToolResult(
+        task,
+        'prepare_blocked_goal_resume_attempt',
+        'repoassure.blocked-goal-recovery-resume-attempt-task-package.v1'
+      );
+      const taskText = await readFile(join(root, 'blocked-goal-recovery-resume-attempt-task-package.json'), 'utf8');
+      const taskArtifact = JSON.parse(taskText) as {
+        actionTasks: Array<{ actionKey: string }>;
+        resumeCommandTasks: Array<{ commandId: string }>;
+        verificationChecklist: string[];
+      };
+      await writeJson(root, 'blocked-goal-recovery-resume-attempt-execution-evidence-input.json', {
+        sourceTaskPackageSha256: sha256(taskText),
+        attemptId: 'mcp-fixture-attempt',
+        startedAt: '2026-07-13T09:00:00.000Z',
+        completedAt: '2026-07-13T09:01:00.000Z',
+        actionResults: taskArtifact.actionTasks.map((item) => ({
+          actionKey: item.actionKey, status: 'passed', summary: 'Passed.', evidenceRefs: ['action.log']
+        })),
+        resumeCommandResults: taskArtifact.resumeCommandTasks.map((item) => ({
+          commandId: item.commandId, status: 'passed', exitCode: 0,
+          summary: 'Executed in separately authorized fixture.', evidenceRefs: ['resume.log']
+        })),
+        verificationResults: taskArtifact.verificationChecklist.map((check) => ({
+          checkId: `verification-${sha256(check).slice(0, 16)}`,
+          status: 'passed', summary: 'Passed.', evidenceRefs: ['verification.log']
+        })),
+        boundaryEvidence: {
+          unlistedCommandsExecuted: false,
+          blockedActionsPreserved: true,
+          targetRepoMutationByRepoAssure: false
+        },
+        redactionBoundary: 'Sanitized local fixture evidence only.'
+      });
+
+      const intake = await callTool(transport, 34, 'intake_blocked_goal_resume_evidence', { inputDir: root });
+      expectRecoveryToolResult(
+        intake,
+        'intake_blocked_goal_resume_evidence',
+        'repoassure.blocked-goal-recovery-resume-attempt-execution-evidence-intake.v1'
+      );
+      const intakeText = await readFile(
+        join(root, 'blocked-goal-recovery-resume-attempt-execution-evidence-intake.json'),
+        'utf8'
+      );
+      const intakeArtifact = JSON.parse(intakeText) as {
+        actionResults: Array<{ actionKey: string }>;
+        resumeCommandResults: Array<{ commandId: string }>;
+        verificationResults: Array<{ checkId: string }>;
+      };
+      await writeJson(root, 'blocked-goal-recovery-resume-attempt-evidence-review-decisions.json', {
+        sourceEvidenceIntakeSha256: sha256(intakeText),
+        decisions: [
+          ...intakeArtifact.actionResults.map((item) => `action:${item.actionKey}`),
+          ...intakeArtifact.resumeCommandResults.map((item) => `command:${item.commandId}`),
+          ...intakeArtifact.verificationResults.map((item) => `verification:${item.checkId}`)
+        ].map((evidenceKey) => ({
+          evidenceKey, decision: 'accept', evidence: 'Reviewed.', reviewerRole: 'maintainer'
+        }))
+      });
+
+      const review = await callTool(transport, 35, 'review_blocked_goal_resume_evidence', { inputDir: root });
+      expectRecoveryToolResult(
+        review,
+        'review_blocked_goal_resume_evidence',
+        'repoassure.blocked-goal-recovery-resume-attempt-evidence-review-decision-package.v1'
+      );
+      const reviewText = await readFile(
+        join(root, 'blocked-goal-recovery-resume-attempt-evidence-review-decision-package.json'),
+        'utf8'
+      );
+      await writeJson(root, 'blocked-goal-recovery-resume-attempt-closure-input.json', {
+        sourceEvidenceReviewPackageSha256: sha256(reviewText),
+        closureEvidence: 'MCP fixture closure reviewed.',
+        reviewerRole: 'maintainer',
+        acknowledgedRiskEvidenceKeys: []
+      });
+
+      const closure = await callTool(transport, 36, 'close_blocked_goal_resume_attempt', { inputDir: root });
+      expectRecoveryToolResult(
+        closure,
+        'close_blocked_goal_resume_attempt',
+        'repoassure.blocked-goal-recovery-resume-attempt-closure-receipt.v1'
+      );
+      expect(readRecord(readRecord(closure.output).boundaryCompliance)).toMatchObject({
+        commandsExecutedByClosure: false,
+        externalGoalClosedByReceipt: false
+      });
+    } finally {
+      await server.close();
+    }
+  });
 });
+
+function expectRecoveryToolResult(
+  value: Record<string, unknown>,
+  toolName: string,
+  outputSchemaVersion: string
+): void {
+  expect(value).toMatchObject({
+    schemaVersion: 'repoassure.mcp-blocked-goal-recovery-tool-result.v1',
+    toolName,
+    output: { schemaVersion: outputSchemaVersion },
+    boundaryCompliance: {
+      commandsExecuted: false,
+      externalStateChanged: false,
+      targetRepoMutation: false
+    }
+  });
+}
+
+async function writeJson(root: string, fileName: string, value: unknown): Promise<void> {
+  await writeFile(join(root, fileName), `${JSON.stringify(value, null, 2)}\n`);
+}
+
+function sha256(value: string): string {
+  return createHash('sha256').update(value).digest('hex');
+}
 
 async function createServerRepo(): Promise<string> {
   const root = await mkdtemp(join(tmpdir(), 'hardening-mcp-chain-'));

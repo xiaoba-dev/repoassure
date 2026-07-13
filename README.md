@@ -198,10 +198,20 @@ node apps/mcp-server/index.js
 - `generate_repair_plan`
 - `harden_report`
 - `run_hardening`
+- `create_blocked_goal_recovery`
+- `consume_blocked_goal_recovery`
+- `record_blocked_goal_recovery_decision`
+- `prepare_blocked_goal_resume_attempt`
+- `intake_blocked_goal_resume_evidence`
+- `review_blocked_goal_resume_evidence`
+- `close_blocked_goal_resume_attempt`
+- `validate_blocked_goal_recovery_lifecycle`
 
 `boot_app` 会返回 `sessionId`。独立调用 `boot_app` 后，应调用 `stop_app` 清理进程。`run_hardening` 内部会自动清理自己的 boot session。
 
 `explore_app` 和 `run_hardening` 支持 `criticalPaths`、`maxRoutes`、`maxActionsPerRoute`、`storageStatePath`、`trace` 与 `browser`。`criticalPaths` 可传同源 URL/path，也可传短自然语言关键路径意图；外部 origin 会被忽略。`generate_tests` 支持 `smokeRoutes` 和 `baseUrl`，用于独立生成关键路径 smoke tests 并指定 generated spec 的安全默认 origin。`generate_repair_plan` 默认读取 `<repo>/.hardening/latest`，也可传 `runDir` 刷新指定 run 的 repair plan 和可执行修复任务包。`run_hardening` 额外支持 `startCommand`、`bootTimeoutMs` 和 `workspaceOutputDir`，并会自动生成 repair plan 与修复任务包。
+
+Blocked-goal recovery tools 按 package → consumption → decision → task → intake → review → closure → lifecycle validation 顺序消费本地物料。它们只接受 `inputDir` 和可选的 contained `outputDir`，返回 stage-bound `repoassure.mcp-blocked-goal-recovery-tool-result.v1`，不执行 recovery/resume commands 或修改目标 repo。工具会覆盖自身固定命名的本地证据文件，因此标记 `destructiveHint: true`；输入必须是 8 MiB 以内的普通文件并使用 non-blocking/no-follow 读取，MCP 对目录 device/inode 做持续校验，输出拒绝已有 symlink 并以同目录临时文件原子替换。完整契约见 `docs/operations/blocked-goal-recovery-mcp-surface-v0.1.md`。
 
 MCP client 配置示例见 `docs/acceptance/guides/user-acceptance-guide.md`。
 

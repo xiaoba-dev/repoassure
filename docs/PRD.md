@@ -127,3 +127,7 @@ RepoAssure must let AI IDE clients discover and call every blocked-goal recovery
 ## Blocked Goal Recovery MCP Real Client Consumption Validation v0.1
 
 The official SDK `Client` and `StdioClientTransport` must discover and consume the recovery surface through a compiled child process. Success content must satisfy the advertised schema; tool failures must remain readable without invalid `structuredContent`; startup failure, timeout, stderr redaction, and child cleanup must be deterministic. The validation does not execute recovery commands or authorize target repo or external-state changes.
+
+## Blocked Goal Recovery MCP External AI IDE Configuration Validation v0.1
+
+RepoAssure must generate copy-pasteable Cursor, VS Code, and Codex local stdio configurations that point to the user-facing `apps/mcp-server/index.js` entry with absolute argv-safe paths. Automated acceptance must consume every generated envelope from a repository-external workspace, discover all eight recovery tools, prove the SDK harness does not serialize or forward an unrelated test secret, enforce deterministic cleanup, and remain non-writing and non-executing for client settings, recovery commands, target repositories, and external state. Actual IDE environment inheritance is a manual acceptance item, not an automated claim.

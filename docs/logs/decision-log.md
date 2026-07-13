@@ -1701,3 +1701,7 @@ Receipt does not execute resume commands，不授权 target repo mutation、rele
 ## 2026-07-13 - blocked goal recovery MCP real client validation
 
 采用官方 SDK `Client` + `StdioClientTransport` 作为 compiled MCP server 的必需 CI contract。Error result 不再写入与 success-only output schema 冲突的 `structuredContent`；可读错误保留在 text `content` 且 `isError: true`。该验证不执行恢复命令或改变外部状态。
+
+## 2026-07-13 - blocked goal recovery MCP external AI IDE configuration validation
+
+在 ADR-0014 与 ADR-0041 的既定边界内，采用动态生成而不是提交机器专属绝对路径：Cursor、VS Code 与 Codex 配置均指向 `apps/mcp-server/index.js`，并由外部 cwd 的官方 SDK consumer 验证。自动证据限于 source checkout 与 SDK harness；真实 IDE 环境继承、sandbox 和配置合并保留为独立人工 gate。Generator does not write client configuration；validation does not execute recovery or resume commands，因此不新增 ADR。

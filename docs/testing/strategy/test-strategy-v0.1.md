@@ -636,3 +636,10 @@ This validation must not upload target repo material, automatically modify targe
 - Integration: a real child process consumes package through closure, rejects an incomplete lifecycle campaign, successfully validates the near-real eight-outcome campaign, and proves success text/structured agreement plus client-readable standard errors.
 - Attack and resilience: missing artifact, unexpected argument, secret-like path, raw-secret stderr, bounded stderr capture, safe environment inheritance, request timeout, and enforced deterministic cleanup are covered.
 - CI: `pnpm test:mcp-real-client` builds required dist outputs and runs as a dedicated GitHub Quality Gates step.
+
+## Blocked Goal Recovery MCP External AI IDE Configuration Validation v0.1
+
+- Unit: strict rendering covers Cursor `mcpServers` JSON, VS Code `servers` stdio JSON, Codex `mcp_servers` TOML, absolute path spaces, argument parsing, unsupported clients, and argument expansion rejection.
+- Integration: `pnpm test:mcp-external-config` generates each configuration from a repository-external cwd, points it at `apps/mcp-server/index.js` through a path-with-spaces source-checkout alias, starts it through official SDK `StdioClientTransport`, discovers all eight recovery tools, and verifies deterministic child cleanup.
+- Security boundary: generated output contains no caller env values, the SDK harness uses its safe default environment, stderr remains empty, missing build modules produce a fixed path-safe error, and the generator does not write client configuration. Actual IDE environment inheritance remains a manual acceptance item.
+- CI: External AI IDE MCP config is an independent GitHub Quality Gates step after real stdio client validation.

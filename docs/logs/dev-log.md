@@ -13758,3 +13758,13 @@ Phase 0：项目初始化。
 - Final review remediation：process signaling 仅将 `ESRCH` 视为已退出，`EPERM` 等错误 fail closed；70 KiB raw stderr fixture 验证 bounded tail 丢弃前缀并对完整 error object 脱敏。
 - Final verification：independent review P0/P1 cleared；real-client gate 2 files / 4 tests、full Vitest 100 files / 831 tests passed with 1 optional file/test skipped；typecheck and lint passed。Repo hygiene、release check、goal audit、PR CI 与 main CI 在交付阶段收口。
 - Boundary：validation does not execute recovery/resume commands、mutate target repos、change external state、publish、launch、contact customers、change pricing/spend or visibility、or claim commercial/hosted availability。
+
+## 2026年7月13日 - Blocked Goal Recovery MCP External AI IDE Configuration Validation v0.1
+
+- Red：缺少 client-specific config renderer、生成脚本、外部 cwd/app shell 消费测试和独立 CI gate。
+- Green：新增 Cursor JSON、VS Code stdio JSON、Codex TOML 生成器；配置使用当前 Node.js 和 `apps/mcp-server/index.js` 的绝对 argv-safe 路径。
+- Integration：三种配置均从 repo 外部、带空格 source-checkout alias 通过官方 SDK `StdioClientTransport` 启动，发现八个 recovery tools，验证 instructions、空 stderr、SDK-harness environment isolation 和 deterministic cleanup；不把该证据扩大为真实 IDE 环境继承结论。
+- Delivery：新增 `pnpm mcp:config`、`pnpm test:mcp-external-config`、GitHub Quality Gates step 和完整 operations/SoT/architecture/testing/acceptance cascade。
+- Verification：`pnpm test:mcp-external-config` 2 files / 11 tests passed；typecheck、lint、repo:hygiene、release:check passed；goal audit 35/35 passed。首次 sandbox full run 的 4 个 localhost boot/MCP failures 由既有 `listen EPERM` 环境边界触发，同组测试在 sandbox 外 6/6 passed。两次 standard parallel full run 暴露已记录的 acceptance dist rebuild race；serialized sandbox-outside full Vitest 102 files / 843 tests passed with 1 optional file/test skipped。
+- Independent review：无 P0/P1；修复 pre-build static-import path leak，fixture 明确为 source checkout 而非 relocatable install，测试从 `mkdtemp` 后无条件清理 temp/env/process，并收窄真实 IDE environment claim；已有客户端配置必须合并 `repoassure` entry，禁止整文件覆盖或重复 TOML table；workstation-specific 输出必须保持 user-level/untracked，禁止 commit、share 或写入 CI log。
+- Boundary：generator does not write client configuration；validation does not execute recovery or resume commands、publish、launch、contact customers、change pricing/spend or visibility、mutate target repos、change external state、or claim commercial/hosted availability。

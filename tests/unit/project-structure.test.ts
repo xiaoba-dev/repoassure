@@ -3732,6 +3732,33 @@ describe('project structure', () => {
     await expectPath('tests/integration/mcp-real-client.test.ts');
   });
 
+  it('records external AI IDE MCP configuration validation and its CI gate', async () => {
+    const files = await Promise.all([
+      readFile('docs/operations/blocked-goal-recovery-mcp-external-ai-ide-configuration-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'), readFile('docs/PRD.md', 'utf8'), readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'), readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/guides/user-acceptance-guide.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'), readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('package.json', 'utf8'), readFile('.github/workflows/ci.yml', 'utf8')
+    ]);
+    const joined = files.join('\n');
+    expect(joined).toContain('Blocked Goal Recovery MCP External AI IDE Configuration Validation v0.1');
+    expect(joined).toContain('pnpm --silent mcp:config');
+    expect(joined).toContain('pnpm test:mcp-external-config');
+    expect(joined).toContain('apps/mcp-server/index.js');
+    expect(joined).toContain('Cursor');
+    expect(joined).toContain('VS Code');
+    expect(joined).toContain('Codex');
+    expect(joined).toContain('does not write client configuration');
+    expect(joined).toContain('does not execute recovery or resume commands');
+    await expectPath('src/adapters/mcp/client-config.ts');
+    await expectPath('scripts/generate-mcp-client-config.mjs');
+    await expectPath('tests/unit/mcp-client-config.test.ts');
+    await expectPath('tests/integration/mcp-external-ai-ide-config.test.ts');
+  });
+
   it('records Autopilot-compatible documentation architecture without moving existing source documents', async () => {
     const [
       adr,

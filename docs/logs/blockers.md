@@ -518,3 +518,28 @@ pnpm goal:audit
 ### 当前判断
 
 该阻塞已解除。v0.1 长期 goal 可进入完成审计，后续工作转入 Spec v0.2。
+
+## 2026年7月13日 - full Vitest parallel dist rebuild race
+
+### 背景
+
+标准 `pnpm test` 会并行运行多个 integration files；其中多条 CLI package scripts 各自执行 `build:acceptance`，并共同重写 `packages/acceptance/dist`。MCP/CLI 子进程可能在重写窗口读取到半成品 ESM modules。
+
+### 影响
+
+两次标准 full run 分别在既有 resume-evidence intake 和新增 external MCP consumer 中出现 `does not provide an export named ...`，每次涉及不同、源码与最终 dist 中都真实存在的 export。专用 `pnpm test:mcp-external-config` 11/11 稳定通过；失败用例聚焦重跑也通过，因此不是本 Goal 的配置/runtime 行为回归，但标准 full test 目前存在非确定性。
+
+### 已尝试方案
+
+1. 检查 source 和最终 dist export：一致。
+2. 聚焦重跑首次失败的 intake integration：2/2 passed。
+3. 重跑标准 full suite：错误转移到另一个同时读取 acceptance dist 的 MCP child，确认共享 dist 重建竞态。
+4. 保留 dedicated CI gate，并使用 serialized full Vitest 作为当前可靠全量验收路径。
+
+### 当前判断
+
+不在 External AI IDE Configuration Validation 的产品范围内临时修改 acceptance build architecture。需要独立的 Parallel Test Runtime Build Isolation v0.1 Execution Goal：让 integration scripts 消费一次性预构建或隔离输出，并让标准 `pnpm test` 可重复稳定通过。
+
+### 临时边界
+
+在该 Goal 完成前，最终本地 full evidence 使用无文件并行的 Vitest；GitHub CI 的 unit、real MCP client 和 external config dedicated gates保持顺序执行。该 workaround 不等于竞态已修复。

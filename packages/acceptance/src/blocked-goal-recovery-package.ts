@@ -1,9 +1,133 @@
-import { createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { basename, join } from 'node:path';
+import { createHash, randomUUID } from 'node:crypto';
+import { AsyncLocalStorage } from 'node:async_hooks';
+import { constants } from 'node:fs';
+import { lstat, mkdir, open, realpath, rename, unlink } from 'node:fs/promises';
+import { basename, dirname, join, sep } from 'node:path';
 
 import { escapeMarkdownTableCell } from './markdown.js';
 import { redactSensitiveText } from './redaction.js';
+
+const MAX_BLOCKED_GOAL_RECOVERY_INPUT_BYTES = 8 * 1024 * 1024;
+
+interface RecoveryDirectoryIdentity {
+  readonly path: string;
+  readonly device: number;
+  readonly inode: number;
+}
+
+const recoveryDirectoryGuards = new AsyncLocalStorage<readonly RecoveryDirectoryIdentity[]>();
+
+export async function withBlockedGoalRecoveryDirectoryGuards<T>(
+  paths: readonly string[],
+  operation: () => Promise<T>
+): Promise<T> {
+  const identities = await Promise.all([...new Set(paths)].map(async (path): Promise<RecoveryDirectoryIdentity> => {
+    const metadata = await lstat(path);
+    if (!metadata.isDirectory()) throw new Error(`Blocked goal recovery path must be a directory: ${path}`);
+    return { path, device: metadata.dev, inode: metadata.ino };
+  }));
+  return recoveryDirectoryGuards.run(identities, operation);
+}
+
+export async function readBlockedGoalRecoveryLocalArtifact(
+  path: string,
+  encoding: BufferEncoding = 'utf8'
+): Promise<string> {
+  const pathMetadata = await lstat(path);
+  if (!pathMetadata.isFile()) throw new Error(`Blocked goal recovery input must be a regular file: ${basename(path)}`);
+  if (pathMetadata.size > MAX_BLOCKED_GOAL_RECOVERY_INPUT_BYTES) {
+    throw new Error(`Blocked goal recovery input exceeds ${MAX_BLOCKED_GOAL_RECOVERY_INPUT_BYTES} bytes`);
+  }
+  await assertRecoveryDirectoryIdentity(path);
+  const handle = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+  try {
+    const metadata = await handle.stat();
+    if (!metadata.isFile()) throw new Error(`Blocked goal recovery input must be a regular file: ${basename(path)}`);
+    if (metadata.dev !== pathMetadata.dev || metadata.ino !== pathMetadata.ino) {
+      throw new Error(`Blocked goal recovery input identity changed: ${basename(path)}`);
+    }
+    if (metadata.size > MAX_BLOCKED_GOAL_RECOVERY_INPUT_BYTES) {
+      throw new Error(`Blocked goal recovery input exceeds ${MAX_BLOCKED_GOAL_RECOVERY_INPUT_BYTES} bytes`);
+    }
+    await assertRecoveryDirectoryIdentity(path);
+    return await readBoundedRecoveryInput(handle, encoding);
+  } finally {
+    await handle.close();
+  }
+}
+
+export async function writeBlockedGoalRecoveryLocalArtifact(path: string, content: string): Promise<void> {
+  const temporaryPath = `${path}.tmp-${process.pid}-${randomUUID()}`;
+  let handle;
+  try {
+    await assertRecoveryDirectoryIdentity(path);
+    handle = await open(
+      temporaryPath,
+      constants.O_CREAT | constants.O_EXCL | constants.O_WRONLY | constants.O_NOFOLLOW,
+      0o600
+    );
+    const temporaryMetadata = await handle.stat();
+    const temporaryPathMetadata = await lstat(temporaryPath);
+    if (
+      temporaryMetadata.dev !== temporaryPathMetadata.dev
+      || temporaryMetadata.ino !== temporaryPathMetadata.ino
+    ) {
+      throw new Error(`Blocked goal recovery output identity changed: ${basename(path)}`);
+    }
+    await assertRecoveryDirectoryIdentity(path);
+    await handle.writeFile(content, 'utf8');
+    await handle.sync();
+    await handle.close();
+    handle = undefined;
+    await assertRecoveryDirectoryIdentity(path);
+    await rename(temporaryPath, path);
+    await assertRecoveryDirectoryIdentity(path);
+  } catch (error) {
+    await handle?.close().catch(() => undefined);
+    await unlink(temporaryPath).catch(() => undefined);
+    throw error;
+  }
+}
+
+async function readBoundedRecoveryInput(
+  handle: Awaited<ReturnType<typeof open>>,
+  encoding: BufferEncoding
+): Promise<string> {
+  const chunks: Buffer[] = [];
+  let totalBytes = 0;
+  while (totalBytes <= MAX_BLOCKED_GOAL_RECOVERY_INPUT_BYTES) {
+    const remaining = (MAX_BLOCKED_GOAL_RECOVERY_INPUT_BYTES + 1) - totalBytes;
+    const buffer = Buffer.allocUnsafe(Math.min(64 * 1024, remaining));
+    const { bytesRead } = await handle.read(buffer, 0, buffer.length, null);
+    if (bytesRead === 0) break;
+    chunks.push(buffer.subarray(0, bytesRead));
+    totalBytes += bytesRead;
+  }
+  if (totalBytes > MAX_BLOCKED_GOAL_RECOVERY_INPUT_BYTES) {
+    throw new Error(`Blocked goal recovery input exceeds ${MAX_BLOCKED_GOAL_RECOVERY_INPUT_BYTES} bytes`);
+  }
+  return Buffer.concat(chunks, totalBytes).toString(encoding);
+}
+
+async function assertRecoveryDirectoryIdentity(artifactPath: string): Promise<void> {
+  const guards = recoveryDirectoryGuards.getStore();
+  if (!guards?.length) return;
+  const guard = [...guards]
+    .sort((left, right) => right.path.length - left.path.length)
+    .find(({ path }) => artifactPath === path || artifactPath.startsWith(`${path}${sep}`));
+  if (!guard) throw new Error(`Blocked goal recovery artifact is outside guarded directories: ${artifactPath}`);
+
+  const metadata = await lstat(guard.path);
+  const artifactParent = await realpath(dirname(artifactPath));
+  if (
+    !metadata.isDirectory()
+    || metadata.dev !== guard.device
+    || metadata.ino !== guard.inode
+    || (artifactParent !== guard.path && !artifactParent.startsWith(`${guard.path}${sep}`))
+  ) {
+    throw new Error(`Blocked goal recovery directory identity changed: ${guard.path}`);
+  }
+}
 
 export type BlockedGoalBlockerCategory =
   | 'environment'
@@ -283,7 +407,9 @@ export function buildBlockedGoalRecoveryPackage(
 export async function writeBlockedGoalRecoveryPackage(
   input: WriteBlockedGoalRecoveryPackageInput
 ): Promise<WriteBlockedGoalRecoveryPackageResult> {
-  const recoveryInput = JSON.parse(await readFile(input.inputPath, 'utf8')) as BlockedGoalRecoveryInput;
+  const recoveryInput = JSON.parse(
+    await readBlockedGoalRecoveryLocalArtifact(input.inputPath, 'utf8')
+  ) as BlockedGoalRecoveryInput;
   const recoveryPackage = buildBlockedGoalRecoveryPackage({
     ...(input.generatedAt ? { generatedAt: input.generatedAt } : {}),
     inputPath: input.inputPath,
@@ -293,8 +419,8 @@ export async function writeBlockedGoalRecoveryPackage(
   const markdownPath = join(input.outputDir, RECOVERY_PACKAGE_MARKDOWN_NAME);
 
   await mkdir(input.outputDir, { recursive: true });
-  await writeFile(jsonPath, `${JSON.stringify(recoveryPackage, null, 2)}\n`);
-  await writeFile(markdownPath, buildBlockedGoalRecoveryPackageMarkdown(recoveryPackage));
+  await writeBlockedGoalRecoveryLocalArtifact(jsonPath, `${JSON.stringify(recoveryPackage, null, 2)}\n`);
+  await writeBlockedGoalRecoveryLocalArtifact(markdownPath, buildBlockedGoalRecoveryPackageMarkdown(recoveryPackage));
 
   return { jsonPath, markdownPath, recoveryPackage };
 }

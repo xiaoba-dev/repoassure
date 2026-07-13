@@ -46,6 +46,7 @@ ADR records long-lived architecture decisions. Use `docs/logs/decision-log.md` f
 | [0038](0038-blocked-goal-recovery-resume-attempt-evidence-review-decision-package.md) | Accepted | Blocked goal recovery resume attempt evidence review decision package |
 | [0039](0039-blocked-goal-recovery-resume-attempt-closure-receipt.md) | Accepted | Blocked goal recovery resume attempt closure receipt |
 | [0040](0040-blocked-goal-recovery-full-lifecycle-campaign-validation.md) | Accepted | Blocked goal recovery full lifecycle campaign validation |
+| [0041](0041-blocked-goal-recovery-mcp-surface.md) | Accepted | Bounded blocked goal recovery MCP surface |
 
 ## Template
 

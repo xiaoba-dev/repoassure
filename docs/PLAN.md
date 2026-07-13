@@ -26,14 +26,15 @@ Recent completed work includes:
 - Blocked Goal Recovery Resume Attempt Evidence Review Decision Package v0.1.
 - Blocked Goal Recovery Resume Attempt Closure Receipt v0.1.
 - Blocked Goal Recovery Full Lifecycle Real Campaign Validation v0.1.
+- Blocked Goal Recovery MCP Surface v0.1.
 - Public release and branch protection governance.
 - Public website private preview and custom-domain work.
 
 ## Next Codex Goal
 
-Blocked Goal Recovery MCP Surface v0.1
+Blocked Goal Recovery MCP Real Client Consumption Validation v0.1
 
-Plain-language explanation: expose the validated recovery lifecycle to AI IDE clients through bounded MCP tools without executing recovery actions.
+Plain-language explanation: validate the bounded recovery tools through a real stdio MCP client process and AI IDE-shaped consumption flow before treating the surface as externally consumable.
 
 ## Execution Rules
 
@@ -73,6 +74,15 @@ Plain-language explanation: expose the validated recovery lifecycle to AI IDE cl
 - ADR-0038: Blocked goal recovery resume attempt evidence review decision package.
 - ADR-0039: Blocked goal recovery resume attempt closure receipt.
 - ADR-0040: Blocked goal recovery full lifecycle campaign validation.
+- ADR-0041: Blocked goal recovery MCP surface.
+
+## Blocked Goal Recovery MCP Surface v0.1
+
+Status: implemented.
+
+- Expose eight explicit recovery lifecycle tools through MCP `tools/list` and `tools/call`.
+- Reuse authoritative acceptance writers and emit `repoassure.mcp-blocked-goal-recovery-tool-result.v1`.
+- Reject argument expansion and output real-path escape while preserving redaction and non-execution boundaries.
 
 ## Blocked Goal Recovery Full Lifecycle Real Campaign Validation v0.1
 

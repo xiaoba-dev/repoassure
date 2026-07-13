@@ -1,18 +1,63 @@
-import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
+import { mkdir, mkdtemp, readFile, rename, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { promisify } from 'node:util';
 
 import { describe, expect, it } from 'vitest';
 
 import {
   buildBlockedGoalRecoveryPackage,
   buildBlockedGoalRecoveryPackageMarkdown,
+  readBlockedGoalRecoveryLocalArtifact,
+  withBlockedGoalRecoveryDirectoryGuards,
   writeBlockedGoalRecoveryPackage,
   writeBlockedGoalRecoveryPackageFromDirectory,
   type BlockedGoalRecoveryInput
 } from '../../packages/acceptance/src/blocked-goal-recovery-package.js';
 
+const execFileAsync = promisify(execFile);
+
 describe('blocked goal recovery package', () => {
+  it('rejects oversized local recovery inputs before reading them into memory', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-recovery-oversized-'));
+    const inputPath = join(root, 'oversized.json');
+    await writeFile(inputPath, Buffer.alloc((8 * 1024 * 1024) + 1, 0x20));
+
+    await expect(readBlockedGoalRecoveryLocalArtifact(inputPath)).rejects.toThrow(
+      'Blocked goal recovery input exceeds 8388608 bytes'
+    );
+  });
+
+  it('rejects FIFO inputs without waiting for a writer', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-recovery-fifo-'));
+    const inputPath = join(root, 'blocked-goal-recovery-input.json');
+    await execFileAsync('mkfifo', [inputPath]);
+
+    await expect(readBlockedGoalRecoveryLocalArtifact(inputPath)).rejects.toThrow(
+      'Blocked goal recovery input must be a regular file: blocked-goal-recovery-input.json'
+    );
+  });
+
+  it('rejects I/O after a guarded directory identity is replaced', async () => {
+    const parent = await mkdtemp(join(tmpdir(), 'repoassure-recovery-identity-'));
+    const root = join(parent, 'root');
+    const movedRoot = join(parent, 'moved-root');
+    const outside = join(parent, 'outside');
+    await mkdir(root);
+    await mkdir(outside);
+    await writeFile(join(root, 'input.json'), '{}');
+    await writeFile(join(outside, 'input.json'), '{"outside":true}');
+
+    await withBlockedGoalRecoveryDirectoryGuards([root], async () => {
+      await rename(root, movedRoot);
+      await symlink(outside, root, 'dir');
+      await expect(readBlockedGoalRecoveryLocalArtifact(join(root, 'input.json'))).rejects.toThrow(
+        `Blocked goal recovery directory identity changed: ${root}`
+      );
+    });
+  });
+
   it('normalizes blocked, incomplete, deferred, and retryable blockers into a local recovery package', () => {
     const recoveryPackage = buildBlockedGoalRecoveryPackage({
       generatedAt: '2026-07-12T01:00:00.000Z',

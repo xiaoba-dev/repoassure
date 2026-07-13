@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, realpath, writeFile } from 'node:fs/promises';
+import { mkdir, realpath } from 'node:fs/promises';
 import { isAbsolute, join, resolve, sep } from 'node:path';
 
 import {
@@ -10,7 +10,11 @@ import {
   assertBlockedGoalRecoveryConsumptionReport,
   assertBlockedGoalRecoveryDecisionReceiptSourceBinding
 } from './blocked-goal-recovery-decision-receipt.js';
-import { BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS } from './blocked-goal-recovery-package.js';
+import {
+  BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BLOCKED_ACTIONS,
+  readBlockedGoalRecoveryLocalArtifact as readFile,
+  writeBlockedGoalRecoveryLocalArtifact as writeFile
+} from './blocked-goal-recovery-package.js';
 import {
   assertBlockedGoalRecoveryResumeAttemptClosureReceipt,
   assertBlockedGoalRecoveryResumeAttemptClosureReceiptSourceBinding,
@@ -93,6 +97,8 @@ export interface WriteBlockedGoalRecoveryLifecycleCampaignSummaryResult {
 const INPUT_NAME = 'blocked-goal-recovery-lifecycle-campaign-input.json';
 const OUTPUT_JSON_NAME = 'blocked-goal-recovery-lifecycle-campaign-summary.json';
 const OUTPUT_MARKDOWN_NAME = 'blocked-goal-recovery-lifecycle-campaign-summary.md';
+const MAX_CAMPAIGN_SCENARIOS = 32;
+const MAX_CONCURRENT_SCENARIO_VALIDATIONS = 4;
 const OUTCOMES: BlockedGoalRecoveryLifecycleOutcome[] = [
   'accepted', 'accepted_with_risk', 'blocked', 'failed', 'incomplete',
   'environment_blocker', 'boundary_violation', 'rejected_tampered'
@@ -115,9 +121,11 @@ export async function writeBlockedGoalRecoveryLifecycleCampaignSummary(
   let campaignInput: unknown;
   try { campaignInput = JSON.parse(sourceText); } catch { throw invalidCampaignInput(); }
   assertCampaignInput(campaignInput);
-  const scenarios = await Promise.all(campaignInput.scenarios.map((scenario) =>
-    validateScenario(input.inputDir, scenario)
-  ));
+  const scenarios = await mapBlockedGoalRecoveryScenariosWithConcurrency(
+    campaignInput.scenarios,
+    MAX_CONCURRENT_SCENARIO_VALIDATIONS,
+    async (scenario) => validateScenario(input.inputDir, scenario)
+  );
   const passedScenarios = scenarios.filter((scenario) => scenario.status === 'passed').length;
   const summary: BlockedGoalRecoveryLifecycleCampaignSummary = {
     schemaVersion: 'repoassure.blocked-goal-recovery-lifecycle-campaign-summary.v1',
@@ -405,11 +413,34 @@ function assertCampaignInput(value: unknown): asserts value is BlockedGoalRecove
     || value.schemaVersion !== 'repoassure.blocked-goal-recovery-lifecycle-campaign-input.v1'
     || !canonicalValue(value.campaignId)
     || !Array.isArray(value.scenarios) || value.scenarios.length === 0
+    || value.scenarios.length > MAX_CAMPAIGN_SCENARIOS
     || !value.scenarios.every(isScenarioInput)
     || !hasCompleteOutcomeCoverage(value.scenarios)
     || !exactKeys(value, ['schemaVersion', 'campaignId', 'scenarios'])) throw invalidCampaignInput();
   const ids = value.scenarios.map((item) => (item as BlockedGoalRecoveryLifecycleCampaignScenarioInput).scenarioId);
   if (new Set(ids).size !== ids.length) throw invalidCampaignInput();
+  const artifactDirs = value.scenarios.map(
+    (item) => (item as BlockedGoalRecoveryLifecycleCampaignScenarioInput).artifactDir
+  );
+  if (new Set(artifactDirs).size !== artifactDirs.length) throw invalidCampaignInput();
+}
+
+export async function mapBlockedGoalRecoveryScenariosWithConcurrency<T, R>(
+  items: readonly T[],
+  concurrency: number,
+  mapper: (item: T) => Promise<R>
+): Promise<R[]> {
+  const results = new Array<R>(items.length);
+  let cursor = 0;
+  const workers = Array.from({ length: Math.min(concurrency, items.length) }, async () => {
+    while (cursor < items.length) {
+      const index = cursor;
+      cursor += 1;
+      results[index] = await mapper(items[index]!);
+    }
+  });
+  await Promise.all(workers);
+  return results;
 }
 
 function isScenarioInput(value: unknown): boolean {
@@ -429,8 +460,9 @@ async function resolveArtifactDir(inputDir: string, artifactDir: string): Promis
   return target;
 }
 function canonicalRelativePath(value: unknown): value is string {
-  return typeof value === 'string' && value.length > 0 && !isAbsolute(value)
-    && !value.split(/[\\/]/u).includes('..') && canonical(value) === value;
+  if (typeof value !== 'string' || value.length === 0 || isAbsolute(value) || canonical(value) !== value) return false;
+  const segments = value.split(/[\\/]/u);
+  return segments.every((segment) => segment !== '' && segment !== '.' && segment !== '..');
 }
 function isOutcome(value: unknown): value is BlockedGoalRecoveryLifecycleOutcome {
   return typeof value === 'string' && OUTCOMES.includes(value as BlockedGoalRecoveryLifecycleOutcome);

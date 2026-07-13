@@ -1693,3 +1693,7 @@ Receipt does not execute resume commands，不授权 target repo mutation、rele
 ## 2026-07-13 - blocked goal recovery full lifecycle campaign validation
 
 接受 ADR-0040。Recovery lifecycle campaign 必须从本地 artifact bytes 推导 outcome 和 trust-chain 状态；`rejected_tampered` 只有在篡改被拒绝时才通过。Validation does not execute commands or change external state。
+
+## 2026-07-13 - blocked goal recovery MCP surface
+
+接受 ADR-0041。AI IDE 使用 8 个显式 MCP tools 消费 recovery lifecycle；adapter 只接受 directory arguments、复用 authoritative writers、限制 output real path，并返回统一 non-execution receipt。

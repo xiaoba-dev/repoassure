@@ -3686,6 +3686,31 @@ describe('project structure', () => {
     await expectPath('scripts/generate-blocked-goal-recovery-lifecycle-campaign-summary.mjs');
   });
 
+  it('records the bounded blocked goal recovery MCP surface', async () => {
+    const files = await Promise.all([
+      readFile('docs/adr/0041-blocked-goal-recovery-mcp-surface.md', 'utf8'),
+      readFile('docs/operations/blocked-goal-recovery-mcp-surface-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'), readFile('docs/PRD.md', 'utf8'), readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'), readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'), readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+    const joined = files.join('\n');
+    const recoveryToolNames = [
+      'create_blocked_goal_recovery', 'consume_blocked_goal_recovery',
+      'record_blocked_goal_recovery_decision', 'prepare_blocked_goal_resume_attempt',
+      'intake_blocked_goal_resume_evidence', 'review_blocked_goal_resume_evidence',
+      'close_blocked_goal_resume_attempt', 'validate_blocked_goal_recovery_lifecycle'
+    ];
+    expect(joined).toContain('Blocked Goal Recovery MCP Surface v0.1');
+    expect(joined).toContain('repoassure.mcp-blocked-goal-recovery-tool-result.v1');
+    expect(joined).toContain('does not execute');
+    expect(joined).toContain('outputDir');
+    for (const toolName of recoveryToolNames) expect(joined).toContain(toolName);
+    await expectPath('src/adapters/mcp/blocked-goal-recovery-tools.ts');
+  });
+
   it('records Autopilot-compatible documentation architecture without moving existing source documents', async () => {
     const [
       adr,

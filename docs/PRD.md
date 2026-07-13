@@ -12,7 +12,7 @@ RepoAssure is not positioned as another AI IDE, a general-purpose vulnerability 
 
 ## Current Product Scope
 
-- Local CLI, MCP Server, and GitHub Action wrapper for repo acceptance.
+- Local CLI, MCP Server, and GitHub Action wrapper for repo acceptance, including the bounded blocked-goal recovery MCP lifecycle.
 - Browser and Python/CLI acceptance modes.
 - Local hardening reports, repair plans, repair task packages, handoff packages, execution evidence, patch plans, validation campaign summaries, AI IDE repair evidence bundles, AI IDE Repair Evidence Bundle Consumer Contract v0.1 outputs, replay readiness outputs, Target Repo Repair Goal Proposal Package v0.1 outputs, Target Repo Repair Goal Authorization Receipt v0.1 outputs, Authorized Target Repo Repair Goal Task Package v0.1 outputs, Target Repo Repair Goal Execution Evidence Intake v0.1 outputs, Target Repair Evidence Review Decision Package v0.1 outputs, Blocked Goal Recovery Package v0.1 outputs, Blocked Goal Recovery Consumption Validation v0.1 outputs, Blocked Goal Recovery Resume Attempt Closure Receipt v0.1 outputs, and full lifecycle recovery campaign summaries.
 - Public website and private-preview release readiness surfaces.
@@ -119,3 +119,7 @@ RepoAssure must convert only an accepted or accepted-with-risk evidence review p
 ## Blocked Goal Recovery Full Lifecycle Real Campaign Validation v0.1
 
 RepoAssure must validate accepted, accepted-risk, blocked, failed, incomplete, environment-blocked, boundary-violating, and tampered recovery chains from local artifacts. The summary must derive outcomes from schemas, hashes, and boundary evidence rather than trusting self-reported pass flags. It does not execute commands or authorize external actions.
+
+## Blocked Goal Recovery MCP Surface v0.1
+
+RepoAssure must let AI IDE clients discover and call every blocked-goal recovery evidence stage over MCP without shell-specific orchestration. The product requirement is eight explicit tools with strict directory-only inputs, typed `repoassure.mcp-blocked-goal-recovery-tool-result.v1` responses, contained local outputs, client-readable redacted errors, and explicit proof that no commands, external state changes, or target repo mutations were performed by RepoAssure.

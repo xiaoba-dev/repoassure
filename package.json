@@ -72,6 +72,7 @@
     "goal:recover:intake-resume-evidence": "pnpm build:acceptance && node scripts/generate-blocked-goal-recovery-resume-attempt-execution-evidence-intake.mjs",
     "goal:recover:review-resume-evidence": "pnpm build:acceptance && node scripts/generate-blocked-goal-recovery-resume-attempt-evidence-review-decision-package.mjs",
     "goal:recover:close-resume-attempt": "pnpm build:acceptance && node scripts/generate-blocked-goal-recovery-resume-attempt-closure-receipt.mjs",
+    "goal:recover:validate-lifecycle": "pnpm build:acceptance && node scripts/generate-blocked-goal-recovery-lifecycle-campaign-summary.mjs",
     "preuser:accept": "pnpm build",
     "user:accept": "node packages/acceptance/dist/run-user-acceptance.js",
     "preuser:handoff": "pnpm build",

@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { isDeepStrictEqual } from 'node:util';
 
 import { escapeMarkdownTableCell } from './markdown.js';
 import { redactSensitiveText } from './redaction.js';
@@ -119,6 +120,25 @@ export function buildBlockedGoalRecoveryConsumptionReport(
     nonAuthorizationBoundary: sanitize(BLOCKED_GOAL_RECOVERY_NON_AUTHORIZATION_BOUNDARY),
     blockedActions: input.recoveryPackage.blockedActions.map(sanitize)
   };
+}
+
+export function assertBlockedGoalRecoveryConsumptionReportSourceBinding(
+  report: BlockedGoalRecoveryConsumptionReport,
+  recoveryPackage: BlockedGoalRecoveryPackage,
+  sourcePackageText: string
+): void {
+  let parsedSource: unknown;
+  try { parsedSource = JSON.parse(sourcePackageText); } catch { throw new Error('Invalid blocked goal recovery package'); }
+  assertBlockedGoalRecoveryPackage(parsedSource);
+  assertBlockedGoalRecoveryPackage(recoveryPackage);
+  if (!isDeepStrictEqual(parsedSource, recoveryPackage)) throw new Error('Invalid blocked goal recovery package');
+  const expected = buildBlockedGoalRecoveryConsumptionReport({
+    generatedAt: report.generatedAt,
+    packagePath: report.sourceRecoveryPackage.path,
+    sourcePackageText,
+    recoveryPackage
+  });
+  if (!isDeepStrictEqual(report, expected)) throw new Error('Invalid blocked goal recovery consumption report');
 }
 
 export async function writeBlockedGoalRecoveryConsumptionReport(
@@ -311,7 +331,7 @@ function isAllowedDecision(option: string): option is BlockedGoalRecoveryAllowed
   return option === 'approve' || option === 'reject' || option === 'defer' || option === 'accept_risk';
 }
 
-function assertBlockedGoalRecoveryPackage(value: unknown): asserts value is BlockedGoalRecoveryPackage {
+export function assertBlockedGoalRecoveryPackage(value: unknown): asserts value is BlockedGoalRecoveryPackage {
   if (!isRecord(value)
     || value.schemaVersion !== 'repoassure.blocked-goal-recovery-package.v1'
     || typeof value.generatedAt !== 'string'

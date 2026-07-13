@@ -279,3 +279,7 @@ ADR-0028 adds a proposal layer after replay readiness: replay readiness -> targe
 ## Blocked Goal Recovery Closure Boundary
 
 `goal:recover:close-resume-attempt` is the terminal local evidence stage after resume evidence review. It validates exact source bytes and accepted scope, emits `repoassure.blocked-goal-recovery-resume-attempt-closure-receipt.v1`, and records `commandsExecutedByClosure: false` plus `externalGoalClosedByReceipt: false`. It does not execute commands or change external state.
+
+## Blocked Goal Recovery Lifecycle Campaign Boundary
+
+`goal:recover:validate-lifecycle` reads the seven-stage local artifact chain and emits `repoassure.blocked-goal-recovery-lifecycle-campaign-summary.v1`. It dispatches authoritative stage validators, verifies cross-stage inventory and raw-byte SHA bindings, enforces real-path containment and the shared redaction boundary, and requires the complete eight-outcome matrix. It does not execute commands or change external state.

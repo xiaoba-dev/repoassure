@@ -154,8 +154,8 @@ export function buildBlockedGoalRecoveryDecisionReceipt(
   } catch {
     throw new Error('Invalid blocked goal recovery consumption report');
   }
-  assertConsumptionReport(parsedSource);
-  assertConsumptionReport(input.consumptionReport);
+  assertBlockedGoalRecoveryConsumptionReport(parsedSource);
+  assertBlockedGoalRecoveryConsumptionReport(input.consumptionReport);
   if (!isDeepStrictEqual(parsedSource, input.consumptionReport)) {
     throw new Error('Invalid blocked goal recovery consumption report');
   }
@@ -230,6 +230,34 @@ export function buildBlockedGoalRecoveryDecisionReceipt(
     nonAuthorizationBoundary: BLOCKED_GOAL_RECOVERY_DECISION_RECEIPT_NON_AUTHORIZATION_BOUNDARY,
     blockedActions
   };
+}
+
+export function assertBlockedGoalRecoveryDecisionReceiptSourceBinding(
+  receipt: BlockedGoalRecoveryDecisionReceipt,
+  consumptionReport: BlockedGoalRecoveryConsumptionReport,
+  sourceConsumptionReportText: string
+): void {
+  let parsedSource: unknown;
+  try { parsedSource = JSON.parse(sourceConsumptionReportText); }
+  catch { throw new Error('Invalid blocked goal recovery consumption report'); }
+  assertBlockedGoalRecoveryConsumptionReport(parsedSource);
+  assertBlockedGoalRecoveryConsumptionReport(consumptionReport);
+  const expectedActionSources = consumptionReport.actionQueue.map(sanitizeAction);
+  const actualActionSources = receipt.decisionItems.map((item) => sanitizeAction(item));
+  const expectedCommandSources = consumptionReport.resumeCommands;
+  const actualCommandSources = receipt.resumeCommandDecisionItems.map((item) => ({
+    commandId: item.commandId, command: item.command, purpose: item.purpose
+  }));
+  if (!isDeepStrictEqual(parsedSource, consumptionReport)
+    || receipt.sourceConsumptionReport.sha256
+      !== createHash('sha256').update(sourceConsumptionReportText).digest('hex')
+    || receipt.sourceConsumptionReport.resumeReadiness !== consumptionReport.resumeReadiness
+    || !isDeepStrictEqual(actualActionSources, expectedActionSources)
+    || !isDeepStrictEqual(actualCommandSources, expectedCommandSources)
+    || receipt.boundaryCompliance.sourceBoundaryPreserved !== hasPreservedBoundary(consumptionReport)
+    || receipt.redactionBoundary !== consumptionReport.redactionBoundary) {
+    throw new Error('Invalid blocked goal recovery decision receipt');
+  }
 }
 
 export async function writeBlockedGoalRecoveryDecisionReceipt(
@@ -343,7 +371,9 @@ export function buildBlockedGoalRecoveryDecisionReceiptMarkdown(
   ].join('\n');
 }
 
-function assertConsumptionReport(value: unknown): asserts value is BlockedGoalRecoveryConsumptionReport {
+export function assertBlockedGoalRecoveryConsumptionReport(
+  value: unknown
+): asserts value is BlockedGoalRecoveryConsumptionReport {
   if (!isRecord(value)
     || value.schemaVersion !== 'repoassure.blocked-goal-recovery-consumption-report.v1'
     || typeof value.generatedAt !== 'string'

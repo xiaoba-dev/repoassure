@@ -1,6 +1,6 @@
 import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
@@ -30,7 +30,8 @@ const SCRIPT_PATHS = {
   'goal:recover:prepare-resume': 'scripts/generate-blocked-goal-recovery-resume-attempt-task-package.mjs',
   'goal:recover:intake-resume-evidence': 'scripts/generate-blocked-goal-recovery-resume-attempt-execution-evidence-intake.mjs',
   'goal:recover:review-resume-evidence': 'scripts/generate-blocked-goal-recovery-resume-attempt-evidence-review-decision-package.mjs',
-  'goal:recover:close-resume-attempt': 'scripts/generate-blocked-goal-recovery-resume-attempt-closure-receipt.mjs'
+  'goal:recover:close-resume-attempt': 'scripts/generate-blocked-goal-recovery-resume-attempt-closure-receipt.mjs',
+  'goal:recover:validate-lifecycle': 'scripts/generate-blocked-goal-recovery-lifecycle-campaign-summary.mjs'
 } as const;
 const FIXTURE_PATH = join(
   process.cwd(),
@@ -428,6 +429,169 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     }, null, 2)}\n`);
     await runScript(['goal:recover:close-resume-attempt', '--', '--from-dir', outputDir]);
 
+    const lifecycleDir = join(root, 'recovery-lifecycle-campaign');
+    const lifecycleOutcomes = [
+      'accepted', 'accepted_with_risk', 'blocked', 'failed', 'incomplete',
+      'environment_blocker', 'boundary_violation', 'rejected_tampered'
+    ] as const;
+    await mkdir(lifecycleDir, { recursive: true });
+    for (const outcome of lifecycleOutcomes) {
+      await cp(outputDir, join(lifecycleDir, outcome), { recursive: true });
+    }
+
+    const riskDir = join(lifecycleDir, 'accepted_with_risk');
+    const riskDecisions = JSON.parse(await readFile(
+      join(riskDir, 'blocked-goal-recovery-resume-attempt-evidence-review-decisions.json'), 'utf8'
+    )) as { decisions: Array<Record<string, unknown>> };
+    riskDecisions.decisions = riskDecisions.decisions.map((item) => ({
+      ...item, decision: 'accept_risk', rationale: 'Fixture risk explicitly accepted for local validation.'
+    }));
+    await writeJson(riskDir, 'blocked-goal-recovery-resume-attempt-evidence-review-decisions.json', riskDecisions);
+    await runScript(['goal:recover:review-resume-evidence', '--', '--from-dir', riskDir]);
+    const riskReviewText = await readFile(
+      join(riskDir, 'blocked-goal-recovery-resume-attempt-evidence-review-decision-package.json'), 'utf8'
+    );
+    const riskReview = JSON.parse(riskReviewText) as { reviewItems: Array<{ evidenceKey: string; decision: string }> };
+    await writeJson(riskDir, 'blocked-goal-recovery-resume-attempt-closure-input.json', {
+      sourceEvidenceReviewPackageSha256: createHash('sha256').update(riskReviewText).digest('hex'),
+      closureEvidence: 'Fixture accepted-risk closure reviewed.', reviewerRole: 'maintainer',
+      acknowledgedRiskEvidenceKeys: riskReview.reviewItems
+        .filter((item) => item.decision === 'accept_risk').map((item) => item.evidenceKey)
+    });
+    await runScript(['goal:recover:close-resume-attempt', '--', '--from-dir', riskDir]);
+
+    const blockedDir = join(lifecycleDir, 'blocked');
+    const blockedConsumptionText = await readFile(
+      join(blockedDir, 'blocked-goal-recovery-consumption-report.json'), 'utf8'
+    );
+    const blockedConsumption = JSON.parse(blockedConsumptionText) as {
+      actionQueue: Array<{ actionKey: string }>;
+      resumeCommands: Array<{ commandId: string }>;
+    };
+    await writeJson(blockedDir, 'blocked-goal-recovery-decisions.json', {
+      sourceConsumptionReportSha256: createHash('sha256').update(blockedConsumptionText).digest('hex'),
+      decisions: blockedConsumption.actionQueue.map((item) => ({
+        actionKey: item.actionKey, decision: 'defer', evidence: 'Fixture deferral reviewed.',
+        reviewerRole: 'maintainer', rationale: 'Resume remains blocked for this scenario.'
+      })),
+      resumeCommandDecisions: blockedConsumption.resumeCommands.map((item) => ({
+        commandId: item.commandId, decision: 'defer', evidence: 'Fixture command deferred.',
+        reviewerRole: 'maintainer', rationale: 'Command execution remains blocked.'
+      }))
+    });
+    await runScript(['goal:recover:decide', '--', '--from-dir', blockedDir]);
+    await removeLifecycleStagesAfter(blockedDir, 'decision');
+
+    const failedDir = join(lifecycleDir, 'failed');
+    const failedEvidence = JSON.parse(await readFile(
+      join(failedDir, 'blocked-goal-recovery-resume-attempt-execution-evidence-input.json'), 'utf8'
+    )) as { actionResults: Array<Record<string, unknown>> };
+    failedEvidence.actionResults[0] = {
+      ...failedEvidence.actionResults[0], status: 'failed', summary: 'Fixture action failed.'
+    };
+    await writeJson(failedDir, 'blocked-goal-recovery-resume-attempt-execution-evidence-input.json', failedEvidence);
+    await runScript(['goal:recover:intake-resume-evidence', '--', '--from-dir', failedDir]);
+    await removeLifecycleStagesAfter(failedDir, 'intake');
+
+    const incompleteDir = join(lifecycleDir, 'incomplete');
+    await removeLifecycleStagesAfter(incompleteDir, 'task');
+
+    const environmentDir = join(lifecycleDir, 'environment_blocker');
+    const environmentInput = JSON.parse(await readFile(
+      join(environmentDir, 'blocked-goal-recovery-input.json'), 'utf8'
+    )) as Record<string, unknown>;
+    environmentInput.blockers = [{
+      blockerId: 'B-environment', category: 'environment', status: 'blocked',
+      summary: 'Fixture environment prerequisite is unavailable.', attemptedActions: [], evidenceRefs: [],
+      externalPrerequisites: [{
+        prerequisite: 'Restore the isolated fixture environment.', owner: 'maintainer'
+      }]
+    }];
+    await writeJson(environmentDir, 'blocked-goal-recovery-input.json', environmentInput);
+    await runScript(['goal:recover', '--', '--from-dir', environmentDir]);
+    await removeLifecycleStagesAfter(environmentDir, 'recovery');
+
+    const boundaryDir = join(lifecycleDir, 'boundary_violation');
+    const boundaryEvidence = JSON.parse(await readFile(
+      join(boundaryDir, 'blocked-goal-recovery-resume-attempt-execution-evidence-input.json'), 'utf8'
+    )) as { boundaryEvidence: Record<string, unknown> };
+    boundaryEvidence.boundaryEvidence.unlistedCommandsExecuted = true;
+    boundaryEvidence.boundaryEvidence.targetRepoMutationByRepoAssure = true;
+    await writeJson(boundaryDir, 'blocked-goal-recovery-resume-attempt-execution-evidence-input.json', boundaryEvidence);
+    await runScript(['goal:recover:intake-resume-evidence', '--', '--from-dir', boundaryDir]);
+    await removeLifecycleStagesAfter(boundaryDir, 'intake');
+
+    const tamperedDir = join(lifecycleDir, 'rejected_tampered');
+    await writeFile(join(tamperedDir, 'blocked-goal-recovery-package.json'), '{ malformed recovery artifact\n');
+
+    await writeFile(join(lifecycleDir, 'blocked-goal-recovery-lifecycle-campaign-input.json'), `${JSON.stringify({
+      schemaVersion: 'repoassure.blocked-goal-recovery-lifecycle-campaign-input.v1',
+      campaignId: 'near-real-recovery-lifecycle',
+      scenarios: lifecycleOutcomes.map((expectedOutcome) => ({
+        scenarioId: expectedOutcome, expectedOutcome, artifactDir: expectedOutcome
+      }))
+    }, null, 2)}\n`);
+    await runScript(['goal:recover:validate-lifecycle', '--', '--from-dir', lifecycleDir, '--output', outputDir]);
+
+    const symlinkCampaignDir = join(root, 'symlink-lifecycle-campaign');
+    await mkdir(symlinkCampaignDir, { recursive: true });
+    for (const outcome of lifecycleOutcomes) {
+      await symlink(join(lifecycleDir, outcome), join(symlinkCampaignDir, outcome), 'dir');
+    }
+    await writeJson(symlinkCampaignDir, 'blocked-goal-recovery-lifecycle-campaign-input.json', {
+      schemaVersion: 'repoassure.blocked-goal-recovery-lifecycle-campaign-input.v1',
+      campaignId: 'symlink-escape-must-fail',
+      scenarios: lifecycleOutcomes.map((expectedOutcome) => ({
+        scenarioId: expectedOutcome, expectedOutcome, artifactDir: expectedOutcome
+      }))
+    });
+    await expect(execFileAsync('node', [
+      SCRIPT_PATHS['goal:recover:validate-lifecycle'], '--from-dir', symlinkCampaignDir
+    ], { cwd: process.cwd(), timeout: SCRIPT_TEST_TIMEOUT_MS })).rejects.toMatchObject({ code: 1 });
+
+    const secretCampaignDir = join(root, 'secret-lifecycle-campaign');
+    await cp(lifecycleDir, secretCampaignDir, { recursive: true });
+    const secretAcceptedDir = join(secretCampaignDir, 'accepted');
+    const secretRecovery = JSON.parse(await readFile(
+      join(secretAcceptedDir, 'blocked-goal-recovery-package.json'), 'utf8'
+    )) as Record<string, unknown>;
+    secretRecovery['TOKEN=secret-value'] = 'metadata';
+    await writeJson(secretAcceptedDir, 'blocked-goal-recovery-package.json', secretRecovery);
+    await relinkLifecycleChain(secretAcceptedDir);
+    await expect(execFileAsync('node', [
+      SCRIPT_PATHS['goal:recover:validate-lifecycle'], '--from-dir', secretCampaignDir
+    ], { cwd: process.cwd(), timeout: SCRIPT_TEST_TIMEOUT_MS })).rejects.toMatchObject({ code: 1 });
+
+    const mislabeledCampaignDir = join(root, 'mislabeled-lifecycle-campaign');
+    await cp(lifecycleDir, mislabeledCampaignDir, { recursive: true });
+    await rm(join(mislabeledCampaignDir, 'rejected_tampered'), { recursive: true });
+    await cp(
+      join(mislabeledCampaignDir, 'accepted'),
+      join(mislabeledCampaignDir, 'rejected_tampered'),
+      { recursive: true }
+    );
+    await expect(execFileAsync('node', [
+      SCRIPT_PATHS['goal:recover:validate-lifecycle'], '--from-dir', mislabeledCampaignDir
+    ], { cwd: process.cwd(), timeout: SCRIPT_TEST_TIMEOUT_MS })).rejects.toMatchObject({ code: 1 });
+
+    const launderedCampaignDir = join(root, 'laundered-lifecycle-campaign');
+    await cp(lifecycleDir, launderedCampaignDir, { recursive: true });
+    const launderedAcceptedDir = join(launderedCampaignDir, 'accepted');
+    const launderedTask = JSON.parse(await readFile(
+      join(launderedAcceptedDir, 'blocked-goal-recovery-resume-attempt-task-package.json'), 'utf8'
+    )) as { sourceDecisionReceipt: { decisionStatus: string; resumeAttemptReadiness: string } };
+    launderedTask.sourceDecisionReceipt.decisionStatus = 'deferred';
+    launderedTask.sourceDecisionReceipt.resumeAttemptReadiness = 'blocked_by_deferral';
+    await writeJson(
+      launderedAcceptedDir,
+      'blocked-goal-recovery-resume-attempt-task-package.json',
+      launderedTask
+    );
+    await relinkLifecycleChainFrom(launderedAcceptedDir, 3);
+    await expect(execFileAsync('node', [
+      SCRIPT_PATHS['goal:recover:validate-lifecycle'], '--from-dir', launderedCampaignDir
+    ], { cwd: process.cwd(), timeout: SCRIPT_TEST_TIMEOUT_MS })).rejects.toMatchObject({ code: 1 });
+
     const outputs = await readArtifacts(outputDir);
 
     expect(outputs.playbook.schemaVersion).toBe('repoassure.ai-ide-repair-execution-playbook.v1');
@@ -565,6 +729,10 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
     expect(outputs.blockedGoalRecoveryResumeAttemptClosure.boundaryCompliance).toEqual({
       commandsExecutedByClosure: false, externalGoalClosedByReceipt: false, sourceBoundaryPreserved: true
     });
+    expect(outputs.blockedGoalRecoveryLifecycleCampaign.schemaVersion).toBe('repoassure.blocked-goal-recovery-lifecycle-campaign-summary.v1');
+    expect(outputs.blockedGoalRecoveryLifecycleCampaign.campaignStatus.status).toBe('passed');
+    expect(Object.values(outputs.blockedGoalRecoveryLifecycleCampaign.coverage).every(Boolean)).toBe(true);
+    expect(outputs.blockedGoalRecoveryLifecycleCampaign.campaignStatus.totalScenarios).toBe(8);
     expect(outputs.bundle.readingOrder.map((item) => item.fileName)).toEqual([
       'ai-ide-repair-playbook.json',
       'ai-ide-playbook-consumption-report.json',
@@ -651,6 +819,8 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
       'blocked-goal-recovery-consumption-report.md',
       'blocked-goal-recovery-decision-receipt.json',
       'blocked-goal-recovery-decision-receipt.md',
+      'blocked-goal-recovery-lifecycle-campaign-summary.json',
+      'blocked-goal-recovery-lifecycle-campaign-summary.md',
       'blocked-goal-recovery-package.json',
       'blocked-goal-recovery-package.md',
       'blocked-goal-recovery-resume-attempt-closure-receipt.json',
@@ -680,6 +850,50 @@ async function runScript(args: string[]): Promise<void> {
   });
 
   expect(stderr).toBe('');
+}
+
+async function writeJson(dir: string, fileName: string, value: unknown): Promise<void> {
+  await writeFile(join(dir, fileName), `${JSON.stringify(value, null, 2)}\n`);
+}
+
+async function removeLifecycleStagesAfter(
+  dir: string,
+  terminalStage: 'recovery' | 'decision' | 'task' | 'intake'
+): Promise<void> {
+  const stages = [
+    ['recovery', 'blocked-goal-recovery-package.json'],
+    ['consumption', 'blocked-goal-recovery-consumption-report.json'],
+    ['decision', 'blocked-goal-recovery-decision-receipt.json'],
+    ['task', 'blocked-goal-recovery-resume-attempt-task-package.json'],
+    ['intake', 'blocked-goal-recovery-resume-attempt-execution-evidence-intake.json'],
+    ['review', 'blocked-goal-recovery-resume-attempt-evidence-review-decision-package.json'],
+    ['closure', 'blocked-goal-recovery-resume-attempt-closure-receipt.json']
+  ] as const;
+  const terminalIndex = stages.findIndex(([stage]) => stage === terminalStage);
+  await Promise.all(stages.slice(terminalIndex + 1).map(([, fileName]) =>
+    rm(join(dir, fileName), { force: true })
+  ));
+}
+
+async function relinkLifecycleChain(dir: string): Promise<void> {
+  await relinkLifecycleChainFrom(dir, 0);
+}
+
+async function relinkLifecycleChainFrom(dir: string, startIndex: number): Promise<void> {
+  const links = [
+    ['blocked-goal-recovery-package.json', 'blocked-goal-recovery-consumption-report.json', 'sourceRecoveryPackage'],
+    ['blocked-goal-recovery-consumption-report.json', 'blocked-goal-recovery-decision-receipt.json', 'sourceConsumptionReport'],
+    ['blocked-goal-recovery-decision-receipt.json', 'blocked-goal-recovery-resume-attempt-task-package.json', 'sourceDecisionReceipt'],
+    ['blocked-goal-recovery-resume-attempt-task-package.json', 'blocked-goal-recovery-resume-attempt-execution-evidence-intake.json', 'sourceTaskPackage'],
+    ['blocked-goal-recovery-resume-attempt-execution-evidence-intake.json', 'blocked-goal-recovery-resume-attempt-evidence-review-decision-package.json', 'sourceEvidenceIntake'],
+    ['blocked-goal-recovery-resume-attempt-evidence-review-decision-package.json', 'blocked-goal-recovery-resume-attempt-closure-receipt.json', 'sourceEvidenceReviewPackage']
+  ] as const;
+  for (const [sourceName, targetName, sourceField] of links.slice(startIndex)) {
+    const sourceText = await readFile(join(dir, sourceName), 'utf8');
+    const target = JSON.parse(await readFile(join(dir, targetName), 'utf8')) as Record<string, unknown>;
+    (target[sourceField] as Record<string, unknown>).sha256 = createHash('sha256').update(sourceText).digest('hex');
+    await writeJson(dir, targetName, target);
+  }
 }
 
 async function buildAcceptancePackage(): Promise<void> {
@@ -818,6 +1032,11 @@ async function readArtifacts(outputDir: string): Promise<{
       commandsExecutedByClosure: boolean; externalGoalClosedByReceipt: boolean; sourceBoundaryPreserved: boolean;
     };
   };
+  blockedGoalRecoveryLifecycleCampaign: {
+    schemaVersion: string;
+    campaignStatus: { status: string; totalScenarios: number };
+    coverage: Record<string, boolean>;
+  };
   evidenceMarkdown: string;
   bundleMarkdown: string;
   contractMarkdown: string;
@@ -833,6 +1052,7 @@ async function readArtifacts(outputDir: string): Promise<{
   blockedGoalRecoveryResumeAttemptEvidenceIntakeMarkdown: string;
   blockedGoalRecoveryResumeAttemptEvidenceReviewMarkdown: string;
   blockedGoalRecoveryResumeAttemptClosureMarkdown: string;
+  blockedGoalRecoveryLifecycleCampaignMarkdown: string;
 }> {
   return {
     playbook: JSON.parse(await readFile(join(outputDir, 'ai-ide-repair-playbook.json'), 'utf8')) as { schemaVersion: string },
@@ -959,6 +1179,11 @@ async function readArtifacts(outputDir: string): Promise<{
         commandsExecutedByClosure: boolean; externalGoalClosedByReceipt: boolean; sourceBoundaryPreserved: boolean;
       };
     },
+    blockedGoalRecoveryLifecycleCampaign: JSON.parse(await readFile(join(outputDir, 'blocked-goal-recovery-lifecycle-campaign-summary.json'), 'utf8')) as {
+      schemaVersion: string;
+      campaignStatus: { status: string; totalScenarios: number };
+      coverage: Record<string, boolean>;
+    },
     evidenceMarkdown: await readFile(join(outputDir, 'ai-ide-repair-execution-evidence-report.md'), 'utf8'),
     bundleMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-bundle-manifest.md'), 'utf8'),
     contractMarkdown: await readFile(join(outputDir, 'ai-ide-repair-evidence-consumer-contract.md'), 'utf8'),
@@ -973,7 +1198,8 @@ async function readArtifacts(outputDir: string): Promise<{
     blockedGoalRecoveryResumeAttemptTaskPackageMarkdown: await readFile(join(outputDir, 'blocked-goal-recovery-resume-attempt-task-package.md'), 'utf8'),
     blockedGoalRecoveryResumeAttemptEvidenceIntakeMarkdown: await readFile(join(outputDir, 'blocked-goal-recovery-resume-attempt-execution-evidence-intake.md'), 'utf8'),
     blockedGoalRecoveryResumeAttemptEvidenceReviewMarkdown: await readFile(join(outputDir, 'blocked-goal-recovery-resume-attempt-evidence-review-decision-package.md'), 'utf8'),
-    blockedGoalRecoveryResumeAttemptClosureMarkdown: await readFile(join(outputDir, 'blocked-goal-recovery-resume-attempt-closure-receipt.md'), 'utf8')
+    blockedGoalRecoveryResumeAttemptClosureMarkdown: await readFile(join(outputDir, 'blocked-goal-recovery-resume-attempt-closure-receipt.md'), 'utf8'),
+    blockedGoalRecoveryLifecycleCampaignMarkdown: await readFile(join(outputDir, 'blocked-goal-recovery-lifecycle-campaign-summary.md'), 'utf8')
   };
 }
 
@@ -1009,6 +1235,8 @@ async function listExpectedArtifactNames(outputDir: string): Promise<string[]> {
     'blocked-goal-recovery-consumption-report.md',
     'blocked-goal-recovery-decision-receipt.json',
     'blocked-goal-recovery-decision-receipt.md',
+    'blocked-goal-recovery-lifecycle-campaign-summary.json',
+    'blocked-goal-recovery-lifecycle-campaign-summary.md',
     'blocked-goal-recovery-package.json',
     'blocked-goal-recovery-package.md',
     'blocked-goal-recovery-resume-attempt-task-package.json',

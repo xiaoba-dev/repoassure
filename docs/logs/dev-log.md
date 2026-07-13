@@ -13723,3 +13723,14 @@ Phase 0：项目初始化。
 
 - Task package does not execute resume commands。
 - No target repo mutation、publish、release、launch、customer contact、pricing/spend、repository visibility change 或 commercial/hosted availability claim was authorized。
+
+## 2026年7月13日 - Blocked Goal Recovery Full Lifecycle Real Campaign Validation v0.1
+
+- Red：lifecycle campaign summary module、CLI、exports 和治理文档不存在。
+- Green：实现 8 outcome matrix、adjacent raw-byte SHA validation、blocked-action/boundary/redaction checks、JSON/Markdown summary、CLI 和 near-real integration。
+- TDD debugging：整段 JSON redaction 会把合法 `nonAuthorizationBoundary` 字段名误判为 credential；改为解析后递归检查字段值并精确检查敏感 key，不放宽 shared redaction boundary。
+- Independent review remediation：强制八结果覆盖，接入每阶段 authoritative runtime validator 和 cross-artifact binding，增加 realpath containment，并区分明确 artifact rejection、I/O failure 与 outcome mismatch。
+- Adversarial E2E：拒绝 self-consistent fabricated chain、symlink escape、provider token、missing tamper evidence 与 valid-chain mislabeled tamper。
+- Final review remediation：使用独立 `artifactObserved` 状态，使首阶段 malformed artifact 可被归类为 `rejected_tampered`，同时继续拒绝 missing file、I/O failure、path escape 和 outcome mismatch。
+- Final verification：unit 63 files / 742 tests passed；integration 34 files / 65 tests passed；E2E 1 passed / 1 optional skipped；full Vitest 98 files / 808 tests passed / 1 skipped；typecheck、lint、repo:hygiene、release:check、goal:audit 35/35 passed。
+- Validation does not execute recovery commands or change external state；完整门禁、独立复审和 CI 待收口。

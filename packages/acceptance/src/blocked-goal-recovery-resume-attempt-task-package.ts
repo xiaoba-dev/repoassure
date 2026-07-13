@@ -121,8 +121,8 @@ export function buildBlockedGoalRecoveryResumeAttemptTaskPackage(
   } catch {
     throw invalidReceipt();
   }
-  assertDecisionReceipt(parsedSource);
-  assertDecisionReceipt(input.receipt);
+  assertBlockedGoalRecoveryDecisionReceipt(parsedSource);
+  assertBlockedGoalRecoveryDecisionReceipt(input.receipt);
   if (!isDeepStrictEqual(parsedSource, input.receipt)) {
     throw invalidReceipt();
   }
@@ -190,6 +190,29 @@ export function buildBlockedGoalRecoveryResumeAttemptTaskPackage(
   };
 }
 
+export function assertBlockedGoalRecoveryResumeAttemptTaskPackageSourceBinding(
+  taskPackage: BlockedGoalRecoveryResumeAttemptTaskPackage,
+  receipt: BlockedGoalRecoveryDecisionReceipt,
+  sourceReceiptText: string
+): void {
+  let parsedSource: unknown;
+  try { parsedSource = JSON.parse(sourceReceiptText); } catch { throw invalidReceipt(); }
+  assertBlockedGoalRecoveryDecisionReceipt(parsedSource);
+  assertBlockedGoalRecoveryDecisionReceipt(receipt);
+  if (!isDeepStrictEqual(parsedSource, receipt)) throw invalidReceipt();
+  const sourceSha256 = createHash('sha256').update(sourceReceiptText).digest('hex');
+  const expected = buildBlockedGoalRecoveryResumeAttemptTaskPackage({
+    generatedAt: taskPackage.generatedAt,
+    receiptPath: taskPackage.sourceDecisionReceipt.path,
+    sourceReceiptText,
+    reviewedSourceSha256: sourceSha256,
+    receipt
+  });
+  if (!isDeepStrictEqual(taskPackage, expected)) {
+    throw new Error('Invalid blocked goal recovery resume attempt task package');
+  }
+}
+
 export async function writeBlockedGoalRecoveryResumeAttemptTaskPackage(
   input: WriteBlockedGoalRecoveryResumeAttemptTaskPackageInput
 ): Promise<WriteBlockedGoalRecoveryResumeAttemptTaskPackageResult> {
@@ -200,7 +223,7 @@ export async function writeBlockedGoalRecoveryResumeAttemptTaskPackage(
   } catch {
     throw invalidReceipt();
   }
-  assertDecisionReceipt(receipt);
+  assertBlockedGoalRecoveryDecisionReceipt(receipt);
   const taskPackage = buildBlockedGoalRecoveryResumeAttemptTaskPackage({
     ...(input.generatedAt ? { generatedAt: input.generatedAt } : {}),
     receiptPath: input.receiptPath,
@@ -350,7 +373,9 @@ function buildCommandTask(
   };
 }
 
-function assertDecisionReceipt(value: unknown): asserts value is BlockedGoalRecoveryDecisionReceipt {
+export function assertBlockedGoalRecoveryDecisionReceipt(
+  value: unknown
+): asserts value is BlockedGoalRecoveryDecisionReceipt {
   if (!isRecord(value)
     || value.schemaVersion !== 'repoassure.blocked-goal-recovery-decision-receipt.v1'
     || typeof value.generatedAt !== 'string'

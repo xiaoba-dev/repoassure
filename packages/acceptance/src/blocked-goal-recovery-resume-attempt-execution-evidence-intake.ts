@@ -180,7 +180,7 @@ export function assertBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntakeSou
 ): void {
   let parsedTaskPackage: unknown;
   try { parsedTaskPackage = JSON.parse(sourceTaskPackageText); } catch { throw invalidTaskPackage(); }
-  assertTaskPackage(parsedTaskPackage);
+  assertBlockedGoalRecoveryResumeAttemptTaskPackage(parsedTaskPackage);
   const taskPackage = parsedTaskPackage;
   const expectedActionKeys = taskPackage.actionTasks.map((item) => item.actionKey);
   const expectedCommandIds = taskPackage.resumeCommandTasks.map((item) => item.commandId);
@@ -223,8 +223,8 @@ export function buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake(
   } catch {
     throw invalidTaskPackage();
   }
-  assertTaskPackage(parsedTaskPackage);
-  assertTaskPackage(input.taskPackage);
+  assertBlockedGoalRecoveryResumeAttemptTaskPackage(parsedTaskPackage);
+  assertBlockedGoalRecoveryResumeAttemptTaskPackage(input.taskPackage);
   if (!isDeepStrictEqual(parsedTaskPackage, input.taskPackage)) throw invalidTaskPackage();
   assertEvidenceInput(input.evidenceInput, input.taskPackage);
 
@@ -300,7 +300,7 @@ export async function writeBlockedGoalRecoveryResumeAttemptExecutionEvidenceInta
   } catch {
     throw invalidEvidence();
   }
-  assertTaskPackage(taskPackage);
+  assertBlockedGoalRecoveryResumeAttemptTaskPackage(taskPackage);
   const intake = buildBlockedGoalRecoveryResumeAttemptExecutionEvidenceIntake({
     ...(input.generatedAt ? { generatedAt: input.generatedAt } : {}),
     taskPackagePath: input.taskPackagePath,
@@ -414,7 +414,9 @@ function assertEvidenceInput(
     || checkIds.some((item) => !allowedCheckIds.has(item))) throw invalidEvidence();
 }
 
-function assertTaskPackage(value: unknown): asserts value is BlockedGoalRecoveryResumeAttemptTaskPackage {
+export function assertBlockedGoalRecoveryResumeAttemptTaskPackage(
+  value: unknown
+): asserts value is BlockedGoalRecoveryResumeAttemptTaskPackage {
   if (!isRecord(value)
     || value.schemaVersion !== 'repoassure.blocked-goal-recovery-resume-attempt-task-package.v1'
     || !canonicalTextValue(value.generatedAt)

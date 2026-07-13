@@ -37,6 +37,12 @@ Implementation should preserve compatibility paths while continuing the phased m
 - Generated artifacts are evidence and handoff material, not automatic execution authorization.
 - Hosted dashboard, Team Cloud, Enterprise governance, and integrations remain roadmap surfaces until separately implemented.
 
+## Parallel Test Runtime Build Isolation v0.1
+
+The standard full-suite contract uses an acceptance build single-flight boundary. `pnpm test` must prebuild package-owned and root runtime outputs before four-worker file-parallel Vitest collection. Every nested `build:acceptance` call computes the same source/configuration/build-implementation fingerprint, coordinates through a complete lease-token lock published by atomic same-filesystem hard link, and reuses only a state written after every expected JavaScript, declaration, and source-map output exists.
+
+Fingerprint changes must rebuild. The coordinator must invalidate prior success before rebuilding; normal failure, partial output, and owner-process exit must not leave reusable success state. Orphan recovery must atomically quarantine the old lock, malformed lock content must fail closed, and only the matching lease token may release a live lock. The cache remains under `node_modules/.cache/repoassure`; it is not a distributable artifact or acceptance evidence.
+
 ## Governing Specification Sources
 
 - `docs/architecture/overview.md`

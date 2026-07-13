@@ -237,6 +237,7 @@ MCP client 配置示例见 `docs/acceptance/guides/user-acceptance-guide.md`。
 pnpm repo:hygiene
 pnpm release:check
 pnpm release:hygiene
+pnpm test
 pnpm test:unit
 pnpm test:integration
 pnpm test:e2e
@@ -250,6 +251,8 @@ pnpm preflight:cloudflare-preview
 ```
 
 私有 GitHub repo 的 CI 基线见 `docs/architecture/specs/private-github-engineering-baseline-v0.1.md`：PR 和 `main` push 必须运行 `pnpm repo:hygiene`、unit、typecheck、lint、build 和 `pnpm goal:audit`。`pnpm repo:hygiene` 只检查已追踪文件，阻止 generated artifacts、build outputs、local hardening runs、env files、private keys 和 local logs 进入提交。当前环境中，监听本地端口的 boot 集成测试和真实浏览器 E2E 需要额外权限。详见 `docs/logs/blockers.md`。
+
+标准 `pnpm test` 会先构建 package/root runtime outputs，再以四个 worker 保持 Vitest file parallelism 运行完整测试。并发 playbook/recovery 子进程通过 `node_modules/.cache/repoassure` 中的本地 source-and-build fingerprint single-flight 状态复用 acceptance build，避免同时改写和读取 `packages/acceptance/dist`；该缓存已被 `node_modules/` 忽略，不属于产品物料。完整说明见 `docs/operations/parallel-test-runtime-build-isolation-v0.1.md`。
 
 v0.3 新增本地优先 GitHub Action wrapper：`.github/actions/repoassure/action.yml`。该 action 在 CI checkout 内安装依赖、构建本地 CLI，并执行 `node dist/adapters/cli/index.js run <repo>`；它不依赖 hosted RepoAssure 服务，也不会默认上传目标 repo source、logs、screenshots、traces、env values 或 private artifacts。安全示例见 `examples/github-actions/repoassure-local-first.yml`，其中 artifact upload 需要显式 opt-in。
 

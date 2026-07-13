@@ -1705,3 +1705,7 @@ Receipt does not execute resume commands，不授权 target repo mutation、rele
 ## 2026-07-13 - blocked goal recovery MCP external AI IDE configuration validation
 
 在 ADR-0014 与 ADR-0041 的既定边界内，采用动态生成而不是提交机器专属绝对路径：Cursor、VS Code 与 Codex 配置均指向 `apps/mcp-server/index.js`，并由外部 cwd 的官方 SDK consumer 验证。自动证据限于 source checkout 与 SDK harness；真实 IDE 环境继承、sandbox 和配置合并保留为独立人工 gate。Generator does not write client configuration；validation does not execute recovery or resume commands，因此不新增 ADR。
+
+## 2026-07-13 - parallel test runtime build isolation
+
+在现有 monorepo package ownership 和测试策略内，将 `build:acceptance` 改为 source-and-build-implementation fingerprint cross-process single-flight，并让标准 `pnpm test` 先构建 package/root runtime outputs，再以四个 file-parallel workers 运行。缓存只存在于 ignored `node_modules/.cache/repoassure`；完整 candidate write + atomic hard-link lease publication、malformed-lock fail-closed、owner-token release、重建前 state invalidation 和完整 expected-output validation 防止失败或 owner process exit 产生可复用 partial output。该决策修复测试/构建运行时，不改变产品 schema、对外接口或授权边界，因此不新增 ADR。完成 PR/main CI 后，下一 gate 为 Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1。

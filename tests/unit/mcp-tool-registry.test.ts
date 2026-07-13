@@ -128,8 +128,7 @@ describe('MCP tool registry', () => {
       inputDir: '.', command: 'codex resume goal'
     });
 
-    expect(result.isError).toBe(true);
-    expect(result.structuredContent).toEqual({ error: 'Unexpected argument: command' });
+    expectToolError(result, 'Unexpected argument: command');
   });
 
   it('rejects output directories that escape inputDir through a symlink', async () => {
@@ -147,8 +146,7 @@ describe('MCP tool registry', () => {
       outputDir: escapedOutput
     });
 
-    expect(result.isError).toBe(true);
-    expect(result.structuredContent).toEqual({ error: 'outputDir must resolve within inputDir' });
+    expectToolError(result, 'outputDir must resolve within inputDir');
     await expect(readFile(join(outside, 'blocked-goal-recovery-package.json'), 'utf8')).rejects.toMatchObject({
       code: 'ENOENT'
     });
@@ -166,10 +164,7 @@ describe('MCP tool registry', () => {
 
     const result = await callHardeningTool('create_blocked_goal_recovery', { inputDir: root });
 
-    expect(result.isError).toBe(true);
-    expect(result.structuredContent).toEqual({
-      error: 'Input artifact must resolve within inputDir: blocked-goal-recovery-input.json'
-    });
+    expectToolError(result, 'Input artifact must resolve within inputDir: blocked-goal-recovery-input.json');
     await expect(readFile(join(root, 'blocked-goal-recovery-package.json'), 'utf8')).rejects.toMatchObject({
       code: 'ENOENT'
     });
@@ -188,10 +183,7 @@ describe('MCP tool registry', () => {
 
     const result = await callHardeningTool('create_blocked_goal_recovery', { inputDir: root });
 
-    expect(result.isError).toBe(true);
-    expect(result.structuredContent).toEqual({
-      error: 'Output artifact must not be a symbolic link: blocked-goal-recovery-package.json'
-    });
+    expectToolError(result, 'Output artifact must not be a symbolic link: blocked-goal-recovery-package.json');
     await expect(readFile(sentinel, 'utf8')).resolves.toBe('do-not-change');
   });
 
@@ -200,8 +192,7 @@ describe('MCP tool registry', () => {
       inputDir: '.', outputDir: 42
     });
 
-    expect(result.isError).toBe(true);
-    expect(result.structuredContent).toEqual({ error: 'Invalid optional string argument: outputDir' });
+    expectToolError(result, 'Invalid optional string argument: outputDir');
   });
 
   it('exposes storage state inputs for browser exploration tools', () => {
@@ -291,10 +282,7 @@ describe('MCP tool registry', () => {
   it('returns a tool error for unknown tools', async () => {
     const result = await callHardeningTool('missing_tool', {});
 
-    expect(result.isError).toBe(true);
-    expect(result.structuredContent).toEqual({
-      error: 'Unknown tool: missing_tool'
-    });
+    expectToolError(result, 'Unknown tool: missing_tool');
   });
 
   it('redacts sensitive values from MCP tool errors', async () => {
@@ -335,14 +323,16 @@ describe('MCP tool registry', () => {
       authorization: { value: 'opaque' },
       authorizationStatus: 'approved',
       nonAuthorizationBoundary: 'This is evidence, not authorization.',
-      sessionId: 'local-session-reference'
+      sessionId: 'local-session-reference',
+      jsonPath: '/tmp/TOKEN=opaque/blocked-goal-recovery-package.json'
     })).toEqual({
       apiKeys: '[REDACTED]',
       token: '[REDACTED]',
       authorization: '[REDACTED]',
       authorizationStatus: 'approved',
       nonAuthorizationBoundary: 'This is evidence, not authorization.',
-      sessionId: 'local-session-reference'
+      sessionId: 'local-session-reference',
+      jsonPath: '/tmp/TOKEN=[REDACTED]/blocked-goal-recovery-package.json'
     });
   });
 
@@ -352,10 +342,7 @@ describe('MCP tool registry', () => {
       maxRoutes: 0
     });
 
-    expect(result.isError).toBe(true);
-    expect(result.structuredContent).toEqual({
-      error: 'Invalid positive integer argument: maxRoutes'
-    });
+    expectToolError(result, 'Invalid positive integer argument: maxRoutes');
   });
 
   it('rejects negative interaction limits before running a tool', async () => {
@@ -364,9 +351,12 @@ describe('MCP tool registry', () => {
       maxActionsPerRoute: -1
     });
 
-    expect(result.isError).toBe(true);
-    expect(result.structuredContent).toEqual({
-      error: 'Invalid non-negative integer argument: maxActionsPerRoute'
-    });
+    expectToolError(result, 'Invalid non-negative integer argument: maxActionsPerRoute');
   });
 });
+
+function expectToolError(result: Awaited<ReturnType<typeof callHardeningTool>>, message: string): void {
+  expect(result.isError).toBe(true);
+  expect(result.structuredContent).toBeUndefined();
+  expect(result.content).toEqual([{ type: 'text', text: message }]);
+}

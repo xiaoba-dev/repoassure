@@ -321,3 +321,4 @@
 - [x] Every recovery MCP call returns `repoassure.mcp-blocked-goal-recovery-tool-result.v1` and records commands, external state changes, and target repo mutation as false.
 - [x] MCP transport integration reaches local closure while argument expansion, symlink output escape, and secret-like output paths fail closed or are redacted.
 - [x] Recovery MCP I/O rejects FIFO/non-regular/oversized inputs, directory identity replacement, and existing output symlinks without mutating external targets.
+- [x] `pnpm test:mcp-real-client` validates the compiled server through official SDK `StdioClientTransport`, including all eight tool discovery, reviewed lifecycle consumption, schema-safe errors, stderr redaction, timeout, and deterministic cleanup.

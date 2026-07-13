@@ -13748,3 +13748,13 @@ Phase 0：项目初始化。
 - Final review remediation：lifecycle campaign 限制为最多 32 scenarios、禁止重复 `artifactDir`，并以 concurrency 4 worker pool 替换无界 `Promise.all`；单元测试覆盖超量、重复目录和实时最大并发。
 - Final review P2 closure：禁止 `artifactDir` 中的 empty / `.` / `..` path segments，关闭 `shared` 与 `./shared` 等路径别名绕过去重的空间。
 - Final verification：independent review reports no P0/P1；focused lifecycle 8/8、focused recovery/MCP 39/39、full Vitest 98 files / 825 tests passed with 1 optional file/test skipped；typecheck and lint passed。Repo hygiene、release check、goal audit、PR CI 与 main CI 在交付阶段收口。
+
+## 2026年7月13日 - Blocked Goal Recovery MCP Real Client Consumption Validation v0.1
+
+- Red：现有 MCP integration 仅使用内存 Transport，缺少官方 `StdioClientTransport`、compiled child process、timeout/early-exit/cleanup 和真实 output-schema validation。
+- Green：新增 reusable real-client harness、七阶段 reviewed lifecycle、八工具发现/lifecycle error、stderr redaction、timeout PID cleanup 和 `pnpm test:mcp-real-client` CI gate。
+- Real-client product fixes：错误响应移除与 success schema 冲突的 `{ error }` structuredContent；missing artifact 使用稳定固定文件名；`jsonPath` / `markdownPath` 脱敏保留 schema-required basename。
+- Independent review remediation：sanitized error cause 不再保留原始 exception；stderr tail 限制 64 KiB；cleanup 对残留 PID fail closed；sentinel 验证安全环境继承；near-real eight-outcome campaign 的成功结果改由真实 `StdioClientTransport` 消费并校验 schema、artifact basename 与 text/structured 一致性。
+- Final review remediation：process signaling 仅将 `ESRCH` 视为已退出，`EPERM` 等错误 fail closed；70 KiB raw stderr fixture 验证 bounded tail 丢弃前缀并对完整 error object 脱敏。
+- Final verification：independent review P0/P1 cleared；real-client gate 2 files / 4 tests、full Vitest 100 files / 831 tests passed with 1 optional file/test skipped；typecheck and lint passed。Repo hygiene、release check、goal audit、PR CI 与 main CI 在交付阶段收口。
+- Boundary：validation does not execute recovery/resume commands、mutate target repos、change external state、publish、launch、contact customers、change pricing/spend or visibility、or claim commercial/hosted availability。

@@ -35,6 +35,7 @@
     "test": "vitest run",
     "test:unit": "pnpm build && vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
+    "test:mcp-real-client": "pnpm build:packages && pnpm build:src && vitest run tests/integration/mcp-real-client.test.ts tests/integration/playbook-e2e-repair-evidence.test.ts",
     "test:e2e": "vitest run tests/e2e",
     "dev": "tsx src/adapters/cli/index.ts",
     "dev:website": "pnpm --filter @repoassure/website dev",

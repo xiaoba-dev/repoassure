@@ -7,7 +7,7 @@ import { promisify } from 'node:util';
 
 import { describe, expect, it } from 'vitest';
 
-import { callHardeningTool } from '../../src/adapters/mcp/tool-registry.js';
+import { connectRealMcpClient } from '../support/real-mcp-client.js';
 
 const execFileAsync = promisify(execFile);
 const SCRIPT_TEST_TIMEOUT_MS = 120_000;
@@ -535,11 +535,19 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
         artifactDir: `recovery-lifecycle-campaign/${expectedOutcome}`
       }))
     }, null, 2)}\n`);
-    const lifecycleMcpResult = await callHardeningTool('validate_blocked_goal_recovery_lifecycle', {
-      inputDir: root,
-      outputDir
+    const realClient = await connectRealMcpClient({
+      args: [join(process.cwd(), 'dist', 'adapters', 'mcp', 'index.js')]
     });
-    expect(lifecycleMcpResult.isError).toBe(false);
+    let lifecycleMcpResult: Awaited<ReturnType<typeof realClient.client.callTool>>;
+    try {
+      lifecycleMcpResult = await realClient.client.callTool({
+        name: 'validate_blocked_goal_recovery_lifecycle',
+        arguments: { inputDir: root, outputDir }
+      }, undefined, { timeout: 10_000 });
+    } finally {
+      await realClient.close();
+    }
+    expect(lifecycleMcpResult.isError).not.toBe(true);
     expect(lifecycleMcpResult.structuredContent).toMatchObject({
       schemaVersion: 'repoassure.mcp-blocked-goal-recovery-tool-result.v1',
       toolName: 'validate_blocked_goal_recovery_lifecycle',
@@ -549,6 +557,14 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
         externalStateChanged: false,
         targetRepoMutation: false
       }
+    });
+    const lifecycleStructured = lifecycleMcpResult.structuredContent as Record<string, unknown>;
+    const lifecycleContent = lifecycleMcpResult.content as Array<{ type: string; text?: string }>;
+    const lifecycleText = lifecycleContent.find((item) => item.type === 'text')?.text;
+    expect(lifecycleText ? JSON.parse(lifecycleText) : null).toEqual(lifecycleStructured);
+    expect(lifecycleStructured.artifacts).toMatchObject({
+      jsonPath: expect.stringMatching(/blocked-goal-recovery-lifecycle-campaign-summary\.json$/u),
+      markdownPath: expect.stringMatching(/blocked-goal-recovery-lifecycle-campaign-summary\.md$/u)
     });
 
     const symlinkCampaignDir = join(root, 'symlink-lifecycle-campaign');

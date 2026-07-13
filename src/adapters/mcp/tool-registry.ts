@@ -344,9 +344,6 @@ function toToolError(message: string): CallToolResult {
         text: safeMessage
       }
     ],
-    structuredContent: {
-      error: safeMessage
-    },
     isError: true
   };
 }
@@ -435,6 +432,7 @@ function redactJsonValue(value: unknown, key = ''): unknown {
   }
   if (typeof value === 'string') {
     if (key === 'sessionId') return value;
+    if (key === 'jsonPath' || key === 'markdownPath') return redactPathPreservingBasename(value);
     return redactSensitiveText(value);
   }
   if (Array.isArray(value)) return value.map((item) => redactJsonValue(item));
@@ -443,6 +441,12 @@ function redactJsonValue(value: unknown, key = ''): unknown {
     entryKey,
     redactJsonValue(entryValue, entryKey)
   ]));
+}
+
+function redactPathPreservingBasename(value: string): string {
+  const separatorIndex = Math.max(value.lastIndexOf('/'), value.lastIndexOf('\\'));
+  if (separatorIndex < 0) return redactSensitiveText(value);
+  return `${redactSensitiveText(value.slice(0, separatorIndex))}${value[separatorIndex]}${value.slice(separatorIndex + 1)}`;
 }
 
 function isSensitiveOutputKey(key: string): boolean {

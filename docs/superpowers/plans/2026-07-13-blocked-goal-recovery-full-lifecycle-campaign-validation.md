@@ -12,4 +12,4 @@
 - [x] Add package exports, compatibility/type-smoke, CLI smoke, and near-real lifecycle integration.
 - [x] Add ADR-0040, operations guide, and documentation cascade.
 - [x] Run independent review and the full local testing pyramid.
-- [ ] Create the PR, pass CI, merge, and verify main CI.
+- [x] Create PR #51, pass CI, merge as `58255fb`, and verify main CI run `29217295221`.

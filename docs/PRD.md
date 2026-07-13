@@ -17,6 +17,7 @@ RepoAssure is not positioned as another AI IDE, a general-purpose vulnerability 
 - Local hardening reports, repair plans, repair task packages, handoff packages, execution evidence, patch plans, validation campaign summaries, AI IDE repair evidence bundles, AI IDE Repair Evidence Bundle Consumer Contract v0.1 outputs, replay readiness outputs, Target Repo Repair Goal Proposal Package v0.1 outputs, Target Repo Repair Goal Authorization Receipt v0.1 outputs, Authorized Target Repo Repair Goal Task Package v0.1 outputs, Target Repo Repair Goal Execution Evidence Intake v0.1 outputs, Target Repair Evidence Review Decision Package v0.1 outputs, Blocked Goal Recovery Package v0.1 outputs, Blocked Goal Recovery Consumption Validation v0.1 outputs, Blocked Goal Recovery Resume Attempt Closure Receipt v0.1 outputs, and full lifecycle recovery campaign summaries.
 - Public website and private-preview release readiness surfaces.
 - Open-core local artifact contract with Team Cloud and Enterprise as future commercial roadmap surfaces.
+- Repeatable standard parallel test evidence for package-owned CLI, MCP, and acceptance runtime consumption.
 
 ## Current Non-Goals
 
@@ -24,6 +25,10 @@ RepoAssure is not positioned as another AI IDE, a general-purpose vulnerability 
 - No automatic target repo branch, commit, pull request, issue, advisory, or file mutation.
 - No target repo source upload by default.
 - No npm publication, GitHub release, public launch, customer contact, pricing/spend change, or commercial availability claim without a separate authorization goal.
+
+## Parallel Test Runtime Reliability
+
+RepoAssure must provide repeatable standard parallel test evidence before an installed AI IDE is accepted as a real MCP consumer. A clean checkout must build required runtime outputs before test collection, and parallel playbook/recovery subprocesses must not observe a partially rewritten acceptance package. Local build coordination is engineering evidence only and does not authorize recovery command execution, target repo mutation, release, launch, or hosted/commercial availability.
 
 ## Governing Product Sources
 

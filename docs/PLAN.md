@@ -36,7 +36,7 @@ Recent completed work includes:
 
 Parallel Test Runtime Build Isolation v0.1
 
-Plain-language explanation: stop parallel integration tests from rebuilding and reading the same acceptance dist at the same time, so the standard full suite is repeatable before real AI IDE manual acceptance.
+Plain-language explanation: close independent-review findings, pass PR and merged-main CI, and only then advance to real AI IDE manual acceptance.
 
 ## Execution Rules
 
@@ -93,7 +93,18 @@ Status: implemented.
 - Generate copy-pasteable Cursor, VS Code, and Codex local stdio configurations.
 - Point every configuration at the user-facing `apps/mcp-server/index.js` entry with absolute argv-safe paths.
 - Consume all three envelopes from an external workspace and path-with-spaces source-checkout alias with SDK-harness environment isolation, eight-tool discovery, and deterministic cleanup; defer actual IDE environment inheritance to manual acceptance.
+
+## Parallel Test Runtime Build Isolation v0.1
+
+Status: implementation complete; independent review and delivery validation in progress.
+
+- Build package and root runtime outputs before standard file-parallel Vitest collection.
+- Coordinate acceptance builds by source fingerprint and cross-process single-flight state under ignored local cache.
+- Recover failed and orphaned build locks without treating partial output as successful.
+- Require repeated standard parallel full-suite evidence before real AI IDE manual acceptance.
 - Do not write client configuration, publish, execute recovery/resume commands, mutate target repos, or change external state.
+
+Queued next goal: Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1.
 
 ## Blocked Goal Recovery Full Lifecycle Real Campaign Validation v0.1
 

@@ -50,4 +50,4 @@ The generator does not write client configuration, alter Cursor, VS Code, Codex,
 
 ## Manual Follow-up
 
-The next engineering gate is Parallel Test Runtime Build Isolation v0.1, which must remove the shared acceptance-dist rebuild race observed during parallel full-suite execution. Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1 follows that reliability gate: a maintainer selects one installed client, merges the generated entry, confirms tool discovery and one non-executing fixture call, records redacted evidence, and removes or retains the configuration by explicit decision.
+Parallel Test Runtime Build Isolation v0.1 has removed the shared acceptance-dist rebuild race from the standard full-suite path. The next gate is Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1: a maintainer selects one installed client, merges the generated entry, confirms tool discovery and one non-executing fixture call, records redacted evidence, and removes or retains the configuration by explicit decision.

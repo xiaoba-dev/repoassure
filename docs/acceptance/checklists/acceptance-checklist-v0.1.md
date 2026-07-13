@@ -324,3 +324,15 @@
 - [x] `pnpm test:mcp-real-client` validates the compiled server through official SDK `StdioClientTransport`, including all eight tool discovery, reviewed lifecycle consumption, schema-safe errors, stderr redaction, timeout, and deterministic cleanup.
 - [x] `pnpm test:mcp-external-config` validates Cursor, VS Code, and Codex configurations from an external cwd, including a spaced source-checkout alias, `apps/mcp-server/index.js`, all eight recovery tools, SDK-harness environment isolation, path-safe pre-build failure, no client-config writes, and deterministic cleanup; actual IDE environment inheritance remains manual.
 - [x] Generated MCP configuration contains workstation-specific absolute paths and must remain user-level or untracked; it must not be committed, shared, or printed in CI logs.
+
+## Parallel Test Runtime Build Isolation v0.1
+
+- [x] A clean standard `pnpm test` prebuilds package and root runtime outputs before Vitest collection.
+- [x] Same-fingerprint acceptance build calls across eight concurrent processes trigger exactly one build.
+- [x] Fingerprint changes rebuild; build implementation changes invalidate the cache; failed partial rebuilds and exited owner processes leave no reusable success state.
+- [x] Build lock and state remain under ignored `node_modules/.cache/repoassure` and never become product artifacts.
+- [x] Real stdio MCP startup, request timeout, redacted error, environment isolation, and deterministic cleanup checks remain enabled.
+- [x] Standard four-worker file-parallel `pnpm test` passes three consecutive final hard-link-lock runs without shared-dist failures: each run reported 104 passed files / 1 optional skipped and 853 passed tests / 1 optional skipped; localhost-bind checks ran in an environment that permits loopback listeners.
+- [x] Typecheck, lint, repository hygiene, release check, build, and goal audit pass after final implementation changes.
+- [ ] PR CI and merged-main CI pass.
+- [x] The build coordinator does not execute recovery commands, mutate a target repo, publish, launch, contact customers, change pricing/spend or visibility, or claim hosted/commercial availability.

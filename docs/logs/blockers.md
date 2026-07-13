@@ -521,6 +521,8 @@ pnpm goal:audit
 
 ## 2026年7月13日 - full Vitest parallel dist rebuild race
 
+Resolution status: resolved
+
 ### 背景
 
 标准 `pnpm test` 会并行运行多个 integration files；其中多条 CLI package scripts 各自执行 `build:acceptance`，并共同重写 `packages/acceptance/dist`。MCP/CLI 子进程可能在重写窗口读取到半成品 ESM modules。
@@ -543,3 +545,7 @@ pnpm goal:audit
 ### 临时边界
 
 在该 Goal 完成前，最终本地 full evidence 使用无文件并行的 Vitest；GitHub CI 的 unit、real MCP client 和 external config dedicated gates保持顺序执行。该 workaround 不等于竞态已修复。
+
+### 解决记录
+
+Parallel Test Runtime Build Isolation v0.1 已让标准 `pnpm test` 在 Vitest collection 前完成 package/root runtime build，并通过 source fingerprint、跨进程 single-flight lock、成功后状态写入和 orphan-owner recovery 阻止并发 `tsc` 改写 `packages/acceptance/dist`。原 serialized workaround 不再作为完成证据；最终验收改为连续三轮标准 file-parallel full suite。

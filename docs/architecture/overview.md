@@ -292,6 +292,12 @@ ADR-0028 adds a proposal layer after replay readiness: replay readiness -> targe
 
 `tests/support/real-mcp-client.ts` wraps the compiled adapter with the official SDK `Client` and `StdioClientTransport`. It is a validation boundary rather than a new domain layer: recovery logic stays in authoritative acceptance writers, while process initialization, redacted stderr, request timeout, and deterministic cleanup remain consumer-harness responsibilities.
 
+## Acceptance Build Runtime Isolation
+
+`scripts/build-acceptance.ts` and `scripts/lib/acceptance-build-coordinator.ts` own the test-time acceptance build single-flight boundary. The standard `pnpm test` entry builds all package and root runtime outputs before Vitest collection, then retains file parallelism under an explicit four-worker process bound. Nested playbook and recovery package scripts can still call `build:acceptance`, but matching source fingerprints reuse ignored state under `node_modules/.cache/repoassure` instead of starting concurrent `tsc` writers against `packages/acceptance/dist`.
+
+The lock records its owner PID. Successful output state is written only after the compiler exits successfully and required entrypoints exist. Normal failures clear the lock; a later process can atomically quarantine a lock whose owner has exited. This layer coordinates local build processes only and does not change package exports, artifact schemas, target repo state, or external authority.
+
 ## External AI IDE Configuration Boundary
 
 `src/adapters/mcp/client-config.ts` renders strict Cursor, VS Code, and Codex local stdio envelopes. The generated command and app-entry argument are absolute and separate, so the consumer does not depend on a shell or RepoAssure cwd. `scripts/generate-mcp-client-config.mjs` dynamically loads built modules behind a fixed path-safe pre-build error, validates local build readiness, and writes configuration to stdout only; it does not write client configuration. External source-checkout fixture integration starts `apps/mcp-server/index.js` with the official SDK and preserves the existing no recovery/resume command execution and no external-state-change boundary. Actual IDE environment inheritance and sandbox behavior remain outside automated claims.

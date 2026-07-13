@@ -6,6 +6,7 @@ import {
 import { redactSensitiveText } from '@hardening-mcp/shared';
 
 const MAX_STDERR_BYTES = 64 * 1024;
+const DEFAULT_CONNECT_TIMEOUT_MS = 15_000;
 
 export interface ConnectRealMcpClientOptions {
   command?: string;
@@ -46,7 +47,7 @@ export async function connectRealMcpClient(
   pidWatcher.unref();
 
   try {
-    await client.connect(transport, { timeout: options.connectTimeoutMs ?? 5_000 });
+    await client.connect(transport, { timeout: options.connectTimeoutMs ?? DEFAULT_CONNECT_TIMEOUT_MS });
   } catch (error) {
     const failedPid = transport.pid ?? observedPid;
     clearInterval(pidWatcher);

@@ -367,6 +367,18 @@ The integration smoke invokes `pnpm playbook:consume` and verifies `ai-ide-playb
 
 This validation must not upload target repo material, automatically modify target repos, create target repo branches, commits, pull requests, issues, advisories, or file mutations, publish npm packages, create GitHub releases, or authorize public launch / commercial availability claims.
 
+## Parallel Test Runtime Build Isolation v0.1
+
+Coverage uses the testing pyramid:
+
+- Contract: `tests/unit/acceptance-build-runtime-contract.test.ts` guards the prebuilt standard `pnpm test` entry, explicit four-worker file-parallel bound, real fingerprint invalidation, coordinated `build:acceptance` entry, local-cache boundary, documentation cascade, and next manual gate.
+- Integration: `tests/integration/acceptance-build-isolation.test.ts` starts eight worker processes and verifies same-fingerprint single-flight behavior, fingerprint invalidation, failed-partial-output rejection, failure cleanup, and orphan-owner recovery.
+- Runtime smoke: `tests/integration/mcp-real-client.test.ts` verifies realistic stdio startup/request budgets, timeout termination, PID cleanup, environment isolation, and stderr redaction under parallel load.
+- Full: run standard `pnpm test` three consecutive times with Vitest file parallelism enabled. Each run must pass without missing exports, partial dist reads, build-contention timeouts, or leaked child processes.
+- Quality gates: `pnpm typecheck`, `pnpm lint`, `pnpm repo:hygiene`, `pnpm release:check`, and `pnpm goal:audit` must pass after the repeated full runs.
+
+The repository fixes file parallelism at four workers to bound nested CLI and MCP child-process pressure while preserving concurrent test execution. Do not replace the repeated parallel evidence with `--no-file-parallelism`, `--maxWorkers=1`, or blanket higher CLI timeouts. Serialized Vitest remains a diagnostic fallback, not completion evidence for this goal.
+
 ## AI IDE Repair Evidence Bundle Manifest v0.1
 
 AI IDE Repair Evidence Bundle Manifest v0.1 verifies that the six local repair evidence artifacts can be indexed as one AI IDE entry point before maintainer review.

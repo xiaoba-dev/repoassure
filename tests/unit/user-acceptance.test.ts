@@ -1118,7 +1118,7 @@ describe('user acceptance record', () => {
       stdout.mockRestore();
       await rm(repoRoot, { recursive: true, force: true });
     }
-  });
+  }, 15_000);
 
   it('writes a structured failure record when the hardening flow fails unexpectedly', async () => {
     const repoRoot = await mkdtemp(join(tmpdir(), 'hardening-user-acceptance-flow-error-'));

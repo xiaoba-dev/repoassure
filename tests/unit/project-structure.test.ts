@@ -5041,7 +5041,7 @@ describe('project structure', () => {
     expect(rootPackageJson).toContain('"build:security-assurance": "tsc -p packages/security-assurance/tsconfig.build.json"');
     expect(rootPackageJson).toContain('"build:browser-explorer": "tsc -p packages/browser-explorer/tsconfig.build.json"');
     expect(rootPackageJson).toContain('"build:repair-planner": "tsc -p packages/repair-planner/tsconfig.build.json"');
-    expect(rootPackageJson).toContain('"build:acceptance": "tsc -p packages/acceptance/tsconfig.build.json"');
+    expect(rootPackageJson).toContain('"build:acceptance": "node --import tsx scripts/build-acceptance.ts"');
     expect(rootPackageJson).toContain('"typecheck": "pnpm build:packages && tsc --noEmit && pnpm typecheck:packages && pnpm typecheck:website"');
     expect(rootPackageJson).toContain('"typecheck:website": "pnpm --filter @repoassure/website typecheck"');
     expect(rootPackageJson).toContain('"typecheck:packages": "pnpm typecheck:shared && pnpm typecheck:security-assurance && pnpm typecheck:browser-explorer && pnpm typecheck:repair-planner && pnpm typecheck:acceptance"');
@@ -6205,7 +6205,7 @@ describe('project structure', () => {
     expect(rootPackageJson.scripts?.['build:security-assurance']).toBe('tsc -p packages/security-assurance/tsconfig.build.json');
     expect(rootPackageJson.scripts?.['build:browser-explorer']).toBe('tsc -p packages/browser-explorer/tsconfig.build.json');
     expect(rootPackageJson.scripts?.['build:repair-planner']).toBe('tsc -p packages/repair-planner/tsconfig.build.json');
-    expect(rootPackageJson.scripts?.['build:acceptance']).toBe('tsc -p packages/acceptance/tsconfig.build.json');
+    expect(rootPackageJson.scripts?.['build:acceptance']).toBe('node --import tsx scripts/build-acceptance.ts');
     expect(rootPackageJson.scripts?.['typecheck:packages']).toBe('pnpm typecheck:shared && pnpm typecheck:security-assurance && pnpm typecheck:browser-explorer && pnpm typecheck:repair-planner && pnpm typecheck:acceptance');
     expect(rootPackageJson.scripts?.['typecheck:shared']).toBe('tsc -p packages/shared/tsconfig.json --noEmit');
     expect(rootPackageJson.scripts?.['typecheck:security-assurance']).toBe('tsc -p packages/security-assurance/tsconfig.json --noEmit');

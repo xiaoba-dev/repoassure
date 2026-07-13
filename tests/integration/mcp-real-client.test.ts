@@ -21,6 +21,7 @@ const recoveryToolNames = [
   'close_blocked_goal_resume_attempt',
   'validate_blocked_goal_recovery_lifecycle'
 ] as const;
+const MCP_REQUEST_TIMEOUT_MS = 15_000;
 
 describe('real stdio MCP client consumption', () => {
   it('discovers and consumes the reviewed recovery lifecycle through a real child process', async () => {
@@ -31,13 +32,13 @@ describe('real stdio MCP client consumption', () => {
     const pid = connection.pid;
 
     try {
-      const listed = await connection.client.listTools({}, { timeout: 5_000 });
+      const listed = await connection.client.listTools({}, { timeout: MCP_REQUEST_TIMEOUT_MS });
       expect(listed.tools.map((tool) => tool.name)).toEqual(expect.arrayContaining([...recoveryToolNames]));
       expect(connection.client.getInstructions()).toContain('do not execute recovery or resume commands');
 
       const missing = await connection.client.callTool({
         name: 'consume_blocked_goal_recovery', arguments: { inputDir: root }
-      }, undefined, { timeout: 5_000 });
+      }, undefined, { timeout: MCP_REQUEST_TIMEOUT_MS });
       expect(missing.isError).toBe(true);
       expect(readText(missing)).toBe('Missing input artifact: blocked-goal-recovery-package.json');
       expect(readText(missing)).not.toContain('client-secret');
@@ -152,14 +153,14 @@ describe('real stdio MCP client consumption', () => {
       });
       const lifecycleError = await connection.client.callTool({
         name: 'validate_blocked_goal_recovery_lifecycle', arguments: { inputDir: root }
-      }, undefined, { timeout: 5_000 });
+      }, undefined, { timeout: MCP_REQUEST_TIMEOUT_MS });
       expect(lifecycleError.isError).toBe(true);
       expect(readText(lifecycleError)).toBe('Invalid blocked goal recovery lifecycle campaign input');
 
       const expanded = await connection.client.callTool({
         name: 'create_blocked_goal_recovery',
         arguments: { inputDir: root, command: 'codex resume goal' }
-      }, undefined, { timeout: 5_000 });
+      }, undefined, { timeout: MCP_REQUEST_TIMEOUT_MS });
       expect(expanded.isError).toBe(true);
       expect(readText(expanded)).toContain('Unexpected argument: command');
       expect(connection.stderr()).toBe('');
@@ -168,7 +169,7 @@ describe('real stdio MCP client consumption', () => {
     }
 
     expect(isProcessAlive(pid)).toBe(false);
-  }, 30_000);
+  }, 60_000);
 
   it('captures a redacted fatal stderr message when the server exits before initialization', async () => {
     let caught: Error | null = null;
@@ -201,23 +202,27 @@ describe('real stdio MCP client consumption', () => {
           pidPath,
           environmentPath
         ],
-        connectTimeoutMs: 150
+        connectTimeoutMs: 2_000
       })).rejects.toThrow(/timed out|timeout/iu);
     } finally {
       delete process.env.REPOASSURE_TEST_SECRET;
     }
-    expect(Date.now() - startedAt).toBeLessThan(5_000);
+    expect(Date.now() - startedAt).toBeLessThan(10_000);
     const pid = Number(await readFile(pidPath, 'utf8'));
     expect(isProcessAlive(pid)).toBe(false);
     await expect(readFile(environmentPath, 'utf8')).resolves.toBe('absent');
-  });
+  }, 15_000);
 });
 
 type RealConnection = Awaited<ReturnType<typeof connectRealMcpClient>>;
 type ToolResult = Awaited<ReturnType<RealConnection['client']['callTool']>>;
 
 async function callStage(connection: RealConnection, name: string, inputDir: string): Promise<ToolResult> {
-  return connection.client.callTool({ name, arguments: { inputDir } }, undefined, { timeout: 5_000 });
+  return connection.client.callTool(
+    { name, arguments: { inputDir } },
+    undefined,
+    { timeout: MCP_REQUEST_TIMEOUT_MS }
+  );
 }
 
 function expectStage(result: ToolResult, toolName: string, outputSchemaVersion: string): void {

@@ -549,3 +549,13 @@ Resolution status: resolved
 ### 解决记录
 
 Parallel Test Runtime Build Isolation v0.1 已让标准 `pnpm test` 在 Vitest collection 前完成 package/root runtime build，并通过 source fingerprint、跨进程 single-flight lock、成功后状态写入和 orphan-owner recovery 阻止并发 `tsc` 改写 `packages/acceptance/dist`。原 serialized workaround 不再作为完成证据；最终验收改为连续三轮标准 file-parallel full suite。
+
+## 2026年7月14日 - Blocked Goal Recovery MCP Real AI IDE Manual Acceptance
+
+### Resolution status
+
+resolved
+
+### Evidence
+
+Maintainer 已在真实 Codex session 发现八个 recovery tools，并只调用 disposable `create_blocked_goal_recovery` fixture。结果的 command/external-state/target-repo-mutation flags 均为 false，生成包不含 resume commands。Maintainer 明确 accepted 并移除临时 config；详见 dated redacted evidence record。该 resolution 不授权 recovery/resume command execution、target repo mutation、release 或 commercial/hosted claims。

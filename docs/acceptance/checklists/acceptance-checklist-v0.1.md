@@ -341,6 +341,6 @@
 
 - [x] A bounded, non-writing maintainer runbook and redacted evidence template exist.
 - [x] The committed fixture contains no target-repository data or recovery/resume commands.
-- [ ] A maintainer has selected one installed Cursor, VS Code, or Codex client and recorded redacted tool-discovery evidence.
-- [ ] The selected client has called only the disposable `create_blocked_goal_recovery` fixture and recorded explicit no-command, no-external-state, and no-target-mutation flags.
-- [ ] The maintainer has recorded an explicit accepted, changes_requested, or deferred decision and whether the client configuration was retained or removed.
+- [x] A maintainer used Codex Desktop and recorded redacted discovery of all eight recovery tools.
+- [x] Codex called only the disposable `create_blocked_goal_recovery` fixture; the recorded flags are no command execution, no external state change, and no target-repository mutation.
+- [x] The maintainer explicitly accepted the result and removed the temporary MCP configuration; see the dated evidence record under `docs/acceptance/evidence/`.

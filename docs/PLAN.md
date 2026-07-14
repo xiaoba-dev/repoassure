@@ -34,9 +34,9 @@ Recent completed work includes:
 
 ## Next Codex Goal
 
-Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1
+Public Release Manual Gate Closure v0.2
 
-Plain-language explanation: a maintainer validates one generated MCP configuration inside a real installed AI IDE, invokes only a non-executing fixture operation, and records redacted evidence. Automated SDK consumption is already complete but is not a substitute for this manual gate.
+Plain-language explanation: the MCP manual gate is complete. Before any public release work, reassess the existing legal, trademark, branch-control, exposure, and publication-authorization evidence; do not change repository visibility or publish anything without a separate explicit decision.
 
 ## Execution Rules
 
@@ -104,16 +104,16 @@ Status: completed.
 - Require repeated standard parallel full-suite evidence before real AI IDE manual acceptance.
 - Do not write client configuration, publish, execute recovery/resume commands, mutate target repos, or change external state.
 
-PR #56 merged as `92ec9512e1132d4710f7b800e6ae907a720b7be5`; its PR quality gate and merged-main CI completed successfully on 2026-07-13. The next goal is Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1.
+PR #56 merged as `92ec9512e1132d4710f7b800e6ae907a720b7be5`; its PR quality gate and merged-main CI completed successfully on 2026-07-13.
 
 ## Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1
 
-Status: awaiting maintainer evidence.
+Status: completed.
 
-- Generate a workstation-specific Cursor, VS Code, or Codex envelope without writing client settings.
-- Have a maintainer use one real installed client to discover eight tools and run only the disposable, non-executing recovery-package fixture.
-- Record redacted evidence and an explicit accepted, changes_requested, or deferred decision.
-- Automated SDK consumption remains supporting evidence only; it does not satisfy this gate.
+- A maintainer used Codex Desktop to discover all eight tools and call only the disposable, non-executing recovery-package fixture.
+- The result recorded no command execution, no external state change, no target-repository mutation, and no resume commands.
+- The maintainer accepted the evidence and removed the temporary configuration.
+- The redacted evidence record is stored under `docs/acceptance/evidence/`.
 
 ## Blocked Goal Recovery Full Lifecycle Real Campaign Validation v0.1
 

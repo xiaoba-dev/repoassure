@@ -641,7 +641,7 @@ describe('project structure', () => {
     expect(closure).toContain('No public launch or production marketing announcement was executed');
     expect(closure).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was executed');
     expect(plan).toMatch(
-      /## Next Codex Goal\n\nProduct \/ Website \/ User Validation Backlog Execution v0\.1/u
+      /## Next Codex Goal\n\nSecurity Assurance Lane Provider Import Ergonomics v0\.1/u
     );
     expect(plan).toMatch(
       /## Public Release Manual Gate Closure v0\.2\n\nStatus: completed_reconciled\./u
@@ -2033,6 +2033,53 @@ describe('project structure', () => {
     expect(packageJson).toContain('"release:hygiene": "node scripts/generate-release-hygiene-evidence.mjs"');
 
     await expectPath('docs/operations/release-readiness-hygiene-automation-runtime-v0.1.md');
+  });
+
+  it('reconciles the product website and user-validation backlog into a traceable local-only queue', async () => {
+    const [
+      execution,
+      plan,
+      readme,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/product-website-user-validation-backlog-execution-v0.1.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(execution).toContain('Product / Website / User Validation Backlog Execution v0.1');
+    expect(execution).toContain('Status: backlog_execution_reconciled_local_only');
+    expect(execution).toContain('Source backlog: `Product / Website / User Validation Backlog Planning v0.1`');
+    expect(execution).toContain('Execution decision: `close_implemented_local_backlog_items`');
+    expect(execution).toContain('verified_implemented');
+    expect(execution).toContain('automatable_next');
+    expect(execution).toContain('manual_or_external_trigger');
+    expect(execution).toContain('do_not_execute');
+    expect(execution).toContain('Target Repo Acceptance Feedback Loop Runtime v0.1');
+    expect(execution).toContain('AI IDE Handoff Material Quality Runtime v0.1');
+    expect(execution).toContain('Repair Task Actionability Runtime v0.1');
+    expect(execution).toContain('User Validation Evidence Loop Runtime v0.1');
+    expect(execution).toContain('Release Readiness Hygiene Automation Runtime v0.1');
+    expect(execution).toContain('Public Website Post-Domain Polish & Launch Boundary Review v0.1');
+    expect(execution).toContain('waiting_for_reviewer_feedback');
+    expect(execution).toContain('Security Assurance Lane Phase 1 provider import ergonomics');
+    expect(execution).toContain('No Action Authorization Receipt was produced');
+    expect(execution).toContain('No public launch or production marketing announcement was executed');
+    expect(plan).toContain('Security Assurance Lane Provider Import Ergonomics v0.1');
+    expect(readme).toContain('Product / Website / User Validation Backlog Execution v0.1');
+    expect(testingStrategy).toContain('Product / Website / User Validation Backlog Execution v0.1');
+    expect(acceptanceChecklist).toContain('Product / Website / User Validation Backlog Execution v0.1');
+    expect(decisionLog).toContain('Product website user validation backlog execution');
+    expect(devLog).toContain('Product / Website / User Validation Backlog Execution v0.1');
+
+    await expectPath('docs/operations/product-website-user-validation-backlog-execution-v0.1.md');
   });
 
   it('records real target validation campaign summary without uploading target artifacts', async () => {

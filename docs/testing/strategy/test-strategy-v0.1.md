@@ -176,6 +176,10 @@ monorepo readiness 的测试使用 unit / structure 层守护，不新增 runtim
 
 Generated tests 的路径提取优先使用 `reproSteps` 中的显式页面导航；普通 repro 描述、finding evidence 和 smoke route 中的完整 URL 只接受本地 app URL 或当前被测 app 同源 URL 作为兜底，本地 app URL 包括 `localhost`、`127.0.0.1`、`0.0.0.0`、`[::1]`、`[::]`，避免第三方 API、CDN 或外部资源 URL 被误生成成本地页面 smoke/regression test。生成 spec 前会保留非敏感 query/fragment 参数与 SPA hash route，并脱敏 token、code、session、CSRF 等敏感 query/fragment 参数值；finding title 进入 generated test title 前也会经过敏感值脱敏。
 
+## Product / Website / User Validation Backlog Execution v0.1
+
+Product / Website / User Validation Backlog Execution v0.1 adds a structure-level contract in `tests/unit/project-structure.test.ts`. It requires one traceable local-only queue that classifies already-implemented product and website evidence as `verified_implemented`, the provider import ergonomics follow-up as `automatable_next`, absent real reviewer feedback as `manual_or_external_trigger`, and launch/publication/customer-contact/hosted-commercial claims as `do_not_execute`. The contract also verifies cascade records in the PLAN gateway, README, acceptance checklist, decision log, and development log. This is documentation and execution-order evidence only; it does not run provider services, contact reviewers, upload source, mutate target repositories, publish packages, or launch the product.
+
 ## 初始命令
 
 ```text

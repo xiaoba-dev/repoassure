@@ -169,3 +169,7 @@ The MCP adapter exposes `create_blocked_goal_recovery`, `consume_blocked_goal_re
 ## Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1
 
 `docs/operations/blocked-goal-recovery-mcp-real-ai-ide-manual-acceptance-v0.1.md` defines a maintainer-only acceptance gate for one installed Cursor, VS Code, or Codex client. The client must discover all eight tools and call only `create_blocked_goal_recovery` with the versioned disposable fixture. Its explicit `includeDefaultResumeCommand: false` option prevents the legacy default resume command from entering the generated package. The response must expose `commandsExecuted: false`, `externalStateChanged: false`, and `targetRepoMutation: false`; the resulting evidence record is redacted and requires an explicit maintainer decision. This gate neither writes client settings nor executes a recovery or resume command.
+
+## Public release state reconciliation
+
+RepoAssure's source repository may be public while npm publication, GitHub releases, public launch, customer outreach, and commercial or hosted availability claims remain independently unauthorized. Release-state documents must distinguish historical gate snapshots from current read-only repository evidence, and must not treat a documentation reconciliation as an external release action.

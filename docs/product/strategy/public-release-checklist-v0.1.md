@@ -12,6 +12,10 @@ Define the gate that must pass before any public open-source release, package pu
 
 This checklist does not publish the project. It defines prerequisites for a future public release.
 
+## Current State Reconciliation (2026-07-14)
+
+The historical entries below document the sequence from private readiness to public source availability. Current state is `PUBLIC` source repository, protected `main` with required `Quality Gates`, and `pnpm release:check` reporting `public release ready: yes`. This reconciliation does not authorize npm publication, GitHub releases, public launch, customer outreach, pricing/spend, or commercial/hosted availability claims; those remain separate decisions.
+
 ## Checklist
 
 - [x] Add repository-level Apache-2.0 `LICENSE` text as readiness material.

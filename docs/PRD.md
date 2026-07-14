@@ -103,6 +103,10 @@ RepoAssure must let a maintainer record `approve`, `reject`, `defer`, or `accept
 
 The receipt does not execute recovery commands and does not authorize target repo mutation, release, launch, customer contact, pricing/spend, repository visibility changes, or commercial/hosted availability claims.
 
+## Public release state reconciliation
+
+RepoAssure's public-source state is distinct from package publication, public launch, marketing, customer outreach, and commercial or hosted availability. The product must preserve that boundary in user-facing and maintainer-facing release evidence: historical no-go records remain valid snapshots, while current repository and branch-control evidence is recorded separately.
+
 ## Blocked Goal Recovery Resume Attempt Task Package v0.1
 
 RepoAssure must convert a ready recovery decision receipt into a bounded local task package that an AI IDE can consume without guessing scope. The package must bind to the exact receipt bytes, include only approved or explicitly risk-accepted actions and resume commands, preserve source evidence and order, and expose prerequisites plus a verification checklist.

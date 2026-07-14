@@ -305,3 +305,7 @@ The lock records its owner PID. Successful output state is written only after th
 ## External AI IDE Configuration Boundary
 
 `src/adapters/mcp/client-config.ts` renders strict Cursor, VS Code, and Codex local stdio envelopes. The generated command and app-entry argument are absolute and separate, so the consumer does not depend on a shell or RepoAssure cwd. `scripts/generate-mcp-client-config.mjs` dynamically loads built modules behind a fixed path-safe pre-build error, validates local build readiness, and writes configuration to stdout only; it does not write client configuration. External source-checkout fixture integration starts `apps/mcp-server/index.js` with the official SDK and preserves the existing no recovery/resume command execution and no external-state-change boundary. Actual IDE environment inheritance and sandbox behavior remain outside automated claims.
+
+## Public release state reconciliation
+
+The repository-exposure control plane separates public source visibility from package distribution and launch surfaces. Current source-public state is backed by GitHub branch protection and `Quality Gates`; it does not enable npm publication, GitHub releases, public marketing, customer outreach, or hosted/commercial availability claims.

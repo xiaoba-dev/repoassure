@@ -1,4 +1,10 @@
 import type { CallToolResult, Tool } from '@modelcontextprotocol/sdk/types.js';
+import {
+  formatSecurityImportError,
+  listSecurityProviderDescriptors,
+  parseSecurityProvider,
+  SecurityImportError
+} from '@hardening-mcp/security-assurance/security-provider-contracts';
 
 import { createPlaywrightBrowserDriver } from '../../domain/explore/playwright-driver.js';
 import { redactSensitiveText } from '../../shared/privacy-redaction.js';
@@ -9,6 +15,7 @@ import { runGenerateTestsTool } from '../../tools/generate-tests-tool.js';
 import { runGenerateRepairPlanTool } from '../../tools/generate-repair-plan-tool.js';
 import { runHardenReportTool } from '../../tools/harden-report-tool.js';
 import { runHardeningTool } from '../../tools/run-hardening-tool.js';
+import { runSecurityImportTool } from '../../tools/security-import-tool.js';
 import {
   isBlockedGoalRecoveryToolName,
   listBlockedGoalRecoveryTools,
@@ -28,6 +35,8 @@ type HardeningToolName =
   | 'generate_repair_plan'
   | 'harden_report'
   | 'run_hardening'
+  | 'list_security_providers'
+  | 'import_security_evidence'
   | BlockedGoalRecoveryToolName;
 
 export function listHardeningTools(): Tool[] {
@@ -192,6 +201,39 @@ export function listHardeningTools(): Tool[] {
         openWorldHint: true
       }
     },
+    {
+      name: 'list_security_providers',
+      title: 'List Security Providers',
+      description: 'List local security evidence provider ids and the normalized scan.json input contract. Does not contact providers.',
+      inputSchema: strictObjectSchema({}, []),
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false
+      }
+    },
+    {
+      name: 'import_security_evidence',
+      title: 'Import Security Evidence',
+      description: 'Import a local normalized scan.json into RepoAssure run artifacts. Does not run scanners or modify target source.',
+      inputSchema: strictObjectSchema(
+        {
+          provider: stringSchema('Provider id returned by list_security_providers.'),
+          sourcePath: stringSchema('Local directory containing normalized scan.json.'),
+          repoRoot: stringSchema('Target repository root used for repair-planning context.'),
+          runDir: stringSchema('RepoAssure run artifact directory where security evidence is written.'),
+          runId: stringSchema('Optional run id. Defaults to the final runDir segment.')
+        },
+        ['provider', 'sourcePath', 'repoRoot', 'runDir']
+      ),
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: false
+      }
+    },
     ...listBlockedGoalRecoveryTools()
   ];
 }
@@ -206,6 +248,10 @@ export async function callHardeningTool(name: string, args: unknown): Promise<Ca
     const result = await runNamedTool(name, record);
     return toToolResult(result);
   } catch (error) {
+    if (error instanceof SecurityImportError) {
+      const formatted = formatSecurityImportError(error);
+      return toToolError(`Security import failed [${formatted.code}]: ${formatted.message} Guidance: ${formatted.guidance}`);
+    }
     return toToolError(error instanceof Error ? error.message : 'Unknown hardening tool error');
   }
 }
@@ -277,6 +323,20 @@ async function runNamedTool(name: HardeningToolName, args: JsonObject): Promise<
           ...(runDir ? { runDir } : {})
         })
       );
+    }
+    case 'list_security_providers':
+      assertAllowedKeys(args, []);
+      return { providers: listSecurityProviderDescriptors() };
+    case 'import_security_evidence': {
+      assertAllowedKeys(args, ['provider', 'sourcePath', 'repoRoot', 'runDir', 'runId']);
+      const runId = readOptionalString(args, 'runId');
+      return toJsonObject(await runSecurityImportTool({
+        provider: parseSecurityProvider(readRequiredString(args, 'provider')),
+        sourcePath: readRequiredString(args, 'sourcePath'),
+        repoRoot: readRequiredString(args, 'repoRoot'),
+        runDir: readRequiredString(args, 'runDir'),
+        ...(runId ? { runId } : {})
+      }));
     }
     case 'harden_report':
       return toJsonObject(
@@ -418,6 +478,13 @@ function asRecord(value: unknown): JsonObject {
   return typeof value === 'object' && value !== null ? (value as JsonObject) : {};
 }
 
+function assertAllowedKeys(record: JsonObject, allowedKeys: string[]): void {
+  const unexpected = Object.keys(record).find((key) => !allowedKeys.includes(key));
+  if (unexpected) {
+    throw new Error(`Unexpected argument: ${unexpected}`);
+  }
+}
+
 function toJsonObject(value: unknown): JsonObject {
   return asRecord(value);
 }
@@ -475,6 +542,13 @@ function objectSchema(properties: Record<string, object>, required: string[]): T
     type: 'object',
     properties,
     required
+  };
+}
+
+function strictObjectSchema(properties: Record<string, object>, required: string[]): Tool['inputSchema'] {
+  return {
+    ...objectSchema(properties, required),
+    additionalProperties: false
   };
 }
 

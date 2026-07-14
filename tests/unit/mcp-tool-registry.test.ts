@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, readFile, symlink, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, stat, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -19,6 +19,8 @@ describe('MCP tool registry', () => {
       'generate_repair_plan',
       'harden_report',
       'run_hardening',
+      'list_security_providers',
+      'import_security_evidence',
       'create_blocked_goal_recovery',
       'consume_blocked_goal_recovery',
       'record_blocked_goal_recovery_decision',
@@ -31,7 +33,7 @@ describe('MCP tool registry', () => {
   });
 
   it('publishes strict non-executing recovery tool contracts', () => {
-    const recoveryTools = listHardeningTools().slice(8);
+    const recoveryTools = listHardeningTools().slice(10);
 
     expect(recoveryTools).toHaveLength(8);
     for (const tool of recoveryTools) {
@@ -213,6 +215,97 @@ describe('MCP tool registry', () => {
     const properties = (generateTests?.inputSchema as { properties?: Record<string, unknown> } | undefined)?.properties;
 
     expect(properties).toHaveProperty('baseUrl');
+  });
+
+  it('publishes closed-world provider discovery and evidence import contracts', () => {
+    const tools = listHardeningTools();
+    const listProviders = tools.find((tool) => tool.name === 'list_security_providers');
+    const importEvidence = tools.find((tool) => tool.name === 'import_security_evidence');
+
+    expect(listProviders).toMatchObject({
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false
+      },
+      inputSchema: { type: 'object', required: [], additionalProperties: false }
+    });
+    expect(importEvidence).toMatchObject({
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: false
+      },
+      inputSchema: {
+        type: 'object',
+        required: ['provider', 'sourcePath', 'repoRoot', 'runDir'],
+        additionalProperties: false,
+        properties: {
+          provider: { type: 'string' },
+          sourcePath: { type: 'string' },
+          repoRoot: { type: 'string' },
+          runDir: { type: 'string' },
+          runId: { type: 'string' }
+        }
+      }
+    });
+  });
+
+  it('lists providers and imports local normalized evidence over MCP routing', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-mcp-security-import-'));
+    const runDir = join(root, '.hardening', 'runs', 'run-mcp-security');
+    const listed = await callHardeningTool('list_security_providers', {});
+    const imported = await callHardeningTool('import_security_evidence', {
+      provider: 'codex-security',
+      sourcePath: join(process.cwd(), 'fixtures/security/codex-security-basic'),
+      repoRoot: root,
+      runDir
+    });
+
+    expect(listed.isError).toBe(false);
+    expect(listed.structuredContent).toMatchObject({
+      providers: expect.arrayContaining([
+        expect.objectContaining({ id: 'codex-security', nativeFormatSupport: false })
+      ])
+    });
+    expect(imported.isError).toBe(false);
+    expect(imported.structuredContent).toMatchObject({
+      findingCount: 1,
+      repairPlanningHandoff: {
+        status: 'ready',
+        mcp: { tool: 'generate_repair_plan' },
+        reviewBoundary: { autoApply: false, targetMutation: false, maintainerReviewRequired: true }
+      }
+    });
+    await expect(readFile(join(runDir, 'security', 'security-findings.json'), 'utf8'))
+      .resolves.toContain('codex-security');
+  });
+
+  it('returns text-only stable safe errors for failed security evidence imports', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-mcp-security-error-'));
+    const sourcePath = join(root, 'TOKEN=mcp-secret');
+    const runDir = join(root, '.hardening', 'runs', 'run-mcp-security-error');
+    const result = await callHardeningTool('import_security_evidence', {
+      provider: 'codex-security',
+      sourcePath,
+      repoRoot: root,
+      runDir
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.structuredContent).toBeUndefined();
+    expect(result.content).toEqual([
+      expect.objectContaining({
+        type: 'text',
+        text: expect.stringContaining('scan_file_missing')
+      })
+    ]);
+    expect(JSON.stringify(result)).toContain('Guidance:');
+    expect(JSON.stringify(result)).not.toContain(sourcePath);
+    expect(JSON.stringify(result)).not.toContain('mcp-secret');
+    await expect(stat(runDir)).rejects.toMatchObject({ code: 'ENOENT' });
   });
 
   it('exposes generate_repair_plan over MCP tool calls', async () => {

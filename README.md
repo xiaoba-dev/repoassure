@@ -139,11 +139,14 @@ pnpm dev explore <repo> <url> --browser --critical-path /login --max-routes 20 -
 pnpm dev generate-tests <findingsPath> <outputDir> --smoke-route /login --base-url http://127.0.0.1:5173
 pnpm dev plan <repo>
 pnpm dev report <runDir> <outputPath>
+pnpm dev security providers
 pnpm dev security import --provider codex-security --scan-dir <dir> --repo <repo> --run-dir <repo>/.hardening/runs/<run-id>
 pnpm dev run <repo> [url]
 pnpm dev run <repo> [url] --browser --critical-path /login --start-command "pnpm dev" --boot-timeout-ms 30000
 pnpm dev run <repo> [url] --workspace-output .hardening-workspace
 ```
+
+`hardening security providers` and MCP `list_security_providers` expose the same local catalog and normalized `scan.json` contract. MCP `import_security_evidence` and the CLI import return `repairPlanningHandoff` for `hardening plan` / `generate_repair_plan`. Native provider formats are not accepted in v0.1; every listed provider currently requires schema `repoassure.normalized-security-scan.v1`, and import never runs a scanner or modifies target source.
 
 构建后也可以使用 bin：
 

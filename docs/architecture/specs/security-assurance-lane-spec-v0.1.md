@@ -1,6 +1,6 @@
 # Security Assurance Lane Spec v0.1
 
-Status: Draft
+Status: Accepted
 Date: 2026-06-23
 Source ADR: [ADR-0013](../../adr/0013-codex-security-and-security-assurance-lane.md)
 
@@ -20,14 +20,14 @@ RepoAssure should still support a provider-neutral lane:
 
 ```text
 Security Assurance Lane
-  Provider adapters
+  Normalized-envelope provider ids
     codex-security
     codeql
     semgrep
     gitleaks
     osv
-    browser-security
     manual-import
+  Future native-format adapters
   Evidence normalization
   RepoAssure artifacts
   Repair plan integration
@@ -36,7 +36,7 @@ Security Assurance Lane
 
 ## Provider Interface
 
-A provider adapter should convert provider-native output into a normalized security evidence bundle.
+A future native provider adapter should convert provider-native output into a normalized security evidence bundle. The implemented v0.1 importer consumes only a RepoAssure normalized `scan.json` envelope; listing a provider id does not claim native-format support.
 
 Minimal provider contract:
 
@@ -61,7 +61,13 @@ repoassure security import --provider codex-security --scan-dir <scan-dir>
 
 The current implementation name may expose this through `hardening` first, but user-facing docs should keep the RepoAssure product language.
 
-Phase 1 implementation note: the current internal CLI exposes `hardening security import --provider codex-security --scan-dir <dir> --repo <repo> --run-dir <dir>` through `@hardening-mcp/security-assurance`. It imports local provider scan directories, writes redacted run-scoped security artifacts, and does not invoke Codex Security runtime, run scanners, fetch remote provider state, upload target repo data, create external records, or modify target repo source.
+Phase 1 implementation note: the current CLI exposes `hardening security providers` and `hardening security import --provider <provider> --scan-dir <dir> --repo <repo> --run-dir <dir>` through `@hardening-mcp/security-assurance`. MCP exposes `list_security_providers` and `import_security_evidence`. Both surfaces reuse one package-owned catalog for `codex-security`, `codeql`, `semgrep`, `gitleaks`, `osv`, and `manual-import`.
+
+Every implemented provider descriptor declares schema `repoassure.normalized-security-scan.v1`, required file `scan.json`, `supportStatus: normalized-envelope`, and `nativeFormatSupport: false`. Native provider formats are not accepted.
+
+Preflight fails before output writes with stable codes `provider_unsupported`, `scan_file_missing`, `scan_json_invalid`, `scan_root_invalid`, `provider_mismatch`, and `findings_invalid`. CLI/MCP guidance does not echo the full source path or provider content.
+
+A successful tool result includes `repairPlanningHandoff` with `securityFindingsPath`, CLI `hardening plan` argv, MCP `generate_repair_plan` arguments, and explicit `autoApply: false`, `targetMutation: false`, and `maintainerReviewRequired: true` boundaries.
 
 ## Normalized Finding Contract
 
@@ -163,13 +169,14 @@ Security tasks should not automatically outrank runtime P0 failures unless sever
 
 ## Acceptance and Goal Audit
 
-When implemented, goal audit should verify:
+Goal and structure audit verify:
 
 - security imports are local-first
 - provider provenance exists
 - generated artifacts are redacted
 - security findings can feed repair plan and repair task package outputs
-- unsupported provider formats fail with structured blockers
+- unsupported providers and malformed normalized envelopes fail with stable, redacted guidance before output writes
+- CLI and MCP expose the same provider catalog and repair-planning handoff
 
 Security imports should not be required for the current MVP acceptance gate. Phase 1 is an optional lane unless a later ADR changes the product scope.
 
@@ -185,7 +192,7 @@ Security imports should not be required for the current MVP acceptance gate. Pha
 
 ## Follow-up
 
-- Extend the current Codex Security local scan directory importer beyond fixture-style `scan.json` when real provider output formats are available.
-- Add fixture provider outputs before runtime implementation.
+- Execute `Security Assurance Lane Provider Format Fixture Contracts v0.1` to add sanitized, versioned provider-format fixtures before native adapter implementation.
+- Extend the normalized importer only after the relevant native format contract is reviewed.
 - Extend repair-plan tests with security evidence types.
-- Update goal audit only when provider import becomes implemented behavior.
+- Keep native format support false until adapter behavior has dedicated tests and documentation.

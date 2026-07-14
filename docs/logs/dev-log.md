@@ -1,5 +1,29 @@
 # 开发日志
 
+## 2026年7月14日 - Security Assurance Lane Provider Import Ergonomics v0.1
+
+### 完成内容
+
+- 在基于最新 `origin/main` 的隔离 worktree 中新增 `security-provider-contracts` package subpath，统一六-provider normalized-envelope catalog 与稳定预检错误。
+- importer 在创建 output 前校验 provider、`scan.json`、JSON root、provider binding 和 findings array，错误不回显完整 source path 或输入内容。
+- CLI 新增 `hardening security providers`，完善 help、精确缺参、unsupported provider 和安全 import error guidance。
+- `runSecurityImportTool` 返回 `repairPlanningHandoff`；MCP 新增 `list_security_providers` 和 `import_security_evidence`。
+- compiled CLI、in-process MCP transport、官方 SDK real stdio client 均覆盖 list/import/handoff/error boundary。
+
+### TDD 记录
+
+- RED：共享 contract 模块不存在；GREEN：新增 catalog、typed error 与 package export。
+- RED：CLI 缺少 handoff/list/help/精确缺参/稳定错误；GREEN：复用共享 contract 并重建 compiled runtime。
+- RED：MCP 无两个 security tools；GREEN：新增 strict closed-world schemas、routing 和 text-only safe errors。
+- MCP server 的既有 boot chain 在 sandbox 内因 `listen EPERM` 失败；读取 `boot-result.json` 确认根因后，在允许 loopback 的环境原命令通过 30/30 tests，没有修改无关 boot 代码。
+- RED：结构测试因 provider ergonomics operation record 缺失失败；GREEN：完成 architecture、operations、PLAN、README、testing、acceptance、goal 与 logs 级联。
+
+### 边界与下一步
+
+- Native provider formats are not accepted；本轮不运行 scanner/provider service、不上传 source/report、不修改 target repo。
+- 未执行 release、launch、customer contact、pricing/spend、visibility change 或 hosted/commercial availability claim。
+- 下一 Goal：`Security Assurance Lane Provider Format Fixture Contracts v0.1`。
+
 ## 2026年7月14日 - Product / Website / User Validation Backlog Execution v0.1
 
 - 在隔离 worktree 复核 Product Backlog Prioritization v0.1 的五个运行时、产品 validation queue、官网 post-domain verification 和 private-preview triage boundary。

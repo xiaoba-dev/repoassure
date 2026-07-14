@@ -178,7 +178,15 @@ Generated tests 的路径提取优先使用 `reproSteps` 中的显式页面导�
 
 ## Product / Website / User Validation Backlog Execution v0.1
 
-Product / Website / User Validation Backlog Execution v0.1 adds a structure-level contract in `tests/unit/project-structure.test.ts`. It requires one traceable local-only queue that classifies already-implemented product and website evidence as `verified_implemented`, the provider import ergonomics follow-up as `automatable_next`, absent real reviewer feedback as `manual_or_external_trigger`, and launch/publication/customer-contact/hosted-commercial claims as `do_not_execute`. The contract also verifies cascade records in the PLAN gateway, README, acceptance checklist, decision log, and development log. This is documentation and execution-order evidence only; it does not run provider services, contact reviewers, upload source, mutate target repositories, publish packages, or launch the product.
+Product / Website / User Validation Backlog Execution v0.1 adds a structure-level contract in `tests/unit/project-structure.test.ts`. It requires one traceable local-only queue that classifies implemented product, website, and provider-import ergonomics evidence as `verified_implemented`, the provider-format fixture contract as the next automatable work, absent real reviewer feedback as `manual_or_external_trigger`, and launch/publication/customer-contact/hosted-commercial claims as `do_not_execute`. The contract also verifies cascade records in the PLAN gateway, README, acceptance checklist, decision log, and development log. This is documentation and execution-order evidence only; it does not run provider services, contact reviewers, upload source, mutate target repositories, publish packages, or launch the product.
+
+## Security Assurance Lane Provider Import Ergonomics v0.1
+
+- Unit: `tests/unit/security-assurance.test.ts` covers the six-provider catalog, normalized-envelope contract, six stable preflight errors, redacted guidance, and no output directory on failure. `tests/unit/cli-options.test.ts` covers provider listing, help, exact missing options, error guidance, and `repairPlanningHandoff`. `tests/unit/mcp-tool-registry.test.ts` covers strict schemas, annotations, routing, text-only errors, and no target mutation boundary.
+- Integration: `tests/integration/cli-generated-artifacts.test.ts` consumes provider list/import through the compiled CLI. `tests/integration/mcp-server.test.ts` consumes both tools over MCP transport.
+- Real client: `tests/integration/mcp-real-client.test.ts` uses the official SDK and compiled stdio server to list providers, import a local fixture, verify repair handoff, and reject a secret-bearing missing path without leakage.
+- Contract: package exports, compatibility inventory, type smoke, architecture spec, operation record, completed goal, PLAN, README, acceptance checklist, decision log, and dev log are structure-tested.
+- Boundary: local fixtures only; native provider formats remain unsupported; no scanner/provider service, upload, target source mutation, release, launch, customer contact, pricing/spend, or hosted/commercial claim.
 
 ## 初始命令
 

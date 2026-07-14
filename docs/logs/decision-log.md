@@ -1713,3 +1713,7 @@ Receipt does not execute resume commands，不授权 target repo mutation、rele
 ## 2026-07-13 - blocked goal recovery MCP real AI IDE manual acceptance
 
 沿用 ADR-0041 和既有 external-config validation 的 local-only boundary，不为单一客户端 UI 行为新增 ADR。采用 versioned disposable fixture、明确允许的单一 `create_blocked_goal_recovery` 调用、response boundary flags 和 redacted maintainer evidence template 记录真实 IDE 证据。自动 SDK evidence 不能替代 installed-client acceptance；缺失、deferred 或 changes_requested evidence 不得被标记为完成。
+
+## 2026-07-14 - blocked goal recovery MCP real AI IDE manual acceptance accepted
+
+Maintainer 在真实 Codex session 中发现八个 recovery tools，并只调用 disposable `create_blocked_goal_recovery` fixture。结果显示 commands/external state/target repo mutation 均为 false，生成包不含 resume commands。Maintainer 选择 accepted 并移除临时 MCP configuration；redacted evidence 已记录。该决定只闭合一个 Codex client 的 manual acceptance，不扩大 release、target repo 或商业/hosted 授权。

@@ -1,6 +1,6 @@
 # Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1
 
-Status: awaiting maintainer evidence
+Status: completed
 
 ## Purpose
 
@@ -47,6 +47,10 @@ An `accepted` decision requires all of the following:
 - the maintainer explicitly chose `accepted` with a concrete rationale.
 
 `changes_requested`, `deferred`, or missing evidence keeps this goal open. A passing automated SDK test, a generated configuration, or a client configuration that has merely been saved is not manual acceptance.
+
+## Accepted Evidence
+
+On 2026-07-14, a maintainer used Codex Desktop with Codex CLI 0.144.2 to discover all eight recovery tools and call only `create_blocked_goal_recovery` against the disposable fixture. The result recorded `commandsExecuted: false`, `externalStateChanged: false`, `targetRepoMutation: false`, and an empty `resumeCommands` list. The maintainer explicitly accepted the result and removed the temporary configuration. The redacted record is `docs/acceptance/evidence/blocked-goal-recovery-mcp-real-ai-ide-manual-acceptance-v0.1-2026-07-14.md`.
 
 ## Boundary
 

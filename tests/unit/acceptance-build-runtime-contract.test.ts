@@ -79,7 +79,7 @@ describe('acceptance build runtime contract', () => {
     expect(operation).toContain('node_modules/.cache/repoassure');
     expect(operation).toContain('three consecutive');
     expect(plan).toMatch(
-      /## Next Codex Goal\n\nBlocked Goal Recovery MCP Real AI IDE Manual Acceptance v0\.1/u
+      /## Next Codex Goal\n\nPublic Release Manual Gate Closure v0\.2/u
     );
     expect(plan).toMatch(
       /## Blocked Goal Recovery MCP Surface v0\.1\n\nStatus: implemented\./u

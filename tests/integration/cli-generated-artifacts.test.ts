@@ -1,8 +1,12 @@
+import { execFile } from 'node:child_process';
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { promisify } from 'node:util';
 
 import { runCli } from '../../src/adapters/cli/run.js';
+
+const execFileAsync = promisify(execFile);
 
 describe('CLI artifact commands', () => {
   it('runs explore from the CLI handler', async () => {
@@ -82,5 +86,39 @@ describe('CLI artifact commands', () => {
     expect(stderr).toBe('');
     expect(output.reportPath).toBe(outputPath);
     expect(report).toContain('# hardening-mcp 硬化报告');
+  });
+
+  it('exposes provider discovery and repair-planning handoff through the compiled CLI', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-compiled-security-cli-'));
+    const runDir = join(root, '.hardening', 'runs', 'run-compiled-security');
+    const cliPath = join(process.cwd(), 'dist', 'adapters', 'cli', 'index.js');
+    const providers = JSON.parse((await execFileAsync(process.execPath, [cliPath, 'security', 'providers'])).stdout) as {
+      providers: Array<{ id: string }>;
+    };
+
+    expect(providers.providers.map((provider) => provider.id)).toContain('codex-security');
+
+    const imported = JSON.parse((await execFileAsync(process.execPath, [
+      cliPath,
+      'security',
+      'import',
+      '--provider',
+      'codex-security',
+      '--scan-dir',
+      join(process.cwd(), 'fixtures', 'security', 'codex-security-basic'),
+      '--repo',
+      root,
+      '--run-dir',
+      runDir
+    ])).stdout) as {
+      securityFindingsPath: string;
+      repairPlanningHandoff: { mcp: { tool: string }; reviewBoundary: { targetMutation: boolean } };
+    };
+
+    expect(imported.repairPlanningHandoff).toMatchObject({
+      mcp: { tool: 'generate_repair_plan' },
+      reviewBoundary: { targetMutation: false }
+    });
+    await expect(readFile(imported.securityFindingsPath, 'utf8')).resolves.toContain('codex-security');
   });
 });

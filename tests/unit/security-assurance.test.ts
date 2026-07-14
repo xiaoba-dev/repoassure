@@ -1,11 +1,113 @@
-import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { importSecurityEvidence } from '../../packages/security-assurance/src/import-security-evidence.js';
+import {
+  formatSecurityImportError,
+  listSecurityProviderDescriptors,
+  type SecurityImportErrorCode
+} from '../../packages/security-assurance/src/security-provider-contracts.js';
 import { generateRepairPlan } from '../../packages/repair-planner/src/generate-repair-plan.js';
 
 describe('security assurance evidence import', () => {
+  it('publishes one honest normalized-envelope contract for every Phase 1 provider id', () => {
+    const providers = listSecurityProviderDescriptors();
+
+    expect(providers.map((provider) => provider.id)).toEqual([
+      'codex-security',
+      'codeql',
+      'semgrep',
+      'gitleaks',
+      'osv',
+      'manual-import'
+    ]);
+    expect(providers).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: 'codex-security',
+        supportStatus: 'normalized-envelope',
+        nativeFormatSupport: false,
+        inputContract: {
+          sourceType: 'scan-dir',
+          requiredFile: 'scan.json',
+          schema: 'repoassure.normalized-security-scan.v1'
+        }
+      })
+    ]));
+    expect(providers.every((provider) => provider.nativeFormatSupport === false)).toBe(true);
+  });
+
+  it.each([
+    {
+      name: 'missing scan file',
+      code: 'scan_file_missing',
+      scanText: null,
+      provider: 'codex-security'
+    },
+    {
+      name: 'malformed scan JSON',
+      code: 'scan_json_invalid',
+      scanText: '{not-json',
+      provider: 'codex-security'
+    },
+    {
+      name: 'non-object scan root',
+      code: 'scan_root_invalid',
+      scanText: '[]',
+      provider: 'codex-security'
+    },
+    {
+      name: 'provider mismatch',
+      code: 'provider_mismatch',
+      scanText: JSON.stringify({ provider: 'semgrep', findings: [] }),
+      provider: 'codex-security'
+    },
+    {
+      name: 'invalid findings collection',
+      code: 'findings_invalid',
+      scanText: JSON.stringify({ provider: 'codex-security', findings: {} }),
+      provider: 'codex-security'
+    },
+    {
+      name: 'unsupported provider id',
+      code: 'provider_unsupported',
+      scanText: JSON.stringify({ findings: [] }),
+      provider: 'unknown-provider'
+    }
+  ] as const)('fails before writing artifacts for $name with safe actionable guidance', async ({ code, scanText, provider }) => {
+    const sourcePath = await mkdtemp(join(tmpdir(), 'repoassure-security-source-sk-live-secret-'));
+    const repoRoot = await mkdtemp(join(tmpdir(), 'repoassure-security-error-repo-'));
+    const runDir = join(repoRoot, '.hardening', 'runs', 'run-security-error');
+    if (scanText !== null) {
+      await writeFile(join(sourcePath, 'scan.json'), scanText);
+    }
+
+    let thrown: unknown;
+    try {
+      await importSecurityEvidence({
+        provider: provider as 'codex-security',
+        sourcePath,
+        repoRoot,
+        runDir,
+        runId: 'run-security-error'
+      });
+    } catch (error) {
+      thrown = error;
+    }
+
+    expect(thrown).toMatchObject({
+      name: 'SecurityImportError',
+      code: code satisfies SecurityImportErrorCode,
+      guidance: expect.any(String)
+    });
+    const formatted = formatSecurityImportError(thrown);
+    expect(formatted).toMatchObject({ code, message: expect.any(String), guidance: expect.any(String) });
+    expect(formatted.guidance.length).toBeGreaterThan(10);
+    expect(JSON.stringify(formatted)).not.toContain(sourcePath);
+    expect(JSON.stringify(formatted)).not.toContain('sk-live-secret');
+    await expect(stat(runDir)).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
   it('imports a local Codex Security scan directory into redacted run-scoped security artifacts', async () => {
     const repoRoot = await mkdtemp(join(tmpdir(), 'repoassure-security-repo-'));
     const runDir = join(repoRoot, '.hardening', 'runs', 'run-security-fixture');

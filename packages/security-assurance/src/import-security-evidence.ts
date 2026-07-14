@@ -4,7 +4,13 @@ import { basename, join } from 'node:path';
 
 import { redactSensitiveText } from '@hardening-mcp/shared/privacy-redaction';
 
-export type SecurityProvider = 'codex-security' | 'codeql' | 'semgrep' | 'gitleaks' | 'osv' | 'manual-import';
+import {
+  parseSecurityProvider,
+  SecurityImportError,
+  type SecurityProvider
+} from './security-provider-contracts.js';
+
+export type { SecurityProvider } from './security-provider-contracts.js';
 export type SecuritySeverity = 'P0' | 'P1' | 'P2' | 'P3';
 export type SecurityValidationStatus = 'validated' | 'suspected' | 'suppressed' | 'not_applicable' | 'deferred';
 
@@ -79,18 +85,19 @@ interface ProviderFindingRecord {
 }
 
 export async function importSecurityEvidence(input: ImportSecurityEvidenceInput): Promise<ImportSecurityEvidenceResult> {
-  const scan = await readProviderScan(input.sourcePath);
+  const provider = parseSecurityProvider(input.provider);
+  const scan = await readProviderScan(input.sourcePath, provider);
   const providerVersion = readOptionalString(scan.providerVersion);
   const targetRevision = readOptionalString(scan.targetRevision);
   const findings = readProviderFindings(scan.findings).map((finding) => normalizeFinding({
     finding,
-    provider: input.provider,
+    provider,
     sourcePath: input.sourcePath,
     ...(providerVersion ? { providerVersion } : {}),
     ...(targetRevision ? { targetRevision } : {})
   }));
   const securityDir = join(input.runDir, 'security');
-  const providerDir = join(securityDir, 'providers', input.provider);
+  const providerDir = join(securityDir, 'providers', provider);
   const securitySummaryPath = join(securityDir, 'security-summary.json');
   const securityFindingsPath = join(securityDir, 'security-findings.json');
   const importManifestPath = join(providerDir, 'import-manifest.json');
@@ -101,7 +108,7 @@ export async function importSecurityEvidence(input: ImportSecurityEvidenceInput)
   await mkdir(providerDir, { recursive: true });
   await writeJson(importManifestPath, {
     schemaVersion: 1,
-    provider: input.provider,
+    provider,
     ...(providerVersion ? { providerVersion } : {}),
     sourceType: 'scan-dir',
     sourcePath: input.sourcePath,
@@ -112,7 +119,7 @@ export async function importSecurityEvidence(input: ImportSecurityEvidenceInput)
   });
   await writeJson(normalizedFindingsPath, {
     schemaVersion: 1,
-    provider: input.provider,
+    provider,
     importedAt,
     findings
   });
@@ -121,7 +128,7 @@ export async function importSecurityEvidence(input: ImportSecurityEvidenceInput)
     runId: redactSensitiveText(input.runId),
     importedAt,
     providerCount: 1,
-    providers: [input.provider],
+    providers: [provider],
     findingCount: findings.length,
     highestSeverity,
     validationStatusCounts: countValidationStatuses(findings),
@@ -144,11 +151,53 @@ export async function importSecurityEvidence(input: ImportSecurityEvidenceInput)
   };
 }
 
-async function readProviderScan(sourcePath: string): Promise<ProviderScanFile> {
+async function readProviderScan(sourcePath: string, provider: SecurityProvider): Promise<ProviderScanFile> {
   const scanPath = join(sourcePath, 'scan.json');
-  const parsed = JSON.parse(await readFile(scanPath, 'utf8')) as unknown;
-  if (!isRecord(parsed)) {
-    throw new Error(`Security provider scan is not a JSON object: ${scanPath}`);
+  let scanText: string;
+  try {
+    scanText = await readFile(scanPath, 'utf8');
+  } catch (error) {
+    if (isNodeError(error) && error.code === 'ENOENT') {
+      throw new SecurityImportError(
+        'scan_file_missing',
+        'The security evidence directory does not contain scan.json.',
+        'Create scan.json using the RepoAssure normalized security scan envelope, then retry the import.'
+      );
+    }
+    throw error;
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(scanText) as unknown;
+  } catch {
+    throw new SecurityImportError(
+      'scan_json_invalid',
+      'The security evidence scan.json file is not valid JSON.',
+      'Correct the JSON syntax without including secrets, then retry the import.'
+    );
+  }
+
+  if (!isRecord(parsed) || Array.isArray(parsed)) {
+    throw new SecurityImportError(
+      'scan_root_invalid',
+      'The security evidence scan.json root must be an object.',
+      'Wrap provider metadata and findings in one normalized JSON object, then retry the import.'
+    );
+  }
+  if (parsed.provider !== undefined && parsed.provider !== provider) {
+    throw new SecurityImportError(
+      'provider_mismatch',
+      'The requested provider does not match the provider declared by scan.json.',
+      'Use the provider id declared by the normalized envelope or regenerate scan.json with the intended provider id.'
+    );
+  }
+  if (!Array.isArray(parsed.findings)) {
+    throw new SecurityImportError(
+      'findings_invalid',
+      'The security evidence scan.json findings field must be an array.',
+      'Provide findings as an array, using an empty array when the scan has no findings, then retry the import.'
+    );
   }
 
   return parsed;
@@ -317,4 +366,8 @@ async function writeJson(path: string, value: unknown): Promise<void> {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
+}
+
+function isNodeError(value: unknown): value is NodeJS.ErrnoException {
+  return value instanceof Error && 'code' in value;
 }

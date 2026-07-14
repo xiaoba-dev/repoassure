@@ -15,6 +15,10 @@
 - CLI 新增 `hardening security providers`，完善 help、精确缺参提示和安全错误指导。
 - tool result 新增 `repairPlanningHandoff`，同时给出 CLI/MCP repair-plan 入口与 maintainer review boundary。
 - MCP 新增 `list_security_providers` 和 `import_security_evidence`，并通过 in-process transport 与 real stdio client 验证。
+- 独立复审后补齐 schema/finding strict validation、P0-P3 mapping、safe unreadable-file error、metadata/id redaction、repo-local `.hardening` containment、symbolic-link rejection、create-only evidence，以及 untrusted provider suggestion boundary。
+- 二次独立复审后让 invalid severity fail closed、P3 进入 repair tasks，新增 no-follow regular-file/10 MiB input boundary、collision-resistant redacted ids，以及 multiline Markdown/prompt neutralization。
+- 最终独立复审后关闭 whole-artifact trust-ordering blocker：security task 先输出 machine-readable `trustBoundary`，使用非 provider 控制的通用标题，Markdown 对 provider text 做字面化转义；taskId 改由 normalized `findingId` 派生，并让 finding 必填/可选字段 fail closed。
+- 最终 P2 收口让所有 normalized provider ids 带内容摘要，避免普通 slug-equivalent id 碰撞；Markdown 同时中和 bare URL/email autolink。
 - 更新 package exports、type smoke、架构规格、README、testing、acceptance、operations、logs 和 PLAN gateway。
 
 ## TDD 证据
@@ -24,6 +28,7 @@
 - RED：compiled CLI 不认识 `security providers`；重建 root runtime 后 GREEN。
 - RED：MCP registry、transport 和 real client 无法发现两个新工具；复用共享 contract/tool 后 GREEN。
 - RED：结构测试因 operation/completed-goal 文档缺失失败；完成文档级联后 GREEN。
+- Review RED：11 个边界测试暴露 10 个失败，existing-output 测试单独确认 overwrite；最小修复并重建 package 后，security/CLI/MCP focused suite 3 files / 82 tests GREEN。
 
 ## 测试金字塔
 
@@ -32,7 +37,9 @@
 - Real client smoke：`mcp-real-client.test.ts` 通过官方 MCP SDK 与 compiled stdio server 消费 list/import。
 - Repository gates：typecheck、lint、unit/full test、repo hygiene、release check、goal audit、diff check 与独立复审。
 
-最终自动化结果：unit 67 files / 791 tests 通过；full suite 106 files / 876 tests 通过，1 个 optional file/test 跳过；typecheck、lint、repo hygiene、release check 均通过；goal audit 35/35 通过，0 missing，0 manual。
+独立复审修复后的最终自动化结果：unit 67 files / 810 tests 通过；full suite 106 files / 895 tests 通过，1 个 optional file/test 跳过；typecheck、lint、repo hygiene、release check 均通过；goal audit 35/35 通过，0 missing，0 manual。
+
+最终 delta review 结论：P0/P1/P2 均为 0；parent-directory TOCTOU 仅在既定 local trusted-maintainer threat model 下作为已记录的非阻断残余风险接受。
 
 ## 边界
 

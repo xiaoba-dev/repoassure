@@ -16,6 +16,10 @@
 
 - 六个 provider id 统一声明 `normalized-envelope` 与 `nativeFormatSupport: false`。
 - CLI/MCP 成功结果提供非自动应用、非目标修改、需 maintainer review 的 handoff；失败在写入前返回脱敏 guidance。
+- 独立代码审查后收紧实现：强制 schema 与 finding object contract，修复 P0-P3 映射，脱敏 provenance metadata/id，将输出限制在 repo-local `.hardening/` 并采用 create-only writes，同时禁止把 provider remediation/verification 提升为执行指令。
+- 二次独立复审后进一步决定：非法 severity fail closed，P3 正式进入 repair task/summary；输入使用 no-follow regular-file handle 并限制 10 MiB；脱敏 finding id 使用哈希后缀避免碰撞；provider free text 在 Markdown/AI prompt 前单行化且 trust boundary 必须先于内容。
+- 最终独立复审后把 trust boundary 提升为 security task 的显式 machine-readable 字段并置于 provider content 之前；task title 不再复用 provider title，Markdown 将 provider text 按字面量转义，taskId 从 normalized `findingId` 派生，normalized finding 字段类型全部 fail closed。
+- 最终 P2 收口决定所有 normalized provider ids 均附加 content digest，避免普通 id 在 slug normalization 后碰撞；Markdown 输出对 bare URL/email autolink 做实体中和。
 - 下一目标为 `Security Assurance Lane Provider Format Fixture Contracts v0.1`；未宣称 native provider formats 可用。
 - 本决策不运行 provider service、不上传 source、不修改 target repo，不执行或授权 release、launch、customer contact、pricing/spend、visibility change 或 hosted/commercial availability claim。
 

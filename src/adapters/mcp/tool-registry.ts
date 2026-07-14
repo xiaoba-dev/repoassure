@@ -222,7 +222,7 @@ export function listHardeningTools(): Tool[] {
           provider: stringSchema('Provider id returned by list_security_providers.'),
           sourcePath: stringSchema('Local directory containing normalized scan.json.'),
           repoRoot: stringSchema('Target repository root used for repair-planning context.'),
-          runDir: stringSchema('RepoAssure run artifact directory where security evidence is written.'),
+          runDir: stringSchema('New or artifact-empty RepoAssure run directory below repoRoot/.hardening/. Symbolic links and artifact overwrite are rejected.'),
           runId: stringSchema('Optional run id. Defaults to the final runDir segment.')
         },
         ['provider', 'sourcePath', 'repoRoot', 'runDir']

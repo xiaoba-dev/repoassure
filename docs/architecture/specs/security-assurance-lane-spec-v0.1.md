@@ -65,9 +65,9 @@ Phase 1 implementation note: the current CLI exposes `hardening security provide
 
 The importer does not invoke Codex Security runtime or any other scanner runtime. Provider ids record provenance only.
 
-Every implemented provider descriptor declares schema `repoassure.normalized-security-scan.v1`, required file `scan.json`, `supportStatus: normalized-envelope`, and `nativeFormatSupport: false`. Native provider formats are not accepted.
+Every implemented provider descriptor declares schema `repoassure.normalized-security-scan.v1`, required file `scan.json`, `supportStatus: normalized-envelope`, and `nativeFormatSupport: false`. The importer requires that exact schema declaration, a regular non-symbolic-link file no larger than 10 MiB, object-valued entries in the `findings` array, recognized P0-P3/provider severity values, non-empty `title`, `category`, and `path` strings, an `evidence` string array, and correctly typed optional fields. Malformed normalized findings fail closed before output writes. Native provider formats are not accepted.
 
-Preflight fails before output writes with stable codes `provider_unsupported`, `scan_file_missing`, `scan_json_invalid`, `scan_root_invalid`, `provider_mismatch`, and `findings_invalid`. CLI/MCP guidance does not echo the full source path or provider content.
+Preflight fails before output writes with stable codes `provider_unsupported`, `scan_file_missing`, `scan_file_unreadable`, `scan_file_too_large`, `scan_json_invalid`, `scan_root_invalid`, `scan_schema_invalid`, `provider_mismatch`, `findings_invalid`, `severity_invalid`, `run_dir_invalid`, and `output_write_failed`. CLI/MCP guidance does not echo the full source path or provider content. Output is restricted to a real descendant of `<repo>/.hardening/`; symbolic-link traversal and artifact replacement are rejected.
 
 A successful tool result includes `repairPlanningHandoff` with `securityFindingsPath`, CLI `hardening plan` argv, MCP `generate_repair_plan` arguments, and explicit `autoApply: false`, `targetMutation: false`, and `maintainerReviewRequired: true` boundaries.
 
@@ -88,7 +88,7 @@ Each imported security finding should preserve provider provenance and map into 
 | `attackPath` | No | Provider attack-path summary when available |
 | `validationStatus` | No | `validated`, `suspected`, `suppressed`, `not_applicable`, or `deferred` |
 | `remediation` | No | Provider or RepoAssure remediation guidance |
-| `verification` | No | Suggested verification commands or manual checks |
+| `verification` | No | Untrusted provider suggestions retained as review evidence; never executable commands without maintainer approval |
 
 ## Provider Provenance
 
@@ -101,7 +101,7 @@ Provider provenance must survive every transformation:
 - handoff packages
 - patch plans
 
-RepoAssure must not rewrite provider evidence in a way that makes it appear natively discovered by RepoAssure. Provider ids, source artifact paths, scan timestamps, target revision, and known limitations should remain visible in machine-readable artifacts.
+RepoAssure must not rewrite provider evidence in a way that makes it appear natively discovered by RepoAssure. Provider ids, redacted source artifact references, scan timestamps, redacted target revision, and known limitations should remain visible in machine-readable artifacts.
 
 ## Local-First Evidence Handling
 
@@ -110,7 +110,7 @@ Security evidence import is local-first:
 - Read provider output from local files or explicit local scan directories.
 - Do not upload target code, provider reports, screenshots, traces, logs, env values, or secrets.
 - Do not fetch remote provider state unless a future ADR explicitly approves a remote integration.
-- Store normalized artifacts in the target repo hardening run bundle or a workspace output directory.
+- Store normalized artifacts only in a real target repo `.hardening/` run directory; reject symbolic-link traversal and existing artifact replacement.
 - Preserve raw provider artifacts by local reference where possible instead of copying large sensitive files into this repo.
 
 ## Redaction Requirements
@@ -123,6 +123,9 @@ All imported provider text is untrusted and may contain secrets. Before writing 
 - URL userinfo and sensitive query or fragment parameters
 - local paths when rendered in user-facing handoff commands
 - provider evidence snippets
+- provider version, target revision, source path, provider finding id, and coverage metadata
+
+All provider free text is untrusted data. Repair planning must single-line provider text before prompt rendering, render it as literal text in Markdown, neutralize bare URL/email autolinks, expose an explicit machine-readable `trustBoundary` before any provider-controlled task content, use a RepoAssure-owned generic task title, and preserve P0-P3 findings in the repair task summary. Every normalized provider id must include a content-derived digest so distinct raw ids cannot collide after slug normalization; security repair task identity must derive from that normalized `findingId`, not a redacted provider-native id. Remediation and verification suggestions may remain explicitly labeled evidence, but must not be copied into `repairIntent`, `verification.commands`, required verification actions, or handoff commands without a separate maintainer decision.
 - remediation text copied from provider reports
 
 Raw provider artifacts may remain in their original provider scan directory, but RepoAssure-generated artifacts must be redacted.

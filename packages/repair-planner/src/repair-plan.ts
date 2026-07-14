@@ -1,4 +1,4 @@
-export type FindingSeverity = 'P0' | 'P1' | 'P2';
+export type FindingSeverity = 'P0' | 'P1' | 'P2' | 'P3';
 
 export type FindingType =
   | 'white_screen'
@@ -28,12 +28,14 @@ export interface RepairPlanSummary {
   p0: number;
   p1: number;
   p2: number;
+  p3: number;
 }
 
 export interface RepairTask {
   taskId: string;
   severity: FindingSeverity;
   status: RepairTaskStatus;
+  trustBoundary?: string;
   title: string;
   rootCauseHypothesis: string;
   repairIntent: string;
@@ -92,6 +94,7 @@ export interface ExecutableRepairTask {
   taskId: string;
   severity: FindingSeverity;
   status: RepairTaskPackageStatus;
+  trustBoundary?: string;
   title: string;
   objective: string;
   context: RepairTaskContext;
@@ -156,7 +159,11 @@ export function severityRank(severity: FindingSeverity): number {
     return 1;
   }
 
-  return 2;
+  if (severity === 'P2') {
+    return 2;
+  }
+
+  return 3;
 }
 
 export function findingTypeRepairIntent(type: FindingType): string {

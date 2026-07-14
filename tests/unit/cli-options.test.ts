@@ -370,6 +370,8 @@ describe('runCli argument validation', () => {
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('hardening security providers');
     expect(result.stdout).toContain('repoassure.normalized-security-scan.v1');
+    expect(result.stdout).toContain('below <repo>/.hardening/');
+    expect(result.stdout).toContain('create-only');
     expect(result.stdout).toContain('Native provider formats are not accepted');
   });
 
@@ -415,6 +417,28 @@ describe('runCli argument validation', () => {
     expect(result.stderr).toContain('Guidance:');
     expect(result.stderr).not.toContain(scanDir);
     expect(result.stderr).not.toContain('sk-cli-secret');
+  });
+
+  it('rejects security import output outside the repo-local .hardening directory', async () => {
+    const repoRoot = await mkdtemp(join(tmpdir(), 'repoassure-cli-security-boundary-repo-'));
+    const runDir = await mkdtemp(join(tmpdir(), 'repoassure-cli-security-outside-'));
+    const result = await runCliForTest([
+      'security',
+      'import',
+      '--provider',
+      'codex-security',
+      '--scan-dir',
+      join(process.cwd(), 'fixtures/security/codex-security-basic'),
+      '--repo',
+      repoRoot,
+      '--run-dir',
+      runDir
+    ]);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('run_dir_invalid');
+    expect(result.stderr).not.toContain(runDir);
   });
 });
 

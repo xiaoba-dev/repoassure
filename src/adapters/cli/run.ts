@@ -490,11 +490,12 @@ Options:
   --provider <provider>  Provider id returned by hardening security providers.
   --scan-dir <dir>       Local directory containing normalized scan.json.
   --repo <repo>          Path to the target repository.
-  --run-dir <dir>        Existing or new RepoAssure run directory.
+  --run-dir <dir>        New or artifact-empty directory below <repo>/.hardening/; symbolic links are rejected.
   --help, -h             Show this help.
 
 Input contract:
   Schema: repoassure.normalized-security-scan.v1
+  Output artifacts are create-only and never overwrite prior evidence.
   Native provider formats are not accepted. Normalize evidence into scan.json before import.
 
 `;

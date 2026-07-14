@@ -2,11 +2,19 @@ export type SecurityProvider = 'codex-security' | 'codeql' | 'semgrep' | 'gitlea
 
 export type SecurityImportErrorCode =
   | 'scan_file_missing'
+  | 'scan_file_unreadable'
+  | 'scan_file_too_large'
   | 'scan_json_invalid'
   | 'scan_root_invalid'
+  | 'scan_schema_invalid'
   | 'provider_mismatch'
   | 'findings_invalid'
-  | 'provider_unsupported';
+  | 'severity_invalid'
+  | 'provider_unsupported'
+  | 'run_dir_invalid'
+  | 'output_write_failed';
+
+export const NORMALIZED_SECURITY_SCAN_SCHEMA = 'repoassure.normalized-security-scan.v1' as const;
 
 export interface SecurityProviderDescriptor {
   id: SecurityProvider;
@@ -29,7 +37,7 @@ export interface FormattedSecurityImportError {
 const INPUT_CONTRACT = {
   sourceType: 'scan-dir',
   requiredFile: 'scan.json',
-  schema: 'repoassure.normalized-security-scan.v1'
+  schema: NORMALIZED_SECURITY_SCAN_SCHEMA
 } as const;
 
 const PROVIDERS: readonly SecurityProviderDescriptor[] = [

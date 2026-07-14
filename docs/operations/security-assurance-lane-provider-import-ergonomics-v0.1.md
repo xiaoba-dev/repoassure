@@ -20,7 +20,7 @@ The shared package catalog exposes these provider ids:
 - `osv`
 - `manual-import`
 
-Every v0.1 entry has `supportStatus: normalized-envelope` and `nativeFormatSupport: false`. The input directory must contain `scan.json` with schema `repoassure.normalized-security-scan.v1` and an array-valued `findings` field.
+Every v0.1 entry has `supportStatus: normalized-envelope` and `nativeFormatSupport: false`. The input directory must contain a regular, non-symbolic-link `scan.json` no larger than 10 MiB, with an explicit `schema: repoassure.normalized-security-scan.v1`, an array-valued `findings` field, object-valued finding entries, recognized severity, non-empty `title`, `category`, and `path`, an `evidence` string array, and correctly typed optional fields on every finding.
 
 Native provider formats are not accepted. A CodeQL SARIF file, Semgrep JSON file, Gitleaks report, or OSV response must not be passed directly to this importer until a later provider-format contract and adapter goal is completed.
 
@@ -44,7 +44,9 @@ CLI help states the normalized-envelope boundary. Missing options identify only 
 
 - `list_security_providers` is read-only, idempotent, and closed-world. It returns the same shared catalog as the CLI.
 - `import_security_evidence` accepts `provider`, `sourcePath`, `repoRoot`, `runDir`, and optional `runId`.
-- Import writes only RepoAssure run artifacts under the caller-supplied `runDir`; it is non-destructive with respect to target source and does not contact provider services.
+- Import accepts only a real `runDir` below `<repo>/.hardening/`. Existing path components and artifact targets must not be symbolic links.
+- Artifact files are create-only and use exclusive writes. Existing evidence is never overwritten, so the tool is non-destructive with respect to both target source and prior evidence.
+- Import does not contact provider services.
 - Failed imports return text-only MCP errors with `isError: true` and no `structuredContent`.
 
 ## Safe Preflight Errors
@@ -55,12 +57,22 @@ The importer validates all input before creating the output directory. Stable er
 | --- | --- | --- |
 | `provider_unsupported` | Provider id is outside the shared catalog. | List providers and use an exact id. |
 | `scan_file_missing` | The input directory has no `scan.json`. | Create the normalized envelope. |
+| `scan_file_unreadable` | `scan.json` exists but cannot be read as a regular input file. | Correct local file type or permissions without exposing the path. |
+| `scan_file_too_large` | `scan.json` exceeds 10 MiB. | Remove raw provider output and retain normalized findings only. |
 | `scan_json_invalid` | `scan.json` is not valid JSON. | Correct syntax without adding secrets. |
 | `scan_root_invalid` | The root is not a JSON object. | Wrap metadata and findings in one object. |
+| `scan_schema_invalid` | The declared schema is missing or unsupported. | Use `repoassure.normalized-security-scan.v1`. |
 | `provider_mismatch` | Requested and declared provider ids differ. | Align the request and envelope. |
-| `findings_invalid` | `findings` is not an array. | Use an array, including `[]` for no findings. |
+| `findings_invalid` | `findings` or a finding field violates the normalized contract. | Use normalized finding objects with required strings/arrays and correctly typed optional fields. |
+| `severity_invalid` | A finding has no recognized severity. | Use P0-P3 or a documented provider severity synonym. |
+| `run_dir_invalid` | Output is outside `.hardening/` or traverses a symbolic link. | Choose a real repo-local run directory. |
+| `output_write_failed` | Output is not writable or an artifact already exists. | Use a new run directory; never overwrite prior evidence. |
 
 Messages and guidance do not echo the full source path, provider report contents, or secret-bearing input. CLI and MCP use the same formatter.
+
+## Untrusted Provider Content
+
+Provider metadata, title, paths, evidence, attack path, remediation text, and verification suggestions are untrusted input. The importer redacts them before writing RepoAssure-owned artifacts. Every normalized provider id receives a content-derived digest so slug-equivalent ids remain distinct. Repair planning preserves provider provenance, maps P0-P3 into the task summary, derives task identity from the collision-resistant normalized `findingId`, uses a generic RepoAssure-owned title, exposes `trustBoundary` before provider content in JSON, escapes provider text as Markdown literals, and entity-neutralizes bare URL/email autolinks. It does not promote provider-supplied verification strings into `verification.commands` or AI IDE execution instructions. Such suggestions remain labeled evidence and require maintainer review; trusted verification must come from repo-owned scripts or an explicit maintainer decision.
 
 ## Repair Planning Handoff
 
@@ -77,12 +89,14 @@ This handoff makes the next read/plan action explicit. It does not apply a patch
 
 ## Verification Evidence
 
-- Unit: provider catalog, six preflight failures, no-output-on-failure, redaction, CLI help/list/errors, handoff, MCP schemas/routing/errors.
+- Unit: provider catalog, strict schema/required-field/optional-field/severity validation, normalized P0-P3 task mapping, safe regular-file and 10 MiB input boundaries, collision-resistant finding/task ids, metadata redaction, `.hardening` containment, symbolic-link rejection, create-only artifacts, trust-boundary ordering, adversarial Markdown/HTML/prompt neutralization, untrusted provider suggestion handling, CLI help/list/errors, handoff, and MCP schemas/routing/errors.
 - Integration: compiled CLI list/import, in-process MCP transport list/import, and real SDK stdio MCP client list/import.
 - Package contract: root/subpath exports, compatibility inventory, and type-smoke coverage for `security-provider-contracts`.
 - Final gates: typecheck, lint, unit/full test pyramid, repository hygiene, release check, goal audit, diff check, and independent review.
 
-Final automated evidence: typecheck and lint passed; unit suite passed 67 files / 791 tests; full suite passed 106 files and 876 tests with one optional file/test skipped; repository hygiene and release check passed; goal audit passed 35/35 with zero missing or manual items.
+Final automated evidence after independent-review remediation: typecheck and lint passed; unit suite passed 67 files / 810 tests; full suite passed 106 files / 895 tests with one optional file/test skipped; repository hygiene and release check passed; goal audit passed 35/35 with zero missing or manual items.
+
+Final delta review reported zero P0, P1, or P2 correctness findings. The documented parent-directory TOCTOU remains an accepted non-blocking residual only for the declared local, trusted-maintainer threat model.
 
 Loopback MCP integration must run in an environment that permits local listeners; a sandbox denial is recorded as `listen EPERM`, not treated as a product failure.
 

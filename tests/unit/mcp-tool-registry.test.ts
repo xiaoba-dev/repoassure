@@ -251,6 +251,10 @@ describe('MCP tool registry', () => {
         }
       }
     });
+    expect(((importEvidence?.inputSchema as { properties?: Record<string, { description?: string }> }).properties?.runDir?.description))
+      .toContain('repoRoot/.hardening/');
+    expect(((importEvidence?.inputSchema as { properties?: Record<string, { description?: string }> }).properties?.runDir?.description))
+      .toContain('overwrite');
   });
 
   it('lists providers and imports local normalized evidence over MCP routing', async () => {
@@ -306,6 +310,22 @@ describe('MCP tool registry', () => {
     expect(JSON.stringify(result)).not.toContain(sourcePath);
     expect(JSON.stringify(result)).not.toContain('mcp-secret');
     await expect(stat(runDir)).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
+  it('rejects MCP security evidence output outside the repo-local .hardening boundary', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-mcp-security-boundary-'));
+    const runDir = await mkdtemp(join(tmpdir(), 'repoassure-mcp-security-outside-'));
+    const result = await callHardeningTool('import_security_evidence', {
+      provider: 'codex-security',
+      sourcePath: join(process.cwd(), 'fixtures/security/codex-security-basic'),
+      repoRoot: root,
+      runDir
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.structuredContent).toBeUndefined();
+    expect(JSON.stringify(result)).toContain('run_dir_invalid');
+    expect(JSON.stringify(result)).not.toContain(runDir);
   });
 
   it('exposes generate_repair_plan over MCP tool calls', async () => {

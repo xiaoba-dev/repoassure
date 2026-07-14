@@ -1,6 +1,6 @@
 # Goal 完成度审计
 
-生成时间：2026-07-14T09:27:25.004Z
+生成时间：2026-07-14T12:00:22.154Z
 
 ## 摘要
 
@@ -99,7 +99,7 @@
 | Legacy acceptance 兼容 wrapper | 已通过 | src/internal/acceptance/*.ts all delegate to packages/acceptance/dist compatibility wrappers |  |
 | Acceptance package typed module exports | 已通过 | root package depends on @hardening-mcp/acceptance workspace package; exact package export surface matches acceptancePackageExportEntries; package dist output contract matches acceptancePackageDistOutputEntries including .js.map sourceMapPath; package dist source specs match PACKAGE_ACCEPTANCE_DIST_OUTPUT_SOURCE_SPECS, PACKAGE_ACCEPTANCE_DIST_DECLARATION_SOURCE_SPECS, and PACKAGE_ACCEPTANCE_DIST_SOURCE_MAP_SOURCE_SPECS; package source contract matches acceptancePackageSourceEntries; typed dist entrypoints have no unexpected package exports |  |
 | Shared package typed module exports and legacy wrappers | 已通过 | root package depends on @hardening-mcp/shared workspace package; packages/shared exports typed root, compatibility, privacy-redaction, shell-quote, and shell-words subpaths; src/shared/*.ts all delegate to packages/shared/dist compatibility wrappers |  |
-| Security assurance package typed module exports | 已通过 | root package depends on @hardening-mcp/security-assurance workspace package; packages/security-assurance exports typed root, compatibility, and import-security-evidence subpaths; type-smoke covers root and subpath resolution |  |
+| Security assurance package typed module exports | 已通过 | root package depends on @hardening-mcp/security-assurance workspace package; packages/security-assurance exports typed root, compatibility, import-security-evidence, and security-provider-contracts subpaths; type-smoke covers root and subpath resolution |  |
 | Repair planner package typed module exports and legacy wrappers | 已通过 | root package depends on @hardening-mcp/repair-planner workspace package; packages/repair-planner exports typed root, compatibility, generate-repair-plan, and repair-plan subpaths; src/domain/repair-plan/*.ts and src/types/repair-plan.ts delegate to packages/repair-planner/dist compatibility wrappers |  |
 | Browser explorer package typed module exports and legacy wrappers | 已通过 | root package depends on @hardening-mcp/browser-explorer workspace package; packages/browser-explorer exports typed root, compatibility, explore-app, and playwright-driver subpaths; src/domain/explore/*.ts delegates to packages/browser-explorer/dist compatibility wrappers |  |
 | Legacy acceptance dist compatibility outputs | 已通过 | dist/internal/acceptance/*.js and *.d.ts compatibility outputs all delegate to packages/acceptance/dist package entrypoints; dist/internal/acceptance/*.js.map source maps are present through legacyAcceptanceDistOutputEntries.sourceMapPath and LEGACY_ACCEPTANCE_DIST_SOURCE_MAP_SOURCE_SPECS |  |

@@ -17,6 +17,7 @@
 - RED：MCP 无两个 security tools；GREEN：新增 strict closed-world schemas、routing 和 text-only safe errors。
 - MCP server 的既有 boot chain 在 sandbox 内因 `listen EPERM` 失败；读取 `boot-result.json` 确认根因后，在允许 loopback 的环境原命令通过 30/30 tests，没有修改无关 boot 代码。
 - RED：结构测试因 provider ergonomics operation record 缺失失败；GREEN：完成 architecture、operations、PLAN、README、testing、acceptance、goal 与 logs 级联。
+- Final：typecheck、lint、repo hygiene、release check 通过；unit 67 files / 791 tests 通过；full suite 106 files / 876 tests 通过且仅 1 个 optional file/test 跳过；goal audit 35/35 通过。
 
 ### 边界与下一步
 

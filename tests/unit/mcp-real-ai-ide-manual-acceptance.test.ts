@@ -24,7 +24,7 @@ describe('blocked goal recovery MCP real AI IDE manual acceptance contract', () 
     ]);
 
     expect(plan).toMatch(
-      /## Next Codex Goal\n\nSecurity Assurance Lane Provider Import Ergonomics v0\.1/u
+      /## Next Codex Goal\n\nSecurity Assurance Lane Provider Format Fixture Contracts v0\.1/u
     );
     expect(operation).toContain('Status: completed');
     expect(operation).toContain('pnpm --silent mcp:config -- --client codex');

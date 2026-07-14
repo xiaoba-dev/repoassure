@@ -63,6 +63,8 @@ The current implementation name may expose this through `hardening` first, but u
 
 Phase 1 implementation note: the current CLI exposes `hardening security providers` and `hardening security import --provider <provider> --scan-dir <dir> --repo <repo> --run-dir <dir>` through `@hardening-mcp/security-assurance`. MCP exposes `list_security_providers` and `import_security_evidence`. Both surfaces reuse one package-owned catalog for `codex-security`, `codeql`, `semgrep`, `gitleaks`, `osv`, and `manual-import`.
 
+The importer does not invoke Codex Security runtime or any other scanner runtime. Provider ids record provenance only.
+
 Every implemented provider descriptor declares schema `repoassure.normalized-security-scan.v1`, required file `scan.json`, `supportStatus: normalized-envelope`, and `nativeFormatSupport: false`. Native provider formats are not accepted.
 
 Preflight fails before output writes with stable codes `provider_unsupported`, `scan_file_missing`, `scan_json_invalid`, `scan_root_invalid`, `provider_mismatch`, and `findings_invalid`. CLI/MCP guidance does not echo the full source path or provider content.

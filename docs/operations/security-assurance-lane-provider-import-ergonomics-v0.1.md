@@ -82,6 +82,8 @@ This handoff makes the next read/plan action explicit. It does not apply a patch
 - Package contract: root/subpath exports, compatibility inventory, and type-smoke coverage for `security-provider-contracts`.
 - Final gates: typecheck, lint, unit/full test pyramid, repository hygiene, release check, goal audit, diff check, and independent review.
 
+Final automated evidence: typecheck and lint passed; unit suite passed 67 files / 791 tests; full suite passed 106 files and 876 tests with one optional file/test skipped; repository hygiene and release check passed; goal audit passed 35/35 with zero missing or manual items.
+
 Loopback MCP integration must run in an environment that permits local listeners; a sandbox denial is recorded as `listen EPERM`, not treated as a product failure.
 
 ## Non-Authorization Boundary

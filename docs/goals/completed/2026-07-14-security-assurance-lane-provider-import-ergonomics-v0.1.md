@@ -32,6 +32,8 @@
 - Real client smoke：`mcp-real-client.test.ts` 通过官方 MCP SDK 与 compiled stdio server 消费 list/import。
 - Repository gates：typecheck、lint、unit/full test、repo hygiene、release check、goal audit、diff check 与独立复审。
 
+最终自动化结果：unit 67 files / 791 tests 通过；full suite 106 files / 876 tests 通过，1 个 optional file/test 跳过；typecheck、lint、repo hygiene、release check 均通过；goal audit 35/35 通过，0 missing，0 manual。
+
 ## 边界
 
 - Native provider formats are not accepted；当前六个 provider id 只表示 normalized-envelope provenance，不表示原生格式 adapter 已实现。

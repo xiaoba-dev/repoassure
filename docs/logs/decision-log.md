@@ -1717,3 +1717,7 @@ Receipt does not execute resume commands，不授权 target repo mutation、rele
 ## 2026-07-14 - blocked goal recovery MCP real AI IDE manual acceptance accepted
 
 Maintainer 在真实 Codex session 中发现八个 recovery tools，并只调用 disposable `create_blocked_goal_recovery` fixture。结果显示 commands/external state/target repo mutation 均为 false，生成包不含 resume commands。Maintainer 选择 accepted 并移除临时 MCP configuration；redacted evidence 已记录。该决定只闭合一个 Codex client 的 manual acceptance，不扩大 release、target repo 或商业/hosted 授权。
+
+## 2026-07-14 - Public release manual gate reconciliation
+
+Public Release Manual Gate Closure v0.2 的 2026-07-01 private/no-go 结论保留为历史快照。当前只读核验确认 `xiaoba-dev/repoassure` 已是 `PUBLIC`，`main` 由 `Quality Gates` 保护，最新 main CI 成功，且 `pnpm release:check` 报告 `yes`。这与既有 equivalent-control、source-release、native-branch-protection 和 post-merge hygiene 记录一致。本轮未变更外部状态，也不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。

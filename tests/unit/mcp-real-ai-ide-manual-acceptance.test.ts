@@ -24,7 +24,7 @@ describe('blocked goal recovery MCP real AI IDE manual acceptance contract', () 
     ]);
 
     expect(plan).toMatch(
-      /## Next Codex Goal\n\nPublic Release Manual Gate Closure v0\.2/u
+      /## Next Codex Goal\n\nProduct \/ Website \/ User Validation Backlog Execution v0\.1/u
     );
     expect(operation).toContain('Status: completed');
     expect(operation).toContain('pnpm --silent mcp:config -- --client codex');

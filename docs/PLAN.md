@@ -34,9 +34,9 @@ Recent completed work includes:
 
 ## Next Codex Goal
 
-Public Release Manual Gate Closure v0.2
+Product / Website / User Validation Backlog Execution v0.1
 
-Plain-language explanation: the MCP manual gate is complete. Before any public release work, reassess the existing legal, trademark, branch-control, exposure, and publication-authorization evidence; do not change repository visibility or publish anything without a separate explicit decision.
+Plain-language explanation: public source availability and branch controls are already verified, while public launch remains deferred. Convert real product and website feedback into prioritized, locally reviewable improvements without launching, contacting customers, or claiming unshipped commercial features.
 
 ## Execution Rules
 
@@ -114,6 +114,15 @@ Status: completed.
 - The result recorded no command execution, no external state change, no target-repository mutation, and no resume commands.
 - The maintainer accepted the evidence and removed the temporary configuration.
 - The redacted evidence record is stored under `docs/acceptance/evidence/`.
+
+## Public Release Manual Gate Closure v0.2
+
+Status: completed_reconciled.
+
+- The 2026-07-01 private-repository no-go snapshot is retained as historical evidence.
+- Current read-only evidence confirms the repository is public, `main` is protected by `Quality Gates`, and the latest main CI is successful.
+- Existing equivalent-control, source-release, native-branch-protection, and post-merge hygiene records establish the separately authorized source-public sequence.
+- This reconciliation does not authorize npm publication, GitHub releases, public launch, customer contact, pricing/spend changes, or commercial/hosted availability claims.
 
 ## Blocked Goal Recovery Full Lifecycle Real Campaign Validation v0.1
 

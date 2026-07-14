@@ -559,3 +559,13 @@ resolved
 ### Evidence
 
 Maintainer 已在真实 Codex session 发现八个 recovery tools，并只调用 disposable `create_blocked_goal_recovery` fixture。结果的 command/external-state/target-repo-mutation flags 均为 false，生成包不含 resume commands。Maintainer 明确 accepted 并移除临时 config；详见 dated redacted evidence record。该 resolution 不授权 recovery/resume command execution、target repo mutation、release 或 commercial/hosted claims。
+
+## 2026年7月14日 - Public Release Manual Gate Closure v0.2 状态漂移
+
+### Resolution status
+
+resolved
+
+### Evidence
+
+旧 v0.2 文档保留了 repository `PRIVATE`、branch protection `HTTP 403` 与 public release no-go 的历史快照，但当前 GitHub 只读核验确认 repository 为 `PUBLIC`、`main` 已受 `Quality Gates` 保护、最新 main CI 成功，且 `pnpm release:check` 报告 `yes`。历史 Equivalent Release Control Closure、Public Source Release Execution、Native Branch Protection Enablement 与 post-merge hygiene 已解释这一状态演进。本轮只调和文档与计划，不改变外部状态；public launch 仍为 deferred。

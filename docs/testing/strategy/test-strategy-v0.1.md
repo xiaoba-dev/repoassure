@@ -662,3 +662,9 @@ This validation must not upload target repo material, automatically modify targe
 - Integration: `tests/integration/mcp-manual-acceptance-fixture.test.ts` starts the compiled app entry, copies the committed fixture to a temporary directory, and proves the one allowed call emits the explicit zero-side-effect flags with no resume commands. Existing `pnpm test:mcp-external-config` remains the integration proof for generated envelopes and real stdio process consumption.
 - Manual acceptance: one maintainer used Codex Desktop to discover all eight tools and call only `create_blocked_goal_recovery` against a disposable fixture. The returned boundary flags, empty resume-command list, explicit accepted decision, and configuration-removal decision are recorded in the dated redacted evidence file.
 - Non-substitution: CI cannot claim installed-client UI behavior or environment inheritance. The accepted Codex record closes this v0.1 one-client gate; additional client coverage remains separate work.
+
+## Public Release State Reconciliation v0.2
+
+- Contract: `tests/unit/project-structure.test.ts` keeps the historical 2026-07-01 no-go snapshot distinct from the current public-source, protected-branch reconciliation.
+- Read-only verification: release-state review checks repository visibility, `main` protection, latest main CI, `pnpm release:check`, and `pnpm repo:hygiene`; it does not change external state.
+- Boundary: source-public state does not imply npm publication, GitHub release, public launch, customer contact, pricing/spend, or commercial/hosted availability.

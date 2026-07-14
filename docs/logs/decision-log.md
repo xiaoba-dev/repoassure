@@ -1,5 +1,23 @@
 # 决策日志
 
+## 2026年7月14日 - Product website user validation backlog execution
+
+### 决策
+
+接受 Product / Website / User Validation Backlog Execution v0.1：关闭已经具备实现和自动化证据的本地 backlog 项，并把剩余工作分为下一项可自动执行的 provider import ergonomics、等待真实外部输入的 reviewer feedback triage，以及当前不得执行的发布和外部动作。
+
+### 原因
+
+- Product Backlog Prioritization v0.1 的五个本地产品优先级已经分别形成 runtime、contract tests 和级联文档；继续把它们当作未完成工作会造成重复开发。
+- 官网的域名、metadata、localization 和 smoke evidence 已有独立记录，但不能被误读为 public launch 授权。
+- 当前没有真实 reviewer feedback，不能编造输入或自动启动 triage；Security Assurance Lane Phase 1 provider import ergonomics 是不依赖外部身份或外部状态的下一项工作。
+
+### 影响
+
+- 新增统一队列 `docs/operations/product-website-user-validation-backlog-execution-v0.1.md`，明确 `verified_implemented`、`automatable_next`、`manual_or_external_trigger` 和 `do_not_execute`。
+- `docs/PLAN.md` 将下一目标指向 Security Assurance Lane Provider Import Ergonomics v0.1。
+- 本决策不运行 provider service、不上传 source、不联系 reviewer、不改变 Cloudflare/GitHub/target repo 状态，不执行 npm publication、GitHub release、public launch、production marketing announcement、pricing/spend 或商业/hosted availability claim。
+
 ## 2026年7月8日 - AI IDE repair replay real campaign validation
 
 ### 决策

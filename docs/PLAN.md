@@ -34,9 +34,9 @@ Recent completed work includes:
 
 ## Next Codex Goal
 
-Product / Website / User Validation Backlog Execution v0.1
+Security Assurance Lane Provider Import Ergonomics v0.1
 
-Plain-language explanation: public source availability and branch controls are already verified, while public launch remains deferred. Convert real product and website feedback into prioritized, locally reviewable improvements without launching, contacting customers, or claiming unshipped commercial features.
+Plain-language explanation: the local product, website, and user-validation backlog has been reconciled. Improve the existing local security-provider evidence import path so an AI IDE or maintainer can understand supported inputs, redacted failures, and repair-planning handoff without running a provider service, uploading source, or changing a target repository.
 
 ## Execution Rules
 

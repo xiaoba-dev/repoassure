@@ -103,7 +103,8 @@ function buildSecurityAssurancePackageTypedModuleExportsGoalAuditItem(
     ...findMissingMarkers(sources.securityAssuranceTypeSmoke ?? '', [
       "from '@hardening-mcp/security-assurance'",
       "from '@hardening-mcp/security-assurance/compatibility'",
-      "from '@hardening-mcp/security-assurance/import-security-evidence'"
+      "from '@hardening-mcp/security-assurance/import-security-evidence'",
+      "from '@hardening-mcp/security-assurance/security-provider-contracts'"
     ])
   ];
 
@@ -112,7 +113,7 @@ function buildSecurityAssurancePackageTypedModuleExportsGoalAuditItem(
     requirement: 'Security assurance package typed module exports',
     status: missingMarkers.length === 0 ? 'passed' : 'missing',
     evidence: missingMarkers.length === 0
-      ? ['root package depends on @hardening-mcp/security-assurance workspace package; packages/security-assurance exports typed root, compatibility, and import-security-evidence subpaths; type-smoke covers root and subpath resolution']
+      ? ['root package depends on @hardening-mcp/security-assurance workspace package; packages/security-assurance exports typed root, compatibility, import-security-evidence, and security-provider-contracts subpaths; type-smoke covers root and subpath resolution']
       : [`missing security assurance package markers: ${missingMarkers.join(', ')}`],
     ...(missingMarkers.length > 0
       ? { nextAction: '补齐 root workspace dependency、packages/security-assurance typed exports 和 type-smoke 后重新运行 goal audit。' }
@@ -319,7 +320,8 @@ function findMissingSecurityAssuranceTypedPackageExportMarkers(packageJsonText: 
   const expectedExports = [
     { exportPath: '.', types: './dist/index.d.ts', default: './dist/index.js' },
     { exportPath: './compatibility', types: './dist/compatibility.d.ts', default: './dist/compatibility.js' },
-    { exportPath: './import-security-evidence', types: './dist/import-security-evidence.d.ts', default: './dist/import-security-evidence.js' }
+    { exportPath: './import-security-evidence', types: './dist/import-security-evidence.d.ts', default: './dist/import-security-evidence.js' },
+    { exportPath: './security-provider-contracts', types: './dist/security-provider-contracts.d.ts', default: './dist/security-provider-contracts.js' }
   ] as const;
   const expectedExportPaths = new Set<string>(expectedExports.map(({ exportPath }) => exportPath));
   const unexpectedExportMarkers = Object.keys(exports)

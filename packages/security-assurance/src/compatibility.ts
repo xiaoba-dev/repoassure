@@ -1,18 +1,20 @@
 export const securityAssuranceCompatibilityContract = {
   packageName: '@hardening-mcp/security-assurance',
-  packageOwnedModules: ['compatibility', 'import-security-evidence']
+  packageOwnedModules: ['compatibility', 'import-security-evidence', 'security-provider-contracts']
 } as const;
 
 export const securityAssurancePackageSubpathSpecifiers = [
   '@hardening-mcp/security-assurance',
   '@hardening-mcp/security-assurance/compatibility',
-  '@hardening-mcp/security-assurance/import-security-evidence'
+  '@hardening-mcp/security-assurance/import-security-evidence',
+  '@hardening-mcp/security-assurance/security-provider-contracts'
 ] as const;
 
 export const securityAssurancePackageExportEntries = [
   { exportPath: '.', types: './dist/index.d.ts', default: './dist/index.js' },
   { exportPath: './compatibility', types: './dist/compatibility.d.ts', default: './dist/compatibility.js' },
-  { exportPath: './import-security-evidence', types: './dist/import-security-evidence.d.ts', default: './dist/import-security-evidence.js' }
+  { exportPath: './import-security-evidence', types: './dist/import-security-evidence.d.ts', default: './dist/import-security-evidence.js' },
+  { exportPath: './security-provider-contracts', types: './dist/security-provider-contracts.d.ts', default: './dist/security-provider-contracts.js' }
 ] as const;
 
 export const securityAssurancePackageSourceEntries = [

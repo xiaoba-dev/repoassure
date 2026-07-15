@@ -9,6 +9,12 @@ import type {
   ImportSecurityEvidenceInput,
   ImportSecurityEvidenceResult
 } from '@hardening-mcp/security-assurance/import-security-evidence';
+import {
+  formatSecurityImportError,
+  listSecurityProviderDescriptors,
+  parseSecurityProvider,
+  SecurityImportError
+} from '@hardening-mcp/security-assurance/security-provider-contracts';
 
 const input: ImportSecurityEvidenceInput = {
   provider: 'codex-security',
@@ -24,3 +30,7 @@ void input;
 void importer;
 void securityAssuranceCompatibilityContract;
 void securityAssurancePackageExportEntries;
+void formatSecurityImportError;
+void listSecurityProviderDescriptors;
+void parseSecurityProvider;
+void SecurityImportError;

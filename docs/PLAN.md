@@ -31,12 +31,13 @@ Recent completed work includes:
 - Blocked Goal Recovery MCP External AI IDE Configuration Validation v0.1.
 - Public release and branch protection governance.
 - Public website private preview and custom-domain work.
+- Security Assurance Lane Provider Import Ergonomics v0.1.
 
 ## Next Codex Goal
 
-Security Assurance Lane Provider Import Ergonomics v0.1
+Security Assurance Lane Provider Format Fixture Contracts v0.1
 
-Plain-language explanation: the local product, website, and user-validation backlog has been reconciled. Improve the existing local security-provider evidence import path so an AI IDE or maintainer can understand supported inputs, redacted failures, and repair-planning handoff without running a provider service, uploading source, or changing a target repository.
+Plain-language explanation: provider discovery, safe normalized-envelope import, and repair-planning handoff are implemented for CLI and MCP. Before claiming native CodeQL, Semgrep, Gitleaks, or OSV format support, create a sanitized and versioned fixture matrix that defines each native input contract and expected normalization without running provider services.
 
 ## Execution Rules
 

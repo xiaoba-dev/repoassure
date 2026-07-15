@@ -54,6 +54,39 @@ describe('hardening MCP server', () => {
     await server.close();
   });
 
+  it('discovers and imports normalized security evidence over MCP transport', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-mcp-security-transport-'));
+    const runDir = join(root, '.hardening', 'runs', 'run-security-transport');
+    const { server, transport } = await connectMcpServer();
+
+    try {
+      const tools = await listTools(transport, 5);
+      expect(tools.map((tool) => tool.name)).toEqual(expect.arrayContaining([
+        'list_security_providers',
+        'import_security_evidence'
+      ]));
+
+      const listed = await callTool(transport, 6, 'list_security_providers', {});
+      expect(readArray(listed.providers).map((provider) => readRecord(provider).id)).toContain('codex-security');
+
+      const imported = await callTool(transport, 7, 'import_security_evidence', {
+        provider: 'codex-security',
+        sourcePath: join(process.cwd(), 'fixtures/security/codex-security-basic'),
+        repoRoot: root,
+        runDir
+      });
+      expect(imported.findingCount).toBe(1);
+      expect(readRecord(imported.repairPlanningHandoff)).toMatchObject({
+        status: 'ready',
+        reviewBoundary: { autoApply: false, targetMutation: false, maintainerReviewRequired: true }
+      });
+      await expect(readFile(join(runDir, 'security', 'security-findings.json'), 'utf8'))
+        .resolves.toContain('codex-security');
+    } finally {
+      await server.close();
+    }
+  });
+
   it('runs the P0 hardening tool chain over MCP transport', async () => {
     const root = await createServerRepo();
     const { server, transport } = await connectMcpServer();

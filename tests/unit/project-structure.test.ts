@@ -641,7 +641,7 @@ describe('project structure', () => {
     expect(closure).toContain('No public launch or production marketing announcement was executed');
     expect(closure).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was executed');
     expect(plan).toMatch(
-      /## Next Codex Goal\n\nSecurity Assurance Lane Provider Import Ergonomics v0\.1/u
+      /## Next Codex Goal\n\nSecurity Assurance Lane Provider Format Fixture Contracts v0\.1/u
     );
     expect(plan).toMatch(
       /## Public Release Manual Gate Closure v0\.2\n\nStatus: completed_reconciled\./u
@@ -5543,7 +5543,7 @@ describe('project structure', () => {
     expect(openCoreSpec).not.toContain('| `packages/repair-planner` | Open core target | Future repair plan and task package package |');
 
     expect(securityLaneSpec).toContain('# Security Assurance Lane Spec v0.1');
-    expect(securityLaneSpec).toContain('Status: Draft');
+    expect(securityLaneSpec).toContain('Status: Accepted');
     expect(securityLaneSpec).toContain('Source ADR: [ADR-0013](../../adr/0013-codex-security-and-security-assurance-lane.md)');
     expect(securityLaneSpec).toContain('Codex Security is the preferred first provider');
     expect(securityLaneSpec).toContain('Provider provenance');
@@ -6959,6 +6959,81 @@ describe('project structure', () => {
     expect(feedbackIntake).not.toContain('@');
     expect(trackedDocs).toContain('waiting_for_reviewer_feedback');
     expect(feedbackIntake).not.toContain('accepted / changes_requested / blocked');
+  });
+
+  it('records Security Assurance provider import ergonomics and advances the local-only execution queue', async () => {
+    const [
+      operation,
+      completedGoal,
+      plan,
+      securitySpec,
+      backlogExecution,
+      readme,
+      packageReadme,
+      testStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      securityImportBlockersLog
+    ] = await Promise.all([
+      readFile('docs/operations/security-assurance-lane-provider-import-ergonomics-v0.1.md', 'utf8'),
+      readFile('docs/goals/completed/2026-07-14-security-assurance-lane-provider-import-ergonomics-v0.1.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/specs/security-assurance-lane-spec-v0.1.md', 'utf8'),
+      readFile('docs/operations/product-website-user-validation-backlog-execution-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('packages/security-assurance/README.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('docs/logs/blockers.md', 'utf8')
+    ]);
+
+    expect(operation).toContain('Security Assurance Lane Provider Import Ergonomics v0.1');
+    expect(operation).toContain('Status: implemented_local_only');
+    expect(operation).toContain('hardening security providers');
+    expect(operation).toContain('list_security_providers');
+    expect(operation).toContain('import_security_evidence');
+    expect(operation).toContain('repoassure.normalized-security-scan.v1');
+    expect(operation).toContain('repairPlanningHandoff');
+    expect(operation).toContain('scan_file_missing');
+    expect(operation).toContain('run_dir_invalid');
+    expect(operation).toContain('severity_invalid');
+    expect(operation).toContain('10 MiB');
+    expect(operation).toContain('Untrusted Provider Content');
+    expect(operation).toContain('Native provider formats are not accepted');
+    expect(operation).toContain('No Action Authorization Receipt was produced');
+    expect(completedGoal).toContain('状态：已完成');
+    expect(completedGoal).toContain('RED');
+    expect(completedGoal).toContain('GREEN');
+    expect(plan).toContain('- Security Assurance Lane Provider Import Ergonomics v0.1.');
+    expect(plan).toContain('Security Assurance Lane Provider Format Fixture Contracts v0.1');
+    expect(securitySpec).toContain('Status: Accepted');
+    expect(securitySpec).toContain('hardening security providers');
+    expect(securitySpec).toContain('list_security_providers');
+    expect(securitySpec).toContain('provider_unsupported');
+    expect(securitySpec).toContain('scan_schema_invalid');
+    expect(securitySpec).toContain('scan_file_too_large');
+    expect(securitySpec).toContain('symbolic-link');
+    expect(backlogExecution).toContain('| `verified_implemented` | Security Assurance Lane Phase 1 provider import ergonomics |');
+    expect(backlogExecution).toContain('Security Assurance Lane Provider Format Fixture Contracts v0.1');
+    expect(readme).toContain('hardening security providers');
+    expect(readme).toContain('list_security_providers');
+    expect(packageReadme).toContain('security-provider-contracts');
+    expect(packageReadme).toContain('Native provider formats are not accepted');
+    expect(packageReadme).toContain('create-only');
+    expect(testStrategy).toContain('Security Assurance Lane Provider Import Ergonomics v0.1');
+    expect(testStrategy).toContain('tests/integration/mcp-real-client.test.ts');
+    expect(testStrategy).toContain('symbolic-link rejection');
+    expect(acceptanceChecklist).toContain('Security Assurance Lane Provider Import Ergonomics v0.1');
+    expect(decisionLog).toContain('Security Assurance Lane provider import ergonomics');
+    expect(decisionLog).toContain('create-only writes');
+    expect(devLog).toContain('Security Assurance Lane Provider Import Ergonomics v0.1');
+    expect(devLog).toContain('untrusted review evidence');
+    expect(devLog).toContain('multiline provider Markdown/prompt injection');
+    expect(securityImportBlockersLog).toContain('Security import parent-directory TOCTOU residual risk');
+    expect(securityImportBlockersLog).toContain('local trusted-maintainer threat model');
   });
 });
 

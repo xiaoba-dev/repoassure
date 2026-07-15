@@ -1,5 +1,39 @@
 # 开发日志
 
+## 2026年7月14日 - Security Assurance Lane Provider Import Ergonomics v0.1
+
+### 完成内容
+
+- 在基于最新 `origin/main` 的隔离 worktree 中新增 `security-provider-contracts` package subpath，统一六-provider normalized-envelope catalog 与稳定预检错误。
+- importer 在创建 output 前校验 provider、`scan.json`、JSON root、provider binding 和 findings array，错误不回显完整 source path 或输入内容。
+- CLI 新增 `hardening security providers`，完善 help、精确缺参、unsupported provider 和安全 import error guidance。
+- `runSecurityImportTool` 返回 `repairPlanningHandoff`；MCP 新增 `list_security_providers` 和 `import_security_evidence`。
+- compiled CLI、in-process MCP transport、官方 SDK real stdio client 均覆盖 list/import/handoff/error boundary。
+- 独立复审发现 severity mapping、untrusted verification、metadata redaction、runDir containment、unsafe read error 和 schema/finding validation 六类缺口；通过新增 RED tests 后完成最小修复。
+- 修复后 `scan.json` 必须声明 `repoassure.normalized-security-scan.v1`，P0-P3 不再误降级；所有 provenance metadata/id 先脱敏，输出仅允许真实 repo-local `.hardening/` descendant 且使用 create-only writes。
+- Provider remediation/verification 只保留为标记后的 untrusted review evidence，不再进入 repair intent、required command 或 AI IDE handoff command。
+- 二次独立复审发现 invalid/P3 severity fail-open 与 multiline provider Markdown/prompt injection 两个 P1；新增 RED tests 后，非法 severity 改为 `severity_invalid`，P3 进入 repair task summary，provider free text 单行化且 prompt 先声明 trust boundary。
+- 同轮关闭低成本 P2：scan input 使用 no-follow regular-file handle 与 10 MiB 上限；secret-bearing provider IDs 使用脱敏标记加 12 位 SHA-256 后缀避免 findingId 碰撞。
+- 最终独立复审仍发现 whole-artifact trust warning ordering P1，以及 taskId collision 和 malformed field tolerance P2；通过 RED tests 后，security task 在 provider content 前输出 `trustBoundary`，使用通用标题并字面化 Markdown，taskId 从 normalized `findingId` 派生，required/optional finding fields 改为 fail closed。
+- 最终复核追加两个 P2 RED：普通 `A/B` 与 `A B` provider id 会发生 slug collision，裸 URL 会被 Markdown 自动链接；所有 normalized ids 追加 12 位内容摘要并对 URL/email autolink 做实体中和后转绿。
+
+### TDD 记录
+
+- RED：共享 contract 模块不存在；GREEN：新增 catalog、typed error 与 package export。
+- RED：CLI 缺少 handoff/list/help/精确缺参/稳定错误；GREEN：复用共享 contract 并重建 compiled runtime。
+- RED：MCP 无两个 security tools；GREEN：新增 strict closed-world schemas、routing 和 text-only safe errors。
+- MCP server 的既有 boot chain 在 sandbox 内因 `listen EPERM` 失败；读取 `boot-result.json` 确认根因后，在允许 loopback 的环境原命令通过 30/30 tests，没有修改无关 boot 代码。
+- RED：结构测试因 provider ergonomics operation record 缺失失败；GREEN：完成 architecture、operations、PLAN、README、testing、acceptance、goal 与 logs 级联。
+- Review RED：新增 11 个安全边界用例后出现 10 个预期失败，并单独验证 existing evidence overwrite RED；实现修复、重建 compiled packages 后，security/CLI/MCP focused suite 3 files / 82 tests GREEN。
+- Final：typecheck、lint、repo hygiene、release check 通过；unit 67 files / 810 tests 通过；full suite 106 files / 895 tests 通过且仅 1 个 optional file/test 跳过；goal audit 35/35 通过。
+- Final independent delta review：P0/P1/P2 均为 0；parent-directory TOCTOU 在 local trusted-maintainer threat model 下保持已记录的非阻断残余风险。
+
+### 边界与下一步
+
+- Native provider formats are not accepted；本轮不运行 scanner/provider service、不上传 source/report、不修改 target repo。
+- 未执行 release、launch、customer contact、pricing/spend、visibility change 或 hosted/commercial availability claim。
+- 下一 Goal：`Security Assurance Lane Provider Format Fixture Contracts v0.1`。
+
 ## 2026年7月14日 - Product / Website / User Validation Backlog Execution v0.1
 
 - 在隔离 worktree 复核 Product Backlog Prioritization v0.1 的五个运行时、产品 validation queue、官网 post-domain verification 和 private-preview triage boundary。

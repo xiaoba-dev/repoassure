@@ -1,3 +1,10 @@
+import {
+  formatSecurityImportError,
+  listSecurityProviderDescriptors,
+  parseSecurityProvider as parseSecurityProviderId,
+  type SecurityProvider
+} from '@hardening-mcp/security-assurance/security-provider-contracts';
+
 import { version } from '../../index.js';
 import { runAnalyzeRepoTool } from '../../tools/analyze-repo-tool.js';
 import { runExploreAppTool } from '../../tools/explore-app-tool.js';
@@ -44,7 +51,7 @@ export interface GenerateRepairPlanCliOptions {
 }
 
 export interface SecurityImportCliOptions {
-  provider?: 'codex-security' | 'codeql' | 'semgrep' | 'gitleaks' | 'osv' | 'manual-import';
+  provider?: SecurityProvider;
   scanDir?: string;
   repoRoot?: string;
   runDir?: string;
@@ -103,8 +110,17 @@ export async function runCli(args: string[], io: CliIO): Promise<number> {
 }
 
 async function runSecurity(args: string[], io: CliIO): Promise<number> {
+  if (args[0] === 'providers') {
+    if (args.length > 1) {
+      writeCliError(io, `Unexpected argument: ${args[1]}`);
+      return 1;
+    }
+    io.writeStdout(formatCliJsonOutput({ providers: listSecurityProviderDescriptors() }));
+    return 0;
+  }
+
   if (args[0] !== 'import') {
-    writeCliError(io, args[0] ? `Unknown security subcommand: ${args[0]}` : 'Missing required security subcommand: import');
+    writeCliError(io, args[0] ? `Unknown security subcommand: ${args[0]}` : 'Missing required security subcommand: import or providers');
     return 1;
   }
 
@@ -114,7 +130,13 @@ async function runSecurity(args: string[], io: CliIO): Promise<number> {
     return 1;
   }
   if (!options.provider || !options.scanDir || !options.repoRoot || !options.runDir) {
-    writeCliError(io, 'Missing required options: --provider, --scan-dir, --repo, --run-dir');
+    const missingOptions = [
+      !options.provider ? '--provider' : undefined,
+      !options.scanDir ? '--scan-dir' : undefined,
+      !options.repoRoot ? '--repo' : undefined,
+      !options.runDir ? '--run-dir' : undefined
+    ].filter((option): option is string => Boolean(option));
+    writeCliError(io, `Missing required options: ${missingOptions.join(', ')}`);
     return 1;
   }
 
@@ -128,8 +150,8 @@ async function runSecurity(args: string[], io: CliIO): Promise<number> {
     io.writeStdout(formatCliJsonOutput(result));
     return 0;
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    writeCliError(io, `Failed to import security evidence: ${message}`);
+    const formatted = formatSecurityImportError(error);
+    writeCliError(io, `Security import failed [${formatted.code}]: ${formatted.message} Guidance: ${formatted.guidance}`);
     return 1;
   }
 }
@@ -461,14 +483,20 @@ Options:
     return `hardening security
 
 Usage:
+  hardening security providers
   hardening security import --provider <provider> --scan-dir <dir> --repo <repo> --run-dir <dir>
 
 Options:
-  --provider <provider>  Security provider id. Phase 1 supports codex-security fixtures.
-  --scan-dir <dir>       Local provider scan directory containing scan.json.
+  --provider <provider>  Provider id returned by hardening security providers.
+  --scan-dir <dir>       Local directory containing normalized scan.json.
   --repo <repo>          Path to the target repository.
-  --run-dir <dir>        Existing or new RepoAssure run directory.
+  --run-dir <dir>        New or artifact-empty directory below <repo>/.hardening/; symbolic links are rejected.
   --help, -h             Show this help.
+
+Input contract:
+  Schema: repoassure.normalized-security-scan.v1
+  Output artifacts are create-only and never overwrite prior evidence.
+  Native provider formats are not accepted. Normalize evidence into scan.json before import.
 
 `;
   }
@@ -497,9 +525,11 @@ export function parseSecurityImportOptions(args: string[]): SecurityImportCliOpt
       if (value.error) {
         error = value.error;
       } else if (value.value) {
-        provider = parseSecurityProvider(value.value) ?? provider;
-        if (!parseSecurityProvider(value.value)) {
-          error = `Unsupported security provider: ${value.value}`;
+        try {
+          provider = parseSecurityProviderId(value.value);
+        } catch (providerError) {
+          const formatted = formatSecurityImportError(providerError);
+          error = `[${formatted.code}] ${formatted.message} Run hardening security providers and provide a normalized scan.json.`;
         }
       }
       continue;
@@ -554,21 +584,6 @@ export function parseSecurityImportOptions(args: string[]): SecurityImportCliOpt
     ...(runDir ? { runDir } : {}),
     ...(error ? { error } : {})
   };
-}
-
-function parseSecurityProvider(value: string): SecurityImportCliOptions['provider'] | undefined {
-  if (
-    value === 'codex-security' ||
-    value === 'codeql' ||
-    value === 'semgrep' ||
-    value === 'gitleaks' ||
-    value === 'osv' ||
-    value === 'manual-import'
-  ) {
-    return value;
-  }
-
-  return undefined;
 }
 
 export function parseGenerateRepairPlanOptions(args: string[]): GenerateRepairPlanCliOptions {

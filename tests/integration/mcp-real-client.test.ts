@@ -171,6 +171,71 @@ describe('real stdio MCP client consumption', () => {
     expect(isProcessAlive(pid)).toBe(false);
   }, 60_000);
 
+  it('discovers and consumes security provider import through a real stdio client', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-real-mcp-security-'));
+    const runDir = join(root, '.hardening', 'runs', 'run-real-security');
+    const connection = await connectRealMcpClient({
+      args: [resolve('dist/adapters/mcp/index.js')]
+    });
+    const pid = connection.pid;
+
+    try {
+      const listedTools = await connection.client.listTools({}, { timeout: MCP_REQUEST_TIMEOUT_MS });
+      expect(listedTools.tools.map((tool) => tool.name)).toEqual(expect.arrayContaining([
+        'list_security_providers',
+        'import_security_evidence'
+      ]));
+
+      const providers = await connection.client.callTool({
+        name: 'list_security_providers', arguments: {}
+      }, undefined, { timeout: MCP_REQUEST_TIMEOUT_MS });
+      expect(providers.isError).not.toBe(true);
+      expect(readRecord(providers.structuredContent)).toMatchObject({
+        providers: expect.arrayContaining([expect.objectContaining({ id: 'codex-security' })])
+      });
+
+      const imported = await connection.client.callTool({
+        name: 'import_security_evidence',
+        arguments: {
+          provider: 'codex-security',
+          sourcePath: resolve('fixtures/security/codex-security-basic'),
+          repoRoot: root,
+          runDir
+        }
+      }, undefined, { timeout: MCP_REQUEST_TIMEOUT_MS });
+      expect(imported.isError).not.toBe(true);
+      expect(readRecord(imported.structuredContent)).toMatchObject({
+        findingCount: 1,
+        repairPlanningHandoff: {
+          mcp: { tool: 'generate_repair_plan' },
+          reviewBoundary: { targetMutation: false }
+        }
+      });
+      await expect(readFile(join(runDir, 'security', 'security-findings.json'), 'utf8'))
+        .resolves.toContain('codex-security');
+
+      const failed = await connection.client.callTool({
+        name: 'import_security_evidence',
+        arguments: {
+          provider: 'codex-security',
+          sourcePath: join(root, 'TOKEN=real-mcp-secret'),
+          repoRoot: root,
+          runDir: join(root, '.hardening', 'runs', 'run-real-security-error')
+        }
+      }, undefined, { timeout: MCP_REQUEST_TIMEOUT_MS });
+      expect(failed.isError).toBe(true);
+      expect(failed.structuredContent).toBeUndefined();
+      expect(readText(failed)).toContain('scan_file_missing');
+      expect(readText(failed)).toContain('Guidance:');
+      expect(readText(failed)).not.toContain('real-mcp-secret');
+      expect(connection.stderr()).toBe('');
+    } finally {
+      await connection.close();
+    }
+
+    expect(isProcessAlive(pid)).toBe(false);
+  }, 30_000);
+
   it('captures a redacted fatal stderr message when the server exits before initialization', async () => {
     let caught: Error | null = null;
     try {

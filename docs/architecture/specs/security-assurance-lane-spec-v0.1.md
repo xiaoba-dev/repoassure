@@ -1,6 +1,6 @@
 # Security Assurance Lane Spec v0.1
 
-Status: Draft
+Status: Accepted
 Date: 2026-06-23
 Source ADR: [ADR-0013](../../adr/0013-codex-security-and-security-assurance-lane.md)
 
@@ -20,14 +20,14 @@ RepoAssure should still support a provider-neutral lane:
 
 ```text
 Security Assurance Lane
-  Provider adapters
+  Normalized-envelope provider ids
     codex-security
     codeql
     semgrep
     gitleaks
     osv
-    browser-security
     manual-import
+  Future native-format adapters
   Evidence normalization
   RepoAssure artifacts
   Repair plan integration
@@ -36,7 +36,7 @@ Security Assurance Lane
 
 ## Provider Interface
 
-A provider adapter should convert provider-native output into a normalized security evidence bundle.
+A future native provider adapter should convert provider-native output into a normalized security evidence bundle. The implemented v0.1 importer consumes only a RepoAssure normalized `scan.json` envelope; listing a provider id does not claim native-format support.
 
 Minimal provider contract:
 
@@ -61,7 +61,15 @@ repoassure security import --provider codex-security --scan-dir <scan-dir>
 
 The current implementation name may expose this through `hardening` first, but user-facing docs should keep the RepoAssure product language.
 
-Phase 1 implementation note: the current internal CLI exposes `hardening security import --provider codex-security --scan-dir <dir> --repo <repo> --run-dir <dir>` through `@hardening-mcp/security-assurance`. It imports local provider scan directories, writes redacted run-scoped security artifacts, and does not invoke Codex Security runtime, run scanners, fetch remote provider state, upload target repo data, create external records, or modify target repo source.
+Phase 1 implementation note: the current CLI exposes `hardening security providers` and `hardening security import --provider <provider> --scan-dir <dir> --repo <repo> --run-dir <dir>` through `@hardening-mcp/security-assurance`. MCP exposes `list_security_providers` and `import_security_evidence`. Both surfaces reuse one package-owned catalog for `codex-security`, `codeql`, `semgrep`, `gitleaks`, `osv`, and `manual-import`.
+
+The importer does not invoke Codex Security runtime or any other scanner runtime. Provider ids record provenance only.
+
+Every implemented provider descriptor declares schema `repoassure.normalized-security-scan.v1`, required file `scan.json`, `supportStatus: normalized-envelope`, and `nativeFormatSupport: false`. The importer requires that exact schema declaration, a regular non-symbolic-link file no larger than 10 MiB, object-valued entries in the `findings` array, recognized P0-P3/provider severity values, non-empty `title`, `category`, and `path` strings, an `evidence` string array, and correctly typed optional fields. Malformed normalized findings fail closed before output writes. Native provider formats are not accepted.
+
+Preflight fails before output writes with stable codes `provider_unsupported`, `scan_file_missing`, `scan_file_unreadable`, `scan_file_too_large`, `scan_json_invalid`, `scan_root_invalid`, `scan_schema_invalid`, `provider_mismatch`, `findings_invalid`, `severity_invalid`, `run_dir_invalid`, and `output_write_failed`. CLI/MCP guidance does not echo the full source path or provider content. Output is restricted to a real descendant of `<repo>/.hardening/`; symbolic-link traversal and artifact replacement are rejected.
+
+A successful tool result includes `repairPlanningHandoff` with `securityFindingsPath`, CLI `hardening plan` argv, MCP `generate_repair_plan` arguments, and explicit `autoApply: false`, `targetMutation: false`, and `maintainerReviewRequired: true` boundaries.
 
 ## Normalized Finding Contract
 
@@ -80,7 +88,7 @@ Each imported security finding should preserve provider provenance and map into 
 | `attackPath` | No | Provider attack-path summary when available |
 | `validationStatus` | No | `validated`, `suspected`, `suppressed`, `not_applicable`, or `deferred` |
 | `remediation` | No | Provider or RepoAssure remediation guidance |
-| `verification` | No | Suggested verification commands or manual checks |
+| `verification` | No | Untrusted provider suggestions retained as review evidence; never executable commands without maintainer approval |
 
 ## Provider Provenance
 
@@ -93,7 +101,7 @@ Provider provenance must survive every transformation:
 - handoff packages
 - patch plans
 
-RepoAssure must not rewrite provider evidence in a way that makes it appear natively discovered by RepoAssure. Provider ids, source artifact paths, scan timestamps, target revision, and known limitations should remain visible in machine-readable artifacts.
+RepoAssure must not rewrite provider evidence in a way that makes it appear natively discovered by RepoAssure. Provider ids, redacted source artifact references, scan timestamps, redacted target revision, and known limitations should remain visible in machine-readable artifacts.
 
 ## Local-First Evidence Handling
 
@@ -102,7 +110,7 @@ Security evidence import is local-first:
 - Read provider output from local files or explicit local scan directories.
 - Do not upload target code, provider reports, screenshots, traces, logs, env values, or secrets.
 - Do not fetch remote provider state unless a future ADR explicitly approves a remote integration.
-- Store normalized artifacts in the target repo hardening run bundle or a workspace output directory.
+- Store normalized artifacts only in a real target repo `.hardening/` run directory; reject symbolic-link traversal and existing artifact replacement.
 - Preserve raw provider artifacts by local reference where possible instead of copying large sensitive files into this repo.
 
 ## Redaction Requirements
@@ -115,6 +123,9 @@ All imported provider text is untrusted and may contain secrets. Before writing 
 - URL userinfo and sensitive query or fragment parameters
 - local paths when rendered in user-facing handoff commands
 - provider evidence snippets
+- provider version, target revision, source path, provider finding id, and coverage metadata
+
+All provider free text is untrusted data. Repair planning must single-line provider text before prompt rendering, render it as literal text in Markdown, neutralize bare URL/email autolinks, expose an explicit machine-readable `trustBoundary` before any provider-controlled task content, use a RepoAssure-owned generic task title, and preserve P0-P3 findings in the repair task summary. Every normalized provider id must include a content-derived digest so distinct raw ids cannot collide after slug normalization; security repair task identity must derive from that normalized `findingId`, not a redacted provider-native id. Remediation and verification suggestions may remain explicitly labeled evidence, but must not be copied into `repairIntent`, `verification.commands`, required verification actions, or handoff commands without a separate maintainer decision.
 - remediation text copied from provider reports
 
 Raw provider artifacts may remain in their original provider scan directory, but RepoAssure-generated artifacts must be redacted.
@@ -163,13 +174,14 @@ Security tasks should not automatically outrank runtime P0 failures unless sever
 
 ## Acceptance and Goal Audit
 
-When implemented, goal audit should verify:
+Goal and structure audit verify:
 
 - security imports are local-first
 - provider provenance exists
 - generated artifacts are redacted
 - security findings can feed repair plan and repair task package outputs
-- unsupported provider formats fail with structured blockers
+- unsupported providers and malformed normalized envelopes fail with stable, redacted guidance before output writes
+- CLI and MCP expose the same provider catalog and repair-planning handoff
 
 Security imports should not be required for the current MVP acceptance gate. Phase 1 is an optional lane unless a later ADR changes the product scope.
 
@@ -185,7 +197,7 @@ Security imports should not be required for the current MVP acceptance gate. Pha
 
 ## Follow-up
 
-- Extend the current Codex Security local scan directory importer beyond fixture-style `scan.json` when real provider output formats are available.
-- Add fixture provider outputs before runtime implementation.
+- Execute `Security Assurance Lane Provider Format Fixture Contracts v0.1` to add sanitized, versioned provider-format fixtures before native adapter implementation.
+- Extend the normalized importer only after the relevant native format contract is reviewed.
 - Extend repair-plan tests with security evidence types.
-- Update goal audit only when provider import becomes implemented behavior.
+- Keep native format support false until adapter behavior has dedicated tests and documentation.

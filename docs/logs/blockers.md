@@ -1,5 +1,25 @@
 # 阻塞日志
 
+## 2026年7月14日 - Security import parent-directory TOCTOU residual risk
+
+### 背景
+
+Security Assurance Lane provider importer 已限制 output 到 repo-local `.hardening/`，逐段拒绝静态 symbolic link，并使用 create-only `wx` 写入保护既有 evidence。二次独立复审指出，Node.js 路径 API 的 `lstat -> mkdir/write` 之间仍存在父目录被本机并发对抗进程替换的 TOCTOU 窗口。
+
+### 当前状态
+
+- 这不是正常 maintainer/AI IDE 工作流中的产品阻塞，也不影响本轮静态 containment 验收。
+- 当前实现不宣称能抵御已获得同机文件系统写权限的并发恶意进程。
+- 完全关闭需要基于 directory file descriptor 的 `openat`/`mkdirat`/`renameat` 与 no-follow 语义，Node.js 当前跨平台 API 无法完整表达该链路。
+
+### 后续条件
+
+若产品未来把 importer 放入多租户或不可信本机进程共享环境，应单独设计 native helper、隔离 sandbox 或每次导入独占的受控 artifact root，并补充并发攻击测试。在此之前保持 local trusted-maintainer threat model。
+
+### 边界
+
+本记录不授权上传 provider evidence、修改 target source、发布、launch、客户联系、pricing/spend、repository visibility change 或 hosted/commercial availability claim。
+
 ## 2026年7月1日 - Public release branch protection gate remains blocked by private repo plan
 
 ### 背景

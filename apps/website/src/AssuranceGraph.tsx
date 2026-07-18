@@ -42,7 +42,12 @@ export function AssuranceGraph({ copy }: AssuranceGraphProps) {
         {copy.nodes.map((node) => {
           const NodeIcon = graphIcons[node.id];
           return (
-            <li className="graph-chain-fallback-item" data-variant={node.variant} key={node.id}>
+            <li
+              className="graph-chain-fallback-item"
+              data-variant={node.variant}
+              data-reachability={node.reachability}
+              key={node.id}
+            >
               <div>
                 <NodeIcon size={16} aria-hidden="true" />
                 <strong>{node.label}</strong>
@@ -50,6 +55,14 @@ export function AssuranceGraph({ copy }: AssuranceGraphProps) {
               <span>
                 <Check size={14} aria-hidden="true" />
                 {node.status}
+                {/* Patch plan and acceptance are pnpm scripts inside this repository, not
+                    commands the distributed CLI exposes. Saying so keeps the graph from
+                    implying a chain the product does not ship. */}
+                <em className="graph-node-reachability">
+                  {node.reachability === 'cli'
+                    ? copy.reachabilityLabels.cli
+                    : copy.reachabilityLabels.internal}
+                </em>
               </span>
             </li>
           );

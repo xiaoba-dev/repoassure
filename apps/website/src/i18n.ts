@@ -43,11 +43,19 @@ export type AssuranceGraphCopy = {
   verifiedLabel: string;
   generatedLabel: string;
   producesLabel: string;
+  /* Reachability is shown because the graph previously implied the whole chain ships in
+     the CLI. Patch plan and acceptance are internal pnpm scripts in this repository, not
+     commands a user of the distributed CLI can run. */
+  reachabilityLabels: {
+    cli: string;
+    internal: string;
+  };
   nodes: Array<{
     id: 'docs' | 'code' | 'tests' | 'adrs' | 'repair' | 'patch' | 'acceptance';
     label: string;
     status: string;
     variant: 'verified' | 'generated' | 'accepted';
+    reachability: 'cli' | 'internal';
   }>;
 };
 
@@ -62,6 +70,7 @@ type WebsiteCopy = {
   };
   nav: {
     howItWorks: string;
+    answers: string;
     assuranceGraph: string;
     artifacts: string;
     openCore: string;
@@ -83,6 +92,23 @@ type WebsiteCopy = {
       label: string;
       value: string;
     }>;
+  };
+  answers: {
+    label: string;
+    heading: string;
+    intro: string;
+    items: Array<{
+      id: 'ready' | 'evidence' | 'blocking' | 'next';
+      question: string;
+      text: string;
+      value: string;
+      highlight: string;
+    }>;
+  };
+  roles: {
+    label: string;
+    heading: string;
+    intro: string;
   };
   assuranceGraph: AssuranceGraphCopy;
   assuranceGraphSection: {
@@ -200,6 +226,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
     },
     nav: {
       howItWorks: 'How it works',
+      answers: 'What it answers',
       assuranceGraph: 'Assurance Graph',
       artifacts: 'Proof artifacts',
       openCore: 'Open core',
@@ -209,8 +236,8 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
     },
     hero: {
       status: 'Local-first by design',
-      heading: 'Assure every AI-generated repo before it ships',
-      lede: 'Content-hashed local evidence, repair plans, and acceptance decisions for AI-generated repositories.',
+      heading: 'Is this AI-generated repo ready to ship?',
+      lede: 'RepoAssure boots your app, drives it with real Chromium, and turns what breaks into a readiness score, an evidence bundle, and a repair plan your AI IDE can execute. Entirely on your machine.',
       highlight:
         'Verified inputs become content-hashed artifacts and local acceptance decisions — without leaving your machine.',
       primaryCta: 'Join private preview',
@@ -224,20 +251,62 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
         { label: 'Evidence bundle', value: '.hardening/latest/manifest.json' }
       ]
     },
+    answers: {
+      label: 'What it answers',
+      heading: 'Four questions a reviewer actually asks',
+      intro:
+        'Every run answers the same four questions, with evidence attached to each answer. Figures below come from a recorded benchmark run.',
+      items: [
+        {
+          id: 'ready',
+          question: 'Is this repo ready to ship?',
+          text: 'Readiness starts at 100 and deducts per finding: 35 for a P0, 15 for a P1, 5 for a P2, 25 if the app never booted. The formula is published, so the number can be checked.',
+          value: 'readiness · P0: 0 · P1: 1',
+          highlight: '85'
+        },
+        {
+          id: 'evidence',
+          question: 'What evidence proves it?',
+          text: 'Each run writes an evidence bundle. Every artifact records a content fingerprint, so anyone can recompute it on another machine and confirm nothing changed.',
+          value: 'artifacts · all verified',
+          highlight: '4'
+        },
+        {
+          id: 'blocking',
+          question: 'What is still blocking acceptance?',
+          text: 'Findings are grouped by severity and reviewer impact, each with reproduction steps and captured evidence rather than a bare warning.',
+          value: 'P1 finding · no P0 blockers',
+          highlight: '1'
+        },
+        {
+          id: 'next',
+          question: 'What should the AI IDE fix first?',
+          text: 'The repair plan is ordered and carries a root-cause hypothesis, target areas, and verification commands. An AI IDE consumes it directly instead of guessing.',
+          value: 'repair action · sequenced for handoff',
+          highlight: '1'
+        }
+      ]
+    },
+    roles: {
+      label: 'Delivery roles',
+      heading: 'Who reads what, locally',
+      intro: 'The same bundle serves four readers. None of them has to trust the other three.'
+    },
     assuranceGraph: {
       label: 'Assurance Graph',
       centerLabel: 'All checks verified',
       verifiedLabel: 'Verified',
       generatedLabel: 'Generated',
       producesLabel: 'Produces',
+      reachabilityLabels: { cli: 'In the CLI', internal: 'Internal tooling' },
       nodes: [
-        { id: 'docs', label: 'Docs', status: 'Verified', variant: 'verified' },
-        { id: 'code', label: 'Code', status: 'Verified', variant: 'verified' },
-        { id: 'tests', label: 'Tests', status: 'Verified', variant: 'verified' },
-        { id: 'adrs', label: 'ADRs', status: 'Verified', variant: 'verified' },
-        { id: 'repair', label: 'Repair Plan', status: 'Generated', variant: 'generated' },
-        { id: 'patch', label: 'Patch Plan', status: 'Generated', variant: 'generated' },
-        { id: 'acceptance', label: 'Acceptance', status: 'Accepted', variant: 'accepted' }
+        { id: 'docs', label: 'Docs', status: 'Verified', variant: 'verified', reachability: 'cli' },
+        { id: 'code', label: 'Code', status: 'Verified', variant: 'verified', reachability: 'cli' },
+        { id: 'tests', label: 'Tests', status: 'Verified', variant: 'verified', reachability: 'cli' },
+        { id: 'adrs', label: 'ADRs', status: 'Verified', variant: 'verified', reachability: 'cli' },
+        { id: 'repair', label: 'Repair Plan', status: 'Generated', variant: 'generated', reachability: 'cli' },
+        { id: 'patch', label: 'Patch Plan', status: 'Generated', variant: 'generated', reachability: 'internal' },
+        { id: 'acceptance', label: 'Acceptance', status: 'Accepted', variant: 'accepted', reachability: 'internal' }
       ]
     },
     assuranceGraphSection: {
@@ -277,8 +346,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           timestamp: '2026-06-18 10:48:47Z',
           summary: '1 action',
           detail: 'Prioritized',
-          evidence: 'sha256: d2c7...770e'
-        },
+          evidence: 'sha256: d2c7...770e' },
         {
           id: 'patch',
           artifact: 'Patch plan',
@@ -286,8 +354,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           timestamp: '2026-06-18 10:48:47Z',
           summary: 'Patch candidates',
           detail: 'Ready to apply',
-          evidence: 'sha256: 1c9a...e3d4'
-        },
+          evidence: 'sha256: 1c9a...e3d4' },
         {
           id: 'acceptance',
           artifact: 'Acceptance',
@@ -295,8 +362,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           timestamp: '2026-06-18 10:50:02Z',
           summary: 'Risk: Low',
           detail: 'Policy: team-default',
-          evidence: 'sha256: 9e21...c5ab'
-        }
+          evidence: 'sha256: 9e21...c5ab' }
       ],
       footer: 'Every artifact is content-hashed and stored locally.',
       localNote: 'Evidence never leaves your machine.',
@@ -445,16 +511,16 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       heading: 'Your code stays with you',
       items: [
         {
-          title: 'No source upload by default',
-          text: 'All analysis and artifact generation happens locally on your machine.'
+          title: 'Two network calls, both to localhost',
+          text: 'The product makes exactly two network calls: one health probe and one page crawl, both against the app being tested. There is no third, and no telemetry SDK. Count them yourself.'
+        },
+        {
+          title: 'It cannot write to your repo',
+          text: 'Repair plans are plans. Every execution artifact carries a machine-readable no-write proof: targetRepoWriteAuthorized: false.'
         },
         {
           title: 'Tampering shows up',
           text: 'Every artifact records a content fingerprint. Recompute it on another machine and confirm nothing changed — without trusting RepoAssure.'
-        },
-        {
-          title: 'You control storage',
-          text: 'Store artifacts wherever you choose. We do not store your code.'
         }
       ]
     },
@@ -489,6 +555,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
     },
     nav: {
       howItWorks: '工作方式',
+      answers: '它回答什么',
       assuranceGraph: '保障图谱',
       artifacts: '证据物料',
       openCore: '开放核心',
@@ -498,8 +565,8 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
     },
     hero: {
       status: '本地优先设计',
-      heading: '在交付前保障每个 AI 生成仓库',
-      lede: '为 AI 生成仓库提供带内容指纹的本地证据、修复计划和验收决策。',
+      heading: '这个 AI 生成的仓库，能交付了吗？',
+      lede: 'RepoAssure 启动你的应用，用真实 Chromium 跑一遍，把出问题的地方变成就绪度评分、证据包，和你的 AI IDE 能直接执行的修复计划。全程在你的机器上。',
       highlight: '已验证输入在本地生成带内容指纹的证据与验收决策，交付链路全程可审计。',
       primaryCta: '加入私密预览',
       secondaryCta: '查看保障图谱'
@@ -512,20 +579,61 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
         { label: '证据包', value: '.hardening/latest/manifest.json' }
       ]
     },
+    answers: {
+      label: '它回答什么',
+      heading: '评审者真正会问的四个问题',
+      intro: '每次运行都回答同样四个问题，每个答案都附带证据。下面的数字来自一次真实的基准运行记录。',
+      items: [
+        {
+          id: 'ready',
+          question: '这个仓库能交付吗？',
+          text: '就绪度从 100 起扣：P0 每条 −35，P1 −15，P2 −5，应用启动失败 −25。算法公开，分数可以复核。',
+          value: '就绪度 · P0: 0 · P1: 1',
+          highlight: '85'
+        },
+        {
+          id: 'evidence',
+          question: '凭什么证据？',
+          text: '每次运行产出一个证据包。每份物料都记录内容指纹，换一台机器重算就能确认它没被改过。',
+          value: '份物料 · 全部校验通过',
+          highlight: '4'
+        },
+        {
+          id: 'blocking',
+          question: '还有什么卡着验收？',
+          text: '发现项按严重级别和评审影响分组，每条都带复现步骤和抓取到的证据，而不是一句「有问题」。',
+          value: '项 P1 · 无 P0 阻塞',
+          highlight: '1'
+        },
+        {
+          id: 'next',
+          question: '下一个 AI IDE 该先修什么？',
+          text: '修复计划已排序，带根因假设、目标区域和验证命令。AI IDE 直接消费，不用猜。',
+          value: '个动作 · 已排序待交接',
+          highlight: '1'
+        }
+      ]
+    },
+    roles: {
+      label: '交付角色',
+      heading: '谁在本地审查什么',
+      intro: '同一个证据包服务四类读者，而他们彼此之间不需要互相信任。'
+    },
     assuranceGraph: {
       label: '保障图谱',
       centerLabel: '所有检查已验证',
       verifiedLabel: '已验证',
       generatedLabel: '已生成',
       producesLabel: '生成',
+      reachabilityLabels: { cli: 'CLI 可达', internal: '内部工具' },
       nodes: [
-        { id: 'docs', label: '文档', status: '已验证', variant: 'verified' },
-        { id: 'code', label: '代码', status: '已验证', variant: 'verified' },
-        { id: 'tests', label: '测试', status: '已验证', variant: 'verified' },
-        { id: 'adrs', label: 'ADR', status: '已验证', variant: 'verified' },
-        { id: 'repair', label: '修复计划', status: '已生成', variant: 'generated' },
-        { id: 'patch', label: '补丁计划', status: '已生成', variant: 'generated' },
-        { id: 'acceptance', label: '验收决策', status: '已接受', variant: 'accepted' }
+        { id: 'docs', label: '文档', status: '已验证', variant: 'verified', reachability: 'cli' },
+        { id: 'code', label: '代码', status: '已验证', variant: 'verified', reachability: 'cli' },
+        { id: 'tests', label: '测试', status: '已验证', variant: 'verified', reachability: 'cli' },
+        { id: 'adrs', label: 'ADR', status: '已验证', variant: 'verified', reachability: 'cli' },
+        { id: 'repair', label: '修复计划', status: '已生成', variant: 'generated', reachability: 'cli' },
+        { id: 'patch', label: '补丁计划', status: '已生成', variant: 'generated', reachability: 'internal' },
+        { id: 'acceptance', label: '验收决策', status: '已接受', variant: 'accepted', reachability: 'internal' }
       ]
     },
     assuranceGraphSection: {
@@ -564,8 +672,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           timestamp: '2026-06-18 10:48:47Z',
           summary: '1 个动作',
           detail: '已排序',
-          evidence: 'sha256: d2c7...770e'
-        },
+          evidence: 'sha256: d2c7...770e' },
         {
           id: 'patch',
           artifact: '补丁计划',
@@ -573,8 +680,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           timestamp: '2026-06-18 10:48:47Z',
           summary: '补丁候选',
           detail: '可应用',
-          evidence: 'sha256: 1c9a...e3d4'
-        },
+          evidence: 'sha256: 1c9a...e3d4' },
         {
           id: 'acceptance',
           artifact: '验收决策',
@@ -582,8 +688,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           timestamp: '2026-06-18 10:50:02Z',
           summary: '风险：低',
           detail: '策略：team-default',
-          evidence: 'sha256: 9e21...c5ab'
-        }
+          evidence: 'sha256: 9e21...c5ab' }
       ],
       footer: '每份证据物料都会在本地生成内容指纹并存储。',
       localNote: '证据永远不会离开你的机器。',
@@ -722,16 +827,16 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       heading: '你的代码留在你这里',
       items: [
         {
-          title: '默认不上传源代码',
-          text: '所有分析和证据生成都在你的本地环境中完成。'
+          title: '网络调用只有两处，都打本地',
+          text: '产品代码里的网络调用总共两个：一个健康探测、一个页面爬取，都指向被测应用本身。没有第三个，也没有任何遥测 SDK。你可以自己数。'
+        },
+        {
+          title: '它不能改你的仓库',
+          text: '修复计划就只是计划。每份执行产物都带机器可读的不写入证明：targetRepoWriteAuthorized: false。'
         },
         {
           title: '改过就能看出来',
           text: '每份产出都记录了内容指纹。换一台机器重算一遍，就能确认它没被改过——不需要相信 RepoAssure。'
-        },
-        {
-          title: '你控制存储位置',
-          text: '证据物料可以存放在你选择的位置。我们不存储你的代码。'
         }
       ]
     },

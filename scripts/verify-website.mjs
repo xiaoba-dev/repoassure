@@ -163,7 +163,7 @@ try {
   const comparisonScreenshot = join(outDir, 'comparison-desktop.png');
   await comparison.screenshot({ path: comparisonScreenshot, fullPage: true });
 
-  if (heading !== 'Assure every AI-generated repo before it ships') {
+  if (heading !== 'Is this AI-generated repo ready to ship?') {
     throw new Error(`Unexpected hero heading: ${heading}`);
   }
   if (metadata.canonical !== 'https://repoassure.com/') {
@@ -175,7 +175,7 @@ try {
   if (metadata.robots !== 'index,follow') {
     throw new Error(`Unexpected robots metadata: ${metadata.robots}`);
   }
-  if (metadata.themeColor !== '#04111f') {
+  if (metadata.themeColor !== '#ffffff') {
     throw new Error(`Unexpected theme color: ${metadata.themeColor}`);
   }
   if (metadata.favicon !== '/favicon.svg' || metadata.manifest !== '/site.webmanifest') {
@@ -210,7 +210,7 @@ try {
   if (!faviconAsset.ok || !faviconAsset.text.includes('RepoAssure') || !faviconAsset.text.includes('<svg')) {
     throw new Error(`Unexpected favicon response: ${faviconAsset.status} ${faviconAsset.text.slice(0, 120)}`);
   }
-  if (!ogImageAsset.ok || !ogImageAsset.text.includes('RepoAssure') || !ogImageAsset.text.includes('Assure every AI-generated repo before it ships')) {
+  if (!ogImageAsset.ok || !ogImageAsset.text.includes('RepoAssure') || !ogImageAsset.text.includes('Is this AI-generated repo ready to ship?')) {
     throw new Error(`Unexpected og-image response: ${ogImageAsset.status} ${ogImageAsset.text.slice(0, 120)}`);
   }
   if (initialLang !== 'en') {
@@ -244,7 +244,7 @@ try {
   if (zhLang !== 'zh-CN') {
     throw new Error(`Unexpected zh-CN html lang: ${zhLang}`);
   }
-  if (zhHeading !== '在交付前保障每个 AI 生成仓库' || mobileZhHeading !== zhHeading) {
+  if (zhHeading !== '这个 AI 生成的仓库，能交付了吗？' || mobileZhHeading !== zhHeading) {
     throw new Error(`Unexpected zh-CN hero heading: ${zhHeading} / ${mobileZhHeading}`);
   }
   if (

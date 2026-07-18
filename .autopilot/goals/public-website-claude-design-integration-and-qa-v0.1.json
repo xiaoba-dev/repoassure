@@ -2,7 +2,7 @@
   "schema": "project-autopilot/goal@1",
   "id": "public-website-claude-design-integration-and-qa-v0.1",
   "title": "Public Website Claude Design Integration & QA v0.1",
-  "status": "queued",
+  "status": "completed",
   "created_at": "2026-07-18T00:00:00.000Z",
   "objective": "Rebuild the public website against RepoAssure Design System v2 and restructure its information architecture around the four questions recorded in ADR-0013, separating delivery sequence from delivery roles. Re-baseline the website guardrail suite so it asserts rendered structure and preserved guarantees rather than superseded source text.",
   "deferred_until": null,
@@ -45,5 +45,23 @@
     "target_repo_write",
     "pricing_change",
     "customer_contact"
-  ]
+  ],
+  "completed_at": "2026-07-19T01:30:00.000+08:00",
+  "integration_summary": {
+    "ia_spine": "ADR-0013 four questions",
+    "new_sections": [
+      "answers",
+      "roles"
+    ],
+    "roles_split_from_how_it_works": true,
+    "nav_items": 5,
+    "theme_default": "light",
+    "console_surface_remains_dark": true,
+    "graph_reachability_labelled": true,
+    "trust_claims_independently_verifiable": true,
+    "locales": [
+      "en",
+      "zh-CN"
+    ]
+  }
 }

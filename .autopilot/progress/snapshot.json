@@ -1,15 +1,15 @@
 {
   "schema": "project-autopilot/progress-snapshot@1",
-  "generated_at": "2026-07-19T00:20:00.000+08:00",
-  "current_stage": "RepoAssure Evidence Integrity Hashing v0.1 completed; website design integration ready",
+  "generated_at": "2026-07-19T01:30:00.000+08:00",
+  "current_stage": "Public Website Claude Design Integration & QA v0.1 completed; console redesign ready",
   "active_goal": {
-    "id": "public-website-claude-design-integration-and-qa-v0.1",
-    "title": "Public Website Claude Design Integration & QA v0.1",
+    "id": "project-intelligence-console-redesign-v0.1",
+    "title": "Project Intelligence Console Redesign v0.1",
     "status": "ready_to_execute"
   },
   "next_goal": {
-    "id": "public-website-claude-design-integration-and-qa-v0.1",
-    "title": "Public Website Claude Design Integration & QA v0.1",
+    "id": "project-intelligence-console-redesign-v0.1",
+    "title": "Project Intelligence Console Redesign v0.1",
     "status": "ready_to_execute"
   },
   "deferred_goals": [],
@@ -86,5 +86,5 @@
     "customer_contact",
     "target_repo_write"
   ],
-  "next_goal_plain_language": "下一个目标是 Public Website Claude Design Integration & QA v0.1：按 Design System v2 重建官网，并把信息架构重组为 ADR-0013 记录的四问（能否交付 / 什么证据 / 还卡着什么 / 下一个 AI IDE 先修什么），同时把交付流程与交付角色拆成独立区块。"
+  "next_goal_plain_language": "下一个目标是 Project Intelligence Console Redesign v0.1：把内部 console 从「给你看问题」改为「给你看状态与信心」，修掉 86% node_modules 噪音与新鲜度失真，并接上规格要求但从未接线的 goal audit 与发布就绪度证据。"
 }

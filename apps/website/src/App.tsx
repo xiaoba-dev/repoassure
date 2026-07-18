@@ -39,7 +39,7 @@ export function App() {
 
   return (
     <main className="site-shell" data-locale={locale}>
-      <header className="site-header theme-dark">
+      <header className="site-header theme-light">
         <a className="brand" href="#top" aria-label="RepoAssure home">
           <span className="brand-mark" aria-hidden="true">
             <ShieldCheck size={22} strokeWidth={2.4} />
@@ -60,8 +60,8 @@ export function App() {
         </button>
 
         <nav className={menuOpen ? 'nav nav-open' : 'nav'} aria-label="Primary navigation">
+          <a href="#answers">{copy.nav.answers}</a>
           <a href="#how-it-works">{copy.nav.howItWorks}</a>
-          <a href="#assurance-graph">{copy.nav.assuranceGraph}</a>
           <a href="#artifacts">{copy.nav.artifacts}</a>
           <a href="#open-core">{copy.nav.openCore}</a>
           <a href="#trust">{copy.nav.trust}</a>
@@ -89,7 +89,7 @@ export function App() {
         </div>
       </header>
 
-      <section className="hero theme-dark" id="top">
+      <section className="hero theme-light" id="top">
         <div className="hero-copy">
           <span className="status-chip">
             <Lock size={14} />
@@ -108,7 +108,7 @@ export function App() {
               {copy.hero.primaryCta}
               <ArrowRight size={18} />
             </a>
-            <a className="text-link hero-secondary-link" href="#assurance-graph">
+            <a className="text-link hero-secondary-link" href="#answers">
               {copy.hero.secondaryCta}
               <ArrowRight size={16} />
             </a>
@@ -122,6 +122,32 @@ export function App() {
 
       <div className="hero-graph-breath" aria-hidden="true" />
 
+      {/* The spine of the page. ADR-0013 records the four questions RepoAssure answers;
+          until now they appeared nowhere on the site. Figures come from a recorded
+          benchmark run, not composed numbers. */}
+      <section className="answers-section theme-light" id="answers" data-testid="answers-section">
+        <p className="section-label">{copy.answers.label}</p>
+        <h2>{copy.answers.heading}</h2>
+        <p className="section-intro">{copy.answers.intro}</p>
+        <ol className="answers-grid">
+          {copy.answers.items.map((item, index) => (
+            <li className="answer-card" key={item.id} data-answer={item.id}>
+              <span className="answer-index" aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <h3>{item.question}</h3>
+              <p>{item.text}</p>
+              {/* Split rather than inline-emphasised: copy strings carry no markup, so
+                  emphasis has to come from structure. */}
+              <p className="answer-value">
+                <span className="answer-figure">{item.highlight}</span>
+                <span className="answer-caption">{item.value}</span>
+              </p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
       <section className="assurance-graph-section theme-dark" id="assurance-graph" data-testid="assurance-graph-section">
         <div className="assurance-graph-copy">
           <p className="section-label">{copy.assuranceGraphSection.label}</p>
@@ -131,8 +157,16 @@ export function App() {
         <AssuranceGraph copy={copy.assuranceGraph} />
       </section>
 
+      {/* Sequence only. The four role cards used to sit inside this section under an i18n
+          key named `steps`, which made the section read as neither a sequence nor a cast. */}
       <section className="steps-section theme-light" id="how-it-works">
         <CliDemo copy={copy.cliDemo} />
+      </section>
+
+      <section className="roles-section theme-light" id="roles" data-testid="roles-section">
+        <p className="section-label">{copy.roles.label}</p>
+        <h2>{copy.roles.heading}</h2>
+        <p className="section-intro">{copy.roles.intro}</p>
         <div className="steps-grid steps-grid-compact">
           {copy.steps.items.map((step, index) => {
             const StepIcon = stepIcons[index] ?? ShieldCheck;
@@ -249,7 +283,7 @@ export function App() {
         </form>
       </section>
 
-      <footer className="site-footer site-footer-compact theme-dark">
+      <footer className="site-footer site-footer-compact theme-light">
         <div className="footer-main">
           <a className="footer-brand" href="#top">
             <ShieldCheck size={18} />
@@ -258,8 +292,8 @@ export function App() {
           <p>{copy.footer.description}</p>
         </div>
         <nav className="footer-links" aria-label={copy.footer.linksLabel}>
+          <a href="#answers">{copy.nav.answers}</a>
           <a href="#how-it-works">{copy.nav.howItWorks}</a>
-          <a href="#assurance-graph">{copy.nav.assuranceGraph}</a>
           <a href="#artifacts">{copy.nav.artifacts}</a>
           <a href="#trust">{copy.nav.trust}</a>
           <a href="#open-core">{copy.nav.openCore}</a>

@@ -61,6 +61,93 @@ describe('forbidden claim patterns', () => {
   });
 });
 
+describe('information architecture', () => {
+  it('states the four questions ADR-0013 records, which the site never carried before', async () => {
+    const [appSource, i18nSource] = await Promise.all([
+      readFile('apps/website/src/App.tsx', 'utf8'),
+      readFile('apps/website/src/i18n.ts', 'utf8')
+    ]);
+
+    expect(appSource).toContain('data-testid="answers-section"');
+    expect(appSource).toContain('id="answers"');
+
+    for (const question of [
+      'Is this repo ready to ship?',
+      'What evidence proves it?',
+      'What is still blocking acceptance?',
+      'What should the AI IDE fix first?'
+    ]) {
+      expect(i18nSource).toContain(question);
+    }
+    for (const question of [
+      '这个仓库能交付吗？',
+      '凭什么证据？',
+      '还有什么卡着验收？',
+      '下一个 AI IDE 该先修什么？'
+    ]) {
+      expect(i18nSource).toContain(question);
+    }
+  });
+
+  it('keeps delivery sequence and delivery roles in separate sections', async () => {
+    const appSource = await readFile('apps/website/src/App.tsx', 'utf8');
+
+    // The role cards used to live inside #how-it-works under an i18n key named `steps`,
+    // so the section read as neither a sequence nor a cast.
+    expect(appSource).toContain('data-testid="roles-section"');
+    expect(appSource).toContain('id="roles"');
+
+    const howItWorks = appSource.indexOf('id="how-it-works"');
+    const roles = appSource.indexOf('id="roles"');
+    const stepsGrid = appSource.indexOf('steps-grid');
+    expect(howItWorks).toBeGreaterThan(-1);
+    expect(roles).toBeGreaterThan(howItWorks);
+    expect(stepsGrid).toBeGreaterThan(roles);
+  });
+
+  it('marks which assurance graph nodes the distributed CLI can actually reach', async () => {
+    const [i18nSource, graphSource] = await Promise.all([
+      readFile('apps/website/src/i18n.ts', 'utf8'),
+      readFile('apps/website/src/AssuranceGraph.tsx', 'utf8')
+    ]);
+
+    // Patch plan and acceptance are pnpm scripts inside this repository. Showing them
+    // unqualified implied a chain the shipped CLI does not provide.
+    expect(graphSource).toContain('data-reachability={node.reachability}');
+    expect(graphSource).toContain('copy.reachabilityLabels.internal');
+    expect(i18nSource).toContain("reachabilityLabels: { cli: 'In the CLI', internal: 'Internal tooling' }");
+    expect(i18nSource).toContain("reachabilityLabels: { cli: 'CLI 可达', internal: '内部工具' }");
+
+    const internalNodes = i18nSource.match(/reachability: 'internal'/g) ?? [];
+    expect(internalNodes.length).toBe(4);
+  });
+
+  it('keeps primary navigation at five items', async () => {
+    const appSource = await readFile('apps/website/src/App.tsx', 'utf8');
+    const nav = appSource.slice(
+      appSource.indexOf('aria-label="Primary navigation"'),
+      appSource.indexOf('</nav>')
+    );
+    const links = nav.match(/<a href="#/g) ?? [];
+    expect(links.length).toBe(5);
+    expect(nav).toContain('#answers');
+    expect(nav).toContain('#how-it-works');
+    expect(nav).toContain('#artifacts');
+    expect(nav).toContain('#open-core');
+    expect(nav).toContain('#trust');
+  });
+
+  it('states trust boundary claims a reader can verify rather than adjectives', async () => {
+    const i18nSource = await readFile('apps/website/src/i18n.ts', 'utf8');
+
+    // Every one of these is checkable against the source by someone who does not
+    // trust the claim. That is the point.
+    expect(i18nSource).toContain('Two network calls, both to localhost');
+    expect(i18nSource).toContain('targetRepoWriteAuthorized: false');
+    expect(i18nSource).toContain('网络调用只有两处，都打本地');
+  });
+});
+
 describe('public website app', () => {
   it('ships a private-preview website package with guarded public copy', async () => {
     const [
@@ -126,7 +213,7 @@ describe('public website app', () => {
     expect(indexHtml).toContain('<meta name="twitter:card" content="summary_large_image" />');
     expect(indexHtml).toContain('<link rel="icon" type="image/svg+xml" href="/favicon.svg" />');
     expect(indexHtml).toContain('<link rel="manifest" href="/site.webmanifest" />');
-    expect(indexHtml).toContain('<meta name="theme-color" content="#04111f" />');
+    expect(indexHtml).toContain('<meta name="theme-color" content="#ffffff" />');
     expect(indexHtml).not.toContain('SaaS is available');
     expect(indexHtml).not.toContain('Team Cloud is available');
     expect(indexHtml).not.toContain('Enterprise is available');
@@ -144,7 +231,7 @@ describe('public website app', () => {
     expect(favicon).toContain('RepoAssure');
     expect(ogImage).toContain('<svg');
     expect(ogImage).toContain('RepoAssure');
-    expect(ogImage).toContain('Assure every AI-generated repo before it ships');
+    expect(ogImage).toContain('Is this AI-generated repo ready to ship?');
 
     expect(appSource).toContain('RepoAssure');
     expect(appSource).toContain('useWebsiteLocale');
@@ -206,8 +293,8 @@ describe('public website app', () => {
     expect(i18nSource).toContain('roadmapLocales');
     expect(i18nSource).toContain("'ja'");
     expect(i18nSource).toContain("'ko'");
-    expect(i18nSource).toContain('Assure every AI-generated repo before it ships');
-    expect(i18nSource).toContain('在交付前保障每个 AI 生成仓库');
+    expect(i18nSource).toContain('Is this AI-generated repo ready to ship?');
+    expect(i18nSource).toContain('这个 AI 生成的仓库，能交付了吗？');
     expect(i18nSource).toContain('加入私密预览');
     expect(i18nSource).toContain('heroRunSummary');
     expect(appSource).not.toContain('#roadmap">{copy.nav');
@@ -237,7 +324,8 @@ describe('public website app', () => {
     expect(designTokens).toContain('/* Semantic tokens */');
     expect(designTokens).toContain('/* Component tokens */');
     expect(stylesheetBundle).toContain('--brand-assurance: #009d5c');
-    expect(stylesheetBundle).toContain('--surface-hero: #04111f');
+    // Light is the default surface under Design System v2 (ADR-0022).
+    expect(stylesheetBundle).toContain('--surface-hero: #ffffff');
     expect(stylesheetBundle).toContain('--surface-page: #ffffff');
     expect(stylesheetBundle).toContain('--surface-panel: rgba(9, 24, 40, 0.84)');
     expect(stylesheetBundle).toContain('--text-primary: #111827');
@@ -285,7 +373,7 @@ describe('public website app', () => {
     expect(responsiveStyles).toContain('.graph-chain-fallback');
 
     expect(verifyWebsite).toContain('ig_04fa6cbaaebee9cb016a3d1d4ad8088191a53375bdf20065a8.png');
-    expect(verifyWebsite).toContain('Assure every AI-generated repo before it ships');
+    expect(verifyWebsite).toContain('Is this AI-generated repo ready to ship?');
     expect(verifyWebsite).toContain('assurance-graph');
     expect(verifyWebsite).toContain('desktop-focus-dark.png');
     expect(verifyWebsite).toContain('desktop-focus-light.png');
@@ -307,12 +395,12 @@ describe('public website app', () => {
     const englishSerialized = JSON.stringify(locales.en);
     const chineseSerialized = JSON.stringify(locales['zh-CN']);
 
-    expect(englishSerialized).toContain('Assure every AI-generated repo before it ships');
+    expect(englishSerialized).toContain('Is this AI-generated repo ready to ship?');
     expect(englishSerialized).toContain('View assurance graph');
     expect(englishSerialized).toContain('Evidence model · Team Cloud planned');
     expect(englishSerialized).toContain('Trust Ledger');
     expect(englishSerialized).toContain('Evidence generated locally');
-    expect(chineseSerialized).toContain('在交付前保障每个 AI 生成仓库');
+    expect(chineseSerialized).toContain('这个 AI 生成的仓库，能交付了吗？');
     expect(chineseSerialized).toContain('查看保障图谱');
     expect(chineseSerialized).toContain('证据模型 · Team Cloud 计划中');
     expect(chineseSerialized).toContain('信任账本');

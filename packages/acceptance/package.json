@@ -157,6 +157,38 @@
     "./run-repair-patch-plan": {
       "types": "./dist/run-repair-patch-plan.d.ts",
       "default": "./dist/run-repair-patch-plan.js"
+    },
+    "./run-repair-evidence-package": {
+      "types": "./dist/run-repair-evidence-package.d.ts",
+      "default": "./dist/run-repair-evidence-package.js"
+    },
+    "./run-project-intelligence-snapshot": {
+      "types": "./dist/run-project-intelligence-snapshot.d.ts",
+      "default": "./dist/run-project-intelligence-snapshot.js"
+    },
+    "./run-project-intelligence-viewer": {
+      "types": "./dist/run-project-intelligence-viewer.d.ts",
+      "default": "./dist/run-project-intelligence-viewer.js"
+    },
+    "./run-project-intelligence-backlog": {
+      "types": "./dist/run-project-intelligence-backlog.d.ts",
+      "default": "./dist/run-project-intelligence-backlog.js"
+    },
+    "./run-project-intelligence-decision-intake": {
+      "types": "./dist/run-project-intelligence-decision-intake.d.ts",
+      "default": "./dist/run-project-intelligence-decision-intake.js"
+    },
+    "./run-project-intelligence-recommendation-draft": {
+      "types": "./dist/run-project-intelligence-recommendation-draft.d.ts",
+      "default": "./dist/run-project-intelligence-recommendation-draft.js"
+    },
+    "./run-project-intelligence-maintainer-decision": {
+      "types": "./dist/run-project-intelligence-maintainer-decision.d.ts",
+      "default": "./dist/run-project-intelligence-maintainer-decision.js"
+    },
+    "./run-project-intelligence-controlled-remediation-plan": {
+      "types": "./dist/run-project-intelligence-controlled-remediation-plan.d.ts",
+      "default": "./dist/run-project-intelligence-controlled-remediation-plan.js"
     }
   }
 }

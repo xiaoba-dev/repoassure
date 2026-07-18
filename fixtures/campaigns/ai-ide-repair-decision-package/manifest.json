@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "mode": "cli",
+  "runId": "campaign-run-001",
+  "repoRoot": "/tmp/repoassure-fixture-target",
+  "artifacts": {
+    "manifestPath": "/tmp/repoassure-campaign/runs/campaign-run-001/manifest.json",
+    "hardeningReportPath": "/tmp/repoassure-campaign/runs/campaign-run-001/hardening-report.md",
+    "repairPlanPath": "/tmp/repoassure-campaign/runs/campaign-run-001/repair-plan.json",
+    "repairTaskPackagePath": "/tmp/repoassure-campaign/runs/campaign-run-001/repair-task-package.json",
+    "acceptanceRecordPath": "/tmp/repoassure-campaign/runs/campaign-run-001/user-acceptance-record.md"
+  },
+  "commandResults": [
+    {
+      "command": "pnpm",
+      "args": ["test", "--", "--runInBand"],
+      "exitCode": 1,
+      "stdout": "FAIL auth/password.test.js expected sha256 but got sha1 Authorization: Bearer ghp_real_secret_token",
+      "stderr": "",
+      "timedOut": false
+    },
+    {
+      "command": "pnpm",
+      "args": ["lint"],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "src/auth/password.js:42 weak hash algorithm Cookie: sessionid=private",
+      "timedOut": false
+    },
+    {
+      "command": "pnpm",
+      "args": ["typecheck"],
+      "exitCode": 0,
+      "stdout": "typecheck passed",
+      "stderr": "",
+      "timedOut": false
+    }
+  ],
+  "checks": [
+    {
+      "name": "Maintainer acceptance decision",
+      "required": true,
+      "status": "failed",
+      "evidence": "acceptance decision is still pending after campaign review"
+    },
+    {
+      "name": "Browser trace replay",
+      "required": true,
+      "status": "blocked",
+      "evidence": "Chromium trace replay blocked by local sandbox listen EPERM; do not mark campaign accepted"
+    },
+    {
+      "name": "Generated repair package readability",
+      "required": false,
+      "status": "passed",
+      "evidence": "repair-task-package.json and repair-plan.json were generated and reviewed"
+    }
+  ]
+}

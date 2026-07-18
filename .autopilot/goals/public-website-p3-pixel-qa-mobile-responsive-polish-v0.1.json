@@ -1,0 +1,32 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "public-website-p3-pixel-qa-mobile-responsive-polish-v0.1",
+  "title": "Public Website P3 Pixel QA & Mobile Responsive Polish v0.1",
+  "status": "completed_deferred_to_owner_design_review",
+  "created_at": "2026-07-16T00:00:00.000Z",
+  "objective": "Public Website P3 Pixel QA: resolve owner-reported desktop and mobile visual quality issues in the RepoAssure public website while preserving local-first, private-preview, and release-boundary claims.",
+  "document_basis": [
+    "docs/PLAN.md",
+    "docs/DESIGN.md",
+    "docs/design/design-system-v0.1.md",
+    "docs/design/website-uiux-roadmap-v0.2.md",
+    "docs/product/specs/public-website-spec-v0.1.md"
+  ],
+  "acceptance": [
+    "Mobile layouts do not overlap or clip visible text.",
+    "Trust Ledger and evidence preview components fit desktop, tablet, and mobile breakpoints.",
+    "Spacing and information density match security-grade, evidence-first, local-first, enterprise-calm design principles.",
+    "Website build, typecheck, unit tests, and browser verification pass or record explicit environmental blockers.",
+    "Documentation and progress snapshot are updated with verification evidence."
+  ],
+  "blocked_actions": [
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "deployment",
+    "pricing_change",
+    "customer_contact"
+  ]
+}

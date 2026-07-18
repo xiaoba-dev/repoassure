@@ -4,6 +4,8 @@ RepoAssure 是一个本地优先的 AI 代码验收与交付保障层，用于�
 
 当前实现工作区仍命名为 `hardening-mcp`：一个 Code Hardening MCP Server + CLI，用于分析、启动、探索和测试 AI 生成的 Web 应用代码，并生成硬化报告、回归测试、修复计划和 AI IDE 可消费的交接物料。
 
+Brownfield Autopilot Initialization v0.1 已将本仓库初始化为 Autopilot-managed brownfield project：`docs/PRD.md`、`docs/SPEC.md`、`docs/DESIGN.md` 和 `docs/PLAN.md` 是薄 canonical entrypoints，详细依据仍保留在现有 `docs/product/`、`docs/architecture/`、`docs/design/`、`docs/operations/`、`docs/testing/`、`docs/acceptance/` 和 `docs/adr/` 中。机器可读进度和目标状态位于 `.autopilot/progress/` 与 `.autopilot/goals/`；`.autopilot/runs/`、`.autopilot/cache/` 和 `.autopilot/secrets/` 是本地运行态或敏感态，已从 Git 排除。该初始化不授权公开发布、部署、仓库可见性变更、npm 发布、GitHub release、public launch、客户联系、定价或支出变更。
+
 ## 当前能力
 
 - 分析本地 repo：识别框架、包管理器、脚本、workspace 子包、环境变量线索和启动建议；包管理器支持 npm、pnpm、yarn 和 Bun，优先按 lockfile 判断，缺失时读取 `package.json#packageManager`；启动建议按 `dev`、`start`、`preview` 顺序选择，缺失标准脚本时会尝试常见 app/web/frontend dev 脚本，并可从 `package.json#workspaces` 或 `pnpm-workspace.yaml` 的多行列表/简单 inline array 子包声明生成 workspace 启动命令，且优先选择通过依赖、`next.config.*`、`vite.config.*` 或 framework 启动脚本识别为 Web app 的子包；当根脚本只是 `turbo`、`nx`、`lerna` 这类通用 workspace 编排器时，会优先推荐已识别 Web app 子包的直接启动命令；`appDirectories` 会优先列出已识别的 Web app 子包，并在根项目本身不是 Web app 时过滤根 `src` 这类噪声信号。
@@ -16,7 +18,7 @@ RepoAssure 是一个本地优先的 AI 代码验收与交付保障层，用于�
   - 可选输出 Playwright trace zip，帮助回放复杂前端问题。
   - 默认跳过删除、支付、退出登录等高风险控件，避免探索真实项目时执行破坏性动作。
 - 生成测试：根据 findings 和已探索关键路径生成 Playwright 回归测试草案；优先使用 `reproSteps` 中的显式页面导航，普通描述文本、evidence 和 smoke route 里的完整 URL 只接受本地 app URL（如 `localhost`、`127.0.0.1`、`0.0.0.0`、`[::1]`、`[::]`）或当前被测 app 同源 URL，避免把第三方 API/CDN URL 误生成成本地页面测试；传入 app URL 时，generated spec 会把安全 origin 写作默认 baseURL，并仍支持 `HARDENING_BASE_URL` 覆盖；写入 generated spec 前会脱敏 route query/fragment 中的 token、code、session、CSRF 等敏感参数值，保留 SPA hash route，并脱敏 generated test title 中的敏感值。
-- 生成报告、修复计划和物料包：输出 `hardening-report.md`、AI IDE 可消费的 `repair-plan.json`、人类可读的 `repair-plan.md`、可执行修复任务包 `repair-task-package.json` / `repair-task-package.md`、repair handoff 的 `repair-handoff-package.json` / `.md` / `verification-plan.md`、repair execute 的 `repair-execution-report.json` / `.md`、patch plan 的 `patch-plan.json` / `.md`、可人工审查的 `.hardening/run/patch.diff`，并为每次 `run_hardening` 生成 `.hardening/runs/<run-id>/manifest.json`；`.hardening/latest` 会指向最新 run，方便 AI IDE 从单一入口读取本次报告、JSON、截图、generated tests、repair plan 和修复任务包。报告、repair plan、修复任务包、repair handoff、repair execution report、patch plan 和 diff 会脱敏 API key、token、password、session、JWT、CSRF、Cookie/Set-Cookie value、Authorization/Proxy-Authorization credential、URL userinfo credential 和 URL query/fragment 中的敏感参数值；`boot-result.json` 的 URL、日志路径、blockers 和 errors 写入前也会脱敏。
+- 生成报告、修复计划和物料包：输出 `hardening-report.md`、AI IDE 可消费的 `repair-plan.json`、人类可读的 `repair-plan.md`、可执行修复任务包 `repair-task-package.json` / `repair-task-package.md`、repair handoff 的 `repair-handoff-package.json` / `.md` / `verification-plan.md`、repair execute 的 `repair-execution-report.json` / `.md`、patch plan 的 `patch-plan.json` / `.md`、端到端 AI IDE repair evidence package 的 `ai-ide-repair-evidence-package.json` / `.md`、Project Intelligence 的 `project-intelligence-snapshot.json` / `.md`、可人工审查的 `.hardening/run/patch.diff`，并为每次 `run_hardening` 生成 `.hardening/runs/<run-id>/manifest.json`；`.hardening/latest` 会指向最新 run，方便 AI IDE 从单一入口读取本次报告、JSON、截图、generated tests、repair plan 和修复任务包。报告、repair plan、修复任务包、repair handoff、repair execution report、patch plan、repair evidence package、project intelligence snapshot 和 diff 会脱敏 API key、token、password、session、JWT、CSRF、Cookie/Set-Cookie value、Authorization/Proxy-Authorization credential、URL userinfo credential 和 URL query/fragment 中的敏感参数值；`boot-result.json` 的 URL、日志路径、blockers 和 errors 写入前也会脱敏。
 - Security Assurance Lane Phase 1：可通过 `hardening security import --provider codex-security --scan-dir <dir> --repo <repo> --run-dir <dir>` 从本地 provider scan directory 导入安全证据，提供 local-first provider security evidence import，生成 `.hardening/runs/<run-id>/security/security-summary.json`、`security-findings.json`、provider `import-manifest.json` 和 `normalized-findings.json`；导入过程保留 provider provenance、写入前脱敏证据，并让 repair plan / repair task package 消费 security findings。该能力不运行 Codex Security 插件、不联网、不上传目标 repo、不创建 issue/PR/advisory、不修改目标 repo，也不是当前 MVP 必需验收门槛。
 - CLI：成功 stdout JSON 和 stderr 错误输出都会在写入前脱敏，避免上游工具结果或异常消息中的敏感值直接进入终端。
 - MCP Server：通过 stdio 暴露 hardening tools，供 Agent/IDE 调用；tool 成功响应和错误响应写入 `content` 与 `structuredContent` 前都会脱敏，进程级启动失败写入 stderr 前也会脱敏；`sessionId` 作为 `stop_app` 所需操作句柄会保留在成功响应的 `structuredContent` 中。
@@ -52,6 +54,7 @@ docs/
   goals/       active goal 和 completed/
 artifacts/
   benchmark-runs/  benchmark 运行产物
+  project-graph/   Project Intelligence 本地 graph snapshots
   test-results/    测试运行产物
 examples/      示例目标 repo 和集成示例预留区
 ```
@@ -180,6 +183,8 @@ v0.3 新增本地优先 GitHub Action wrapper：`.github/actions/repoassure/acti
 
 分支保护与发布边界见 `docs/operations/branch-protection-release-boundary-v0.1.md`。当前目标状态是 `main` 要求 `RepoAssure CI` / `Quality Gates`，但 GitHub 对当前 private repo plan 返回 403；仓库仍必须保持 private，不能发布 package、移除 `package.json` `"private": true`、公开仓库或通过公开仓库绕过该限制。仓库级 Apache-2.0 `LICENSE` 只是 public-release readiness material，不是公开发布授权。Release candidate 本地打包与审查交接见 `docs/operations/release-candidate-handoff-v0.1.md`；Public Release Readiness v0.2 检查点见 `docs/operations/public-release-readiness-v0.2.md`，当前仍要求 `public release ready: no`，并保留 legal、trademark、branch protection / equivalent ruleset 和 final maintainer publication authorization 人工 gate。Public Release Candidate Final Review v0.1 见 `docs/operations/public-release-candidate-final-review-v0.1.md`，当前结论仍是 no-go until manual gates close。Public Release Manual Gate Input Collection v0.1 见 `docs/operations/public-release-manual-gate-input-collection-v0.1.md`，只收集 maintainer 输入，不关闭 gate，也不授权发布。Public Release Manual Gate Closure v0.1 见 `docs/operations/public-release-manual-gate-closure-v0.1.md`，当前状态为 `not_closed_missing_manual_evidence`，public release remains no-go。Public Release Manual Gate Closure v0.2 见 `docs/operations/public-release-manual-gate-closure-v0.2.md`，当前状态为 `not_closed_after_fresh_evidence_review`：仓库仍为 private，最新 `RepoAssure CI` 成功，但 branch protection / repository rulesets 仍返回 HTTP 403，legal、trademark/name、final publication authorization 和 reviewer feedback decision 仍未关闭，public release remains no-go。Public Release Manual Gate Evidence Intake v0.1 见 `docs/operations/public-release-manual-gate-evidence-intake-v0.1.md`，当前状态为 `evidence_intake_incomplete`，只记录已存在自动证据和缺失人工证据。Public Release Manual Gate Evidence Completion v0.1 见 `docs/operations/public-release-manual-gate-evidence-completion-v0.1.md`，当前状态为 `incomplete_missing_manual_evidence`，No gate was completed, closed, or passed。Public Release Manual Evidence Decision v0.1 见 `docs/operations/public-release-manual-evidence-decision-v0.1.md`，当前状态为 `pending_manual_decisions`，所有人工 gate 均为 `pending_decision`。Public Release Manual Evidence Decision Closure v0.1 见 `docs/operations/public-release-manual-evidence-decision-closure-v0.1.md`，当前状态为 `not_closed_pending_decisions`，decision closure remains not_closed。Public Release Manual Decision Input v0.1 见 `docs/operations/public-release-manual-decision-input-v0.1.md`，当前状态为 `pending_input`，未预填任何 approve/reject/defer/accept risk 决策。Public Release Manual Decision Input Completion v0.1 见 `docs/operations/public-release-manual-decision-input-completion-v0.1.md`，当前状态为 `not_completed_missing_explicit_decisions`，本轮执行授权未提供逐项 decision value、evidence、date、notes 和 scope，所有 manual gates 均未完成，public release remains no-go。Public Release Manual Decision Input Review v0.1 见 `docs/operations/public-release-manual-decision-input-review-v0.1.md`，当前状态为 `not_ready_pending_input`，确认决策表单仍为空，public release remains no-go。Public Website release candidate 审查交接见 `docs/operations/public-website-release-candidate-handoff-v0.1.md`。ADR-0020 进一步规定官网 private preview deployment、production deployment 和 public launch 是三个独立 gate；ADR-0021 规定 Vercel fallback 决策，当前远程私密预览应先解决 Vercel target mismatch 或改用 Cloudflare Pages preview deployments with Cloudflare Access / 等效访问受控静态托管。上述交接和 ADR 不授权 push、PR、GitHub release、npm publish、部署官网或仓库公开。
 
+Public Release Manual Decision Intake v0.2 见 `docs/operations/public-release-manual-decision-intake-v0.2.md`，当前状态为 `decisions_recorded_release_execution_blocked`：legal review 已 approve，trademark/name、private preview feedback 和 dependency/license risk 已 accept risk，secret/customer data exposure 基于自动核验 approve，final maintainer publication authorization 已 approve，但 branch protection / equivalent repository ruleset 因 GitHub private repo plan 下 API 仍 HTTP 403 被记录为 defer，因此 public release remains no-go。
+
 Public Website local static preview package 可通过 `pnpm build:website && pnpm package:website-preview` 生成，交接见 `docs/operations/local-static-preview-package-v0.1.md`。输出位于 `artifacts/public-website-preview/local-static-preview`，只用于本地 review，不授权 remote hosting、preview URL、production deployment 或 public launch。
 
 Cloudflare Access remote preview preflight 可通过 `pnpm preflight:cloudflare-preview` 生成本地 evidence，交接见 `docs/operations/cloudflare-access-preview-preflight-v0.1.md`。该预检不上传 website source/build output、不调用 Cloudflare API、不创建 preview URL；Cloudflare Pages preview deployments are public by default，因此 Cloudflare Access policy must be enabled before any preview URL is shared。Public Website Custom Domain Deployment v0.1 见 `docs/operations/public-website-custom-domain-deployment-v0.1.md`，当前状态为 `verified_custom_domain_active`：`repoassure.com` 和 `www.repoassure.com` 均已在 Cloudflare Pages custom domains 中 active，HTTPS 返回 200，`pnpm verify:website` 已分别通过两个 custom domain 的英文/中文、桌面/移动、Trust Ledger、Assurance Graph、artifact tabs、private preview form 和 forbidden-claim 验证；Public Website Post-Domain Polish & Launch Boundary Review v0.1 见 `docs/operations/public-website-post-domain-polish-v0.1.md`，当前状态为 `verified_post_domain_polish`，已补齐 canonical URL、Open Graph/Twitter metadata、favicon、web manifest、robots.txt 和 sitemap.xml，并记录 apex/www 当前均直接 HTTP/2 200 服务、不配置 canonical redirect；上述记录不授权仓库公开、npm publish、GitHub release、public launch、production marketing announcement、SaaS/Team Cloud/Enterprise 或 hosted dashboard availability claims。
@@ -202,6 +207,10 @@ pnpm repair:handoff -- --run <repo>/.hardening/runs/<run-id>
 pnpm repair:execute -- --package <repo>/.hardening/runs/<run-id>/repair-handoff-package.json --task <taskId> --dry-run
 pnpm repair:execute -- --package <repo>/.hardening/runs/<run-id>/repair-handoff-package.json --task <taskId> --validation-only
 pnpm repair:patch-plan -- --report <repo>/.hardening/runs/<run-id>/repair-execution-report.json
+pnpm repair:evidence-package -- --handoff <repair-handoff-package.json> --dry-run-report <dry-run-repair-execution-report.json> --validation-report <validation-only-repair-execution-report.json> --patch-plan <patch-plan.json>
+pnpm project:intelligence
+pnpm project:intelligence -- --root . --output artifacts/project-graph
+pnpm project:intelligence:recommendation-draft
 pnpm user:accept -- --help
 pnpm user:accept -- -h
 pnpm user:accept -- --repo <real-web-app-repo> --browser --decision pending
@@ -219,6 +228,24 @@ pnpm user:accept -- --mode cli --repo <python-cli-repo> --decision pending
 `pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --dry-run` 会生成执行计划报告但不运行命令；`--validation-only` 会只复跑该任务的 verification commands，并写出 `repair-execution-report.json` 和 `repair-execution-report.md`。当前 v0.1 不自动修改目标 repo 代码；失败验证会进入 report，命令本身只表示执行报告是否成功生成。
 
 `pnpm repair:patch-plan -- --report <repair-execution-report.json>` 会把失败验证证据分类为可审查补丁计划，输出 `patch-plan.json` 和 `patch-plan.md`。当前 v0.1 识别 `ruff I001` import-sort 自动修复候选，以及 mypy `[index]`、`[return-value]`、`[attr-defined]` 等类型修复候选；该命令只生成计划，不写目标 repo 源码、不运行 formatter、不创建 PR。
+
+`pnpm repair:evidence-package -- --handoff <repair-handoff-package.json> --dry-run-report <dry-run-repair-execution-report.json> --validation-report <validation-only-repair-execution-report.json> --patch-plan <patch-plan.json>` 会把 AI IDE repair handoff、dry-run report、validation-only report、patch plan 和 no-write proof 聚合为 `ai-ide-repair-evidence-package.json` / `.md`。该包提供 `artifactIndex`、`repairFlow`、`taskMatrix`、`maintainerReview`、`verificationChecklist` 和 `noWriteProof`，用于让 AI IDE 和 maintainer 按统一读取顺序消费完整修复证据；该命令不应用补丁、不修改目标 repo、不创建 branch/commit/PR，也不标记 acceptance passed。
+
+`pnpm project:intelligence` 会从本地 docs、apps、packages、src、tests、scripts 和 `.autopilot` 状态生成 Project Intelligence graph snapshot，默认输出到 `artifacts/project-graph/project-intelligence-snapshot.json` 和 `.md`。该 snapshot 包含 `docsGraph`、`codeGraph`、`progressGraph`、source coverage 和 redaction metadata；该命令不实现 hosted dashboard、不上传、不部署、不修改目标 repo。
+
+`pnpm project:intelligence:view` 会读取本地 `artifacts/project-graph/project-intelligence-snapshot.json` 并生成 `artifacts/project-graph/project-intelligence-viewer.html`，用于在本机查看 docs/code/progress graph。该 viewer 是 ignored/generated artifact，不加载外部资源、不启用 telemetry、不上传、不部署，也不代表 hosted dashboard 已实现。
+
+Project Intelligence snapshot 现在会包含 `findings`，用于标记 ADR 级联缺口、孤立代码入口、缺失测试链接和 progress active-goal 不一致。当前这些 findings 只是 local readiness evidence，不会自动修改文档、代码或目标 repo。
+
+`pnpm project:intelligence:backlog` 会读取 `project-intelligence-snapshot.json` 中的 `missing_cascade` findings，并生成 `artifacts/project-graph/adr-cascade-remediation-backlog.md`。该 backlog 只用于 maintainer review，要求逐项选择 approve / defer / accept-risk / repair；命令不会自动修改 ADR、spec、验收文档、测试、日志或源码。
+
+`pnpm project:intelligence:decision-intake` 会读取 `artifacts/project-graph/adr-cascade-remediation-backlog.md`，并生成 `artifacts/project-graph/adr-cascade-remediation-decision-intake.md` 和 `.json`。该 intake 只创建 pending decision slots，供 maintainer 后续逐项确认 approve / defer / accept-risk / repair；命令不会自动修复 ADR、改写文档或执行 repair。
+
+`pnpm project:intelligence:recommendation-draft` 会读取 `artifacts/project-graph/adr-cascade-remediation-decision-intake.json`，并生成 `artifacts/project-graph/adr-cascade-remediation-recommendation-draft.md` 和 `.json`。该 draft 为每个 pending item 提供 recommended decision、rationale、risk、evidence 和 rollback / follow-up notes；它不写入最终 maintainer decision、不自动修复 ADR、不改写文档、不执行 repair。
+
+`pnpm project:intelligence:maintainer-decision` 会读取 `artifacts/project-graph/adr-cascade-remediation-recommendation-draft.json`，并生成 `artifacts/project-graph/adr-cascade-maintainer-decision-record.md` 和 `.json`。该 record 只记录 owner 授权的 maintainer decisions；它不自动修复 ADR、不改写文档、不执行 repair、不上传、不部署、不启用 telemetry。
+
+`pnpm project:intelligence:controlled-remediation-plan` 会读取 `artifacts/project-graph/adr-cascade-maintainer-decision-record.json`，并生成 `artifacts/project-graph/adr-cascade-controlled-remediation-plan.md` 和 `.json`。该 plan 只规划每条 ADR cascade repair decision 的目标文件、执行顺序、回滚说明和验证清单；它不自动修复 ADR、不改写文档、不执行 repair、不上传、不部署、不启用 telemetry。
 
 `pnpm goal:audit` 生成 `docs/acceptance/goal-completion-audit.md`，用于把 `docs/goals/codex-goal.md` 的成功条件映射到当前证据。该审计不会替代用户验收；只在自动可验证范围内确认是否已准备好请求验收。只有带具体确认备注、且 generated Playwright spec 执行验证通过的 `--validate-generated-tests --decision accepted --notes "用户确认 MVP 符合预期"` 会被判定为完成；`--decision changes_requested` 也必须带具体 `--notes`，会被识别为有效修改反馈并要求继续迭代。
 
@@ -308,6 +335,11 @@ AI IDE / Agent 应优先读取 `.hardening/latest/manifest.json`，再按 `files
 
 ## 项目文档
 
+- `docs/PRD.md`
+- `docs/SPEC.md`
+- `docs/DESIGN.md`
+- `docs/PLAN.md`
+- `docs/operations/brownfield-autopilot-intake-v0.1.md`
 - `docs/product/specs/mvp-spec-v0.1.md`
 - `docs/product/specs/mvp-spec-v0.2.md`
 - `docs/product/research/competitive-landscape-v0.1.md`

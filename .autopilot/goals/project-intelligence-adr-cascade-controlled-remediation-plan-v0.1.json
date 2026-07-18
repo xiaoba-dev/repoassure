@@ -1,0 +1,62 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-adr-cascade-controlled-remediation-plan-v0.1",
+  "title": "Project Intelligence ADR Cascade Controlled Remediation Plan v0.1",
+  "status": "completed",
+  "created_at": "2026-07-18T19:25:00.000+08:00",
+  "completed_at": "2026-07-18T20:05:00.000+08:00",
+  "objective": "Generate a controlled remediation plan for the 11 recorded ADR cascade repair decisions, with explicit file-level scope, review order, rollback notes, and verification gates before any ADR/spec/docs edits execute.",
+  "document_basis": [
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "docs/operations/project-intelligence-adr-cascade-maintainer-decision-recording-v0.1.md",
+    "artifacts/project-graph/adr-cascade-maintainer-decision-record.json"
+  ],
+  "acceptance": [
+    "Read the maintainer decision record and preserve all 11 repair decisions.",
+    "Generate a maintainer-reviewable controlled remediation plan with item-to-file mapping, proposed edit order, rollback notes, and verification checklist.",
+    "Keep the plan local-first and ignored-artifact aware.",
+    "Do not execute ADR/spec/docs/source edits until a separate confirmed remediation execution goal is authorized."
+  ],
+  "blocked_actions": [
+    "automatic_doc_rewrite",
+    "automatic_adr_repair",
+    "repair_execution",
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "website_visual_redesign",
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "deployment",
+    "pricing_change",
+    "customer_contact"
+  ],
+  "source_maintainer_decision_record": {
+    "path": "artifacts/project-graph/adr-cascade-maintainer-decision-record.json",
+    "items": 11,
+    "repair_decisions_recorded": 11,
+    "repair_execution_authorized": false
+  },
+  "controlled_remediation_plan_summary": {
+    "markdown_output": "artifacts/project-graph/adr-cascade-controlled-remediation-plan.md",
+    "json_output": "artifacts/project-graph/adr-cascade-controlled-remediation-plan.json",
+    "items": 11,
+    "repair_decisions_included": 11,
+    "automatic_edits_planned": false,
+    "repair_execution_authorized": false
+  },
+  "verification_evidence": {
+    "tests": [
+      "pnpm vitest run tests/unit/project-intelligence-controlled-remediation-plan.test.ts",
+      "pnpm build:acceptance",
+      "pnpm typecheck:acceptance"
+    ],
+    "artifact_generation": "node packages/acceptance/dist/run-project-intelligence-controlled-remediation-plan.js --decision-record artifacts/project-graph/adr-cascade-maintainer-decision-record.json --output artifacts/project-graph"
+  },
+  "next_goal_id": "project-intelligence-adr-cascade-controlled-remediation-execution-v0.1"
+}

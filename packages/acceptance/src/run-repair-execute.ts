@@ -13,7 +13,7 @@ const defaultTimeoutMs = 120_000;
 const defaultMaxOutputChars = 2_000;
 
 export type RepairExecuteMode = 'dry-run' | 'validation-only';
-export type RepairExecutionStatus = 'planned' | 'passed' | 'failed';
+export type RepairExecutionStatus = 'planned' | 'passed' | 'failed' | 'skipped';
 
 export interface RepairExecuteCliOptions {
   packagePath: string;
@@ -58,6 +58,7 @@ export interface RepairVerificationCommandResult {
 export interface RepairExecutionTaskReport {
   taskId: string;
   priority: string;
+  sourceType: string;
   objective: string;
   executionStatus: RepairExecutionStatus;
   mode: RepairExecuteMode;
@@ -83,6 +84,17 @@ export interface RepairExecutionReport {
     skipped: number;
   };
   agentContract: RepairExecutionAgentContract;
+  executionPlan: RepairExecutionPlan;
+  patchPreview: RepairExecutionPatchPreview;
+  maintainerReview: {
+    requiredBefore: string[];
+    allowedDecisions: string[];
+  };
+  verificationChecklist: {
+    commands: string[];
+    completionSignals: string[];
+  };
+  noWriteProof: RepairExecutionNoWriteProof;
   tasks: RepairExecutionTaskReport[];
 }
 
@@ -93,11 +105,32 @@ export interface RepairExecutionAgentContract {
     planned: string;
     passed: string;
     failed: string;
+    skipped: string;
   };
   nextCommands: {
     patchPlan: string;
   };
   boundaries: string[];
+}
+
+export interface RepairExecutionPlan {
+  readOrder: string[];
+  steps: string[];
+}
+
+export interface RepairExecutionPatchPreview {
+  status: 'preview_only';
+  candidateTasks: Array<{
+    taskId: string;
+    sourceType: string;
+    expectedFiles: string[];
+  }>;
+}
+
+export interface RepairExecutionNoWriteProof {
+  targetRepoWriteAuthorized: false;
+  sourceFilesChanged: false;
+  prohibitedActions: string[];
 }
 
 export async function main(args: string[] = process.argv.slice(2)): Promise<number> {
@@ -293,7 +326,7 @@ export function buildRepairExecutionReport(input: {
   const taskReports = selectedTasks.map((task) => buildTaskReport(input.mode, task, input.verificationResults));
   const failed = input.verificationResults.filter((result) => result.exitCode !== 0 || result.timedOut).length;
   const passed = input.verificationResults.filter((result) => result.exitCode === 0 && !result.timedOut).length;
-  const skipped = input.mode === 'dry-run' ? selectedTasks.length : 0;
+  const skipped = taskReports.filter((task) => task.executionStatus === 'skipped' || task.executionStatus === 'planned').length;
   const status: RepairExecutionStatus = input.mode === 'dry-run'
     ? 'planned'
     : failed > 0 ? 'failed' : 'passed';
@@ -314,6 +347,17 @@ export function buildRepairExecutionReport(input: {
       skipped
     },
     agentContract: buildRepairExecutionAgentContract(),
+    executionPlan: buildRepairExecutionPlan(),
+    patchPreview: buildRepairExecutionPatchPreview(selectedTasks),
+    maintainerReview: {
+      requiredBefore: input.pkg.maintainerReview.requiredBefore.map(cleanText),
+      allowedDecisions: input.pkg.maintainerReview.allowedDecisions.map(cleanText)
+    },
+    verificationChecklist: {
+      commands: input.pkg.verificationChecklist.commands.map(cleanText),
+      completionSignals: input.pkg.verificationChecklist.completionSignals.map(cleanText)
+    },
+    noWriteProof: buildNoWriteProof(input.pkg),
     tasks: taskReports
   };
 }
@@ -343,6 +387,29 @@ export function formatRepairExecutionReportMarkdown(report: RepairExecutionRepor
 - Patch plan: ${report.agentContract.nextCommands.patchPlan}
 - Boundaries: ${report.agentContract.boundaries.join(' ')}
 
+## Execution Plan
+
+${report.executionPlan.steps.map((step) => `- ${step}`).join('\n')}
+
+## Patch Preview
+
+${report.patchPreview.candidateTasks.map((task) => `- ${task.taskId} (${task.sourceType}): ${task.expectedFiles.length > 0 ? task.expectedFiles.join(', ') : 'no concrete file path inferred'}`).join('\n')}
+
+## Maintainer Review Boundary
+
+- Required before: ${report.maintainerReview.requiredBefore.join(', ')}
+- Allowed decisions: ${report.maintainerReview.allowedDecisions.join(', ')}
+
+## Verification Checklist
+
+${report.verificationChecklist.commands.map((command) => `- \`${command}\``).join('\n')}
+
+## No-write Proof
+
+- Target repo write authorized: ${report.noWriteProof.targetRepoWriteAuthorized}
+- Source files changed: ${report.noWriteProof.sourceFilesChanged}
+- Prohibited actions: ${report.noWriteProof.prohibitedActions.join(', ')}
+
 ${report.tasks.map(formatTaskMarkdown).join('\n\n')}
 `;
 }
@@ -361,7 +428,8 @@ function buildRepairExecutionAgentContract(): RepairExecutionAgentContract {
     resultSemantics: {
       planned: 'No verification commands were run.',
       passed: 'All selected verification commands exited zero.',
-      failed: 'At least one selected verification command failed or timed out.'
+      failed: 'At least one selected verification command failed or timed out.',
+      skipped: 'A selected task had no runnable verification command in this local context.'
     },
     nextCommands: {
       patchPlan: 'pnpm repair:patch-plan -- --report <repair-execution-report.json>'
@@ -374,6 +442,46 @@ function buildRepairExecutionAgentContract(): RepairExecutionAgentContract {
   };
 }
 
+function buildRepairExecutionPlan(): RepairExecutionPlan {
+  return {
+    readOrder: [
+      'summary',
+      'executionPlan',
+      'patchPreview',
+      'tasks[]',
+      'tasks[].verificationCommands',
+      'maintainerReview',
+      'verificationChecklist',
+      'noWriteProof'
+    ],
+    steps: [
+      'Review selected repairActionQueue tasks before any code change.',
+      'Inspect patchPreview and task verification commands.',
+      'Record maintainer approval before applying patches or changing target repository files.',
+      'Run validation-only checks after a separately authorized repair implementation.'
+    ]
+  };
+}
+
+function buildRepairExecutionPatchPreview(tasks: RepairHandoffTask[]): RepairExecutionPatchPreview {
+  return {
+    status: 'preview_only',
+    candidateTasks: tasks.map((task) => ({
+      taskId: cleanText(task.taskId),
+      sourceType: cleanText(task.sourceType),
+      expectedFiles: inferExpectedFiles(task)
+    }))
+  };
+}
+
+function buildNoWriteProof(pkg: RepairHandoffPackage): RepairExecutionNoWriteProof {
+  return {
+    targetRepoWriteAuthorized: false,
+    sourceFilesChanged: false,
+    prohibitedActions: pkg.maintainerReview.requiredBefore.map(cleanText)
+  };
+}
+
 function buildTaskReport(
   mode: RepairExecuteMode,
   task: RepairHandoffTask,
@@ -381,13 +489,15 @@ function buildTaskReport(
 ): RepairExecutionTaskReport {
   const verificationResults = allResults.filter((result) => result.taskId === task.taskId);
   const failed = verificationResults.some((result) => result.exitCode !== 0 || result.timedOut);
+  const runnableCommands = task.verification.commands.filter(isRunnableVerificationCommand);
   const executionStatus: RepairExecutionStatus = mode === 'dry-run'
     ? 'planned'
-    : failed ? 'failed' : 'passed';
+    : runnableCommands.length === 0 ? 'skipped' : failed ? 'failed' : 'passed';
 
   return {
     taskId: task.taskId,
     priority: task.priority,
+    sourceType: cleanText(task.sourceType),
     objective: cleanText(task.objective),
     executionStatus,
     mode,
@@ -396,6 +506,18 @@ function buildTaskReport(
     handoffPrompt: cleanText(task.handoffPrompt),
     nextAction: formatTaskNextAction(mode, executionStatus)
   };
+}
+
+function inferExpectedFiles(task: RepairHandoffTask): string[] {
+  const evidenceText = JSON.stringify(task.evidence);
+  const pathMatches = evidenceText.match(/[A-Za-z0-9._/-]+\.[A-Za-z0-9]+(?::\d+)?/gu) ?? [];
+  const files = pathMatches
+    .map((match) => cleanText(match.replace(/:\d+$/u, '')))
+    .filter((path) => !path.startsWith('.hardening/'))
+    .filter((path) => path.includes('/'))
+    .filter((path, index, all) => all.indexOf(path) === index);
+
+  return files;
 }
 
 async function runVerificationCommands(input: {
@@ -409,6 +531,10 @@ async function runVerificationCommands(input: {
 
   for (const task of input.tasks) {
     for (const command of task.verification.commands) {
+      if (!isRunnableVerificationCommand(command)) {
+        continue;
+      }
+
       results.push(await runVerificationCommand({
         taskId: task.taskId,
         command,
@@ -421,6 +547,10 @@ async function runVerificationCommands(input: {
   }
 
   return results;
+}
+
+function isRunnableVerificationCommand(command: string): boolean {
+  return !/<[^>\s]+>/u.test(command);
 }
 
 function runVerificationCommand(input: {
@@ -548,6 +678,10 @@ function formatTaskNextAction(mode: RepairExecuteMode, status: RepairExecutionSt
 
   if (status === 'passed') {
     return 'Re-run user acceptance and regenerate repair handoff to confirm this task disappears.';
+  }
+
+  if (status === 'skipped') {
+    return 'Verification command contains a placeholder or requires manual environment context; resolve the placeholder or record a maintainer decision before rerunning.';
   }
 
   return 'Use the failed verification output as evidence for the next code repair step.';

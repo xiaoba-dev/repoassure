@@ -316,6 +316,134 @@ export {
 } from './run-repair-patch-plan.js';
 
 export {
+  buildRepairEvidencePackage,
+  formatRepairEvidencePackageMarkdown,
+  isDirectRun as isRepairEvidencePackageDirectRun,
+  isRepairEvidencePackageHelpRequest,
+  main as runRepairEvidencePackageCli,
+  parseRepairEvidencePackageArgs,
+  repairEvidencePackageHelpText,
+  runRepairEvidencePackage,
+  type RepairEvidenceAgentContract,
+  type RepairEvidenceArtifactIndexEntry,
+  type RepairEvidenceFlowStage,
+  type RepairEvidencePackage,
+  type RepairEvidencePackageCliOptions,
+  type RepairEvidencePackageRunInput,
+  type RepairEvidencePackageRunResult,
+  type RepairEvidencePackageStatus,
+  type RepairEvidenceTaskMatrixItem
+} from './run-repair-evidence-package.js';
+
+export {
+  buildProjectIntelligenceSnapshot,
+  formatProjectIntelligenceSnapshotMarkdown,
+  isDirectRun as isProjectIntelligenceSnapshotDirectRun,
+  isProjectIntelligenceSnapshotHelpRequest,
+  main as runProjectIntelligenceSnapshotCli,
+  parseProjectIntelligenceSnapshotArgs,
+  projectIntelligenceSnapshotHelpText,
+  runProjectIntelligenceSnapshot,
+  type ProjectIntelligenceEdge,
+  type ProjectIntelligenceEdgeType,
+  type ProjectIntelligenceGraph,
+  type ProjectIntelligenceGraphName,
+  type ProjectIntelligenceNode,
+  type ProjectIntelligenceNodeType,
+  type ProjectIntelligenceSnapshot,
+  type ProjectIntelligenceSnapshotCliOptions,
+  type ProjectIntelligenceSnapshotRunInput,
+  type ProjectIntelligenceSnapshotRunResult
+} from './run-project-intelligence-snapshot.js';
+
+export {
+  formatProjectIntelligenceViewerHtml,
+  isDirectRun as isProjectIntelligenceViewerDirectRun,
+  isProjectIntelligenceViewerHelpRequest,
+  main as runProjectIntelligenceViewerCli,
+  parseProjectIntelligenceViewerArgs,
+  projectIntelligenceViewerHelpText,
+  runProjectIntelligenceViewer,
+  type ProjectIntelligenceViewerCliOptions,
+  type ProjectIntelligenceViewerRunInput,
+  type ProjectIntelligenceViewerRunResult
+} from './run-project-intelligence-viewer.js';
+
+export {
+  formatProjectIntelligenceBacklogMarkdown,
+  isDirectRun as isProjectIntelligenceBacklogDirectRun,
+  isProjectIntelligenceBacklogHelpRequest,
+  main as runProjectIntelligenceBacklogCli,
+  parseProjectIntelligenceBacklogArgs,
+  projectIntelligenceBacklogHelpText,
+  runProjectIntelligenceBacklog,
+  type ProjectIntelligenceBacklogCliOptions,
+  type ProjectIntelligenceBacklogRunInput,
+  type ProjectIntelligenceBacklogRunResult
+} from './run-project-intelligence-backlog.js';
+
+export {
+  formatProjectIntelligenceDecisionIntakeMarkdown,
+  isDirectRun as isProjectIntelligenceDecisionIntakeDirectRun,
+  isProjectIntelligenceDecisionIntakeHelpRequest,
+  main as runProjectIntelligenceDecisionIntakeCli,
+  parseProjectIntelligenceDecisionIntakeArgs,
+  projectIntelligenceDecisionIntakeHelpText,
+  runProjectIntelligenceDecisionIntake,
+  type ProjectIntelligenceAdrCascadeDecision,
+  type ProjectIntelligenceDecisionIntake,
+  type ProjectIntelligenceDecisionIntakeCliOptions,
+  type ProjectIntelligenceDecisionIntakeItem,
+  type ProjectIntelligenceDecisionIntakeRunInput,
+  type ProjectIntelligenceDecisionIntakeRunResult
+} from './run-project-intelligence-decision-intake.js';
+
+export {
+  formatProjectIntelligenceRecommendationDraftMarkdown,
+  isDirectRun as isProjectIntelligenceRecommendationDraftDirectRun,
+  isProjectIntelligenceRecommendationDraftHelpRequest,
+  main as runProjectIntelligenceRecommendationDraftCli,
+  parseProjectIntelligenceRecommendationDraftArgs,
+  projectIntelligenceRecommendationDraftHelpText,
+  runProjectIntelligenceRecommendationDraft,
+  type ProjectIntelligenceRecommendationDraft,
+  type ProjectIntelligenceRecommendationDraftCliOptions,
+  type ProjectIntelligenceRecommendationDraftItem,
+  type ProjectIntelligenceRecommendationDraftRunInput,
+  type ProjectIntelligenceRecommendationDraftRunResult
+} from './run-project-intelligence-recommendation-draft.js';
+
+export {
+  formatProjectIntelligenceMaintainerDecisionRecordMarkdown,
+  isDirectRun as isProjectIntelligenceMaintainerDecisionDirectRun,
+  isProjectIntelligenceMaintainerDecisionHelpRequest,
+  main as runProjectIntelligenceMaintainerDecisionCli,
+  parseProjectIntelligenceMaintainerDecisionArgs,
+  projectIntelligenceMaintainerDecisionHelpText,
+  runProjectIntelligenceMaintainerDecisionRecord,
+  type ProjectIntelligenceMaintainerDecisionCliOptions,
+  type ProjectIntelligenceMaintainerDecisionRecord,
+  type ProjectIntelligenceMaintainerDecisionRecordItem,
+  type ProjectIntelligenceMaintainerDecisionRunInput,
+  type ProjectIntelligenceMaintainerDecisionRunResult
+} from './run-project-intelligence-maintainer-decision.js';
+
+export {
+  formatProjectIntelligenceControlledRemediationPlanMarkdown,
+  isDirectRun as isProjectIntelligenceControlledRemediationPlanDirectRun,
+  isProjectIntelligenceControlledRemediationPlanHelpRequest,
+  main as runProjectIntelligenceControlledRemediationPlanCli,
+  parseProjectIntelligenceControlledRemediationPlanArgs,
+  projectIntelligenceControlledRemediationPlanHelpText,
+  runProjectIntelligenceControlledRemediationPlan,
+  type ProjectIntelligenceControlledRemediationPlan,
+  type ProjectIntelligenceControlledRemediationPlanCliOptions,
+  type ProjectIntelligenceControlledRemediationPlanItem,
+  type ProjectIntelligenceControlledRemediationPlanRunInput,
+  type ProjectIntelligenceControlledRemediationPlanRunResult
+} from './run-project-intelligence-controlled-remediation-plan.js';
+
+export {
   isDirectRun as isUserAcceptanceDirectRun,
   isUserAcceptanceHelpRequest,
   main as runUserAcceptanceCli,

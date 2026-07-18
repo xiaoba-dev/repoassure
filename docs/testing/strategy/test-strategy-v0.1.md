@@ -1,5 +1,41 @@
 # 测试策略
 
+## Brownfield Autopilot Initialization
+
+Brownfield Autopilot Initialization v0.1 的测试范围是 structure-level governance checks：`project-structure.test.ts` 守护 `docs/PRD.md`、`docs/SPEC.md`、`docs/DESIGN.md`、`docs/PLAN.md`、`docs/operations/brownfield-autopilot-intake-v0.1.md`、`.autopilot/progress/intake-confirmation.json`、`.autopilot/progress/init-doc-pack.json`、`.autopilot/progress/snapshot.json`、`.autopilot/progress/PROGRESS_SNAPSHOT.md`、`.autopilot/goals/index.json`、active goal record、README、acceptance checklist、testing strategy、decision log 和 dev log 的级联。该测试只验证 brownfield Autopilot state 与文档入口，不授权 public release、deployment、repository visibility change、npm publication、GitHub release、public launch、customer contact、pricing 或 spend changes。
+
+Public Website Design Work Deferred v0.1 的测试范围继续限于 structure-level governance checks：`project-structure.test.ts` 守护 `docs/operations/public-website-design-work-deferred-v0.1.md`、`.autopilot/goals/repoassure-product-core-execution-resume-v0.1.json`、`.autopilot/goals/index.json`、`.autopilot/progress/snapshot.json`、`.autopilot/progress/PROGRESS_SNAPSHOT.md`、`docs/PLAN.md`、`docs/DESIGN.md`、acceptance checklist、testing strategy、decision log 和 dev log 的级联。该 gate 只证明 design queue 已暂缓、product core queue 已恢复；不运行网站视觉实现、不要求 screenshot QA、不授权 deployment、public launch、repository visibility change、npm publication、GitHub release、customer contact、pricing、spend changes 或 website visual redesign。
+
+Product Core Execution Resume v0.1 的测试范围继续限于 structure-level governance checks：`project-structure.test.ts` 守护 `docs/operations/product-core-execution-resume-v0.1.md`、`.autopilot/goals/repoassure-product-core-execution-resume-v0.1.json`、`.autopilot/goals/ai-ide-repair-decision-package-contract-hardening-v0.1.json`、goal index、progress snapshot、PLAN、acceptance checklist、testing strategy、decision log 和 dev log 的级联。该 gate 只证明产品核心队列已恢复并选出 AI IDE Repair Decision Package Contract Hardening v0.1；不执行该产品核心实现、不修改目标 repo、不授权发布、部署、客户联系或 website visual redesign。
+
+AI IDE Repair Decision Package Contract Hardening v0.1 已按 TDD + 测试金字塔完成核心 contract hardening：`repair-handoff.test.ts` 覆盖 AI IDE reading order、`repairActionQueue`、`maintainerReview`、`verificationChecklist`、`redaction`、passed run empty queue、environment blocker tasks 和 no automatic target repo write boundary；`repair-execute.test.ts` 与 `repair-patch-plan.test.ts` 覆盖 downstream package shape compatibility。该 gate 只证明 repair decision package contract 可被 AI IDE 确定性读取，不执行目标 repo 自动修改、不创建 PR、不发布、不触发官网设计改造。
+
+AI IDE Repair Decision Package Real Campaign Validation v0.1 的后续实施应使用真实或近真实、无私密源码的 campaign artifacts，继续按 TDD + 测试金字塔验证 JSON/Markdown 可读性、CLI entrypoint、schema、redaction boundary、repair action queue consumption、maintainer review boundary 和 no automatic target repo write。该 goal 不得执行发布、launch、客户联系、网站视觉重构或目标 repo 自动变更。
+
+AI IDE Repair Decision Package Real Campaign Validation v0.1 已完成第一层真实/近真实 fixture validation：`fixtures/campaigns/ai-ide-repair-decision-package/manifest.json` 覆盖 failed command、failed maintainer acceptance check、required environment blocker、artifact references 和 sensitive evidence redaction；`repair-handoff.test.ts` 验证生成的 JSON / Markdown / verification plan、`repairActionQueue`、`maintainerReview`、`verificationChecklist`、`redaction`、environment blocker handling 和 no automatic target repo write。
+
+AI IDE Repair Execution Dry-Run Real Campaign Validation v0.1 已沿用该 fixture 完成第二层 dry-run validation：`repair-execute.test.ts` 验证 `repair:execute --dry-run` 可消费 selected queued tasks，并生成包含 `executionPlan`、`patchPreview`、`maintainerReview`、`verificationChecklist`、`noWriteProof` 的 redaction-safe JSON / Markdown execution report，同时保持不修改目标 repo。
+
+下一步 `AI IDE Repair Patch Plan Real Campaign Validation v0.1` 应继续沿用该 fixture 或等价非私密 campaign artifact，验证 `repair:patch-plan` 消费 dry-run execution report、生成 patch plan inputs，并保持不应用补丁或修改目标 repo。
+
+AI IDE Repair End-to-End Evidence Package Validation v0.1 已完成 repair loop 聚合测试：`repair-evidence-package.test.ts` 沿用近真实 campaign fixture，依次生成 repair handoff、dry-run report、validation-only report、patch plan 和 `ai-ide-repair-evidence-package.json` / `.md`，并验证 `agentContract`、`artifactIndex`、`repairFlow`、`taskMatrix`、`maintainerReview`、`verificationChecklist`、`noWriteProof`、redaction boundary 和 no target repo write。该 gate 不应用补丁、不修改目标 repo、不创建 branch/commit/PR，也不标记 acceptance passed。
+
+Project Intelligence Console Graph Snapshot Generator v0.1 已完成本地 graph snapshot 测试：`project-intelligence-snapshot.test.ts` 使用 fixture repo 验证 `pnpm project:intelligence` 对 docs graph、code graph、progress graph、source coverage、bounded output、ignored artifact boundary、redaction 和 no hosted dashboard / telemetry boundary 的输出契约。该 gate 只生成 `artifacts/project-graph/project-intelligence-snapshot.json` / `.md`，不实现 internal UI、不上传、不部署、不修改目标 repo。
+
+Project Intelligence Console Local Static Viewer v0.1 已完成本地静态查看器测试：`project-intelligence-viewer.test.ts` 使用 fixture snapshot 验证 `pnpm project:intelligence:view` 生成 `project-intelligence-viewer.html`，覆盖读取顺序、Docs Graph、Code Graph、Progress Graph、local-only 标记、redaction boundary、missing/malformed snapshot failure 和 unsupported CLI option failure。该 gate 只生成 ignored/local artifact，不实现 hosted dashboard、不加载外部资源、不上传、不部署、不修改目标 repo。
+
+Project Intelligence Console Graph Freshness and Staleness Checks v0.1 已完成本地 findings 测试：`project-intelligence-snapshot.test.ts` 验证 snapshot 写入 `summary.findings` 与 `findings` 列表，并覆盖 `missing_cascade`、`orphan_code`、`missing_test_link` 和 `progress_state_mismatch`；`project-intelligence-viewer.test.ts` 验证 viewer 展示 Freshness and Staleness Findings。真实工作区当前生成 11 个 medium findings，均为 ADR missing_cascade，用于后续 backlog triage；该 gate 不自动修改文档、代码或目标 repo。
+
+Project Intelligence ADR Cascade Remediation Backlog v0.1 已完成本地 backlog 测试：`project-intelligence-backlog.test.ts` 使用 fixture snapshot 验证 `pnpm project:intelligence:backlog` 只消费 `missing_cascade` findings，生成 `adr-cascade-remediation-backlog.md`，并明确 maintainer decision boundary、approve / defer / accept-risk / repair 选项、redaction 和 unsupported `--apply` failure。真实工作区当前生成 11 个 backlog items；该 gate 不自动修改 ADR/spec/docs/tests/logs/source。
+
+Project Intelligence ADR Cascade Remediation Decision Intake v0.1 已完成本地 decision intake 测试：`project-intelligence-decision-intake.test.ts` 使用 fixture backlog 验证 `pnpm project:intelligence:decision-intake` 生成 Markdown/JSON intake records，覆盖 pending decision slot、approve / defer / accept-risk / repair 选项、redaction、missing/malformed backlog failure 和 unsupported `--repair` failure。真实工作区当前生成 11 个 pending decision items；该 gate 不自动修复 ADR、不改写文档、不执行 repair。
+
+Project Intelligence ADR Cascade Remediation Recommendation Draft v0.1 已完成本地 recommendation draft 测试：`project-intelligence-recommendation-draft.test.ts` 使用 fixture decision intake 验证 `pnpm project:intelligence:recommendation-draft` 生成 Markdown/JSON advisory draft records，覆盖 recommended decision、rationale、risk、evidence、rollback / follow-up notes、final decision remains pending、redaction、missing/malformed intake failure 和 unsupported `--apply` / `--repair` failure。真实工作区当前生成 11 个 recommended repair items；该 gate 不写最终 maintainer decision、不自动修复 ADR、不改写文档、不执行 repair。
+
+Project Intelligence ADR Cascade Maintainer Decision Recording v0.1 已完成本地 maintainer decision record 测试：`project-intelligence-maintainer-decision.test.ts` 使用 fixture recommendation draft 验证 `pnpm project:intelligence:maintainer-decision` 生成 Markdown/JSON final decision records，覆盖 maintainer decision=repair、evidence note、repair execution remains unauthorized、redaction、missing/malformed draft failure、unsupported `--apply` / `--repair-execute` failure 和 unsupported decision failure。真实工作区当前记录 11 个 repair decisions；该 gate 不自动修复 ADR、不改写文档、不执行 repair。
+
+Project Intelligence ADR Cascade Controlled Remediation Plan v0.1 已完成本地 controlled remediation plan 测试：`project-intelligence-controlled-remediation-plan.test.ts` 使用 fixture maintainer decision record 验证 `pnpm project:intelligence:controlled-remediation-plan` 生成 Markdown/JSON plan records，覆盖 item-to-file mapping、proposed execution order、rollback notes、verification checklist、maintainer review boundary、repair execution remains unauthorized、redaction、missing/malformed decision record failure 和 unsupported `--apply` / `--repair-execute` failure。真实工作区当前生成 11 个 controlled remediation plan items；该 gate 不自动修复 ADR、不改写文档、不执行 repair。
+
 ## 原则
 
 项目采用 TDD 和测试金字塔：
@@ -50,6 +86,8 @@ Public Release Manual Decision Input v0.1 的测试继续限于 structure-level 
 
 Public Release Manual Decision Input Completion v0.1 的测试继续限于 structure-level tests，不执行真实发布动作：`project-structure.test.ts` 守护 `docs/operations/public-release-manual-decision-input-completion-v0.1.md`、README、public release checklist、acceptance checklist、testing strategy 和 dev log 的级联，要求状态为 `not_completed_missing_explicit_decisions`、public release remains no-go、Goal execution authorization is not a manual release decision，并要求 legal review、trademark/name review、branch protection or equivalent repository ruleset、final maintainer publication authorization、private preview reviewer feedback decision、dependency/license risk confirmation、secret/customer data exposure confirmation 全部保持 not_completed / missing_decision。该 gate 不预填 approve / reject / defer / accept risk，不关闭任何 release gate，不授权 repository visibility change、npm publication、GitHub release、public launch、production marketing announcement 或 SaaS/Team Cloud/Enterprise/hosted dashboard availability claims。
 
+Public Release Manual Decision Intake v0.2 的测试继续限于 structure-level tests 和 read-only remote evidence review，不执行真实发布动作：`project-structure.test.ts` 守护 `docs/operations/public-release-manual-decision-intake-v0.2.md`、README、public release checklist、acceptance checklist、testing strategy 和 dev log 的级联，要求状态为 `decisions_recorded_release_execution_blocked`、public release remains no-go，并记录七项决策：legal review approve、trademark/name accept risk、branch protection or equivalent repository ruleset defer、final maintainer publication authorization approve、private preview reviewer feedback accept risk、dependency/license risk accept risk、secret/customer data exposure approve。该 gate 还必须记录 branch protection / repository rulesets `HTTP 403`、conditional approve fallback defer、final authorization 被 deferred branch protection gate 阻塞，以及 no repository visibility change / npm publication / GitHub release / public launch / SaaS availability 的非授权边界。
+
 Public Release Manual Decision Input Review v0.1 的测试继续限于 structure-level tests，不执行真实发布动作：`project-structure.test.ts` 守护 `docs/operations/public-release-manual-decision-input-review-v0.1.md`、README、public release checklist、acceptance checklist、testing strategy 和 dev log 的级联，要求状态为 `not_ready_pending_input`、public release remains no-go、No approve / reject / defer / accept risk decision was supplied by the maintainer，并要求 legal review、trademark/name review、branch protection or equivalent repository ruleset、final maintainer publication authorization、private preview reviewer feedback decision、dependency/license risk confirmation、secret/customer data exposure confirmation 全部保持 pending_input / missing，同时阻止 Public Source Release Execution v0.1。
 
 Team Cloud & Enterprise Spec v0.1 的当前测试范围限于 structure-level tests：`project-structure.test.ts` 守护 ADR-0016、商业版产品 spec、商业版架构 spec、README、architecture overview、commercialization strategy、open-core packaging、MVP v0.3、acceptance checklist、decision log 和 dev log 的级联。因为当前增量明确 No paid cloud implementation in this increment，不新增云端 runtime unit/integration/E2E；未来一旦实现 artifact import、hosted dashboard、team collaboration、enterprise integrations 或 advanced governance，必须先补对应金字塔测试。
@@ -62,7 +100,7 @@ Public Website Enterprise Design System 的当前测试范围限于 structure-le
 
 Public Website v0.2 Enterprise Redesign 的测试范围包括 unit / structure / browser visual QA：`public-website.test.ts` 守护 Assurance Graph component、code-native Trust Ledger、dark enterprise security tokens、English default、Simplified Chinese locale、no browser-language auto-switching、selected source concept 和 guarded public copy；`pnpm verify:website` 覆盖 v0.2 headline、Assurance Graph、Trust Ledger、assurance pipeline、artifact tabs、private preview form、mobile navigation、English default 和 Simplified Chinese switching；`design-qa.md` 记录 selected Product Design direction 2 source visual、desktop/mobile screenshots、comparison evidence、P0/P1/P2 findings 和 `final result: passed`。
 
-Public Website UI/UX Gate 的测试范围包括 unit / structure / browser focus evidence：`public-website.test.ts` 守护 website semantic token layer，包括 brand tokens、semantic tokens、component tokens、`theme-dark` / `theme-light`、`--surface-hero`、`--surface-page`、`--status-verified`、`--focus-ring`、`--focus-ring-on-dark`，并要求 `a`、`button`、`select`、`input`、`[role="tab"]` 具备 `:focus-visible` 覆盖；`project-structure.test.ts` 守护 design system、public website spec、acceptance checklist、testing strategy 和 dev log 的 UI/UX gate 级联；`pnpm verify:website` 额外捕获 `desktop-focus-dark.png` 和 `desktop-focus-light.png`，证明深色首屏和白色表单区焦点态在真实浏览器中可见。该 gate 不授权 SaaS、Team Cloud、Enterprise、public release claims 或 product artifact localization。
+Public Website UI/UX Gate 的测试范围包括 unit / structure / browser focus evidence：`public-website.test.ts` 守护 website semantic token layer，包括 brand tokens、semantic tokens、component tokens、`theme-dark` / `theme-light`、`--surface-hero`、`--surface-page`、`--accent`、`--status-success`、`--focus-ring`、`--focus-ring-on-dark`，并要求 `a`、`button`、`select`、`input`、`[role="tab"]` 具备 `:focus-visible` 覆盖；`project-structure.test.ts` 守护 design system、`website-uiux-roadmap-v0.2.md`、public website spec、acceptance checklist、testing strategy 和 dev log 的 UI/UX gate 级联；`pnpm verify:website` 额外捕获 `desktop-focus-dark.png` 和 `desktop-focus-light.png`，证明深色首屏和白色表单区焦点态在真实浏览器中可见。该 gate 不授权 SaaS、Team Cloud、Enterprise、public release claims 或 product artifact localization。
 
 Public Website Private Preview Deployment Planning 的测试范围限于 structure-level tests：`project-structure.test.ts` 守护 ADR-0020、public website spec、public website handoff、README、architecture overview、acceptance checklist、testing strategy、decision log 和 dev log 的级联。该 planning gate 不执行真实部署，不调用 hosting provider，不创建 preview URL，不连接 custom domain，不公开 repo，不发布 npm package，不创建 GitHub release。deployment execution goal 已补 `vercel.json`、`.vercelignore` 和 blocker 记录测试；当前 Vercel 尝试被记录为 blocked，因为 CLI / project 返回 `target production` 或不可验证的 `UNKNOWN` preview，且 Vercel Git integration 曾在 `main` push 后自动创建 production deployment；Git integration 已断开。Resolve Vercel Preview Target Blocker v0.1 的测试补充要求 blocker、dev log 和 handoff 记录 retry 状态；本轮复验 `main` 默认 deploy、显式 `--target preview --skip-domain` 和临时非 main 分支 deploy 后仍未得到 accepted preview URL。只有获得 `Ready`、访问受控、非 production alias 的 preview URL，并通过 smoke/content/screenshot/forbidden-claim verification 后，才能把该 gate 改为通过。
 
@@ -249,3 +287,58 @@ Private Preview External Reviewer Feedback Intake v0.1 is verified through struc
 The structure test requires `docs/operations/private-preview-external-reviewer-feedback-intake-v0.1.md` and cascade docs to record `Intake status: waiting_for_reviewer_feedback`, `Feedback received: no`, `external-reviewer-1`, `external-reviewer-2`, the sensitive material redaction gate, `No reviewer feedback was invented`, `No feedback triage was started`, and `No external issue was created`.
 
 The test intentionally does not assert any reviewer decision such as accepted or changes_requested because no real reviewer feedback exists yet. Triage remains blocked until redacted real feedback is received.
+
+## Public Website P3 Pixel QA
+
+Public Website P3 Pixel QA & Mobile Responsive Polish v0.1 is verified through:
+
+```text
+pnpm vitest run tests/unit/public-website.test.ts
+pnpm build:website
+pnpm typecheck:website
+in-app browser DOM metrics against http://127.0.0.1:5175/
+```
+
+The unit test guards the P3 responsive CSS contracts, screenshot artifact names, and `horizontalOverflow` verification hook. The local browser DOM metric run at `390x1200` must report `horizontalOverflow: 0`.
+
+Current environment limitation: Playwright/System Chrome screenshot capture can fail with Chrome headless `SIGABRT` / CDP screenshot timeout. When this happens, treat screenshot capture as `environment_limited`, not as owner visual acceptance. Owner visual review remains the next gate.
+
+## AI IDE Repair Patch Plan Real Campaign Validation
+
+AI IDE Repair Patch Plan Real Campaign Validation v0.1 is verified through TDD coverage around the near-real repair campaign fixture:
+
+```text
+pnpm vitest run tests/unit/repair-patch-plan.test.ts --testNamePattern "near-real patch plan"
+pnpm vitest run tests/unit/repair-patch-plan.test.ts
+```
+
+The test consumes `fixtures/campaigns/ai-ide-repair-decision-package/manifest.json` through `repair:handoff`, runs `repair:execute` in dry-run mode, and then runs `repair:patch-plan`. The expected patch plan must expose `patchPlanInputs`, `maintainerReview`, `verificationChecklist`, and `noWriteProof`, redact secret-like fixture strings, and prove the target source file remains unchanged.
+
+Next validation should cover `repair:execute --validation-only` against a controlled near-real target repo while preserving the same no-write boundary.
+
+## AI IDE Repair Validation-Only Real Campaign Validation
+
+AI IDE Repair Validation-Only Real Campaign Validation v0.1 is verified through:
+
+```text
+pnpm vitest run tests/unit/repair-execute.test.ts --testNamePattern "validation-only near-real campaign"
+pnpm vitest run tests/unit/repair-execute.test.ts
+```
+
+The test consumes the near-real campaign fixture through `repair:handoff`, runs `repair:execute --validation-only` with a controlled fake `pnpm` command, and validates passed / failed / skipped task evidence. Commands with placeholders such as `<repo>` are skipped rather than executed, failed command output is redacted, and the target repo source file remains unchanged.
+
+Next validation should consolidate repair handoff, dry-run execution report, validation-only execution report, patch plan, and no-write proof into one end-to-end evidence package.
+
+## Project Intelligence ADR Cascade Controlled Remediation Execution
+
+Project Intelligence ADR Cascade Controlled Remediation Execution v0.1 is verified through structure-level TDD coverage:
+
+```text
+pnpm vitest run tests/unit/adr-cascade-controlled-remediation.test.ts
+pnpm vitest run tests/unit/adr-cascade-controlled-remediation.test.ts tests/unit/project-structure.test.ts
+pnpm project:intelligence
+```
+
+The focused test requires all 11 owner-authorized ADRs to include a `Cascade Evidence` section that links to `docs/PRD.md`, `docs/SPEC.md`, `docs/PLAN.md`, `docs/testing/strategy/test-strategy-v0.1.md`, `docs/acceptance/checklists/acceptance-checklist-v0.1.md`, `docs/logs/decision-log.md`, `docs/logs/dev-log.md`, `docs/product/specs/project-intelligence-console-spec-v0.1.md`, and `docs/architecture/specs/project-intelligence-console-architecture-v0.1.md`.
+
+The verification boundary confirms documentation governance repair only. It does not prove hosted dashboard, cloud sync, telemetry, deployment, public release, target repo writes, or website visual redesign.

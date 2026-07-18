@@ -79,3 +79,18 @@ Localized forbidden-claim checks must prevent every locale from implying:
 - Keep localized forbidden-claim tests current for every supported locale.
 - Defer `/en/`, `/zh-CN/`, `/ja/`, and `/ko/` SEO route strategy until the routing and deployment plan is accepted.
 - Create a separate ADR before localizing hardening reports, repair plans, acceptance packages, generated tests, CLI output, or AI IDE handoff materials.
+
+## Cascade Evidence
+
+Project Intelligence ADR Cascade Controlled Remediation Execution v0.1 repaired this ADR's cascade links.
+
+- Product entrypoint: `docs/PRD.md`
+- Specification entrypoint: `docs/SPEC.md`
+- Execution plan: `docs/PLAN.md`
+- Testing strategy: `docs/testing/strategy/test-strategy-v0.1.md`
+- Acceptance checklist: `docs/acceptance/checklists/acceptance-checklist-v0.1.md`
+- Decision log: `docs/logs/decision-log.md`
+- Development log: `docs/logs/dev-log.md`
+- Project Intelligence spec: `docs/product/specs/project-intelligence-console-spec-v0.1.md`
+- Project Intelligence architecture: `docs/architecture/specs/project-intelligence-console-architecture-v0.1.md`
+- Repair execution: authorized by Project Intelligence ADR Cascade Controlled Remediation Execution v0.1.

@@ -1,0 +1,22 @@
+{
+  "schema": "project-autopilot/intake-confirmation@1",
+  "recorded_at": "2026-07-16T00:00:00.000Z",
+  "project_intake_mode": "brownfield",
+  "owner_confirmed": true,
+  "confirmation_source": "owner_requested_and_authorized_brownfield_autopilot_initialization",
+  "primary_doc_locale": "zh-CN",
+  "machine_protocol_locale": "en-US",
+  "brownfield_report_status": "initialized_owner_confirmed",
+  "brownfield_report_path": "docs/operations/brownfield-autopilot-intake-v0.1.md",
+  "non_authorized_actions": [
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "public_launch",
+    "production_marketing_announcement",
+    "deployment",
+    "pricing_change",
+    "customer_contact"
+  ]
+}
+

@@ -68,3 +68,18 @@ This ADR does not authorize:
 - SaaS, Team Cloud, or Enterprise availability claims.
 - Hosted dashboard availability claims.
 - Product artifact localization.
+
+## Cascade Evidence
+
+Project Intelligence ADR Cascade Controlled Remediation Execution v0.1 repaired this ADR's cascade links.
+
+- Product entrypoint: `docs/PRD.md`
+- Specification entrypoint: `docs/SPEC.md`
+- Execution plan: `docs/PLAN.md`
+- Testing strategy: `docs/testing/strategy/test-strategy-v0.1.md`
+- Acceptance checklist: `docs/acceptance/checklists/acceptance-checklist-v0.1.md`
+- Decision log: `docs/logs/decision-log.md`
+- Development log: `docs/logs/dev-log.md`
+- Project Intelligence spec: `docs/product/specs/project-intelligence-console-spec-v0.1.md`
+- Project Intelligence architecture: `docs/architecture/specs/project-intelligence-console-architecture-v0.1.md`
+- Repair execution: authorized by Project Intelligence ADR Cascade Controlled Remediation Execution v0.1.

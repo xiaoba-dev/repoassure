@@ -1,0 +1,42 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "ai-ide-repair-execution-dry-run-real-campaign-validation-v0.1",
+  "title": "AI IDE Repair Execution Dry-Run Real Campaign Validation v0.1",
+  "status": "completed",
+  "created_at": "2026-07-16T00:00:00.000Z",
+  "objective": "Validate repair execution dry-run consumption for real or near-real campaign repair decision packages, proving selected repairActionQueue tasks can produce execution reports and patch-plan inputs without automatic target repo writes.",
+  "document_basis": [
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "docs/operations/ai-ide-repair-decision-package-real-campaign-validation-v0.1.md",
+    "docs/testing/strategy/test-strategy-v0.1.md",
+    "docs/acceptance/checklists/acceptance-checklist-v0.1.md"
+  ],
+  "acceptance": [
+    "Use the existing near-real campaign fixture or equivalent non-private run artifact.",
+    "Generate a repair handoff package, then consume selected queued tasks with repair:execute dry-run.",
+    "Validate execution report JSON/Markdown readability, selected task boundaries, verification commands, and redaction.",
+    "Prove dry-run does not write target repository source files, create commits, create PRs, or mark acceptance passed.",
+    "Update operations docs, testing strategy, acceptance checklist, decision log, dev log, and progress snapshot."
+  ],
+  "blocked_actions": [
+    "automatic_target_repo_write",
+    "website_visual_redesign",
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "deployment",
+    "pricing_change",
+    "customer_contact"
+  ],
+  "completed_at": "2026-07-16T14:55:00.000Z",
+  "result_summary": "Near-real repair decision package dry-run validation proves repair:execute can consume selected repairActionQueue tasks and produce executionPlan, patchPreview, maintainerReview, verificationChecklist, redaction-safe reports, and noWriteProof without automatic target repo writes.",
+  "verification_evidence": [
+    "tests/unit/repair-execute.test.ts covers near-real dry-run consumption from fixtures/campaigns/ai-ide-repair-decision-package/manifest.json.",
+    "repair-execution-report.json exposes executionPlan, patchPreview, maintainerReview, verificationChecklist, and noWriteProof.",
+    "The dry-run test preserves target source content and mtime while writing only report artifacts to the output directory."
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "ai-ide-repair-end-to-end-evidence-package-validation-v0.1",
+  "title": "AI IDE Repair End-to-End Evidence Package Validation v0.1",
+  "status": "completed",
+  "created_at": "2026-07-16T16:05:00.000Z",
+  "objective": "Validate an end-to-end evidence package for AI IDE and maintainer consumption, proving repair handoff, dry-run execution report, validation-only execution report, patch plan, no-write proof, redaction boundaries, and read-order guidance are coherent across one near-real campaign without applying patches or automatically changing target repository files.",
+  "document_basis": [
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "docs/operations/ai-ide-repair-validation-only-real-campaign-validation-v0.1.md",
+    "docs/testing/strategy/test-strategy-v0.1.md",
+    "docs/acceptance/checklists/acceptance-checklist-v0.1.md"
+  ],
+  "acceptance": [
+    "Use the controlled near-real campaign fixture and target repo.",
+    "Generate repair-handoff-package.json, dry-run repair-execution-report.json, validation-only repair-execution-report.json, and patch-plan.json.",
+    "Validate that AI IDE read order, maintainer review boundary, verification checklist, no-write proof, and redaction guarantees are coherent across the package.",
+    "Prove no patch is applied, no commit or pull request is created, no acceptance is marked passed, and no target repository source file is modified.",
+    "Update operations docs, testing strategy, acceptance checklist, decision log, dev log, and progress snapshot."
+  ],
+  "blocked_actions": [
+    "automatic_target_repo_write",
+    "patch_application",
+    "website_visual_redesign",
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "deployment",
+    "pricing_change",
+    "customer_contact"
+  ],
+  "completed_at": "2026-07-16T16:20:00.000Z",
+  "evidence": [
+    "packages/acceptance/src/run-repair-evidence-package.ts",
+    "tests/unit/repair-evidence-package.test.ts",
+    "docs/operations/ai-ide-repair-end-to-end-evidence-package-validation-v0.1.md",
+    "pnpm repair:evidence-package",
+    "ai-ide-repair-evidence-package.json",
+    "ai-ide-repair-evidence-package.md"
+  ],
+  "next_goal_id": "project-intelligence-console-graph-snapshot-generator-v0.1"
+}

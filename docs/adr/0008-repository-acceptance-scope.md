@@ -70,3 +70,18 @@ Out of scope for the current browser acceptance flow:
 ### Follow-up Implementation Note - 2026-06-21
 
 The dedicated mode has entered the product as an explicit `user:accept --mode cli` path. This does not weaken the browser preflight: default browser acceptance still requires a Web App `package.json` manifest. CLI mode uses `pyproject.toml` preflight, Python/CLI profile generation, CLI smoke/static/test check execution results, a CLI-oriented report, run manifest, repair plan, and repair task package. Accepted CLI records still require concrete user notes, but they do not require generated Playwright spec validation.
+
+## Cascade Evidence
+
+Project Intelligence ADR Cascade Controlled Remediation Execution v0.1 repaired this ADR's cascade links.
+
+- Product entrypoint: `docs/PRD.md`
+- Specification entrypoint: `docs/SPEC.md`
+- Execution plan: `docs/PLAN.md`
+- Testing strategy: `docs/testing/strategy/test-strategy-v0.1.md`
+- Acceptance checklist: `docs/acceptance/checklists/acceptance-checklist-v0.1.md`
+- Decision log: `docs/logs/decision-log.md`
+- Development log: `docs/logs/dev-log.md`
+- Project Intelligence spec: `docs/product/specs/project-intelligence-console-spec-v0.1.md`
+- Project Intelligence architecture: `docs/architecture/specs/project-intelligence-console-architecture-v0.1.md`
+- Repair execution: authorized by Project Intelligence ADR Cascade Controlled Remediation Execution v0.1.

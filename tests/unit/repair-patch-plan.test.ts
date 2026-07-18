@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -10,7 +10,8 @@ import {
   parseRepairPatchPlanArgs,
   runRepairPatchPlan
 } from '../../packages/acceptance/src/run-repair-patch-plan.js';
-import type { RepairExecutionReport } from '../../packages/acceptance/src/run-repair-execute.js';
+import { runRepairExecute, type RepairExecutionReport } from '../../packages/acceptance/src/run-repair-execute.js';
+import { runRepairHandoff, type RepairHandoffPackage } from '../../packages/acceptance/src/run-repair-handoff.js';
 
 function buildExecutionReport(): RepairExecutionReport {
   return {
@@ -34,17 +35,43 @@ function buildExecutionReport(): RepairExecutionReport {
       resultSemantics: {
         planned: 'No verification commands were run.',
         passed: 'All selected verification commands exited zero.',
-        failed: 'At least one selected verification command failed or timed out.'
+        failed: 'At least one selected verification command failed or timed out.',
+        skipped: 'A selected task had no runnable verification command in this local context.'
       },
       nextCommands: {
         patchPlan: 'pnpm repair:patch-plan -- --report <repair-execution-report.json>'
       },
       boundaries: ['Validation-only mode does not modify target repository files.']
     },
+    executionPlan: {
+      readOrder: ['summary', 'executionPlan', 'patchPreview', 'tasks[]'],
+      steps: ['Review selected repairActionQueue tasks before any code change.']
+    },
+    patchPreview: {
+      status: 'preview_only',
+      candidateTasks: [
+        { taskId: 'pycli-failed-ruff-check', sourceType: 'command_failure', expectedFiles: ['agent_reach/channels/__init__.py'] },
+        { taskId: 'pycli-failed-mypy', sourceType: 'command_failure', expectedFiles: ['agent_reach/cookie_extract.py', 'agent_reach/probe.py'] }
+      ]
+    },
+    maintainerReview: {
+      requiredBefore: ['changing target repository files'],
+      allowedDecisions: ['approve', 'reject', 'defer', 'accept_risk']
+    },
+    verificationChecklist: {
+      commands: ['ruff check .', 'mypy .'],
+      completionSignals: ['Maintainer review decision is recorded before any target repo write.']
+    },
+    noWriteProof: {
+      targetRepoWriteAuthorized: false,
+      sourceFilesChanged: false,
+      prohibitedActions: ['changing target repository files']
+    },
     tasks: [
       {
         taskId: 'pycli-failed-ruff-check',
         priority: 'P1',
+        sourceType: 'command_failure',
         objective: '修复失败命令：ruff check .',
         executionStatus: 'failed',
         mode: 'validation-only',
@@ -65,6 +92,7 @@ function buildExecutionReport(): RepairExecutionReport {
       {
         taskId: 'pycli-failed-mypy',
         priority: 'P1',
+        sourceType: 'command_failure',
         objective: '修复失败命令：mypy .',
         executionStatus: 'failed',
         mode: 'validation-only',
@@ -162,5 +190,122 @@ describe('repair patch plan', () => {
     expect(result.autoFixCandidates).toBe(1);
     await expect(readFile(result.planPath, 'utf8')).resolves.toContain('"actionType": "import-sort"');
     await expect(readFile(result.markdownPath, 'utf8')).resolves.toContain('ruff check . --fix');
+  });
+
+  it('builds a near-real patch plan from a dry-run execution report without applying patches', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'hardening-patch-plan-campaign-'));
+    const targetRepo = join(dir, 'target-repo');
+    const sourceFile = join(targetRepo, 'src/auth/password.js');
+    const runDir = join(dir, 'runs/campaign-run-001');
+    const handoffDir = join(dir, 'handoff');
+    const executeDir = join(dir, 'execute');
+    const patchPlanDir = join(dir, 'patch-plan');
+    const sourceBefore = 'module.exports = { hash: "sha1" };\n';
+
+    await mkdir(join(targetRepo, 'src/auth'), { recursive: true });
+    await writeFile(sourceFile, sourceBefore);
+    const mtimeBefore = (await stat(sourceFile)).mtimeMs;
+
+    const fixtureManifest = JSON.parse(
+      await readFile('fixtures/campaigns/ai-ide-repair-decision-package/manifest.json', 'utf8')
+    ) as Record<string, unknown>;
+    await mkdir(runDir, { recursive: true });
+    await writeFile(
+      join(runDir, 'manifest.json'),
+      `${JSON.stringify({ ...fixtureManifest, repoRoot: targetRepo }, null, 2)}\n`
+    );
+
+    const handoff = await runRepairHandoff({
+      runDir,
+      outputDir: handoffDir,
+      generatedAt: '2026-07-16T13:00:00.000Z'
+    });
+    const handoffPackage = JSON.parse(await readFile(handoff.packagePath, 'utf8')) as RepairHandoffPackage;
+    const taskIds = handoffPackage.repairActionQueue.map((task) => task.taskId);
+
+    const execution = await runRepairExecute({
+      packagePath: handoff.packagePath,
+      taskIds,
+      dryRun: true,
+      outputDir: executeDir,
+      generatedAt: '2026-07-16T13:05:00.000Z'
+    });
+    const result = await runRepairPatchPlan({
+      reportPath: execution.reportPath,
+      outputDir: patchPlanDir,
+      generatedAt: '2026-07-16T13:10:00.000Z'
+    });
+
+    const plan = JSON.parse(await readFile(result.planPath, 'utf8')) as {
+      sourceReportMode: string;
+      patchPlanInputs: {
+        status: string;
+        source: string;
+        candidateTasks: Array<{ taskId: string; sourceType: string; expectedFiles: string[]; verificationCommands: string[] }>;
+      };
+      maintainerReview: { requiredBefore: string[]; allowedDecisions: string[] };
+      verificationChecklist: { commands: string[]; completionSignals: string[] };
+      noWriteProof: {
+        targetRepoWriteAuthorized: boolean;
+        patchesApplied: boolean;
+        sourceFilesChanged: boolean;
+        prohibitedActions: string[];
+      };
+      agentContract: { readOrder: string[]; applyPolicy: string };
+      actions: Array<{ taskId: string; actionType: string; targetFiles: string[]; suggestedCommands: string[]; autoFixCandidate: boolean }>;
+    };
+    const markdown = await readFile(result.markdownPath, 'utf8');
+
+    expect(result.status).toBe('review_required');
+    expect(result.actionCount).toBe(taskIds.length);
+    expect(result.autoFixCandidates).toBe(0);
+    expect(plan.sourceReportMode).toBe('dry-run');
+    expect(plan.patchPlanInputs).toMatchObject({
+      status: 'inputs_only',
+      source: 'patchPreview'
+    });
+    expect(plan.patchPlanInputs.candidateTasks.map((task) => task.sourceType).sort()).toEqual([
+      'acceptance_check_failure',
+      'command_failure',
+      'command_failure',
+      'environment_blocker'
+    ].sort());
+    expect(plan.patchPlanInputs.candidateTasks.flatMap((task) => task.expectedFiles)).toContain('src/auth/password.js');
+    expect(plan.patchPlanInputs.candidateTasks.flatMap((task) => task.verificationCommands)).toContain('pnpm test -- --runInBand');
+    expect(plan.actions.every((action) => action.actionType === 'manual-investigation')).toBe(true);
+    expect(plan.actions.flatMap((action) => action.targetFiles)).toContain('src/auth/password.js');
+    expect(plan.actions.flatMap((action) => action.suggestedCommands)).toContain('pnpm test -- --runInBand');
+    expect(plan.actions.every((action) => action.autoFixCandidate === false)).toBe(true);
+    expect(plan.maintainerReview.requiredBefore).toContain('changing target repository files');
+    expect(plan.verificationChecklist.commands).toContain('pnpm test -- --runInBand');
+    expect(plan.noWriteProof).toMatchObject({
+      targetRepoWriteAuthorized: false,
+      patchesApplied: false,
+      sourceFilesChanged: false
+    });
+    expect(plan.noWriteProof.prohibitedActions).toContain('changing target repository files');
+    expect(plan.agentContract.applyPolicy).toBe('manual-review-only');
+    expect(plan.agentContract.readOrder).toEqual([
+      'status',
+      'summary',
+      'patchPlanInputs',
+      'actions[]',
+      'actions[].targetFiles',
+      'actions[].recommendedChange',
+      'actions[].suggestedCommands',
+      'maintainerReview',
+      'verificationChecklist',
+      'noWriteProof'
+    ]);
+    expect(markdown).toContain('## Patch Plan Inputs');
+    expect(markdown).toContain('## Maintainer Review Boundary');
+    expect(markdown).toContain('## Verification Checklist');
+    expect(markdown).toContain('## No-write Proof');
+    expect(markdown).not.toContain('ghp_real_secret_token');
+    expect(markdown).not.toContain('sessionid=private');
+    expect(JSON.stringify(plan)).not.toContain('ghp_real_secret_token');
+    expect(JSON.stringify(plan)).not.toContain('sessionid=private');
+    await expect(readFile(sourceFile, 'utf8')).resolves.toBe(sourceBefore);
+    expect((await stat(sourceFile)).mtimeMs).toBe(mtimeBefore);
   });
 });

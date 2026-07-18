@@ -1,0 +1,41 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "ai-ide-repair-decision-package-real-campaign-validation-v0.1",
+  "title": "AI IDE Repair Decision Package Real Campaign Validation v0.1",
+  "status": "completed",
+  "created_at": "2026-07-16T00:00:00.000Z",
+  "completed_at": "2026-07-16T00:00:00.000Z",
+  "objective": "Run real campaign validation for the hardened AI IDE repair decision package by consuming representative or real non-private campaign artifacts, validating JSON and Markdown readability, confirming AI IDE reading order and maintainer review boundaries, and proving no automatic target repo write occurs.",
+  "document_basis": [
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "docs/operations/ai-ide-repair-decision-package-contract-hardening-v0.1.md",
+    "docs/testing/strategy/test-strategy-v0.1.md",
+    "docs/acceptance/checklists/acceptance-checklist-v0.1.md"
+  ],
+  "acceptance": [
+    "Prepare or reuse redacted campaign-summary fixtures covering passed, blocked, failed, environment blocker, and queued repair action scenarios.",
+    "Generate AI IDE repair decision package JSON and Markdown from fixture or real non-private campaign artifacts.",
+    "Validate deterministic reading order, repairActionQueue, maintainerReview, verificationChecklist, redaction, and no automatic target repo write boundary.",
+    "Run focused contract/unit tests plus smoke/integration checks for CLI entrypoint, schema, Markdown readability, and redaction boundary.",
+    "Update operations docs, README if needed, testing strategy, acceptance checklist, decision log, dev log, and progress snapshot."
+  ],
+  "blocked_actions": [
+    "automatic_target_repo_write",
+    "website_visual_redesign",
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "deployment",
+    "pricing_change",
+    "customer_contact"
+  ],
+  "result_summary": "Near-real campaign manifest fixture validates JSON and Markdown readability, repairActionQueue consumption, maintainerReview boundary, verificationChecklist, redaction, environment blocker handling, and no automatic target repo writes.",
+  "verification_evidence": [
+    "pnpm vitest run tests/unit/repair-handoff.test.ts",
+    "pnpm vitest run tests/unit/project-structure.test.ts --testNamePattern \"initializes brownfield Autopilot state\""
+  ]
+}

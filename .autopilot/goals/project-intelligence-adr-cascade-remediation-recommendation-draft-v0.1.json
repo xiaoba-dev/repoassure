@@ -1,0 +1,61 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-adr-cascade-remediation-recommendation-draft-v0.1",
+  "title": "Project Intelligence ADR Cascade Remediation Recommendation Draft v0.1",
+  "status": "completed",
+  "created_at": "2026-07-17T12:00:00.000+08:00",
+  "completed_at": "2026-07-17T18:35:00.000+08:00",
+  "objective": "Generate a maintainer-reviewable recommendation draft for the 11 ADR cascade decision intake items, suggesting approve, defer, accept-risk, or repair with rationale while leaving final decisions pending.",
+  "document_basis": [
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "docs/operations/project-intelligence-adr-cascade-remediation-decision-intake-v0.1.md",
+    "artifacts/project-graph/adr-cascade-remediation-decision-intake.json"
+  ],
+  "acceptance": [
+    "Read the generated ADR cascade remediation decision intake JSON/Markdown.",
+    "Generate a recommendation draft with one suggested decision and rationale per item.",
+    "Keep every final maintainer decision pending until explicit owner confirmation.",
+    "Do not execute repair actions or modify ADR/spec/docs/tests/logs/source.",
+    "Cascade the selected recommendation-draft status into PLAN, acceptance checklist, testing strategy, decision log, dev log, and autopilot progress state."
+  ],
+  "blocked_actions": [
+    "final_maintainer_decision_write",
+    "automatic_doc_rewrite",
+    "automatic_adr_repair",
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "website_visual_redesign",
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "deployment",
+    "pricing_change",
+    "customer_contact"
+  ],
+  "source_intake": {
+    "path": "artifacts/project-graph/adr-cascade-remediation-decision-intake.json",
+    "items": 11,
+    "status": "maintainer_decision_required"
+  },
+  "recommendation_summary": {
+    "markdown_output": "artifacts/project-graph/adr-cascade-remediation-recommendation-draft.md",
+    "json_output": "artifacts/project-graph/adr-cascade-remediation-recommendation-draft.json",
+    "items": 11,
+    "recommended_repair": 11,
+    "final_maintainer_decisions_written": 0,
+    "automatic_repair_authorized": false
+  },
+  "verification_evidence": {
+    "tests": [
+      "pnpm vitest run tests/unit/project-intelligence-recommendation-draft.test.ts",
+      "pnpm build:acceptance"
+    ],
+    "artifact_generation": "node packages/acceptance/dist/run-project-intelligence-recommendation-draft.js --intake artifacts/project-graph/adr-cascade-remediation-decision-intake.json --output artifacts/project-graph"
+  },
+  "next_goal_id": "project-intelligence-adr-cascade-maintainer-decision-recording-v0.1"
+}

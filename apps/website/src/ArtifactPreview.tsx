@@ -1,3 +1,4 @@
+import { SeverityChip, StatusChip } from './components/ui/StatusChip.tsx';
 import type { ArtifactId } from './i18n.ts';
 
 type ArtifactPreviewItem = {
@@ -57,27 +58,7 @@ export function ArtifactPreview({
       </div>
 
       <article className="artifact-detail">
-        <header className="artifact-detail-header">
-          <div>
-            <p className="artifact-status">{activeArtifact.status}</p>
-            <h3>{activeArtifact.name}</h3>
-            <p>{activeArtifact.summary}</p>
-          </div>
-          <dl className="artifact-detail-meta">
-            <div>
-              <dt>{labels.evidenceLabel}</dt>
-              <dd>
-                <code>{activeArtifact.evidence}</code>
-              </dd>
-            </div>
-            <div>
-              <dt>{labels.detailLabel}</dt>
-              <dd>{activeArtifact.detail}</dd>
-            </div>
-          </dl>
-        </header>
-
-        <div className="artifact-preview-panel" aria-label={labels.previewLabel}>
+        <div className="artifact-preview-panel artifact-preview-panel-leading" aria-label={labels.previewLabel}>
           <p className="artifact-preview-panel-label">{labels.previewLabel}</p>
           <h4>{activeArtifact.previewHeading}</h4>
           <div className="artifact-preview-surface">
@@ -85,9 +66,7 @@ export function ArtifactPreview({
               if (line.kind === 'finding') {
                 return (
                   <div className="artifact-finding" key={`${line.text}-${index}`}>
-                    <span className={`severity-chip severity-${line.severity?.toLowerCase() ?? 'p2'}`}>
-                      {line.severity}
-                    </span>
+                    <SeverityChip severity={line.severity ?? 'P2'} />
                     <p>{line.text}</p>
                   </div>
                 );
@@ -110,6 +89,26 @@ export function ArtifactPreview({
             })}
           </div>
         </div>
+
+        <header className="artifact-detail-header artifact-detail-header-compact">
+          <div className="artifact-detail-title">
+            <StatusChip tone="success">{activeArtifact.status}</StatusChip>
+            <h3>{activeArtifact.name}</h3>
+            <p className="artifact-detail-summary">{activeArtifact.summary}</p>
+          </div>
+          <dl className="artifact-detail-meta artifact-detail-meta-inline">
+            <div>
+              <dt>{labels.evidenceLabel}</dt>
+              <dd>
+                <code>{activeArtifact.evidence}</code>
+              </dd>
+            </div>
+            <div>
+              <dt>{labels.detailLabel}</dt>
+              <dd>{activeArtifact.detail}</dd>
+            </div>
+          </dl>
+        </header>
       </article>
     </div>
   );

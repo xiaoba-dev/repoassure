@@ -65,7 +65,6 @@ type WebsiteCopy = {
     assuranceGraph: string;
     artifacts: string;
     openCore: string;
-    roadmap: string;
     trust: string;
     privatePreview: string;
     toggleNavigation: string;
@@ -74,10 +73,16 @@ type WebsiteCopy = {
     status: string;
     heading: string;
     lede: string;
-    assurances: string[];
+    highlight: string;
     primaryCta: string;
     secondaryCta: string;
-    privacyNote: string;
+  };
+  heroRunSummary: {
+    label: string;
+    items: Array<{
+      label: string;
+      value: string;
+    }>;
   };
   assuranceGraph: AssuranceGraphCopy;
   assuranceGraphSection: {
@@ -136,6 +141,14 @@ type WebsiteCopy = {
     bullets: string[];
     link: string;
     repositoryNote: string;
+    diagram: {
+      label: string;
+      nodes: Array<{
+        id: string;
+        title: string;
+        caption: string;
+      }>;
+    };
   };
   roadmap: {
     label: string;
@@ -155,6 +168,7 @@ type WebsiteCopy = {
   preview: {
     heading: string;
     body: string;
+    designPartnerNote: string;
     emailLabel: string;
     emailPlaceholder: string;
     submit: string;
@@ -163,15 +177,8 @@ type WebsiteCopy = {
   };
   footer: {
     description: string;
-    product: string;
-    community: string;
-    company: string;
-    repository: string;
-    contributing: string;
-    privacy: string;
-    contact: string;
-    previewTitle: string;
-    previewText: string;
+    linksLabel: string;
+    note: string;
   };
 };
 
@@ -196,7 +203,6 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       assuranceGraph: 'Assurance Graph',
       artifacts: 'Proof artifacts',
       openCore: 'Open core',
-      roadmap: 'Evidence model',
       trust: 'Trust',
       privatePreview: 'Private preview',
       toggleNavigation: 'Toggle navigation'
@@ -205,10 +211,18 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       status: 'Local-first by design',
       heading: 'Assure every AI-generated repo before it ships',
       lede: 'Signed local evidence, repair plans, and acceptance decisions for AI-generated repositories.',
-      assurances: ['Docs, code, tests, and ADRs verified', 'Repair plans and patch plans generated', 'Acceptance decisions signed locally'],
+      highlight:
+        'Verified inputs become signed artifacts and local acceptance decisions — without leaving your machine.',
       primaryCta: 'Join private preview',
-      secondaryCta: 'View evidence model',
-      privacyNote: 'Evidence never leaves your machine.'
+      secondaryCta: 'View assurance graph'
+    },
+    heroRunSummary: {
+      label: 'Latest local run',
+      items: [
+        { label: 'Readiness score', value: '85 · P0: 0 · P1: 1' },
+        { label: 'Findings', value: '214 issues · 38 repair actions' },
+        { label: 'Signed bundle', value: '.hardening/latest/manifest.json' }
+      ]
     },
     assuranceGraph: {
       label: 'Assurance Graph',
@@ -403,10 +417,19 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
         'Reproducible, auditable, verifiable'
       ],
       link: 'Explore the repository',
-      repositoryNote: 'Public repository link opens after the public release gate closes.'
+      repositoryNote: 'Public repository link opens after the public release gate closes.',
+      diagram: {
+        label: 'Local-first open core flow',
+        nodes: [
+          { id: 'repo', title: 'AI repo', caption: 'Local workspace' },
+          { id: 'engine', title: 'RepoAssure', caption: 'CLI · MCP · Action' },
+          { id: 'bundle', title: '.hardening/', caption: 'Signed artifacts' },
+          { id: 'acceptance', title: 'Acceptance', caption: 'Local decision' }
+        ]
+      }
     },
     roadmap: {
-      label: 'Team Cloud / Enterprise planned',
+      label: 'Evidence model · Team Cloud planned',
       heading: 'Roadmap: Team Cloud and Enterprise',
       body: 'Secure collaboration, centralized policy, and audit at scale.',
       bullets: [
@@ -438,6 +461,8 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
     preview: {
       heading: 'Join the private preview',
       body: 'Help shape the future of trustworthy AI code delivery.',
+      designPartnerNote:
+        'Private preview includes invited engineering teams. Partner names are shared only with permission — no public logo wall yet.',
       emailLabel: 'Work email',
       emailPlaceholder: 'you@example.com',
       submit: 'Join private preview',
@@ -445,16 +470,9 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       submittedStatus: 'Request noted locally for this prototype.'
     },
     footer: {
-      description: 'AI code delivery assurance with verifiable, local-first evidence.',
-      product: 'Product',
-      community: 'Community',
-      company: 'Company',
-      repository: 'Repository',
-      contributing: 'Contributing',
-      privacy: 'Privacy',
-      contact: 'Contact',
-      previewTitle: 'Private preview',
-      previewText: 'Access is by invitation only. Not for public distribution.'
+      description: 'Local-first assurance for AI-generated repositories.',
+      linksLabel: 'Footer navigation',
+      note: 'Private preview · invitation only.'
     }
   },
   'zh-CN': {
@@ -474,7 +492,6 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       assuranceGraph: '保障图谱',
       artifacts: '证据物料',
       openCore: '开放核心',
-      roadmap: '证据模型',
       trust: '信任边界',
       privatePreview: '私密预览',
       toggleNavigation: '切换导航'
@@ -483,10 +500,17 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       status: '本地优先设计',
       heading: '在交付前保障每个 AI 生成仓库',
       lede: '为 AI 生成仓库提供已签名的本地证据、修复计划和验收决策。',
-      assurances: ['文档、代码、测试和 ADR 已验证', '修复计划和补丁计划已生成', '验收决策在本地签名'],
+      highlight: '已验证输入在本地生成签名证据与验收决策，交付链路全程可审计。',
       primaryCta: '加入私密预览',
-      secondaryCta: '查看证据模型',
-      privacyNote: '证据永远不会离开你的机器。'
+      secondaryCta: '查看保障图谱'
+    },
+    heroRunSummary: {
+      label: '最近一次本地运行',
+      items: [
+        { label: '就绪度评分', value: '85 · P0: 0 · P1: 1' },
+        { label: '发现项', value: '214 个问题 · 38 个修复动作' },
+        { label: '签名证据包', value: '.hardening/latest/manifest.json' }
+      ]
     },
     assuranceGraph: {
       label: '保障图谱',
@@ -675,10 +699,19 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       body: 'RepoAssure 采用 open core 路线。核心引擎、策略和证据格式保持透明，并由社区共同演进。',
       bullets: ['核心引擎和证据规格保持开放', '支持可插拔策略与分析器', '可复现、可审计、可验证'],
       link: '查看代码仓库',
-      repositoryNote: '公开仓库链接将在公开发布门禁关闭后开放。'
+      repositoryNote: '公开仓库链接将在公开发布门禁关闭后开放。',
+      diagram: {
+        label: '本地优先开放核心流程',
+        nodes: [
+          { id: 'repo', title: 'AI 仓库', caption: '本地工作区' },
+          { id: 'engine', title: 'RepoAssure', caption: 'CLI · MCP · Action' },
+          { id: 'bundle', title: '.hardening/', caption: '签名证据包' },
+          { id: 'acceptance', title: '验收决策', caption: '本地记录' }
+        ]
+      }
     },
     roadmap: {
-      label: 'Team Cloud / Enterprise 计划中',
+      label: '证据模型 · Team Cloud 计划中',
       heading: '路线图：Team Cloud 与 Enterprise',
       body: '面向团队协作、集中策略和规模化审计的安全能力。',
       bullets: ['证据存储与共享', '基于角色的访问与审批', '企业策略管理', '审计轨迹与合规导出'],
@@ -705,6 +738,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
     preview: {
       heading: '加入私密预览',
       body: '一起塑造可信 AI 代码交付的未来。',
+      designPartnerNote: '私密预览面向受邀工程团队。合作伙伴名称仅在获得授权后共享，当前不展示公开 logo 墙。',
       emailLabel: '工作邮箱',
       emailPlaceholder: 'you@example.com',
       submit: '加入私密预览',
@@ -712,16 +746,9 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       submittedStatus: '请求已在此原型中本地记录。'
     },
     footer: {
-      description: '以可验证、本地优先证据保障 AI 代码交付。',
-      product: '产品',
-      community: '社区',
-      company: '公司',
-      repository: '代码仓库',
-      contributing: '参与贡献',
-      privacy: '隐私',
-      contact: '联系',
-      previewTitle: '私密预览',
-      previewText: '访问仅限邀请。当前不面向公众分发。'
+      description: '为 AI 生成仓库提供本地优先的可信保障。',
+      linksLabel: '页脚导航',
+      note: '私密预览 · 仅限邀请。'
     }
   }
 };

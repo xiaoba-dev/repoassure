@@ -1,0 +1,37 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-adr-cascade-remediation-closure-v0.1",
+  "title": "Project Intelligence ADR Cascade Remediation Closure v0.1",
+  "status": "ready_to_execute",
+  "created_at": "2026-07-18T20:30:00.000+08:00",
+  "objective": "Rerun Project Intelligence freshness and ADR cascade backlog checks after controlled remediation execution, confirm whether the 11 repaired ADR cascade findings are cleared, and record residual findings or rule-calibration needs.",
+  "document_basis": [
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "docs/operations/project-intelligence-adr-cascade-controlled-remediation-execution-v0.1.md",
+    "docs/acceptance/checklists/acceptance-checklist-v0.1.md"
+  ],
+  "acceptance": [
+    "Run Project Intelligence snapshot after the 11 ADR cascade evidence repairs.",
+    "Regenerate or inspect ADR cascade backlog evidence.",
+    "Record whether the original 11 missing_cascade findings are closed.",
+    "If residual findings remain, classify them as documentation residue, detection-rule calibration, or legitimate follow-up work.",
+    "Do not perform hosted dashboard, cloud sync, telemetry, deployment, public release, target repo writes, or website visual redesign work."
+  ],
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "website_visual_redesign",
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "deployment",
+    "pricing_change",
+    "customer_contact",
+    "target_repo_write"
+  ]
+}

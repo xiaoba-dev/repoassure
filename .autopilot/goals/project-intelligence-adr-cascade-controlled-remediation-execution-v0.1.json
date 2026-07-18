@@ -1,0 +1,62 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-adr-cascade-controlled-remediation-execution-v0.1",
+  "title": "Project Intelligence ADR Cascade Controlled Remediation Execution v0.1",
+  "status": "completed",
+  "created_at": "2026-07-18T20:05:00.000+08:00",
+  "completed_at": "2026-07-18T20:30:00.000+08:00",
+  "objective": "Execute the controlled remediation plan only after explicit maintainer authorization for concrete ADR/spec/docs edits, preserving item-level rollback and verification evidence.",
+  "document_basis": [
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "docs/operations/project-intelligence-adr-cascade-controlled-remediation-plan-v0.1.md",
+    "docs/operations/project-intelligence-adr-cascade-controlled-remediation-execution-v0.1.md",
+    "artifacts/project-graph/adr-cascade-controlled-remediation-plan.json"
+  ],
+  "acceptance": [
+    "Explicit maintainer authorization was provided before editing ADR/spec/docs files.",
+    "Applied only the file-level cascade edits listed in the controlled remediation plan.",
+    "Recorded rollback notes, verification evidence, and Project Intelligence freshness follow-up boundary after edits.",
+    "Did not perform hosted dashboard, cloud sync, telemetry, deployment, public release, target repo writes, or website visual redesign work."
+  ],
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "website_visual_redesign",
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "deployment",
+    "pricing_change",
+    "customer_contact",
+    "target_repo_write"
+  ],
+  "source_controlled_remediation_plan": {
+    "path": "artifacts/project-graph/adr-cascade-controlled-remediation-plan.json",
+    "items": 11,
+    "repair_execution_authorized": true
+  },
+  "controlled_remediation_execution_summary": {
+    "adr_items_repaired": 11,
+    "cascade_evidence_sections_added": 11,
+    "repair_execution_authorized_by_owner": true,
+    "hosted_dashboard_implemented": false,
+    "cloud_sync_enabled": false,
+    "telemetry_enabled": false,
+    "deployment_performed": false,
+    "target_repo_writes": false,
+    "website_visual_redesign": false
+  },
+  "verification_evidence": {
+    "tdd_red": "pnpm vitest run tests/unit/adr-cascade-controlled-remediation.test.ts",
+    "focused_tests": "pnpm vitest run tests/unit/adr-cascade-controlled-remediation.test.ts tests/unit/project-structure.test.ts",
+    "project_intelligence_snapshot": "pnpm project:intelligence",
+    "post_remediation_findings_total": 0,
+    "freshness_follow_up": "Project Intelligence ADR Cascade Remediation Closure v0.1"
+  },
+  "next_goal_id": "project-intelligence-adr-cascade-remediation-closure-v0.1"
+}

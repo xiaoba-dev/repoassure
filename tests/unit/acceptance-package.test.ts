@@ -75,7 +75,15 @@ describe('acceptance package', () => {
       userHandoff: 'run-user-acceptance-handoff.js',
       repairHandoff: 'run-repair-handoff.js',
       repairExecute: 'run-repair-execute.js',
-      repairPatchPlan: 'run-repair-patch-plan.js'
+      repairPatchPlan: 'run-repair-patch-plan.js',
+      repairEvidencePackage: 'run-repair-evidence-package.js',
+      projectIntelligenceSnapshot: 'run-project-intelligence-snapshot.js',
+      projectIntelligenceViewer: 'run-project-intelligence-viewer.js',
+      projectIntelligenceBacklog: 'run-project-intelligence-backlog.js',
+      projectIntelligenceDecisionIntake: 'run-project-intelligence-decision-intake.js',
+      projectIntelligenceRecommendationDraft: 'run-project-intelligence-recommendation-draft.js',
+      projectIntelligenceMaintainerDecision: 'run-project-intelligence-maintainer-decision.js',
+      projectIntelligenceControlledRemediationPlan: 'run-project-intelligence-controlled-remediation-plan.js'
     });
   });
 

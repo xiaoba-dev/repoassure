@@ -16,7 +16,8 @@ import {
 import { ArtifactPreview } from './ArtifactPreview.tsx';
 import { AssuranceGraph } from './AssuranceGraph.tsx';
 import { CliDemo } from './CliDemo.tsx';
-import { TrustLedgerPreview } from './TrustLedgerPreview.tsx';
+import { HeroConsole } from './HeroConsole.tsx';
+import { OpenCoreDiagram } from './OpenCoreDiagram.tsx';
 import { artifactOrder, useWebsiteLocale } from './i18n.ts';
 
 const stepIcons = [Code2, SearchCheck, Users, UserCheck] as const;
@@ -63,7 +64,6 @@ export function App() {
           <a href="#assurance-graph">{copy.nav.assuranceGraph}</a>
           <a href="#artifacts">{copy.nav.artifacts}</a>
           <a href="#open-core">{copy.nav.openCore}</a>
-          <a href="#roadmap">{copy.nav.roadmap}</a>
           <a href="#trust">{copy.nav.trust}</a>
         </nav>
 
@@ -98,35 +98,29 @@ export function App() {
           <h1>{copy.hero.heading}</h1>
           <p className="hero-lede">{copy.hero.lede}</p>
 
-          <ul className="check-list" aria-label="RepoAssure core assurances">
-            {copy.hero.assurances.map((assurance) => (
-              <li key={assurance}>
-                <Check size={17} />
-                {assurance}
-              </li>
-            ))}
-          </ul>
+          <p className="hero-highlight">
+            <Check size={17} />
+            {copy.hero.highlight}
+          </p>
 
           <div className="hero-actions">
             <a className="primary-button" href="#private-preview">
               {copy.hero.primaryCta}
               <ArrowRight size={18} />
             </a>
-            <a className="secondary-button" href="#artifacts">
+            <a className="text-link hero-secondary-link" href="#assurance-graph">
               {copy.hero.secondaryCta}
+              <ArrowRight size={16} />
             </a>
           </div>
-
-          <p className="privacy-note">
-            <ShieldCheck size={18} />
-            {copy.hero.privacyNote}
-          </p>
         </div>
 
         <div className="hero-media">
-          <TrustLedgerPreview copy={copy.trustLedgerPreview} variant="hero" />
+          <HeroConsole ledger={copy.trustLedgerPreview} runSummary={copy.heroRunSummary} />
         </div>
       </section>
+
+      <div className="hero-graph-breath" aria-hidden="true" />
 
       <section className="assurance-graph-section theme-dark" id="assurance-graph" data-testid="assurance-graph-section">
         <div className="assurance-graph-copy">
@@ -181,6 +175,7 @@ export function App() {
           <p className="section-label">{copy.openCore.label}</p>
           <h2>{copy.openCore.heading}</h2>
           <p>{copy.openCore.body}</p>
+          <OpenCoreDiagram copy={copy.openCore.diagram} />
           <ul className="check-list">
             {copy.openCore.bullets.map((bullet) => (
               <li key={bullet}>
@@ -229,6 +224,7 @@ export function App() {
           </span>
           <h2>{copy.preview.heading}</h2>
           <p>{copy.preview.body}</p>
+          <p className="design-partner-note">{copy.preview.designPartnerNote}</p>
         </div>
         <form className="preview-form" data-testid="private-preview-form" onSubmit={handlePreviewSubmit}>
           <label htmlFor="preview-email">{copy.preview.emailLabel}</label>
@@ -253,37 +249,22 @@ export function App() {
         </form>
       </section>
 
-      <footer className="site-footer theme-dark">
-        <div>
+      <footer className="site-footer site-footer-compact theme-dark">
+        <div className="footer-main">
           <a className="footer-brand" href="#top">
             <ShieldCheck size={18} />
             RepoAssure
           </a>
           <p>{copy.footer.description}</p>
         </div>
-        <div>
-          <h3>{copy.footer.product}</h3>
+        <nav className="footer-links" aria-label={copy.footer.linksLabel}>
           <a href="#how-it-works">{copy.nav.howItWorks}</a>
           <a href="#assurance-graph">{copy.nav.assuranceGraph}</a>
           <a href="#artifacts">{copy.nav.artifacts}</a>
           <a href="#trust">{copy.nav.trust}</a>
-        </div>
-        <div>
-          <h3>{copy.footer.community}</h3>
           <a href="#open-core">{copy.nav.openCore}</a>
-          <a href="#open-core">{copy.footer.repository}</a>
-          <a href="#private-preview">{copy.footer.contributing}</a>
-        </div>
-        <div>
-          <h3>{copy.footer.company}</h3>
-          <a href="#roadmap">{copy.nav.roadmap}</a>
-          <a href="#trust">{copy.footer.privacy}</a>
-          <a href="#private-preview">{copy.footer.contact}</a>
-        </div>
-        <div className="footer-note">
-          <p>{copy.footer.previewTitle}</p>
-          <span>{copy.footer.previewText}</span>
-        </div>
+        </nav>
+        <p className="footer-note-inline">{copy.footer.note}</p>
       </footer>
     </main>
   );

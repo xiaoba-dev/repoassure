@@ -108,3 +108,18 @@ The legacy `dist/shared/*` remains a compatibility output, not the current packa
 The legacy `dist/domain/repair-plan/*` and `dist/types/repair-plan.*` paths remain compatibility outputs, not the current repair planner implementation owner. `packages/repair-planner/src` owns `generate-repair-plan` and `repair-plan` implementation modules. `src/domain/repair-plan/*` and `src/types/repair-plan.ts` now re-export `packages/repair-planner/dist/*`, while package root and `./compatibility` exports expose `repairPlannerPackageExportEntries`, `repairPlannerPackageDistOutputEntries`, `repairPlannerPackageSourceEntries`, `legacyRepairPlannerDistOutputEntries`, and `legacyRepairPlannerWrapperSourceEntries` so structure tests and type-smoke checks share one exact repair-planner package extraction contract.
 
 The legacy `dist/domain/explore/*` path remains a compatibility output, not the current browser explorer implementation owner. `packages/browser-explorer/src` owns `explore-app` and `playwright-driver` implementation modules. `src/domain/explore/*` now re-exports `packages/browser-explorer/dist/*`, while package root and `./compatibility` exports expose `browserExplorerPackageExportEntries`, `browserExplorerPackageDistOutputEntries`, `browserExplorerPackageSourceEntries`, `legacyBrowserExplorerDistOutputEntries`, and `legacyBrowserExplorerWrapperSourceEntries` so structure tests and type-smoke checks share one exact browser-explorer package extraction contract.
+
+## Cascade Evidence
+
+Project Intelligence ADR Cascade Controlled Remediation Execution v0.1 repaired this ADR's cascade links.
+
+- Product entrypoint: `docs/PRD.md`
+- Specification entrypoint: `docs/SPEC.md`
+- Execution plan: `docs/PLAN.md`
+- Testing strategy: `docs/testing/strategy/test-strategy-v0.1.md`
+- Acceptance checklist: `docs/acceptance/checklists/acceptance-checklist-v0.1.md`
+- Decision log: `docs/logs/decision-log.md`
+- Development log: `docs/logs/dev-log.md`
+- Project Intelligence spec: `docs/product/specs/project-intelligence-console-spec-v0.1.md`
+- Project Intelligence architecture: `docs/architecture/specs/project-intelligence-console-architecture-v0.1.md`
+- Repair execution: authorized by Project Intelligence ADR Cascade Controlled Remediation Execution v0.1.

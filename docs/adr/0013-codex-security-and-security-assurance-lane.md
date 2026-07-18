@@ -85,3 +85,18 @@ RepoAssure should avoid claims such as "better than Codex Security" or "complete
 - Include Codex Security in the competitive landscape and watchlist.
 - Do not implement a native deep security scanner in the current MVP unless a later ADR explicitly changes this boundary.
 - When implemented, goal audit should verify that security imports are local-first, redact sensitive content, and preserve provider provenance.
+
+## Cascade Evidence
+
+Project Intelligence ADR Cascade Controlled Remediation Execution v0.1 repaired this ADR's cascade links.
+
+- Product entrypoint: `docs/PRD.md`
+- Specification entrypoint: `docs/SPEC.md`
+- Execution plan: `docs/PLAN.md`
+- Testing strategy: `docs/testing/strategy/test-strategy-v0.1.md`
+- Acceptance checklist: `docs/acceptance/checklists/acceptance-checklist-v0.1.md`
+- Decision log: `docs/logs/decision-log.md`
+- Development log: `docs/logs/dev-log.md`
+- Project Intelligence spec: `docs/product/specs/project-intelligence-console-spec-v0.1.md`
+- Project Intelligence architecture: `docs/architecture/specs/project-intelligence-console-architecture-v0.1.md`
+- Repair execution: authorized by Project Intelligence ADR Cascade Controlled Remediation Execution v0.1.

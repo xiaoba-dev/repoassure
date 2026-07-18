@@ -23,10 +23,17 @@ describe('public website app', () => {
       appSource,
       artifactPreviewSource,
       cliDemoSource,
+      heroConsoleSource,
+      openCoreDiagramSource,
       assuranceGraphSource,
       trustLedgerPreviewSource,
       i18nSource,
       styles,
+      designTokens,
+      evidenceSystem,
+      responsiveStyles,
+      statusChipSource,
+      evidenceHashSource,
       verifyWebsite,
       robots,
       sitemap,
@@ -40,10 +47,17 @@ describe('public website app', () => {
       readFile('apps/website/src/App.tsx', 'utf8'),
       readFile('apps/website/src/ArtifactPreview.tsx', 'utf8'),
       readFile('apps/website/src/CliDemo.tsx', 'utf8'),
+      readFile('apps/website/src/HeroConsole.tsx', 'utf8'),
+      readFile('apps/website/src/OpenCoreDiagram.tsx', 'utf8'),
       readFile('apps/website/src/AssuranceGraph.tsx', 'utf8'),
       readFile('apps/website/src/TrustLedgerPreview.tsx', 'utf8'),
       readFile('apps/website/src/i18n.ts', 'utf8'),
       readFile('apps/website/src/styles.css', 'utf8'),
+      readFile('apps/website/src/styles/tokens.css', 'utf8'),
+      readFile('apps/website/src/styles/evidence-system.css', 'utf8'),
+      readFile('apps/website/src/styles/responsive.css', 'utf8'),
+      readFile('apps/website/src/components/ui/StatusChip.tsx', 'utf8'),
+      readFile('apps/website/src/components/ui/EvidenceHash.tsx', 'utf8'),
       readFile('scripts/verify-website.mjs', 'utf8'),
       readFile('apps/website/public/robots.txt', 'utf8'),
       readFile('apps/website/public/sitemap.xml', 'utf8'),
@@ -89,24 +103,54 @@ describe('public website app', () => {
     expect(appSource).toContain('RepoAssure');
     expect(appSource).toContain('useWebsiteLocale');
     expect(appSource).toContain('AssuranceGraph');
-    expect(appSource).toContain('TrustLedgerPreview');
+    expect(appSource).not.toContain('TrustLedgerPreview');
+    expect(appSource).toContain('HeroConsole');
+    expect(appSource).toContain('hero-media');
     expect(appSource).not.toContain('/assets/trust-ledger.png');
     expect(appSource).toContain('data-testid="language-switcher"');
     expect(appSource).toContain('ArtifactPreview');
-    expect(appSource).toContain('CliDemo');
+    expect(appSource).toContain('site-footer-compact');
+    expect(appSource).toContain('footer-links');
     expect(artifactPreviewSource).toContain('data-testid="artifact-preview-tabs"');
     expect(appSource).toContain('data-testid="private-preview-form"');
     expect(appSource).toContain('data-testid="assurance-graph-section"');
     expect(cliDemoSource).toContain('data-testid="cli-demo"');
+    expect(heroConsoleSource).toContain('data-testid="hero-console"');
+    expect(heroConsoleSource).toContain('hero-console-summary');
+    expect(heroConsoleSource).not.toContain('cli-terminal-body');
+    expect(assuranceGraphSource).toContain('data-testid="assurance-graph-fallback"');
     expect(appSource).not.toContain('data-testid="assurance-pipeline"');
 
     expect(assuranceGraphSource).toContain('data-testid="assurance-graph"');
+    expect(assuranceGraphSource).toContain('graph-svg');
+    expect(assuranceGraphSource).toContain('buildGraphEdgePath');
     expect(assuranceGraphSource).toContain('centerLabel');
     expect(assuranceGraphSource).not.toContain('<img');
 
     expect(trustLedgerPreviewSource).toContain('data-testid="trust-ledger-preview"');
+    expect(trustLedgerPreviewSource).toContain('EvidenceHash');
+    expect(trustLedgerPreviewSource).toContain('trust-ledger-sidebar');
+    expect(trustLedgerPreviewSource).not.toContain('variant');
     expect(trustLedgerPreviewSource).not.toContain('<img');
     expect(trustLedgerPreviewSource).not.toContain('trust-ledger.png');
+
+    expect(appSource).toContain('hero-graph-breath');
+    expect(appSource).toContain('hero-highlight');
+    expect(appSource).toContain('hero-secondary-link');
+    expect(appSource).toContain('OpenCoreDiagram');
+    expect(openCoreDiagramSource).toContain('data-testid="open-core-diagram"');
+    expect(openCoreDiagramSource).toContain('open-core-diagram-list');
+    expect(appSource).toContain('design-partner-note');
+    expect(artifactPreviewSource).toContain('artifact-preview-panel-leading');
+    expect(artifactPreviewSource).toContain('SeverityChip');
+    expect(statusChipSource).toContain("'accent' | 'success'");
+    expect(evidenceHashSource).toContain('evidence-hash');
+
+    const stylesheetBundle = [styles, designTokens, evidenceSystem, responsiveStyles].join('\n');
+
+    expect(styles).toContain("@import './styles/tokens.css'");
+    expect(styles).toContain("@import './styles/evidence-system.css'");
+    expect(styles).toContain("@import './styles/responsive.css'");
 
     expect(i18nSource).toContain('defaultLocale =');
     expect(i18nSource).not.toContain('navigator.languages');
@@ -119,17 +163,23 @@ describe('public website app', () => {
     expect(i18nSource).toContain('Assure every AI-generated repo before it ships');
     expect(i18nSource).toContain('在交付前保障每个 AI 生成仓库');
     expect(i18nSource).toContain('加入私密预览');
+    expect(i18nSource).toContain('heroRunSummary');
+    expect(appSource).not.toContain('#roadmap">{copy.nav');
     expect(i18nSource).toContain('assuranceGraph');
     expect(i18nSource).toContain('assuranceGraphSection');
     expect(i18nSource).toContain('Proof artifacts');
     expect(i18nSource).toContain('证据物料');
     expect(i18nSource).toContain('cliDemo');
-    expect(i18nSource).toContain('View evidence model');
-    expect(i18nSource).toContain('Evidence never leaves your machine.');
+    expect(i18nSource).toContain('View assurance graph');
+    expect(i18nSource).toContain('highlight:');
+    expect(i18nSource).toContain('查看保障图谱');
+    expect(i18nSource).toContain('证据模型 · Team Cloud 计划中');
     expect(i18nSource).toContain('100% LOCAL');
     expect(i18nSource).toContain('trustLedgerPreview');
     expect(i18nSource).toContain('Evidence generated locally');
     expect(i18nSource).toContain('本地生成的证据');
+    expect(i18nSource).toContain('designPartnerNote');
+    expect(i18nSource).toContain('Local-first open core flow');
     expect(i18nSource).toContain('All artifacts are signed and stored locally.');
     expect(i18nSource).toContain('所有证据物料都会在本地签名并存储。');
 
@@ -137,23 +187,36 @@ describe('public website app', () => {
       expect(i18nSource).not.toMatch(pattern);
     }
 
-    expect(styles).toContain('/* Brand tokens */');
-    expect(styles).toContain('/* Semantic tokens */');
-    expect(styles).toContain('/* Component tokens */');
-    expect(styles).toContain('--brand-assurance: #009d5c');
-    expect(styles).toContain('--surface-hero: #04111f');
-    expect(styles).toContain('--surface-page: #ffffff');
-    expect(styles).toContain('--surface-panel: rgba(9, 24, 40, 0.84)');
-    expect(styles).toContain('--text-primary: #111827');
-    expect(styles).toContain('--text-muted: #526071');
-    expect(styles).toContain('--text-on-dark: #f8fafc');
-    expect(styles).toContain('--border-subtle: #d8e0ea');
-    expect(styles).toContain('--status-verified: #22d876');
-    expect(styles).toContain('--status-generated: #22d876');
-    expect(styles).toContain('--status-accepted: #22d876');
-    expect(styles).toContain('--focus-ring: #8bb5ff');
-    expect(styles).toContain('--focus-ring-on-dark: #36e58b');
-    expect(styles).toContain('--component-radius-control: 10px');
+    expect(designTokens).toContain('/* Brand tokens */');
+    expect(designTokens).toContain('/* Semantic tokens */');
+    expect(designTokens).toContain('/* Component tokens */');
+    expect(stylesheetBundle).toContain('--brand-assurance: #009d5c');
+    expect(stylesheetBundle).toContain('--surface-hero: #04111f');
+    expect(stylesheetBundle).toContain('--surface-page: #ffffff');
+    expect(stylesheetBundle).toContain('--surface-panel: rgba(9, 24, 40, 0.84)');
+    expect(stylesheetBundle).toContain('--text-primary: #111827');
+    expect(stylesheetBundle).toContain('--text-muted: #526071');
+    expect(stylesheetBundle).toContain('--text-on-dark: #f8fafc');
+    expect(stylesheetBundle).toContain('--border-subtle: #d8e0ea');
+    expect(designTokens).toContain('/* Status — 2 success + 1 accent */');
+    expect(stylesheetBundle).toContain('--accent: #009d5c');
+    expect(stylesheetBundle).toContain('--accent-emphasis: #36e58b');
+    expect(stylesheetBundle).toContain('--status-success: #22d876');
+    expect(stylesheetBundle).toContain('--status-success-muted:');
+    expect(stylesheetBundle).toContain('--status-success-surface:');
+    expect(designTokens).not.toContain('--status-verified:');
+    expect(designTokens).not.toContain('--status-generated:');
+    expect(stylesheetBundle).toContain('--focus-ring: #8bb5ff');
+    expect(stylesheetBundle).toContain('--focus-ring-on-dark: var(--accent-emphasis)');
+    expect(stylesheetBundle).toContain('--component-radius-control: 10px');
+    expect(styles).toContain('.open-core-diagram');
+    expect(styles).toContain('.design-partner-note');
+    expect(styles).not.toContain('.assurance-pipeline');
+    expect(styles).not.toContain('.artifact-card');
+    expect(styles).not.toContain('.hero-assurance-surface');
+    expect(styles).not.toContain('.trust-ledger-preview-hero');
+    expect(evidenceSystem).toContain('.evidence-hash');
+    expect(evidenceSystem).toContain('.severity-chip');
     expect(styles).toContain('.theme-dark');
     expect(styles).toContain('.theme-light');
     expect(styles).toContain(':focus-visible');
@@ -164,12 +227,16 @@ describe('public website app', () => {
     expect(styles).toContain('[role="tab"]:focus-visible');
     expect(styles).toContain('.language-switcher');
     expect(styles).toContain('.assurance-graph');
+    expect(styles).toContain('.graph-svg');
+    expect(styles).toContain('aspect-ratio: 640 / 480');
     expect(styles).toContain('.assurance-graph-section');
     expect(styles).toContain('.cli-demo');
     expect(styles).toContain('.artifact-preview-panel');
+    expect(styles).toContain('.hero-console');
     expect(styles).toContain('.trust-ledger-preview');
     expect(styles).toContain('@media (max-width: 760px)');
-    expect(styles).toContain('prefers-reduced-motion');
+    expect(responsiveStyles).toContain('prefers-reduced-motion');
+    expect(responsiveStyles).toContain('.graph-chain-fallback');
 
     expect(verifyWebsite).toContain('ig_04fa6cbaaebee9cb016a3d1d4ad8088191a53375bdf20065a8.png');
     expect(verifyWebsite).toContain('Assure every AI-generated repo before it ships');
@@ -195,13 +262,13 @@ describe('public website app', () => {
     const chineseSerialized = JSON.stringify(locales['zh-CN']);
 
     expect(englishSerialized).toContain('Assure every AI-generated repo before it ships');
-    expect(englishSerialized).toContain('View evidence model');
-    expect(englishSerialized).toContain('Evidence never leaves your machine.');
+    expect(englishSerialized).toContain('View assurance graph');
+    expect(englishSerialized).toContain('Evidence model · Team Cloud planned');
     expect(englishSerialized).toContain('Trust Ledger');
     expect(englishSerialized).toContain('Evidence generated locally');
     expect(chineseSerialized).toContain('在交付前保障每个 AI 生成仓库');
-    expect(chineseSerialized).toContain('查看证据模型');
-    expect(chineseSerialized).toContain('证据永远不会离开你的机器。');
+    expect(chineseSerialized).toContain('查看保障图谱');
+    expect(chineseSerialized).toContain('证据模型 · Team Cloud 计划中');
     expect(chineseSerialized).toContain('信任账本');
     expect(chineseSerialized).toContain('本地生成的证据');
     expect(chineseSerialized).toContain('加入私密预览');
@@ -213,5 +280,32 @@ describe('public website app', () => {
         expect(serialized).not.toMatch(pattern);
       }
     }
+  });
+
+  it('guards P3 pixel polish for responsive public website surfaces', async () => {
+    const [styles, responsiveStyles, verifyWebsite] = await Promise.all([
+      readFile('apps/website/src/styles.css', 'utf8'),
+      readFile('apps/website/src/styles/responsive.css', 'utf8'),
+      readFile('scripts/verify-website.mjs', 'utf8')
+    ]);
+    const stylesheetBundle = [styles, responsiveStyles].join('\n');
+
+    expect(responsiveStyles).toContain('/* P3 pixel polish');
+    expect(responsiveStyles).toContain('@media (max-width: 760px)');
+    expect(responsiveStyles).toContain('.trust-ledger-table-head');
+    expect(responsiveStyles).toContain('.trust-ledger-row');
+    expect(responsiveStyles).toContain('grid-template-columns: minmax(0, 1fr)');
+    expect(responsiveStyles).toContain('.trust-ledger-evidence .evidence-hash');
+    expect(responsiveStyles).toContain('.artifact-detail-meta-inline');
+    expect(responsiveStyles).toContain('.artifact-code');
+    expect(responsiveStyles).toContain('.graph-chain-fallback');
+    expect(responsiveStyles).toContain('.preview-form');
+    expect(responsiveStyles).toContain('.site-footer-compact');
+    expect(responsiveStyles).toContain('@media (max-width: 430px)');
+    expect(stylesheetBundle).toContain('overflow-wrap: anywhere');
+    expect(stylesheetBundle).toContain('text-wrap: balance');
+    expect(verifyWebsite).toContain('desktop-p3-fold.png');
+    expect(verifyWebsite).toContain('mobile-p3-fold.png');
+    expect(verifyWebsite).toContain('horizontalOverflow');
   });
 });

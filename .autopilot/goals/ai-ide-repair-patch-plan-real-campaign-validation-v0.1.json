@@ -1,0 +1,43 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "ai-ide-repair-patch-plan-real-campaign-validation-v0.1",
+  "title": "AI IDE Repair Patch Plan Real Campaign Validation v0.1",
+  "status": "completed",
+  "created_at": "2026-07-16T14:55:00.000Z",
+  "objective": "Validate repair patch plan consumption for real or near-real dry-run execution reports, proving patch-plan inputs can be generated for selected repair tasks without applying patches or changing target repositories.",
+  "document_basis": [
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "docs/operations/ai-ide-repair-execution-dry-run-real-campaign-validation-v0.1.md",
+    "docs/testing/strategy/test-strategy-v0.1.md",
+    "docs/acceptance/checklists/acceptance-checklist-v0.1.md"
+  ],
+  "acceptance": [
+    "Use the existing near-real campaign fixture or equivalent non-private dry-run execution report.",
+    "Consume repair-execution-report.json with repair:patch-plan.",
+    "Validate patch plan JSON/Markdown readability, selected task boundaries, patch preview inputs, verification commands, and maintainer review boundary.",
+    "Prove patch-plan validation does not apply patches, create commits, create pull requests, mark acceptance passed, or write target repository source files.",
+    "Update operations docs, testing strategy, acceptance checklist, decision log, dev log, and progress snapshot."
+  ],
+  "blocked_actions": [
+    "automatic_target_repo_write",
+    "patch_application",
+    "website_visual_redesign",
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "deployment",
+    "pricing_change",
+    "customer_contact"
+  ],
+  "completed_at": "2026-07-16T15:20:00.000Z",
+  "result_summary": "Validated repair:patch-plan consumption of a near-real dry-run repair execution report. Patch-plan output now includes patchPlanInputs, maintainerReview, verificationChecklist, noWriteProof, redaction checks, and no target repo source writes.",
+  "evidence": [
+    "docs/operations/ai-ide-repair-patch-plan-real-campaign-validation-v0.1.md",
+    "tests/unit/repair-patch-plan.test.ts"
+  ],
+  "selected_next_goal_id": "ai-ide-repair-validation-only-real-campaign-validation-v0.1"
+}

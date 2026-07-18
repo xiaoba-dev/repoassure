@@ -4,7 +4,12 @@ import { fileURLToPath } from 'node:url';
 
 import { formatAcceptanceFatalError } from './fatal-error.js';
 import { redactSensitiveText } from './redaction.js';
-import type { RepairExecutionReport, RepairVerificationCommandResult } from './run-repair-execute.js';
+import type {
+  RepairExecuteMode,
+  RepairExecutionReport,
+  RepairExecutionTaskReport,
+  RepairVerificationCommandResult
+} from './run-repair-execute.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 
@@ -50,6 +55,7 @@ export interface PatchPlan {
   schemaVersion: 1;
   generatedAt: string;
   status: PatchPlanStatus;
+  sourceReportMode: RepairExecuteMode;
   executionReportPath: string;
   repoRoot: string;
   runId: string;
@@ -59,9 +65,35 @@ export interface PatchPlan {
     manualReviewRequired: number;
     affectedFiles: number;
   };
+  patchPlanInputs: PatchPlanInputs;
   actions: PatchAction[];
+  maintainerReview: {
+    requiredBefore: string[];
+    allowedDecisions: string[];
+  };
+  verificationChecklist: {
+    commands: string[];
+    completionSignals: string[];
+  };
+  noWriteProof: {
+    targetRepoWriteAuthorized: false;
+    patchesApplied: false;
+    sourceFilesChanged: false;
+    prohibitedActions: string[];
+  };
   boundaries: string[];
   agentContract: PatchPlanAgentContract;
+}
+
+export interface PatchPlanInputs {
+  status: 'inputs_only';
+  source: 'patchPreview' | 'verificationResults';
+  candidateTasks: Array<{
+    taskId: string;
+    sourceType: string;
+    expectedFiles: string[];
+    verificationCommands: string[];
+  }>;
 }
 
 export interface PatchPlanAgentContract {
@@ -175,11 +207,8 @@ export function buildPatchPlan(input: {
   executionReportPath: string;
   report: RepairExecutionReport;
 }): PatchPlan {
-  const actions = input.report.tasks.flatMap((task) => {
-    return task.verificationResults
-      .filter((result) => result.exitCode !== 0 || result.timedOut)
-      .flatMap((result) => classifyVerificationResult(task.taskId, result));
-  });
+  const patchPlanInputs = buildPatchPlanInputs(input.report);
+  const actions = buildPatchActions(input.report);
   const affectedFiles = new Set(actions.flatMap((action) => action.targetFiles));
   const autoFixCandidates = actions.filter((action) => action.autoFixCandidate).length;
 
@@ -187,6 +216,7 @@ export function buildPatchPlan(input: {
     schemaVersion: 1,
     generatedAt: input.generatedAt,
     status: actions.length > 0 ? 'review_required' : 'no_actions',
+    sourceReportMode: input.report.mode,
     executionReportPath: cleanText(input.executionReportPath),
     repoRoot: cleanText(input.report.repoRoot),
     runId: cleanText(input.report.runId),
@@ -196,7 +226,22 @@ export function buildPatchPlan(input: {
       manualReviewRequired: actions.length - autoFixCandidates,
       affectedFiles: affectedFiles.size
     },
+    patchPlanInputs,
     actions,
+    maintainerReview: {
+      requiredBefore: input.report.maintainerReview.requiredBefore.map(cleanText),
+      allowedDecisions: input.report.maintainerReview.allowedDecisions.map(cleanText)
+    },
+    verificationChecklist: {
+      commands: input.report.verificationChecklist.commands.map(cleanText),
+      completionSignals: input.report.verificationChecklist.completionSignals.map(cleanText)
+    },
+    noWriteProof: {
+      targetRepoWriteAuthorized: false,
+      patchesApplied: false,
+      sourceFilesChanged: input.report.noWriteProof.sourceFilesChanged,
+      prohibitedActions: input.report.noWriteProof.prohibitedActions.map(cleanText)
+    },
     boundaries: [
       'This patch plan does not modify target repository files.',
       'Review every action before applying edits in an AI IDE or editor.',
@@ -216,6 +261,7 @@ export function formatPatchPlanMarkdown(plan: PatchPlan): string {
 | Field | Value |
 | --- | --- |
 | Status | ${plan.status} |
+| Source Report Mode | ${plan.sourceReportMode} |
 | Repo Root | ${plan.repoRoot} |
 | Run ID | ${plan.runId} |
 | Total Actions | ${plan.summary.totalActions} |
@@ -232,6 +278,28 @@ export function formatPatchPlanMarkdown(plan: PatchPlan): string {
 - Validate: ${plan.agentContract.nextCommands.validate}
 - Boundaries: ${plan.agentContract.boundaries.join(' ')}
 
+## Patch Plan Inputs
+
+- Status: ${plan.patchPlanInputs.status}
+- Source: ${plan.patchPlanInputs.source}
+- Candidate Tasks: ${plan.patchPlanInputs.candidateTasks.map((task) => `${task.taskId} (${task.sourceType})`).join(', ') || 'n/a'}
+
+## Maintainer Review Boundary
+
+- Required before: ${plan.maintainerReview.requiredBefore.join(', ')}
+- Allowed decisions: ${plan.maintainerReview.allowedDecisions.join(', ')}
+
+## Verification Checklist
+
+${plan.verificationChecklist.commands.map((command) => `- \`${command}\``).join('\n') || '- n/a'}
+
+## No-write Proof
+
+- Target repo write authorized: ${plan.noWriteProof.targetRepoWriteAuthorized}
+- Patches applied: ${plan.noWriteProof.patchesApplied}
+- Source files changed: ${plan.noWriteProof.sourceFilesChanged}
+- Prohibited actions: ${plan.noWriteProof.prohibitedActions.join(', ')}
+
 ${actions}
 `;
 }
@@ -243,11 +311,14 @@ function buildPatchPlanAgentContract(): PatchPlanAgentContract {
     readOrder: [
       'status',
       'summary',
+      'patchPlanInputs',
       'actions[]',
       'actions[].targetFiles',
       'actions[].recommendedChange',
       'actions[].suggestedCommands',
-      'actions[].reviewNotes'
+      'maintainerReview',
+      'verificationChecklist',
+      'noWriteProof'
     ],
     reviewWorkflow: [
       'Review each action before applying edits in an AI IDE or editor.',
@@ -261,6 +332,65 @@ function buildPatchPlanAgentContract(): PatchPlanAgentContract {
       'Does not write target repository files.',
       'Does not run formatters, create commits, open PRs, or upload artifacts.',
       'Auto-fix candidates still require review before execution.'
+    ]
+  };
+}
+
+function buildPatchActions(report: RepairExecutionReport): PatchAction[] {
+  if (report.mode === 'dry-run') {
+    return report.patchPreview.candidateTasks.map((candidate) => {
+      const task = report.tasks.find((item) => item.taskId === candidate.taskId);
+      return buildDryRunPatchAction(candidate, task);
+    });
+  }
+
+  return report.tasks.flatMap((task) => {
+    return task.verificationResults
+      .filter((result) => result.exitCode !== 0 || result.timedOut)
+      .flatMap((result) => classifyVerificationResult(task.taskId, result));
+  });
+}
+
+function buildPatchPlanInputs(report: RepairExecutionReport): PatchPlanInputs {
+  return {
+    status: 'inputs_only',
+    source: report.mode === 'dry-run' ? 'patchPreview' : 'verificationResults',
+    candidateTasks: report.patchPreview.candidateTasks.map((candidate) => {
+      const task = report.tasks.find((item) => item.taskId === candidate.taskId);
+      return {
+        taskId: cleanText(candidate.taskId),
+        sourceType: cleanText(candidate.sourceType),
+        expectedFiles: candidate.expectedFiles.map(cleanText),
+        verificationCommands: (task?.verificationCommands ?? []).map(cleanText)
+      };
+    })
+  };
+}
+
+function buildDryRunPatchAction(
+  candidate: RepairExecutionReport['patchPreview']['candidateTasks'][number],
+  task: RepairExecutionTaskReport | undefined
+): PatchAction {
+  const sourceType = cleanText(candidate.sourceType);
+  const suggestedCommands = (task?.verificationCommands ?? []).map(cleanText);
+
+  return {
+    actionId: `${cleanText(candidate.taskId)}-dry-run-patch-input`,
+    taskId: cleanText(candidate.taskId),
+    command: suggestedCommands.join(' && ') || 'manual review',
+    actionType: 'manual-investigation',
+    title: `Prepare reviewed patch input for ${cleanText(candidate.taskId)}`,
+    targetFiles: candidate.expectedFiles.map(cleanText),
+    evidence: cleanText(task?.objective ?? `Dry-run patch preview selected ${candidate.taskId}.`),
+    errorCode: null,
+    rationale: `Dry-run execution selected this ${sourceType} task for repair planning without running or applying edits.`,
+    recommendedChange: cleanText(task?.nextAction ?? 'Review the task objective and prepare the smallest patch under maintainer approval.'),
+    suggestedCommands,
+    autoFixCandidate: false,
+    risk: sourceType === 'environment_blocker' ? 'high' : 'medium',
+    reviewNotes: [
+      'Generated from dry-run patchPreview; no patch has been applied.',
+      'Maintainer approval is required before changing target repository files.'
     ]
   };
 }

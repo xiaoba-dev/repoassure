@@ -41,7 +41,7 @@ export interface RepairHandoffManifest {
 export interface RepairHandoffTask {
   taskId: string;
   priority: RepairHandoffPriority;
-  sourceType: 'command_failure' | 'acceptance_check_failure';
+  sourceType: 'command_failure' | 'acceptance_check_failure' | 'environment_blocker';
   objective: string;
   issue: {
     title: string;
@@ -72,12 +72,39 @@ export interface RepairHandoffAgentContract {
   schema: 'repoassure.repair-handoff.v1';
   primaryReadPath: string;
   readOrder: string[];
+  maintainerReviewBoundary: RepairHandoffMaintainerReviewBoundary;
   nextCommands: {
     dryRun: string;
     validationOnly: string;
     patchPlan: string;
   };
   boundaries: string[];
+}
+
+export interface RepairHandoffMaintainerReviewBoundary {
+  requiredBefore: string[];
+  allowedDecisions: Array<'approve' | 'reject' | 'defer' | 'accept_risk'>;
+}
+
+export interface RepairActionQueueItem {
+  taskId: string;
+  priority: RepairHandoffPriority;
+  status: 'queued';
+  objective: string;
+  sourceType: RepairHandoffTask['sourceType'];
+  verificationCommands: string[];
+  requiresMaintainerReview: boolean;
+}
+
+export interface RepairHandoffVerificationChecklist {
+  commands: string[];
+  acceptanceCriteria: string[];
+  completionSignals: string[];
+}
+
+export interface RepairHandoffRedactionContract {
+  guarantee: string;
+  prohibitedContent: string[];
 }
 
 export interface RepairHandoffPackage {
@@ -91,10 +118,15 @@ export interface RepairHandoffPackage {
     totalTasks: number;
     failedCommands: number;
     requiredFailed: number;
+    requiredBlocked: number;
     highestPriority: RepairHandoffPriority | null;
   };
   sourceArtifacts: Record<string, unknown>;
   agentContract: RepairHandoffAgentContract;
+  repairActionQueue: RepairActionQueueItem[];
+  maintainerReview: RepairHandoffMaintainerReviewBoundary;
+  verificationChecklist: RepairHandoffVerificationChecklist;
+  redaction: RepairHandoffRedactionContract;
   tasks: RepairHandoffTask[];
 }
 
@@ -213,13 +245,15 @@ export async function runRepairHandoff(input: RepairHandoffRunInput): Promise<Re
 
 export function buildRepairHandoffPackage(input: BuildRepairHandoffPackageInput): RepairHandoffPackage {
   const mode = normalizeMode(input.manifest.mode);
-  const sourceArtifacts = input.manifest.artifacts ?? {};
+  const sourceArtifacts = redactJsonObject(input.manifest.artifacts ?? {});
   const failedCommands = (input.manifest.commandResults ?? [])
     .filter((result) => result.exitCode !== 0 || result.timedOut);
   const failedCommandValues = new Set(failedCommands.map((result) => formatCommandValue(result.command, result.args)));
   const failedChecks = (input.manifest.checks ?? [])
     .filter((check) => check.status === 'failed')
     .filter((check) => !isDuplicateCommandExecutionCheck(check.name, failedCommandValues));
+  const blockedChecks = (input.manifest.checks ?? [])
+    .filter((check) => check.status === 'blocked');
   const commandTasks = failedCommands.map((result) => buildCommandFailureTask({
     result,
     mode,
@@ -230,8 +264,14 @@ export function buildRepairHandoffPackage(input: BuildRepairHandoffPackageInput)
     mode,
     sourceArtifacts
   }));
-  const tasks = [...commandTasks, ...checkTasks].sort((left, right) => priorityRank(left.priority) - priorityRank(right.priority));
+  const blockerTasks = blockedChecks.map((check) => buildEnvironmentBlockerTask({
+    check,
+    mode,
+    sourceArtifacts
+  }));
+  const tasks = [...commandTasks, ...checkTasks, ...blockerTasks].sort((left, right) => priorityRank(left.priority) - priorityRank(right.priority));
   const requiredFailed = failedChecks.filter((check) => check.required).length;
+  const requiredBlocked = blockedChecks.filter((check) => check.required).length;
 
   return {
     schemaVersion: 1,
@@ -244,10 +284,15 @@ export function buildRepairHandoffPackage(input: BuildRepairHandoffPackageInput)
       totalTasks: tasks.length,
       failedCommands: failedCommands.length,
       requiredFailed,
+      requiredBlocked,
       highestPriority: tasks[0]?.priority ?? null
     },
     sourceArtifacts,
     agentContract: buildRepairHandoffAgentContract(),
+    repairActionQueue: buildRepairActionQueue(tasks),
+    maintainerReview: buildMaintainerReviewBoundary(),
+    verificationChecklist: buildVerificationChecklist(tasks),
+    redaction: buildRedactionContract(),
     tasks
   };
 }
@@ -267,6 +312,7 @@ export function formatRepairHandoffMarkdown(pkg: RepairHandoffPackage): string {
 | Total Tasks | ${pkg.summary.totalTasks} |
 | Failed Commands | ${pkg.summary.failedCommands} |
 | Required Failed Checks | ${pkg.summary.requiredFailed} |
+| Required Blocked Checks | ${pkg.summary.requiredBlocked} |
 | Highest Priority | ${pkg.summary.highestPriority ?? 'n/a'} |
 
 ## Agent Contract
@@ -279,6 +325,29 @@ export function formatRepairHandoffMarkdown(pkg: RepairHandoffPackage): string {
 - Patch plan: ${pkg.agentContract.nextCommands.patchPlan}
 - Boundaries: ${pkg.agentContract.boundaries.join(' ')}
 
+## AI IDE Repair Decision Contract
+
+AI IDEs and coding agents should read this package in the declared order, plan from repairActionQueue, and stop before any target repository write unless the maintainer separately authorizes a repair execution goal.
+
+## Repair Action Queue
+
+${pkg.repairActionQueue.length > 0 ? pkg.repairActionQueue.map((item) => `- ${item.taskId} (${item.priority}, ${item.status}) — ${item.objective}`).join('\n') : '- No queued repair actions.'}
+
+## Maintainer Review Boundary
+
+- Required before: ${pkg.maintainerReview.requiredBefore.join(', ')}
+- Allowed decisions: ${pkg.maintainerReview.allowedDecisions.join(', ')}
+
+## Verification Checklist
+
+### Commands
+
+${pkg.verificationChecklist.commands.length > 0 ? pkg.verificationChecklist.commands.map((command) => `- \`${command}\``).join('\n') : '- Re-run the original acceptance command and project quality gates.'}
+
+### Completion Signals
+
+${pkg.verificationChecklist.completionSignals.map((signal) => `- ${signal}`).join('\n')}
+
 ${taskSections}
 `;
 }
@@ -289,12 +358,17 @@ function buildRepairHandoffAgentContract(): RepairHandoffAgentContract {
     primaryReadPath: '.hardening/latest/repair-handoff-package.json',
     readOrder: [
       'summary',
+      'agentContract',
+      'repairActionQueue[]',
       'tasks[]',
       'tasks[].evidence',
       'tasks[].recommendedFix',
       'tasks[].verification.commands',
-      'tasks[].handoffPrompt'
+      'maintainerReview',
+      'verificationChecklist',
+      'redaction'
     ],
+    maintainerReviewBoundary: buildMaintainerReviewBoundary(),
     nextCommands: {
       dryRun: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --dry-run',
       validationOnly: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --validation-only',
@@ -302,9 +376,58 @@ function buildRepairHandoffAgentContract(): RepairHandoffAgentContract {
     },
     boundaries: [
       'Does not modify target repository files.',
+      'Must not modify target repository files unless the maintainer separately authorizes a repair execution goal.',
       'Does not create branches, commits, issues, pull requests, or advisories.',
       'Read redacted evidence only; do not infer or reconstruct secrets.'
     ]
+  };
+}
+
+function buildMaintainerReviewBoundary(): RepairHandoffMaintainerReviewBoundary {
+  return {
+    requiredBefore: [
+      'applying patches',
+      'changing target repository files',
+      'creating branches, commits, issues, pull requests, or advisories',
+      'marking acceptance as passed'
+    ],
+    allowedDecisions: ['approve', 'reject', 'defer', 'accept_risk']
+  };
+}
+
+function buildRepairActionQueue(tasks: RepairHandoffTask[]): RepairActionQueueItem[] {
+  return tasks.map((task) => ({
+    taskId: task.taskId,
+    priority: task.priority,
+    status: 'queued',
+    objective: task.objective,
+    sourceType: task.sourceType,
+    verificationCommands: task.verification.commands,
+    requiresMaintainerReview: true
+  }));
+}
+
+function buildVerificationChecklist(tasks: RepairHandoffTask[]): RepairHandoffVerificationChecklist {
+  const completionSignals = tasks.length === 0
+    ? ['No queued repair actions remain.']
+    : [];
+
+  return {
+    commands: [...new Set(tasks.flatMap((task) => task.verification.commands))],
+    acceptanceCriteria: tasks.flatMap((task) => task.verification.acceptanceCriteria.map((item) => `${task.taskId}: ${item}`)),
+    completionSignals: [
+      ...completionSignals,
+      'All selected verification commands exit zero or have recorded environment blockers.',
+      'Repair handoff package no longer contains completed taskIds after a fresh run.',
+      'Maintainer review decision is recorded before any target repo write.'
+    ]
+  };
+}
+
+function buildRedactionContract(): RepairHandoffRedactionContract {
+  return {
+    guarantee: 'All command output, evidence, paths, and prompts are redacted before entering this package.',
+    prohibitedContent: ['secrets', 'tokens', 'cookies', 'private keys', 'authorization headers', 'raw credentials']
   };
 }
 
@@ -442,6 +565,63 @@ function buildCheckFailureTask(input: {
   };
 }
 
+function buildEnvironmentBlockerTask(input: {
+  check: { name?: string; required?: boolean; status?: string; evidence?: string };
+  mode: RepairHandoffMode;
+  sourceArtifacts: Record<string, unknown>;
+}): RepairHandoffTask {
+  const name = cleanText(input.check.name ?? 'Unnamed environment blocker');
+  const taskId = `environment-blocker-${slugify(name)}`;
+  const priority: RepairHandoffPriority = input.check.required ? 'P0' : 'P2';
+  const evidence = cleanText(input.check.evidence ?? 'No environment blocker evidence captured.');
+
+  return {
+    taskId,
+    priority,
+    sourceType: 'environment_blocker',
+    objective: `解除环境阻塞：${name}`,
+    issue: {
+      title: `Environment blocker: ${name}`,
+      mode: input.mode,
+      failedCheck: name
+    },
+    evidence: {
+      check: {
+        name,
+        required: input.check.required ?? false,
+        status: cleanText(input.check.status ?? 'blocked'),
+        evidence
+      },
+      sourceArtifacts: input.sourceArtifacts
+    },
+    impact: input.check.required
+      ? '必需环境门禁阻塞，当前 run 不能被视为可交付或失败修复完成。'
+      : '可选环境门禁阻塞，需要先区分环境限制与产品缺陷。',
+    recommendedFix: {
+      expectedOutcome: `环境阻塞 \`${name}\` 被解除，或记录 maintainer 接受的环境豁免。`,
+      changeScope: {
+        include: ['优先修复或记录该环境阻塞直接指向的运行条件、权限、依赖或配置。'],
+        exclude: ['不要把环境阻塞伪装成产品通过；不要降低 required 级别来规避阻塞。']
+      },
+      implementationSteps: [
+        '读取 blocker evidence 和关联 sourceArtifacts。',
+        '判断 blocker 是本地权限、依赖、浏览器、网络、端口还是目标 repo 缺陷。',
+        '修复可控环境条件，或记录 maintainer 接受的环境豁免。',
+        '重新运行 acceptance flow 并确认 blocker 解除。'
+      ]
+    },
+    verification: {
+      commands: ['pnpm user:accept -- --repo <repo> --decision pending'],
+      acceptanceCriteria: [
+        `环境阻塞 \`${name}\` 状态不再为 blocked。`,
+        '新的 repair handoff 不再包含当前 environment blocker taskId。'
+      ]
+    },
+    risks: ['环境阻塞可能掩盖真实产品缺陷，解除后必须重新运行验收。'],
+    handoffPrompt: cleanText(`你是接手目标 repo 的修复 Agent。请先处理环境阻塞 ${name}，不要把 blocked 伪装为 passed；解除后重新运行 acceptance flow。`)
+  };
+}
+
 function isDuplicateCommandExecutionCheck(name: string | undefined, failedCommandValues: Set<string>): boolean {
   const prefix = 'Python CLI check 执行: ';
 
@@ -536,6 +716,28 @@ function basenameRunId(runDir: string): string {
 
 function cleanText(value: string): string {
   return redactSensitiveText(value).replace(/\s+/gu, ' ').trim();
+}
+
+function redactJsonValue(value: unknown): unknown {
+  if (typeof value === 'string') {
+    return cleanText(value);
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(redactJsonValue);
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [cleanText(key), redactJsonValue(entry)])
+    );
+  }
+
+  return value;
+}
+
+function redactJsonObject(value: Record<string, unknown>): Record<string, unknown> {
+  return redactJsonValue(value) as Record<string, unknown>;
 }
 
 function slugify(value: string): string {

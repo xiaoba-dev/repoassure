@@ -90,6 +90,8 @@ try {
   const initialLang = await desktop.locator('html').getAttribute('lang');
   const desktopScreenshot = join(outDir, 'desktop-full.png');
   await desktop.screenshot({ path: desktopScreenshot, fullPage: true });
+  const desktopP3FoldScreenshot = join(outDir, 'desktop-p3-fold.png');
+  await desktop.screenshot({ path: desktopP3FoldScreenshot, fullPage: false });
   await desktop.keyboard.press('Tab');
   const darkFocusVisible = await desktop.evaluate(() => globalThis.document.activeElement?.matches(':focus-visible') ?? false);
   const desktopFocusDarkScreenshot = join(outDir, 'desktop-focus-dark.png');
@@ -109,8 +111,6 @@ try {
   const normalizedAssuranceGraphText = assuranceGraphText.toLowerCase();
   const assuranceGraphSectionVisible = await desktop.locator('[data-testid="assurance-graph-section"]').isVisible();
   const cliDemoVisible = await desktop.locator('[data-testid="cli-demo"]').isVisible();
-  const trustLedgerPreviewVisible = await desktop.locator('[data-testid="trust-ledger-preview"]').isVisible();
-  const trustLedgerPreviewText = await desktop.locator('[data-testid="trust-ledger-preview"]').innerText();
 
   await desktop.selectOption('[data-testid="language-switcher"] select', 'zh-CN');
   const zhLang = await desktop.locator('html').getAttribute('lang');
@@ -119,7 +119,6 @@ try {
   await desktop.click('button[role="tab"]:has-text("修复计划")');
   const zhSelectedTab = await desktop.locator('button[role="tab"][aria-selected="true"]').innerText();
   const zhRepairDetailVisible = await desktop.getByText('38 个动作，可交给 AI IDE 或维护者执行。').isVisible();
-  const zhTrustLedgerPreviewText = await desktop.locator('[data-testid="trust-ledger-preview"]').innerText();
   const zhScreenshot = join(outDir, 'desktop-zh-full.png');
   await desktop.screenshot({ path: zhScreenshot, fullPage: true });
   await desktop.locator('#preview-email').scrollIntoViewIfNeeded();
@@ -133,6 +132,12 @@ try {
   await mobile.selectOption('[data-testid="language-switcher"] select', 'zh-CN');
   const mobileScreenshot = join(outDir, 'mobile-full.png');
   await mobile.screenshot({ path: mobileScreenshot, fullPage: true });
+  const mobileP3FoldScreenshot = join(outDir, 'mobile-p3-fold.png');
+  await mobile.screenshot({ path: mobileP3FoldScreenshot, fullPage: false });
+  const horizontalOverflow = await mobile.evaluate(() => {
+    const root = globalThis.document.documentElement;
+    return Math.max(0, root.scrollWidth - root.clientWidth);
+  });
   await mobile.click('button[aria-label="切换导航"]');
   const mobileNavVisible = await mobile.locator('nav.nav-open').isVisible();
   const mobileZhHeading = await mobile.locator('h1').innerText();
@@ -223,6 +228,9 @@ try {
   if (!mobileNavVisible) {
     throw new Error('Mobile navigation did not open.');
   }
+  if (horizontalOverflow > 1) {
+    throw new Error(`Mobile layout has horizontal overflow: ${horizontalOverflow}px.`);
+  }
   if (
     !assuranceGraphSectionVisible ||
     !cliDemoVisible ||
@@ -232,15 +240,6 @@ try {
     !assuranceGraphText.includes('Acceptance')
   ) {
     throw new Error('English Assurance Graph did not render expected v0.2 text.');
-  }
-  if (
-    !trustLedgerPreviewVisible ||
-    !trustLedgerPreviewText.includes('Trust Ledger') ||
-    !trustLedgerPreviewText.includes('Evidence generated locally') ||
-    !trustLedgerPreviewText.includes('Hardening report') ||
-    !trustLedgerPreviewText.includes('All artifacts are signed and stored locally.')
-  ) {
-    throw new Error('English Trust Ledger preview did not render expected localized text.');
   }
   if (zhLang !== 'zh-CN') {
     throw new Error(`Unexpected zh-CN html lang: ${zhLang}`);
@@ -259,14 +258,6 @@ try {
   if (zhSelectedTab !== '修复计划' || !zhRepairDetailVisible) {
     throw new Error('zh-CN artifact tabs did not expose the Repair plan detail.');
   }
-  if (
-    !zhTrustLedgerPreviewText.includes('信任账本') ||
-    !zhTrustLedgerPreviewText.includes('本地生成的证据') ||
-    !zhTrustLedgerPreviewText.includes('硬化报告') ||
-    !zhTrustLedgerPreviewText.includes('所有证据物料都会在本地签名并存储。')
-  ) {
-    throw new Error('zh-CN Trust Ledger preview did not render expected localized text.');
-  }
 
   console.log(
     JSON.stringify(
@@ -276,12 +267,15 @@ try {
         initialLang,
         zhLang,
         desktopScreenshot,
+        desktopP3FoldScreenshot,
         desktopFocusDarkScreenshot,
         desktopFocusLightScreenshot,
         zhScreenshot,
         mobileScreenshot,
+        mobileP3FoldScreenshot,
         mobileMenuScreenshot,
         comparisonScreenshot,
+        horizontalOverflow,
         heading,
         zhHeading,
         selectedTab,
@@ -293,7 +287,6 @@ try {
         formStatus,
         mobileNavVisible,
         mobileZhHeading,
-        trustLedgerPreviewVisible,
         metadata,
         robotsUrl,
         sitemapUrl,

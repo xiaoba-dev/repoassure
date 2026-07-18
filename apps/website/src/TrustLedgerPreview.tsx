@@ -1,5 +1,6 @@
 import { Copy, FileText, GitBranch, Grid2X2, SearchCheck, Server, ShieldCheck } from 'lucide-react';
 
+import { EvidenceHash } from './components/ui/EvidenceHash.tsx';
 import type { TrustLedgerPreviewCopy } from './i18n.ts';
 
 const navIcons = [Grid2X2, FileText, SearchCheck, ShieldCheck, ShieldCheck, Server, GitBranch] as const;
@@ -13,18 +14,11 @@ const rowIcons = {
 
 type TrustLedgerPreviewProps = {
   copy: TrustLedgerPreviewCopy;
-  variant?: 'hero' | 'default';
 };
 
-export function TrustLedgerPreview({ copy, variant = 'default' }: TrustLedgerPreviewProps) {
-  const sidebarItems = variant === 'hero' ? copy.sidebar.slice(0, 4) : copy.sidebar;
-
+export function TrustLedgerPreview({ copy }: TrustLedgerPreviewProps) {
   return (
-    <section
-      className={variant === 'hero' ? 'trust-ledger-preview trust-ledger-preview-hero' : 'trust-ledger-preview'}
-      data-testid="trust-ledger-preview"
-      aria-label={copy.label}
-    >
+    <section className="trust-ledger-preview" data-testid="trust-ledger-preview" aria-label={copy.label}>
       <div className="trust-ledger-shell">
         <aside className="trust-ledger-sidebar" aria-label={copy.label}>
           <div className="trust-ledger-brand">
@@ -36,7 +30,7 @@ export function TrustLedgerPreview({ copy, variant = 'default' }: TrustLedgerPre
             </span>
           </div>
           <nav>
-            {sidebarItems.map((item, index) => {
+            {copy.sidebar.map((item, index) => {
               const NavIcon = navIcons[index] ?? FileText;
               return (
                 <span className={index === 0 ? 'active' : undefined} key={item}>
@@ -89,8 +83,7 @@ export function TrustLedgerPreview({ copy, variant = 'default' }: TrustLedgerPre
                     <small>{row.detail}</small>
                   </span>
                   <span className="trust-ledger-evidence" role="cell">
-                    <code>{row.evidence}</code>
-                    <Copy size={15} />
+                    <EvidenceHash value={row.evidence} />
                   </span>
                 </div>
               );

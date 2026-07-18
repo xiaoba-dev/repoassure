@@ -1,0 +1,160 @@
+/* Evidence visualization system — shared by Trust Ledger, Artifact preview, and future console */
+
+.status-chip,
+.section-label,
+.artifact-status {
+  align-items: center;
+  color: var(--accent);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 780;
+  gap: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.status-chip-success,
+.status-chip-verified,
+.status-chip-generated,
+.status-chip-accepted,
+.status-chip-local {
+  background: var(--status-success-surface);
+  border: 1px solid var(--status-success-border);
+  border-radius: 999px;
+  color: var(--status-success);
+  padding: 5px 10px;
+}
+
+.status-chip-accent {
+  background: var(--accent-surface);
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+  color: var(--accent-emphasis);
+  padding: 9px 13px;
+}
+
+.severity-chip {
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 5px 9px;
+}
+
+.severity-p0 {
+  background: #fee2e2;
+  color: var(--risk-p0);
+}
+
+.severity-p1 {
+  background: #ffedd5;
+  color: var(--risk-p1);
+}
+
+.severity-p2 {
+  background: #e0ecff;
+  color: var(--risk-p2);
+}
+
+.evidence-hash {
+  align-items: center;
+  background: var(--surface-evidence-soft);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 8px;
+  color: #dbe7f5;
+  display: inline-flex;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  gap: 8px;
+  justify-content: space-between;
+  max-width: 100%;
+  min-width: 0;
+  padding: 8px 10px;
+}
+
+.evidence-hash code {
+  min-width: 0;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.evidence-table {
+  display: grid;
+  gap: 0;
+}
+
+.evidence-table-row {
+  align-items: start;
+  border-top: 1px solid var(--border-subtle);
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(150px, 1.1fr) minmax(132px, 0.8fr) minmax(150px, 1fr) minmax(150px, 1fr);
+  padding: 18px clamp(20px, 3vw, 34px);
+}
+
+.evidence-table-head {
+  color: #526071;
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.evidence-table-head,
+.evidence-status strong {
+  color: inherit;
+}
+
+.evidence-status {
+  display: grid;
+  gap: 4px;
+}
+
+.evidence-status::before {
+  background: var(--status-success);
+  border-radius: 999px;
+  content: "";
+  display: inline-block;
+  height: 8px;
+  margin-bottom: 2px;
+  width: 8px;
+}
+
+.evidence-status small,
+.evidence-summary small {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.evidence-summary {
+  display: grid;
+  gap: 4px;
+}
+
+.terminal-block {
+  background: var(--surface-evidence);
+  border: 1px solid #1f3348;
+  border-radius: 14px;
+  color: #dbe7f5;
+  overflow: hidden;
+}
+
+.terminal-block-chrome {
+  align-items: center;
+  background: #061425;
+  border-bottom: 1px solid #1f3348;
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+}
+
+.terminal-block-body {
+  display: grid;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  gap: 10px;
+  line-height: 1.55;
+  padding: 18px 20px 8px;
+}

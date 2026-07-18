@@ -1,0 +1,51 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-console-graph-snapshot-generator-v0.1",
+  "title": "Project Intelligence Console Graph Snapshot Generator v0.1",
+  "status": "completed",
+  "created_at": "2026-07-16T16:20:00.000Z",
+  "completed_at": "2026-07-17T01:04:00.000+08:00",
+  "objective": "Implement the first local-only Project Intelligence Console foundation by generating bounded JSON graph snapshots for docs relationships, code ownership, and project progress from repository files, without building a hosted dashboard or changing website design.",
+  "document_basis": [
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "docs/product/specs/project-intelligence-console-spec-v0.1.md",
+    "docs/operations/ai-ide-repair-end-to-end-evidence-package-validation-v0.1.md",
+    "docs/testing/strategy/test-strategy-v0.1.md",
+    "docs/acceptance/checklists/acceptance-checklist-v0.1.md"
+  ],
+  "acceptance": [
+    "Generate local-only graph snapshot JSON for docs graph, code ownership graph, and project progress graph.",
+    "Keep graph snapshots under an ignored/generated artifact boundary.",
+    "Validate source coverage, schema shape, bounded output size, and redaction/no secret leakage.",
+    "Do not implement hosted dashboard, SaaS runtime, telemetry, upload, deployment, or website visual redesign.",
+    "Update operations docs, testing strategy, acceptance checklist, decision log, dev log, and progress snapshot."
+  ],
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "website_visual_redesign",
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "deployment",
+    "pricing_change",
+    "customer_contact"
+  ],
+  "evidence": [
+    "packages/acceptance/src/run-project-intelligence-snapshot.ts",
+    "tests/unit/project-intelligence-snapshot.test.ts",
+    "artifacts/project-graph/project-intelligence-snapshot.json",
+    "artifacts/project-graph/project-intelligence-snapshot.md",
+    "docs/operations/project-intelligence-console-graph-snapshot-generator-v0.1.md"
+  ],
+  "snapshot_summary": {
+    "nodes": 2617,
+    "edges": 3147
+  },
+  "next_goal_id": "project-intelligence-console-local-static-viewer-v0.1"
+}

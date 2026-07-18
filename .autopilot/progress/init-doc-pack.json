@@ -1,0 +1,30 @@
+{
+  "schema": "project-autopilot/init-doc-pack@1",
+  "recorded_at": "2026-07-16T00:00:00.000Z",
+  "status": "initialized_from_brownfield",
+  "source": "brownfield_inference",
+  "confirmation": "owner_confirmed_for_initialization",
+  "primary_doc_locale": "zh-CN",
+  "machine_protocol_locale": "en-US",
+  "shape_matrix": [
+    "command_line",
+    "mcp_server",
+    "web_app",
+    "sdk_package",
+    "composite_product_shape"
+  ],
+  "created_entrypoints": [
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/DESIGN.md",
+    "docs/PLAN.md"
+  ],
+  "created_routing_indexes": [
+    "docs/public/README.md",
+    "docs/spec/README.md",
+    "docs/planning/README.md"
+  ],
+  "brownfield_report_path": "docs/operations/brownfield-autopilot-intake-v0.1.md",
+  "do_not_treat_as_public_release_authorization": true
+}
+

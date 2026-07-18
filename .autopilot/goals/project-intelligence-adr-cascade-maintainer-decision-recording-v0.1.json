@@ -1,0 +1,63 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-adr-cascade-maintainer-decision-recording-v0.1",
+  "title": "Project Intelligence ADR Cascade Maintainer Decision Recording v0.1",
+  "status": "completed",
+  "created_at": "2026-07-17T18:35:00.000+08:00",
+  "completed_at": "2026-07-18T19:25:00.000+08:00",
+  "objective": "Record explicit maintainer decisions for the 11 ADR cascade recommendation draft items before any downstream ADR/spec/docs remediation can execute.",
+  "document_basis": [
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "docs/operations/project-intelligence-adr-cascade-remediation-recommendation-draft-v0.1.md",
+    "artifacts/project-graph/adr-cascade-remediation-recommendation-draft.json"
+  ],
+  "acceptance": [
+    "Maintainer provides explicit approve, defer, accept-risk, or repair decision for each of the 11 recommendation draft items.",
+    "Record maintainer evidence notes without inventing decisions.",
+    "Keep non-confirmed items pending.",
+    "Do not execute repair actions or modify ADR/spec/docs/tests/logs/source without a separate confirmed remediation goal."
+  ],
+  "blocked_actions": [
+    "invent_maintainer_decision",
+    "automatic_doc_rewrite",
+    "automatic_adr_repair",
+    "repair_execution",
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "website_visual_redesign",
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "deployment",
+    "pricing_change",
+    "customer_contact"
+  ],
+  "source_recommendation_draft": {
+    "path": "artifacts/project-graph/adr-cascade-remediation-recommendation-draft.json",
+    "items": 11,
+    "status": "maintainer_review_required",
+    "final_maintainer_decisions_written": 0
+  },
+  "maintainer_decision_summary": {
+    "markdown_output": "artifacts/project-graph/adr-cascade-maintainer-decision-record.md",
+    "json_output": "artifacts/project-graph/adr-cascade-maintainer-decision-record.json",
+    "items": 11,
+    "repair_decisions_recorded": 11,
+    "final_maintainer_decisions_written": 11,
+    "repair_execution_authorized": false,
+    "evidence_note": "Owner authorized execution in Codex conversation on 2026-07-18."
+  },
+  "verification_evidence": {
+    "tests": [
+      "pnpm vitest run tests/unit/project-intelligence-maintainer-decision.test.ts",
+      "pnpm build:acceptance"
+    ],
+    "artifact_generation": "node packages/acceptance/dist/run-project-intelligence-maintainer-decision.js --draft artifacts/project-graph/adr-cascade-remediation-recommendation-draft.json --output artifacts/project-graph --decision repair --evidence-note \"Owner authorized execution in Codex conversation on 2026-07-18.\" --maintainer owner"
+  },
+  "next_goal_id": "project-intelligence-adr-cascade-controlled-remediation-plan-v0.1"
+}

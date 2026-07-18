@@ -104,6 +104,28 @@ Project Progress Graph should show:
 - Generated graph snapshots should live under `artifacts/project-graph/` or another ignored artifact directory.
 - Any future shared/exported graph must go through explicit review.
 
+## Implementation Status
+
+Graph snapshot generation is implemented as `pnpm project:intelligence`. It writes local-only JSON and Markdown snapshots under `artifacts/project-graph/`.
+
+The local static viewer is implemented as `pnpm project:intelligence:view`. It reads `project-intelligence-snapshot.json` and writes local-only `project-intelligence-viewer.html` under the same ignored artifact boundary.
+
+Freshness and staleness findings are implemented in the local snapshot and viewer. Current checks cover ADR cascade gaps, app ownership documentation gaps, package test-link gaps, and progress active-goal mismatches.
+
+ADR cascade remediation backlog generation is implemented as a local review artifact. It turns `missing_cascade` findings into maintainer decision items but does not automatically edit ADRs or downstream docs.
+
+ADR cascade remediation decision intake is implemented as a local review artifact. It turns backlog items into Markdown/JSON pending decision slots for approve / defer / accept-risk / repair and does not automatically repair ADRs or mutate downstream docs.
+
+ADR cascade remediation recommendation draft generation is implemented as a local review artifact. It turns decision intake items into Markdown/JSON advisory recommendations with suggested decision, rationale, risk, evidence, and rollback / follow-up notes while keeping final maintainer decisions pending.
+
+ADR cascade maintainer decision recording is implemented as a local decision artifact. It records owner-authorized maintainer decisions from the recommendation draft into Markdown/JSON outputs while keeping repair execution and document mutation unauthorized.
+
+ADR cascade controlled remediation planning is implemented as a local planning artifact. It records item-to-file mapping, proposed execution order, rollback notes, and verification checklist from the maintainer decision record while keeping repair execution and document mutation unauthorized.
+
+Project Intelligence ADR Cascade Controlled Remediation Execution v0.1 is implemented as a controlled documentation governance repair for 11 owner-authorized ADR cascade items. It adds `Cascade Evidence` links to the affected ADRs and cascades the execution status into canonical docs, testing strategy, acceptance checklist, logs, and autopilot state. It does not implement hosted dashboard, cloud sync, telemetry, deployment, public release, or target repo writes.
+
+Watch mode, agent context export, automated remediation execution, and any hosted/internal live console remain planned or pending explicit maintainer confirmation.
+
 ## Acceptance Criteria
 
 | Area | v0.1 acceptance |
@@ -111,13 +133,13 @@ Project Progress Graph should show:
 | Scope | Spec defines Docs Graph, Code Graph, and Project Progress Graph |
 | Boundary | Spec states local-only and no hosted service dependency |
 | Data | Spec defines local source files and generated graph snapshot path |
-| Implementation | No internal site runtime is implemented in this planning increment |
-| Testing | Future graph builder must start with executable tests before runtime code |
+| Implementation | Graph snapshot generator, local static viewer, freshness/staleness findings, ADR cascade backlog generation, ADR cascade decision intake, recommendation draft generation, maintainer decision recording, controlled remediation planning, and Project Intelligence ADR Cascade Controlled Remediation Execution v0.1 for 11 ADR documentation cascade repairs implemented; post-remediation closure remains the next freshness check |
+| Testing | Graph builder, static viewer, findings, backlog generation, decision intake, recommendation draft generation, maintainer decision recording, controlled remediation planning, and controlled remediation execution covered by executable unit tests before runtime code |
 
 ## Non-Goals
 
-- No graph builder runtime implementation in this planning increment.
-- No UI implementation in this planning increment.
+- No hosted graph dashboard implementation in this planning increment.
+- No live internal console server implementation in this planning increment.
 - No hosted dashboard or Team Cloud dependency.
 - No source upload, cloud sync, analytics, or telemetry.
 - No replacement for ADRs, specs, acceptance docs, or logs; the console reads them rather than becoming the source of truth.

@@ -58,27 +58,35 @@ The voice is direct, technical, and trust-focused.
 
 ### Color Roles
 
-| Role | Current token | Use |
+| Role | Token / value | Use |
 | --- | --- | --- |
-| Background | `#ffffff` | Primary page surface |
-| Soft background | `#f7fafc` | Subtle section and control backgrounds |
-| Ink | `#111827` | Primary text and strong headings |
-| Muted text | `#526071` | Secondary copy |
-| Border | `#d8e0ea` | Panels, tables, controls |
-| Assurance green | `#008a4c` | Positive evidence, accepted status, primary CTA |
-| Assurance green dark | `#006c3e` | CTA hover, strong success text |
-| Control blue | `#2563eb` | Navigation emphasis, planned/roadmap notes, secondary focus |
-| Footer navy | `#0c1b2a` | Dense footer and future console dark surfaces |
+| Page surface | `--surface-page` (`#ffffff`) | Primary light sections |
+| Hero / dark surface | `--surface-hero` (`#04111f`) | Header, hero, graph dark bands |
+| Soft background | `--surface-page-soft` (`#f7fafc`) | Breathing bands, subtle fills |
+| Primary text | `--text-primary` (`#111827`) | Headings and body on light |
+| Muted text | `--text-muted` (`#526071`) | Secondary copy |
+| Border | `--border-subtle` (`#d8e0ea`) | Panels, tables, controls |
+| Accent (brand green) | `--accent` (`#009d5c`) | CTA, section labels, brand emphasis |
+| Accent emphasis | `--accent-emphasis` (`#36e58b`) | Dark-surface highlights, focus on dark |
+| Success (evidence state) | `--status-success` (`#22d876`) | Verified / generated / accepted markers |
+| Control blue | `--brand-control-blue` (`#4f86ff`) | Navigation emphasis, planned notes |
+| Footer navy | `--surface-footer` (`#020914`) | Compact footer |
+
+**Accent vs success:** accent drives brand and interactive emphasis; success drives operational evidence state (graph nodes, ledger status, local-complete badges). Do not reintroduce separate `--status-verified` / `--status-generated` / `--status-accepted` tokens on the public website — they were converged in the P1 token cleanup.
 
 ### Semantic Token Layer
 
-Public Website v0.2 now uses a three-layer token model in `apps/website/src/styles.css`:
+Public Website v0.2 uses a three-layer token model in `apps/website/src/styles/tokens.css` (imported via `styles.css`):
 
-- Brand tokens: `--brand-navy-950`, `--brand-navy-900`, `--brand-assurance`, `--brand-control-blue`, and related brand primitives.
-- Semantic tokens: `--surface-hero`, `--surface-page`, `--surface-panel`, `--text-primary`, `--text-muted`, `--text-on-dark`, `--border-subtle`, `--status-verified`, `--status-generated`, `--status-accepted`, `--focus-ring`, and `--focus-ring-on-dark`.
-- Component tokens: `--component-radius-control`, `--component-radius-card`, `--component-radius-panel`, `--component-border-subtle`, `--component-border-on-dark`, and `--component-shadow-panel`.
+- **Brand tokens:** `--brand-navy-950`, `--brand-navy-900`, `--brand-assurance`, `--brand-control-blue`, and related primitives.
+- **Semantic tokens:** `--surface-hero`, `--surface-page`, `--surface-panel`, `--text-primary`, `--text-muted`, `--text-on-dark`, `--border-subtle`, `--accent*`, `--status-success*`, `--focus-ring`, `--focus-ring-on-dark`.
+- **Component tokens:** `--component-radius-control`, `--component-radius-card`, `--component-radius-panel`, `--component-border-subtle`, `--component-border-on-dark`, `--component-shadow-panel`.
+
+Evidence-specific visuals live in `apps/website/src/styles/evidence-system.css`. Responsive breakpoints live in `apps/website/src/styles/responsive.css`.
 
 Dark and light sections must opt into explicit theme classes such as `theme-dark` and `theme-light`; future website surfaces should not rely on long post-hoc cascade overrides to infer text or background color.
+
+UI implementation guardrails and completed sprint scope are recorded in [`website-uiux-roadmap-v0.2.md`](website-uiux-roadmap-v0.2.md).
 
 Future product surfaces can extend this model with:
 
@@ -273,12 +281,13 @@ Future website redesign work should pass:
 
 ## Current Gaps
 
-Public Website v0.2 now implements the selected Assurance Graph direction for the first viewport and is closer to the intended enterprise security aesthetic.
+Public Website v0.2 implements the selected Assurance Graph direction, HeroConsole, ArtifactPreview tabs, CliDemo, OpenCoreDiagram, and the P0–P2 UI/UX roadmap captured in [`website-uiux-roadmap-v0.2.md`](website-uiux-roadmap-v0.2.md).
 
 Known gaps:
 
-- No reusable component library for website/product-console surfaces.
-- Graph visual language exists in the public website hero, but the internal Project Intelligence Console graph language is not implemented yet.
-- Later P3 polish can tune mobile information density, panel proportions, type optical weight, and first-viewport spacing against the selected Product Design source.
+- No reusable component library shared between website and future product-console surfaces.
+- Graph visual language exists on the public website, but the internal Project Intelligence Console graph language is not implemented yet.
+- P3 polish (mobile information density, panel proportions, type optical weight, first-viewport spacing) remains a separate optional goal.
+- ja / ko public locales remain roadmap-only.
 
 These gaps should be addressed through future focused implementation goals, not hidden by this document.

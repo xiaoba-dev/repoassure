@@ -1,0 +1,43 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "ai-ide-repair-validation-only-real-campaign-validation-v0.1",
+  "title": "AI IDE Repair Validation-Only Real Campaign Validation v0.1",
+  "status": "completed",
+  "created_at": "2026-07-16T15:20:00.000Z",
+  "objective": "Validate repair:execute --validation-only consumption of a real or near-real repair handoff package against a controlled target repo, proving verification commands can produce actionable evidence without applying patches or automatically changing target repository files.",
+  "document_basis": [
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "docs/operations/ai-ide-repair-patch-plan-real-campaign-validation-v0.1.md",
+    "docs/testing/strategy/test-strategy-v0.1.md",
+    "docs/acceptance/checklists/acceptance-checklist-v0.1.md"
+  ],
+  "acceptance": [
+    "Use a controlled near-real target repo fixture that contains no private source code.",
+    "Consume an existing repair-handoff-package.json through repair:execute --validation-only.",
+    "Run bounded verification commands and capture passed, failed, and skipped evidence.",
+    "Prove validation-only execution does not apply patches, create commits, create pull requests, mark acceptance passed, or write target repository source files.",
+    "Update operations docs, testing strategy, acceptance checklist, decision log, dev log, and progress snapshot."
+  ],
+  "blocked_actions": [
+    "automatic_target_repo_write",
+    "patch_application",
+    "website_visual_redesign",
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "deployment",
+    "pricing_change",
+    "customer_contact"
+  ],
+  "completed_at": "2026-07-16T16:05:00.000Z",
+  "result_summary": "Validated repair:execute --validation-only consumption of a near-real repair handoff package. Runnable commands now produce passed and failed evidence, placeholder/manual checks are recorded as skipped, sensitive output is redacted, and target repository source files remain unchanged.",
+  "evidence": [
+    "docs/operations/ai-ide-repair-validation-only-real-campaign-validation-v0.1.md",
+    "tests/unit/repair-execute.test.ts"
+  ],
+  "selected_next_goal_id": "ai-ide-repair-end-to-end-evidence-package-validation-v0.1"
+}

@@ -1,0 +1,56 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-adr-cascade-remediation-backlog-v0.1",
+  "title": "Project Intelligence ADR Cascade Remediation Backlog v0.1",
+  "status": "completed",
+  "created_at": "2026-07-17T08:28:00.000+08:00",
+  "completed_at": "2026-07-17T11:30:00.000+08:00",
+  "objective": "Turn Project Intelligence missing_cascade findings into a maintainer-reviewable ADR cascade remediation backlog without automatically modifying documents or source code.",
+  "document_basis": [
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "docs/operations/project-intelligence-console-graph-freshness-and-staleness-checks-v0.1.md",
+    "artifacts/project-graph/project-intelligence-snapshot.json"
+  ],
+  "acceptance": [
+    "Read local Project Intelligence findings and group ADR missing_cascade items by likely remediation path.",
+    "Produce a docs/operations backlog record with approve/defer/accept-risk choices for maintainer review.",
+    "Do not automatically edit ADRs, specs, acceptance docs, tests, or logs as part of backlog generation.",
+    "Keep generated graph artifacts ignored and local-only.",
+    "Update PLAN, acceptance checklist, testing strategy, decision log, dev log, and autopilot progress state."
+  ],
+  "blocked_actions": [
+    "automatic_doc_rewrite",
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "website_visual_redesign",
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "deployment",
+    "pricing_change",
+    "customer_contact"
+  ],
+  "backlog_summary": {
+    "output": "artifacts/project-graph/adr-cascade-remediation-backlog.md",
+    "items": 11,
+    "missing_cascade": 11,
+    "decision_options": [
+      "approve",
+      "defer",
+      "accept-risk",
+      "repair"
+    ],
+    "automatic_remediation_authorized": false
+  },
+  "verification_evidence": [
+    "tests/unit/project-intelligence-backlog.test.ts",
+    "docs/operations/project-intelligence-adr-cascade-remediation-backlog-v0.1.md",
+    "artifacts/project-graph/adr-cascade-remediation-backlog.md"
+  ],
+  "next_goal_id": "project-intelligence-adr-cascade-remediation-decision-intake-v0.1"
+}

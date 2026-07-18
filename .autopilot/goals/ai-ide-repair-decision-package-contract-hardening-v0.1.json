@@ -1,0 +1,42 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "ai-ide-repair-decision-package-contract-hardening-v0.1",
+  "title": "AI IDE Repair Decision Package Contract Hardening v0.1",
+  "status": "completed",
+  "created_at": "2026-07-16T00:00:00.000Z",
+  "completed_at": "2026-07-16T00:00:00.000Z",
+  "objective": "Harden the AI IDE repair decision package contract so AI IDEs and coding agents can consume repair decision package artifacts with deterministic reading order, repair actions, maintainer review boundaries, verification checklists, redaction guarantees, and no automatic target repo writes.",
+  "document_basis": [
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "docs/adr/0004-repair-plan-and-task-package.md",
+    "docs/adr/0014-distribution-and-repair-loop-readiness.md",
+    "docs/product/strategy/open-core-packaging-spec-v0.1.md",
+    "docs/operations/product-core-execution-resume-v0.1.md"
+  ],
+  "acceptance": [
+    "Contract tests cover AI IDE reading order, repair decision package fields, repair task references, maintainer review boundary, verification checklist, and redaction boundary.",
+    "Representative fixtures cover passed, blocked, failed, environment blocker, and queued repair action scenarios.",
+    "Generated Markdown is readable by a maintainer and aligns with the JSON contract.",
+    "CLI/MCP artifact production remains local-first and does not automatically modify target repositories.",
+    "PLAN, testing strategy, acceptance checklist, decision log, dev log, and progress snapshot are updated with evidence."
+  ],
+  "blocked_actions": [
+    "automatic_target_repo_write",
+    "website_visual_redesign",
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "deployment",
+    "pricing_change",
+    "customer_contact"
+  ],
+  "result_summary": "AI IDE repair decision package contract now exposes deterministic read order, repairActionQueue, maintainerReview, verificationChecklist, redaction, environment blocker tasks, and passed-run empty-queue guidance.",
+  "verification_evidence": [
+    "pnpm vitest run tests/unit/repair-handoff.test.ts tests/unit/repair-execute.test.ts tests/unit/repair-patch-plan.test.ts",
+    "pnpm typecheck"
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-adr-cascade-remediation-decision-intake-v0.1",
+  "title": "Project Intelligence ADR Cascade Remediation Decision Intake v0.1",
+  "status": "completed",
+  "created_at": "2026-07-17T11:30:00.000+08:00",
+  "completed_at": "2026-07-17T12:00:00.000+08:00",
+  "objective": "Record maintainer decisions for the 11 Project Intelligence ADR cascade backlog items as approve, defer, accept-risk, or repair without automatically rewriting ADRs, specs, docs, tests, or logs.",
+  "document_basis": [
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "docs/operations/project-intelligence-adr-cascade-remediation-backlog-v0.1.md",
+    "artifacts/project-graph/adr-cascade-remediation-backlog.md"
+  ],
+  "acceptance": [
+    "Read the generated ADR cascade remediation backlog.",
+    "Create a maintainer decision intake record with one explicit decision slot for each backlog item.",
+    "Support approve, defer, accept-risk, and repair decisions with evidence notes.",
+    "Do not execute repair actions or modify ADR/spec/docs content as part of decision intake.",
+    "Cascade the selected decision-intake status into PLAN, acceptance checklist, testing strategy, decision log, dev log, and autopilot progress state."
+  ],
+  "blocked_actions": [
+    "automatic_doc_rewrite",
+    "automatic_adr_repair",
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "website_visual_redesign",
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "deployment",
+    "pricing_change",
+    "customer_contact"
+  ],
+  "source_backlog": {
+    "path": "artifacts/project-graph/adr-cascade-remediation-backlog.md",
+    "items": 11,
+    "status": "maintainer_review_required"
+  },
+  "intake_summary": {
+    "markdown_output": "artifacts/project-graph/adr-cascade-remediation-decision-intake.md",
+    "json_output": "artifacts/project-graph/adr-cascade-remediation-decision-intake.json",
+    "items": 11,
+    "pending_decisions": 11,
+    "automatic_repair_authorized": false
+  },
+  "verification_evidence": [
+    "tests/unit/project-intelligence-decision-intake.test.ts",
+    "docs/operations/project-intelligence-adr-cascade-remediation-decision-intake-v0.1.md",
+    "artifacts/project-graph/adr-cascade-remediation-decision-intake.md",
+    "artifacts/project-graph/adr-cascade-remediation-decision-intake.json"
+  ],
+  "next_goal_id": "project-intelligence-adr-cascade-remediation-recommendation-draft-v0.1"
+}

@@ -1,6 +1,6 @@
 {
   "schema": "project-autopilot/goal-index@1",
-  "active_goal_id": "project-intelligence-console-redesign-v0.1",
+  "active_goal_id": "project-intelligence-adr-cascade-remediation-closure-v0.1",
   "goals": [
     {
       "id": "public-website-p3-pixel-qa-mobile-responsive-polish-v0.1",
@@ -110,7 +110,7 @@
     {
       "id": "project-intelligence-console-redesign-v0.1",
       "path": ".autopilot/goals/project-intelligence-console-redesign-v0.1.json",
-      "status": "ready_to_execute"
+      "status": "completed"
     }
   ],
   "deferred_goal_ids": [],
@@ -120,5 +120,5 @@
   "superseded_goal_ids": [
     "public-website-owner-visual-acceptance-p3-follow-up-triage-v0.1"
   ],
-  "last_updated_at": "2026-07-19T01:30:00.000+08:00"
+  "last_updated_at": "2026-07-19T02:10:00.000+08:00"
 }

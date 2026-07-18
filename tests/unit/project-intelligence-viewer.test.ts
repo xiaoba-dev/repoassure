@@ -84,6 +84,59 @@ describe('project intelligence local static viewer', () => {
   });
 });
 
+describe('console reports state, not only exceptions', () => {
+  it('renders a verdict and a next action even when there are no findings', () => {
+    // The console's only actionable section used to be the findings list, so it was
+    // least informative exactly when the project was healthiest — its normal state.
+    const html = formatProjectIntelligenceViewerHtml({
+      ...buildSnapshotFixture(),
+      findings: [],
+      summary: { ...buildSnapshotFixture().summary, findings: { total: 0, high: 0, medium: 0, low: 0 } }
+    });
+
+    expect(html).toContain('class="verdict"');
+    expect(html).toContain('data-state="clear"');
+    expect(html).toContain('No freshness or staleness findings');
+    expect(html).toContain('verdict-next');
+  });
+
+  it('breaks findings down by severity instead of showing only a total', () => {
+    const html = formatProjectIntelligenceViewerHtml({
+      ...buildSnapshotFixture(),
+      summary: { ...buildSnapshotFixture().summary, findings: { total: 6, high: 1, medium: 2, low: 3 } }
+    });
+
+    expect(html).toContain('1 high');
+    expect(html).toContain('2 medium');
+    expect(html).toContain('3 low');
+    expect(html).toContain('data-state="attention"');
+  });
+
+  it('states how much of a capped list is actually shown', () => {
+    const nodes = Array.from({ length: 120 }, (_, index) => ({
+      id: `node-${index}`,
+      label: `Node ${index}`,
+      type: 'source' as const
+    }));
+    const html = formatProjectIntelligenceViewerHtml({
+      ...buildSnapshotFixture(),
+      codeGraph: { nodes, edges: [] }
+    });
+
+    // A heading reading "2502 nodes" above eighty rows reads as full coverage.
+    expect(html).toContain('showing 80 of 120');
+  });
+
+  it('emits no external reference and stays a local-only artifact', () => {
+    const html = formatProjectIntelligenceViewerHtml(buildSnapshotFixture());
+
+    expect(html).not.toMatch(/https?:\/\//);
+    expect(html).toContain('data-local-only="true"');
+    expect(html).toContain('No hosted dashboard');
+  });
+});
+
+
 function buildSnapshotFixture(): ProjectIntelligenceSnapshot {
   return {
     schemaVersion: 1,

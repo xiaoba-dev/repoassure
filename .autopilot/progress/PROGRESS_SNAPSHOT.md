@@ -1,6 +1,6 @@
 # RepoAssure Progress Snapshot
 
-Status: Public Website Claude Design Integration & QA v0.1 completed; console redesign ready
+Status: Project Intelligence Console Redesign v0.1 completed; ADR cascade remediation closure ready
 Generated: 2026-07-18
 
 ## Latest Goal
@@ -20,8 +20,8 @@ Plain-language explanation: 按 Design System v2 重建官网，并把信息架�
 1. RepoAssure Design System v2 Adoption v0.1 — completed
 2. RepoAssure Evidence Integrity Hashing v0.1 — completed
 3. Public Website Claude Design Integration & QA v0.1 — completed
-4. Project Intelligence Console Redesign v0.1 — active
-5. Project Intelligence ADR Cascade Remediation Closure v0.1 — re-queued
+4. Project Intelligence Console Redesign v0.1 — completed
+5. Project Intelligence ADR Cascade Remediation Closure v0.1 — active
 
 ## Completed Product-Core Goals
 
@@ -37,6 +37,7 @@ Plain-language explanation: 按 Design System v2 重建官网，并把信息架�
 - RepoAssure Design System v2 Adoption v0.1 — 37 components vendored, zero bundle change
 - RepoAssure Evidence Integrity Hashing v0.1 — content hashing implemented, integrity claims made accurate
 - Public Website Claude Design Integration & QA v0.1 — IA rebuilt around the ADR-0013 four questions
+- Project Intelligence Console Redesign v0.1 — code graph noise removed, console reframed to state reporting
 
 ## Released Goals
 

@@ -1,15 +1,15 @@
 {
   "schema": "project-autopilot/progress-snapshot@1",
-  "generated_at": "2026-07-19T01:30:00.000+08:00",
-  "current_stage": "Public Website Claude Design Integration & QA v0.1 completed; console redesign ready",
+  "generated_at": "2026-07-19T02:10:00.000+08:00",
+  "current_stage": "Project Intelligence Console Redesign v0.1 completed; ADR cascade remediation closure ready",
   "active_goal": {
-    "id": "project-intelligence-console-redesign-v0.1",
-    "title": "Project Intelligence Console Redesign v0.1",
+    "id": "project-intelligence-adr-cascade-remediation-closure-v0.1",
+    "title": "Project Intelligence ADR Cascade Remediation Closure v0.1",
     "status": "ready_to_execute"
   },
   "next_goal": {
-    "id": "project-intelligence-console-redesign-v0.1",
-    "title": "Project Intelligence Console Redesign v0.1",
+    "id": "project-intelligence-adr-cascade-remediation-closure-v0.1",
+    "title": "Project Intelligence ADR Cascade Remediation Closure v0.1",
     "status": "ready_to_execute"
   },
   "deferred_goals": [],
@@ -26,12 +26,7 @@
       "reason": "P3 follow-up triage items absorbed into the design system v2 redesign rather than executed against the superseded design"
     }
   ],
-  "requeued_goals": [
-    {
-      "id": "project-intelligence-adr-cascade-remediation-closure-v0.1",
-      "reason": "not started when the design queue was released; returns to the queue after the console redesign"
-    }
-  ],
+  "requeued_goals": [],
   "workflow_map": {
     "schema": "project-autopilot/workflow-map@1",
     "name": "Discovery-to-Design-to-Execution",
@@ -86,5 +81,5 @@
     "customer_contact",
     "target_repo_write"
   ],
-  "next_goal_plain_language": "下一个目标是 Project Intelligence Console Redesign v0.1：把内部 console 从「给你看问题」改为「给你看状态与信心」，修掉 86% node_modules 噪音与新鲜度失真，并接上规格要求但从未接线的 goal audit 与发布就绪度证据。"
+  "next_goal_plain_language": "下一个目标是 Project Intelligence ADR Cascade Remediation Closure v0.1：重新运行 freshness/backlog 检查，确认 11 个已修复的 ADR cascade findings 是否清零，并记录 residual findings 或规则校准需求。"
 }

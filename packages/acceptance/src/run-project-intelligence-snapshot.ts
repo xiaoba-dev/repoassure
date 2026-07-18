@@ -21,6 +21,10 @@ const ignoredPathPrefixes = [
   'test-results/'
 ] as const;
 
+const ignoredDirectoryNames = new Set(
+  ignoredPathPrefixes.map((prefix) => prefix.replace(/\/$/u, ''))
+);
+
 export type ProjectIntelligenceGraphName = 'docsGraph' | 'codeGraph' | 'progressGraph';
 export type ProjectIntelligenceNodeType =
   | 'adr'
@@ -659,8 +663,23 @@ function isSnapshotSourceFile(path: string): boolean {
   return /\.(json|md|mjs|ts|tsx|js|jsx|yaml|yml)$/u.test(path);
 }
 
+/**
+ * Matches ignored directories at any depth, not only at the repository root.
+ *
+ * The previous root-anchored check meant `node_modules/` matched only the top-level
+ * directory. 2149 of 2502 code graph nodes were `apps/website/node_modules` files, which
+ * filled the viewer's 80-item window with dependency source and hid every test
+ * relationship edge the console is supposed to surface.
+ *
+ * Segment equality rather than substring: `src/distribution/` is not `dist/`.
+ */
+export function isIgnoredSnapshotPath(path: string): boolean {
+  const segments = normalizePath(path).split('/').filter((segment) => segment.length > 0);
+  return segments.some((segment) => ignoredDirectoryNames.has(segment));
+}
+
 function isIgnoredPath(path: string): boolean {
-  return ignoredPathPrefixes.some((prefix) => path === prefix.slice(0, -1) || path.startsWith(prefix));
+  return isIgnoredSnapshotPath(path);
 }
 
 function normalizePath(path: string): string {

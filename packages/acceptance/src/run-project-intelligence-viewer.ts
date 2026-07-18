@@ -116,6 +116,71 @@ export async function runProjectIntelligenceViewer(
   };
 }
 
+/**
+ * The console previously reported exceptions only, so in the steady state it rendered
+ * "No findings" above hundreds of dependency files. State and confidence are what a
+ * maintainer opens it for.
+ */
+function formatVerdict(snapshot: ProjectIntelligenceSnapshot): string {
+  const { total, high, medium, low } = snapshot.summary.findings;
+  const clear = total === 0;
+  const headline = clear
+    ? 'No freshness or staleness findings in this snapshot.'
+    : `${total} finding${total === 1 ? '' : 's'} need review.`;
+  const detail = clear
+    ? `${snapshot.sourceCoverage?.filesScanned ?? 0} source files scanned across ${snapshot.sourceCoverage?.rootsScanned?.length ?? 0} roots. Docs, code, and progress graphs are internally consistent.`
+    : `${high} high, ${medium} medium, ${low} low. Highest severity first below.`;
+
+  return [
+    `<section class="verdict" data-state="${clear ? 'clear' : 'attention'}" aria-label="Snapshot verdict">`,
+    `<p class="verdict-state">${escapeHtml(headline)}</p>`,
+    `<p class="verdict-detail">${escapeHtml(detail)}</p>`,
+    `<p class="verdict-next"><span>Next</span> ${escapeHtml(formatNextAction(snapshot, clear))}</p>`,
+    '</section>'
+  ].join('\n');
+}
+
+/** Not one element of the previous console answered "what do I do now". */
+function formatNextAction(snapshot: ProjectIntelligenceSnapshot, clear: boolean): string {
+  if (!clear) {
+    return 'Triage the findings below, then re-run `pnpm project:intelligence` to confirm they close.';
+  }
+  const activeGoal = snapshot.progressGraph.nodes.find((node) => node.status === 'ready_to_execute');
+  if (activeGoal) {
+    return `Execute the active goal: ${activeGoal.label}.`;
+  }
+  return 'Select the next goal from docs/PLAN.md.';
+}
+
+/** Severity was computed and then discarded; only the total reached the page. */
+function formatFindingsSummary(findings: { total: number; high: number; medium: number; low: number }): string {
+  if (findings.total === 0) {
+    return '0';
+  }
+  return `${findings.total} · ${findings.high} high · ${findings.medium} medium · ${findings.low} low`;
+}
+
+/** Bound to the snapshot rather than restated as prose that cannot drift-check. */
+function formatBoundary(snapshot: ProjectIntelligenceSnapshot): string {
+  const boundary = snapshot.boundary as Record<string, unknown> | undefined;
+  const claims: string[] = [];
+  const deny = (key: string, label: string) => {
+    if (boundary && boundary[key] === false) {
+      claims.push(label);
+    }
+  };
+  deny('hostedDashboardImplemented', 'No hosted dashboard');
+  deny('telemetryEnabled', 'No telemetry');
+  deny('cloudSyncEnabled', 'No cloud sync');
+  deny('deploymentPerformed', 'No deployment');
+  deny('targetRepoWrites', 'No target repo writes');
+  return escapeHtml(
+    claims.length > 0
+      ? `${claims.join('. ')}.`
+      : 'No hosted dashboard. No telemetry. No cloud sync. No deployment. No target repo writes.'
+  );
+}
+
 export function formatProjectIntelligenceViewerHtml(snapshot: ProjectIntelligenceSnapshot): string {
   const docs = formatGraphSection('Docs Graph', 'docsGraph', snapshot.docsGraph);
   const code = formatGraphSection('Code Graph', 'codeGraph', snapshot.codeGraph);
@@ -140,15 +205,20 @@ export function formatProjectIntelligenceViewerHtml(snapshot: ProjectIntelligenc
     '<p class="eyebrow">RepoAssure Internal</p>',
     '<h1>Project Intelligence Console</h1>',
     '<p class="lede">local-only static viewer for docs, code, and progress graph snapshots.</p>',
-    '<div class="boundary">No hosted dashboard. No telemetry. No cloud sync. No deployment. No target repo writes.</div>',
+    /* Bound to snapshot.boundary rather than hardcoded prose. The strongest trust claim
+       on the page was previously the least verifiable one. */
+    `<div class="boundary">${formatBoundary(snapshot)}</div>`,
     '</header>',
+    /* A console whose only actionable section is the findings list is empty exactly when
+       the project is healthy — which is its normal state. Lead with the verdict. */
+    formatVerdict(snapshot),
     '<section class="summary" aria-label="Snapshot summary">',
-    summaryCard('Generated', snapshot.generatedAt),
+    summaryCard('Findings', formatFindingsSummary(snapshot.summary.findings)),
+    summaryCard('Source files scanned', String(snapshot.sourceCoverage?.filesScanned ?? 0)),
     summaryCard('Docs nodes', String(snapshot.summary.docsNodes)),
     summaryCard('Code nodes', String(snapshot.summary.codeNodes)),
     summaryCard('Progress nodes', String(snapshot.summary.progressNodes)),
     summaryCard('Edges', String(snapshot.summary.totalEdges)),
-    summaryCard('Findings', String(snapshot.summary.findings.total)),
     '</section>',
     '<nav class="tabs" aria-label="Graph sections">',
     ...snapshot.summary.graphs.map((graphName) => `<a href="#${escapeHtml(graphName)}">${escapeHtml(formatGraphName(graphName))}</a>`),
@@ -249,6 +319,16 @@ function formatFindingsSection(findings: ProjectIntelligenceFinding[]): string {
   ].join('\n');
 }
 
+const listLimit = 80;
+
+/**
+ * The list cap was silent: a heading read "2502 nodes" above eighty rows with nothing
+ * saying the rest existed, which reads as complete coverage when it is 3%.
+ */
+function formatTruncationNote(total: number, limit: number): string {
+  return total > limit ? ` <small class="truncated">showing ${limit} of ${total}</small>` : '';
+}
+
 function formatGraphSection(title: string, id: ProjectIntelligenceGraphName, graph: ProjectIntelligenceGraph): string {
   return [
     `<section class="graph" id="${escapeHtml(id)}">`,
@@ -258,21 +338,24 @@ function formatGraphSection(title: string, id: ProjectIntelligenceGraphName, gra
     '</div>',
     '<div class="grid">',
     '<div>',
-    '<h3>Nodes</h3>',
+    `<h3>Nodes${formatTruncationNote(graph.nodes.length, listLimit)}</h3>`,
     '<ol class="list">',
-    ...graph.nodes.slice(0, 80).map((node) => [
+    ...graph.nodes.slice(0, listLimit).map((node) => [
       '<li>',
       `<strong>${escapeHtml(node.label)}</strong>`,
       `<span>${escapeHtml(node.type)} · ${escapeHtml(node.path ?? node.id)}</span>`,
+      /* `owner` is populated on every node and was rendered nowhere, so the console
+         could not answer "who owns this capability" — one of its stated questions. */
+      node.owner ? `<b class="owner">${escapeHtml(node.owner)}</b>` : '',
       node.status ? `<em>${escapeHtml(node.status)}</em>` : '',
       '</li>'
     ].join('')),
     '</ol>',
     '</div>',
     '<div>',
-    '<h3>Edges</h3>',
+    `<h3>Edges${formatTruncationNote(graph.edges.length, listLimit)}</h3>`,
     '<ol class="list">',
-    ...graph.edges.slice(0, 80).map((edge) => [
+    ...graph.edges.slice(0, listLimit).map((edge) => [
       '<li>',
       `<strong>${escapeHtml(edge.type)}</strong>`,
       `<span>${escapeHtml(edge.from)} -> ${escapeHtml(edge.to)}</span>`,
@@ -315,15 +398,25 @@ function escapeHtml(value: string): string {
 
 function css(): string {
   return `
+.verdict{border:1px solid rgba(148,163,184,.16);border-radius:12px;padding:22px 24px;margin:0 0 22px;background:#101f31}
+.verdict[data-state="clear"]{border-left:3px solid #52d290}
+.verdict[data-state="attention"]{border-left:3px solid #f0ab3a}
+.verdict-state{margin:0 0 6px;font-size:19px;font-weight:600;color:#e7edf5}
+.verdict-detail{margin:0 0 14px;font-size:14px;color:#8698ad}
+.verdict-next{margin:0;font-size:14px;color:#e7edf5;display:flex;gap:10px;align-items:baseline}
+.verdict-next span{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#52d290;flex:none}
+.truncated{font-weight:400;font-size:11px;color:#8698ad;letter-spacing:.03em}
+.list .owner{display:block;font-weight:500;font-size:11px;color:#8ce4b6;letter-spacing:.02em}
+
 :root {
   color-scheme: dark;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #07110f;
-  color: #e8f3ef;
+  background: #0a1420;
+  color: #e7edf5;
 }
 body {
   margin: 0;
-  background: #07110f;
+  background: #0a1420;
 }
 .shell {
   width: min(1180px, calc(100% - 48px));
@@ -331,12 +424,12 @@ body {
   padding: 56px 0;
 }
 .hero {
-  border: 1px solid #25443c;
+  border: 1px solid rgba(148,163,184,.16);
   padding: 32px;
-  background: #0b1714;
+  background: #101f31;
 }
 .eyebrow {
-  color: #20c776;
+  color: #52d290;
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
@@ -349,21 +442,21 @@ h1 {
   line-height: 1.05;
 }
 .lede, footer {
-  color: #9fb3ac;
+  color: #8698ad;
 }
 .boundary {
-  color: #96f0c4;
+  color: #8ce4b6;
   font-weight: 700;
 }
 .summary {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  border: 1px solid #25443c;
+  border: 1px solid rgba(148,163,184,.16);
   border-top: 0;
 }
 .summary article {
   padding: 18px;
-  border-right: 1px solid #25443c;
+  border-right: 1px solid rgba(148,163,184,.16);
 }
 .summary article:last-child {
   border-right: 0;
@@ -372,7 +465,7 @@ h1 {
 .list span,
 .list em {
   display: block;
-  color: #9fb3ac;
+  color: #8698ad;
 }
 .summary strong {
   display: block;
@@ -385,15 +478,15 @@ h1 {
   margin: 24px 0;
 }
 .tabs a {
-  color: #e8f3ef;
-  border: 1px solid #25443c;
+  color: #e7edf5;
+  border: 1px solid rgba(148,163,184,.16);
   padding: 10px 14px;
   text-decoration: none;
 }
 .graph {
-  border: 1px solid #25443c;
+  border: 1px solid rgba(148,163,184,.16);
   margin-bottom: 24px;
-  background: #0b1714;
+  background: #101f31;
 }
 .graph-heading {
   display: flex;
@@ -401,7 +494,7 @@ h1 {
   justify-content: space-between;
   gap: 24px;
   padding: 24px;
-  border-bottom: 1px solid #25443c;
+  border-bottom: 1px solid rgba(148,163,184,.16);
 }
 .grid {
   display: grid;
@@ -411,7 +504,7 @@ h1 {
   padding: 24px;
 }
 .grid > div + div {
-  border-left: 1px solid #25443c;
+  border-left: 1px solid rgba(148,163,184,.16);
 }
 .list {
   display: grid;
@@ -420,7 +513,7 @@ h1 {
 }
 .list li {
   padding-bottom: 12px;
-  border-bottom: 1px solid #172823;
+  border-bottom: 1px solid rgba(148,163,184,.10);
 }
 footer {
   padding: 24px 0;
@@ -441,7 +534,7 @@ footer {
   .grid > div + div {
     border-right: 0;
     border-left: 0;
-    border-top: 1px solid #25443c;
+    border-top: 1px solid rgba(148,163,184,.16);
   }
   .tabs,
   .graph-heading {

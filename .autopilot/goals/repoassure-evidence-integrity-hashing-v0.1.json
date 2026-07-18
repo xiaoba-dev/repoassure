@@ -2,7 +2,7 @@
   "schema": "project-autopilot/goal@1",
   "id": "repoassure-evidence-integrity-hashing-v0.1",
   "title": "RepoAssure Evidence Integrity Hashing v0.1",
-  "status": "queued",
+  "status": "completed",
   "created_at": "2026-07-18T00:00:00.000Z",
   "objective": "Implement content hashing for emitted artifacts and a verification command that recomputes and compares them, then correct every surface that currently describes artifacts as signed. Replace composed website demonstration figures with recorded benchmark output.",
   "deferred_until": null,
@@ -36,5 +36,15 @@
     "target_repo_write",
     "pricing_change",
     "customer_contact"
-  ]
+  ],
+  "completed_at": "2026-07-19T00:20:00.000+08:00",
+  "integrity_summary": {
+    "algorithm": "sha256",
+    "manifest_block": "integrity",
+    "paths_relative_to_manifest": true,
+    "verify_command": "hardening verify <runDirOrManifest>",
+    "signing_implemented": false,
+    "forbidden_claim_patterns_added": 8,
+    "fabricated_demo_numbers_removed": true
+  }
 }

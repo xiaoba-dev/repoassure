@@ -7,6 +7,7 @@ import { runBootAppTool, type BootAppToolSession } from './boot-app-tool.js';
 import { runExploreAppTool, type ExploreAppToolResult } from './explore-app-tool.js';
 import { runGenerateTestsTool, type GenerateTestsToolResult } from './generate-tests-tool.js';
 import { runHardenReportTool } from './harden-report-tool.js';
+import { buildArtifactIntegrity } from '../domain/integrity/artifact-integrity.js';
 import { generateRepairPlan } from '../domain/repair-plan/generate-repair-plan.js';
 import type { HardenReportResult } from '../domain/reports/harden-report.js';
 import type { ExploreBrowserDriver } from '../domain/explore/explore-app.js';
@@ -266,11 +267,19 @@ async function writeRunArtifactBundle(input: {
     repairTaskPackage: repairPlan.repairTaskPackagePath,
     repairTaskPackageMarkdown: repairPlan.repairTaskPackageMarkdownPath
   };
+  /* Hashed after every artifact is written, and keyed to the same names as `files`, so a
+     reviewer can confirm the bundle was not edited after the run produced it. Paths are
+     recorded relative to the manifest so the bundle stays verifiable once it is moved. */
+  const integrity = await buildArtifactIntegrity(filesWithRepairPlan, {
+    baseDir: dirname(manifestPath)
+  });
+
   const manifest = {
     schemaVersion: 1,
     runId,
     generatedAt: new Date().toISOString(),
     repoRoot: input.root,
+    integrity,
     entrypoints: {
       manifest: manifestPath,
       report: files.report,

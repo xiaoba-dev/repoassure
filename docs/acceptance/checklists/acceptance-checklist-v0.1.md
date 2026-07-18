@@ -201,7 +201,10 @@
   - 当前状态：已完成。新增 workspace 包 `@repoassure/design-system`：37 个组件（含补齐的 37 份类型声明）、三层 token、base 样式、3 个品牌 SVG。拉丁字体自托管（183 个本地 woff2），中文走系统字体栈——`@fontsource/noto-sans-sc` 为 71.6 MB，不适合本地优先仓库。字体加载拆出为独立 opt-in 样式表，token 层零外部引用，便于 Console 内联。新增 `readDesignSystemCss()` 供独立 HTML 界面使用。验证：620 tests passed（新增 7 项）、根与官网两条消费路径 typecheck 均通过、lint clean、hygiene passed。
   - 零视觉变化证明：`pnpm build` 产出的 `index-AykPd8pp.css` 与 `index-DgAYzd9A.js` 哈希与落地前逐字节一致。Vite 使用内容哈希命名，哈希不变即打包内容未变。
   - 边界：设计系统尚未接入任何界面；`--signed-*` token 按原样 vendor，改名与内容哈希实现同属下一 goal。不授权 deployment、public launch、repository visibility change、npm publication、GitHub release、public custom domain decision 或 customer contact。
-- [ ] RepoAssure Evidence Integrity Hashing v0.1
-  - 当前状态：下一步。为产出的 artifact 写入内容哈希、新增校验命令重算比对，把 signed / cryptographically verifiable 措辞改为 content-hashed / 完整性可独立验证，并把官网演示数据换成真实基准跑分产出。
+- [x] RepoAssure Evidence Integrity Hashing v0.1
+  - 当前状态：已完成。manifest 新增 `integrity` 块，为每个物料记录 sha256 与字节数，路径相对 manifest 因此证据包换机器仍可校验；新增 `hardening verify <runDirOrManifest>` 重算比对，逐个报告 match / mismatch / missing。端到端实测：篡改 `readiness: 85` → `100` 后被检出 mismatch 并返回退出码 1。官网与 PRD 的 signed / cryptographically verifiable 措辞已改为如实表述，Hero 编造的「214 个问题」换为真实基准值「1 个问题」，两处不一致的证据哈希已统一。禁止虚假宣传护栏新增 8 条并附「护栏必须真的触发」测试。验证：629 tests passed、两条 typecheck 路径通过、lint clean、hygiene passed、build 成功。
+  - 边界：实现的是内容哈希完整性校验，不是数字签名——无密钥体系。本项未改动任何界面视觉或信息架构。不授权 deployment、public launch、repository visibility change、npm publication、GitHub release、public custom domain decision 或 customer contact。
+- [ ] Public Website Claude Design Integration & QA v0.1
+  - 当前状态：下一步。按 Design System v2 重建官网，把信息架构重组为 ADR-0013 记录的四问，并把交付流程与交付角色拆成独立区块。
 - [ ] Project Intelligence ADR Cascade Remediation Closure v0.1
   - 当前状态：重新排队至 console 重构之后。需要重新运行 Project Intelligence freshness/backlog 检查，确认 11 个已修复 ADR cascade findings 是否清零，并记录 residual findings 或 rule-calibration 需求。

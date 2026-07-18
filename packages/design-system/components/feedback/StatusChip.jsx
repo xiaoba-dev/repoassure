@@ -1,7 +1,7 @@
 import React from 'react';
 const MAP={
   verified:{fg:'var(--success-fg)',bg:'var(--success-subtle)',bd:'var(--success-muted)',dot:true,label:'Verified'},
-  signed:{fg:'var(--signed-fg)',bg:'var(--signed-subtle)',bd:'var(--signed-muted)',dot:true,label:'Signed'},
+  hashed:{fg:'var(--verified-fg)',bg:'var(--verified-subtle)',bd:'var(--verified-muted)',dot:true,label:'Content-hashed'},
   local:{fg:'var(--info-fg)',bg:'var(--info-subtle)',bd:'var(--info-muted)',dot:true,label:'Local-only'},
   pending:{fg:'var(--warning-fg)',bg:'var(--warning-subtle)',bd:'var(--warning-muted)',dot:true,label:'Pending'},
   failed:{fg:'var(--danger-fg)',bg:'var(--danger-subtle)',bd:'var(--danger-muted)',dot:true,label:'Failed'},

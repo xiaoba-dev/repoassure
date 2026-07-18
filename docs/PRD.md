@@ -15,7 +15,7 @@ The current implementation still uses `hardening-mcp` as the internal package, C
 ## Target Users
 
 - Individual AI builders who need a repeatable local hardening workflow before shipping generated repos.
-- Engineering teams that need signed evidence, repair plans, and acceptance decisions.
+- Engineering teams that need content-hashed evidence, repair plans, and acceptance decisions.
 - AI IDE users who need an actionable repair decision package instead of a generic audit report.
 - Future Team Cloud / Enterprise evaluators, with those capabilities explicitly marked as planned rather than available.
 

@@ -1,5 +1,38 @@
 # 开发日志
 
+## 2026年7月19日 - RepoAssure Evidence Integrity Hashing v0.1
+
+### 完成内容
+
+- 新增 `src/domain/integrity/artifact-integrity.ts`：`buildArtifactIntegrity()` 与 `verifyArtifactIntegrity()`。
+- `run_hardening` 产出的 manifest 新增 `integrity` 块，为每个索引到的物料记录 sha256 与字节数。路径按**相对 manifest** 记录——manifest 中的绝对路径属于产出机器，而「把证据包交给评审者」正是该功能的用途。
+- 新增 CLI `hardening verify <runDirOrManifest>`：重算并逐个报告 match / mismatch / missing；全部一致退出 0，有物料被改或缺失退出 1。
+- 官网与 PRD 术语修正：`signed` / `cryptographically verifiable` → 内容哈希与可独立重算验证。信任卡片改写为「改过就能看出来 / 每份产出都记录了内容指纹……不需要相信 RepoAssure」。
+- 演示数据换真实基准跑分：Hero 的「214 个问题 · 38 个修复动作」改为 `next-console` fixture 的真实值「1 个问题 · 1 个修复动作」。该 fixture 的「85 · P0: 0 · P1: 1」本就是真实值，保留。物料页签中的 38 / 24 计数同样改为不虚构的表述。
+- 修掉 repair plan 证据哈希在两处界面不一致的问题（`dc27...7f0e` vs `d2c7...770e`）。
+- 设计系统 `--signed-*` token 更名为 `--verified-*`，`StatusChip` / `EvidenceRow` 的 `signed` 状态改为 `hashed`。
+- 禁止虚假宣传护栏新增 8 条覆盖完整性声明，测试与打包脚本同步。
+
+### TDD 记录
+
+- Red：先写 `tests/unit/evidence-integrity.test.ts`，因模块不存在而失败。
+- Green：实现模块与 manifest 接线，7 项通过，含「证据包被移动到另一位置后仍可验证」。
+- Red（护栏）：新增「护栏必须真的触发」测试，断言全部历史文案都被捕获。该测试立刻发现两个洞——英文 `Signed local evidence`（形容词+名词结构）和中文「所有证据物料都会在本地签名并存储」（证据与签名之间隔了 7 个字）都未被首版模式覆盖。
+- Green：补充 `signed\s+(local\s+)?evidence` 等 3 条英文模式，中文改为「证据类名词 + 12 字内 + 签名」的邻近匹配。同时断言新文案不被误伤。
+
+### 验证
+
+- `npx vitest run tests/unit` — 47 files / 629 tests passed（新增 9 项）
+- 端到端实测：构造证据包 → `hardening verify` 返回 ok/退出 0；把 `readiness: 85` 改成 `100` → 检出 mismatch、退出 1、输出期望与实际哈希
+- `npx tsc --noEmit` 与 `tsc -p apps/website` 均通过；`npx eslint .` clean；`repo:hygiene` passed；`pnpm build` 成功
+- 官网 CSS 产物哈希未变（未动样式），JS 产物哈希变更（文案变更），符合预期
+
+### 边界
+
+- 实现的是**内容哈希完整性校验，不是数字签名**。没有密钥体系、没有证书、没有 sigstore/cosign。文案与文档一律不得再出现 signed 措辞，护栏已覆盖该类声明。
+- 未改动任何界面视觉或信息架构，那属于下一个 goal。
+- 不执行 deployment、public launch、production marketing announcement、repository visibility change、npm publication、GitHub release、public custom domain decision、hosted dashboard、cloud sync、telemetry、target repo writes、pricing/spend change 或 customer contact。
+
 ## 2026年7月18日 - RepoAssure Design System v2 Adoption v0.1
 
 ### 完成内容

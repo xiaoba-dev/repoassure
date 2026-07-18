@@ -1,25 +1,25 @@
 # RepoAssure Progress Snapshot
 
-Status: RepoAssure Design System v2 Adoption v0.1 completed; evidence integrity hashing ready
+Status: RepoAssure Evidence Integrity Hashing v0.1 completed; website design integration ready
 Generated: 2026-07-18
 
 ## Latest Goal
 
-RepoAssure Design System v2 Adoption v0.1
+RepoAssure Evidence Integrity Hashing v0.1
 
-Plain-language explanation: Design System v2 已作为 `@repoassure/design-system` 落地为 workspace 包：37 个组件连同补全的类型声明、三层 token、自托管拉丁字体。官网构建产物哈希与落地前逐字节一致，证明本步骤零视觉变化。
+Plain-language explanation: manifest 现在为每个物料记录 sha256 与字节数，`hardening verify` 可重算比对并检出被改动的物料。官网与 PRD 中「已签名 / 可加密验证」的说法改为如实的「内容指纹 / 可独立重算验证」，Hero 里编造的「214 个问题」换成真实基准跑分的 1 个。禁止虚假宣传护栏新增 8 条覆盖完整性声明。
 
 ## Next Goal
 
-RepoAssure Evidence Integrity Hashing v0.1
+Public Website Claude Design Integration & QA v0.1
 
-Plain-language explanation: 为产出的 artifact 写入内容哈希、新增校验命令重算比对，并把 signed / cryptographically verifiable 措辞改为 content-hashed / 完整性可独立验证，同时把演示数据换成真实基准跑分产出。
+Plain-language explanation: 按 Design System v2 重建官网，并把信息架构重组为 ADR-0013 记录的四问，同时把交付流程与交付角色拆成独立区块。
 
 ## Goal Sequence
 
 1. RepoAssure Design System v2 Adoption v0.1 — completed
-2. RepoAssure Evidence Integrity Hashing v0.1 — active
-3. Public Website Claude Design Integration & QA v0.1 — queued
+2. RepoAssure Evidence Integrity Hashing v0.1 — completed
+3. Public Website Claude Design Integration & QA v0.1 — active
 4. Project Intelligence Console Redesign v0.1 — queued
 5. Project Intelligence ADR Cascade Remediation Closure v0.1 — re-queued
 
@@ -35,6 +35,7 @@ Plain-language explanation: 为产出的 artifact 写入内容哈希、新增校
 - Project Intelligence ADR Cascade Controlled Remediation Plan v0.1
 - Project Intelligence ADR Cascade Controlled Remediation Execution v0.1 — 11 ADR cascade evidence gaps repaired
 - RepoAssure Design System v2 Adoption v0.1 — 37 components vendored, zero bundle change
+- RepoAssure Evidence Integrity Hashing v0.1 — content hashing implemented, integrity claims made accurate
 
 ## Released Goals
 

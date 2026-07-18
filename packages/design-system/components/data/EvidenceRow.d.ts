@@ -1,7 +1,7 @@
 import { ReactElement } from 'react';
-/** @startingPoint section="Data" subtitle="Signed-artifact ledger row: status · artifact · hash" viewport="700x110" */
+/** @startingPoint section="Data" subtitle="Artifact ledger row: status · artifact · content hash" viewport="700x110" */
 export interface EvidenceRowProps {
-  status?: 'verified' | 'signed' | 'pending' | 'failed';
+  status?: 'verified' | 'hashed' | 'pending' | 'failed';
   artifact: string;
   summary?: string;
   hash?: string;

@@ -7,6 +7,17 @@ const forbiddenClaimPatterns = [
   /\bpublic npm package\b/i,
   /\bpublic repository is already published\b/i,
   /\bsource code is uploaded by default\b/i,
+  // Integrity claims must match implementation. Content hashing exists; signing does not,
+  // and to a security reviewer "signed" means something specific and stronger. This class
+  // of claim shipped publicly for weeks because no pattern covered it.
+  /\bartifacts are signed\b/i,
+  /\bcryptographically signed\b/i,
+  /\bdigitally signed\b/i,
+  /\bsigned\s+(local\s+)?evidence\b/i,
+  /\bsigned\s+artifacts?\b/i,
+  /\bsigned\s+(artifact\s+)?bundle\b/i,
+  /(证据|物料|产出)[^。]{0,12}签名/,
+  /已签名的/,
   /SaaS\s*已(经)?(上线|可用|开放)/,
   /Team Cloud\s*已(经)?(上线|可用|开放)/,
   /Enterprise\s*已(经)?(上线|可用|开放)/,
@@ -14,6 +25,41 @@ const forbiddenClaimPatterns = [
   /公开仓库\s*已(经)?发布/,
   /默认上传源代码/
 ];
+
+describe('forbidden claim patterns', () => {
+  // A guard that never fires is not a guard. These are the exact strings the website
+  // shipped publicly before the integrity claim was implemented; each must now be caught.
+  const previouslyShippedClaims = [
+    'Artifacts are signed. Integrity can be verified independent of RepoAssure.',
+    'All artifacts are signed and stored locally.',
+    'Signed local evidence, repair plans, and acceptance decisions',
+    '证据物料会被签名，完整性可独立于 RepoAssure 进行验证。',
+    '所有证据物料都会在本地签名并存储。',
+    '为 AI 生成仓库提供已签名的本地证据、修复计划和验收决策。'
+  ];
+
+  it('catches every integrity claim the site used to make', () => {
+    for (const claim of previouslyShippedClaims) {
+      const matched = forbiddenClaimPatterns.some((pattern) => pattern.test(claim));
+      expect(matched, `no pattern caught: ${claim}`).toBe(true);
+    }
+  });
+
+  it('does not catch the accurate replacement copy', () => {
+    const accurateClaims = [
+      'Every artifact is content-hashed and stored locally.',
+      'Every artifact records a content fingerprint. Recompute it on another machine and confirm nothing changed — without trusting RepoAssure.',
+      'Content-hashed local evidence, repair plans, and acceptance decisions for AI-generated repositories.',
+      '每份证据物料都会在本地生成内容指纹并存储。',
+      '每份产出都记录了内容指纹。换一台机器重算一遍，就能确认它没被改过——不需要相信 RepoAssure。'
+    ];
+
+    for (const claim of accurateClaims) {
+      const matched = forbiddenClaimPatterns.filter((pattern) => pattern.test(claim));
+      expect(matched, `over-matched: ${claim} by ${matched}`).toEqual([]);
+    }
+  });
+});
 
 describe('public website app', () => {
   it('ships a private-preview website package with guarded public copy', async () => {
@@ -180,8 +226,8 @@ describe('public website app', () => {
     expect(i18nSource).toContain('本地生成的证据');
     expect(i18nSource).toContain('designPartnerNote');
     expect(i18nSource).toContain('Local-first open core flow');
-    expect(i18nSource).toContain('All artifacts are signed and stored locally.');
-    expect(i18nSource).toContain('所有证据物料都会在本地签名并存储。');
+    expect(i18nSource).toContain('Every artifact is content-hashed and stored locally.');
+    expect(i18nSource).toContain('每份证据物料都会在本地生成内容指纹并存储。');
 
     for (const pattern of forbiddenClaimPatterns) {
       expect(i18nSource).not.toMatch(pattern);

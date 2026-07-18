@@ -210,9 +210,9 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
     hero: {
       status: 'Local-first by design',
       heading: 'Assure every AI-generated repo before it ships',
-      lede: 'Signed local evidence, repair plans, and acceptance decisions for AI-generated repositories.',
+      lede: 'Content-hashed local evidence, repair plans, and acceptance decisions for AI-generated repositories.',
       highlight:
-        'Verified inputs become signed artifacts and local acceptance decisions — without leaving your machine.',
+        'Verified inputs become content-hashed artifacts and local acceptance decisions — without leaving your machine.',
       primaryCta: 'Join private preview',
       secondaryCta: 'View assurance graph'
     },
@@ -220,8 +220,8 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       label: 'Latest local run',
       items: [
         { label: 'Readiness score', value: '85 · P0: 0 · P1: 1' },
-        { label: 'Findings', value: '214 issues · 38 repair actions' },
-        { label: 'Signed bundle', value: '.hardening/latest/manifest.json' }
+        { label: 'Findings', value: '1 issue · 1 repair action' },
+        { label: 'Evidence bundle', value: '.hardening/latest/manifest.json' }
       ]
     },
     assuranceGraph: {
@@ -244,7 +244,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       label: 'Assurance Graph',
       heading: 'See how local evidence connects across the delivery loop',
       intro:
-        'Verified inputs produce signed artifacts and acceptance decisions without leaving your machine.'
+        'Verified inputs produce content-hashed artifacts and acceptance decisions without leaving your machine.'
     },
     trustLedgerPreview: {
       label: 'Trust Ledger product preview',
@@ -266,7 +266,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           artifact: 'Hardening report',
           status: 'Generated',
           timestamp: '2026-06-18 10:48:47Z',
-          summary: '214 findings',
+          summary: '1 finding',
           detail: '8 high · 27 medium',
           evidence: 'sha256: af83...b91c'
         },
@@ -275,7 +275,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           artifact: 'Repair plan',
           status: 'Generated',
           timestamp: '2026-06-18 10:48:47Z',
-          summary: '38 actions',
+          summary: '1 action',
           detail: 'Prioritized',
           evidence: 'sha256: d2c7...770e'
         },
@@ -284,7 +284,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           artifact: 'Patch plan',
           status: 'Generated',
           timestamp: '2026-06-18 10:48:47Z',
-          summary: '24 patches',
+          summary: 'Patch candidates',
           detail: 'Ready to apply',
           evidence: 'sha256: 1c9a...e3d4'
         },
@@ -298,7 +298,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           evidence: 'sha256: 9e21...c5ab'
         }
       ],
-      footer: 'All artifacts are signed and stored locally.',
+      footer: 'Every artifact is content-hashed and stored locally.',
       localNote: 'Evidence never leaves your machine.',
       localBadge: '100% LOCAL'
     },
@@ -306,7 +306,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       label: 'How it works',
       heading: 'Run hardening locally in one command',
       intro:
-        'RepoAssure analyzes your AI-generated repo, boots the app when needed, explores routes, and writes a signed artifact bundle under .hardening/.',
+        'RepoAssure analyzes your AI-generated repo, boots the app when needed, explores routes, and writes a content-hashed artifact bundle under .hardening/.',
       command: 'pnpm hardening run ./my-ai-app --browser',
       lines: [
         'Repo profile detected: vite · npm',
@@ -334,14 +334,14 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
         },
         {
           title: 'Maintainer',
-          text: 'Records acceptance decisions with signed local evidence.'
+          text: 'Records acceptance decisions with content-hashed local evidence.'
         }
       ]
     },
     artifacts: {
       label: 'Proof artifacts',
       heading: 'Evidence that stands up to review',
-      intro: 'Every run produces a signed artifact bundle. Nothing leaves your machine by default.',
+      intro: 'Every run produces a content-hashed artifact bundle. Nothing leaves your machine by default.',
       tabLabel: 'Artifact examples',
       statusLabel: 'Status',
       evidenceLabel: 'Evidence',
@@ -353,7 +353,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           status: 'Generated',
           summary: 'Findings, severity, and evidence mapped to policy rules and best practices.',
           evidence: 'sha256: af83...b91c',
-          detail: '214 findings, grouped by severity and reviewer impact.',
+          detail: '1 finding, grouped by severity and reviewer impact.',
           previewHeading: 'hardening-report.md excerpt',
           previewLines: [
             { kind: 'meta', label: 'Readiness score', text: '85 · P0: 0 · P1: 1' },
@@ -369,11 +369,11 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           name: 'Repair plan',
           status: 'Generated',
           summary: 'Actionable repair steps to address issues with prioritization and rationale.',
-          evidence: 'sha256: dc27...7f0e',
-          detail: '38 actions, sequenced for AI IDE or maintainer execution.',
+          evidence: 'sha256: d2c7...770e',
+          detail: '1 action, sequenced for AI IDE or maintainer execution.',
           previewHeading: 'repair-plan.json task excerpt',
           previewLines: [
-            { kind: 'meta', label: 'Tasks', text: '38 prioritized actions for AI IDE handoff' },
+            { kind: 'meta', label: 'Tasks', text: 'Prioritized actions for AI IDE handoff' },
             {
               kind: 'json',
               text: '{\n  "taskId": "repair-014",\n  "severity": "P1",\n  "title": "Stabilize Save control on /settings"\n}'
@@ -385,10 +385,10 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           status: 'Generated',
           summary: 'Minimal, reviewable changes with context and risk assessment.',
           evidence: 'sha256: 1c9a...e3d4',
-          detail: '24 patches, ready to evaluate before application.',
+          detail: 'Reviewable patch candidates, evaluated before anything is applied.',
           previewHeading: 'patch-plan.md candidate',
           previewLines: [
-            { kind: 'meta', label: 'Candidates', text: '24 reviewable patches before apply' },
+            { kind: 'meta', label: 'Candidates', text: 'Reviewable patches before apply' },
             { kind: 'code', text: 'ruff I001 · sort imports in src/components/SettingsForm.tsx' }
           ]
         },
@@ -423,7 +423,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
         nodes: [
           { id: 'repo', title: 'AI repo', caption: 'Local workspace' },
           { id: 'engine', title: 'RepoAssure', caption: 'CLI · MCP · Action' },
-          { id: 'bundle', title: '.hardening/', caption: 'Signed artifacts' },
+          { id: 'bundle', title: '.hardening/', caption: 'Hashed artifacts' },
           { id: 'acceptance', title: 'Acceptance', caption: 'Local decision' }
         ]
       }
@@ -449,8 +449,8 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           text: 'All analysis and artifact generation happens locally on your machine.'
         },
         {
-          title: 'Cryptographically verifiable',
-          text: 'Artifacts are signed. Integrity can be verified independent of RepoAssure.'
+          title: 'Tampering shows up',
+          text: 'Every artifact records a content fingerprint. Recompute it on another machine and confirm nothing changed — without trusting RepoAssure.'
         },
         {
           title: 'You control storage',
@@ -499,8 +499,8 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
     hero: {
       status: '本地优先设计',
       heading: '在交付前保障每个 AI 生成仓库',
-      lede: '为 AI 生成仓库提供已签名的本地证据、修复计划和验收决策。',
-      highlight: '已验证输入在本地生成签名证据与验收决策，交付链路全程可审计。',
+      lede: '为 AI 生成仓库提供带内容指纹的本地证据、修复计划和验收决策。',
+      highlight: '已验证输入在本地生成带内容指纹的证据与验收决策，交付链路全程可审计。',
       primaryCta: '加入私密预览',
       secondaryCta: '查看保障图谱'
     },
@@ -508,8 +508,8 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       label: '最近一次本地运行',
       items: [
         { label: '就绪度评分', value: '85 · P0: 0 · P1: 1' },
-        { label: '发现项', value: '214 个问题 · 38 个修复动作' },
-        { label: '签名证据包', value: '.hardening/latest/manifest.json' }
+        { label: '发现项', value: '1 个问题 · 1 个修复动作' },
+        { label: '证据包', value: '.hardening/latest/manifest.json' }
       ]
     },
     assuranceGraph: {
@@ -531,7 +531,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
     assuranceGraphSection: {
       label: '保障图谱',
       heading: '看清本地证据如何在交付链路中串联',
-      intro: '已验证输入会生成签名证据与验收决策，全程不离开你的机器。'
+      intro: '已验证输入会生成带内容指纹的证据与验收决策，全程不离开你的机器。'
     },
     trustLedgerPreview: {
       label: 'Trust Ledger 产品预览',
@@ -553,7 +553,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           artifact: '硬化报告',
           status: '已生成',
           timestamp: '2026-06-18 10:48:47Z',
-          summary: '214 个发现',
+          summary: '1 个发现',
           detail: '8 个高危 · 27 个中危',
           evidence: 'sha256: af83...b91c'
         },
@@ -562,7 +562,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           artifact: '修复计划',
           status: '已生成',
           timestamp: '2026-06-18 10:48:47Z',
-          summary: '38 个动作',
+          summary: '1 个动作',
           detail: '已排序',
           evidence: 'sha256: d2c7...770e'
         },
@@ -571,7 +571,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           artifact: '补丁计划',
           status: '已生成',
           timestamp: '2026-06-18 10:48:47Z',
-          summary: '24 个补丁',
+          summary: '补丁候选',
           detail: '可应用',
           evidence: 'sha256: 1c9a...e3d4'
         },
@@ -585,7 +585,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           evidence: 'sha256: 9e21...c5ab'
         }
       ],
-      footer: '所有证据物料都会在本地签名并存储。',
+      footer: '每份证据物料都会在本地生成内容指纹并存储。',
       localNote: '证据永远不会离开你的机器。',
       localBadge: '100% 本地'
     },
@@ -593,7 +593,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       label: '工作方式',
       heading: '一条命令在本地完成硬化',
       intro:
-        'RepoAssure 会分析 AI 生成仓库，在需要时启动应用、探索路由，并把签名证据包写入 .hardening/。',
+        'RepoAssure 会分析 AI 生成仓库，在需要时启动应用、探索路由，并把带内容指纹的证据包写入 .hardening/。',
       command: 'pnpm hardening run ./my-ai-app --browser',
       lines: [
         '已识别仓库配置：vite · npm',
@@ -621,14 +621,14 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
         },
         {
           title: '维护者',
-          text: '用已签名的本地证据记录验收决策。'
+          text: '用带内容指纹的本地证据记录验收决策。'
         }
       ]
     },
     artifacts: {
       label: '证据物料',
       heading: '经得起评审的交付证据',
-      intro: '每次运行都会生成已签名的证据包。默认情况下，任何内容都不会离开你的机器。',
+      intro: '每次运行都会生成带内容指纹的证据包。默认情况下，任何内容都不会离开你的机器。',
       tabLabel: '证据示例',
       statusLabel: '状态',
       evidenceLabel: '证据',
@@ -640,7 +640,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           status: '已生成',
           summary: '将发现、严重级别和证据映射到策略规则与最佳实践。',
           evidence: 'sha256: af83...b91c',
-          detail: '214 个发现，已按严重级别和评审影响分组。',
+          detail: '1 个发现，已按严重级别和评审影响分组。',
           previewHeading: 'hardening-report.md 摘要',
           previewLines: [
             { kind: 'meta', label: '就绪度评分', text: '85 · P0: 0 · P1: 1' },
@@ -656,11 +656,11 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           name: '修复计划',
           status: '已生成',
           summary: '按优先级和原因说明组织可执行修复步骤。',
-          evidence: 'sha256: dc27...7f0e',
-          detail: '38 个动作，可交给 AI IDE 或维护者执行。',
+          evidence: 'sha256: d2c7...770e',
+          detail: '1 个动作，可交给 AI IDE 或维护者执行。',
           previewHeading: 'repair-plan.json 任务摘要',
           previewLines: [
-            { kind: 'meta', label: '任务数', text: '38 个已排序动作，供 AI IDE 交接' },
+            { kind: 'meta', label: '任务数', text: '已排序动作，供 AI IDE 交接' },
             {
               kind: 'json',
               text: '{\n  "taskId": "repair-014",\n  "severity": "P1",\n  "title": "稳定 /settings 页面 Save 控件"\n}'
@@ -672,10 +672,10 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           status: '已生成',
           summary: '提供最小、可评审、带上下文和风险说明的变更。',
           evidence: 'sha256: 1c9a...e3d4',
-          detail: '24 个补丁，可在应用前先评估。',
+          detail: '可评审的补丁候选，应用前先评估。',
           previewHeading: 'patch-plan.md 候选补丁',
           previewLines: [
-            { kind: 'meta', label: '候选数', text: '24 个可评审补丁，应用前需确认' },
+            { kind: 'meta', label: '候选数', text: '可评审补丁，应用前需确认' },
             { kind: 'code', text: 'ruff I001 · 整理 src/components/SettingsForm.tsx 的 import' }
           ]
         },
@@ -705,7 +705,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
         nodes: [
           { id: 'repo', title: 'AI 仓库', caption: '本地工作区' },
           { id: 'engine', title: 'RepoAssure', caption: 'CLI · MCP · Action' },
-          { id: 'bundle', title: '.hardening/', caption: '签名证据包' },
+          { id: 'bundle', title: '.hardening/', caption: '带指纹的证据' },
           { id: 'acceptance', title: '验收决策', caption: '本地记录' }
         ]
       }
@@ -726,8 +726,8 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
           text: '所有分析和证据生成都在你的本地环境中完成。'
         },
         {
-          title: '可加密验证',
-          text: '证据物料会被签名，完整性可独立于 RepoAssure 进行验证。'
+          title: '改过就能看出来',
+          text: '每份产出都记录了内容指纹。换一台机器重算一遍，就能确认它没被改过——不需要相信 RepoAssure。'
         },
         {
           title: '你控制存储位置',

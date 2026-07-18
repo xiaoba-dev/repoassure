@@ -32,7 +32,7 @@
   --amber-4:#e0900f; --amber-5:#c2790a; --amber-6:#9c6008; --amber-7:#7a4b0a;
   --amber-8:#5c390b; --amber-9:#422a0b;
 
-  /* -- Violet (signed / cryptographic accent) ---------------- */
+  /* -- Violet (integrity / content-hash accent) --------------- */
   --violet-0:#f0ecfe; --violet-1:#ddd3fc; --violet-2:#c1adf8; --violet-3:#a184f2;
   --violet-4:#8460e8; --violet-5:#6d47d6; --violet-6:#5836b5; --violet-7:#452a8f;
   --violet-8:#35226c; --violet-9:#271a4d;
@@ -77,7 +77,7 @@
   --success-fg:var(--green-6);--success-emphasis:var(--green-5);--success-muted:var(--green-2);--success-subtle:var(--green-0);
   --danger-fg:var(--red-6);   --danger-emphasis:var(--red-5); --danger-muted:var(--red-2);  --danger-subtle:var(--red-0);
   --warning-fg:var(--amber-6);--warning-emphasis:var(--amber-4);--warning-muted:var(--amber-2);--warning-subtle:var(--amber-0);
-  --signed-fg:var(--violet-6);--signed-emphasis:var(--violet-5);--signed-muted:var(--violet-2);--signed-subtle:var(--violet-0);
+  --verified-fg:var(--violet-6);--verified-emphasis:var(--violet-5);--verified-muted:var(--violet-2);--verified-subtle:var(--violet-0);
 
   /* severity aliases (P0/P1/P2) */
   --sev-p0-fg:var(--danger-fg); --sev-p0-subtle:var(--danger-subtle); --sev-p0-muted:var(--danger-muted);
@@ -118,7 +118,7 @@
   --success-fg:var(--green-3);--success-emphasis:var(--green-5);--success-muted:rgba(6,168,92,.42);--success-subtle:rgba(6,168,92,.14);
   --danger-fg:var(--red-3);   --danger-emphasis:var(--red-5); --danger-muted:rgba(224,72,72,.42);  --danger-subtle:rgba(224,72,72,.14);
   --warning-fg:var(--amber-3);--warning-emphasis:var(--amber-4);--warning-muted:rgba(224,144,15,.42);--warning-subtle:rgba(224,144,15,.14);
-  --signed-fg:var(--violet-3);--signed-emphasis:var(--violet-5);--signed-muted:rgba(132,96,232,.42);--signed-subtle:rgba(132,96,232,.16);
+  --verified-fg:var(--violet-3);--verified-emphasis:var(--violet-5);--verified-muted:rgba(132,96,232,.42);--verified-subtle:rgba(132,96,232,.16);
 
   --sev-p0-fg:var(--danger-fg); --sev-p0-subtle:var(--danger-subtle); --sev-p0-muted:var(--danger-muted);
   --sev-p1-fg:var(--warning-fg);--sev-p1-subtle:var(--warning-subtle);--sev-p1-muted:var(--warning-muted);

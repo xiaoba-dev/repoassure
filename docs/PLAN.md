@@ -19,7 +19,7 @@ The current boundary is valid when the following are true:
 - Website copy stays in `apps/website/src/i18n.ts` so the forbidden-claim guard keeps covering it.
 - No deployment, public launch, repository visibility change, npm publish, GitHub release, public custom domain decision, pricing, spend, or customer contact action is performed.
 
-Unresolved and deliberately not addressed by ADR-0022: the live `repoassure.com` binding conflicts with [ADR-0020](adr/0020-public-website-private-preview-deployment.md) and [ADR-0021](adr/0021-private-preview-hosting-fallback.md), both of which remain Accepted with no amendment. That needs a separate recorded owner decision.
+The `repoassure.com` binding conflict is resolved: [ADR-0023](adr/0023-public-marketing-site-reachability-boundary.md) supersedes the custom-domain clauses in ADR-0020 and ADR-0021, moving the control from reachability to claims. Everything else in both records stands, and public launch, npm publication, repository visibility change, and deployment all remain unauthorized.
 
 ## Active / Next Codex Goal
 
@@ -67,7 +67,6 @@ Goal sequence:
 
 The ADR-0022 sequence is complete. Two items are recorded and outstanding, neither of which Autopilot may select on its own:
 
-1. **Resolve the ADR-0020 / ADR-0021 custom domain conflict** under a separate owner decision. `repoassure.com` is bound and indexable while both ADRs forbid exactly that, and both remain Accepted with no amendment. This blocks any deployment.
-2. **Tighten `findOrphanCode`** to require a README at the app root rather than at any depth. Recorded during closure and deliberately not actioned there, because changing a detection rule inside a closure run makes the closure evidence unreadable.
+1. **Tighten `findOrphanCode`** to require a README at the app root rather than at any depth. Recorded during closure and deliberately not actioned there, because changing a detection rule inside a closure run makes the closure evidence unreadable.
 
 Beyond those, the next goal is the owner's to select.

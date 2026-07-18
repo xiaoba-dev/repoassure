@@ -1,5 +1,29 @@
 # 决策日志
 
+## 2026年7月19日 - Public marketing site reachability boundary
+
+### 决策
+
+接受 ADR-0023：营销站点可以在产品公开发布门禁关闭之前公开可达且允许搜索索引。取代 ADR-0020 与 ADR-0021 中的公开自定义域名禁令，两份记录的其余条款全部继续有效。
+
+真正的边界从「谁能访问」移到「页面上声明什么」：全部对外文案必须留在 `apps/website/src/i18n.ts` 以保持 CI 护栏覆盖；不得声称任何未交付能力可用；不得展示客户 logo、分析师徽章、案例、star 数或认证；不得把物料描述为 signed；私密预览保持仅限邀请。
+
+### 原因
+
+- owner 确认 `repoassure.com` 为其注册所有。所有权从来不是争点——两条禁令约束的是**绑定时机相对于发布门禁**，而非注册归属。
+- 那两份 ADR 落笔时，防止过早公开的唯一手段就是让站点不可达。如今官网已有 25 条 CI 强制的禁止虚假宣传正则，外加一条断言「护栏对历史文案确实触发、对新文案不误伤」的测试。可达性本来是给声明问题用的代理控制，而声明问题现在有了直接控制。
+- 两份 Accepted 状态的 ADR 与可观测现实持续矛盾，本身有代价。Project Intelligence Console 正是为抓这类漂移而存在；放着不管等于教人 ADR 是装饰品。
+- 一个营销站在产品正式发布前公开，是 pre-launch 产品的常规安排。
+
+### 影响
+
+- 新增 `docs/adr/0023-public-marketing-site-reachability-boundary.md`。
+- ADR-0020 与 ADR-0021 增加 `Amended by` 标注与修订说明，**仅**域名条款被取代；merge / deployment / public launch 三道独立门禁、Vercel 暂停、私密预览 URL 分享前必须先配置访问控制，全部继续有效。
+- `docs/PLAN.md` 的未决项从「域名冲突」更新为「部署与工作区不一致」。
+- 继续禁止：public launch、production marketing announcement、repository visibility change、npm publication、GitHub release、deployment、SaaS / Team Cloud / Enterprise / hosted dashboard 可用性声明、customer contact、pricing/spend change、恢复 Vercel Git integration。
+- branch protection 门禁仍为 defer，继续阻断 public release；ADR-0012「不得为解锁 branch protection 而公开仓库」继续有效。
+- 已记录的新风险：移除可达性控制后，未来的过度声明会直接抵达公众。护栏只覆盖它编码的模式——完整性声明正是因为无模式覆盖才在公网挂了数周。
+
 ## 2026年7月18日 - RepoAssure Design System v2 unfreeze and information architecture decision
 
 ### 决策

@@ -28,6 +28,7 @@ ADR records long-lived architecture decisions. Use `docs/logs/decision-log.md` f
 | [0020](0020-public-website-private-preview-deployment.md) | Accepted | Public website private preview deployment boundary |
 | [0021](0021-private-preview-hosting-fallback.md) | Accepted | Private preview hosting fallback decision |
 | [0022](0022-repoassure-design-system-v2-and-information-architecture.md) | Accepted | RepoAssure Design System v2 and information architecture redesign |
+| [0023](0023-public-marketing-site-reachability-boundary.md) | Accepted | Public marketing site reachability boundary |
 
 ## Template
 

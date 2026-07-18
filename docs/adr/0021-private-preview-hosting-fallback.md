@@ -1,7 +1,11 @@
 # ADR-0021: Private Preview Hosting Fallback Decision
 
 Status: Accepted
+Amended by: [ADR-0023](0023-public-marketing-site-reachability-boundary.md) (public custom domain clause only)
 Date: 2026-06-27
+
+
+> **2026-07-19 修订：**本记录的公开自定义域名禁令已被 [ADR-0023](0023-public-marketing-site-reachability-boundary.md) 取代。其余条款——Vercel 暂停、私密预览 URL 分享前必须先配置访问控制——继续有效。
 
 ## Context
 

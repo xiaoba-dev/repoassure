@@ -1,5 +1,7 @@
 # Public Website UI/UX Roadmap v0.2
 
+> **2026-07-19 更新：**§3 的冻结决策已由 [ADR-0022](../adr/0022-repoassure-design-system-v2-and-information-architecture.md) 部分解除。信息架构已按 ADR-0013 四问重组，交付流程与交付角色拆分为独立区块，浅色成为默认主题。导航仍为 5 项。其余冻结项继续有效。
+
 | 字段 | 值 |
 | --- | --- |
 | **Status** | `ACTIVE` |

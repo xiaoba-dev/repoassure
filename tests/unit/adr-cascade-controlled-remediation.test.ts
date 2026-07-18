@@ -124,10 +124,13 @@ describe('ADR cascade controlled remediation execution', () => {
         ?.status
     ).toBe('ready_to_execute');
     expect(progressMarkdown).toContain('Project Intelligence ADR Cascade Remediation Closure v0.1');
-    expect(
-      progress.requeued_goals?.some(
-        (item) => item.id === 'project-intelligence-adr-cascade-remediation-closure-v0.1'
-      )
-    ).toBe(true);
+    // The closure goal was re-queued behind the design sequence and has since become
+    // active. Assert it is still tracked somewhere legitimate rather than pinning which
+    // bucket it currently sits in.
+    const closureId = 'project-intelligence-adr-cascade-remediation-closure-v0.1';
+    const tracked =
+      progress.active_goal?.id === closureId ||
+      (progress.requeued_goals ?? []).some((item) => item.id === closureId);
+    expect(tracked).toBe(true);
   });
 });

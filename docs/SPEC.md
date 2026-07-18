@@ -6,6 +6,8 @@ Last updated: 2026-07-16
 
 This is the canonical solution entrypoint. It summarizes current system boundaries and routes implementation details to existing specs.
 
+
+Run manifests record a content hash and byte count for every artifact they index, with paths relative to the manifest so a bundle stays verifiable after it is moved. `hardening verify <runDirOrManifest>` recomputes them and reports match, mismatch, or missing per file. This is content-hash integrity, not digital signing: there is no key system, and no surface may describe artifacts as signed.
 ## System Boundary
 
 RepoAssure currently consists of:

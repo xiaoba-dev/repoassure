@@ -204,7 +204,11 @@
 - [x] RepoAssure Evidence Integrity Hashing v0.1
   - 当前状态：已完成。manifest 新增 `integrity` 块，为每个物料记录 sha256 与字节数，路径相对 manifest 因此证据包换机器仍可校验；新增 `hardening verify <runDirOrManifest>` 重算比对，逐个报告 match / mismatch / missing。端到端实测：篡改 `readiness: 85` → `100` 后被检出 mismatch 并返回退出码 1。官网与 PRD 的 signed / cryptographically verifiable 措辞已改为如实表述，Hero 编造的「214 个问题」换为真实基准值「1 个问题」，两处不一致的证据哈希已统一。禁止虚假宣传护栏新增 8 条并附「护栏必须真的触发」测试。验证：629 tests passed、两条 typecheck 路径通过、lint clean、hygiene passed、build 成功。
   - 边界：实现的是内容哈希完整性校验，不是数字签名——无密钥体系。本项未改动任何界面视觉或信息架构。不授权 deployment、public launch、repository visibility change、npm publication、GitHub release、public custom domain decision 或 customer contact。
-- [ ] Public Website Claude Design Integration & QA v0.1
-  - 当前状态：下一步。按 Design System v2 重建官网，把信息架构重组为 ADR-0013 记录的四问，并把交付流程与交付角色拆成独立区块。
+- [x] Public Website Claude Design Integration & QA v0.1
+  - 当前状态：已完成。信息架构按 ADR-0013 四问重组（新增 `#answers`），交付角色拆为独立 `#roles` 区块，保障图谱标注 CLI 可达性，信任边界改为可核验断言，浅色成为默认主题且品牌资产同步。H1 改为提问式，导航保持 5 项。验证：634 tests passed、两条 typecheck 路径、lint、hygiene、build 全通过。
+- [x] Project Intelligence Console Redesign v0.1
+  - 当前状态：已完成。修复 ignore 过滤器根锚定 bug：代码图谱节点 2502 → 315（排除 2149 个 vendor 文件），339 条 tests 关系边首次可见。新增 verdict 区块与「下一步」陈述，findings 按严重级别分级，owner 渲染，截断显式披露，boundary 绑定快照。产出 0 个外部 URL，local-only 边界全部保留。验证：642 tests passed。
+- [x] Website Guardrail Triage v0.1
+  - 当前状态：已完成。设计序列净增 102 条断言，无任何文件断言数下降；禁止虚假宣传正则 12 → 25 条。七项关键边界断言全部核实保留。记录见 `docs/operations/website-guardrail-triage-v0.1.md`。
 - [ ] Project Intelligence ADR Cascade Remediation Closure v0.1
   - 当前状态：重新排队至 console 重构之后。需要重新运行 Project Intelligence freshness/backlog 检查，确认 11 个已修复 ADR cascade findings 是否清零，并记录 residual findings 或 rule-calibration 需求。

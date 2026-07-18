@@ -1,5 +1,77 @@
 # 开发日志
 
+## 2026年7月19日 - Website Guardrail Triage v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/website-guardrail-triage-v0.1.md`，量化记录整个设计序列对断言的净影响。
+- 从 `22f65f3`（P0 完成点）到 console 重构结束：断言 4318 → 4420（**+102**），**无任何文件断言数下降**；禁止虚假宣传正则 12 → 25 条；新增 4 个测试文件。
+- 明确区分三类处理：边界断言原样保留、状态快照断言按 owner 决策重设、新行为新增断言。
+
+### 验证
+
+- 逐文件对比 `git show 22f65f3:<file>` 与当前的 `expect(` 计数
+- 关键边界断言全部核实仍在：无外部 URL、data-local-only、no hosted dashboard、targetRepoWriteAuthorized、locale 锁定、focus-visible、横向溢出
+
+### 边界
+
+- 没有为了让测试变绿而删除任何断言，没有停用、跳过或收窄任何质量门禁。
+- 发现的一个既有 flaky 测试（Python CLI 验收）如实记录而非消音，未在本次改动中触碰。
+
+## 2026年7月19日 - Project Intelligence Console Redesign v0.1
+
+### 完成内容
+
+- 修复 `isIgnoredPath` 根锚定 bug：改为按路径段匹配（`src/distribution/` 不会被误判为 `dist/`）。代码图谱节点 2502 → 315，其中 2149 个 `apps/website/node_modules` 文件被正确排除；扫描文件 2651 → 469。
+- 结果是 **339 条 `tests` 关系边首次可见**——此前 80 条显示窗口被依赖文件占满，规格书要求回答的「哪些测试保护了什么」结构性不可见。
+- 新增 verdict 区块：以状态开场，并**始终陈述下一步动作**。此前没有任何元素回答「我现在该做什么」。
+- findings 按 high/medium/low 分级显示（此前算了只显示总数）；节点 `owner` 渲染（此前 100% 填充、一次没显示）；截断改为显式「showing 80 of N」。
+- boundary 行绑定到 `snapshot.boundary`，不再是硬编码散文——页面上最强的信任声明此前恰是最无法核验的一条。
+- 8 处硬编码绿黑十六进制换成 Design System v2 的 console token。
+
+### TDD 记录
+
+- Red：`tests/unit/project-intelligence-ignore.test.ts` 断言嵌套 vendor 目录应被忽略，因根锚定实现而失败。
+- Green：改为按路径段匹配，4 项通过，含「不因子串误判」一项。
+- 新增 viewer 状态断言 4 项（verdict、severity 分级、截断披露、无外部引用）。
+
+### 验证
+
+- `npx vitest run tests/unit` — 48 files / 642 tests passed
+- 真实重跑 `pnpm project:intelligence` 与 `:view`，核实产出 0 个外部 URL、data-local-only、三图名、no hosted dashboard 边界全部保留
+
+### 边界
+
+- Console 仍是本地专用静态产物。未实现 hosted dashboard、telemetry、cloud sync 或部署。
+- 不执行 deployment、public launch、repository visibility change、npm publication、GitHub release、public custom domain decision、target repo writes、pricing/spend change 或 customer contact。
+
+## 2026年7月19日 - Public Website Claude Design Integration & QA v0.1
+
+### 完成内容
+
+- 官网信息架构按 ADR-0013 四问重组：新增 `#answers` 区块，数字取自 `next-console` 真实基准跑分。
+- 交付角色从 `#how-it-works` 拆出为独立的 `#roles` 区块。四张角色卡此前挤在一个 i18n key 名为 `steps` 的区块里，导致流程和角色两边都讲不清。
+- 保障图谱节点新增可达性标注。`patch plan` 与 `acceptance` 是本仓库的 pnpm 脚本，不在分发的 CLI 里；不加区分地展示等于暗示产品不具备的能力——与 signed 声明同类，只是更隐蔽。
+- 信任边界改为可核验断言：两处网络调用均打本地、机器可读的不写入证明、内容指纹。
+- 浅色成为默认主题（DS v2），保障图谱保持常暗作为 console token 设计的仪表盘表面；theme-color、web manifest、OG 图同步。
+- H1 改为产品所回答的那个问题。导航保持 5 项，遵守 v0.2 roadmap 的冻结决策。
+
+### TDD 记录
+
+- Red：改 H1 与 theme-color 后，`public-website.test.ts` 与 `verify-website.mjs` 共 5 处断言失败。
+- Green：断言同步到新值，并新增 5 项 IA 断言（双语四问、流程与角色分离、图谱可达性、5 项导航、信任声明可核验）。
+
+### 验证
+
+- `npx vitest run tests/unit` — 47 files / 634 tests passed
+- 两条 typecheck 路径、lint、repo:hygiene、build 全部通过
+
+### 边界
+
+- 未部署。改代码与上线是两道独立的门。
+- 全部对外文案仍在 `apps/website/src/i18n.ts`，禁止虚假宣传护栏继续覆盖。
+- 未新增 locale，未做产品 artifact 多语言化。
+
 ## 2026年7月19日 - RepoAssure Evidence Integrity Hashing v0.1
 
 ### 完成内容

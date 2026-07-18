@@ -1,5 +1,11 @@
 # RepoAssure Design System v0.1
 
+Status: superseded
+Superseded by: RepoAssure Design System v2, adopted in [ADR-0022](../adr/0022-repoassure-design-system-v2-and-information-architecture.md)
+Superseded on: 2026-07-19
+
+> Retained as the point-in-time record of the v0.1 design system. The vendored system now lives at `packages/design-system/`; its two deliberate deviations (self-hosted Latin faces, system CJK) are recorded in that package's README.
+
 Source ADR: [ADR-0019](../adr/0019-public-website-enterprise-design-system.md)
 
 ## Purpose

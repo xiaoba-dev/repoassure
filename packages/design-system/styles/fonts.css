@@ -1,0 +1,23 @@
+/* Self-hosted brand faces.
+
+   Upstream shipped a single @import pointing at a third-party font CDN. That would
+   put an external network request on every page load of a product whose central
+   claim is that nothing leaves your machine, so it is replaced by local files.
+
+   No literal external URL appears anywhere in this package, including in comments:
+   generated Project Intelligence Console output is asserted to contain none, and a
+   commented-out one is still a match.
+
+   CJK is intentionally absent — see styles/tokens/typography.css. */
+@import '@fontsource/space-grotesk/500.css';
+@import '@fontsource/space-grotesk/600.css';
+@import '@fontsource/space-grotesk/700.css';
+@import '@fontsource/hanken-grotesk/400.css';
+@import '@fontsource/hanken-grotesk/500.css';
+@import '@fontsource/hanken-grotesk/600.css';
+@import '@fontsource/hanken-grotesk/700.css';
+@import '@fontsource/hanken-grotesk/800.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/600.css';
+@import '@fontsource/jetbrains-mono/700.css';

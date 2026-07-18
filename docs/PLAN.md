@@ -8,30 +8,29 @@ This is the canonical planning entrypoint. It summarizes current execution order
 
 ## Current Stage
 
-Public Website Design Work Deferred v0.1 is now the active planning boundary.
+The design queue is released. Public Website Design Work Deferred v0.1 held it at `deferred_design_pending` from 2026-07-16 until the owner supplied RepoAssure Design System v2, which satisfied `owner_finalizes_claude_design`. See [ADR-0022](adr/0022-repoassure-design-system-v2-and-information-architecture.md) and [the unfreeze record](operations/repoassure-design-system-v2-unfreeze-v0.1.md).
 
-Public Website P3 Pixel QA & Mobile Responsive Polish v0.1 was implemented locally, but the owner has decided to pause further design-system, public website visual redesign, owner visual triage, and Claude Design integration work until the new Claude Design direction is finalized.
+Current stage: RepoAssure Design System v2 Adoption v0.1 completed. The design system is vendored as `@repoassure/design-system` and consumable from both surfaces, with the website bundle hash unchanged. Evidence integrity hashing is the next bounded goal.
 
-Current stage: Project Intelligence ADR Cascade Controlled Remediation Execution v0.1 completed; 11 ADR cascade evidence gaps have been repaired, and post-remediation freshness closure is the next bounded goal.
+The current boundary is valid when the following are true:
 
-The deferred design boundary is valid when the following are true:
-
-- Public Website Owner Visual Acceptance & P3 Follow-up Triage v0.1 is not auto-selected.
-- Public Website Claude Design Integration & QA v0.1 is not auto-selected.
-- Product-core execution can proceed without website visual redesign.
+- Design and implementation work proceeds; deployment does not.
 - Local-first and private-preview claims remain preserved.
-- No deployment, public launch, repository visibility change, npm publish, GitHub release, pricing, spend, or customer contact action is performed.
+- Website copy stays in `apps/website/src/i18n.ts` so the forbidden-claim guard keeps covering it.
+- No deployment, public launch, repository visibility change, npm publish, GitHub release, public custom domain decision, pricing, spend, or customer contact action is performed.
+
+Unresolved and deliberately not addressed by ADR-0022: the live `repoassure.com` binding conflicts with [ADR-0020](adr/0020-public-website-private-preview-deployment.md) and [ADR-0021](adr/0021-private-preview-hosting-fallback.md), both of which remain Accepted with no amendment. That needs a separate recorded owner decision.
 
 ## Active / Next Codex Goal
 
-Next Codex Goal: RepoAssure Design System v2 Adoption v0.1
+Next Codex Goal: RepoAssure Evidence Integrity Hashing v0.1
 
 Plain-language explanation: owner 已提供定稿的 RepoAssure Design System v2，`owner_finalizes_claude_design` 条件满足，设计队列解冻（见 [ADR-0022](adr/0022-repoassure-design-system-v2-and-information-architecture.md)）。接下来按四步执行：先把设计系统以 workspace 包落地并自托管字体（不改视觉），再补齐 artifact 内容哈希与校验命令并修正 signed 措辞，然后重构官网信息架构，最后重构 Project Intelligence Console。Project Intelligence ADR Cascade Remediation Closure v0.1 未启动，重新排入队列，在 console 重构之后执行。
 
 Goal sequence:
 
-1. RepoAssure Design System v2 Adoption v0.1 — active
-2. RepoAssure Evidence Integrity Hashing v0.1 — queued
+1. RepoAssure Design System v2 Adoption v0.1 — completed
+2. RepoAssure Evidence Integrity Hashing v0.1 — active
 3. Public Website Claude Design Integration & QA v0.1 — queued
 4. Project Intelligence Console Redesign v0.1 — queued
 5. Project Intelligence ADR Cascade Remediation Closure v0.1 — re-queued
@@ -57,6 +56,7 @@ Goal sequence:
 - Record Project Intelligence ADR Cascade Controlled Remediation Plan v0.1 as completed with 11 plan items, file-level scope, rollback notes, verification checklist, and no repair execution.
 - Record Project Intelligence ADR Cascade Controlled Remediation Execution v0.1 as completed with 11 ADR cascade evidence sections, operation record, canonical doc cascade, TDD guard, rollback boundary, and no deployment/cloud/target-repo-write action.
 - Record RepoAssure Design System v2 Unfreeze v0.1 as completed with ADR-0022, unfreeze operation record, released design queue, four-goal sequence, canonical doc cascade, governance test re-baseline, and no deployment/public-launch/custom-domain action.
+- Record RepoAssure Design System v2 Adoption v0.1 as completed with the `@repoassure/design-system` workspace package, 37 vendored components and declarations, self-hosted Latin faces, system CJK fallback, a console-safe flattened CSS export, dual-path typecheck evidence, and an unchanged website bundle hash.
 - Select Project Intelligence ADR Cascade Remediation Closure v0.1 as the next freshness and residual-finding closure goal.
 - Preserve local-first and private-preview claims.
 - Do not execute public release, deployment, repository visibility change, npm publish, GitHub release, public launch, customer contact, pricing, or spend changes.
@@ -64,6 +64,8 @@ Goal sequence:
 
 ## Planning Order
 
-1. Project Intelligence ADR Cascade Remediation Closure v0.1, to rerun Project Intelligence freshness/backlog checks and record whether the 11 repaired ADR cascade findings are closed.
-2. Continue product-core or release-readiness engineering work that does not require website visual redesign after closure is recorded.
-3. Resume Public Website Claude Design Integration & QA v0.1 only after owner finalizes the Claude Design direction.
+1. RepoAssure Evidence Integrity Hashing v0.1, to make the integrity claim true before any surface repeats it.
+2. Public Website Claude Design Integration & QA v0.1, to restructure the information architecture around the four questions recorded in ADR-0013.
+3. Project Intelligence Console Redesign v0.1, to reframe the console from exception reporting to state reporting.
+4. Project Intelligence ADR Cascade Remediation Closure v0.1, to rerun freshness/backlog checks and record whether the 11 repaired ADR cascade findings are closed. This goal was active and not started when the design queue was released; it is re-queued, not cancelled.
+5. Resolve the ADR-0020 / ADR-0021 custom domain conflict under a separate owner decision before any deployment.

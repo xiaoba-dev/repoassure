@@ -1,15 +1,15 @@
 {
   "schema": "project-autopilot/progress-snapshot@1",
-  "generated_at": "2026-07-18T21:30:00.000+08:00",
-  "current_stage": "RepoAssure Design System v2 unfreeze recorded; design system adoption ready",
+  "generated_at": "2026-07-18T23:10:00.000+08:00",
+  "current_stage": "RepoAssure Design System v2 Adoption v0.1 completed; evidence integrity hashing ready",
   "active_goal": {
-    "id": "repoassure-design-system-v2-adoption-v0.1",
-    "title": "RepoAssure Design System v2 Adoption v0.1",
+    "id": "repoassure-evidence-integrity-hashing-v0.1",
+    "title": "RepoAssure Evidence Integrity Hashing v0.1",
     "status": "ready_to_execute"
   },
   "next_goal": {
-    "id": "repoassure-design-system-v2-adoption-v0.1",
-    "title": "RepoAssure Design System v2 Adoption v0.1",
+    "id": "repoassure-evidence-integrity-hashing-v0.1",
+    "title": "RepoAssure Evidence Integrity Hashing v0.1",
     "status": "ready_to_execute"
   },
   "deferred_goals": [],
@@ -86,5 +86,5 @@
     "customer_contact",
     "target_repo_write"
   ],
-  "next_goal_plain_language": "下一个目标是 RepoAssure Design System v2 Adoption v0.1：把 owner 提供的 Design System v2 以 workspace 包的形式落地、自托管品牌字体，让官网和 Project Intelligence Console 共用同一套 token。这一步不改变任何视觉表现。"
+  "next_goal_plain_language": "下一个目标是 RepoAssure Evidence Integrity Hashing v0.1：为产出的 artifact 写入内容哈希、新增校验命令重算比对，并把官网与 PRD 里的 signed / cryptographically verifiable 措辞改为 content-hashed / 完整性可独立验证，同时把演示数据换成真实基准跑分产出。"
 }

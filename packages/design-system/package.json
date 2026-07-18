@@ -1,0 +1,29 @@
+{
+  "name": "@repoassure/design-system",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./css": {
+      "types": "./css.d.ts",
+      "default": "./css.js"
+    },
+    "./styles": "./styles/index.css",
+    "./styles/fonts": "./styles/fonts.css",
+    "./assets/*": "./assets/*"
+  },
+  "dependencies": {
+    "@fontsource/hanken-grotesk": "^5.2.8",
+    "@fontsource/jetbrains-mono": "^5.2.8",
+    "@fontsource/space-grotesk": "^5.2.10"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  }
+}

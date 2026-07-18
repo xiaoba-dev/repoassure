@@ -1,24 +1,24 @@
 # RepoAssure Progress Snapshot
 
-Status: RepoAssure Design System v2 unfreeze recorded; design system adoption ready
+Status: RepoAssure Design System v2 Adoption v0.1 completed; evidence integrity hashing ready
 Generated: 2026-07-18
 
 ## Latest Goal
 
-RepoAssure Design System v2 Unfreeze v0.1
+RepoAssure Design System v2 Adoption v0.1
 
-Plain-language explanation: owner 提供了定稿的 RepoAssure Design System v2，`owner_finalizes_claude_design` 条件已满足，设计队列解冻。本次只记录治理状态变更与目标序列，不改动任何界面代码。
+Plain-language explanation: Design System v2 已作为 `@repoassure/design-system` 落地为 workspace 包：37 个组件连同补全的类型声明、三层 token、自托管拉丁字体。官网构建产物哈希与落地前逐字节一致，证明本步骤零视觉变化。
 
 ## Next Goal
 
-RepoAssure Design System v2 Adoption v0.1
+RepoAssure Evidence Integrity Hashing v0.1
 
-Plain-language explanation: 把 Design System v2 以 workspace 包的形式落地、自托管品牌字体，让官网和 Project Intelligence Console 共用同一套 token。这一步不改变任何视觉表现。
+Plain-language explanation: 为产出的 artifact 写入内容哈希、新增校验命令重算比对，并把 signed / cryptographically verifiable 措辞改为 content-hashed / 完整性可独立验证，同时把演示数据换成真实基准跑分产出。
 
 ## Goal Sequence
 
-1. RepoAssure Design System v2 Adoption v0.1 — active
-2. RepoAssure Evidence Integrity Hashing v0.1 — queued
+1. RepoAssure Design System v2 Adoption v0.1 — completed
+2. RepoAssure Evidence Integrity Hashing v0.1 — active
 3. Public Website Claude Design Integration & QA v0.1 — queued
 4. Project Intelligence Console Redesign v0.1 — queued
 5. Project Intelligence ADR Cascade Remediation Closure v0.1 — re-queued
@@ -34,6 +34,7 @@ Plain-language explanation: 把 Design System v2 以 workspace 包的形式落�
 - Project Intelligence ADR Cascade Maintainer Decision Recording v0.1
 - Project Intelligence ADR Cascade Controlled Remediation Plan v0.1
 - Project Intelligence ADR Cascade Controlled Remediation Execution v0.1 — 11 ADR cascade evidence gaps repaired
+- RepoAssure Design System v2 Adoption v0.1 — 37 components vendored, zero bundle change
 
 ## Released Goals
 

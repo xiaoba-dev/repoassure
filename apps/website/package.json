@@ -10,11 +10,12 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@repoassure/design-system": "workspace:*",
     "@vitejs/plugin-react": "5.0.4",
     "lucide-react": "^0.468.0",
-    "vite": "6.4.2",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "vite": "6.4.2"
   },
   "devDependencies": {
     "@types/react": "^19.2.0",

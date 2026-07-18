@@ -190,5 +190,8 @@
       "types": "./dist/run-project-intelligence-controlled-remediation-plan.d.ts",
       "default": "./dist/run-project-intelligence-controlled-remediation-plan.js"
     }
+  },
+  "dependencies": {
+    "@repoassure/design-system": "workspace:*"
   }
 }

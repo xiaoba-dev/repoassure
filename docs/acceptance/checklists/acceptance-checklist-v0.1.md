@@ -197,7 +197,11 @@
 - [x] RepoAssure Design System v2 Unfreeze v0.1
   - 当前状态：已完成。owner 提供定稿的 RepoAssure Design System v2，`owner_finalizes_claude_design` 条件满足，设计队列由 `deferred_design_pending` 释放为 `design_queue_released`。新增 ADR-0022（ADR-0019 标记 Superseded）、unfreeze operation record 和四个 goal（design system adoption / evidence integrity hashing / website design integration / console redesign），治理状态测试同步重设基线。验证：`npx vitest run tests/unit` 45 files / 613 tests passed、`npx eslint .` clean、`npx tsc -p tsconfig.build.json --noEmit` exit 0。本项只做治理记录与排期，未改动任何界面代码；不授权 deployment、public launch、production marketing announcement、repository visibility change、npm publication、GitHub release、public custom domain decision、hosted dashboard、cloud sync、telemetry、locale expansion、product artifact localization、target repo writes、pricing/spend change 或 customer contact。
   - 未决边界：线上 `repoassure.com` 与 ADR-0020 / ADR-0021 的公开自定义域名禁令冲突，需单独 owner 决策，本项不追认。
-- [ ] RepoAssure Design System v2 Adoption v0.1
-  - 当前状态：下一步。以 workspace 包形式落地 Design System v2、自托管品牌字体，使官网与 Project Intelligence Console 共用同一套 token，且不产生任何视觉变化。
+- [x] RepoAssure Design System v2 Adoption v0.1
+  - 当前状态：已完成。新增 workspace 包 `@repoassure/design-system`：37 个组件（含补齐的 37 份类型声明）、三层 token、base 样式、3 个品牌 SVG。拉丁字体自托管（183 个本地 woff2），中文走系统字体栈——`@fontsource/noto-sans-sc` 为 71.6 MB，不适合本地优先仓库。字体加载拆出为独立 opt-in 样式表，token 层零外部引用，便于 Console 内联。新增 `readDesignSystemCss()` 供独立 HTML 界面使用。验证：620 tests passed（新增 7 项）、根与官网两条消费路径 typecheck 均通过、lint clean、hygiene passed。
+  - 零视觉变化证明：`pnpm build` 产出的 `index-AykPd8pp.css` 与 `index-DgAYzd9A.js` 哈希与落地前逐字节一致。Vite 使用内容哈希命名，哈希不变即打包内容未变。
+  - 边界：设计系统尚未接入任何界面；`--signed-*` token 按原样 vendor，改名与内容哈希实现同属下一 goal。不授权 deployment、public launch、repository visibility change、npm publication、GitHub release、public custom domain decision 或 customer contact。
+- [ ] RepoAssure Evidence Integrity Hashing v0.1
+  - 当前状态：下一步。为产出的 artifact 写入内容哈希、新增校验命令重算比对，把 signed / cryptographically verifiable 措辞改为 content-hashed / 完整性可独立验证，并把官网演示数据换成真实基准跑分产出。
 - [ ] Project Intelligence ADR Cascade Remediation Closure v0.1
   - 当前状态：重新排队至 console 重构之后。需要重新运行 Project Intelligence freshness/backlog 检查，确认 11 个已修复 ADR cascade findings 是否清零，并记录 residual findings 或 rule-calibration 需求。

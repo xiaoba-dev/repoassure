@@ -96,6 +96,7 @@
     "@hardening-mcp/security-assurance": "workspace:*",
     "@hardening-mcp/shared": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.29.0",
+    "@repoassure/design-system": "workspace:*",
     "playwright": "^1.61.0"
   }
 }

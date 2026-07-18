@@ -1,5 +1,37 @@
 # 开发日志
 
+## 2026年7月18日 - RepoAssure Design System v2 Adoption v0.1
+
+### 完成内容
+
+- 新增 workspace 包 `@repoassure/design-system`：37 个组件（core / layout / navigation / forms / data / feedback）、三层 token、base 样式、3 个品牌 SVG。
+- 补齐 37 个组件的类型声明。上游 `.d.ts` 只声明了 props 接口、没有声明组件本身，直接 import 会解析到不存在的导出；vendoring 时为每个组件追加 `export declare function <Name>(props: <Name>Props): ReactElement`。
+- 自托管拉丁字体。上游 `tokens/fonts.css` 是一条指向第三方字体 CDN 的 `@import`，改为 `@fontsource` 的 Space Grotesk / Hanken Grotesk / JetBrains Mono，共 183 个本地 woff2。
+- 中文改走系统字体栈（PingFang SC / Hiragino Sans GB / Microsoft YaHei / Noto Sans CJK SC）。`@fontsource/noto-sans-sc` 为 71.6 MB，是三个拉丁字体总和的 20 倍以上。
+- 字体加载从 `styles/index.css` 拆到 `styles/fonts.css`，使 Console 可以只取 token 层。
+- 新增 `readDesignSystemCss()`：返回展平的 token 层 CSS 字符串，供无打包器的独立 HTML 界面内联。
+- 新增 `tests/unit/design-system.test.ts`（7 项）、`tests/type-smoke/design-system-css.ts`、`apps/website/src/design-system-smoke.ts`。
+
+### TDD 记录
+
+- Red：`readDesignSystemCss()` 因根包未声明依赖而无法解析；官网类型冒烟因 `SeverityChipProps` 实际字段是 `level?: 'p0'` 而非猜测的 `severity: 'P0'` 而失败。
+- Green：在根、官网、acceptance 三处注册 workspace 依赖；按真实类型修正冒烟文件。
+- 重构：把 `current_stage` 与 `active_goal_id` 的字面量断言改为结构性断言。原写法导致每完成一个 goal 都必须改测试，是 churn 而非保障；改后校验的是两份进度文件一致、active goal 在序列内且状态合法。
+
+### 验证
+
+- `npx vitest run tests/unit` — 46 files / 620 tests passed（新增 7 项）
+- `npx tsc --noEmit`（根，NodeNext 无 JSX）与 `tsc -p apps/website`（Bundler + react-jsx）均通过，两条消费路径分别得到验证
+- `npx eslint .` — clean
+- `node scripts/check-repo-hygiene.mjs` — passed
+- `pnpm build` — 产物 `index-AykPd8pp.css` 与 `index-DgAYzd9A.js` 哈希与落地前逐字节一致
+
+### 边界
+
+- 零视觉变化。设计系统已可用但尚未接入任何界面，构建产物哈希不变即为证明。
+- `--signed-*` token 与 `StatusChip` 的 `signed` 状态按原样 vendor，未改名。改名与实现内容哈希、修正措辞同属下一个 goal，应当一起落地。
+- 不执行 deployment、public launch、production marketing announcement、repository visibility change、npm publication、GitHub release、public custom domain decision、hosted dashboard、cloud sync、telemetry、target repo writes、pricing/spend change 或 customer contact。
+
 ## 2026年7月18日 - RepoAssure Design System v2 Unfreeze v0.1
 
 ### 完成内容

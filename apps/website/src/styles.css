@@ -66,9 +66,13 @@ input:focus-visible,
   width: 100%;
 }
 
+/* Was `background: var(--surface-hero)`. That token is now the light page surface, so
+   dark sections painted white while keeping light text — the assurance graph heading
+   rendered white-on-white. Dark surfaces use the console layer instead, which is
+   theme-independent by design. */
 .theme-dark {
-  background: var(--surface-hero);
-  color: var(--text-on-dark);
+  background: var(--console-bg);
+  color: var(--console-fg);
 }
 
 .theme-light {
@@ -793,7 +797,9 @@ h3 {
 }
 
 .planned-note {
-  color: var(--color-blue) !important;
+  /* Text on a light surface: --color-blue is 3.39:1 on white. The !important here is
+     pre-existing and left alone; only the value is corrected. */
+  color: var(--control-blue-text) !important;
   font-size: 15px !important;
   font-weight: 650;
 }
@@ -2625,4 +2631,182 @@ h1 {
   .preview-section h2 {
     font-size: 34px;
   }
+}
+
+/* ============================================================
+   Light-surface corrections (ADR-0022)
+
+   The block above around lines 880-1060 was written when the site was
+   dark-first: it sets light-on-dark text globally, with no theme selector, and
+   wins on cascade order. Flipping the page to a light default left those rules
+   painting white text onto white surfaces — the h1 rendered at a 1:1 contrast
+   ratio, and the footer and header were equally unreadable.
+
+   Scoping twenty inherited rules was the riskier edit, so these corrections are
+   additive and scoped to the surfaces that actually became light. The assurance
+   graph keeps `theme-dark` and is untouched.
+   ============================================================ */
+
+.site-header.theme-light {
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom-color: var(--border-subtle);
+}
+
+.site-header.theme-light .brand,
+.site-header.theme-light .menu-button,
+.site-header.theme-light .language-switcher,
+.site-header.theme-light .language-switcher span,
+.site-header.theme-light .language-switcher select {
+  color: var(--text-primary);
+}
+
+.site-header.theme-light .nav a {
+  color: var(--text-secondary);
+}
+
+.site-header.theme-light .nav a:hover {
+  color: var(--accent-strong);
+}
+
+.site-header.theme-light .language-switcher {
+  background: #ffffff;
+  border-color: var(--border-subtle);
+}
+
+.site-header.theme-light .menu-button,
+.site-header.theme-light .language-switcher select {
+  border-color: var(--border-subtle);
+  background: transparent;
+}
+
+.hero.theme-light h1,
+.hero.theme-light .hero-copy {
+  color: var(--text-primary);
+}
+
+.hero.theme-light .hero-lede {
+  color: var(--text-secondary);
+}
+
+.hero.theme-light .hero-highlight {
+  color: var(--text-muted);
+}
+
+.hero.theme-light .status-chip {
+  color: var(--accent-strong);
+  background: var(--accent-surface);
+  border-color: var(--accent-border);
+}
+
+.hero.theme-light .hero-secondary-link,
+.hero.theme-light .text-link {
+  color: var(--control-blue-text);
+}
+
+.site-footer.theme-light {
+  color: var(--text-secondary);
+}
+
+.site-footer.theme-light .footer-brand,
+.site-footer.theme-light h3 {
+  color: var(--text-primary);
+}
+
+.site-footer.theme-light a,
+.site-footer.theme-light .footer-links a {
+  color: var(--text-secondary);
+}
+
+.site-footer.theme-light a:hover,
+.site-footer.theme-light .footer-links a:hover {
+  color: var(--accent-strong);
+}
+
+.site-footer.theme-light p,
+.site-footer.theme-light span,
+.site-footer.theme-light .footer-note-inline {
+  color: var(--text-muted);
+}
+
+/* Remaining light-surface text corrections.
+
+   The dark-first block sets text colours on shared classes with no theme selector, so
+   they leak onto every light section: check-list items, section intros, artifact tabs,
+   and preview panels all rendered as light grey on white. A contrast audit of the
+   rendered page found 24 failures, the worst at a 1:1 ratio.
+
+   These restore the light-surface values. Dark sections keep `theme-dark` and are
+   unaffected, because every selector here is scoped to a light ancestor. */
+
+.theme-light .check-list li,
+.theme-light .privacy-note,
+.theme-light .hero-highlight {
+  color: var(--text-secondary);
+}
+
+.theme-light .section-intro,
+.theme-light .split-section p,
+.theme-light .trust-grid p,
+.theme-light .preview-section p,
+.theme-light .roadmap-panel p,
+.theme-light .roadmap-panel li {
+  color: var(--text-muted);
+}
+
+.theme-light .section-label {
+  color: var(--accent-strong);
+}
+
+.theme-light .text-link,
+.theme-light .secondary-button {
+  color: var(--control-blue-text);
+}
+
+/* Tabs only. Deliberately not `.artifact-preview h4/p/strong`: the preview panel inside
+   this light section is itself dark, so a descendant selector would paint dark text onto
+   a dark surface — the failure this whole block exists to remove. */
+.theme-light [role='tab'] {
+  color: var(--text-secondary);
+}
+
+.theme-light [role='tab'][aria-selected='true'] {
+  color: var(--accent-strong);
+}
+
+.theme-light .repository-note,
+.theme-light .design-partner-note {
+  color: var(--text-muted);
+}
+
+.theme-light .preview-form label,
+.theme-light .preview-form p {
+  color: var(--text-secondary);
+}
+
+/* Contrast corrections, measured against the rendered page rather than assumed.
+
+   Three real defects the light flip left behind:
+   - the artifact preview panel lost its dark background, so its light evidence text
+     rendered at #dbe7f5 on #ffffff
+   - the assurance graph section moved to a dark surface but its intro kept the
+     light-theme muted colour, giving #526071 on #0a1420
+   - --accent at #009d5c reaches 3.9:1 on white, under AA for small label text */
+
+.artifact-preview-panel {
+  background: var(--surface-evidence);
+  border-radius: var(--component-radius-card);
+}
+
+.theme-dark .section-intro,
+.theme-dark .assurance-graph-copy p {
+  color: var(--console-fg-muted);
+}
+
+.theme-light .section-label,
+.theme-light .status-chip {
+  color: var(--accent-text);
+}
+
+.theme-light [role='tab'][aria-selected='true'] {
+  color: var(--accent-text);
 }

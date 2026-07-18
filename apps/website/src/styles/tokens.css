@@ -10,10 +10,20 @@
   --brand-assurance-strong: #00a960;
   --brand-assurance-soft: #36e58b;
   --brand-control-blue: #4f86ff;
+  /* #4f86ff is 3.39:1 on white. This darker step is for link and note text on light
+     surfaces; --brand-control-blue stays for borders, fills, and dark-surface text. */
+  --control-blue-text: #2b5fd9;
   --brand-white: #ffffff;
 
   /* Semantic tokens */
   --surface-hero: #ffffff;
+  /* Design System v2 console layer — the always-dark instrument surface. Theme-independent
+     by design: an evidence panel should not follow the page theme. */
+  --console-bg: #0a1420;
+  --console-surface: #101f31;
+  --console-fg: #e7edf5;
+  --console-fg-muted: #8698ad;
+  --console-border: rgba(148, 163, 184, 0.16);
   --surface-page: #ffffff;
   --surface-page-soft: #f7fafc;
   --surface-panel: rgba(9, 24, 40, 0.84);
@@ -32,6 +42,9 @@
 
   /* Status — 2 success + 1 accent */
   --accent: #009d5c;
+  /* #009d5c reaches only 3.9:1 on white, so it fails WCAG AA for the small uppercase
+     labels it is used on. This darker step is for text; --accent stays for fills. */
+  --accent-text: #00703c;
   --accent-strong: #00a960;
   --accent-emphasis: #36e58b;
   --accent-surface: rgba(0, 138, 76, 0.12);

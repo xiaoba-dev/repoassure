@@ -163,6 +163,86 @@ try {
   const comparisonScreenshot = join(outDir, 'comparison-desktop.png');
   await comparison.screenshot({ path: comparisonScreenshot, fullPage: true });
 
+  /* Contrast audit against the rendered page.
+
+     This exists because the light-default flip shipped an h1 at a 1:1 contrast ratio —
+     white text on a white surface — through 642 unit tests, two typecheck passes, lint,
+     build, and goal:audit. Every one of those gates checks claims, structure, or
+     boundaries. None of them looks at colour, so the most visible possible defect was
+     also the least detectable one. */
+  const contrastFailures = await desktop.evaluate(() => {
+    const px = (value) => (value.match(/[\d.]+/g) || []).map(Number);
+    const luminance = (rgb) => {
+      const [r, g, b] = rgb.map((v) => {
+        const c = v / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    // Composite the ancestor chain honouring alpha: semi-transparent panels are common
+    // here, and treating them as opaque scores them against the wrong background.
+    const backgroundOf = (element) => {
+      const layers = [];
+      let node = element;
+      while (node) {
+        const parsed = px(globalThis.getComputedStyle(node).backgroundColor);
+        if (parsed.length && (parsed[3] === undefined || parsed[3] > 0)) layers.push(parsed);
+        node = node.parentElement;
+      }
+      layers.push([255, 255, 255, 1]);
+      let out = layers[layers.length - 1].slice(0, 3);
+      for (let i = layers.length - 2; i >= 0; i -= 1) {
+        const layer = layers[i];
+        const alpha = layer[3] === undefined ? 1 : layer[3];
+        out = [0, 1, 2].map((k) => Math.round(layer[k] * alpha + out[k] * (1 - alpha)));
+      }
+      return out;
+    };
+    const ratio = (a, b) => {
+      const x = luminance(a);
+      const y = luminance(b);
+      return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+    };
+
+    const failures = [];
+    globalThis.document
+      .querySelectorAll('h1,h2,h3,h4,p,a,li,span,strong,em,button,label,dt,dd,code')
+      .forEach((element) => {
+        const text = (element.textContent || '').trim();
+        if (!text || element.children.length > 0) return;
+        const styles = globalThis.getComputedStyle(element);
+        if (styles.display === 'none' || styles.visibility === 'hidden') return;
+        if (parseFloat(styles.opacity) < 0.1) return;
+        const foreground = px(styles.color);
+        if (foreground.length < 3) return;
+
+        const size = parseFloat(styles.fontSize);
+        const bold = parseInt(styles.fontWeight, 10) >= 700;
+        const large = size >= 24 || (size >= 18.66 && bold);
+        const required = large ? 3 : 4.5;
+        const measured = ratio(foreground.slice(0, 3), backgroundOf(element));
+        if (measured < required) {
+          failures.push({
+            text: text.slice(0, 48),
+            selector: (element.className || element.tagName).toString().slice(0, 40),
+            ratio: Number(measured.toFixed(2)),
+            required
+          });
+        }
+      });
+    return failures;
+  });
+
+  if (contrastFailures.length > 0) {
+    const detail = contrastFailures
+      .slice(0, 8)
+      .map((f) => `  ${f.ratio}:1 (needs ${f.required}) — "${f.text}" [${f.selector}]`)
+      .join('\n');
+    throw new Error(
+      `WCAG AA contrast failures: ${contrastFailures.length}\n${detail}`
+    );
+  }
+
   if (heading !== 'Is this AI-generated repo ready to ship?') {
     throw new Error(`Unexpected hero heading: ${heading}`);
   }

@@ -39,7 +39,7 @@
   font-family: var(--font-mono-stack, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
   font-size: 11px;
   letter-spacing: 0.09em;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .answer-card h3 {
@@ -76,7 +76,8 @@
   font-size: 23px;
   font-weight: 600;
   line-height: 1;
-  color: var(--accent);
+  /* --accent is 3.9:1 on white; the figure is 23px, under the large-text threshold. */
+  color: var(--accent-text);
   font-variant-numeric: tabular-nums;
 }
 

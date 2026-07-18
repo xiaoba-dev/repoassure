@@ -1,5 +1,355 @@
 # 决策日志
 
+## 2026年7月18日 - RepoAssure Design System v2 unfreeze and information architecture decision
+
+### 决策
+
+接受 RepoAssure Design System v2 Unfreeze v0.1，并记录 ADR-0022：owner 已提供定稿的 RepoAssure Design System v2，`owner_finalizes_claude_design` 条件满足，释放 `deferred_design_pending` 设计队列，授权 `website_visual_redesign`。
+
+采纳设计系统 v2 作为官网与 Project Intelligence Console 两个界面的统一设计源，并在其基础上做两项偏离：浅色为默认主题（深色 opt-in、证据区用常暗 console 表面），品牌字体自托管而不引用字体 CDN。
+
+官网信息架构按 ADR-0013 记录的四问重组（能否交付 / 什么证据 / 还卡着什么 / 下一个 AI IDE 先修什么），并把交付流程与交付角色拆成独立区块。Console 从「异常上报」改为「状态与信心上报」。
+
+实现 artifact 内容哈希与校验命令，同时把 signed / cryptographically verifiable 措辞改为 content-hashed / 完整性可独立验证。官网演示数据改用真实基准跑分产出。
+
+执行顺序为四个 goal：design system adoption、evidence integrity hashing、website design integration、console redesign。`project-intelligence-adr-cascade-remediation-closure-v0.1` 未启动，重新排队至 console 重构之后。
+
+### 原因
+
+- 全量文档与实现扫描发现四个问题使单纯换 token 不足以解决：ADR-0013 四问定位在官网完全缺席；`#how-it-works` 把流程与角色混在一个区块；官网宣称的 signed / cryptographically verifiable 在代码中无任何实现，产出的 manifest 不含 hash、signature、checksum 或 digest 字段，且现有 forbidden-claim 护栏未覆盖该声明；Hero 的「214 issues」与真实跑分（1–3 findings）不符。
+- Console 在项目健康时 findings 为 0，当前设计使其在最该证明价值时变成空页；其 code graph 中 2502 个节点有 2149 个（85.9%）是 vendored 依赖文件，占满 80 条显示窗口并掩盖全部 357 条测试关系边。
+- ADR-0019 明确要求「必须由单独的实现 goal 对照设计系统重构 `apps/website`」，本决策即该 goal 的授权来源。
+- 设计系统自带的字体 CDN 引用与本地优先主张冲突，且 Project Intelligence Console 测试禁止生成产物出现任何 http:// 或 https:// 引用。
+
+### 影响
+
+- 新增 `docs/adr/0022-repoassure-design-system-v2-and-information-architecture.md`，ADR-0019 标记为 Superseded。
+- 新增 `docs/operations/repoassure-design-system-v2-unfreeze-v0.1.md`，`docs/operations/public-website-design-work-deferred-v0.1.md` 标记为 superseded 并保留为时点记录。
+- 新增四个 goal：`repoassure-design-system-v2-adoption-v0.1`（active）、`repoassure-evidence-integrity-hashing-v0.1`、`public-website-claude-design-integration-and-qa-v0.1`（released from deferral）、`project-intelligence-console-redesign-v0.1`。
+- `public-website-owner-visual-acceptance-p3-follow-up-triage-v0.1` 标记为 superseded，其 P3 triage 项并入本次重构。
+- `.autopilot/goals/index.json` 与 `.autopilot/progress/` 状态更新；`website_visual_redesign` 从 blocked actions 移除，新增 `public_custom_domain_decision` 为 blocked。
+- 治理状态测试同步重设基线：`tests/unit/project-structure.test.ts` 与 `tests/unit/adr-cascade-controlled-remediation.test.ts`。
+- Deployment、public launch、production marketing announcement、repository visibility change、npm publication、GitHub release、public custom domain decision、hosted dashboard、cloud sync、telemetry、locale expansion、product artifact localization、target repo writes、pricing/spend change 和 customer contact 继续禁止。
+- 线上 `repoassure.com` 与 ADR-0020 / ADR-0021 的公开自定义域名禁令冲突，本决策不解决、不追认、不取代该冲突，需单独的 owner 决策记录。
+
+## 2026年7月18日 - Project Intelligence ADR cascade controlled remediation execution completed
+
+### 决策
+
+接受 Project Intelligence ADR Cascade Controlled Remediation Execution v0.1：在用户明确授权后，按受控 remediation plan 对 11 个 ADR missing_cascade items 执行文档级联修复，并选择 Project Intelligence ADR Cascade Remediation Closure v0.1 作为下一个 freshness closure goal。
+
+### 原因
+
+- 11 条 maintainer decision 已记录为 `repair`，且 controlled remediation plan 已明确目标文件、回滚边界和验证清单。
+- 直接补齐 ADR `Cascade Evidence` 可以让 Project Intelligence docs graph 更清楚地追踪 ADR -> PRD/SPEC/PLAN/testing/acceptance/log/architecture 的关系。
+- Closure 应单独执行，以便重新生成 freshness/backlog 证据并审计 residual findings。
+
+### 影响
+
+- 11 个 ADR 新增 `Cascade Evidence`。
+- 新增 `docs/operations/project-intelligence-adr-cascade-controlled-remediation-execution-v0.1.md`。
+- 新增 `tests/unit/adr-cascade-controlled-remediation.test.ts`。
+- `.autopilot/goals/index.json` active goal 更新为 `project-intelligence-adr-cascade-remediation-closure-v0.1`。
+- Hosted dashboard、cloud sync、telemetry、deployment、public launch、repository visibility change、npm publication、GitHub release、customer contact、pricing/spend change、target repo writes 和 website visual redesign 继续禁止。
+
+## 2026年7月18日 - Project Intelligence ADR cascade controlled remediation plan completed
+
+### 决策
+
+接受 Project Intelligence ADR Cascade Controlled Remediation Plan v0.1：从 11 条 maintainer repair decisions 生成本地 Markdown/JSON 受控修复计划，并选择 `Project Intelligence ADR Cascade Controlled Remediation Execution v0.1` 作为下一步但保持执行待授权。
+
+### 原因
+
+- Repair decision 需要先转成具体 file-level plan，才能降低直接改写 ADR/spec/docs 的风险。
+- Plan 应明确每条 item 的目标文件、执行顺序、回滚说明和验证清单。
+- Controlled remediation plan 是 planning evidence，不等于授权执行 repair。
+
+### 影响
+
+- 新增 `pnpm project:intelligence:controlled-remediation-plan`。
+- 新增 ignored artifacts `artifacts/project-graph/adr-cascade-controlled-remediation-plan.md` 和 `.json`。
+- `.autopilot/goals/index.json` active goal 更新为 `project-intelligence-adr-cascade-controlled-remediation-execution-v0.1`，状态为 `pending_authorization`。
+- Automatic ADR/spec/docs edits、repair execution、hosted dashboard、cloud sync、telemetry、deployment、public launch、repository visibility change、npm publication、target repo writes 和 website visual redesign 继续禁止，直到单独授权 remediation execution。
+
+## 2026年7月18日 - Project Intelligence ADR cascade maintainer decisions recorded
+
+### 决策
+
+接受 Project Intelligence ADR Cascade Maintainer Decision Recording v0.1：基于 owner 在 Codex 对话中的明确授权，将 11 条 recommendation draft items 的最终 maintainer decision 记录为 `repair`，并选择 `Project Intelligence ADR Cascade Controlled Remediation Plan v0.1` 作为下一个执行 goal。
+
+### 原因
+
+- Recommendation draft 只提供建议，不等于最终 maintainer decision。
+- Owner 已授权执行决策记录，因此可以把 11 条 recommended repair items 转成显式 maintainer repair decisions。
+- Repair decision 只说明“同意进入修复规划”，不等于授权立即改写 ADR/spec/docs/source。
+
+### 影响
+
+- 新增 `pnpm project:intelligence:maintainer-decision`。
+- 新增 ignored artifacts `artifacts/project-graph/adr-cascade-maintainer-decision-record.md` 和 `.json`。
+- `.autopilot/goals/index.json` active goal 更新为 `project-intelligence-adr-cascade-controlled-remediation-plan-v0.1`，状态为 `ready_to_execute`。
+- Automatic ADR/spec/docs edits、repair execution、hosted dashboard、cloud sync、telemetry、deployment、public launch、repository visibility change、npm publication、target repo writes 和 website visual redesign 继续禁止。
+
+## 2026年7月17日 - Project Intelligence ADR cascade recommendation draft completed
+
+### 决策
+
+接受 Project Intelligence ADR Cascade Remediation Recommendation Draft v0.1：将 11 个 pending decision intake items 转成 maintainer-reviewable Markdown/JSON recommendation draft，并选择 `Project Intelligence ADR Cascade Maintainer Decision Recording v0.1` 作为下一个 owner-decision goal。
+
+### 原因
+
+- Maintainer 需要先看到每条 item 的建议、理由、风险和 follow-up，再决定 approve / defer / accept-risk / repair。
+- Recommendation draft 是 advisory evidence，不等于最终 maintainer decision。
+- 在没有逐项 maintainer confirmation 前，不应自动修复 ADR、不应改写 spec/docs/tests/logs/source。
+
+### 影响
+
+- 新增 `pnpm project:intelligence:recommendation-draft`。
+- 新增 ignored artifacts `artifacts/project-graph/adr-cascade-remediation-recommendation-draft.md` 和 `.json`。
+- `.autopilot/goals/index.json` active goal 更新为 `project-intelligence-adr-cascade-maintainer-decision-recording-v0.1`，状态为 `pending_confirmation`。
+- Hosted dashboard、cloud sync、telemetry、deployment、public launch、repository visibility change、npm publication、target repo writes 和 website visual redesign 继续禁止。
+
+## 2026年7月17日 - Project Intelligence ADR cascade decision intake completed
+
+### 决策
+
+接受 Project Intelligence ADR Cascade Remediation Decision Intake v0.1：将 11 个 ADR cascade backlog items 转成 maintainer-reviewable Markdown/JSON decision intake，并选择 `Project Intelligence ADR Cascade Remediation Recommendation Draft v0.1` 作为下一个执行 goal。
+
+### 原因
+
+- Backlog 仍不是 maintainer decision，需要独立的 decision intake surface。
+- Decision intake 必须保留 approve / defer / accept-risk / repair 选项，但不能预填最终决策。
+- 在推荐决策草案或 repair 之前，系统应先提供可审阅、可追踪、可脱敏的决策槽。
+
+### 影响
+
+- 新增 `pnpm project:intelligence:decision-intake`。
+- 新增 ignored artifacts `artifacts/project-graph/adr-cascade-remediation-decision-intake.md` 和 `.json`。
+- `.autopilot/goals/index.json` active goal 更新为 `project-intelligence-adr-cascade-remediation-recommendation-draft-v0.1`。
+- 后续执行仍必须保持 no automatic ADR repair、no automatic doc rewrite、no hosted dashboard、no cloud sync、no telemetry、no deployment、no public launch、no repository visibility change、no npm publication、no GitHub release、no customer contact、no pricing/spend change、no website visual redesign。
+
+## 2026年7月17日 - Project Intelligence ADR cascade backlog completed
+
+### 决策
+
+接受 Project Intelligence ADR Cascade Remediation Backlog v0.1：将 11 个 `missing_cascade` findings 转成 maintainer-reviewable backlog，并选择 `Project Intelligence ADR Cascade Remediation Decision Intake v0.1` 作为下一个执行 goal。
+
+### 原因
+
+- `missing_cascade` findings 不能直接等同于授权修改 ADR/spec/docs。
+- Backlog 让 maintainer 能逐项选择 approve / defer / accept-risk / repair。
+- 在决策录入前，系统只生成 review artifact，不自动改文档。
+
+### 影响
+
+- 新增 `pnpm project:intelligence:backlog`。
+- 新增 ignored artifact `artifacts/project-graph/adr-cascade-remediation-backlog.md`。
+- `.autopilot/goals/index.json` active goal 更新为 `project-intelligence-adr-cascade-remediation-decision-intake-v0.1`。
+- 后续执行仍必须保持 no automatic doc rewrite、no hosted dashboard、no cloud sync、no telemetry、no deployment、no public launch、no repository visibility change、no npm publication、no GitHub release、no customer contact、no pricing/spend change、no website visual redesign。
+
+## 2026年7月17日 - Project Intelligence graph freshness checks completed
+
+### 决策
+
+接受 Project Intelligence Console Graph Freshness and Staleness Checks v0.1：snapshot 与 viewer 均展示 freshness/staleness findings，并选择 `Project Intelligence ADR Cascade Remediation Backlog v0.1` 作为下一个执行 goal。
+
+### 原因
+
+- Graph 只展示关系还不够，需要主动指出文档级联、代码所有权、测试链接和进展状态的不一致。
+- 当前真实工作区发现 11 个 medium `missing_cascade`，说明下一步应整理可执行 backlog。
+- Findings 只作为 local readiness evidence，不应自动修改文档或目标 repo。
+
+### 影响
+
+- `project-intelligence-snapshot.json` 新增 `summary.findings` 和 `findings`。
+- `project-intelligence-viewer.html` 新增 Freshness and Staleness Findings 区块。
+- `.autopilot/goals/index.json` active goal 更新为 `project-intelligence-adr-cascade-remediation-backlog-v0.1`。
+- 后续执行仍必须保持 no hosted dashboard、no cloud sync、no telemetry、no deployment、no public launch、no repository visibility change、no npm publication、no GitHub release、no customer contact、no pricing/spend change、no website visual redesign。
+
+## 2026年7月17日 - Project Intelligence local static viewer completed
+
+### 决策
+
+接受 Project Intelligence Console Local Static Viewer v0.1：用 local-only runner 将 `project-intelligence-snapshot.json` 渲染为 `project-intelligence-viewer.html`，并选择 `Project Intelligence Console Graph Freshness and Staleness Checks v0.1` 作为下一个执行 goal。
+
+### 原因
+
+- Maintainer 和 AI IDE 需要比 JSON/Markdown 更直观的本地查看入口。
+- Viewer 仍在 ignored `artifacts/project-graph/` 边界内，不会把 graph console 提前变成 hosted dashboard。
+- 完成 viewer 后，下一步最有价值的是让 graph 能主动发现过期、缺失和不一致，而不是继续扩展 UI。
+
+### 影响
+
+- 新增 `pnpm project:intelligence:view`。
+- 新增 `project-intelligence-viewer.html` 本地输出。
+- `.autopilot/goals/index.json` active goal 更新为 `project-intelligence-console-graph-freshness-and-staleness-checks-v0.1`。
+- 后续执行仍必须保持 no hosted dashboard、no cloud sync、no telemetry、no deployment、no public launch、no repository visibility change、no npm publication、no GitHub release、no customer contact、no pricing/spend change、no website visual redesign。
+
+## 2026年7月17日 - Project Intelligence graph snapshot generator completed
+
+### 决策
+
+接受 Project Intelligence Console Graph Snapshot Generator v0.1：用 local-only runner 生成 docsGraph、codeGraph 和 progressGraph 快照，并选择 `Project Intelligence Console Local Static Viewer v0.1` 作为下一个执行 goal。
+
+### 原因
+
+- 当前 docs、code、tests、logs 和 `.autopilot` 状态已经足够复杂，需要机器可读 graph snapshot 帮助 maintainer 和 AI IDE 理解项目全貌。
+- `artifacts/project-graph/` 是 ignored artifact 边界，适合保存本地快照而不污染 source surface。
+- 先生成 JSON/Markdown 快照，再做 local static viewer，可以保持 TDD 和本地优先边界。
+
+### 影响
+
+- 新增 `pnpm project:intelligence`。
+- 新增 `project-intelligence-snapshot.json` / `.md` 本地输出。
+- `.autopilot/goals/index.json` active goal 更新为 `project-intelligence-console-local-static-viewer-v0.1`。
+- 后续执行仍必须保持 no hosted dashboard、no cloud sync、no telemetry、no deployment、no public launch、no repository visibility change、no npm publication、no GitHub release、no customer contact、no pricing/spend change、no website visual redesign。
+
+## 2026年7月16日 - AI IDE repair end-to-end evidence package completed
+
+### 决策
+
+接受 AI IDE Repair End-to-End Evidence Package Validation v0.1：将 repair handoff、dry-run execution report、validation-only execution report、patch plan 和 no-write proof 聚合成 AI IDE / maintainer 可统一读取的 evidence package，并选择 `Project Intelligence Console Graph Snapshot Generator v0.1` 作为下一个执行 goal。
+
+### 原因
+
+- 前几轮已分别验证 handoff、dry-run、validation-only 和 patch plan，但 AI IDE 仍需要一个稳定入口理解完整修复链路。
+- `artifactIndex`、`repairFlow` 和 `taskMatrix` 可以把分散物料变成可审阅的决策包。
+- no-write proof 必须跨 dry-run、validation-only 和 patch plan 汇总，避免把“可修复建议”误解为“已获授权自动改代码”。
+
+### 影响
+
+- `AI IDE Repair End-to-End Evidence Package Validation v0.1` 记录为 `completed`。
+- 新增 `pnpm repair:evidence-package` 作为本地 evidence aggregation 入口。
+- `.autopilot/goals/index.json` active goal 更新为 `project-intelligence-console-graph-snapshot-generator-v0.1`。
+- 后续执行仍必须保持 no automatic target repo write、no hosted dashboard、no deployment、no public launch、no repository visibility change、no npm publication、no GitHub release、no customer contact、no pricing/spend change、no website visual redesign。
+
+## 2026年7月16日 - AI IDE repair execution dry-run validation completed
+
+### 决策
+
+接受 AI IDE Repair Execution Dry-Run Real Campaign Validation v0.1：用近真实 campaign fixture 验证 `repair:execute --dry-run` 可消费 repair decision package，并选择 `AI IDE Repair Patch Plan Real Campaign Validation v0.1` 作为下一个执行 goal。
+
+### 原因
+
+- 上一轮 real campaign validation 证明了 repair decision package 可被 AI IDE 读取；本轮进一步证明 dry-run execution report 可被稳定生成。
+- 新报告显式包含 `executionPlan`、`patchPreview`、`maintainerReview`、`verificationChecklist` 和 `noWriteProof`。
+- dry-run 只生成执行报告，不应用补丁、不修改目标 repo、不创建 branch/commit/PR，也不标记 acceptance passed。
+
+### 影响
+
+- `AI IDE Repair Execution Dry-Run Real Campaign Validation v0.1` 记录为 `completed`。
+- `.autopilot/goals/index.json` active goal 更新为 `ai-ide-repair-patch-plan-real-campaign-validation-v0.1`。
+- 后续执行仍必须保持 no automatic target repo write、no deployment、no public launch、no repository visibility change、no npm publication、no GitHub release、no customer contact、no pricing/spend change、no website visual redesign。
+
+## 2026年7月16日 - AI IDE repair decision package real campaign validation completed
+
+### 决策
+
+接受 AI IDE Repair Decision Package Real Campaign Validation v0.1：用近真实 campaign fixture 验证 hardened repair decision package 可被 AI IDE 稳定消费，并选择 `AI IDE Repair Execution Dry-Run Real Campaign Validation v0.1` 作为下一个执行 goal。
+
+### 原因
+
+- 上一轮 contract hardening 证明了字段结构，但还需要真实/近真实 campaign artifact 验证 JSON、Markdown、verification plan、脱敏和 no-write 边界。
+- `fixtures/campaigns/ai-ide-repair-decision-package/manifest.json` 覆盖 failed command、maintainer acceptance failure、required environment blocker 和 sensitive evidence redaction。
+- 下一步应验证 `repair:execute --dry-run` 是否能消费这些 queued tasks 并生成 execution report，而不是直接进入自动修复。
+
+### 影响
+
+- `AI IDE Repair Decision Package Real Campaign Validation v0.1` 记录为 `completed`。
+- `.autopilot/goals/index.json` active goal 更新为 `ai-ide-repair-execution-dry-run-real-campaign-validation-v0.1`。
+- 后续执行仍必须保持 no automatic target repo write、no deployment、no public launch、no repository visibility change、no npm publication、no GitHub release、no customer contact、no pricing/spend change、no website visual redesign。
+
+## 2026年7月16日 - AI IDE repair decision package contract hardened
+
+### 决策
+
+接受 AI IDE Repair Decision Package Contract Hardening v0.1：repair decision package contract 已从“报告/任务包辅助材料”强化为 AI IDE 可确定消费的决策包合同，并选择 `AI IDE Repair Decision Package Real Campaign Validation v0.1` 作为下一个执行 goal。
+
+### 原因
+
+- AI IDE 和 coding agent 需要稳定字段、读取顺序和维护者边界，不能依赖自然语言报告自行猜测。
+- `repairActionQueue`、`maintainerReview`、`verificationChecklist` 和 `redaction` 能把修复动作、验收步骤、人工决策边界和隐私保证分开表达。
+- 下一步必须用真实或近真实 campaign artifacts 验证消费闭环，而不是只停留在 fixture contract。
+
+### 影响
+
+- `AI IDE Repair Decision Package Contract Hardening v0.1` 记录为 `completed`。
+- `.autopilot/goals/index.json` active goal 更新为 `ai-ide-repair-decision-package-real-campaign-validation-v0.1`。
+- 后续执行仍必须保持 no automatic target repo write、no deployment、no public launch、no repository visibility change、no npm publication、no GitHub release、no customer contact、no pricing/spend change、no website visual redesign。
+
+## 2026年7月16日 - Product core queue resumed
+
+### 决策
+
+接受 Product Core Execution Resume v0.1：官网设计线暂缓后，产品核心队列恢复，并选择 `AI IDE Repair Decision Package Contract Hardening v0.1` 作为下一个具体可执行 goal。
+
+### 原因
+
+- PRD 将 AI IDE 用户定义为核心目标用户之一，他们需要可执行的修复决策包，而不是泛泛的审计报告。
+- SPEC 已明确 CLI/MCP、artifact contracts、repair plans、acceptance records 和 local-first boundary 是当前系统边界。
+- 设计系统和官网视觉重构暂缓后，继续推进 AI IDE handoff / repair decision package 是更直接的产品核心增量。
+
+### 影响
+
+- `RepoAssure Product Core Execution Resume v0.1` 记录为 `completed_selected_next_goal`。
+- `.autopilot/goals/index.json` active goal 更新为 `ai-ide-repair-decision-package-contract-hardening-v0.1`。
+- 后续执行仍必须保持 no automatic target repo write、no deployment、no public launch、no repository visibility change、no npm publication、no GitHub release、no customer contact、no pricing/spend change、no website visual redesign。
+
+## 2026年7月16日 - Public Website design work deferred
+
+### 决策
+
+接受 Public Website Design Work Deferred v0.1：在 owner 提供并定稿 Claude Design 新方案前，暂缓官网设计系统、视觉重构、owner visual triage 和 Claude Design integration。
+
+### 原因
+
+- Owner 明确表示新的设计尚未敲定，希望跳过与 design system 相关的任务。
+- 继续自动选择视觉任务会消耗时间并可能与即将到来的新设计方向冲突。
+- P3 pixel QA 已完成首轮实现，可以保留为当前状态；后续视觉质量应等最终设计输入后统一处理。
+
+### 影响
+
+- `.autopilot/goals/index.json` 的 active goal 改为 `RepoAssure Product Core Execution Resume v0.1`。
+- `Public Website Owner Visual Acceptance & P3 Follow-up Triage v0.1` 和 `Public Website Claude Design Integration & QA v0.1` 暂缓至 `owner_finalizes_claude_design`。
+- 不授权 deployment、public launch、repository visibility change、npm publication、GitHub release、customer contact、pricing、spend changes 或 website visual redesign implementation。
+
+## 2026年7月16日 - Public Website P3 owner visual gate
+
+### 决策
+
+接受 Public Website P3 Pixel QA & Mobile Responsive Polish v0.1 作为官网视觉质量的自动化修复 pass，但不把它自动等同于最终视觉验收。
+
+### 原因
+
+- P3 修复已经覆盖 owner 截图反馈中的移动端重叠、密度、图谱高度、Artifact/Trust Ledger 响应式和 CTA/footer 比例问题。
+- 自动验证证明 build/typecheck/unit guard 通过，并且 390px 移动端 DOM metrics 无横向溢出。
+- 当前环境无法稳定生成 Playwright/System Chrome 截图，仍需要 owner 直接查看运行页面确认主观视觉质量。
+
+### 影响
+
+- 下一步进入 `Public Website Owner Visual Acceptance & P3 Follow-up Triage v0.1`。
+- 若 owner 接受，则刷新 website release-candidate evidence。
+- 若仍有视觉问题，则按 fix / defer / accept risk 记录，不扩大到 public release 或 deployment。
+
+## 2026年7月16日 - Brownfield Autopilot Initialization v0.1
+
+### 决策
+
+接受 Brownfield Autopilot Initialization v0.1，将 RepoAssure 初始化为 Autopilot-managed brownfield project。
+
+### 原因
+
+仓库已经有 CLI、MCP Server、public website、acceptance/test platform、release governance、ADR、operations records 和大量验收材料，但缺少统一的 canonical PRD / SPEC / DESIGN / PLAN entrypoints 与机器可读 progress / goal state。没有初始化时，每次选择下一个 Codex goal 都需要重新扫描分散文档，容易让 public release、website polish 和 core product execution 混在一起。
+
+### 影响
+
+- 新增 `docs/PRD.md`、`docs/SPEC.md`、`docs/DESIGN.md`、`docs/PLAN.md` 作为薄 canonical entrypoints。
+- 新增 `docs/operations/brownfield-autopilot-intake-v0.1.md` 记录 brownfield intake、shape matrix 和 non-authorization boundary。
+- 新增 `.autopilot/progress/` 与 `.autopilot/goals/` 的 sanitized runtime state。
+- `.autopilot/runs/`、`.autopilot/cache/` 和 `.autopilot/secrets/` 作为 local-only / never-commit surfaces 加入 `.gitignore`。
+- 下一执行目标设为 `Public Website P3 Pixel QA & Mobile Responsive Polish v0.1`。
+- 本决策不授权 public release、deployment、repository visibility change、npm publication、GitHub release、public launch、customer contact、pricing 或 spend changes。
+
 ## 2026年6月25日 - Public release readiness boundary
 
 ### 决策
@@ -740,3 +1090,39 @@ v0.2 的核心能力是生成 `repair-plan.json` 和 `repair-plan.md`，并把�
 - Cloudflare Pages + Access 或等效受控静态托管成为远程 fallback candidate。
 - 任何新 hosting provider 上传仍需要明确 execution authorization、access-control verification、smoke/content/screenshot/forbidden-claim checks 和 rollback evidence。
 - 本决策不授权 public launch、production deployment、public custom domain、恢复 Vercel Git integration 或向新 provider 上传代码。
+
+## 2026年7月16日 - AI IDE repair patch plan real campaign validation
+
+### 决策
+
+接受 AI IDE Repair Patch Plan Real Campaign Validation v0.1。`repair:patch-plan` 必须同时支持 validation-only failed command evidence 和 dry-run `patchPreview` inputs；dry-run 场景只能生成 maintainer-reviewable patch plan inputs，不得应用补丁或自动修改目标 repo。
+
+### 原因
+
+- AI IDE 需要的不只是错误列表，还需要明确的读取顺序、目标文件、验证命令和维护者审批边界。
+- dry-run execution report 没有真实失败命令输出，若 patch-plan 只依赖 verification failures，会返回 `no_actions`，无法形成 AI IDE 可消费的修复输入。
+- 自动 patch application 风险过高，必须保留 `manual-review-only` apply policy 和 `noWriteProof`。
+
+### 影响
+
+- `patch-plan.json` 现在包含 `patchPlanInputs`、`maintainerReview`、`verificationChecklist` 和 `noWriteProof`。
+- `patch-plan.md` 现在显式展示 Patch Plan Inputs、Maintainer Review Boundary、Verification Checklist 和 No-write Proof。
+- 下一个自动 goal 转为 AI IDE Repair Validation-Only Real Campaign Validation v0.1。
+
+## 2026年7月16日 - AI IDE repair validation-only real campaign validation
+
+### 决策
+
+接受 AI IDE Repair Validation-Only Real Campaign Validation v0.1。`repair:execute --validation-only` 必须区分 passed、failed 和 skipped：可执行命令运行并记录结果，包含 `<repo>` 等占位符或需要人工环境上下文的命令不执行，记录为 skipped。
+
+### 原因
+
+- AI IDE 和 maintainer 需要知道哪些证据来自真实命令执行，哪些是人工/环境 gate，不能把 placeholder 命令错误执行后当作产品失败。
+- validation-only 必须继续保持 no-write 边界，不得应用补丁或自动修改目标 repo。
+- skipped evidence 能让下一步端到端 evidence package 明确区分 code repair、manual acceptance 和 environment blocker。
+
+### 影响
+
+- `repair-execution-report.json` 的 task status 支持 `skipped`。
+- validation-only summary 可表达 passed / failed / skipped evidence。
+- 下一个自动 goal 转为 AI IDE Repair End-to-End Evidence Package Validation v0.1。

@@ -24,9 +24,10 @@ ADR records long-lived architecture decisions. Use `docs/logs/decision-log.md` f
 | [0016](0016-team-cloud-enterprise-boundary.md) | Accepted | Team Cloud and Enterprise commercial edition boundary |
 | [0017](0017-public-website-and-project-intelligence-console.md) | Accepted | Public website and internal project intelligence console |
 | [0018](0018-public-website-localization-strategy.md) | Accepted | Public website localization strategy |
-| [0019](0019-public-website-enterprise-design-system.md) | Accepted | Public website enterprise design system |
+| [0019](0019-public-website-enterprise-design-system.md) | Superseded | Public website enterprise design system |
 | [0020](0020-public-website-private-preview-deployment.md) | Accepted | Public website private preview deployment boundary |
 | [0021](0021-private-preview-hosting-fallback.md) | Accepted | Private preview hosting fallback decision |
+| [0022](0022-repoassure-design-system-v2-and-information-architecture.md) | Accepted | RepoAssure Design System v2 and information architecture redesign |
 
 ## Template
 

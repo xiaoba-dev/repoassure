@@ -47,6 +47,9 @@ import {
   securityAssurancePackageSourceEntries,
   securityAssurancePackageSubpathSpecifiers
 } from '../../packages/security-assurance/src/index.js';
+import {
+  classifyUserAcceptanceRecord
+} from '../../packages/acceptance/src/user-acceptance-record.js';
 
 describe('project structure', () => {
   it('routes benchmark artifacts through the artifacts directory while excluding legacy output', async () => {
@@ -873,6 +876,45 @@ describe('project structure', () => {
     await expectPath('docs/operations/public-release-manual-decision-input-completion-v0.1.md');
   });
 
+  it('records public release manual decision intake v0.2 while keeping source release execution blocked', async () => {
+    const [intake, readme, releaseChecklist, testingStrategy, acceptanceChecklist, devLog] = await Promise.all([
+      readFile('docs/operations/public-release-manual-decision-intake-v0.2.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/product/strategy/public-release-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+
+    expect(intake).toContain('Public Release Manual Decision Intake v0.2');
+    expect(intake).toContain('Status: decisions_recorded_release_execution_blocked');
+    expect(intake).toContain('public release remains no-go');
+    expect(intake).toContain('Legal review | approve');
+    expect(intake).toContain('Trademark/name review | accept risk');
+    expect(intake).toContain('Branch protection or equivalent repository ruleset | defer');
+    expect(intake).toContain('Final maintainer publication authorization | approve');
+    expect(intake).toContain('Private preview reviewer feedback decision | accept risk');
+    expect(intake).toContain('Dependency/license risk confirmation | accept risk');
+    expect(intake).toContain('Secret/customer data exposure confirmation | approve');
+    expect(intake).toContain('conditional approve fallback defer');
+    expect(intake).toContain('Branch protection API: `HTTP 403`');
+    expect(intake).toContain('Repository rulesets API: `HTTP 403`');
+    expect(intake).toContain('Final maintainer publication authorization is recorded, but release execution is blocked by the deferred branch protection gate');
+    expect(intake).toContain('Public Source Release Execution v0.1 remains blocked');
+    expect(intake).toContain('No repository visibility change was authorized');
+    expect(intake).toContain('No npm publication was authorized');
+    expect(intake).toContain('No GitHub release was authorized');
+    expect(intake).toContain('No public launch or production marketing announcement was authorized');
+    expect(intake).toContain('No SaaS, Team Cloud, Enterprise, or hosted dashboard availability claim was authorized');
+    expect(readme).toContain('Public Release Manual Decision Intake v0.2');
+    expect(releaseChecklist).toContain('Public Release Manual Decision Intake v0.2');
+    expect(testingStrategy).toContain('Public Release Manual Decision Intake v0.2');
+    expect(acceptanceChecklist).toContain('Public Release Manual Decision Intake v0.2');
+    expect(devLog).toContain('Public Release Manual Decision Intake v0.2');
+
+    await expectPath('docs/operations/public-release-manual-decision-intake-v0.2.md');
+  });
+
   it('records public release manual decision input review as not ready while inputs remain blank', async () => {
     const [review, readme, releaseChecklist, testingStrategy, acceptanceChecklist, devLog] = await Promise.all([
       readFile('docs/operations/public-release-manual-decision-input-review-v0.1.md', 'utf8'),
@@ -1278,6 +1320,7 @@ describe('project structure', () => {
       adrIndex,
       designSystemAdr,
       designSystem,
+      websiteUiuxRoadmap,
       publicWebsiteSpec,
       readme,
       architecture,
@@ -1289,6 +1332,7 @@ describe('project structure', () => {
       readFile('docs/adr/README.md', 'utf8'),
       readFile('docs/adr/0019-public-website-enterprise-design-system.md', 'utf8'),
       readFile('docs/design/design-system-v0.1.md', 'utf8'),
+      readFile('docs/design/website-uiux-roadmap-v0.2.md', 'utf8'),
       readFile('docs/product/specs/public-website-spec-v0.1.md', 'utf8'),
       readFile('README.md', 'utf8'),
       readFile('docs/architecture/overview.md', 'utf8'),
@@ -1310,6 +1354,14 @@ describe('project structure', () => {
     expect(designSystem).toContain('Semantic Token Layer');
     expect(designSystem).toContain('Focus Visibility Gate');
     expect(designSystem).toContain('Forbidden Patterns');
+    expect(designSystem).toContain('website-uiux-roadmap-v0.2.md');
+    expect(designSystem).toContain('--accent');
+    expect(designSystem).toContain('--status-success');
+    expect(websiteUiuxRoadmap).toContain('Status');
+    expect(websiteUiuxRoadmap).toContain('`ACTIVE`');
+    expect(websiteUiuxRoadmap).toContain('P0-1');
+    expect(websiteUiuxRoadmap).toContain('P2-3');
+    expect(websiteUiuxRoadmap).toContain('冻结决策');
     expect(publicWebsiteSpec).toContain('ADR-0019');
     expect(publicWebsiteSpec).toContain('design-system-v0.1.md');
     expect(publicWebsiteSpec).toContain('semantic token layer');
@@ -1323,9 +1375,13 @@ describe('project structure', () => {
     expect(decisionLog).toContain('Public website enterprise design system');
     expect(devLog).toContain('Public Website Enterprise Design System ADR');
     expect(devLog).toContain('Public Website UI/UX Gate');
+    expect(devLog).toContain('Public Website UI/UX 路线图归档');
+    expect(websiteUiuxRoadmap).toContain('已归档');
 
     await expectPath('docs/adr/0019-public-website-enterprise-design-system.md');
     await expectPath('docs/design/design-system-v0.1.md');
+    await expectPath('docs/design/website-uiux-roadmap-v0.2.md');
+    await expectPath('docs/design/website-uiux-baseline-temp-2026-07-01.md');
   });
 
   it('records the public website private preview deployment boundary before execution', async () => {
@@ -3026,6 +3082,14 @@ describe('project structure', () => {
       'report',
       'run-acceptance',
       'run-goal-audit',
+      'run-project-intelligence-backlog',
+      'run-project-intelligence-controlled-remediation-plan',
+      'run-project-intelligence-decision-intake',
+      'run-project-intelligence-maintainer-decision',
+      'run-project-intelligence-recommendation-draft',
+      'run-project-intelligence-snapshot',
+      'run-project-intelligence-viewer',
+      'run-repair-evidence-package',
       'run-repair-execute',
       'run-repair-handoff',
       'run-repair-patch-plan',
@@ -3765,12 +3829,15 @@ describe('project structure', () => {
 
     expect(Number.isFinite(automaticPassed)).toBe(true);
     expect(Number.isFinite(handoffAutomaticPassed)).toBe(true);
-    const hasAcceptedUserDecision = userAcceptanceRecord.includes('| 用户结论 | 用户确认通过 |');
+    const userAcceptanceStatus = classifyUserAcceptanceRecord(userAcceptanceRecord, {
+      goalLastUpdatedText: codexGoal,
+      pathExists: () => false
+    });
 
     expect(handoffAutomaticPassed).toBeGreaterThanOrEqual(automaticPassed);
     expect(handoff).toContain('| 自动证据缺失 | 0 |');
 
-    if (hasAcceptedUserDecision) {
+    if (userAcceptanceStatus === 'accepted') {
       expect(goalAudit).toContain('| 需要人工确认 | 0 |');
       expect(handoff).toContain('| 需要人工确认 | 0 |');
       expect(handoff).toContain('| 总体状态 | 已完成 |');
@@ -3946,6 +4013,820 @@ describe('project structure', () => {
     expect(feedbackIntake).not.toContain('@');
     expect(trackedDocs).toContain('waiting_for_reviewer_feedback');
     expect(feedbackIntake).not.toContain('accepted / changes_requested / blocked');
+  });
+
+  it('initializes brownfield Autopilot state without replacing human source-of-truth docs', async () => {
+    const [
+      prd,
+      spec,
+      design,
+      plan,
+      brownfieldIntake,
+      designDeferred,
+      productCoreResume,
+      aiIdeContractHardening,
+      aiIdeRealCampaignValidation,
+      aiIdeExecutionValidation,
+      aiIdePatchPlanValidation,
+      aiIdeValidationOnlyValidation,
+      aiIdeEndToEndValidation,
+      projectIntelligenceSnapshot,
+      projectIntelligenceViewer,
+      projectIntelligenceFreshness,
+      projectIntelligenceBacklog,
+      projectIntelligenceDecisionIntake,
+      projectIntelligenceRecommendationDraft,
+      projectIntelligenceMaintainerDecision,
+      projectIntelligenceControlledRemediationPlan,
+      projectIntelligenceControlledRemediationExecution,
+      intakeConfirmation,
+      initDocPack,
+      goalRecord,
+      productCoreGoalRecord,
+      aiIdeGoalRecord,
+      aiIdeRealValidationGoalRecord,
+      aiIdeExecutionGoalRecord,
+      aiIdePatchPlanGoalRecord,
+      aiIdeValidationOnlyGoalRecord,
+      aiIdeEndToEndGoalRecord,
+      projectIntelligenceGoalRecord,
+      projectIntelligenceViewerGoalRecord,
+      projectIntelligenceFreshnessGoalRecord,
+      projectIntelligenceBacklogGoalRecord,
+      projectIntelligenceDecisionIntakeGoalRecord,
+      projectIntelligenceRecommendationDraftGoalRecord,
+      projectIntelligenceMaintainerDecisionGoalRecord,
+      projectIntelligenceControlledRemediationGoalRecord,
+      projectIntelligenceControlledRemediationExecutionGoalRecord,
+      projectIntelligenceClosureGoalRecord,
+      goalIndex,
+      snapshot,
+      progressMarkdown,
+      gitignore,
+      readme,
+      acceptanceChecklist,
+      testingStrategy,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/DESIGN.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/operations/brownfield-autopilot-intake-v0.1.md', 'utf8'),
+      readFile('docs/operations/public-website-design-work-deferred-v0.1.md', 'utf8'),
+      readFile('docs/operations/product-core-execution-resume-v0.1.md', 'utf8'),
+      readFile('docs/operations/ai-ide-repair-decision-package-contract-hardening-v0.1.md', 'utf8'),
+      readFile('docs/operations/ai-ide-repair-decision-package-real-campaign-validation-v0.1.md', 'utf8'),
+      readFile('docs/operations/ai-ide-repair-execution-dry-run-real-campaign-validation-v0.1.md', 'utf8'),
+      readFile('docs/operations/ai-ide-repair-patch-plan-real-campaign-validation-v0.1.md', 'utf8'),
+      readFile('docs/operations/ai-ide-repair-validation-only-real-campaign-validation-v0.1.md', 'utf8'),
+      readFile('docs/operations/ai-ide-repair-end-to-end-evidence-package-validation-v0.1.md', 'utf8'),
+      readFile('docs/operations/project-intelligence-console-graph-snapshot-generator-v0.1.md', 'utf8'),
+      readFile('docs/operations/project-intelligence-console-local-static-viewer-v0.1.md', 'utf8'),
+      readFile('docs/operations/project-intelligence-console-graph-freshness-and-staleness-checks-v0.1.md', 'utf8'),
+      readFile('docs/operations/project-intelligence-adr-cascade-remediation-backlog-v0.1.md', 'utf8'),
+      readFile('docs/operations/project-intelligence-adr-cascade-remediation-decision-intake-v0.1.md', 'utf8'),
+      readFile('docs/operations/project-intelligence-adr-cascade-remediation-recommendation-draft-v0.1.md', 'utf8'),
+      readFile('docs/operations/project-intelligence-adr-cascade-maintainer-decision-recording-v0.1.md', 'utf8'),
+      readFile('docs/operations/project-intelligence-adr-cascade-controlled-remediation-plan-v0.1.md', 'utf8'),
+      readFile('docs/operations/project-intelligence-adr-cascade-controlled-remediation-execution-v0.1.md', 'utf8'),
+      readFile('.autopilot/progress/intake-confirmation.json', 'utf8'),
+      readFile('.autopilot/progress/init-doc-pack.json', 'utf8'),
+      readFile('.autopilot/goals/public-website-p3-pixel-qa-mobile-responsive-polish-v0.1.json', 'utf8'),
+      readFile('.autopilot/goals/repoassure-product-core-execution-resume-v0.1.json', 'utf8'),
+      readFile('.autopilot/goals/ai-ide-repair-decision-package-contract-hardening-v0.1.json', 'utf8'),
+      readFile('.autopilot/goals/ai-ide-repair-decision-package-real-campaign-validation-v0.1.json', 'utf8'),
+      readFile('.autopilot/goals/ai-ide-repair-execution-dry-run-real-campaign-validation-v0.1.json', 'utf8'),
+      readFile('.autopilot/goals/ai-ide-repair-patch-plan-real-campaign-validation-v0.1.json', 'utf8'),
+      readFile('.autopilot/goals/ai-ide-repair-validation-only-real-campaign-validation-v0.1.json', 'utf8'),
+      readFile('.autopilot/goals/ai-ide-repair-end-to-end-evidence-package-validation-v0.1.json', 'utf8'),
+      readFile('.autopilot/goals/project-intelligence-console-graph-snapshot-generator-v0.1.json', 'utf8'),
+      readFile('.autopilot/goals/project-intelligence-console-local-static-viewer-v0.1.json', 'utf8'),
+      readFile('.autopilot/goals/project-intelligence-console-graph-freshness-and-staleness-checks-v0.1.json', 'utf8'),
+      readFile('.autopilot/goals/project-intelligence-adr-cascade-remediation-backlog-v0.1.json', 'utf8'),
+      readFile('.autopilot/goals/project-intelligence-adr-cascade-remediation-decision-intake-v0.1.json', 'utf8'),
+      readFile('.autopilot/goals/project-intelligence-adr-cascade-remediation-recommendation-draft-v0.1.json', 'utf8'),
+      readFile('.autopilot/goals/project-intelligence-adr-cascade-maintainer-decision-recording-v0.1.json', 'utf8'),
+      readFile('.autopilot/goals/project-intelligence-adr-cascade-controlled-remediation-plan-v0.1.json', 'utf8'),
+      readFile('.autopilot/goals/project-intelligence-adr-cascade-controlled-remediation-execution-v0.1.json', 'utf8'),
+      readFile('.autopilot/goals/project-intelligence-adr-cascade-remediation-closure-v0.1.json', 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8'),
+      readFile('.gitignore', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+    const intake = JSON.parse(intakeConfirmation) as {
+      schema: string;
+      project_intake_mode: string;
+      owner_confirmed: boolean;
+      primary_doc_locale: string;
+      machine_protocol_locale: string;
+    };
+    const init = JSON.parse(initDocPack) as {
+      schema: string;
+      status: string;
+      source: string;
+      confirmation: string;
+      shape_matrix: string[];
+    };
+    const goal = JSON.parse(goalRecord) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+    };
+    const productCoreGoal = JSON.parse(productCoreGoalRecord) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      deferred_until?: string;
+      selected_goal_id?: string;
+    };
+    const aiIdeGoal = JSON.parse(aiIdeGoalRecord) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      document_basis: string[];
+    };
+    const aiIdeRealValidationGoal = JSON.parse(aiIdeRealValidationGoalRecord) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+    };
+    const aiIdeExecutionGoal = JSON.parse(aiIdeExecutionGoalRecord) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+    };
+    const aiIdePatchPlanGoal = JSON.parse(aiIdePatchPlanGoalRecord) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+    };
+    const aiIdeValidationOnlyGoal = JSON.parse(aiIdeValidationOnlyGoalRecord) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+    };
+    const aiIdeEndToEndGoal = JSON.parse(aiIdeEndToEndGoalRecord) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      next_goal_id?: string;
+    };
+    const projectIntelligenceGoal = JSON.parse(projectIntelligenceGoalRecord) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      next_goal_id?: string;
+      snapshot_summary?: { nodes?: number; edges?: number };
+    };
+    const projectIntelligenceViewerGoal = JSON.parse(projectIntelligenceViewerGoalRecord) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      next_goal_id?: string;
+      viewer_summary?: { output?: string; local_only?: boolean; hosted_dashboard_implemented?: boolean };
+    };
+    const projectIntelligenceFreshnessGoal = JSON.parse(projectIntelligenceFreshnessGoalRecord) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      next_goal_id?: string;
+      findings_summary?: { total?: number; medium?: number; dominant_category?: string };
+    };
+    const projectIntelligenceBacklogGoal = JSON.parse(projectIntelligenceBacklogGoalRecord) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      next_goal_id?: string;
+      backlog_summary?: { output?: string; items?: number; missing_cascade?: number };
+    };
+    const projectIntelligenceDecisionIntakeGoal = JSON.parse(projectIntelligenceDecisionIntakeGoalRecord) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      source_backlog?: { path?: string; items?: number; status?: string };
+      next_goal_id?: string;
+      intake_summary?: {
+        markdown_output?: string;
+        json_output?: string;
+        items?: number;
+        pending_decisions?: number;
+        automatic_repair_authorized?: boolean;
+      };
+    };
+    const projectIntelligenceRecommendationDraftGoal = JSON.parse(projectIntelligenceRecommendationDraftGoalRecord) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      source_intake?: { path?: string; items?: number; status?: string };
+      next_goal_id?: string;
+      recommendation_summary?: {
+        markdown_output?: string;
+        json_output?: string;
+        items?: number;
+        recommended_repair?: number;
+        final_maintainer_decisions_written?: number;
+        automatic_repair_authorized?: boolean;
+      };
+    };
+    const projectIntelligenceMaintainerDecisionGoal = JSON.parse(projectIntelligenceMaintainerDecisionGoalRecord) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      next_goal_id?: string;
+      source_recommendation_draft?: {
+        path?: string;
+        items?: number;
+        status?: string;
+        final_maintainer_decisions_written?: number;
+      };
+      maintainer_decision_summary?: {
+        markdown_output?: string;
+        json_output?: string;
+        items?: number;
+        repair_decisions_recorded?: number;
+        final_maintainer_decisions_written?: number;
+        repair_execution_authorized?: boolean;
+      };
+    };
+    const projectIntelligenceControlledRemediationGoal = JSON.parse(
+      projectIntelligenceControlledRemediationGoalRecord
+    ) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      next_goal_id?: string;
+      source_maintainer_decision_record?: {
+        path?: string;
+        items?: number;
+        repair_decisions_recorded?: number;
+        repair_execution_authorized?: boolean;
+      };
+      controlled_remediation_plan_summary?: {
+        markdown_output?: string;
+        json_output?: string;
+        items?: number;
+        repair_decisions_included?: number;
+        automatic_edits_planned?: boolean;
+        repair_execution_authorized?: boolean;
+      };
+    };
+    const projectIntelligenceControlledRemediationExecutionGoal = JSON.parse(
+      projectIntelligenceControlledRemediationExecutionGoalRecord
+    ) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      next_goal_id?: string;
+      source_controlled_remediation_plan?: {
+        path?: string;
+        items?: number;
+        repair_execution_authorized?: boolean;
+      };
+      controlled_remediation_execution_summary?: {
+        adr_items_repaired?: number;
+        cascade_evidence_sections_added?: number;
+        repair_execution_authorized_by_owner?: boolean;
+        hosted_dashboard_implemented?: boolean;
+        target_repo_writes?: boolean;
+      };
+    };
+    const projectIntelligenceClosureGoal = JSON.parse(projectIntelligenceClosureGoalRecord) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+    };
+    const index = JSON.parse(goalIndex) as {
+      active_goal_id: string;
+      deferred_goal_ids?: string[];
+      released_goal_ids?: string[];
+      superseded_goal_ids?: string[];
+    };
+    const progress = JSON.parse(snapshot) as {
+      schema: string;
+      current_stage: string;
+      active_goal: { id: string; status?: string };
+      next_goal?: { id: string; status?: string };
+      deferred_goals?: Array<{ id: string; reason: string }>;
+      released_goals?: Array<{ id: string; reason: string }>;
+      requeued_goals?: Array<{ id: string; reason: string }>;
+      workflow_map: { mermaid: string };
+      blocked_actions: string[];
+    };
+
+    expect(prd).toContain('Status: canonical_entrypoint');
+    expect(prd).toContain('Source: brownfield_inference_with_owner_confirmation');
+    expect(prd).toContain('docs/product/specs/mvp-spec-v0.3.md');
+    expect(spec).toContain('Status: canonical_entrypoint');
+    expect(spec).toContain('CLI + MCP Server');
+    expect(spec).toContain('Public Website');
+    expect(design).toContain('Status: canonical_entrypoint');
+    expect(design).toContain('docs/design/design-system-v0.1.md');
+    expect(design).toContain('design_queue_released');
+    expect(design).toContain('ADR-0022');
+    expect(design).toContain('RepoAssure Design System v2');
+    expect(design).toContain('Public Website Claude Design Integration & QA v0.1');
+    expect(plan).toContain('Status: canonical_entrypoint');
+    expect(plan).toContain('Public Website Design Work Deferred v0.1');
+    expect(plan).toContain('RepoAssure Product Core Execution Resume v0.1');
+    expect(plan).toContain('AI IDE Repair Decision Package Contract Hardening v0.1');
+    expect(plan).toContain('Next Codex Goal');
+    expect(designDeferred).toContain('Public Website Design Work Deferred v0.1');
+    expect(designDeferred).toContain('Status: superseded');
+    expect(designDeferred).toContain('repoassure-design-system-v2-unfreeze-v0.1.md');
+    expect(designDeferred).toContain('Do not auto-select website visual polish, design-system rewrite, or Claude Design integration goals');
+    expect(designDeferred).toContain('RepoAssure Product Core Execution Resume v0.1');
+    expect(designDeferred).toContain('No deployment was authorized');
+    expect(productCoreResume).toContain('Product Core Execution Resume v0.1');
+    expect(productCoreResume).toContain('Status: selected_next_goal');
+    expect(productCoreResume).toContain('AI IDE Repair Decision Package Contract Hardening v0.1');
+    expect(productCoreResume).toContain('No website visual redesign was authorized');
+    expect(aiIdeContractHardening).toContain('AI IDE Repair Decision Package Contract Hardening v0.1');
+    expect(aiIdeContractHardening).toContain('Status: completed');
+    expect(aiIdeContractHardening).toContain('repairActionQueue');
+    expect(aiIdeContractHardening).toContain('maintainerReview');
+    expect(aiIdeContractHardening).toContain('verificationChecklist');
+    expect(aiIdeContractHardening).toContain('redaction');
+    expect(aiIdeContractHardening).toContain('No automatic target repo write was authorized');
+    expect(aiIdeRealCampaignValidation).toContain('AI IDE Repair Decision Package Real Campaign Validation v0.1');
+    expect(aiIdeRealCampaignValidation).toContain('Status: completed');
+    expect(aiIdeRealCampaignValidation).toContain('fixtures/campaigns/ai-ide-repair-decision-package/manifest.json');
+    expect(aiIdeRealCampaignValidation).toContain('repairActionQueue');
+    expect(aiIdeRealCampaignValidation).toContain('maintainerReview');
+    expect(aiIdeRealCampaignValidation).toContain('verificationChecklist');
+    expect(aiIdeRealCampaignValidation).toContain('redaction');
+    expect(aiIdeRealCampaignValidation).toContain('No automatic target repo write was authorized');
+    expect(aiIdeExecutionValidation).toContain('AI IDE Repair Execution Dry-Run Real Campaign Validation v0.1');
+    expect(aiIdeExecutionValidation).toContain('Status: completed');
+    expect(aiIdeExecutionValidation).toContain('executionPlan');
+    expect(aiIdeExecutionValidation).toContain('patchPreview');
+    expect(aiIdeExecutionValidation).toContain('maintainerReview');
+    expect(aiIdeExecutionValidation).toContain('verificationChecklist');
+    expect(aiIdeExecutionValidation).toContain('noWriteProof');
+    expect(aiIdeExecutionValidation).toContain('No automatic target repo write was authorized');
+    expect(aiIdePatchPlanValidation).toContain('AI IDE Repair Patch Plan Real Campaign Validation v0.1');
+    expect(aiIdePatchPlanValidation).toContain('Status: completed');
+    expect(aiIdePatchPlanValidation).toContain('patchPlanInputs');
+    expect(aiIdePatchPlanValidation).toContain('maintainerReview');
+    expect(aiIdePatchPlanValidation).toContain('verificationChecklist');
+    expect(aiIdePatchPlanValidation).toContain('noWriteProof');
+    expect(aiIdePatchPlanValidation).toContain('No automatic target repo write was authorized');
+    expect(aiIdeValidationOnlyValidation).toContain('AI IDE Repair Validation-Only Real Campaign Validation v0.1');
+    expect(aiIdeValidationOnlyValidation).toContain('Status: completed');
+    expect(aiIdeValidationOnlyValidation).toContain('passed');
+    expect(aiIdeValidationOnlyValidation).toContain('failed');
+    expect(aiIdeValidationOnlyValidation).toContain('skipped');
+    expect(aiIdeValidationOnlyValidation).toContain('No automatic target repo write was authorized');
+    expect(aiIdeEndToEndValidation).toContain('AI IDE Repair End-to-End Evidence Package Validation v0.1');
+    expect(aiIdeEndToEndValidation).toContain('Status: completed');
+    expect(aiIdeEndToEndValidation).toContain('artifactIndex');
+    expect(aiIdeEndToEndValidation).toContain('repairFlow');
+    expect(aiIdeEndToEndValidation).toContain('taskMatrix');
+    expect(aiIdeEndToEndValidation).toContain('noWriteProof');
+    expect(aiIdeEndToEndValidation).toContain('No automatic target repo write was authorized');
+    expect(projectIntelligenceSnapshot).toContain('Project Intelligence Console Graph Snapshot Generator v0.1');
+    expect(projectIntelligenceSnapshot).toContain('Status: completed');
+    expect(projectIntelligenceSnapshot).toContain('docsGraph');
+    expect(projectIntelligenceSnapshot).toContain('codeGraph');
+    expect(projectIntelligenceSnapshot).toContain('progressGraph');
+    expect(projectIntelligenceSnapshot).toContain('artifacts/project-graph/project-intelligence-snapshot.json');
+    expect(projectIntelligenceSnapshot).toContain('No hosted dashboard implemented');
+    expect(projectIntelligenceViewer).toContain('Project Intelligence Console Local Static Viewer v0.1');
+    expect(projectIntelligenceViewer).toContain('Status: completed');
+    expect(projectIntelligenceViewer).toContain('project-intelligence-viewer.html');
+    expect(projectIntelligenceViewer).toContain('No hosted dashboard');
+    expect(projectIntelligenceFreshness).toContain('Project Intelligence Console Graph Freshness and Staleness Checks v0.1');
+    expect(projectIntelligenceFreshness).toContain('Status: completed');
+    expect(projectIntelligenceFreshness).toContain('Total findings: 11');
+    expect(projectIntelligenceFreshness).toContain('missing_cascade');
+    expect(projectIntelligenceBacklog).toContain('Project Intelligence ADR Cascade Remediation Backlog v0.1');
+    expect(projectIntelligenceBacklog).toContain('Status: completed');
+    expect(projectIntelligenceBacklog).toContain('Backlog items: 11');
+    expect(projectIntelligenceBacklog).toContain('approve');
+    expect(projectIntelligenceBacklog).toContain('accept-risk');
+    expect(projectIntelligenceBacklog).toContain('No automatic ADR/spec/docs edits');
+    expect(projectIntelligenceDecisionIntake).toContain('Project Intelligence ADR Cascade Remediation Decision Intake v0.1');
+    expect(projectIntelligenceDecisionIntake).toContain('Status: completed');
+    expect(projectIntelligenceDecisionIntake).toContain('Decision items: 11');
+    expect(projectIntelligenceDecisionIntake).toContain('Pending decisions: 11');
+    expect(projectIntelligenceDecisionIntake).toContain('No automatic ADR/spec/docs edits');
+    expect(projectIntelligenceDecisionIntake).toContain('Project Intelligence ADR Cascade Remediation Recommendation Draft v0.1');
+    expect(projectIntelligenceRecommendationDraft).toContain(
+      'Project Intelligence ADR Cascade Remediation Recommendation Draft v0.1'
+    );
+    expect(projectIntelligenceRecommendationDraft).toContain('Status: completed');
+    expect(projectIntelligenceRecommendationDraft).toContain('Draft items: 11');
+    expect(projectIntelligenceRecommendationDraft).toContain('Recommended repair decisions: 11');
+    expect(projectIntelligenceRecommendationDraft).toContain('Final maintainer decisions written: 0');
+    expect(projectIntelligenceRecommendationDraft).toContain('Project Intelligence ADR Cascade Maintainer Decision Recording v0.1');
+    expect(projectIntelligenceMaintainerDecision).toContain(
+      'Project Intelligence ADR Cascade Maintainer Decision Recording v0.1'
+    );
+    expect(projectIntelligenceMaintainerDecision).toContain('Status: completed');
+    expect(projectIntelligenceMaintainerDecision).toContain('Final maintainer decisions written: 11');
+    expect(projectIntelligenceMaintainerDecision).toContain('Repair decisions recorded: 11');
+    expect(projectIntelligenceMaintainerDecision).toContain('Repair execution authorized: no');
+    expect(projectIntelligenceMaintainerDecision).toContain('Project Intelligence ADR Cascade Controlled Remediation Plan v0.1');
+    expect(projectIntelligenceControlledRemediationPlan).toContain(
+      'Project Intelligence ADR Cascade Controlled Remediation Plan v0.1'
+    );
+    expect(projectIntelligenceControlledRemediationPlan).toContain('Status: completed');
+    expect(projectIntelligenceControlledRemediationPlan).toContain('Plan items: 11');
+    expect(projectIntelligenceControlledRemediationPlan).toContain('Repair decisions included: 11');
+    expect(projectIntelligenceControlledRemediationPlan).toContain('Repair execution authorized: no');
+    expect(projectIntelligenceControlledRemediationPlan).toContain(
+      'Project Intelligence ADR Cascade Controlled Remediation Execution v0.1'
+    );
+    expect(projectIntelligenceControlledRemediationExecution).toContain(
+      'Project Intelligence ADR Cascade Controlled Remediation Execution v0.1'
+    );
+    expect(projectIntelligenceControlledRemediationExecution).toContain('Status: completed');
+    expect(projectIntelligenceControlledRemediationExecution).toContain('Repaired ADR items: 11');
+    expect(projectIntelligenceControlledRemediationExecution).toContain('Cascade evidence sections added: 11');
+    expect(projectIntelligenceControlledRemediationExecution).toContain('Rollback boundary');
+    expect(projectIntelligenceControlledRemediationExecution).toContain(
+      'Project Intelligence ADR Cascade Remediation Closure v0.1'
+    );
+    expect(brownfieldIntake).toContain('Brownfield Autopilot Intake v0.1');
+    expect(brownfieldIntake).toContain('Owner confirmation: recorded');
+    expect(brownfieldIntake).toContain('command_line');
+    expect(brownfieldIntake).toContain('mcp_server');
+    expect(brownfieldIntake).toContain('web_app');
+    expect(brownfieldIntake).toContain('No repository visibility change was authorized');
+    expect(intake.schema).toBe('project-autopilot/intake-confirmation@1');
+    expect(intake.project_intake_mode).toBe('brownfield');
+    expect(intake.owner_confirmed).toBe(true);
+    expect(intake.primary_doc_locale).toBe('zh-CN');
+    expect(intake.machine_protocol_locale).toBe('en-US');
+    expect(init.schema).toBe('project-autopilot/init-doc-pack@1');
+    expect(init.status).toBe('initialized_from_brownfield');
+    expect(init.source).toBe('brownfield_inference');
+    expect(init.confirmation).toBe('owner_confirmed_for_initialization');
+    expect(init.shape_matrix).toEqual(expect.arrayContaining([
+      'command_line',
+      'mcp_server',
+      'web_app',
+      'composite_product_shape'
+    ]));
+    expect(goal.schema).toBe('project-autopilot/goal@1');
+    expect(goal.status).toBe('completed_deferred_to_owner_design_review');
+    expect(goal.objective).toContain('Public Website P3 Pixel QA');
+    expect(goal.blocked_actions).toContain('public_launch');
+    expect(productCoreGoal.schema).toBe('project-autopilot/goal@1');
+    expect(productCoreGoal.status).toBe('completed_selected_next_goal');
+    expect(productCoreGoal.objective).toContain('product core execution');
+    expect(productCoreGoal.selected_goal_id).toBe('ai-ide-repair-decision-package-contract-hardening-v0.1');
+    expect(productCoreGoal.deferred_until).toBe('owner_finalizes_claude_design');
+    expect(productCoreGoal.blocked_actions).toContain('website_visual_redesign');
+    expect(aiIdeGoal.schema).toBe('project-autopilot/goal@1');
+    expect(aiIdeGoal.status).toBe('completed');
+    expect(aiIdeGoal.objective).toContain('AI IDE');
+    expect(aiIdeGoal.objective).toContain('repair decision package');
+    expect(aiIdeGoal.document_basis).toContain('docs/PRD.md');
+    expect(aiIdeGoal.blocked_actions).toContain('automatic_target_repo_write');
+    expect(aiIdeRealValidationGoal.schema).toBe('project-autopilot/goal@1');
+    expect(aiIdeRealValidationGoal.status).toBe('completed');
+    expect(aiIdeRealValidationGoal.objective).toContain('real campaign validation');
+    expect(aiIdeRealValidationGoal.blocked_actions).toContain('automatic_target_repo_write');
+    expect(aiIdeExecutionGoal.schema).toBe('project-autopilot/goal@1');
+    expect(aiIdeExecutionGoal.status).toBe('completed');
+    expect(aiIdeExecutionGoal.objective).toContain('repair execution dry-run');
+    expect(aiIdeExecutionGoal.blocked_actions).toContain('automatic_target_repo_write');
+    expect(aiIdePatchPlanGoal.schema).toBe('project-autopilot/goal@1');
+    expect(aiIdePatchPlanGoal.status).toBe('completed');
+    expect(aiIdePatchPlanGoal.objective).toContain('repair patch plan');
+    expect(aiIdePatchPlanGoal.blocked_actions).toContain('automatic_target_repo_write');
+    expect(aiIdeValidationOnlyGoal.schema).toBe('project-autopilot/goal@1');
+    expect(aiIdeValidationOnlyGoal.status).toBe('completed');
+    expect(aiIdeValidationOnlyGoal.objective).toContain('validation-only');
+    expect(aiIdeValidationOnlyGoal.blocked_actions).toContain('automatic_target_repo_write');
+    expect(aiIdeEndToEndGoal.schema).toBe('project-autopilot/goal@1');
+    expect(aiIdeEndToEndGoal.status).toBe('completed');
+    expect(aiIdeEndToEndGoal.objective).toContain('end-to-end evidence package');
+    expect(aiIdeEndToEndGoal.blocked_actions).toContain('automatic_target_repo_write');
+    expect(aiIdeEndToEndGoal.next_goal_id).toBe('project-intelligence-console-graph-snapshot-generator-v0.1');
+    expect(projectIntelligenceGoal.schema).toBe('project-autopilot/goal@1');
+    expect(projectIntelligenceGoal.status).toBe('completed');
+    expect(projectIntelligenceGoal.objective).toContain('Project Intelligence Console');
+    expect(projectIntelligenceGoal.blocked_actions).toContain('hosted_dashboard');
+    expect(projectIntelligenceGoal.next_goal_id).toBe('project-intelligence-console-local-static-viewer-v0.1');
+    expect(projectIntelligenceGoal.snapshot_summary?.nodes).toBeGreaterThan(0);
+    expect(projectIntelligenceViewerGoal.schema).toBe('project-autopilot/goal@1');
+    expect(projectIntelligenceViewerGoal.status).toBe('completed');
+    expect(projectIntelligenceViewerGoal.objective).toContain('local-only static viewer');
+    expect(projectIntelligenceViewerGoal.blocked_actions).toContain('hosted_dashboard');
+    expect(projectIntelligenceViewerGoal.next_goal_id).toBe(
+      'project-intelligence-console-graph-freshness-and-staleness-checks-v0.1'
+    );
+    expect(projectIntelligenceViewerGoal.viewer_summary?.output).toBe(
+      'artifacts/project-graph/project-intelligence-viewer.html'
+    );
+    expect(projectIntelligenceViewerGoal.viewer_summary?.local_only).toBe(true);
+    expect(projectIntelligenceViewerGoal.viewer_summary?.hosted_dashboard_implemented).toBe(false);
+    expect(projectIntelligenceFreshnessGoal.schema).toBe('project-autopilot/goal@1');
+    expect(projectIntelligenceFreshnessGoal.status).toBe('completed');
+    expect(projectIntelligenceFreshnessGoal.objective).toContain('stale docs');
+    expect(projectIntelligenceFreshnessGoal.blocked_actions).toContain('hosted_dashboard');
+    expect(projectIntelligenceFreshnessGoal.next_goal_id).toBe('project-intelligence-adr-cascade-remediation-backlog-v0.1');
+    expect(projectIntelligenceFreshnessGoal.findings_summary?.total).toBe(11);
+    expect(projectIntelligenceFreshnessGoal.findings_summary?.medium).toBe(11);
+    expect(projectIntelligenceFreshnessGoal.findings_summary?.dominant_category).toBe('missing_cascade');
+    expect(projectIntelligenceBacklogGoal.schema).toBe('project-autopilot/goal@1');
+    expect(projectIntelligenceBacklogGoal.status).toBe('completed');
+    expect(projectIntelligenceBacklogGoal.objective).toContain('ADR cascade remediation backlog');
+    expect(projectIntelligenceBacklogGoal.blocked_actions).toContain('automatic_doc_rewrite');
+    expect(projectIntelligenceBacklogGoal.next_goal_id).toBe(
+      'project-intelligence-adr-cascade-remediation-decision-intake-v0.1'
+    );
+    expect(projectIntelligenceBacklogGoal.backlog_summary?.items).toBe(11);
+    expect(projectIntelligenceBacklogGoal.backlog_summary?.missing_cascade).toBe(11);
+    expect(projectIntelligenceBacklogGoal.backlog_summary?.output).toBe(
+      'artifacts/project-graph/adr-cascade-remediation-backlog.md'
+    );
+    expect(projectIntelligenceDecisionIntakeGoal.schema).toBe('project-autopilot/goal@1');
+    expect(projectIntelligenceDecisionIntakeGoal.status).toBe('completed');
+    expect(projectIntelligenceDecisionIntakeGoal.objective).toContain('maintainer decisions');
+    expect(projectIntelligenceDecisionIntakeGoal.blocked_actions).toContain('automatic_doc_rewrite');
+    expect(projectIntelligenceDecisionIntakeGoal.blocked_actions).toContain('automatic_adr_repair');
+    expect(projectIntelligenceDecisionIntakeGoal.source_backlog?.path).toBe(
+      'artifacts/project-graph/adr-cascade-remediation-backlog.md'
+    );
+    expect(projectIntelligenceDecisionIntakeGoal.source_backlog?.items).toBe(11);
+    expect(projectIntelligenceDecisionIntakeGoal.next_goal_id).toBe(
+      'project-intelligence-adr-cascade-remediation-recommendation-draft-v0.1'
+    );
+    expect(projectIntelligenceDecisionIntakeGoal.intake_summary?.markdown_output).toBe(
+      'artifacts/project-graph/adr-cascade-remediation-decision-intake.md'
+    );
+    expect(projectIntelligenceDecisionIntakeGoal.intake_summary?.json_output).toBe(
+      'artifacts/project-graph/adr-cascade-remediation-decision-intake.json'
+    );
+    expect(projectIntelligenceDecisionIntakeGoal.intake_summary?.items).toBe(11);
+    expect(projectIntelligenceDecisionIntakeGoal.intake_summary?.pending_decisions).toBe(11);
+    expect(projectIntelligenceDecisionIntakeGoal.intake_summary?.automatic_repair_authorized).toBe(false);
+    expect(projectIntelligenceRecommendationDraftGoal.schema).toBe('project-autopilot/goal@1');
+    expect(projectIntelligenceRecommendationDraftGoal.status).toBe('completed');
+    expect(projectIntelligenceRecommendationDraftGoal.objective).toContain('recommendation draft');
+    expect(projectIntelligenceRecommendationDraftGoal.blocked_actions).toContain('final_maintainer_decision_write');
+    expect(projectIntelligenceRecommendationDraftGoal.blocked_actions).toContain('automatic_adr_repair');
+    expect(projectIntelligenceRecommendationDraftGoal.source_intake?.path).toBe(
+      'artifacts/project-graph/adr-cascade-remediation-decision-intake.json'
+    );
+    expect(projectIntelligenceRecommendationDraftGoal.source_intake?.items).toBe(11);
+    expect(projectIntelligenceRecommendationDraftGoal.next_goal_id).toBe(
+      'project-intelligence-adr-cascade-maintainer-decision-recording-v0.1'
+    );
+    expect(projectIntelligenceRecommendationDraftGoal.recommendation_summary?.markdown_output).toBe(
+      'artifacts/project-graph/adr-cascade-remediation-recommendation-draft.md'
+    );
+    expect(projectIntelligenceRecommendationDraftGoal.recommendation_summary?.json_output).toBe(
+      'artifacts/project-graph/adr-cascade-remediation-recommendation-draft.json'
+    );
+    expect(projectIntelligenceRecommendationDraftGoal.recommendation_summary?.items).toBe(11);
+    expect(projectIntelligenceRecommendationDraftGoal.recommendation_summary?.recommended_repair).toBe(11);
+    expect(projectIntelligenceRecommendationDraftGoal.recommendation_summary?.final_maintainer_decisions_written).toBe(0);
+    expect(projectIntelligenceRecommendationDraftGoal.recommendation_summary?.automatic_repair_authorized).toBe(false);
+    expect(projectIntelligenceMaintainerDecisionGoal.schema).toBe('project-autopilot/goal@1');
+    expect(projectIntelligenceMaintainerDecisionGoal.status).toBe('completed');
+    expect(projectIntelligenceMaintainerDecisionGoal.objective).toContain('maintainer decisions');
+    expect(projectIntelligenceMaintainerDecisionGoal.blocked_actions).toContain('invent_maintainer_decision');
+    expect(projectIntelligenceMaintainerDecisionGoal.blocked_actions).toContain('automatic_adr_repair');
+    expect(projectIntelligenceMaintainerDecisionGoal.source_recommendation_draft?.path).toBe(
+      'artifacts/project-graph/adr-cascade-remediation-recommendation-draft.json'
+    );
+    expect(projectIntelligenceMaintainerDecisionGoal.source_recommendation_draft?.items).toBe(11);
+    expect(projectIntelligenceMaintainerDecisionGoal.source_recommendation_draft?.final_maintainer_decisions_written).toBe(0);
+    expect(projectIntelligenceMaintainerDecisionGoal.next_goal_id).toBe(
+      'project-intelligence-adr-cascade-controlled-remediation-plan-v0.1'
+    );
+    expect(projectIntelligenceMaintainerDecisionGoal.maintainer_decision_summary?.markdown_output).toBe(
+      'artifacts/project-graph/adr-cascade-maintainer-decision-record.md'
+    );
+    expect(projectIntelligenceMaintainerDecisionGoal.maintainer_decision_summary?.json_output).toBe(
+      'artifacts/project-graph/adr-cascade-maintainer-decision-record.json'
+    );
+    expect(projectIntelligenceMaintainerDecisionGoal.maintainer_decision_summary?.items).toBe(11);
+    expect(projectIntelligenceMaintainerDecisionGoal.maintainer_decision_summary?.repair_decisions_recorded).toBe(11);
+    expect(projectIntelligenceMaintainerDecisionGoal.maintainer_decision_summary?.final_maintainer_decisions_written).toBe(11);
+    expect(projectIntelligenceMaintainerDecisionGoal.maintainer_decision_summary?.repair_execution_authorized).toBe(false);
+    expect(projectIntelligenceControlledRemediationGoal.schema).toBe('project-autopilot/goal@1');
+    expect(projectIntelligenceControlledRemediationGoal.status).toBe('completed');
+    expect(projectIntelligenceControlledRemediationGoal.objective).toContain('controlled remediation plan');
+    expect(projectIntelligenceControlledRemediationGoal.blocked_actions).toContain('automatic_adr_repair');
+    expect(projectIntelligenceControlledRemediationGoal.blocked_actions).toContain('repair_execution');
+    expect(projectIntelligenceControlledRemediationGoal.source_maintainer_decision_record?.path).toBe(
+      'artifacts/project-graph/adr-cascade-maintainer-decision-record.json'
+    );
+    expect(projectIntelligenceControlledRemediationGoal.source_maintainer_decision_record?.items).toBe(11);
+    expect(projectIntelligenceControlledRemediationGoal.source_maintainer_decision_record?.repair_decisions_recorded).toBe(11);
+    expect(projectIntelligenceControlledRemediationGoal.source_maintainer_decision_record?.repair_execution_authorized).toBe(false);
+    expect(projectIntelligenceControlledRemediationGoal.controlled_remediation_plan_summary?.markdown_output).toBe(
+      'artifacts/project-graph/adr-cascade-controlled-remediation-plan.md'
+    );
+    expect(projectIntelligenceControlledRemediationGoal.controlled_remediation_plan_summary?.json_output).toBe(
+      'artifacts/project-graph/adr-cascade-controlled-remediation-plan.json'
+    );
+    expect(projectIntelligenceControlledRemediationGoal.controlled_remediation_plan_summary?.items).toBe(11);
+    expect(projectIntelligenceControlledRemediationGoal.controlled_remediation_plan_summary?.repair_decisions_included).toBe(11);
+    expect(projectIntelligenceControlledRemediationGoal.controlled_remediation_plan_summary?.automatic_edits_planned).toBe(false);
+    expect(projectIntelligenceControlledRemediationGoal.controlled_remediation_plan_summary?.repair_execution_authorized).toBe(false);
+    expect(projectIntelligenceControlledRemediationGoal.next_goal_id).toBe(
+      'project-intelligence-adr-cascade-controlled-remediation-execution-v0.1'
+    );
+    expect(projectIntelligenceControlledRemediationExecutionGoal.schema).toBe('project-autopilot/goal@1');
+    expect(projectIntelligenceControlledRemediationExecutionGoal.status).toBe('completed');
+    expect(projectIntelligenceControlledRemediationExecutionGoal.objective).toContain('Execute the controlled remediation plan');
+    expect(projectIntelligenceControlledRemediationExecutionGoal.blocked_actions).toContain('hosted_dashboard');
+    expect(projectIntelligenceControlledRemediationExecutionGoal.blocked_actions).toContain('target_repo_write');
+    expect(projectIntelligenceControlledRemediationExecutionGoal.source_controlled_remediation_plan?.path).toBe(
+      'artifacts/project-graph/adr-cascade-controlled-remediation-plan.json'
+    );
+    expect(projectIntelligenceControlledRemediationExecutionGoal.source_controlled_remediation_plan?.items).toBe(11);
+    expect(projectIntelligenceControlledRemediationExecutionGoal.source_controlled_remediation_plan?.repair_execution_authorized).toBe(true);
+    expect(projectIntelligenceControlledRemediationExecutionGoal.controlled_remediation_execution_summary?.adr_items_repaired).toBe(11);
+    expect(projectIntelligenceControlledRemediationExecutionGoal.controlled_remediation_execution_summary?.cascade_evidence_sections_added).toBe(11);
+    expect(projectIntelligenceControlledRemediationExecutionGoal.controlled_remediation_execution_summary?.repair_execution_authorized_by_owner).toBe(true);
+    expect(projectIntelligenceControlledRemediationExecutionGoal.controlled_remediation_execution_summary?.hosted_dashboard_implemented).toBe(false);
+    expect(projectIntelligenceControlledRemediationExecutionGoal.controlled_remediation_execution_summary?.target_repo_writes).toBe(false);
+    expect(projectIntelligenceControlledRemediationExecutionGoal.next_goal_id).toBe(
+      'project-intelligence-adr-cascade-remediation-closure-v0.1'
+    );
+    expect(projectIntelligenceClosureGoal.schema).toBe('project-autopilot/goal@1');
+    expect(projectIntelligenceClosureGoal.status).toBe('ready_to_execute');
+    expect(projectIntelligenceClosureGoal.objective).toContain('freshness');
+    expect(projectIntelligenceClosureGoal.blocked_actions).toContain('hosted_dashboard');
+    expect(projectIntelligenceClosureGoal.blocked_actions).toContain('target_repo_write');
+    expect(index.active_goal_id).toBe('repoassure-design-system-v2-adoption-v0.1');
+    expect(index.deferred_goal_ids).toEqual([]);
+    expect(index.released_goal_ids).toContain('public-website-claude-design-integration-and-qa-v0.1');
+    expect(index.superseded_goal_ids).toContain(
+      'public-website-owner-visual-acceptance-p3-follow-up-triage-v0.1'
+    );
+    expect(progress.schema).toBe('project-autopilot/progress-snapshot@1');
+    expect(progress.current_stage).toBe(
+      'RepoAssure Design System v2 unfreeze recorded; design system adoption ready'
+    );
+    expect(progress.active_goal.id).toBe(index.active_goal_id);
+    expect(progress.next_goal?.id).toBe(index.active_goal_id);
+    expect(progress.active_goal.status).toBe('ready_to_execute');
+    expect(progress.next_goal?.status).toBe('ready_to_execute');
+    expect(progress.deferred_goals).toEqual([]);
+    expect(progress.released_goals?.[0]?.reason).toContain('owner_finalizes_claude_design');
+    expect(progress.requeued_goals?.[0]?.id).toBe(
+      'project-intelligence-adr-cascade-remediation-closure-v0.1'
+    );
+    expect(progress.blocked_actions).not.toContain('website_visual_redesign');
+    expect(progress.workflow_map.mermaid).toContain('flowchart TD');
+    expect(progress.workflow_map.mermaid).toContain('Local Static Viewer');
+    expect(progress.workflow_map.mermaid).toContain('Freshness Checks');
+    expect(progress.workflow_map.mermaid).toContain('ADR Cascade Backlog');
+    expect(progress.workflow_map.mermaid).toContain('Decision Intake');
+    expect(progress.workflow_map.mermaid).toContain('Recommendation Draft');
+    expect(progress.workflow_map.mermaid).toContain('Maintainer Decisions');
+    expect(progress.workflow_map.mermaid).toContain('Controlled Remediation Plan');
+    expect(progress.workflow_map.mermaid).toContain('Controlled Remediation Execution');
+    expect(progress.workflow_map.mermaid).toContain('Remediation Closure');
+    expect(progress.blocked_actions).toContain('hosted_dashboard');
+    expect(progress.blocked_actions).toContain('repository_visibility_change');
+    expect(progressMarkdown).toContain('RepoAssure Progress Snapshot');
+    expect(progressMarkdown).toContain(
+      'RepoAssure Design System v2 unfreeze recorded; design system adoption ready'
+    );
+    expect(progressMarkdown).toContain('RepoAssure Design System v2 Adoption v0.1');
+    expect(progressMarkdown).toContain('RepoAssure Evidence Integrity Hashing v0.1');
+    expect(progressMarkdown).toContain('Project Intelligence Console Redesign v0.1');
+    expect(progressMarkdown).toContain('Project Intelligence Console Graph Snapshot Generator v0.1');
+    expect(progressMarkdown).toContain('Project Intelligence Console Local Static Viewer v0.1');
+    expect(progressMarkdown).toContain('Project Intelligence Console Graph Freshness and Staleness Checks v0.1');
+    expect(progressMarkdown).toContain('Project Intelligence ADR Cascade Remediation Backlog v0.1');
+    expect(progressMarkdown).toContain('Project Intelligence ADR Cascade Remediation Decision Intake v0.1');
+    expect(progressMarkdown).toContain('Project Intelligence ADR Cascade Remediation Recommendation Draft v0.1');
+    expect(progressMarkdown).toContain('Project Intelligence ADR Cascade Maintainer Decision Recording v0.1');
+    expect(progressMarkdown).toContain('Project Intelligence ADR Cascade Controlled Remediation Plan v0.1');
+    expect(progressMarkdown).toContain('Project Intelligence ADR Cascade Controlled Remediation Execution v0.1');
+    expect(progressMarkdown).toContain('Project Intelligence ADR Cascade Remediation Closure v0.1');
+    expect(gitignore).toContain('.autopilot/runs/');
+    expect(gitignore).toContain('.autopilot/cache/');
+    expect(gitignore).toContain('.autopilot/secrets/');
+    expect(gitignore).toContain('artifacts/project-graph/');
+    expect(readme).toContain('Brownfield Autopilot Initialization v0.1');
+    expect(readme).toContain('pnpm project:intelligence');
+    expect(readme).toContain('pnpm project:intelligence:view');
+    expect(readme).toContain('pnpm project:intelligence:backlog');
+    expect(readme).toContain('pnpm project:intelligence:decision-intake');
+    expect(readme).toContain('pnpm project:intelligence:recommendation-draft');
+    expect(readme).toContain('pnpm project:intelligence:maintainer-decision');
+    expect(readme).toContain('pnpm project:intelligence:controlled-remediation-plan');
+    expect(acceptanceChecklist).toContain('Brownfield Autopilot Initialization v0.1');
+    expect(acceptanceChecklist).toContain('Project Intelligence Console Local Static Viewer v0.1');
+    expect(acceptanceChecklist).toContain('Project Intelligence Console Graph Freshness and Staleness Checks v0.1');
+    expect(acceptanceChecklist).toContain('Project Intelligence ADR Cascade Remediation Backlog v0.1');
+    expect(acceptanceChecklist).toContain('Project Intelligence ADR Cascade Remediation Decision Intake v0.1');
+    expect(acceptanceChecklist).toContain('Project Intelligence ADR Cascade Remediation Recommendation Draft v0.1');
+    expect(acceptanceChecklist).toContain('Project Intelligence ADR Cascade Maintainer Decision Recording v0.1');
+    expect(acceptanceChecklist).toContain('Project Intelligence ADR Cascade Controlled Remediation Plan v0.1');
+    expect(acceptanceChecklist).toContain('Project Intelligence ADR Cascade Controlled Remediation Execution v0.1');
+    expect(testingStrategy).toContain('Brownfield Autopilot Initialization v0.1');
+    expect(testingStrategy).toContain('Public Website Design Work Deferred v0.1');
+    expect(testingStrategy).toContain('Product Core Execution Resume v0.1');
+    expect(testingStrategy).toContain('AI IDE Repair Decision Package Contract Hardening v0.1');
+    expect(testingStrategy).toContain('AI IDE Repair Decision Package Real Campaign Validation v0.1');
+    expect(testingStrategy).toContain('AI IDE Repair Execution Dry-Run Real Campaign Validation v0.1');
+    expect(testingStrategy).toContain('AI IDE Repair Patch Plan Real Campaign Validation v0.1');
+    expect(testingStrategy).toContain('AI IDE Repair Validation-Only Real Campaign Validation v0.1');
+    expect(testingStrategy).toContain('AI IDE Repair End-to-End Evidence Package Validation v0.1');
+    expect(testingStrategy).toContain('Project Intelligence Console Graph Snapshot Generator v0.1');
+    expect(testingStrategy).toContain('Project Intelligence Console Local Static Viewer v0.1');
+    expect(testingStrategy).toContain('project-intelligence-viewer.test.ts');
+    expect(testingStrategy).toContain('Project Intelligence Console Graph Freshness and Staleness Checks v0.1');
+    expect(testingStrategy).toContain('Project Intelligence ADR Cascade Remediation Backlog v0.1');
+    expect(testingStrategy).toContain('project-intelligence-backlog.test.ts');
+    expect(testingStrategy).toContain('Project Intelligence ADR Cascade Remediation Decision Intake v0.1');
+    expect(testingStrategy).toContain('project-intelligence-decision-intake.test.ts');
+    expect(testingStrategy).toContain('Project Intelligence ADR Cascade Remediation Recommendation Draft v0.1');
+    expect(testingStrategy).toContain('project-intelligence-recommendation-draft.test.ts');
+    expect(testingStrategy).toContain('Project Intelligence ADR Cascade Maintainer Decision Recording v0.1');
+    expect(testingStrategy).toContain('project-intelligence-maintainer-decision.test.ts');
+    expect(testingStrategy).toContain('Project Intelligence ADR Cascade Controlled Remediation Plan v0.1');
+    expect(testingStrategy).toContain('project-intelligence-controlled-remediation-plan.test.ts');
+    expect(testingStrategy).toContain('progress_state_mismatch');
+    expect(testingStrategy).toContain('repairActionQueue');
+    expect(testingStrategy).toContain('patchPreview');
+    expect(testingStrategy).toContain('patchPlanInputs');
+    expect(testingStrategy).toContain('noWriteProof');
+    expect(testingStrategy).toContain('passed / failed / skipped');
+    expect(testingStrategy).toContain('taskMatrix');
+    expect(testingStrategy).toContain('docs graph');
+    expect(testingStrategy).toContain('progress graph');
+    expect(decisionLog).toContain('Brownfield Autopilot Initialization v0.1');
+    expect(decisionLog).toContain('Public Website design work deferred');
+    expect(decisionLog).toContain('Product core queue resumed');
+    expect(decisionLog).toContain('Project Intelligence graph snapshot generator completed');
+    expect(decisionLog).toContain('Project Intelligence local static viewer completed');
+    expect(decisionLog).toContain('Project Intelligence graph freshness checks completed');
+    expect(decisionLog).toContain('Project Intelligence ADR cascade backlog completed');
+    expect(decisionLog).toContain('Project Intelligence ADR cascade decision intake completed');
+    expect(decisionLog).toContain('Project Intelligence ADR cascade recommendation draft completed');
+    expect(decisionLog).toContain('Project Intelligence ADR cascade maintainer decisions recorded');
+    expect(decisionLog).toContain('Project Intelligence ADR cascade controlled remediation plan completed');
+    expect(devLog).toContain('Brownfield Autopilot Initialization v0.1');
+    expect(devLog).toContain('Public Website Design Work Deferred v0.1');
+    expect(devLog).toContain('Product Core Execution Resume v0.1');
+    expect(devLog).toContain('AI IDE Repair Decision Package Contract Hardening v0.1');
+    expect(devLog).toContain('AI IDE Repair Decision Package Real Campaign Validation v0.1');
+    expect(devLog).toContain('AI IDE Repair Execution Dry-Run Real Campaign Validation v0.1');
+    expect(devLog).toContain('AI IDE Repair Patch Plan Real Campaign Validation v0.1');
+    expect(devLog).toContain('AI IDE Repair Validation-Only Real Campaign Validation v0.1');
+    expect(devLog).toContain('AI IDE Repair End-to-End Evidence Package Validation v0.1');
+    expect(devLog).toContain('Project Intelligence Console Graph Snapshot Generator v0.1');
+    expect(devLog).toContain('Project Intelligence Console Local Static Viewer v0.1');
+    expect(devLog).toContain('Project Intelligence Console Graph Freshness and Staleness Checks v0.1');
+    expect(devLog).toContain('Project Intelligence ADR Cascade Remediation Backlog v0.1');
+    expect(devLog).toContain('Project Intelligence ADR Cascade Remediation Decision Intake v0.1');
+    expect(devLog).toContain('Project Intelligence ADR Cascade Remediation Recommendation Draft v0.1');
+    expect(devLog).toContain('Project Intelligence ADR Cascade Maintainer Decision Recording v0.1');
+    expect(devLog).toContain('Project Intelligence ADR Cascade Controlled Remediation Plan v0.1');
+
+    await expectPath('.autopilot/goals');
+    await expectPath('.autopilot/ledger');
+    await expectPath('.autopilot/snapshots');
+    await expectPath('docs/operations/ai-ide-repair-execution-dry-run-real-campaign-validation-v0.1.md');
+    await expectPath('docs/operations/ai-ide-repair-patch-plan-real-campaign-validation-v0.1.md');
+    await expectPath('docs/operations/ai-ide-repair-validation-only-real-campaign-validation-v0.1.md');
+    await expectPath('docs/operations/ai-ide-repair-end-to-end-evidence-package-validation-v0.1.md');
+    await expectPath('docs/operations/project-intelligence-console-graph-snapshot-generator-v0.1.md');
+    await expectPath('docs/operations/project-intelligence-console-local-static-viewer-v0.1.md');
+    await expectPath('docs/operations/project-intelligence-console-graph-freshness-and-staleness-checks-v0.1.md');
+    await expectPath('docs/operations/project-intelligence-adr-cascade-remediation-backlog-v0.1.md');
+    await expectPath('docs/operations/project-intelligence-adr-cascade-remediation-decision-intake-v0.1.md');
+    await expectPath('docs/operations/project-intelligence-adr-cascade-remediation-recommendation-draft-v0.1.md');
+    await expectPath('docs/operations/project-intelligence-adr-cascade-maintainer-decision-recording-v0.1.md');
+    await expectPath('docs/operations/project-intelligence-adr-cascade-controlled-remediation-plan-v0.1.md');
   });
 });
 

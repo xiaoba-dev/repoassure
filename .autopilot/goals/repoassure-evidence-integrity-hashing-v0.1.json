@@ -1,0 +1,40 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-evidence-integrity-hashing-v0.1",
+  "title": "RepoAssure Evidence Integrity Hashing v0.1",
+  "status": "queued",
+  "created_at": "2026-07-18T00:00:00.000Z",
+  "objective": "Implement content hashing for emitted artifacts and a verification command that recomputes and compares them, then correct every surface that currently describes artifacts as signed. Replace composed website demonstration figures with recorded benchmark output.",
+  "deferred_until": null,
+  "next_goal_id": "public-website-claude-design-integration-and-qa-v0.1",
+  "document_basis": [
+    "docs/adr/0022-repoassure-design-system-v2-and-information-architecture.md",
+    "docs/operations/repoassure-design-system-v2-unfreeze-v0.1.md",
+    "docs/SPEC.md",
+    "docs/PRD.md"
+  ],
+  "acceptance": [
+    "Emitted run manifests record a content hash for every artifact file they index.",
+    "A verification command recomputes artifact hashes and reports match or mismatch per file.",
+    "Verification detects a modified artifact and reports it as a mismatch.",
+    "No surface describes artifacts as signed or cryptographically signed. Terminology is content-hashed and independently verifiable.",
+    "docs/PRD.md no longer claims signed evidence.",
+    "Website demonstration figures are sourced from recorded benchmark output and are internally consistent.",
+    "Forbidden-claim patterns are extended to cover unimplemented integrity claims.",
+    "Unit tests, typecheck, lint, and build pass."
+  ],
+  "blocked_actions": [
+    "deployment",
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "target_repo_write",
+    "pricing_change",
+    "customer_contact"
+  ]
+}

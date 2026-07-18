@@ -1,0 +1,49 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "public-website-claude-design-integration-and-qa-v0.1",
+  "title": "Public Website Claude Design Integration & QA v0.1",
+  "status": "queued",
+  "created_at": "2026-07-18T00:00:00.000Z",
+  "objective": "Rebuild the public website against RepoAssure Design System v2 and restructure its information architecture around the four questions recorded in ADR-0013, separating delivery sequence from delivery roles. Re-baseline the website guardrail suite so it asserts rendered structure and preserved guarantees rather than superseded source text.",
+  "deferred_until": null,
+  "next_goal_id": "project-intelligence-console-redesign-v0.1",
+  "released_from_deferral": "owner_finalizes_claude_design",
+  "document_basis": [
+    "docs/adr/0022-repoassure-design-system-v2-and-information-architecture.md",
+    "docs/adr/0013-codex-security-and-security-assurance-lane.md",
+    "docs/adr/0018-public-website-localization-strategy.md",
+    "docs/operations/repoassure-design-system-v2-unfreeze-v0.1.md",
+    "docs/design/website-uiux-roadmap-v0.2.md",
+    "docs/product/specs/public-website-spec-v0.1.md"
+  ],
+  "acceptance": [
+    "The website states the ADR-0013 four-question positioning: ready to ship, evidence, blockers, and what to fix first.",
+    "Delivery sequence content and delivery role content occupy separate sections.",
+    "Light is the default theme. Dark is opt-in. Evidence blocks use the console surface.",
+    "Brand assets, theme-color, and the web manifest are consistent with the adopted theme.",
+    "Trust boundary claims are independently auditable and match implementation.",
+    "All user-visible copy remains in apps/website/src/i18n.ts so the forbidden-claim guard keeps covering it.",
+    "English and Simplified Chinese parity is preserved. No locale is added.",
+    "Guardrail tests preserve claim, bilingual, focus-visible, and mobile overflow guarantees.",
+    "Guardrail assertions that pinned superseded class names, token values, and file layout are rewritten against rendered structure.",
+    "Website build, typecheck, unit tests, lint, and browser verification pass or record explicit environmental blockers.",
+    "docs/design/design-system-v0.1.md and docs/design/website-uiux-roadmap-v0.2.md are reissued against the adopted design system."
+  ],
+  "blocked_actions": [
+    "deployment",
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "public_custom_domain_decision",
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "locale_expansion",
+    "product_artifact_localization",
+    "target_repo_write",
+    "pricing_change",
+    "customer_contact"
+  ]
+}

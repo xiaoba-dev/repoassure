@@ -2,6 +2,18 @@
 
 ## 当前已通过
 
+- [x] Brownfield Autopilot Initialization v0.1
+  - 当前状态：`docs/PRD.md`、`docs/SPEC.md`、`docs/DESIGN.md` 和 `docs/PLAN.md` 已作为薄 canonical entrypoints 落地；`docs/operations/brownfield-autopilot-intake-v0.1.md` 记录 brownfield intake、shape matrix 和 non-authorization boundary；`.autopilot/progress/` 与 `.autopilot/goals/` 记录 sanitized progress / goal state；`.autopilot/runs/`、`.autopilot/cache/`、`.autopilot/secrets/` 已加入 `.gitignore`。下一执行目标为 Public Website P3 Pixel QA & Mobile Responsive Polish v0.1；初始化不授权 public release、deployment、repository visibility change、npm publication、GitHub release、public launch、customer contact、pricing 或 spend changes。
+- [x] Public Website Design Work Deferred v0.1
+  - 当前状态：owner 已确认在 Claude Design 新方案定稿前暂缓官网设计系统、视觉重构、owner visual triage 和 Claude Design integration；`.autopilot/goals/index.json` 已将下一个自动目标切换为 `RepoAssure Product Core Execution Resume v0.1`。该 gate 不授权 deployment、public launch、repository visibility change、npm publication、GitHub release、customer contact、pricing、spend changes 或 website visual redesign。
+- [x] Product Core Execution Resume v0.1
+  - 当前状态：`.autopilot/goals/index.json` 已将 active goal 从元恢复目标推进到 `AI IDE Repair Decision Package Contract Hardening v0.1`；`RepoAssure Product Core Execution Resume v0.1` 记录为 `completed_selected_next_goal`。该 gate 不执行 AI IDE repair decision package 实现、不修改目标 repo、不授权 deployment、public launch、repository visibility change、npm publication、GitHub release、customer contact、pricing、spend changes 或 website visual redesign。
+- [x] AI IDE Repair Decision Package Contract Hardening v0.1
+  - 当前状态：repair decision package 已包含 deterministic read order、`repairActionQueue`、`maintainerReview`、`verificationChecklist`、`redaction`、environment blocker tasks 和 passed-run empty queue guidance；focused repair handoff / execute / patch plan tests 与 `pnpm typecheck` 已通过。该 gate 不修改目标 repo、不创建 PR、不授权 deployment、public launch、repository visibility change、npm publication、GitHub release、customer contact、pricing、spend changes 或 website visual redesign。
+- [x] AI IDE Repair Decision Package Real Campaign Validation v0.1
+  - 当前状态：新增 `fixtures/campaigns/ai-ide-repair-decision-package/manifest.json` 作为近真实 campaign fixture；`repair-handoff.test.ts` 已验证 JSON/Markdown/verification plan 可读性、repairActionQueue、maintainerReview、verificationChecklist、redaction、environment blocker 和 no automatic target repo write。该 gate 不执行 repair、不中改目标 repo、不创建 PR、不授权 deployment、public launch、repository visibility change、npm publication、GitHub release、customer contact、pricing、spend changes 或 website visual redesign。
+- [x] AI IDE Repair Execution Dry-Run Real Campaign Validation v0.1
+  - 当前状态：沿用近真实 campaign fixture；`repair-execute.test.ts` 已验证 `repair:execute --dry-run` 可消费 selected queued tasks，生成包含 `executionPlan`、`patchPreview`、`maintainerReview`、`verificationChecklist`、`noWriteProof` 的 redaction-safe JSON/Markdown execution report，并证明 no automatic target repo write。该 gate 不应用补丁、不修改目标 repo、不创建 PR、不授权 deployment、public launch、repository visibility change、npm publication、GitHub release、customer contact、pricing、spend changes 或 website visual redesign。
 - [x] 可以安装依赖
 - [x] 目标完成度审计已覆盖安装步骤和环境前置条件：README 与用户验收指南均说明 Node.js 22+、pnpm、Playwright Chromium、`pnpm install` 和 `pnpm build`
 - [x] 可以运行 typecheck：`pnpm typecheck`
@@ -88,6 +100,8 @@
   - 当前状态：新增 `docs/operations/public-release-manual-decision-input-v0.1.md`，记录 maintainer 可填写决策表单；当前状态为 `pending_input`，所有人工 gate 均为空白待填写，public release remains no-go。
 - [x] Public Release Manual Decision Input Completion v0.1
   - 当前状态：新增 `docs/operations/public-release-manual-decision-input-completion-v0.1.md`，记录 completion attempt；当前状态为 `not_completed_missing_explicit_decisions`。本轮 goal execution authorization 不等于 manual release decision，未提供任何 approve / reject / defer / accept risk decision、evidence、decision date、notes 或 scope；legal、trademark/name、branch protection or equivalent repository ruleset、final maintainer publication authorization、private preview reviewer feedback decision、dependency/license risk confirmation 和 secret/customer data exposure confirmation 均未完成，public release remains no-go。
+- [x] Public Release Manual Decision Intake v0.2
+  - 当前状态：新增 `docs/operations/public-release-manual-decision-intake-v0.2.md`，记录 maintainer 明确给出的 7 项 manual gate 决策；状态为 `decisions_recorded_release_execution_blocked`。Legal review 为 approve；trademark/name review 为 accept risk；branch protection or equivalent repository ruleset 按 conditional approve fallback defer 解释，因 GitHub private repo branch protection / rulesets 仍返回 `HTTP 403`，最终为 defer；final maintainer publication authorization 为 approve，但 release execution 被 deferred branch protection gate 阻塞；private preview reviewer feedback decision 为 accept risk；dependency/license risk confirmation 为 accept risk；secret/customer data exposure confirmation 基于 `pnpm repo:hygiene`、`pnpm release:check` 和 scoped sensitive account scan 为 approve。Public release remains no-go。
 - [x] Public Release Manual Decision Input Review v0.1
   - 当前状态：新增 `docs/operations/public-release-manual-decision-input-review-v0.1.md`，记录对 maintainer 决策表单的 review；当前状态为 `not_ready_pending_input`，所有人工 gate 仍缺少 decision/evidence/date/notes/scope 输入，public release remains no-go。
 - [x] Team Cloud & Enterprise Spec v0.1
@@ -150,3 +164,40 @@
   - 当前状态：新增 `docs/operations/private-preview-external-reviewer-feedback-intake-v0.1.md`，建立 `external-reviewer-1` 和 `external-reviewer-2` 的 slot-level intake ledger、敏感信息脱敏门禁和 allowed feedback record shape。当前 `Feedback received: no`，状态保持 `waiting_for_reviewer_feedback`；该项不启动 feedback triage、不创建 external issue、不编造 reviewer feedback、不记录真实 reviewer email、OTP、cookie、Access token、login query-state、raw Access redirect URL、reviewer credentials 或无关个人数据。
 - [x] Cloudflare Pages + Access Private Preview Execution Blocked
   - 当前状态：用户已授权 Cloudflare remote private preview execution；已创建空 `repoassure-preview` Pages project，域名为 `repoassure-preview.pages.dev`。Access API 返回 `Authentication error`，因此在配置 Cloudflare Access 前停止执行；`wrangler pages deployment list --project-name repoassure-preview` 确认为空，没有上传 website source/build output，没有 accepted preview URL。
+- [x] Public Website P3 Pixel QA & Mobile Responsive Polish v0.1
+  - 当前状态：`tests/unit/public-website.test.ts` 已增加 P3 responsive guard；`pnpm vitest run tests/unit/public-website.test.ts`、`pnpm build:website`、`pnpm typecheck:website` 均通过。In-app Browser DOM metrics at `390x1200` showed `horizontalOverflow: 0`，Assurance Graph mobile fallback height reduced from 622px to 320px。Playwright/System Chrome screenshot capture 受当前环境限制失败，owner visual review remains next gate。
+
+## 下一步人工验收
+
+- [x] AI IDE Repair Patch Plan Real Campaign Validation v0.1
+  - 当前状态：`repair:patch-plan` 已能消费近真实 dry-run execution report，生成 `patchPlanInputs`、`maintainerReview`、`verificationChecklist` 和 `noWriteProof`；测试证明不会应用补丁、不会修改目标 repo source file，并会脱敏 secret-like fixture values。
+- [x] AI IDE Repair Validation-Only Real Campaign Validation v0.1
+  - 当前状态：`repair:execute --validation-only` 已能消费近真实 repair handoff package，安全运行可执行验证命令，生成 passed / failed / skipped evidence；含 `<repo>` 占位符的人工/环境验证命令会被记录为 skipped，不会被错误执行；测试证明不会应用补丁、不会修改目标 repo source file，并会脱敏 secret-like output。
+- [x] AI IDE Repair End-to-End Evidence Package Validation v0.1
+  - 当前状态：新增 `pnpm repair:evidence-package` 和 `ai-ide-repair-evidence-package.json` / `.md`，已用近真实 campaign fixture 验证 repair handoff、dry-run execution report、validation-only execution report、patch plan 和 no-write proof 可被串成统一 evidence package；输出包含 `artifactIndex`、`repairFlow`、`taskMatrix`、`maintainerReview`、`verificationChecklist` 和 `noWriteProof`，并证明不应用补丁、不修改目标 repo source file、脱敏 secret-like output。
+- [x] Project Intelligence Console Graph Snapshot Generator v0.1
+  - 当前状态：新增 `pnpm project:intelligence` 和 `packages/acceptance/src/run-project-intelligence-snapshot.ts`，生成 local-only `project-intelligence-snapshot.json` / `.md`。真实工作区快照包含 docsGraph、codeGraph、progressGraph、sourceCoverage 和 redaction metadata，输出到 ignored `artifacts/project-graph/`；未实现 hosted dashboard、internal UI、telemetry、upload、deployment、公开发布或官网视觉重构。
+- [x] Project Intelligence Console Local Static Viewer v0.1
+  - 当前状态：新增 `pnpm project:intelligence:view` 和 `packages/acceptance/src/run-project-intelligence-viewer.ts`，读取 local-only snapshot 并生成 ignored `artifacts/project-graph/project-intelligence-viewer.html`。未实现 hosted dashboard、cloud sync、telemetry、upload、deployment、公开发布、目标 repo 自动修改或官网视觉重构。
+- [x] Project Intelligence Console Graph Freshness and Staleness Checks v0.1
+  - 当前状态：已完成。Snapshot 和 viewer 已显示 local-only findings；fixture 覆盖 missing_cascade、orphan_code、missing_test_link、progress_state_mismatch；真实工作区当前发现 11 个 medium ADR missing_cascade。
+- [x] Project Intelligence ADR Cascade Remediation Backlog v0.1
+  - 当前状态：已完成。新增 `pnpm project:intelligence:backlog`，生成 ignored `artifacts/project-graph/adr-cascade-remediation-backlog.md`，包含 11 个 maintainer-reviewable ADR cascade items；未自动修改 ADR/spec/docs/tests/logs/source。
+- [x] Project Intelligence ADR Cascade Remediation Decision Intake v0.1
+  - 当前状态：已完成。新增 `pnpm project:intelligence:decision-intake`，生成 ignored `artifacts/project-graph/adr-cascade-remediation-decision-intake.md` 和 `.json`，包含 11 个 pending decision slots；未自动修复 ADR、未改写文档、未执行 repair。
+- [x] Project Intelligence ADR Cascade Remediation Recommendation Draft v0.1
+  - 当前状态：已完成。新增 `pnpm project:intelligence:recommendation-draft`，生成 ignored `artifacts/project-graph/adr-cascade-remediation-recommendation-draft.md` 和 `.json`，包含 11 个 advisory recommended repair items；未写最终 maintainer decision、未自动修复 ADR、未改写文档、未执行 repair。
+- [x] Project Intelligence ADR Cascade Maintainer Decision Recording v0.1
+  - 当前状态：基于 owner 授权记录 11 个 maintainer decision=repair，生成 `adr-cascade-maintainer-decision-record.md` / `.json`；该记录不自动改 ADR/spec/docs、不执行 repair。
+
+- [x] Project Intelligence ADR Cascade Controlled Remediation Plan v0.1
+  - 验收证据：`pnpm project:intelligence:controlled-remediation-plan` 生成 `adr-cascade-controlled-remediation-plan.md` 和 `.json`，包含 11 个 plan items、file-level scope、execution order、rollback notes、verification checklist，并保持 repair execution unauthorized。
+- [x] Project Intelligence ADR Cascade Controlled Remediation Execution v0.1
+  - 当前状态：已完成。基于用户明确授权和 controlled remediation plan，已为 11 个 ADR 添加 `Cascade Evidence`，并级联写入 PRD、SPEC、PLAN、testing strategy、acceptance checklist、decision log、dev log、Project Intelligence spec/architecture 和 `.autopilot` 状态。该项只执行文档治理修复，不授权 hosted dashboard、cloud sync、telemetry、deployment、public launch、repository visibility change、npm publication、GitHub release、customer contact、pricing/spend change、target repo writes 或 website visual redesign。
+- [x] RepoAssure Design System v2 Unfreeze v0.1
+  - 当前状态：已完成。owner 提供定稿的 RepoAssure Design System v2，`owner_finalizes_claude_design` 条件满足，设计队列由 `deferred_design_pending` 释放为 `design_queue_released`。新增 ADR-0022（ADR-0019 标记 Superseded）、unfreeze operation record 和四个 goal（design system adoption / evidence integrity hashing / website design integration / console redesign），治理状态测试同步重设基线。验证：`npx vitest run tests/unit` 45 files / 613 tests passed、`npx eslint .` clean、`npx tsc -p tsconfig.build.json --noEmit` exit 0。本项只做治理记录与排期，未改动任何界面代码；不授权 deployment、public launch、production marketing announcement、repository visibility change、npm publication、GitHub release、public custom domain decision、hosted dashboard、cloud sync、telemetry、locale expansion、product artifact localization、target repo writes、pricing/spend change 或 customer contact。
+  - 未决边界：线上 `repoassure.com` 与 ADR-0020 / ADR-0021 的公开自定义域名禁令冲突，需单独 owner 决策，本项不追认。
+- [ ] RepoAssure Design System v2 Adoption v0.1
+  - 当前状态：下一步。以 workspace 包形式落地 Design System v2、自托管品牌字体，使官网与 Project Intelligence Console 共用同一套 token，且不产生任何视觉变化。
+- [ ] Project Intelligence ADR Cascade Remediation Closure v0.1
+  - 当前状态：重新排队至 console 重构之后。需要重新运行 Project Intelligence freshness/backlog 检查，确认 11 个已修复 ADR cascade findings 是否清零，并记录 residual findings 或 rule-calibration 需求。

@@ -1,0 +1,38 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-design-system-v2-adoption-v0.1",
+  "title": "RepoAssure Design System v2 Adoption v0.1",
+  "status": "ready_to_execute",
+  "created_at": "2026-07-18T00:00:00.000Z",
+  "objective": "Vendor RepoAssure Design System v2 into the workspace as a shared package with self-hosted typefaces, so that both the public website and the Project Intelligence Console can consume one token system. This goal makes no visual change to either surface.",
+  "deferred_until": null,
+  "next_goal_id": "repoassure-evidence-integrity-hashing-v0.1",
+  "document_basis": [
+    "docs/adr/0022-repoassure-design-system-v2-and-information-architecture.md",
+    "docs/operations/repoassure-design-system-v2-unfreeze-v0.1.md",
+    "docs/DESIGN.md",
+    "docs/PLAN.md",
+    "docs/design/design-system-v0.1.md"
+  ],
+  "acceptance": [
+    "Design System v2 tokens, base stylesheet, brand assets, and the 37 React primitives are vendored as a workspace package.",
+    "Brand typefaces are self-hosted. No stylesheet, component, or generated artifact references an external font CDN.",
+    "The website builds, typechecks, and renders unchanged. This goal introduces no visual difference.",
+    "The design system package is consumable from both a React surface and a static HTML string generator.",
+    "Website build, typecheck, unit tests, and lint pass."
+  ],
+  "blocked_actions": [
+    "deployment",
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "target_repo_write",
+    "pricing_change",
+    "customer_contact"
+  ]
+}

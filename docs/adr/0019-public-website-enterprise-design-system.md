@@ -1,8 +1,11 @@
 # ADR-0019: Public Website Enterprise Design System
 
-- Status: Accepted
+- Status: Superseded
+- Superseded by: [ADR-0022](0022-repoassure-design-system-v2-and-information-architecture.md)
 - Date: 2026-06-25
 - Deciders: hardening-mcp maintainers
+
+> Superseded on 2026-07-18. ADR-0022 adopts RepoAssure Design System v2 as the design source of truth for both product surfaces. This record's requirement that "a separate implementation goal must redesign or refactor `apps/website` against the design system with tests, screenshots, and browser QA" is carried forward by ADR-0022 and its goal sequence.
 
 ## Context
 

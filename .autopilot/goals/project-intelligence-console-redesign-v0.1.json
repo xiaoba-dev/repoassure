@@ -1,0 +1,44 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-console-redesign-v0.1",
+  "title": "Project Intelligence Console Redesign v0.1",
+  "status": "queued",
+  "created_at": "2026-07-18T00:00:00.000Z",
+  "objective": "Reframe the Project Intelligence Console from exception reporting to state and confidence reporting, rebuild it against RepoAssure Design System v2, and connect the goal audit and release readiness evidence its specification already requires. Fix the ignore filter and staleness defects that make the current output misleading.",
+  "deferred_until": null,
+  "next_goal_id": "project-intelligence-adr-cascade-remediation-closure-v0.1",
+  "document_basis": [
+    "docs/adr/0022-repoassure-design-system-v2-and-information-architecture.md",
+    "docs/adr/0017-public-website-and-project-intelligence-console.md",
+    "docs/operations/repoassure-design-system-v2-unfreeze-v0.1.md",
+    "docs/product/specs/project-intelligence-console-spec-v0.1.md",
+    "docs/architecture/specs/project-intelligence-console-architecture-v0.1.md"
+  ],
+  "acceptance": [
+    "The console reports project state and confidence, and remains informative when the finding count is zero.",
+    "The ignore filter excludes nested vendor and build directories, not only root-anchored ones.",
+    "The code graph reports real source nodes. Vendored dependency files no longer dominate the rendered set.",
+    "Truncation is explicit. Any capped list states how many of how many are shown.",
+    "The rendered page expresses its own freshness relative to the snapshot it was generated from.",
+    "Goal audit results and release readiness status are rendered, as the console specification requires.",
+    "Node ownership and finding severity breakdown are rendered rather than discarded.",
+    "The next action a reader should take is stated.",
+    "The console remains a local-only self-contained static artifact. Generated output contains no http:// or https:// reference and loads no external resource.",
+    "data-local-only, the three graph names, freshness and staleness findings, and the no hosted dashboard boundary are preserved.",
+    "Unit tests, typecheck, lint, and build pass."
+  ],
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_launch",
+    "production_marketing_announcement",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "pricing_change",
+    "customer_contact"
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "schema": "project-autopilot/goal-index@1",
+  "active_goal_id": "repoassure-design-system-v2-adoption-v0.1",
+  "goals": [
+    {
+      "id": "public-website-p3-pixel-qa-mobile-responsive-polish-v0.1",
+      "path": ".autopilot/goals/public-website-p3-pixel-qa-mobile-responsive-polish-v0.1.json",
+      "status": "completed_deferred_to_owner_design_review"
+    },
+    {
+      "id": "repoassure-product-core-execution-resume-v0.1",
+      "path": ".autopilot/goals/repoassure-product-core-execution-resume-v0.1.json",
+      "status": "completed_selected_next_goal"
+    },
+    {
+      "id": "ai-ide-repair-decision-package-contract-hardening-v0.1",
+      "path": ".autopilot/goals/ai-ide-repair-decision-package-contract-hardening-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "ai-ide-repair-decision-package-real-campaign-validation-v0.1",
+      "path": ".autopilot/goals/ai-ide-repair-decision-package-real-campaign-validation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "ai-ide-repair-execution-dry-run-real-campaign-validation-v0.1",
+      "path": ".autopilot/goals/ai-ide-repair-execution-dry-run-real-campaign-validation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "ai-ide-repair-patch-plan-real-campaign-validation-v0.1",
+      "path": ".autopilot/goals/ai-ide-repair-patch-plan-real-campaign-validation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "ai-ide-repair-validation-only-real-campaign-validation-v0.1",
+      "path": ".autopilot/goals/ai-ide-repair-validation-only-real-campaign-validation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "ai-ide-repair-end-to-end-evidence-package-validation-v0.1",
+      "path": ".autopilot/goals/ai-ide-repair-end-to-end-evidence-package-validation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-console-graph-snapshot-generator-v0.1",
+      "path": ".autopilot/goals/project-intelligence-console-graph-snapshot-generator-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-console-local-static-viewer-v0.1",
+      "path": ".autopilot/goals/project-intelligence-console-local-static-viewer-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-console-graph-freshness-and-staleness-checks-v0.1",
+      "path": ".autopilot/goals/project-intelligence-console-graph-freshness-and-staleness-checks-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-adr-cascade-remediation-backlog-v0.1",
+      "path": ".autopilot/goals/project-intelligence-adr-cascade-remediation-backlog-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-adr-cascade-remediation-decision-intake-v0.1",
+      "path": ".autopilot/goals/project-intelligence-adr-cascade-remediation-decision-intake-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-adr-cascade-remediation-recommendation-draft-v0.1",
+      "path": ".autopilot/goals/project-intelligence-adr-cascade-remediation-recommendation-draft-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-adr-cascade-maintainer-decision-recording-v0.1",
+      "path": ".autopilot/goals/project-intelligence-adr-cascade-maintainer-decision-recording-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-adr-cascade-controlled-remediation-plan-v0.1",
+      "path": ".autopilot/goals/project-intelligence-adr-cascade-controlled-remediation-plan-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-adr-cascade-controlled-remediation-execution-v0.1",
+      "path": ".autopilot/goals/project-intelligence-adr-cascade-controlled-remediation-execution-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-adr-cascade-remediation-closure-v0.1",
+      "path": ".autopilot/goals/project-intelligence-adr-cascade-remediation-closure-v0.1.json",
+      "status": "ready_to_execute"
+    },
+    {
+      "id": "repoassure-design-system-v2-adoption-v0.1",
+      "path": ".autopilot/goals/repoassure-design-system-v2-adoption-v0.1.json",
+      "status": "ready_to_execute"
+    },
+    {
+      "id": "repoassure-evidence-integrity-hashing-v0.1",
+      "path": ".autopilot/goals/repoassure-evidence-integrity-hashing-v0.1.json",
+      "status": "queued"
+    },
+    {
+      "id": "public-website-claude-design-integration-and-qa-v0.1",
+      "path": ".autopilot/goals/public-website-claude-design-integration-and-qa-v0.1.json",
+      "status": "queued"
+    },
+    {
+      "id": "project-intelligence-console-redesign-v0.1",
+      "path": ".autopilot/goals/project-intelligence-console-redesign-v0.1.json",
+      "status": "queued"
+    }
+  ],
+  "deferred_goal_ids": [],
+  "released_goal_ids": [
+    "public-website-claude-design-integration-and-qa-v0.1"
+  ],
+  "superseded_goal_ids": [
+    "public-website-owner-visual-acceptance-p3-follow-up-triage-v0.1"
+  ],
+  "last_updated_at": "2026-07-18T21:30:00.000+08:00"
+}

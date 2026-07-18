@@ -1,0 +1,90 @@
+{
+  "schema": "project-autopilot/progress-snapshot@1",
+  "generated_at": "2026-07-18T21:30:00.000+08:00",
+  "current_stage": "RepoAssure Design System v2 unfreeze recorded; design system adoption ready",
+  "active_goal": {
+    "id": "repoassure-design-system-v2-adoption-v0.1",
+    "title": "RepoAssure Design System v2 Adoption v0.1",
+    "status": "ready_to_execute"
+  },
+  "next_goal": {
+    "id": "repoassure-design-system-v2-adoption-v0.1",
+    "title": "RepoAssure Design System v2 Adoption v0.1",
+    "status": "ready_to_execute"
+  },
+  "deferred_goals": [],
+  "released_goals": [
+    {
+      "id": "public-website-claude-design-integration-and-qa-v0.1",
+      "reason": "owner_finalizes_claude_design satisfied by RepoAssure Design System v2",
+      "released_at": "2026-07-18T21:30:00.000+08:00"
+    }
+  ],
+  "superseded_goals": [
+    {
+      "id": "public-website-owner-visual-acceptance-p3-follow-up-triage-v0.1",
+      "reason": "P3 follow-up triage items absorbed into the design system v2 redesign rather than executed against the superseded design"
+    }
+  ],
+  "requeued_goals": [
+    {
+      "id": "project-intelligence-adr-cascade-remediation-closure-v0.1",
+      "reason": "not started when the design queue was released; returns to the queue after the console redesign"
+    }
+  ],
+  "workflow_map": {
+    "schema": "project-autopilot/workflow-map@1",
+    "name": "Discovery-to-Design-to-Execution",
+    "mermaid": "flowchart TD\n  A[Brownfield Intake] --> B[Canonical Docs]\n  B --> C[Design Work Deferred]\n  C --> D[AI IDE Contract Hardened]\n  D --> E[Real Campaign Validation]\n  E --> F[Repair Execution Dry Run]\n  F --> G[Repair Patch Plan]\n  G --> H[Validation Only Evidence]\n  H --> I[End to End Evidence Package]\n  I --> J[Project Graph Snapshots]\n  J --> K[Local Static Viewer]\n  K --> L[Freshness Checks]\n  L --> M[ADR Cascade Backlog]\n  M --> N[Decision Intake]\n  N --> O[Recommendation Draft]\n  O --> P[Maintainer Decisions]\n  P --> Q[Controlled Remediation Plan]\n  Q --> R[Controlled Remediation Execution]\n  R --> T[Design Queue Released]\n  T --> U[Design System v2 Adoption]\n  U --> V[Evidence Integrity Hashing]\n  V --> W[Website Design Integration]\n  W --> X[Console Redesign]\n  X --> S[Remediation Closure]"
+  },
+  "shape_matrix": [
+    "command_line",
+    "mcp_server",
+    "web_app",
+    "sdk_package",
+    "composite_product_shape"
+  ],
+  "document_basis": [
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/DESIGN.md",
+    "docs/PLAN.md",
+    "docs/adr/0022-repoassure-design-system-v2-and-information-architecture.md",
+    "docs/operations/brownfield-autopilot-intake-v0.1.md",
+    "docs/operations/public-website-design-work-deferred-v0.1.md",
+    "docs/operations/repoassure-design-system-v2-unfreeze-v0.1.md",
+    "docs/operations/product-core-execution-resume-v0.1.md",
+    "docs/operations/ai-ide-repair-decision-package-contract-hardening-v0.1.md",
+    "docs/operations/ai-ide-repair-decision-package-real-campaign-validation-v0.1.md",
+    "docs/operations/ai-ide-repair-execution-dry-run-real-campaign-validation-v0.1.md",
+    "docs/operations/ai-ide-repair-patch-plan-real-campaign-validation-v0.1.md",
+    "docs/operations/ai-ide-repair-validation-only-real-campaign-validation-v0.1.md",
+    "docs/operations/ai-ide-repair-end-to-end-evidence-package-validation-v0.1.md",
+    "docs/operations/project-intelligence-console-graph-snapshot-generator-v0.1.md",
+    "docs/operations/project-intelligence-console-local-static-viewer-v0.1.md",
+    "docs/operations/project-intelligence-console-graph-freshness-and-staleness-checks-v0.1.md",
+    "docs/operations/project-intelligence-adr-cascade-remediation-backlog-v0.1.md",
+    "docs/operations/project-intelligence-adr-cascade-remediation-decision-intake-v0.1.md",
+    "docs/operations/project-intelligence-adr-cascade-remediation-recommendation-draft-v0.1.md",
+    "docs/operations/project-intelligence-adr-cascade-maintainer-decision-recording-v0.1.md",
+    "docs/operations/project-intelligence-adr-cascade-controlled-remediation-plan-v0.1.md",
+    "docs/operations/project-intelligence-adr-cascade-controlled-remediation-execution-v0.1.md",
+    "docs/design/website-uiux-roadmap-v0.2.md"
+  ],
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "public_launch",
+    "production_marketing_announcement",
+    "public_custom_domain_decision",
+    "deployment",
+    "pricing_change",
+    "customer_contact",
+    "target_repo_write"
+  ],
+  "next_goal_plain_language": "下一个目标是 RepoAssure Design System v2 Adoption v0.1：把 owner 提供的 Design System v2 以 workspace 包的形式落地、自托管品牌字体，让官网和 Project Intelligence Console 共用同一套 token。这一步不改变任何视觉表现。"
+}

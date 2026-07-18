@@ -1,5 +1,665 @@
 # 开发日志
 
+## 2026年7月18日 - RepoAssure Design System v2 Unfreeze v0.1
+
+### 完成内容
+
+- 新增 `docs/adr/0022-repoassure-design-system-v2-and-information-architecture.md`，并将 ADR-0019 标记为 Superseded、更新 ADR 索引。
+- 新增 `docs/operations/repoassure-design-system-v2-unfreeze-v0.1.md`；将 `docs/operations/public-website-design-work-deferred-v0.1.md` 标记为 superseded 并保留为 2026-07-16 时点记录。
+- 新增四个 goal JSON：`repoassure-design-system-v2-adoption-v0.1`、`repoassure-evidence-integrity-hashing-v0.1`、`public-website-claude-design-integration-and-qa-v0.1`、`project-intelligence-console-redesign-v0.1`。
+- 更新 `.autopilot/goals/index.json`：active goal 切换为 design system adoption，`deferred_goal_ids` 清空，新增 `released_goal_ids` 与 `superseded_goal_ids`。
+- 更新 `.autopilot/progress/snapshot.json` 与 `PROGRESS_SNAPSHOT.md`：新增 released / superseded / requeued goals，从 blocked actions 移除 `website_visual_redesign`，新增 `public_custom_domain_decision`，workflow map 增加设计阶段节点。
+- 级联更新 `docs/DESIGN.md`（design queue 状态、设计源、两项偏离决策）与 `docs/PLAN.md`（next goal、goal sequence、acceptance criteria）。
+- 重设治理状态测试基线。
+
+### TDD 记录
+
+- Red：改动治理状态后 `npx vitest run tests/unit` 失败，依次暴露四处状态断言 —— deferred 记录状态串、`index.active_goal_id`、`progress.deferred_goals` 结构、`progressMarkdown` 阶段串。
+- Green：按新的治理状态重写断言，并补充 `released_goal_ids`、`superseded_goal_ids`、`requeued_goals` 与 `blocked_actions` 不含 `website_visual_redesign` 的正向断言。
+- 保留全部既有边界断言：blocked actions、no hosted dashboard、no target repo write、11 项 ADR cascade 证据。
+
+### 验证
+
+- `npx vitest run tests/unit` — 45 files / 613 tests passed
+- `npx eslint .` — clean
+- `npx tsc -p tsconfig.build.json --noEmit` — exit 0
+
+### 边界
+
+- 本轮只做治理状态记录与目标排期，未改动任何界面代码、样式或组件。
+- 不执行 deployment、public launch、production marketing announcement、repository visibility change、npm publication、GitHub release、public custom domain decision、hosted dashboard、cloud sync、telemetry、locale expansion、product artifact localization、target repo writes、pricing/spend change 或 customer contact。
+- 线上 `repoassure.com` 与 ADR-0020 / ADR-0021 的冲突未处理，需单独 owner 决策。
+
+## 2026年7月18日 - Project Intelligence ADR Cascade Controlled Remediation Execution v0.1
+
+### 完成内容
+
+- 新增 `tests/unit/adr-cascade-controlled-remediation.test.ts`。
+- 为 11 个 owner-authorized ADR repair items 添加 `Cascade Evidence`。
+- 新增 `docs/operations/project-intelligence-adr-cascade-controlled-remediation-execution-v0.1.md`。
+- 级联更新 PRD、SPEC、PLAN、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 Autopilot progress state。
+- 将下一 goal 选择为 `Project Intelligence ADR Cascade Remediation Closure v0.1`。
+
+### TDD 记录
+
+- Red：`pnpm vitest run tests/unit/adr-cascade-controlled-remediation.test.ts` 因 11 个 ADR 缺少 `Cascade Evidence` 且 execution operation record 不存在而失败。
+- Green：补齐 11 个 ADR cascade evidence、执行记录和 canonical docs/autopilot 级联状态。
+
+### 验证
+
+- `pnpm vitest run tests/unit/adr-cascade-controlled-remediation.test.ts`
+- `pnpm vitest run tests/unit/adr-cascade-controlled-remediation.test.ts tests/unit/project-structure.test.ts`
+- `pnpm project:intelligence` regenerated the local Project Intelligence snapshot with `findings.total: 0`
+
+### 边界
+
+- 只执行文档治理修复。
+- 不执行 hosted dashboard、cloud sync、telemetry、deployment、public launch、repository visibility change、npm publication、GitHub release、customer contact、pricing/spend change、target repo writes 或 website visual redesign。
+
+## 2026年7月18日 - Project Intelligence ADR Cascade Controlled Remediation Plan v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/run-project-intelligence-controlled-remediation-plan.ts`。
+- 新增 `pnpm project:intelligence:controlled-remediation-plan`。
+- Controlled remediation plan runner 读取 `adr-cascade-maintainer-decision-record.json`，生成 Markdown/JSON plan records。
+- 每个 plan item 包含 target files、execution step、proposed action、review boundary、rollback note、verification checklist，并保持 repair execution unauthorized。
+- 真实工作区结果：11 个 controlled remediation plan items，0 个 repair executions authorized。
+- 将下一 goal 选择为 `Project Intelligence ADR Cascade Controlled Remediation Execution v0.1`，状态为 pending authorization。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/project-intelligence-controlled-remediation-plan.test.ts`，测试因缺少 `run-project-intelligence-controlled-remediation-plan` 按预期失败。
+- Green：实现 controlled remediation plan runner、Markdown/JSON formatter、CLI 参数解析、package script、package export 和 type-smoke；focused 单测通过。
+- Redaction：对 parsed JSON 结构递归脱敏，防止 `Authorization: Bearer` 和 secret-like values 进入输出物料。
+- Cascade：补齐 operation record、PLAN、SPEC、PRD、README、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 Autopilot progress state。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-intelligence-controlled-remediation-plan.test.ts`
+- `pnpm build:acceptance`
+- `pnpm typecheck:acceptance`
+- `node packages/acceptance/dist/run-project-intelligence-controlled-remediation-plan.js --decision-record artifacts/project-graph/adr-cascade-maintainer-decision-record.json --output artifacts/project-graph`
+
+### 边界
+
+- 只生成 controlled remediation plan，不自动修复 ADR。
+- 不改写 ADR/spec/docs/tests/logs/source。
+- 不执行 repair。
+- 不执行 hosted dashboard、cloud sync、telemetry、deployment、public launch、target repo writes 或 website visual redesign。
+
+## 2026年7月18日 - Project Intelligence ADR Cascade Maintainer Decision Recording v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/run-project-intelligence-maintainer-decision.ts`。
+- 新增 `pnpm project:intelligence:maintainer-decision`。
+- Maintainer decision runner 读取 `adr-cascade-remediation-recommendation-draft.json`，生成 Markdown/JSON maintainer decision records。
+- 基于 owner 授权，将 11 个 recommendation draft items 记录为最终 maintainer `repair` decisions。
+- 真实工作区结果：11 个 repair decisions recorded，11 个 final maintainer decisions written，0 个 repair executions authorized。
+- 将下一 goal 选择为 `Project Intelligence ADR Cascade Controlled Remediation Plan v0.1`。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/project-intelligence-maintainer-decision.test.ts`，测试因缺少 `run-project-intelligence-maintainer-decision` 按预期失败。
+- Green：实现 maintainer decision runner、Markdown/JSON formatter、CLI 参数解析、package script、package export 和 type-smoke；focused 单测通过。
+- Redaction：对 parsed JSON 结构递归脱敏，防止 `Authorization: Bearer` 和 secret-like values 进入输出物料。
+- Cascade：补齐 operation record、PLAN、SPEC、PRD、README、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 Autopilot progress state。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-intelligence-maintainer-decision.test.ts`
+- `pnpm build:acceptance`
+- `node packages/acceptance/dist/run-project-intelligence-maintainer-decision.js --draft artifacts/project-graph/adr-cascade-remediation-recommendation-draft.json --output artifacts/project-graph --decision repair --evidence-note "Owner authorized execution in Codex conversation on 2026-07-18." --maintainer owner`
+
+### 边界
+
+- 只记录 maintainer decision，不自动修复 ADR。
+- 不改写 ADR/spec/docs/tests/logs/source。
+- 不执行 repair。
+- 不执行 hosted dashboard、cloud sync、telemetry、deployment、public launch、target repo writes 或 website visual redesign。
+
+## 2026年7月17日 - Project Intelligence ADR Cascade Remediation Recommendation Draft v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/run-project-intelligence-recommendation-draft.ts`。
+- 新增 `pnpm project:intelligence:recommendation-draft`。
+- Recommendation draft runner 读取 `adr-cascade-remediation-decision-intake.json`，生成 Markdown/JSON advisory draft records。
+- 每个 item 包含 recommended decision、rationale、risk、evidence、rollback / follow-up notes，并保持 final maintainer decision pending。
+- 真实工作区结果：11 个 advisory recommended repair items，0 个 final maintainer decisions written。
+- 将下一 owner-decision goal 选择为 `Project Intelligence ADR Cascade Maintainer Decision Recording v0.1`。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/project-intelligence-recommendation-draft.test.ts`，测试因缺少 `run-project-intelligence-recommendation-draft` 按预期失败。
+- Green：实现 recommendation draft runner、Markdown/JSON formatter、CLI 参数解析、package script、package export 和 type-smoke；focused 单测通过。
+- Redaction：对 parsed JSON 结构递归脱敏，避免在 JSON parse 前改写原始文本导致非法 JSON，同时防止 `Authorization: Bearer` 和 secret-like values 进入输出物料。
+- Cascade：补齐 operation record、PLAN、SPEC、PRD、README、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 Autopilot progress state。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-intelligence-recommendation-draft.test.ts`
+- `pnpm build:acceptance`
+- `node packages/acceptance/dist/run-project-intelligence-recommendation-draft.js --intake artifacts/project-graph/adr-cascade-remediation-decision-intake.json --output artifacts/project-graph`
+
+### 边界
+
+- 不写最终 maintainer decision。
+- 不自动修复 ADR。
+- 不改写 ADR/spec/docs/tests/logs/source。
+- 不执行 repair。
+- 不执行 hosted dashboard、cloud sync、telemetry、deployment、public launch、target repo writes 或 website visual redesign。
+
+## 2026年7月17日 - Project Intelligence ADR Cascade Remediation Decision Intake v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/run-project-intelligence-decision-intake.ts`。
+- 新增 `pnpm project:intelligence:decision-intake`。
+- Decision intake runner 读取 `adr-cascade-remediation-backlog.md`，解析 `RA-ADR-CASCADE-###` items，并生成 Markdown/JSON intake records。
+- 每个 item 保留 pending decision、approve / defer / accept-risk / repair、evidence note、follow-up owner 和 repair authorization slot。
+- 真实工作区结果：11 个 pending decision items。
+- 将下一自动 product-core goal 选择为 `Project Intelligence ADR Cascade Remediation Recommendation Draft v0.1`。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/project-intelligence-decision-intake.test.ts`，测试因缺少 `run-project-intelligence-decision-intake` 按预期失败。
+- Green：实现 decision intake runner、Markdown/JSON formatter、CLI 参数解析、package script、package export 和 type-smoke；focused 单测通过。
+- Redaction：加严 decision intake 层授权头脱敏，避免 `Authorization: Bearer` 标签进入输出物料。
+- Cascade：补齐 operation record、PLAN、SPEC、PRD、README、testing strategy、acceptance checklist、decision log、dev log 和 Autopilot progress state。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-intelligence-decision-intake.test.ts`
+- `pnpm build:acceptance`
+- `node packages/acceptance/dist/run-project-intelligence-decision-intake.js --backlog artifacts/project-graph/adr-cascade-remediation-backlog.md --output artifacts/project-graph`
+
+### 边界
+
+- 不自动修复 ADR。
+- 不改写 ADR/spec/docs/tests/logs/source。
+- 不执行 repair。
+- 不执行 hosted dashboard、cloud sync、telemetry、deployment、public launch、target repo writes 或 website visual redesign。
+
+## 2026年7月17日 - Project Intelligence ADR Cascade Remediation Backlog v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/run-project-intelligence-backlog.ts`。
+- 新增 `pnpm project:intelligence:backlog`。
+- Backlog runner 读取 `project-intelligence-snapshot.json`，筛选 `missing_cascade` findings，并生成 `adr-cascade-remediation-backlog.md`。
+- Backlog item 包含 `RA-ADR-CASCADE-###` 编号、severity、finding、evidence、suggested action、maintainer decision checkbox。
+- 真实工作区结果：11 个 ADR cascade backlog items。
+- 将下一自动 product-core goal 选择为 `Project Intelligence ADR Cascade Remediation Decision Intake v0.1`。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/project-intelligence-backlog.test.ts`，测试因缺少 `run-project-intelligence-backlog` 按预期失败。
+- Green：实现 backlog runner、Markdown formatter、CLI 参数解析、package script、package export 和 type-smoke；focused 单测通过。
+- Cascade：补齐 operation record、PLAN、SPEC、PRD、Project Intelligence spec/architecture、README、testing strategy、acceptance checklist、decision log、dev log 和 Autopilot progress state。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-intelligence-backlog.test.ts`
+- `pnpm build:acceptance`
+- `pnpm typecheck:acceptance`
+- `node packages/acceptance/dist/run-project-intelligence-backlog.js --snapshot artifacts/project-graph/project-intelligence-snapshot.json --output artifacts/project-graph`
+
+### 边界
+
+- Backlog 只作为 maintainer review artifact，不自动修改 ADR/spec/docs/tests/logs/source。
+- 未实现 hosted dashboard、telemetry、cloud sync、upload、deployment、public launch、repository visibility change、npm publish、GitHub release、customer contact、pricing/spend change 或 website visual redesign。
+
+## 2026年7月17日 - Project Intelligence Console Graph Freshness and Staleness Checks v0.1
+
+### 完成内容
+
+- `project-intelligence-snapshot.json` 新增 `summary.findings` 和 `findings`。
+- Snapshot Markdown 新增 `Freshness and Staleness Findings`。
+- Local static viewer 新增 findings summary 和 findings section。
+- 当前规则覆盖 `missing_cascade`、`orphan_code`、`missing_test_link`、`progress_state_mismatch`。
+- 真实工作区结果：11 个 medium findings，均为 ADR `missing_cascade`。
+- 将下一自动 product-core goal 选择为 `Project Intelligence ADR Cascade Remediation Backlog v0.1`。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-intelligence-snapshot.test.ts` 和 `tests/unit/project-intelligence-viewer.test.ts`，要求 snapshot/viewer 具备 findings；测试按预期失败。
+- Green：实现 findings 类型、检测规则、summary、Markdown 和 viewer 渲染；focused 单测通过。
+- Cascade：补齐 operation record、PLAN、SPEC、PRD、Project Intelligence spec/architecture、README、testing strategy、acceptance checklist、decision log、dev log 和 Autopilot progress state。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-intelligence-snapshot.test.ts tests/unit/project-intelligence-viewer.test.ts`
+- `pnpm build:acceptance`
+- `node packages/acceptance/dist/run-project-intelligence-snapshot.js --root . --output artifacts/project-graph`
+- `node packages/acceptance/dist/run-project-intelligence-viewer.js --snapshot artifacts/project-graph/project-intelligence-snapshot.json --output artifacts/project-graph`
+
+### 边界
+
+- Findings 只作为 local readiness evidence，不自动修改文档、代码或目标 repo。
+- 未实现 hosted dashboard、telemetry、cloud sync、upload、deployment、public launch、repository visibility change、npm publish、GitHub release、customer contact、pricing/spend change 或 website visual redesign。
+
+## 2026年7月17日 - Project Intelligence Console Local Static Viewer v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/run-project-intelligence-viewer.ts`。
+- 新增 `pnpm project:intelligence:view`，读取 `artifacts/project-graph/project-intelligence-snapshot.json` 并输出 `artifacts/project-graph/project-intelligence-viewer.html`。
+- Viewer 覆盖 summary、Docs Graph、Code Graph、Progress Graph、source coverage、redaction metadata 和 local-only boundary。
+- 新增 `tests/unit/project-intelligence-viewer.test.ts`，验证 HTML 输出、missing snapshot、malformed snapshot、redaction 和 no hosted dashboard / telemetry boundary。
+- 将下一自动 product-core goal 选择为 `Project Intelligence Console Graph Freshness and Staleness Checks v0.1`。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/project-intelligence-viewer.test.ts`，测试因缺少 `run-project-intelligence-viewer` 按预期失败。
+- Green：实现 viewer runner、HTML formatter、CLI 参数解析、package script 和 package export；focused 单测通过。
+- Cascade：补齐 operation record、PLAN、SPEC、PRD、Project Intelligence spec/architecture、README、testing strategy、acceptance checklist、decision log、dev log 和 Autopilot progress state。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-intelligence-viewer.test.ts`
+- `pnpm typecheck:acceptance`
+- `node packages/acceptance/dist/run-project-intelligence-viewer.js --snapshot artifacts/project-graph/project-intelligence-snapshot.json --output artifacts/project-graph`
+
+### 边界
+
+- 未实现 hosted dashboard、telemetry、cloud sync、upload、deployment、public launch、repository visibility change、npm publish、GitHub release、customer contact、pricing/spend change 或 website visual redesign。
+- 未自动修改任何目标 repo。
+
+## 2026年7月17日 - Project Intelligence Console Graph Snapshot Generator v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/run-project-intelligence-snapshot.ts`。
+- 新增 `pnpm project:intelligence`，输出 `artifacts/project-graph/project-intelligence-snapshot.json` 和 `.md`。
+- Snapshot 包含 `docsGraph`、`codeGraph`、`progressGraph`、`sourceCoverage`、redaction metadata 和 local-only boundary。
+- 新增 `tests/unit/project-intelligence-snapshot.test.ts`，验证 docs/code/progress graph、bounded output、ignored artifact boundary 和 no hosted dashboard / telemetry boundary。
+- 真实工作区生成结果：2617 nodes，3147 edges。
+- 将下一自动 product-core goal 选择为 `Project Intelligence Console Local Static Viewer v0.1`。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/project-intelligence-snapshot.test.ts`，测试因缺少 `run-project-intelligence-snapshot` 按预期失败。
+- Green：实现 snapshot runner、Markdown formatter、CLI 参数解析、package script 和 package export；focused 单测通过。
+- Cascade：补齐 operation record、PLAN、SPEC、PRD、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 Autopilot progress state。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-intelligence-snapshot.test.ts`
+- `node packages/acceptance/dist/run-project-intelligence-snapshot.js --root . --output artifacts/project-graph`
+
+### 边界
+
+- 未实现 hosted dashboard、internal UI、telemetry、cloud sync、upload、deployment、public launch、repository visibility change、npm publish、GitHub release、customer contact、pricing/spend change 或 website visual redesign。
+- 未自动修改任何目标 repo。
+
+## 2026年7月16日 - AI IDE Repair End-to-End Evidence Package Validation v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/run-repair-evidence-package.ts`。
+- 新增 `pnpm repair:evidence-package`，输出 `ai-ide-repair-evidence-package.json` 和 `ai-ide-repair-evidence-package.md`。
+- 新增 `tests/unit/repair-evidence-package.test.ts`，沿用近真实 campaign fixture 串联 repair handoff、dry-run execution report、validation-only execution report 和 patch plan。
+- evidence package 提供 `agentContract`、`artifactIndex`、`repairFlow`、`taskMatrix`、`maintainerReview`、`verificationChecklist`、`noWriteProof` 和 redaction boundary。
+- 证明 no patch applied、no target repo source write、no branch/commit/PR、no acceptance passed。
+- 新增 `docs/operations/ai-ide-repair-end-to-end-evidence-package-validation-v0.1.md`。
+- 将下一自动 product-core goal 选择为 `Project Intelligence Console Graph Snapshot Generator v0.1`。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/repair-evidence-package.test.ts`，要求 `run-repair-evidence-package` 存在并生成端到端 evidence package；测试因缺少 runner 按预期失败。
+- Green：实现 evidence package runner、Markdown formatter、CLI 参数解析、package script 和 package export；focused 单测通过。
+- Cascade：补齐 operation record、PLAN、README、testing strategy、acceptance checklist、decision log、dev log 和 Autopilot progress state。
+
+### 验证
+
+- `pnpm vitest run tests/unit/repair-evidence-package.test.ts`
+
+### 边界
+
+- 未执行发布、部署、npm publish、GitHub release、仓库可见性变更、客户联系、价格/支出变更或网站视觉重构。
+- 未自动修改任何目标 repo。
+
+## 2026年7月16日 - AI IDE Repair Execution Dry-Run Real Campaign Validation v0.1
+
+### 完成内容
+
+- 使用近真实 fixture `fixtures/campaigns/ai-ide-repair-decision-package/manifest.json` 验证 `repair:execute --dry-run`。
+- 扩展 `repair-execution-report.json` / Markdown 输出，新增 `executionPlan`、`patchPreview`、`maintainerReview`、`verificationChecklist`、`noWriteProof`。
+- 验证 dry-run 只写 execution report artifacts，不修改目标 repo source file，也不应用补丁、创建 commit/PR 或标记 acceptance passed。
+- 新增 `docs/operations/ai-ide-repair-execution-dry-run-real-campaign-validation-v0.1.md`。
+- 将 `.autopilot` 当前 active goal 切换为 `AI IDE Repair Patch Plan Real Campaign Validation v0.1`。
+
+### TDD 记录
+
+- Red：`pnpm vitest run tests/unit/repair-execute.test.ts --testNamePattern "dry-runs a near-real repair decision package"` 失败，原因是 `executionPlan` 缺失。
+- Green：补齐 dry-run execution contract 后，同一测试通过。
+- Cascade Red：扩展 `tests/unit/project-structure.test.ts`，要求 dry-run operation record、completed goal state、next patch-plan goal 和文档级联；测试因 operation record 缺失按预期失败。
+- Cascade Green：补齐 operation record、Autopilot goal/progress state 和级联文档。
+
+### 验证
+
+- `pnpm vitest run tests/unit/repair-execute.test.ts --testNamePattern "dry-runs a near-real repair decision package"`
+- `pnpm vitest run tests/unit/repair-execute.test.ts`
+
+### 边界
+
+- 未执行发布、部署、npm publish、GitHub release、仓库可见性变更、客户联系、价格/支出变更或网站视觉重构。
+- 未自动修改任何目标 repo。
+
+## 2026年7月16日 - AI IDE Repair Decision Package Real Campaign Validation v0.1
+
+### 完成内容
+
+- 新增近真实 campaign fixture：`fixtures/campaigns/ai-ide-repair-decision-package/manifest.json`。
+- 扩展 `tests/unit/repair-handoff.test.ts`，验证 fixture 生成的 JSON package、Markdown handoff、verification plan、`repairActionQueue`、`maintainerReview`、`verificationChecklist`、`redaction` 和 environment blocker handling。
+- 测试创建临时 target repo source file，运行 `runRepairHandoff` 后验证文件内容与 mtime 不变，证明 no automatic target repo write。
+- 新增 `docs/operations/ai-ide-repair-decision-package-real-campaign-validation-v0.1.md`。
+- 新增 `.autopilot/goals/ai-ide-repair-execution-dry-run-real-campaign-validation-v0.1.json` 作为下一个 product-core goal。
+- 级联更新 `.autopilot/goals/index.json`、`.autopilot/progress/snapshot.json`、`.autopilot/progress/PROGRESS_SNAPSHOT.md`、`docs/PLAN.md`、testing strategy、acceptance checklist 和 decision log。
+
+### TDD 记录
+
+- Red：先新增 fixture consumption test，要求 `fixtures/campaigns/ai-ide-repair-decision-package/manifest.json` 存在并可生成 AI IDE repair decision package；测试因 fixture 缺失按预期失败。
+- Green：补充 near-real campaign fixture，并验证 JSON/Markdown/verification plan、repairActionQueue、maintainerReview、verificationChecklist、redaction 和 no target source mutation。
+- Cascade Red：扩展 `tests/unit/project-structure.test.ts`，要求 real campaign validation operation record、completed goal state、next execution dry-run goal 和文档级联；测试因 operation record 缺失按预期失败。
+- Cascade Green：补齐 operation record、Autopilot goal/progress state 和级联文档。
+
+### 验证
+
+- `pnpm vitest run tests/unit/repair-handoff.test.ts`
+- `pnpm vitest run tests/unit/project-structure.test.ts --testNamePattern "initializes brownfield Autopilot state"`
+
+### 边界
+
+- No automatic target repo write was authorized.
+- No website visual redesign was authorized.
+- No deployment was authorized.
+- No public release was authorized.
+- No repository visibility change was authorized.
+- No npm publication or GitHub release was authorized.
+- No public launch, customer contact, pricing, or spend change was authorized.
+
+## 2026年7月16日 - AI IDE Repair Decision Package Contract Hardening v0.1
+
+### 完成内容
+
+- 强化 `packages/acceptance/src/run-repair-handoff.ts` 的 AI IDE repair decision package contract。
+- 新增 `repairActionQueue`、`maintainerReview`、`verificationChecklist`、`redaction` 顶层字段。
+- 扩展 `agentContract.readOrder` 和 `maintainerReviewBoundary`，让 AI IDE 明确读取顺序、修复队列、证据、验证命令和人工 review 边界。
+- 增加 environment blocker task 与 passed-run empty queue guidance。
+- 更新 Markdown 输出，增加 AI IDE Repair Decision Contract、Repair Action Queue、Maintainer Review Boundary 和 Verification Checklist sections。
+- 更新 repair execute fixture，保持 downstream package compatibility。
+- 新增 `docs/operations/ai-ide-repair-decision-package-contract-hardening-v0.1.md`，并级联更新 Autopilot goal/progress state、PLAN、testing strategy、acceptance checklist 和 decision log。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/repair-handoff.test.ts`，要求 deterministic read order、`repairActionQueue`、`maintainerReview`、`verificationChecklist`、`redaction`、passed run empty queue 和 environment blocker coverage；测试因新 contract 字段缺失按预期失败。
+- Green：实现 hardened package contract、Markdown sections、environment blocker task 和 downstream fixture 更新。
+- Cascade Red：扩展 `tests/unit/project-structure.test.ts`，要求 operation record、completed goal state、real campaign validation next goal 和文档级联；测试因 operation record 缺失按预期失败。
+- Cascade Green：补齐 operation record、Autopilot goal/progress state 和级联文档。
+
+### 验证
+
+- `pnpm vitest run tests/unit/repair-handoff.test.ts tests/unit/repair-execute.test.ts tests/unit/repair-patch-plan.test.ts`
+- `pnpm typecheck`
+
+### 边界
+
+- No automatic target repo write was authorized.
+- No website visual redesign was authorized.
+- No deployment was authorized.
+- No public release was authorized.
+- No repository visibility change was authorized.
+- No npm publication or GitHub release was authorized.
+- No public launch, customer contact, pricing, or spend change was authorized.
+
+## 2026年7月16日 - Product Core Execution Resume v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/product-core-execution-resume-v0.1.md`，记录产品核心队列恢复和下一个具体目标选择。
+- 新增 `.autopilot/goals/ai-ide-repair-decision-package-contract-hardening-v0.1.json`。
+- 将 `.autopilot/goals/repoassure-product-core-execution-resume-v0.1.json` 标记为 `completed_selected_next_goal`，并记录 selected goal。
+- 更新 `.autopilot/goals/index.json`、`.autopilot/progress/snapshot.json`、`.autopilot/progress/PROGRESS_SNAPSHOT.md` 和 `docs/PLAN.md`，把 active / next goal 切换到 AI IDE repair decision package contract hardening。
+- 级联更新 testing strategy、acceptance checklist 和 decision log。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 product core resume operation record、AI IDE repair decision package goal record、goal index、progress snapshot 和文档级联存在；测试因 `docs/operations/product-core-execution-resume-v0.1.md` 缺失按预期失败。
+- Green：补齐 operation record、goal records、progress snapshot 和文档级联。
+
+### 边界
+
+- No automatic target repo write was authorized.
+- No website visual redesign was authorized.
+- No deployment was authorized.
+- No public release was authorized.
+- No repository visibility change was authorized.
+- No npm publication or GitHub release was authorized.
+- No public launch, customer contact, pricing, or spend change was authorized.
+
+## 2026年7月16日 - Public Website Design Work Deferred v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/public-website-design-work-deferred-v0.1.md`，记录 design queue 暂缓原因、触发条件和非授权边界。
+- 新增 `.autopilot/goals/repoassure-product-core-execution-resume-v0.1.json`，将下一自动目标切回 product core execution。
+- 更新 `.autopilot/goals/index.json`、`.autopilot/progress/snapshot.json` 和 `.autopilot/progress/PROGRESS_SNAPSHOT.md`，明确 `public-website-owner-visual-acceptance-p3-follow-up-triage-v0.1` 与 `public-website-claude-design-integration-and-qa-v0.1` 暂缓至 `owner_finalizes_claude_design`。
+- 级联更新 `docs/PLAN.md`、`docs/DESIGN.md`、`docs/design/website-uiux-roadmap-v0.2.md`、testing strategy、acceptance checklist 和 decision log。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求暂缓文档、新 product core goal、progress snapshot 和文档级联存在；测试因 `docs/operations/public-website-design-work-deferred-v0.1.md` 缺失按预期失败。
+- Green：补齐 deferral operation record、Autopilot goal/progress state 和级联文档。
+
+### 边界
+
+- No deployment was authorized.
+- No public release was authorized.
+- No repository visibility change was authorized.
+- No npm publication or GitHub release was authorized.
+- No public launch, customer contact, pricing, or spend change was authorized.
+- No website visual redesign implementation was authorized.
+
+## 2026年7月16日 - Public Website P3 Pixel QA & Mobile Responsive Polish v0.1
+
+### 完成内容
+
+- 修复 owner 截图反馈中的移动端视觉问题：Hero 单栏强覆盖、zh-CN H1 断字、Assurance Graph fallback 过高、Artifact Preview / EvidenceHash 溢出、Trust Ledger 行内重叠、private preview CTA 和 footer 比例。
+- 在 `tests/unit/public-website.test.ts` 增加 P3 responsive polish guard，要求 P3 移动端规则、QA 截图命名和 horizontal overflow 检查存在。
+- 更新 `scripts/verify-website.mjs`，增加 `desktop-p3-fold.png`、`mobile-p3-fold.png` 和 `horizontalOverflow` 检查。
+- 级联更新 `docs/design/website-uiux-roadmap-v0.2.md`、`docs/DESIGN.md`、`docs/PLAN.md` 和 `.autopilot/progress` snapshot。
+
+### TDD 记录
+
+- Red：新增 P3 responsive polish guard 后，`pnpm vitest run tests/unit/public-website.test.ts` 因 `/* P3 pixel polish` 缺失按预期失败。
+- Green：补充响应式 CSS、证据哈希防溢出和验证脚本字段后，P3 单元测试通过。
+
+### 验证
+
+- `pnpm vitest run tests/unit/public-website.test.ts` passed。
+- `pnpm build:website` passed。
+- `pnpm typecheck:website` passed。
+- In-app Browser DOM metrics at `390x1200` showed `horizontalOverflow: 0`。
+- Assurance Graph mobile fallback height reduced from 622px to 320px。
+- Playwright/System Chrome screenshot capture remained unavailable in this local environment due Chrome headless `SIGABRT` / CDP screenshot timeout；recorded as environment limitation.
+
+### 边界
+
+- No public release was authorized.
+- No deployment was authorized.
+- No repository visibility change was authorized.
+- No npm publication or GitHub release was authorized.
+- No public launch, customer contact, pricing, or spend change was authorized.
+
+## 2026年7月16日 - Brownfield Autopilot Initialization v0.1
+
+### 完成内容
+
+- 按 owner 授权初始化 RepoAssure 为 brownfield Autopilot-managed project。
+- 新增薄 canonical entrypoints：`docs/PRD.md`、`docs/SPEC.md`、`docs/DESIGN.md`、`docs/PLAN.md`。
+- 新增 `docs/operations/brownfield-autopilot-intake-v0.1.md`，记录 brownfield evidence、shape matrix、Autopilot runtime state 和 non-authorization boundary。
+- 新增 `.autopilot/progress/intake-confirmation.json`、`.autopilot/progress/init-doc-pack.json`、`.autopilot/progress/snapshot.json`、`.autopilot/progress/PROGRESS_SNAPSHOT.md`、`.autopilot/goals/index.json` 和 `Public Website P3 Pixel QA & Mobile Responsive Polish v0.1` active goal record。
+- 新增 `docs/public/README.md`、`docs/spec/README.md`、`docs/planning/README.md` 作为文档族路由索引。
+- 将 `.autopilot/runs/`、`.autopilot/cache/` 和 `.autopilot/secrets/` 加入 `.gitignore`。
+- 级联更新 README、acceptance checklist、testing strategy 和 decision log。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 canonical docs entrypoints、brownfield intake、`.autopilot` progress / goal state、`.gitignore` 边界和级联文档存在；测试因 `docs/PRD.md` 缺失按预期失败。
+- Green：新增初始化文档与 `.autopilot` 状态，并完成级联写入。
+
+### 边界
+
+- No public release was authorized.
+- No deployment was authorized.
+- No repository visibility change was authorized.
+- No npm publication or GitHub release was authorized.
+- No public launch, customer contact, pricing, or spend change was authorized.
+
+## 2026年7月1日 - Public Website UI/UX 路线图归档
+
+### 完成内容
+
+- 由 `website-uiux-baseline-temp-2026-07-01.md` promote 为正式 [`docs/design/website-uiux-roadmap-v0.2.md`](../design/website-uiux-roadmap-v0.2.md)（P0–P2 完成态、冻结决策、术语锚点、评分目标、后续轮次）。
+- 临时基线标为 `ARCHIVED`，保留历史指针。
+- 更新 `docs/design/design-system-v0.1.md`：accent / success token 收敛、`tokens.css` 路径、路线图交叉引用、Current Gaps。
+- 扩展 `project-structure.test.ts` 守护新路线图文档。
+
+## 2026年7月1日 - Public Website UI/UX P2 实施
+
+### 完成内容
+
+- P2-1：清理 `styles.css` 中 dead CSS（`.assurance-pipeline`、`.artifact-card`、`.hero-assurance-surface`、`.trust-ledger-preview-hero` 等）；`TrustLedgerPreview` 移除未使用的 `hero` variant。
+- P2-2：新增 `OpenCoreDiagram.tsx` 单色架构示意（桌面 SVG + 移动端有序列表 fallback），接入 `#open-core` 区。
+- P2-3：私密预览区增加 `designPartnerNote`（诚实说明受邀团队、无公开 logo 墙）；en/zh-CN 文案同步。
+- 更新 `website-uiux-baseline-temp-2026-07-01.md` P2 DoD 勾选；扩展 `public-website.test.ts`。
+
+### 验证
+
+- `pnpm vitest run tests/unit/public-website.test.ts`
+- `pnpm build:website`
+
+## 2026年7月1日 - Public Release Manual Decision Intake v0.2
+
+### 完成内容
+
+- 新增 `docs/operations/public-release-manual-decision-intake-v0.2.md`。
+- 记录当前状态：`Status: decisions_recorded_release_execution_blocked`。
+- 正式落档 maintainer 明确给出的 7 项 manual gate 决策：
+  - Legal review: approve。
+  - Trademark/name review: accept risk。
+  - Branch protection or equivalent repository ruleset: conditional approve fallback defer，当前最终为 defer。
+  - Final maintainer publication authorization: approve，但被 deferred branch protection gate 阻塞。
+  - Private preview reviewer feedback decision: accept risk。
+  - Dependency/license risk confirmation: accept risk。
+  - Secret/customer data exposure confirmation: approve，基于自动核验。
+- 只读核验 GitHub repository state：repo 仍为 `PRIVATE`，branch protection API 和 repository rulesets API 仍返回 `HTTP 403`。
+- 复核 `pnpm repo:hygiene`、`pnpm release:check` 和 scoped sensitive account scan。
+- 级联更新 README、public release checklist、acceptance checklist 和 testing strategy。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 Public Release Manual Decision Intake v0.2 文档和级联记录存在；测试因 `docs/operations/public-release-manual-decision-intake-v0.2.md` 缺失按预期失败。
+- Green：新增 v0.2 decision intake 文档和级联记录，明确 final authorization 已记录但 release execution 仍因 deferred branch protection gate 阻塞。
+
+### 边界
+
+- Public Source Release Execution v0.1 remains blocked。
+- No repository visibility change was authorized。
+- No npm publication was authorized。
+- No GitHub release was authorized。
+- No public launch or production marketing announcement was authorized。
+- No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
+## 2026年7月16日 - AI IDE Repair Patch Plan Real Campaign Validation v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/ai-ide-repair-patch-plan-real-campaign-validation-v0.1.md`。
+- 在 `tests/unit/repair-patch-plan.test.ts` 中加入近真实 campaign dry-run 链路测试：`repair:handoff` -> `repair:execute --dry-run` -> `repair:patch-plan`。
+- 扩展 `packages/acceptance/src/run-repair-patch-plan.ts`，让 dry-run report 可从 `patchPreview.candidateTasks` 生成 reviewable manual patch inputs。
+- `patch-plan.json` 现在包含 `sourceReportMode`、`patchPlanInputs`、`maintainerReview`、`verificationChecklist` 和 `noWriteProof`。
+- `patch-plan.md` 现在包含 Patch Plan Inputs、Maintainer Review Boundary、Verification Checklist 和 No-write Proof。
+- 级联更新 PLAN、testing strategy、acceptance checklist、decision log、dev log、progress snapshot 和 Autopilot goal index。
+
+### TDD 记录
+
+- Red：新增 near-real patch-plan consumption test，当前实现返回 `no_actions`，按预期失败。
+- Green：新增 dry-run patch action generation 与 patch-plan contract fields，局部 patch-plan 测试通过。
+
+### 边界
+
+- No automatic target repo write was authorized。
+- No patch application was authorized。
+- No deployment, public launch, repository visibility change, npm publication, GitHub release, pricing change, or customer contact was authorized。
+
+## 2026年7月16日 - AI IDE Repair Validation-Only Real Campaign Validation v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/ai-ide-repair-validation-only-real-campaign-validation-v0.1.md`。
+- 在 `tests/unit/repair-execute.test.ts` 中加入近真实 validation-only campaign 测试。
+- 扩展 `packages/acceptance/src/run-repair-execute.ts`，让 validation-only report 支持 `skipped` task status。
+- 含 `<repo>` 等占位符的 verification commands 不再被执行，而是作为需要人工/环境上下文的 skipped evidence 记录。
+- 测试覆盖 passed / failed / skipped evidence、secret-like output redaction、command execution boundary 和 target repo source no-write proof。
+- 级联更新 PLAN、testing strategy、acceptance checklist、decision log、dev log、progress snapshot 和 Autopilot goal index。
+
+### TDD 记录
+
+- Red：新增 validation-only near-real campaign test，当前实现执行了 placeholder `user:accept` 命令并产生错误 failed 计数，按预期失败。
+- Green：新增 runnable command 过滤和 skipped task status，局部 repair-execute 测试通过。
+
+### 边界
+
+- No automatic target repo write was authorized。
+- No patch application was authorized。
+- No deployment, public launch, repository visibility change, npm publication, GitHub release, pricing change, or customer contact was authorized。
+
+## 2026年7月1日 - Public Website UI/UX P1 实施
+
+### 完成内容
+
+- P1-1：Hero checklist 改为单行 `highlight`；secondary CTA 改为 text link 指向 `#assurance-graph`；移除 Hero `privacy-note`。
+- P1-2：Hero 与 Assurance Graph 之间增加 `hero-graph-breath` 浅色渐变呼吸带。
+- P1-3：`ArtifactPreview` 预览面板置顶（`artifact-preview-panel-leading` 深色主视觉），meta 收至底部紧凑栏。
+- P1-4：zh-CN 术语统一（`查看保障图谱`、`证据模型 · Team Cloud 计划中` 等）；en secondary CTA 改为 `View assurance graph`。
+
+### 验证
+
+- `pnpm vitest run tests/unit/public-website.test.ts`
+- `pnpm build:website`
+
+## 2026年7月1日 - Public Website UI/UX P0 实施
+
+### 完成内容
+
+- P0-1：Hero 在 `≤1100px` 改单栏，消除中宽视口挤压（`responsive.css`, `styles.css`）。
+- P0-2：`HeroConsole` 改为 run 摘要（readiness / findings / bundle），完整 CLI 仅保留在 `#how-it-works`（`HeroConsole.tsx`, `i18n.ts` `heroRunSummary`）。
+- P0-3：Assurance Graph 在 `<960px` 显示 `graph-chain-fallback` 列表，隐藏 SVG 画布（`AssuranceGraph.tsx`, `responsive.css`）。
+- P0-4：Header/footer nav 精简为 5 项，移除独立 Roadmap 链接（`#roadmap` 区块保留在 Open core 区）。
+- 更新 `docs/design/website-uiux-baseline-temp-2026-07-01.md` P0 DoD 勾选。
+
+### 验证
+
+- `pnpm vitest run tests/unit/public-website.test.ts`
+- `pnpm build:website`
+
+## 2026年7月1日 - Public Website UI/UX 实施基线（临时）
+
+### 完成内容
+
+- 新增 `docs/design/website-uiux-baseline-temp-2026-07-01.md`。
+- 记录二次 UI/UX 评审结论（58/100）、当前组件快照、防漂移冻结决策、P0–P2 DoD。
+- 目的：后续 Hero / Graph / Nav 修复时有单一锚点，避免恢复 Trust Ledger 全表、CLI 重复、假链接等回退。
+
+### 边界
+
+- 本文件为 **TEMP** 实施基线，不替代 `design-qa.md` 的 release guardrails。
+- 不授权公开发布、SaaS、npm 或 repository visibility 变更。
+
 ## 2026年7月1日 - Public Release Manual Decision Input Completion v0.1
 
 ### 完成内容

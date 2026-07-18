@@ -10,7 +10,7 @@ This is the canonical planning entrypoint. It summarizes current execution order
 
 The design queue is released. Public Website Design Work Deferred v0.1 held it at `deferred_design_pending` from 2026-07-16 until the owner supplied RepoAssure Design System v2, which satisfied `owner_finalizes_claude_design`. See [ADR-0022](adr/0022-repoassure-design-system-v2-and-information-architecture.md) and [the unfreeze record](operations/repoassure-design-system-v2-unfreeze-v0.1.md).
 
-Current stage: RepoAssure Evidence Integrity Hashing v0.1 completed. Emitted manifests now carry a content hash per artifact, `hardening verify` recomputes them, and every surface that described artifacts as signed has been corrected. Website information architecture is the next bounded goal.
+Current stage: the ADR-0022 design sequence is complete, and the ADR cascade remediation closure confirmed the original 11 `missing_cascade` findings are cleared. There is no active goal; the next one is the owner's to select.
 
 The current boundary is valid when the following are true:
 
@@ -23,17 +23,17 @@ Unresolved and deliberately not addressed by ADR-0022: the live `repoassure.com`
 
 ## Active / Next Codex Goal
 
-Next Codex Goal: Public Website Claude Design Integration & QA v0.1
+Next Codex Goal: none selected — the design sequence and ADR cascade closure are complete
 
-Plain-language explanation: owner 已提供定稿的 RepoAssure Design System v2，`owner_finalizes_claude_design` 条件满足，设计队列解冻（见 [ADR-0022](adr/0022-repoassure-design-system-v2-and-information-architecture.md)）。接下来按四步执行：先把设计系统以 workspace 包落地并自托管字体（不改视觉），再补齐 artifact 内容哈希与校验命令并修正 signed 措辞，然后重构官网信息架构，最后重构 Project Intelligence Console。Project Intelligence ADR Cascade Remediation Closure v0.1 未启动，重新排入队列，在 console 重构之后执行。
+Plain-language explanation: ADR-0022 的四步设计序列已全部完成——设计系统落地、证据内容哈希、官网信息架构重建、Console 重构——随后的 ADR cascade 闭环确认原始 11 个 findings 清零，并解决了 1 条此前被 vendor 噪音掩盖的残留 finding。当前无 active goal，下一个目标由 owner 选择。
 
 Goal sequence:
 
 1. RepoAssure Design System v2 Adoption v0.1 — completed
 2. RepoAssure Evidence Integrity Hashing v0.1 — completed
-3. Public Website Claude Design Integration & QA v0.1 — active
-4. Project Intelligence Console Redesign v0.1 — queued
-5. Project Intelligence ADR Cascade Remediation Closure v0.1 — re-queued
+3. Public Website Claude Design Integration & QA v0.1 — completed
+4. Project Intelligence Console Redesign v0.1 — completed
+5. Project Intelligence ADR Cascade Remediation Closure v0.1 — completed
 
 ## Acceptance Criteria
 
@@ -65,8 +65,9 @@ Goal sequence:
 
 ## Planning Order
 
-1. RepoAssure Evidence Integrity Hashing v0.1, to make the integrity claim true before any surface repeats it.
-2. Public Website Claude Design Integration & QA v0.1, to restructure the information architecture around the four questions recorded in ADR-0013.
-3. Project Intelligence Console Redesign v0.1, to reframe the console from exception reporting to state reporting.
-4. Project Intelligence ADR Cascade Remediation Closure v0.1, to rerun freshness/backlog checks and record whether the 11 repaired ADR cascade findings are closed. This goal was active and not started when the design queue was released; it is re-queued, not cancelled.
-5. Resolve the ADR-0020 / ADR-0021 custom domain conflict under a separate owner decision before any deployment.
+The ADR-0022 sequence is complete. Two items are recorded and outstanding, neither of which Autopilot may select on its own:
+
+1. **Resolve the ADR-0020 / ADR-0021 custom domain conflict** under a separate owner decision. `repoassure.com` is bound and indexable while both ADRs forbid exactly that, and both remain Accepted with no amendment. This blocks any deployment.
+2. **Tighten `findOrphanCode`** to require a README at the app root rather than at any depth. Recorded during closure and deliberately not actioned there, because changing a detection rule inside a closure run makes the closure evidence unreadable.
+
+Beyond those, the next goal is the owner's to select.

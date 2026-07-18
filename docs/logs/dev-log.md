@@ -1,5 +1,34 @@
 # 开发日志
 
+## 2026年7月19日 - Project Intelligence ADR Cascade Remediation Closure v0.1
+
+### 完成内容
+
+- 重跑 freshness 与 backlog 检查，确认原始 11 个 `missing_cascade` findings **全部清零**：snapshot findings 0、backlog items 0、viewer 判定 clear。
+- 闭环过程中浮现 1 条此前从未出现的 `orphan_code` finding：`apps/website` 缺少 README，而它是十个 app/package 中唯一没有的。
+- 查明它此前未被检出的原因，并如实记录：`findOrphanCode` 的判据是「所含路径中存在以 `/README.md` 结尾者」。在 ignore 过滤器修复前，扫描器会走进 `apps/website/node_modules`——pnpm 用软链铺设该目录，而扫描器用 `stat` 会跟随软链，于是 `typescript/README.md`、`lucide-react/README.md` 等 9 个依赖 README 都进了图谱，任意一个即可让判据通过。
+- **结论：vendor 噪音不只是难看，它在压制真实检测。** 那 85.9% 的依赖文件不仅占满显示窗口，还让一个真实的文档缺口对为其设计的规则不可见。
+- 补写 `apps/website/README.md`，重跑后 findings 归零。
+- 新增闭环记录 `docs/operations/project-intelligence-adr-cascade-remediation-closure-v0.1.md`。
+
+### 分类结论
+
+按 goal 要求对残留 finding 分类：**legitimate follow-up work，且此前被检测缺陷掩盖**。不是文档残渣，也不是误报。
+
+记录但**不在本轮处理**的规则校准项：`findOrphanCode` 匹配任意深度的 `/README.md`。ignore 过滤器修复后依赖树已无法再触发它，但一个 README 位于深层子目录的 app 仍会通过。收紧为「仅认 app 根目录 README」是候选后续项——闭环运行期间改动检测规则会让闭环证据失去可读性。
+
+### 验证
+
+- `pnpm project:intelligence` — 481 节点 / 1121 边 / findings 0
+- `pnpm project:intelligence:backlog` — items 0、missing cascade findings 0
+- `pnpm project:intelligence:view` — verdict clear、产出 0 个外部引用
+- `npx vitest run tests/unit` — 48 files / 642 tests passed
+
+### 边界
+
+- 闭环期间未改动任何检测规则；唯一新增的文档是直接手写的 app README，不是自动规则改写。
+- 不执行 hosted dashboard、cloud sync、telemetry、deployment、public release、repository visibility change、npm publication、GitHub release、public custom domain decision、target repo writes、pricing/spend change 或 customer contact。
+
 ## 2026年7月19日 - Website Guardrail Triage v0.1
 
 ### 完成内容

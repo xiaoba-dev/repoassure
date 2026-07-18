@@ -4678,7 +4678,7 @@ describe('project structure', () => {
       'project-intelligence-adr-cascade-remediation-closure-v0.1'
     );
     expect(projectIntelligenceClosureGoal.schema).toBe('project-autopilot/goal@1');
-    expect(projectIntelligenceClosureGoal.status).toBe('ready_to_execute');
+    expect(['ready_to_execute', 'queued', 'completed']).toContain(projectIntelligenceClosureGoal.status);
     expect(projectIntelligenceClosureGoal.objective).toContain('freshness');
     expect(projectIntelligenceClosureGoal.blocked_actions).toContain('hosted_dashboard');
     expect(projectIntelligenceClosureGoal.blocked_actions).toContain('target_repo_write');
@@ -4692,9 +4692,16 @@ describe('project structure', () => {
       'project-intelligence-console-redesign-v0.1',
       'project-intelligence-adr-cascade-remediation-closure-v0.1'
     ];
-    expect(designSequence).toContain(index.active_goal_id);
-    const activeEntry = index.goals?.find((goal) => goal.id === index.active_goal_id);
-    expect(activeEntry?.status).toBe('ready_to_execute');
+    // Once the whole sequence completes there is no active goal until the owner picks
+    // one. Either state is valid; an active id pointing at an unregistered or
+    // already-completed goal is not.
+    if (index.active_goal_id) {
+      expect(designSequence).toContain(index.active_goal_id);
+      const activeEntry = index.goals?.find((goal) => goal.id === index.active_goal_id);
+      expect(activeEntry?.status).toBe('ready_to_execute');
+    } else {
+      expect(index.goals?.every((goal) => goal.status.startsWith('completed'))).toBe(true);
+    }
     for (const goalId of designSequence) {
       expect(index.goals?.some((goal) => goal.id === goalId)).toBe(true);
     }
@@ -4708,10 +4715,12 @@ describe('project structure', () => {
     // pinned to a literal. Pinning it forces a test edit on every goal completion, which
     // makes the assertion churn rather than a guard.
     expect(progress.current_stage.length).toBeGreaterThan(0);
-    expect(progress.active_goal.id).toBe(index.active_goal_id);
-    expect(progress.next_goal?.id).toBe(index.active_goal_id);
-    expect(progress.active_goal.status).toBe('ready_to_execute');
-    expect(progress.next_goal?.status).toBe('ready_to_execute');
+    expect(progress.active_goal.id ?? null).toBe(index.active_goal_id ?? null);
+    if (index.active_goal_id) {
+      expect(progress.next_goal?.id).toBe(index.active_goal_id);
+      expect(progress.active_goal.status).toBe('ready_to_execute');
+      expect(progress.next_goal?.status).toBe('ready_to_execute');
+    }
     expect(progress.deferred_goals).toEqual([]);
     expect(progress.released_goals?.[0]?.reason).toContain('owner_finalizes_claude_design');
     // Re-queued goals drain as they become active; the invariant is that nothing is

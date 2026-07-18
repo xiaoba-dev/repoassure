@@ -2,7 +2,7 @@
   "schema": "project-autopilot/goal@1",
   "id": "project-intelligence-adr-cascade-remediation-closure-v0.1",
   "title": "Project Intelligence ADR Cascade Remediation Closure v0.1",
-  "status": "ready_to_execute",
+  "status": "completed",
   "created_at": "2026-07-18T20:30:00.000+08:00",
   "objective": "Rerun Project Intelligence freshness and ADR cascade backlog checks after controlled remediation execution, confirm whether the 11 repaired ADR cascade findings are cleared, and record residual findings or rule-calibration needs.",
   "document_basis": [
@@ -33,5 +33,17 @@
     "pricing_change",
     "customer_contact",
     "target_repo_write"
-  ]
+  ],
+  "completed_at": "2026-07-19T02:50:00.000+08:00",
+  "closure_summary": {
+    "original_missing_cascade_findings": 11,
+    "missing_cascade_findings_remaining": 0,
+    "backlog_items": 0,
+    "snapshot_findings_total": 0,
+    "residual_findings_found": 1,
+    "residual_classification": "legitimate_follow_up_previously_masked_by_detection_defect",
+    "residual_resolved": true,
+    "detection_rule_changed_during_closure": false,
+    "rule_calibration_recorded_not_actioned": "findOrphanCode matches /README.md at any depth"
+  }
 }

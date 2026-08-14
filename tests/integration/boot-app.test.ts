@@ -38,6 +38,77 @@ process.on('SIGTERM', () => {
   return root;
 }
 
+async function createDaemonRepo(): Promise<string> {
+  const root = await mkdtemp(join(tmpdir(), 'hardening-boot-daemon-'));
+
+  await writeFile(
+    join(root, 'package.json'),
+    JSON.stringify({
+      scripts: { dev: 'node daemon.mjs' }
+    })
+  );
+  await writeFile(
+    join(root, 'server-daemon.mjs'),
+    `
+import http from 'node:http';
+import { writeFile } from 'node:fs/promises';
+
+const server = http.createServer((_, response) => {
+  response.writeHead(200, { 'content-type': 'text/plain' });
+  response.end('daemon ok');
+});
+
+server.listen(0, '127.0.0.1', async () => {
+  await writeFile(new URL('./port.txt', import.meta.url), String(server.address().port));
+});
+`
+  );
+  await writeFile(
+    join(root, 'daemon.mjs'),
+    `
+import { spawn } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
+import { setTimeout as delay } from 'node:timers/promises';
+
+const child = spawn(process.execPath, [new URL('./server-daemon.mjs', import.meta.url).pathname], {
+  detached: true,
+  stdio: 'ignore'
+});
+child.unref();
+
+const portPath = new URL('./port.txt', import.meta.url).pathname;
+const deadline = Date.now() + 10000;
+while (!existsSync(portPath)) {
+  if (Date.now() > deadline) {
+    process.exit(1);
+  }
+  await delay(25);
+}
+
+const port = readFileSync(portPath, 'utf8').trim();
+console.log(\`Dev server running at http://127.0.0.1:\${port} (pid \${child.pid})\`);
+process.exit(0);
+`
+  );
+
+  return root;
+}
+
+async function waitForPortClosed(url: string, timeoutMs: number): Promise<boolean> {
+  const deadline = Date.now() + timeoutMs;
+
+  while (Date.now() < deadline) {
+    try {
+      await fetch(url, { signal: AbortSignal.timeout(500) });
+    } catch {
+      return true;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+
+  return false;
+}
+
 describe('bootApp', () => {
   it('starts a local app, captures logs, and exposes a stop function', async () => {
     const root = await createServerRepo();
@@ -62,6 +133,77 @@ describe('bootApp', () => {
       expect(logs).toContain('Authorization: Bearer [REDACTED]');
       expect(logs).not.toContain('sk-local-secret');
       expect(logs).not.toContain('bearer-secret');
+    } finally {
+      await session.stop();
+    }
+  }, 45000);
+
+  it('treats a daemonizing dev server as running and cleans up its listener on stop', async () => {
+    const root = await createDaemonRepo();
+    const session = await bootApp({
+      root,
+      startCommand: 'npm run dev',
+      timeoutMs: 30000
+    });
+
+    try {
+      expect(session.status).toBe('running');
+      expect(session.daemon).toBe(true);
+      expect(session.url).toMatch(/^http:\/\/127\.0\.0\.1:\d+$/);
+
+      const response = await fetch(session.url ?? '');
+      expect(response.status).toBe(200);
+      expect(await response.text()).toBe('daemon ok');
+    } finally {
+      await session.stop();
+    }
+
+    expect(await waitForPortClosed(session.url ?? '', 10000)).toBe(true);
+  }, 45000);
+
+  it('fails when the process exits after printing a URL nothing listens on', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'hardening-boot-ghost-url-'));
+    await writeFile(
+      join(root, 'package.json'),
+      JSON.stringify({ scripts: { dev: 'node ghost.mjs' } })
+    );
+    await writeFile(
+      join(root, 'ghost.mjs'),
+      "console.log('Dev server running at http://127.0.0.1:59912');\nprocess.exit(0);\n"
+    );
+
+    const session = await bootApp({
+      root,
+      startCommand: 'npm run dev',
+      timeoutMs: 30000
+    });
+
+    try {
+      expect(session.status).toBe('failed');
+      expect(session.daemon).toBe(false);
+      expect(session.errors.join(' ')).toContain('Process exited before becoming reachable: 0');
+    } finally {
+      await session.stop();
+    }
+  }, 45000);
+
+  it('fails fast when the process exits without ever printing a URL', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'hardening-boot-early-exit-'));
+    await writeFile(
+      join(root, 'package.json'),
+      JSON.stringify({ scripts: { dev: 'node crash.mjs' } })
+    );
+    await writeFile(join(root, 'crash.mjs'), "console.error('boom');\nprocess.exit(2);\n");
+
+    const session = await bootApp({
+      root,
+      startCommand: 'npm run dev',
+      timeoutMs: 30000
+    });
+
+    try {
+      expect(session.status).toBe('failed');
+      expect(session.errors.join(' ')).toContain('Process exited before becoming reachable: 2');
     } finally {
       await session.stop();
     }

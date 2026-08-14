@@ -9,6 +9,7 @@ describe('BootSessionStore', () => {
       url: 'http://localhost:3000',
       port: 3000,
       logsPath: '/tmp/app.log',
+      daemon: false,
       blockers: [],
       errors: [],
       resultPath: '/tmp/boot-result.json',

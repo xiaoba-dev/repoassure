@@ -8,7 +8,7 @@ import { runGenerateRepairPlanTool } from '../../tools/generate-repair-plan-tool
 import { runHardenReportTool } from '../../tools/harden-report-tool.js';
 import { runHardeningTool } from '../../tools/run-hardening-tool.js';
 import { runSecurityImportTool } from '../../tools/security-import-tool.js';
-import { createPlaywrightBrowserDriver } from '../../domain/explore/playwright-driver.js';
+import { BrowserUnavailableError, createPlaywrightBrowserDriver } from '../../domain/explore/playwright-driver.js';
 import { verifyArtifactIntegrity } from '../../domain/integrity/artifact-integrity.js';
 import { redactSensitiveText } from '../../shared/privacy-redaction.js';
 
@@ -202,6 +202,11 @@ async function runHardening(args: string[], io: CliIO): Promise<number> {
     io.writeStdout(formatCliJsonOutput(result));
     return 0;
   } catch (error) {
+    if (error instanceof BrowserUnavailableError) {
+      writeCliError(io, error.message);
+      return 1;
+    }
+
     const message = error instanceof Error ? error.message : 'Unknown error';
     writeCliError(io, `Failed to run hardening flow: ${message}`);
     return 1;
@@ -239,6 +244,11 @@ async function runExplore(args: string[], io: CliIO): Promise<number> {
     io.writeStdout(formatCliJsonOutput(result));
     return 0;
   } catch (error) {
+    if (error instanceof BrowserUnavailableError) {
+      writeCliError(io, error.message);
+      return 1;
+    }
+
     const message = error instanceof Error ? error.message : 'Unknown error';
     writeCliError(io, `Failed to explore app: ${message}`);
     return 1;

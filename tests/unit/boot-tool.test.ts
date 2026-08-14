@@ -7,6 +7,7 @@ describe('toSerializableBootResult', () => {
       url: 'http://localhost:3000',
       port: 3000,
       logsPath: '/tmp/app.log',
+      daemon: false,
       blockers: [],
       errors: [],
       stop: async () => {}
@@ -17,6 +18,7 @@ describe('toSerializableBootResult', () => {
       url: 'http://localhost:3000',
       port: 3000,
       logsPath: '/tmp/app.log',
+      daemon: false,
       blockers: [],
       errors: []
     });
@@ -30,6 +32,7 @@ describe('toSerializableBootResult', () => {
       url: sessionUrl,
       port: 3000,
       logsPath: '/tmp/app.log',
+      daemon: false,
       blockers: [],
       errors: [],
       stop: async () => {}
@@ -49,6 +52,7 @@ describe('toSerializableBootResult', () => {
       url: null,
       port: null,
       logsPath: '/tmp/app.log?token=log-secret',
+      daemon: false,
       blockers: ['blocked by API_KEY=sk-blocker-secret'],
       errors: ['startup failed with client_secret=error-secret'],
       stop: async () => {}

@@ -19,6 +19,7 @@ export function toSerializableBootResult(session: BootAppSession): BootAppResult
     url: session.url ? redactSensitiveText(session.url) : null,
     port: session.port,
     logsPath: redactSensitiveText(session.logsPath),
+    daemon: session.daemon,
     blockers: session.blockers.map((blocker) => redactSensitiveText(blocker)),
     errors: session.errors.map((error) => redactSensitiveText(error))
   };

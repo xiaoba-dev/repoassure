@@ -485,6 +485,7 @@ describe('runHardeningTool', () => {
             url: 'http://localhost:5173',
             port: 5173,
             logsPath: join(root, '.hardening', 'run', 'app.log'),
+            daemon: false,
             blockers: [],
             errors: []
           })
@@ -495,6 +496,7 @@ describe('runHardeningTool', () => {
           url: 'http://localhost:5173',
           port: 5173,
           logsPath: join(root, '.hardening', 'run', 'app.log'),
+          daemon: false,
           blockers: [],
           errors: [],
           resultPath: bootResultPath,
@@ -549,6 +551,7 @@ describe('runHardeningTool', () => {
             url: null,
             port: null,
             logsPath: join(root, '.hardening', 'run', 'app.log'),
+            daemon: false,
             blockers: [],
             errors: ['Timed out waiting for app URL']
           })
@@ -559,6 +562,7 @@ describe('runHardeningTool', () => {
           url: null,
           port: null,
           logsPath: join(root, '.hardening', 'run', 'app.log'),
+          daemon: false,
           blockers: [],
           errors: ['Timed out waiting for app URL'],
           resultPath: bootResultPath,

@@ -7,10 +7,13 @@ export interface PlaywrightBrowserLauncher {
   launch: (options: { headless: boolean }) => Promise<PlaywrightBrowserLike>;
 }
 
+export type PlaywrightWaitUntil = 'load' | 'domcontentloaded' | 'networkidle' | 'commit';
+
 export interface CreatePlaywrightBrowserDriverInput {
   launcher?: PlaywrightBrowserLauncher;
   headless?: boolean;
   navigationTimeoutMs?: number;
+  waitUntil?: PlaywrightWaitUntil;
   storageStatePath?: string;
   trace?: boolean;
 }
@@ -32,7 +35,7 @@ interface PlaywrightBrowserContextLike {
 
 interface PlaywrightPageLike {
   on: (event: string, handler: (value: unknown) => void) => void;
-  goto: (url: string, options: { waitUntil: 'networkidle'; timeout: number }) => Promise<PlaywrightResponseLike | null>;
+  goto: (url: string, options: { waitUntil: PlaywrightWaitUntil; timeout: number }) => Promise<PlaywrightResponseLike | null>;
   content: () => Promise<string>;
   locator: (selector: string) => { innerText: () => Promise<string> };
   $$eval: (selector: string, pageFunction: (elements: unknown[]) => unknown) => Promise<unknown>;
@@ -279,6 +282,9 @@ export async function createPlaywrightBrowserDriver(input: CreatePlaywrightBrows
   const launcher = input.launcher ?? (await loadDefaultLauncher());
   const browser = await launcher.launch({ headless: input.headless ?? true });
   const navigationTimeoutMs = input.navigationTimeoutMs ?? 15_000;
+  /* 'load' instead of 'networkidle': dev servers with HMR sockets never reach network
+     idle, so 'networkidle' turns every healthy local app into a navigation timeout. */
+  const waitUntil = input.waitUntil ?? 'load';
 
   return {
     snapshot: async (url, options) => {
@@ -312,7 +318,7 @@ export async function createPlaywrightBrowserDriver(input: CreatePlaywrightBrows
         }
 
         const response = await page.goto(url, {
-          waitUntil: 'networkidle',
+          waitUntil,
           timeout: navigationTimeoutMs
         });
         const html = await page.content();

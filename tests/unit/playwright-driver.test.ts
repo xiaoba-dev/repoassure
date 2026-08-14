@@ -81,6 +81,37 @@ describe('createPlaywrightBrowserDriver', () => {
     expect(page.gotoCalls).toEqual([{ waitUntil: 'domcontentloaded', timeout: 5_000 }]);
   });
 
+  it('surfaces an actionable BrowserUnavailableError when the browser executable is missing', async () => {
+    await expect(
+      packageCreatePlaywrightBrowserDriver({
+        launcher: {
+          launch: async () => {
+            throw new Error(
+              "browserType.launch: Executable doesn't exist at /caches/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell"
+            );
+          }
+        }
+      })
+    ).rejects.toMatchObject({
+      name: 'BrowserUnavailableError',
+      message: expect.stringContaining('npx playwright install chromium')
+    });
+  });
+
+  it('rethrows launch failures that are not about a missing browser executable', async () => {
+    const createDriver = (): Promise<unknown> =>
+      packageCreatePlaywrightBrowserDriver({
+        launcher: {
+          launch: async () => {
+            throw new Error('browserType.launch: unexpected crash');
+          }
+        }
+      });
+
+    await expect(createDriver()).rejects.toThrow('browserType.launch: unexpected crash');
+    await expect(createDriver()).rejects.toMatchObject({ name: 'Error' });
+  });
+
   it('captures page runtime signals and screenshot artifacts', async () => {
     const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-artifacts-'));
     const page = new FakePage();

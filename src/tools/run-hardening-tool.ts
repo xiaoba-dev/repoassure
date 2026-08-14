@@ -25,9 +25,33 @@ export interface RunHardeningInput {
   criticalPaths?: string[];
   maxRoutes?: number;
   maxActionsPerRoute?: number;
+  runDir?: string;
   workspaceOutputDir?: string;
   bootApp?: RunBootApp;
   browserDriver?: ExploreBrowserDriver;
+}
+
+/* Every write the run performs resolves through this: by default the artifact
+   base is <root>/.hardening plus the report at the repo root, while an explicit
+   runDir keeps the target repository untouched entirely. */
+interface RunPaths {
+  base: string;
+  scratchDir: string;
+  artifactsDir: string;
+  generatedTestsDir: string;
+  reportPath: string;
+}
+
+function resolveRunPaths(root: string, runDirOverride?: string): RunPaths {
+  const base = runDirOverride ?? join(root, '.hardening');
+
+  return {
+    base,
+    scratchDir: join(base, 'run'),
+    artifactsDir: join(base, 'artifacts'),
+    generatedTestsDir: join(base, 'run', 'generated-tests'),
+    reportPath: runDirOverride ? join(base, 'hardening-report.md') : join(root, 'hardening-report.md')
+  };
 }
 
 export interface RunHardeningResult {
@@ -57,21 +81,23 @@ export interface WorkspaceArtifactBundle extends RunArtifactBundle {
 }
 
 export async function runHardeningTool(input: RunHardeningInput): Promise<RunHardeningResult> {
-  const analyze = await runAnalyzeRepoTool({ root: input.root });
+  const paths = resolveRunPaths(input.root, input.runDir);
+  const analyze = await runAnalyzeRepoTool({ root: input.root, runDir: paths.scratchDir });
   const bootRunner = input.bootApp ?? runBootAppTool;
   let bootSession: BootAppToolSession | null = null;
   let targetUrl = input.url ? normalizeClientUrl(input.url) : null;
 
   try {
     if (targetUrl) {
-      await writeExternalUrlBootResult(input.root, targetUrl);
+      await writeExternalUrlBootResult(paths.scratchDir, targetUrl);
     } else {
       const startCommand = input.startCommand ?? analyze.profile.recommendedStartCommand;
 
       if (!startCommand) {
-        await writeFailedBootResult(input.root, 'No URL or start command is available');
+        await writeFailedBootResult(paths.scratchDir, 'No URL or start command is available');
         return await runHardeningWithoutExplore({
           root: input.root,
+          paths,
           analyze,
           ...(input.workspaceOutputDir ? { workspaceOutputDir: input.workspaceOutputDir } : {})
         });
@@ -80,12 +106,14 @@ export async function runHardeningTool(input: RunHardeningInput): Promise<RunHar
       bootSession = await bootRunner({
         root: input.root,
         startCommand,
-        timeoutMs: input.bootTimeoutMs ?? 30_000
+        timeoutMs: input.bootTimeoutMs ?? 30_000,
+        runDir: paths.scratchDir
       });
 
       if (bootSession.status !== 'running' || !bootSession.url) {
         return await runHardeningWithoutExplore({
           root: input.root,
+          paths,
           analyze,
           ...(input.workspaceOutputDir ? { workspaceOutputDir: input.workspaceOutputDir } : {})
         });
@@ -97,6 +125,7 @@ export async function runHardeningTool(input: RunHardeningInput): Promise<RunHar
     return await runHardeningAfterBoot({
       root: input.root,
       url: targetUrl,
+      paths,
       analyze,
       criticalPaths: input.criticalPaths ?? [],
       maxRoutes: input.maxRoutes ?? 20,
@@ -113,21 +142,23 @@ export async function runHardeningTool(input: RunHardeningInput): Promise<RunHar
 
 async function runHardeningWithoutExplore(input: {
   root: string;
+  paths: RunPaths;
   analyze: Awaited<ReturnType<typeof runAnalyzeRepoTool>>;
   workspaceOutputDir?: string;
 }): Promise<RunHardeningResult> {
-  const explore = await writeEmptyFindings(input.root);
+  const explore = await writeEmptyFindings(input.paths);
   const testGeneration = await runGenerateTestsTool({
     findingsPath: explore.findingsPath,
-    outputDir: join(input.root, 'tests', 'hardening'),
+    outputDir: input.paths.generatedTestsDir,
     smokeRoutes: explore.visitedRoutes
   });
   const report = await runHardenReportTool({
-    runDir: join(input.root, '.hardening', 'run'),
-    outputPath: join(input.root, 'hardening-report.md')
+    runDir: input.paths.scratchDir,
+    outputPath: input.paths.reportPath
   });
   const artifactBundle = await writeRunArtifactBundle({
     root: input.root,
+    paths: input.paths,
     profilePath: input.analyze.profilePath,
     findingsPath: explore.findingsPath,
     reportPath: report.reportPath,
@@ -161,6 +192,7 @@ async function runHardeningWithoutExplore(input: {
 async function runHardeningAfterBoot(input: {
   root: string;
   url: string;
+  paths: RunPaths;
   analyze: Awaited<ReturnType<typeof runAnalyzeRepoTool>>;
   criticalPaths: string[];
   maxRoutes: number;
@@ -174,20 +206,23 @@ async function runHardeningAfterBoot(input: {
     criticalPaths: input.criticalPaths,
     maxRoutes: input.maxRoutes,
     maxActionsPerRoute: input.maxActionsPerRoute,
+    runDir: input.paths.scratchDir,
+    artifactsDir: input.paths.artifactsDir,
     ...(input.browserDriver ? { browserDriver: input.browserDriver } : {})
   });
   const testGeneration = await runGenerateTestsTool({
     findingsPath: explore.findingsPath,
-    outputDir: join(input.root, 'tests', 'hardening'),
+    outputDir: input.paths.generatedTestsDir,
     baseUrl: input.url,
     smokeRoutes: explore.visitedRoutes
   });
   const report = await runHardenReportTool({
-    runDir: join(input.root, '.hardening', 'run'),
-    outputPath: join(input.root, 'hardening-report.md')
+    runDir: input.paths.scratchDir,
+    outputPath: input.paths.reportPath
   });
   const artifactBundle = await writeRunArtifactBundle({
     root: input.root,
+    paths: input.paths,
     profilePath: input.analyze.profilePath,
     findingsPath: explore.findingsPath,
     reportPath: report.reportPath,
@@ -220,6 +255,7 @@ async function runHardeningAfterBoot(input: {
 
 async function writeRunArtifactBundle(input: {
   root: string;
+  paths: RunPaths;
   profilePath: string;
   findingsPath: string;
   reportPath: string;
@@ -228,7 +264,7 @@ async function writeRunArtifactBundle(input: {
   generatedTestFiles: string[];
 }): Promise<RunArtifactBundle> {
   const runId = createRunId();
-  const hardeningDir = join(input.root, '.hardening');
+  const hardeningDir = input.paths.base;
   const bundleDir = join(hardeningDir, 'runs', runId);
   const artifactsDir = join(bundleDir, 'artifacts');
   const generatedTestsDir = join(bundleDir, 'generated-tests');
@@ -241,13 +277,13 @@ async function writeRunArtifactBundle(input: {
   const files = {
     report: await copyExistingFile(input.reportPath, join(bundleDir, 'hardening-report.md')),
     repoProfile: await copyExistingFile(input.profilePath, join(bundleDir, 'repo-profile.json')),
-    bootResult: await copyExistingFile(join(input.root, '.hardening', 'run', 'boot-result.json'), join(bundleDir, 'boot-result.json')),
-    appLog: await copyExistingFile(join(input.root, '.hardening', 'run', 'app.log'), join(bundleDir, 'app.log')),
+    bootResult: await copyExistingFile(join(input.paths.scratchDir, 'boot-result.json'), join(bundleDir, 'boot-result.json')),
+    appLog: await copyExistingFile(join(input.paths.scratchDir, 'app.log'), join(bundleDir, 'app.log')),
     findings: await copyExistingFile(input.findingsPath, join(bundleDir, 'findings.json')),
-    testGeneration: await copyExistingFile(join(input.root, '.hardening', 'run', 'test-generation.json'), join(bundleDir, 'test-generation.json')),
+    testGeneration: await copyExistingFile(join(input.paths.scratchDir, 'test-generation.json'), join(bundleDir, 'test-generation.json')),
     patchDiff: await copyExistingFile(input.patchDiffPath, join(bundleDir, 'patch.diff')),
     generatedTests: await copyFilesToDirectory(input.generatedTestFiles, generatedTestsDir),
-    artifacts: await copyFilesToDirectory(await listExistingArtifactFiles(input.artifactFiles, join(input.root, '.hardening', 'artifacts')), artifactsDir)
+    artifacts: await copyFilesToDirectory(await listExistingArtifactFiles(input.artifactFiles, input.paths.artifactsDir), artifactsDir)
   };
   const manifestPath = join(bundleDir, 'manifest.json');
   const repairPlan = await generateRepairPlan({
@@ -256,10 +292,10 @@ async function writeRunArtifactBundle(input: {
     sourceManifestPath: manifestPath,
     runId
   });
-  const legacyRepairPlan = await copyExistingFile(repairPlan.repairPlanPath, join(input.root, '.hardening', 'run', 'repair-plan.json'));
-  const legacyRepairPlanMarkdown = await copyExistingFile(repairPlan.repairPlanMarkdownPath, join(input.root, '.hardening', 'run', 'repair-plan.md'));
-  const legacyRepairTaskPackage = await copyExistingFile(repairPlan.repairTaskPackagePath, join(input.root, '.hardening', 'run', 'repair-task-package.json'));
-  const legacyRepairTaskPackageMarkdown = await copyExistingFile(repairPlan.repairTaskPackageMarkdownPath, join(input.root, '.hardening', 'run', 'repair-task-package.md'));
+  const legacyRepairPlan = await copyExistingFile(repairPlan.repairPlanPath, join(input.paths.scratchDir, 'repair-plan.json'));
+  const legacyRepairPlanMarkdown = await copyExistingFile(repairPlan.repairPlanMarkdownPath, join(input.paths.scratchDir, 'repair-plan.md'));
+  const legacyRepairTaskPackage = await copyExistingFile(repairPlan.repairTaskPackagePath, join(input.paths.scratchDir, 'repair-task-package.json'));
+  const legacyRepairTaskPackageMarkdown = await copyExistingFile(repairPlan.repairTaskPackageMarkdownPath, join(input.paths.scratchDir, 'repair-task-package.md'));
   const filesWithRepairPlan = {
     ...files,
     repairPlan: repairPlan.repairPlanPath,
@@ -298,8 +334,8 @@ async function writeRunArtifactBundle(input: {
       repairPlanMarkdown: legacyRepairPlanMarkdown,
       repairTaskPackage: legacyRepairTaskPackage,
       repairTaskPackageMarkdown: legacyRepairTaskPackageMarkdown,
-      runDir: join(input.root, '.hardening', 'run'),
-      artifactsDir: join(input.root, '.hardening', 'artifacts'),
+      runDir: input.paths.scratchDir,
+      artifactsDir: input.paths.artifactsDir,
       generatedTests: input.generatedTestFiles
     }
   };
@@ -587,9 +623,9 @@ async function updateLatestSymlink(input: {
   await readlink(input.latestPath);
 }
 
-async function writeEmptyFindings(root: string): Promise<ExploreAppToolResult> {
-  const runDir = join(root, '.hardening', 'run');
-  const artifactsDir = join(root, '.hardening', 'artifacts');
+async function writeEmptyFindings(paths: RunPaths): Promise<ExploreAppToolResult> {
+  const runDir = paths.scratchDir;
+  const artifactsDir = paths.artifactsDir;
   const findingsPath = join(runDir, 'findings.json');
 
   await mkdir(runDir, { recursive: true });
@@ -606,8 +642,7 @@ async function writeEmptyFindings(root: string): Promise<ExploreAppToolResult> {
   };
 }
 
-async function writeExternalUrlBootResult(root: string, url: string): Promise<void> {
-  const runDir = join(root, '.hardening', 'run');
+async function writeExternalUrlBootResult(runDir: string, url: string): Promise<void> {
   const resultPath = join(runDir, 'boot-result.json');
 
   await mkdir(runDir, { recursive: true });
@@ -619,6 +654,7 @@ async function writeExternalUrlBootResult(root: string, url: string): Promise<vo
         url: redactSensitiveText(url),
         port: readPort(url),
         logsPath: '',
+        daemon: false,
         blockers: [],
         errors: []
       },
@@ -628,8 +664,7 @@ async function writeExternalUrlBootResult(root: string, url: string): Promise<vo
   );
 }
 
-async function writeFailedBootResult(root: string, error: string): Promise<void> {
-  const runDir = join(root, '.hardening', 'run');
+async function writeFailedBootResult(runDir: string, error: string): Promise<void> {
   const resultPath = join(runDir, 'boot-result.json');
 
   await mkdir(runDir, { recursive: true });
@@ -641,6 +676,7 @@ async function writeFailedBootResult(root: string, error: string): Promise<void>
         url: null,
         port: null,
         logsPath: '',
+        daemon: false,
         blockers: [],
         errors: [error]
       },

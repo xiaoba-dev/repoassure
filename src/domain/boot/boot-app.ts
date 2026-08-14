@@ -13,6 +13,7 @@ export interface BootAppInput {
   root: string;
   startCommand: string;
   timeoutMs: number;
+  runDir?: string;
 }
 
 export interface ParsedStartCommand {
@@ -140,7 +141,7 @@ export function normalizeClientUrl(url: string): string {
 
 export async function bootApp(input: BootAppInput): Promise<BootAppSession> {
   const parsed = parseStartCommand(input.startCommand);
-  const runDir = join(input.root, '.hardening', 'run');
+  const runDir = input.runDir ?? join(input.root, '.hardening', 'run');
   const logsPath = join(runDir, 'app.log');
 
   await mkdir(runDir, { recursive: true });

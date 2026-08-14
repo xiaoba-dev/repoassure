@@ -1,5 +1,5 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, isAbsolute, join, relative } from 'node:path';
+import { basename, dirname, isAbsolute, join } from 'node:path';
 
 import { shellQuoteArg } from '../../shared/shell-quote.js';
 import { redactSensitiveText } from '../../shared/privacy-redaction.js';
@@ -143,14 +143,12 @@ async function buildGeneratedTestDiffs(repoRoot: string, createdFiles: string[])
 
   for (const createdFile of createdFiles) {
     const resolvedPath = isAbsolute(createdFile) ? createdFile : join(repoRoot, createdFile);
-    const relativePath = normalizeDiffPath(relative(repoRoot, resolvedPath));
-
-    if (!relativePath || relativePath.startsWith('../')) {
-      continue;
-    }
+    /* The patch is a proposal for the target repo: the physical spec lives in the
+       run directory, but applying the patch should land it in tests/hardening. */
+    const proposedPath = normalizeDiffPath(join('tests', 'hardening', basename(resolvedPath)));
 
     try {
-      diffs.push(buildNewFileDiff(relativePath, await readFile(resolvedPath, 'utf8')));
+      diffs.push(buildNewFileDiff(proposedPath, await readFile(resolvedPath, 'utf8')));
     } catch {
       continue;
     }

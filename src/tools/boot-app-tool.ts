@@ -27,7 +27,7 @@ export function toSerializableBootResult(session: BootAppSession): BootAppResult
 
 export async function runBootAppTool(input: BootAppInput): Promise<BootAppToolSession> {
   const session = await bootApp(input);
-  const runDir = join(input.root, '.hardening', 'run');
+  const runDir = input.runDir ?? join(input.root, '.hardening', 'run');
   const resultPath = join(runDir, 'boot-result.json');
 
   await mkdir(runDir, { recursive: true });

@@ -8,9 +8,9 @@ export interface AnalyzeRepoToolResult {
   profilePath: string;
 }
 
-export async function runAnalyzeRepoTool(input: AnalyzeRepoInput): Promise<AnalyzeRepoToolResult> {
+export async function runAnalyzeRepoTool(input: AnalyzeRepoInput & { runDir?: string }): Promise<AnalyzeRepoToolResult> {
   const profile = await analyzeRepo(input);
-  const runDir = join(input.root, '.hardening', 'run');
+  const runDir = input.runDir ?? join(input.root, '.hardening', 'run');
   const profilePath = join(runDir, 'repo-profile.json');
 
   await mkdir(runDir, { recursive: true });

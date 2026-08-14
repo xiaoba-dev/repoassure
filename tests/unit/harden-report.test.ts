@@ -90,6 +90,35 @@ describe('generateHardenReport', () => {
     expect(patchDiff).toContain('diff --git a/tests/hardening/generated-findings.spec.ts b/tests/hardening/generated-findings.spec.ts');
   });
 
+  it('proposes generated tests at tests/hardening even when they live in the run directory', async () => {
+    const runDir = await createRunDir();
+    const outputPath = join(runDir, 'hardening-report.md');
+    const generatedSpecPath = join(runDir, '.hardening', 'run', 'generated-tests', 'generated-findings.spec.ts');
+
+    await writeFile(
+      join(runDir, 'test-generation.json'),
+      JSON.stringify({
+        createdFiles: [generatedSpecPath],
+        testCommand: 'npx playwright test',
+        validationStatus: 'skipped',
+        errors: []
+      })
+    );
+    await mkdir(join(runDir, '.hardening', 'run', 'generated-tests'), { recursive: true });
+    await writeFile(
+      generatedSpecPath,
+      "import { test } from '@playwright/test';\n\ntest('regression', async () => {});\n"
+    );
+
+    const result = await generateHardenReport({ runDir, outputPath });
+    const patchDiff = await readFile(result.patchDiffPath, 'utf8');
+
+    expect(patchDiff).toContain(
+      'diff --git a/tests/hardening/generated-findings.spec.ts b/tests/hardening/generated-findings.spec.ts'
+    );
+    expect(patchDiff).not.toContain('a/.hardening/run/generated-tests');
+  });
+
   it('escapes markdown table cells in report metadata', async () => {
     const runDir = await createRunDir();
     const outputPath = join(runDir, 'hardening-report.md');

@@ -181,9 +181,10 @@ pnpm app:cli -- --help
 | `--smoke-route <path-or-url>` | `generate-tests` | 为已知关键路径额外生成 Playwright smoke test，可重复传入。 |
 | `--base-url <url>` | `generate-tests` | 指定 generated spec 默认 `baseURL` 的应用 URL；只写入安全 origin，仍可由 `HARDENING_BASE_URL` 覆盖。 |
 | `--run-dir <dir>` | `plan` | 从指定 hardening run 目录生成或刷新 `repair-plan.json`、`repair-plan.md`、`repair-task-package.json` 和 `repair-task-package.md`；默认读取 `<repo>/.hardening/latest`。 |
+| `--run-dir <dir>` | `run`、`explore` | 把本次运行的全部落盘产物（含报告与生成的测试）写入指定目录，完全不写目标 repo；缺省时写入 `<repo>/.hardening` 并在 repo 根输出 `hardening-report.md`。 |
 | `--start-command <command>` | `run` | URL 省略时，指定应用启动命令。 |
 | `--boot-timeout-ms <ms>` | `run` | URL 省略时，指定启动等待超时。 |
-| `--workspace-output <dir>` | `run` | 额外把本 repo 的 run bundle 同步到一个多 repo 中央输出目录，并更新 workspace manifest。 |
+| `--workspace-output <dir>` | `run` | 额外把本 repo 的 run bundle 同步到一个多 repo 中央输出目录，并更新 workspace manifest；不改变运行产物本身的写入位置（重定向请用 `--run-dir`）。 |
 
 ## MCP Server
 
@@ -417,7 +418,7 @@ Benchmark 会对每个 repo 执行完整 `run --browser`，并重启 fixture app
 - `.hardening/run/patch.diff`
 - `.hardening/artifacts/*`
 - `hardening-report.md`
-- `tests/hardening/*.spec.ts`
+- `.hardening/run/generated-tests/*.spec.ts`（`patch.diff` 会把这些 spec 提议为目标 repo 的 `tests/hardening/*.spec.ts`，由用户应用补丁后才落进仓）
 - `docs/acceptance/acceptance-run.md`
 - `docs/acceptance/goal-completion-audit.md`
 - `docs/acceptance/user-acceptance-handoff.md`

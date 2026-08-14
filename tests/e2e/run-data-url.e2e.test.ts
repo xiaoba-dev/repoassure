@@ -36,7 +36,7 @@ describe('hardening run E2E', () => {
     };
 
     expect(exitCode).toBe(0);
-    expect(stderr).toBe('');
+    expect(stderr).toContain('Writing run artifacts into');
     await expect(readFile(output.findingsPath, 'utf8')).resolves.toContain('"findings": []');
     await expect(readFile(output.reportPath, 'utf8')).resolves.toContain('# hardening-mcp 硬化报告');
     await expect(readFile(output.testGeneration.createdFiles[0]!, 'utf8')).resolves.toContain("import { test, expect } from '@playwright/test'");

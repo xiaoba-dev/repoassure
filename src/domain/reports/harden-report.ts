@@ -23,10 +23,17 @@ export interface HardenReportResult {
   patchDiffPath: string;
 }
 
+interface DeployAdapterSummary {
+  adapter: string;
+  routeDirectories: string[];
+  servedBy: string;
+}
+
 interface RepoProfileSummary {
   framework: string;
   packageManager: string;
   recommendedStartCommand: string | null;
+  deployAdapters: DeployAdapterSummary[];
   blockers: string[];
   confidence: string;
 }
@@ -239,7 +246,7 @@ function buildReport(input: {
 | 启动状态 | ${formatTableCell(input.bootResult.status)} |
 | 应用 URL | ${formatTableCell(input.bootResult.url ?? '未检测到')} |
 | 测量环境 | ${formatTableCell(formatBootEnvironment(input.bootResult.environment))} |
-${formatEnvironmentCaveat(input.bootResult.environment)}
+${formatEnvironmentCaveat(input.bootResult.environment, input.repoProfile)}
 ## Repo Profile
 
 | 字段 | 值 |
@@ -247,6 +254,7 @@ ${formatEnvironmentCaveat(input.bootResult.environment)}
 | framework | ${formatTableCell(input.repoProfile.framework)} |
 | packageManager | ${formatTableCell(input.repoProfile.packageManager)} |
 | recommendedStartCommand | ${formatTableCell(input.repoProfile.recommendedStartCommand ?? '未知')} |
+| deployAdapters | ${formatTableCell(formatDeployAdapters(input.repoProfile.deployAdapters))} |
 | confidence | ${formatTableCell(input.repoProfile.confidence)} |
 
 ## 发现项
@@ -289,18 +297,65 @@ function formatBootEnvironment(environment: string): string {
 /* A framework dev command does not serve routes that a deploy adapter runs
    separately, so those routes 404 locally while working in production. Without
    this note the score reads as a verdict on the deployed app instead of on what
-   the run could actually reach. */
-function formatEnvironmentCaveat(environment: string): string {
+   the run could actually reach. When the repo says which adapter it uses, the
+   note names it and the command that would serve it instead of guessing. */
+function formatEnvironmentCaveat(environment: string, repoProfile: RepoProfileSummary): string {
   if (environment !== 'self-booted') {
     return '';
   }
 
+  const startCommand = repoProfile.recommendedStartCommand ?? '启动命令';
+  const adapterLines = repoProfile.deployAdapters.map((adapter) => {
+    const directories = adapter.routeDirectories.map((directory) => `\`${directory}/\``).join('、');
+    return `> - 检测到 ${adapter.adapter}：\`${startCommand}\` 不服务 ${directories} 下的路由，改用 \`${adapter.servedBy}\` 才会服务它们。`;
+  });
+
   return `
 > 本次评分测量的是自启动的本地应用，不等同于生产环境就绪度。
-> 由部署适配器单独运行的路由（Cloudflare Pages Functions、Netlify Functions、Vercel serverless、SvelteKit adapter endpoints 等）
-> 不会被框架 dev 命令服务，因此这类路由在本地返回 404 属于环境差异而非应用缺陷。
-> 针对已部署 URL 重跑（\`hardening run <repo> <deployed-url>\`）可以区分两者。
+${
+  adapterLines.length > 0
+    ? `${adapterLines.join('\n')}
+> 这些路由在本地返回 404 属于环境差异而非应用缺陷。`
+    : '> 由部署适配器单独运行的路由（Cloudflare Pages Functions、Netlify Functions、Vercel serverless 等）不会被框架 dev 命令服务，这类路由在本地返回 404 属于环境差异而非应用缺陷。'
+}
+> 针对已部署 URL 重跑（\`hardening run <repo> <deployed-url>\`），或对现有 run 执行 \`hardening verify-env <runDir> --deployed-url <url>\`，可以区分两者。
 `;
+}
+
+function formatDeployAdapters(adapters: DeployAdapterSummary[]): string {
+  if (adapters.length === 0) {
+    return '无';
+  }
+
+  return adapters
+    .map((adapter) => `${adapter.adapter} (${adapter.routeDirectories.map((directory) => `${directory}/`).join(', ')})`)
+    .join('; ');
+}
+
+function readDeployAdapters(value: unknown): DeployAdapterSummary[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.flatMap((entry) => {
+    if (typeof entry !== 'object' || entry === null) {
+      return [];
+    }
+
+    const record = entry as Record<string, unknown>;
+
+    if (typeof record.adapter !== 'string') {
+      return [];
+    }
+
+    return [
+      {
+        adapter: record.adapter,
+        routeDirectories: readStringArray(record.routeDirectories),
+        servedBy: readString(record.servedBy, '未知命令')
+      }
+    ];
+  });
 }
 
 function buildVerificationCommand(testGeneration: TestGenerationSummary, bootResult: BootResultSummary): string {
@@ -375,6 +430,7 @@ async function readRepoProfile(path: string): Promise<RepoProfileSummary> {
     packageManager: readString(record.packageManager, 'unknown'),
     recommendedStartCommand:
       typeof record.recommendedStartCommand === 'string' ? record.recommendedStartCommand : null,
+    deployAdapters: readDeployAdapters(record.deployAdapters),
     blockers: readStringArray(record.blockers),
     confidence: readString(record.confidence, 'low')
   };

@@ -8,6 +8,7 @@ import { runGenerateRepairPlanTool } from '../../tools/generate-repair-plan-tool
 import { runHardenReportTool } from '../../tools/harden-report-tool.js';
 import { runHardeningTool } from '../../tools/run-hardening-tool.js';
 import { runSecurityImportTool } from '../../tools/security-import-tool.js';
+import { runVerifyEnvironmentTool } from '../../tools/verify-environment-tool.js';
 import { BrowserUnavailableError, createPlaywrightBrowserDriver } from '../../domain/explore/playwright-driver.js';
 import { redactSensitiveText } from '../../shared/privacy-redaction.js';
 
@@ -43,6 +44,12 @@ export interface GenerateTestsCliOptions {
 export interface GenerateRepairPlanCliOptions {
   root?: string;
   runDir?: string;
+  error?: string;
+}
+
+export interface VerifyEnvironmentCliOptions {
+  runDir?: string;
+  deployedUrl?: string;
   error?: string;
 }
 
@@ -99,6 +106,10 @@ export async function runCli(args: string[], io: CliIO): Promise<number> {
 
   if (command === 'run') {
     return runHardening(rest, io);
+  }
+
+  if (command === 'verify-env') {
+    return runVerifyEnvironment(rest, io);
   }
 
   writeCliError(io, `Unknown command: ${command}`);
@@ -162,6 +173,75 @@ async function runGenerateRepairPlan(args: string[], io: CliIO): Promise<number>
     writeCliError(io, `Failed to generate repair plan: ${message}`);
     return 1;
   }
+}
+
+async function runVerifyEnvironment(args: string[], io: CliIO): Promise<number> {
+  const options = parseVerifyEnvironmentOptions(args);
+
+  if (options.error) {
+    writeCliError(io, options.error);
+    return 1;
+  }
+
+  if (!options.runDir || !options.deployedUrl) {
+    writeCliError(io, 'Missing required arguments: <runDir> --deployed-url <url>');
+    return 1;
+  }
+
+  try {
+    const result = await runVerifyEnvironmentTool({
+      runDir: options.runDir,
+      deployedUrl: options.deployedUrl
+    });
+    io.writeStdout(formatCliJsonOutput(result));
+    return 0;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    writeCliError(io, `Failed to verify findings against the deployed URL: ${message}`);
+    return 1;
+  }
+}
+
+export function parseVerifyEnvironmentOptions(args: string[]): VerifyEnvironmentCliOptions {
+  const positional: string[] = [];
+  let deployedUrl: string | undefined;
+  let error: string | undefined;
+
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+
+    if (!arg) {
+      continue;
+    }
+
+    if (arg === '--deployed-url' || arg.startsWith('--deployed-url=')) {
+      const value = readOptionValue(args, index, '--deployed-url');
+      if (value.consumedNext) {
+        index += 1;
+      }
+      if (value.error) {
+        error = value.error;
+      } else if (value.value) {
+        deployedUrl = value.value;
+      }
+      continue;
+    }
+
+    if (arg.startsWith('-')) {
+      error = `Unknown option: ${arg}`;
+      continue;
+    }
+
+    positional.push(arg);
+  }
+
+  const parseError = error ?? unexpectedPositionalArgument(positional, 1);
+
+  return {
+    ...(positional[0] ? { runDir: positional[0] } : {}),
+    ...(deployedUrl ? { deployedUrl } : {}),
+    ...(parseError ? { error: parseError } : {})
+  };
 }
 
 async function runHardening(args: string[], io: CliIO): Promise<number> {
@@ -358,6 +438,7 @@ Usage:
   hardening plan <repo> [--run-dir <dir>]
   hardening report <runDir> <outputPath>
   hardening security import --provider <provider> --scan-dir <dir> --repo <repo> --run-dir <dir>
+  hardening verify-env <runDir> --deployed-url <url>
   hardening run <repo> [url] [--browser] [--critical-path <path-or-intent>] [--max-routes <n>] [--max-actions-per-route <n>] [--storage-state <path>] [--trace] [--start-command <command>] [--boot-timeout-ms <ms>] [--run-dir <dir>] [--workspace-output <dir>]
 
 Options:
@@ -478,6 +559,35 @@ Options:
   --run-dir <dir>              Write every run artifact (report and generated tests included) under this directory and leave the target repo untouched. Default: <repo>/.hardening plus <repo>/hardening-report.md.
   --workspace-output <dir>     Also copy this repo run bundle into a shared multi-repo workspace output directory. Does not redirect the run artifacts themselves; use --run-dir for that.
   --help, -h                   Show this help.
+
+`;
+  }
+
+  if (command === 'verify-env') {
+    return `hardening verify-env
+
+Usage:
+  hardening verify-env <runDir> --deployed-url <url>
+
+Re-checks each finding whose failure a single request can settle against a deployed
+URL, so an environment gap can be told apart from a defect. Routes a deploy adapter
+serves separately (Cloudflare Pages Functions, Netlify Functions, Vercel serverless)
+404 under a framework dev command while working in production; this pass proves which.
+
+Findings that pass against the deployed URL are downgraded to P2 and annotated with
+both results. Findings that fail there too keep their severity. Findings a request
+cannot settle (dead controls, blank renders, JS errors) are left untouched.
+
+The original findings are preserved as findings.pre-verification.json, and the full
+evidence is written to environment-verification.json. Re-run \`hardening report
+<runDir> <outputPath>\` afterwards to score the verified findings.
+
+Arguments:
+  <runDir>  A hardening run directory containing findings.json.
+
+Options:
+  --deployed-url <url>  Deployed origin to re-check failing routes and resources against.
+  --help, -h            Show this help.
 
 `;
   }

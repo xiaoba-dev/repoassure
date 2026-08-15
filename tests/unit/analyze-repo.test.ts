@@ -19,6 +19,115 @@ async function createRepo(files: Record<string, string>): Promise<string> {
 }
 
 describe('analyzeRepo', () => {
+  it('detects Cloudflare Pages Functions that the dev command will not serve', async () => {
+    const root = await createRepo({
+      'package.json': JSON.stringify({
+        scripts: { dev: 'astro dev', build: 'astro build' },
+        dependencies: { astro: '7.2.2' }
+      }),
+      'wrangler.toml': 'name = "site"\npages_build_output_dir = "dist"\n',
+      'functions/api/stats.js': 'export function onRequest() {}\n',
+      'package-lock.json': '{}'
+    });
+
+    const profile = await analyzeRepo({ root });
+
+    expect(profile.deployAdapters).toEqual([
+      {
+        adapter: 'cloudflare-pages-functions',
+        routeDirectories: ['functions'],
+        servedBy: 'npx wrangler pages dev',
+        evidence: ['functions/', 'wrangler.toml']
+      }
+    ]);
+  });
+
+
+  it('detects Cloudflare Pages Functions from a dependency when there is no wrangler config', async () => {
+    const root = await createRepo({
+      'package.json': JSON.stringify({
+        scripts: { dev: 'astro dev' },
+        dependencies: { astro: '7.2.2' },
+        devDependencies: { wrangler: '4.0.0' }
+      }),
+      'functions/api/stats.js': 'export function onRequest() {}\n',
+      'package-lock.json': '{}'
+    });
+
+    const profile = await analyzeRepo({ root });
+
+    expect(profile.deployAdapters).toEqual([
+      {
+        adapter: 'cloudflare-pages-functions',
+        routeDirectories: ['functions'],
+        servedBy: 'npx wrangler pages dev',
+        evidence: ['functions/', 'wrangler']
+      }
+    ]);
+  });
+
+  it('detects Netlify functions from the netlify directory', async () => {
+    const root = await createRepo({
+      'package.json': JSON.stringify({
+        scripts: { dev: 'vite' },
+        devDependencies: { vite: '8.0.0' }
+      }),
+      'netlify.toml': '[build]\n  command = "npm run build"\n',
+      'netlify/functions/hello.js': 'exports.handler = async () => ({ statusCode: 200 });\n',
+      'package-lock.json': '{}'
+    });
+
+    const profile = await analyzeRepo({ root });
+
+    expect(profile.deployAdapters).toEqual([
+      {
+        adapter: 'netlify-functions',
+        routeDirectories: ['netlify/functions'],
+        servedBy: 'npx netlify dev',
+        evidence: ['netlify/functions/', 'netlify.toml']
+      }
+    ]);
+  });
+
+  it('detects Vercel serverless routes from an api directory beside a vercel config', async () => {
+    const root = await createRepo({
+      'package.json': JSON.stringify({
+        scripts: { dev: 'vite' },
+        devDependencies: { vite: '8.0.0' }
+      }),
+      'vercel.json': '{"framework":"vite"}',
+      'api/stats.ts': 'export default function handler() {}\n',
+      'package-lock.json': '{}'
+    });
+
+    const profile = await analyzeRepo({ root });
+
+    expect(profile.deployAdapters).toEqual([
+      {
+        adapter: 'vercel-serverless',
+        routeDirectories: ['api'],
+        servedBy: 'npx vercel dev',
+        evidence: ['api/', 'vercel.json']
+      }
+    ]);
+  });
+
+  it('does not claim an adapter when the routes directory has no matching config', async () => {
+    const root = await createRepo({
+      'package.json': JSON.stringify({
+        scripts: { dev: 'vite' },
+        devDependencies: { vite: '8.0.0' }
+      }),
+      'functions/helpers.ts': 'export const noop = () => undefined;\n',
+      'api/client.ts': 'export const request = () => undefined;\n',
+      'package-lock.json': '{}'
+    });
+
+    const profile = await analyzeRepo({ root });
+
+    expect(profile.deployAdapters).toEqual([]);
+  });
+
   it('detects a Next.js pnpm repo and recommends pnpm dev', async () => {
     const root = await createRepo({
       'package.json': JSON.stringify({

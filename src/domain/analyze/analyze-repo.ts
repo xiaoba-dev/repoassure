@@ -17,6 +17,19 @@ export interface RepoScripts {
   preview: string | null;
 }
 
+export type DeployAdapter = 'cloudflare-pages-functions' | 'netlify-functions' | 'vercel-serverless';
+
+/* Routes a deploy platform runs in its own runtime. A framework dev command does
+   not serve them, so they 404 locally while working in production — the difference
+   between an environment gap and a defect, which findings cannot tell apart on
+   their own. */
+export interface DeployAdapterHint {
+  adapter: DeployAdapter;
+  routeDirectories: string[];
+  servedBy: string;
+  evidence: string[];
+}
+
 export interface RepoProfile {
   framework: Framework;
   packageManager: PackageManager;
@@ -25,6 +38,7 @@ export interface RepoProfile {
   appDirectories: string[];
   existingTestDirectories: string[];
   envHints: string[];
+  deployAdapters: DeployAdapterHint[];
   blockers: string[];
   confidence: Confidence;
 }
@@ -85,10 +99,11 @@ export async function analyzeRepo(input: AnalyzeRepoInput): Promise<RepoProfile>
   ) {
     blockers.push('No Web App start script detected');
   }
-  const [rootAppDirectories, existingTestDirectories, envHints] = await Promise.all([
+  const [rootAppDirectories, existingTestDirectories, envHints, deployAdapters] = await Promise.all([
     detectExistingDirectories(input.root, ['app', 'pages', 'src']),
     detectExistingDirectories(input.root, ['tests', 'test', '__tests__', 'e2e']),
-    detectEnvHints(input.root)
+    detectEnvHints(input.root),
+    detectDeployAdapters(input.root, packageJson)
   ]);
   const appDirectories = Array.from(
     new Set([
@@ -105,6 +120,7 @@ export async function analyzeRepo(input: AnalyzeRepoInput): Promise<RepoProfile>
     appDirectories,
     existingTestDirectories,
     envHints,
+    deployAdapters,
     blockers,
     confidence: getConfidence({
       packageJson,
@@ -765,6 +781,97 @@ function getConfidence(input: {
   }
 
   return 'medium';
+}
+
+interface DeployAdapterProbe {
+  adapter: DeployAdapter;
+  routeDirectories: string[];
+  configFiles: string[];
+  dependencyPattern: RegExp;
+  servedBy: string;
+}
+
+/* A routes directory alone is ambiguous — plenty of repos keep ordinary modules in
+   `functions/` or `api/` — so a platform signal has to corroborate it. Either half
+   of that signal will do: Cloudflare Pages discovers `functions/` with no config
+   file at all, so requiring wrangler.toml would miss the common deployment. */
+const DEPLOY_ADAPTER_PROBES: DeployAdapterProbe[] = [
+  {
+    adapter: 'cloudflare-pages-functions',
+    routeDirectories: ['functions'],
+    configFiles: ['wrangler.toml', 'wrangler.jsonc', 'wrangler.json'],
+    dependencyPattern: /^(?:wrangler|@cloudflare\/.+|@astrojs\/cloudflare|@sveltejs\/adapter-cloudflare)$/u,
+    servedBy: 'npx wrangler pages dev'
+  },
+  {
+    adapter: 'netlify-functions',
+    routeDirectories: ['netlify/functions', 'netlify/edge-functions'],
+    configFiles: ['netlify.toml'],
+    dependencyPattern: /^(?:netlify-cli|@netlify\/.+|@astrojs\/netlify|@sveltejs\/adapter-netlify)$/u,
+    servedBy: 'npx netlify dev'
+  },
+  {
+    adapter: 'vercel-serverless',
+    routeDirectories: ['api'],
+    configFiles: ['vercel.json', '.vercel/project.json'],
+    dependencyPattern: /^(?:vercel|@vercel\/.+|@astrojs\/vercel|@sveltejs\/adapter-vercel)$/u,
+    servedBy: 'npx vercel dev'
+  }
+];
+
+async function detectDeployAdapters(root: string, packageJson: PackageJsonShape | null): Promise<DeployAdapterHint[]> {
+  const hints = await Promise.all(
+    DEPLOY_ADAPTER_PROBES.map((probe) => detectDeployAdapter(root, packageJson, probe))
+  );
+
+  return hints.flatMap((hint) => (hint ? [hint] : []));
+}
+
+async function detectDeployAdapter(
+  root: string,
+  packageJson: PackageJsonShape | null,
+  probe: DeployAdapterProbe
+): Promise<DeployAdapterHint | null> {
+  const [routeDirectories, configFiles] = await Promise.all([
+    filterExisting(root, probe.routeDirectories),
+    filterExisting(root, probe.configFiles)
+  ]);
+
+  if (routeDirectories.length === 0) {
+    return null;
+  }
+
+  const dependencies = matchDependencies(packageJson, probe.dependencyPattern);
+  const platformSignals = [...configFiles, ...dependencies];
+
+  if (platformSignals.length === 0) {
+    return null;
+  }
+
+  return {
+    adapter: probe.adapter,
+    routeDirectories,
+    servedBy: probe.servedBy,
+    evidence: [...routeDirectories.map((directory) => `${directory}/`), ...platformSignals]
+  };
+}
+
+function matchDependencies(packageJson: PackageJsonShape | null, pattern: RegExp): string[] {
+  if (!packageJson) {
+    return [];
+  }
+
+  return Object.keys({ ...packageJson.dependencies, ...packageJson.devDependencies })
+    .filter((name) => pattern.test(name))
+    .sort();
+}
+
+async function filterExisting(root: string, candidates: string[]): Promise<string[]> {
+  const present = await Promise.all(
+    candidates.map(async (candidate) => ((await exists(join(root, candidate))) ? [candidate] : []))
+  );
+
+  return present.flat();
 }
 
 async function exists(path: string): Promise<boolean> {

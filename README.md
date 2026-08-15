@@ -143,6 +143,9 @@ pnpm dev security import --provider codex-security --scan-dir <dir> --repo <repo
 pnpm dev run <repo> [url]
 pnpm dev run <repo> [url] --browser --critical-path /login --start-command "pnpm dev" --boot-timeout-ms 30000
 pnpm dev run <repo> [url] --workspace-output .hardening-workspace
+
+# 区分环境差异与真实缺陷：对已有 run 复核失败路由
+pnpm dev verify-env <repo>/.hardening/latest --deployed-url https://app.example.com
 ```
 
 构建后也可以使用 bin：
@@ -181,6 +184,7 @@ pnpm app:cli -- --help
 | `--smoke-route <path-or-url>` | `generate-tests` | 为已知关键路径额外生成 Playwright smoke test，可重复传入。 |
 | `--base-url <url>` | `generate-tests` | 指定 generated spec 默认 `baseURL` 的应用 URL；只写入安全 origin，仍可由 `HARDENING_BASE_URL` 覆盖。 |
 | `--run-dir <dir>` | `plan` | 从指定 hardening run 目录生成或刷新 `repair-plan.json`、`repair-plan.md`、`repair-task-package.json` 和 `repair-task-package.md`；默认读取 `<repo>/.hardening/latest`。 |
+| `--deployed-url <url>` | `verify-env` | 针对已部署 URL 复核可由一次请求判定的 finding：在生产可用的降级为 P2 并附双环境证据，仍失败的保留原严重级别；无法由请求判定的（dead control、白屏、JS 错误）不变。 |
 | `--run-dir <dir>` | `run`、`explore` | 把本次运行的全部落盘产物（含报告与生成的测试）写入指定目录，完全不写目标 repo；缺省时写入 `<repo>/.hardening` 并在 repo 根输出 `hardening-report.md`。 |
 | `--start-command <command>` | `run` | URL 省略时，指定应用启动命令。 |
 | `--boot-timeout-ms <ms>` | `run` | URL 省略时，指定启动等待超时。 |

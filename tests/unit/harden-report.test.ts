@@ -180,6 +180,49 @@ describe('generateHardenReport', () => {
     expect(report).not.toContain('Cloudflare Pages Functions');
   });
 
+
+  it('names the detected deploy adapter and the command that serves it', async () => {
+    const runDir = await createRunDir();
+    const outputPath = join(runDir, 'hardening-report.md');
+
+    await writeFile(
+      join(runDir, 'repo-profile.json'),
+      JSON.stringify({
+        framework: 'unknown',
+        packageManager: 'npm',
+        recommendedStartCommand: 'npm run dev',
+        deployAdapters: [
+          {
+            adapter: 'cloudflare-pages-functions',
+            routeDirectories: ['functions'],
+            servedBy: 'npx wrangler pages dev',
+            evidence: ['functions/', 'wrangler.toml']
+          }
+        ],
+        blockers: [],
+        confidence: 'high'
+      })
+    );
+    await writeFile(
+      join(runDir, 'boot-result.json'),
+      JSON.stringify({
+        status: 'running',
+        url: 'http://localhost:4321',
+        port: 4321,
+        environment: 'self-booted',
+        blockers: [],
+        errors: []
+      })
+    );
+
+    await generateHardenReport({ runDir, outputPath });
+    const report = await readFile(outputPath, 'utf8');
+
+    expect(report).toContain('`npm run dev` 不服务 `functions/` 下的路由');
+    expect(report).toContain('npx wrangler pages dev');
+    expect(report).toContain('| deployAdapters | cloudflare-pages-functions (functions/) |');
+  });
+
   it('escapes markdown table cells in report metadata', async () => {
     const runDir = await createRunDir();
     const outputPath = join(runDir, 'hardening-report.md');

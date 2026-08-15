@@ -323,17 +323,18 @@ export async function createPlaywrightBrowserDriver(input: CreatePlaywrightBrows
     snapshot: async (url, options) => {
       const traceEnabled = input.trace === true;
       const { page, context, closeContext } = await newPageForSnapshot(browser, input.storageStatePath, traceEnabled);
-      const consoleErrors: string[] = [];
+      const consoleErrors: ConsoleErrorRecord[] = [];
       const pageErrors: string[] = [];
       const failedRequests: string[] = [];
+      const failedResponses: FailedResponseRecord[] = [];
       const artifactPath = artifactPathForUrl(options.artifactsDir, url);
       const tracePath = traceEnabled ? tracePathForUrl(options.artifactsDir, url) : null;
       let traceStarted = false;
 
       page.on('console', (message) => {
-        const text = getConsoleErrorText(message);
-        if (text) {
-          consoleErrors.push(text);
+        const consoleError = getConsoleError(message);
+        if (consoleError) {
+          consoleErrors.push(consoleError);
         }
       });
       page.on('pageerror', (error) => {
@@ -341,6 +342,16 @@ export async function createPlaywrightBrowserDriver(input: CreatePlaywrightBrows
       });
       page.on('requestfailed', (request) => {
         failedRequests.push(formatFailedRequest(request));
+      });
+      /* requestfailed does not fire for HTTP 4xx/5xx — those are successful
+         responses as far as the browser is concerned — so a 404 subresource would
+         otherwise leave only Chrome's console text, which deliberately omits the
+         URL. Watching responses is what turns it into an actionable finding. */
+      page.on('response', (response) => {
+        const failedResponse = getFailedResponse(response);
+        if (failedResponse) {
+          failedResponses.push(failedResponse);
+        }
       });
 
       try {
@@ -374,9 +385,9 @@ export async function createPlaywrightBrowserDriver(input: CreatePlaywrightBrows
           html,
           bodyText,
           links,
-          consoleErrors,
+          consoleErrors: buildConsoleErrorEvidence(consoleErrors, failedResponses),
           pageErrors,
-          failedRequests,
+          failedRequests: dedupe([...failedRequests, ...failedResponses.map(formatFailedResponse)]),
           artifactFiles,
           interactions
         };
@@ -794,14 +805,92 @@ function tracePathForUrl(artifactsDir: string, url: string): string {
   return artifactPathForUrl(artifactsDir, url).replace(/\.png$/u, '.trace.zip');
 }
 
-function getConsoleErrorText(message: unknown): string | null {
+interface ConsoleErrorRecord {
+  text: string;
+  url: string | null;
+}
+
+interface FailedResponseRecord {
+  url: string;
+  status: number;
+  method: string;
+  resourceType: string;
+}
+
+function getConsoleError(message: unknown): ConsoleErrorRecord | null {
   const type = callStringMethod(message, 'type');
 
   if (type !== 'error') {
     return null;
   }
 
-  return callStringMethod(message, 'text') ?? 'Unknown console error';
+  return {
+    text: callStringMethod(message, 'text') ?? 'Unknown console error',
+    /* Chrome leaves the failing URL out of the console text but keeps it on the
+       message location, so this recovers it even without the response event. */
+    url: readConsoleLocationUrl(message)
+  };
+}
+
+function readConsoleLocationUrl(message: unknown): string | null {
+  const location = callUnknownMethod(message, 'location');
+
+  if (!isRecord(location) || typeof location.url !== 'string' || !location.url) {
+    return null;
+  }
+
+  return location.url;
+}
+
+function getFailedResponse(response: unknown): FailedResponseRecord | null {
+  const status = callUnknownMethod(response, 'status');
+  const url = callStringMethod(response, 'url');
+
+  if (typeof status !== 'number' || status < 400 || !url) {
+    return null;
+  }
+
+  const request = callUnknownMethod(response, 'request');
+
+  return {
+    url,
+    status,
+    method: callStringMethod(request, 'method') ?? 'GET',
+    resourceType: callStringMethod(request, 'resourceType') ?? 'other'
+  };
+}
+
+function formatFailedResponse(response: FailedResponseRecord): string {
+  return `${response.method} ${response.url} :: ${response.status} (${response.resourceType})`;
+}
+
+/* A resource-load console line whose URL is already reported as a failed response
+   would say strictly less than that response, so it is dropped instead of listed
+   beside it — that duplication is what turned four broken endpoints into seven
+   identical, unactionable rows. */
+function buildConsoleErrorEvidence(
+  consoleErrors: ConsoleErrorRecord[],
+  failedResponses: FailedResponseRecord[]
+): string[] {
+  const reportedUrls = new Set(failedResponses.map((response) => response.url));
+
+  return dedupe(
+    consoleErrors.flatMap((consoleError) => {
+      if (consoleError.url && reportedUrls.has(consoleError.url) && isResourceLoadFailure(consoleError.text)) {
+        return [];
+      }
+
+      return [consoleError.url ? `${consoleError.text} :: ${consoleError.url}` : consoleError.text];
+    })
+  );
+}
+
+function isResourceLoadFailure(text: string): boolean {
+  return /failed to load resource/iu.test(text);
+}
+
+function dedupe(values: string[]): string[] {
+  return Array.from(new Set(values));
 }
 
 function formatUnknownError(error: unknown): string {

@@ -90,7 +90,9 @@ describe('hardening MCP server', () => {
       });
       const findingsPath = readString(explore.findingsPath);
 
-      expect(readArray(explore.visitedRoutes)).toContain(bootUrl);
+      // The boot url has no trailing slash; exploration normalizes it so the root
+      // is one route rather than two spellings of the same page.
+      expect(readArray(explore.visitedRoutes)).toContain(new URL(bootUrl).toString());
       await expect(readFile(findingsPath, 'utf8')).resolves.toContain('"findings"');
 
       const generateTests = await callTool(transport, 14, 'generate_tests', {

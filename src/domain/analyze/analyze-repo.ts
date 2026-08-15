@@ -103,7 +103,7 @@ export async function analyzeRepo(input: AnalyzeRepoInput): Promise<RepoProfile>
     detectExistingDirectories(input.root, ['app', 'pages', 'src']),
     detectExistingDirectories(input.root, ['tests', 'test', '__tests__', 'e2e']),
     detectEnvHints(input.root),
-    detectDeployAdapters(input.root)
+    detectDeployAdapters(input.root, packageJson)
   ]);
   const appDirectories = Array.from(
     new Set([
@@ -787,46 +787,64 @@ interface DeployAdapterProbe {
   adapter: DeployAdapter;
   routeDirectories: string[];
   configFiles: string[];
+  dependencyPattern: RegExp;
   servedBy: string;
 }
 
-/* Each probe needs both halves: a routes directory alone is ambiguous (plenty of
-   repos have `functions/` or `api/` holding ordinary modules), and a config alone
-   says nothing about routes this run could fail to reach. */
+/* A routes directory alone is ambiguous — plenty of repos keep ordinary modules in
+   `functions/` or `api/` — so a platform signal has to corroborate it. Either half
+   of that signal will do: Cloudflare Pages discovers `functions/` with no config
+   file at all, so requiring wrangler.toml would miss the common deployment. */
 const DEPLOY_ADAPTER_PROBES: DeployAdapterProbe[] = [
   {
     adapter: 'cloudflare-pages-functions',
     routeDirectories: ['functions'],
     configFiles: ['wrangler.toml', 'wrangler.jsonc', 'wrangler.json'],
+    dependencyPattern: /^(?:wrangler|@cloudflare\/.+|@astrojs\/cloudflare|@sveltejs\/adapter-cloudflare)$/u,
     servedBy: 'npx wrangler pages dev'
   },
   {
     adapter: 'netlify-functions',
     routeDirectories: ['netlify/functions', 'netlify/edge-functions'],
     configFiles: ['netlify.toml'],
+    dependencyPattern: /^(?:netlify-cli|@netlify\/.+|@astrojs\/netlify|@sveltejs\/adapter-netlify)$/u,
     servedBy: 'npx netlify dev'
   },
   {
     adapter: 'vercel-serverless',
     routeDirectories: ['api'],
     configFiles: ['vercel.json', '.vercel/project.json'],
+    dependencyPattern: /^(?:vercel|@vercel\/.+|@astrojs\/vercel|@sveltejs\/adapter-vercel)$/u,
     servedBy: 'npx vercel dev'
   }
 ];
 
-async function detectDeployAdapters(root: string): Promise<DeployAdapterHint[]> {
-  const hints = await Promise.all(DEPLOY_ADAPTER_PROBES.map((probe) => detectDeployAdapter(root, probe)));
+async function detectDeployAdapters(root: string, packageJson: PackageJsonShape | null): Promise<DeployAdapterHint[]> {
+  const hints = await Promise.all(
+    DEPLOY_ADAPTER_PROBES.map((probe) => detectDeployAdapter(root, packageJson, probe))
+  );
 
   return hints.flatMap((hint) => (hint ? [hint] : []));
 }
 
-async function detectDeployAdapter(root: string, probe: DeployAdapterProbe): Promise<DeployAdapterHint | null> {
+async function detectDeployAdapter(
+  root: string,
+  packageJson: PackageJsonShape | null,
+  probe: DeployAdapterProbe
+): Promise<DeployAdapterHint | null> {
   const [routeDirectories, configFiles] = await Promise.all([
     filterExisting(root, probe.routeDirectories),
     filterExisting(root, probe.configFiles)
   ]);
 
-  if (routeDirectories.length === 0 || configFiles.length === 0) {
+  if (routeDirectories.length === 0) {
+    return null;
+  }
+
+  const dependencies = matchDependencies(packageJson, probe.dependencyPattern);
+  const platformSignals = [...configFiles, ...dependencies];
+
+  if (platformSignals.length === 0) {
     return null;
   }
 
@@ -834,8 +852,18 @@ async function detectDeployAdapter(root: string, probe: DeployAdapterProbe): Pro
     adapter: probe.adapter,
     routeDirectories,
     servedBy: probe.servedBy,
-    evidence: [...routeDirectories.map((directory) => `${directory}/`), ...configFiles]
+    evidence: [...routeDirectories.map((directory) => `${directory}/`), ...platformSignals]
   };
+}
+
+function matchDependencies(packageJson: PackageJsonShape | null, pattern: RegExp): string[] {
+  if (!packageJson) {
+    return [];
+  }
+
+  return Object.keys({ ...packageJson.dependencies, ...packageJson.devDependencies })
+    .filter((name) => pattern.test(name))
+    .sort();
 }
 
 async function filterExisting(root: string, candidates: string[]): Promise<string[]> {

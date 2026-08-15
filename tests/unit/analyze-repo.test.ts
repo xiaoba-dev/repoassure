@@ -42,6 +42,30 @@ describe('analyzeRepo', () => {
     ]);
   });
 
+
+  it('detects Cloudflare Pages Functions from a dependency when there is no wrangler config', async () => {
+    const root = await createRepo({
+      'package.json': JSON.stringify({
+        scripts: { dev: 'astro dev' },
+        dependencies: { astro: '7.2.2' },
+        devDependencies: { wrangler: '4.0.0' }
+      }),
+      'functions/api/stats.js': 'export function onRequest() {}\n',
+      'package-lock.json': '{}'
+    });
+
+    const profile = await analyzeRepo({ root });
+
+    expect(profile.deployAdapters).toEqual([
+      {
+        adapter: 'cloudflare-pages-functions',
+        routeDirectories: ['functions'],
+        servedBy: 'npx wrangler pages dev',
+        evidence: ['functions/', 'wrangler']
+      }
+    ]);
+  });
+
   it('detects Netlify functions from the netlify directory', async () => {
     const root = await createRepo({
       'package.json': JSON.stringify({

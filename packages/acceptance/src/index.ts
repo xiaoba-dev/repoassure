@@ -826,3 +826,77 @@ export {
   type ProjectIntelligenceViewerRunInput,
   type ProjectIntelligenceViewerRunResult
 } from './run-project-intelligence-viewer.js';
+
+export {
+  formatProjectIntelligenceBacklogMarkdown,
+  isDirectRun as isProjectIntelligenceBacklogDirectRun,
+  isProjectIntelligenceBacklogHelpRequest,
+  main as runProjectIntelligenceBacklogCli,
+  parseProjectIntelligenceBacklogArgs,
+  projectIntelligenceBacklogHelpText,
+  runProjectIntelligenceBacklog,
+  type ProjectIntelligenceBacklogCliOptions,
+  type ProjectIntelligenceBacklogRunInput,
+  type ProjectIntelligenceBacklogRunResult
+} from './run-project-intelligence-backlog.js';
+
+export {
+  formatProjectIntelligenceDecisionIntakeMarkdown,
+  isDirectRun as isProjectIntelligenceDecisionIntakeDirectRun,
+  isProjectIntelligenceDecisionIntakeHelpRequest,
+  main as runProjectIntelligenceDecisionIntakeCli,
+  parseProjectIntelligenceDecisionIntakeArgs,
+  projectIntelligenceDecisionIntakeHelpText,
+  runProjectIntelligenceDecisionIntake,
+  type ProjectIntelligenceAdrCascadeDecision,
+  type ProjectIntelligenceDecisionIntake,
+  type ProjectIntelligenceDecisionIntakeCliOptions,
+  type ProjectIntelligenceDecisionIntakeItem,
+  type ProjectIntelligenceDecisionIntakeRunInput,
+  type ProjectIntelligenceDecisionIntakeRunResult
+} from './run-project-intelligence-decision-intake.js';
+
+export {
+  formatProjectIntelligenceRecommendationDraftMarkdown,
+  isDirectRun as isProjectIntelligenceRecommendationDraftDirectRun,
+  isProjectIntelligenceRecommendationDraftHelpRequest,
+  main as runProjectIntelligenceRecommendationDraftCli,
+  parseProjectIntelligenceRecommendationDraftArgs,
+  projectIntelligenceRecommendationDraftHelpText,
+  runProjectIntelligenceRecommendationDraft,
+  type ProjectIntelligenceRecommendationDraft,
+  type ProjectIntelligenceRecommendationDraftCliOptions,
+  type ProjectIntelligenceRecommendationDraftItem,
+  type ProjectIntelligenceRecommendationDraftRunInput,
+  type ProjectIntelligenceRecommendationDraftRunResult
+} from './run-project-intelligence-recommendation-draft.js';
+
+export {
+  formatProjectIntelligenceMaintainerDecisionRecordMarkdown,
+  isDirectRun as isProjectIntelligenceMaintainerDecisionDirectRun,
+  isProjectIntelligenceMaintainerDecisionHelpRequest,
+  main as runProjectIntelligenceMaintainerDecisionCli,
+  parseProjectIntelligenceMaintainerDecisionArgs,
+  projectIntelligenceMaintainerDecisionHelpText,
+  runProjectIntelligenceMaintainerDecisionRecord,
+  type ProjectIntelligenceMaintainerDecisionCliOptions,
+  type ProjectIntelligenceMaintainerDecisionRecord,
+  type ProjectIntelligenceMaintainerDecisionRecordItem,
+  type ProjectIntelligenceMaintainerDecisionRunInput,
+  type ProjectIntelligenceMaintainerDecisionRunResult
+} from './run-project-intelligence-maintainer-decision.js';
+
+export {
+  formatProjectIntelligenceControlledRemediationPlanMarkdown,
+  isDirectRun as isProjectIntelligenceControlledRemediationPlanDirectRun,
+  isProjectIntelligenceControlledRemediationPlanHelpRequest,
+  main as runProjectIntelligenceControlledRemediationPlanCli,
+  parseProjectIntelligenceControlledRemediationPlanArgs,
+  projectIntelligenceControlledRemediationPlanHelpText,
+  runProjectIntelligenceControlledRemediationPlan,
+  type ProjectIntelligenceControlledRemediationPlan,
+  type ProjectIntelligenceControlledRemediationPlanCliOptions,
+  type ProjectIntelligenceControlledRemediationPlanItem,
+  type ProjectIntelligenceControlledRemediationPlanRunInput,
+  type ProjectIntelligenceControlledRemediationPlanRunResult
+} from './run-project-intelligence-controlled-remediation-plan.js';

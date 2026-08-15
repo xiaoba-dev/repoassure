@@ -77,6 +77,7 @@ interface InteractionCandidate {
   description: string;
   kind: 'click' | 'form';
   riskText: string;
+  href: string | null;
 }
 
 interface FillCandidate {
@@ -219,7 +220,8 @@ return elements.flatMap(function(element, index) {
     selector: selector,
     description: verb + ' "' + label.slice(0, 80) + '"',
     kind: kind,
-    riskText: [label, ariaLabel, title, name, testId, id, href, action, selected ? 'state:selected' : ''].join(' ')
+    riskText: [label, ariaLabel, title, name, testId, id, href, action, selected ? 'state:selected' : ''].join(' '),
+    href: href || null
   }];
 });
 `
@@ -546,6 +548,10 @@ async function collectInteractions(page: PlaywrightPageLike, maxActionsPerRoute:
     const downloadObserved = downloadCount > beforeDownloadCount;
     const observableResult = !urlUnchanged || !bodyTextUnchanged || elementStateChanged || downloadObserved;
 
+    /* Judged only when nothing observable happened: a self-targeting control that
+       does react (a `#` anchor driving a menu) has already been proven alive above,
+       so the click is never skipped up front and JS-driven controls keep coverage. */
+    const selfTarget = targetsCurrentPage(candidate.href, beforeUrl);
     const failedOutcome = candidate.kind === 'form' ? 'form_failure' : 'dead_control';
     const formFillEvidence =
       formFill.filled > 0 || formFill.skipped > 0 ? [`fields_filled=${formFill.filled}`, `fields_skipped=${formFill.skipped}`] : [];
@@ -553,15 +559,17 @@ async function collectInteractions(page: PlaywrightPageLike, maxActionsPerRoute:
       observableResult && urlUnchanged && bodyTextUnchanged
         ? [`element_state_changed=${elementStateChanged}`, `download_observed=${downloadObserved}`]
         : [];
+    const selfTargetEvidence = !observableResult && selfTarget ? ['self_target=true', `href=${candidate.href ?? ''}`] : [];
 
     interactions.push({
       description: candidate.description,
-      outcome: observableResult ? 'ok' : failedOutcome,
+      outcome: observableResult ? 'ok' : selfTarget ? 'no_op_self_target' : failedOutcome,
       evidence: [
         ...formFillEvidence,
         `url_unchanged=${urlUnchanged}`,
         `body_text_unchanged=${bodyTextUnchanged}`,
-        ...observableEvidence
+        ...observableEvidence,
+        ...selfTargetEvidence
       ]
     });
 
@@ -570,6 +578,44 @@ async function collectInteractions(page: PlaywrightPageLike, maxActionsPerRoute:
   }
 
   return interactions;
+}
+
+/* A brand link on the page it points at, `href="#"`, `href=""`, and an in-page
+   anchor already scrolled into view all produce no observable change by design.
+   Reporting them as dead controls fires on nearly every site, so compare the
+   resolved target with the page it was clicked on, ignoring the fragment. */
+function targetsCurrentPage(href: string | null, currentUrl: string): boolean {
+  if (href === null) {
+    return false;
+  }
+
+  const trimmedHref = href.trim();
+
+  if (trimmedHref === '' || trimmedHref === '#') {
+    return true;
+  }
+
+  if (/^(?:javascript|mailto|tel):/iu.test(trimmedHref)) {
+    return false;
+  }
+
+  let target: URL;
+  let current: URL;
+
+  try {
+    current = new URL(currentUrl);
+    target = new URL(trimmedHref, current);
+  } catch {
+    return false;
+  }
+
+  return target.origin === current.origin
+    && stripTrailingSlash(target.pathname) === stripTrailingSlash(current.pathname)
+    && target.search === current.search;
+}
+
+function stripTrailingSlash(pathname: string): string {
+  return pathname.length > 1 ? pathname.replace(/\/$/u, '') : pathname;
 }
 
 async function fillSafeFormFields(page: PlaywrightPageLike): Promise<FormFillResult> {
@@ -614,7 +660,8 @@ async function readInteractionCandidates(page: PlaywrightPageLike): Promise<Inte
         selector: candidate.selector,
         description: candidate.description,
         kind,
-        riskText
+        riskText,
+        href: typeof candidate.href === 'string' && candidate.href ? candidate.href : null
       }
     ];
   });

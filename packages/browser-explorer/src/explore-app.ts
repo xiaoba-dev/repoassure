@@ -25,7 +25,15 @@ export interface ExplorePageResult {
 
 export type FetchPage = (url: string) => Promise<ExplorePageResult>;
 
-export type BrowserInteractionOutcome = 'ok' | 'dead_control' | 'form_failure' | 'skipped_unsafe';
+export type BrowserInteractionOutcome =
+  | 'ok'
+  | 'dead_control'
+  | 'form_failure'
+  | 'skipped_unsafe'
+  /* Clicked, nothing observable happened, and that is the expected result: the
+     control points at the page it is already on. Recorded rather than dropped so
+     the interaction still shows up as exercised, but it produces no finding. */
+  | 'no_op_self_target';
 
 export interface BrowserInteractionResult {
   description: string;

@@ -367,6 +367,39 @@ describe('exploreApp', () => {
     expect(serializedResult).not.toContain('interaction-token-secret');
   });
 
+  it('records self-targeting no-op interactions without creating findings', async () => {
+    const result = await exploreApp({
+      url: 'http://localhost:3000/',
+      criticalPaths: [],
+      maxRoutes: 1,
+      maxActionsPerRoute: 1,
+      browserDriver: {
+        snapshot: async (url) => ({
+          url,
+          status: 200,
+          html: '<html><body><a href="/">rotifer.ai</a></body></html>',
+          bodyText: 'rotifer.ai',
+          links: [],
+          consoleErrors: [],
+          pageErrors: [],
+          failedRequests: [],
+          artifactFiles: [],
+          interactions: [
+            {
+              description: 'Click "rotifer.ai"',
+              outcome: 'no_op_self_target',
+              evidence: ['url_unchanged=true', 'body_text_unchanged=true', 'self_target=true']
+            }
+          ]
+        }),
+        close: async () => undefined
+      }
+    });
+
+    expect(result.interactions).toEqual(['Click "rotifer.ai"']);
+    expect(result.findings).toEqual([]);
+  });
+
   it('records skipped unsafe interactions without creating findings', async () => {
     const result = await exploreApp({
       url: 'http://localhost:3000/',

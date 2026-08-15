@@ -232,6 +232,70 @@ describe('createPlaywrightBrowserDriver', () => {
     expect(page.clickedSelectors).toEqual(['button:nth-of-type(1)']);
   });
 
+  it('does not report a link pointing at the current page as a dead control', async () => {
+    const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-self-link-'));
+    const page = new FakePage({
+      interactionCandidates: [
+        {
+          selector: 'a:nth-of-type(1)',
+          description: 'Click "rotifer.ai"',
+          href: 'http://localhost:3000/settings'
+        },
+        {
+          selector: 'a:nth-of-type(2)',
+          description: 'Click "Top"',
+          href: '#'
+        }
+      ]
+    });
+    const driver = await legacyCreatePlaywrightBrowserDriver({
+      launcher: {
+        launch: async () => new FakeBrowser(page)
+      }
+    });
+
+    const snapshot = await driver.snapshot('http://localhost:3000/settings', {
+      artifactsDir,
+      maxActionsPerRoute: 2
+    });
+    await driver.close();
+
+    expect(snapshot.interactions.map((interaction) => interaction.outcome)).toEqual([
+      'no_op_self_target',
+      'no_op_self_target'
+    ]);
+    expect(snapshot.interactions[0]?.evidence).toContain('self_target=true');
+  });
+
+  it('still reports a fragment link as observable when clicking it changes the page', async () => {
+    const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-fragment-control-'));
+    const page = new FakePage({
+      interactionCandidates: [
+        {
+          selector: '[data-testid="menu"]',
+          description: 'Click "Menu"',
+          href: '#'
+        }
+      ],
+      elementStates: {
+        '[data-testid="menu"]': ['aria-expanded=false', 'aria-expanded=true']
+      }
+    });
+    const driver = await legacyCreatePlaywrightBrowserDriver({
+      launcher: {
+        launch: async () => new FakeBrowser(page)
+      }
+    });
+
+    const snapshot = await driver.snapshot('http://localhost:3000/settings', {
+      artifactsDir,
+      maxActionsPerRoute: 1
+    });
+    await driver.close();
+
+    expect(snapshot.interactions[0]?.outcome).toBe('ok');
+  });
+
   it('skips invisible interaction targets instead of reporting dead controls', async () => {
     const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-hidden-actions-'));
     const page = new FakePage({
@@ -698,7 +762,7 @@ class FakePage {
 
   constructor(
     private readonly options: {
-      interactionCandidates?: Array<{ selector: string; description: string; kind?: string; riskText?: string }>;
+      interactionCandidates?: Array<{ selector: string; description: string; kind?: string; riskText?: string; href?: string }>;
       rawInteractionElements?: FakeElement[];
       fieldCandidates?: Array<{ selector: string; value: string; riskText: string }>;
       clickFailures?: Record<string, string>;

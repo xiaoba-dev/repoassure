@@ -88,7 +88,17 @@
     "repair:patch-plan": "node packages/acceptance/dist/run-repair-patch-plan.js",
     "project:intelligence": "node packages/acceptance/dist/run-project-intelligence-snapshot.js",
     "project:intelligence:view": "node packages/acceptance/dist/run-project-intelligence-viewer.js",
-    "build:tokens": "node scripts/generate-console-tokens.mjs"
+    "build:tokens": "node scripts/generate-console-tokens.mjs",
+    "project:intelligence:backlog": "node packages/acceptance/dist/run-project-intelligence-backlog.js",
+    "preproject:intelligence:backlog": "pnpm build",
+    "project:intelligence:decision-intake": "node packages/acceptance/dist/run-project-intelligence-decision-intake.js",
+    "preproject:intelligence:decision-intake": "pnpm build",
+    "project:intelligence:recommendation-draft": "node packages/acceptance/dist/run-project-intelligence-recommendation-draft.js",
+    "preproject:intelligence:recommendation-draft": "pnpm build",
+    "project:intelligence:maintainer-decision": "node packages/acceptance/dist/run-project-intelligence-maintainer-decision.js",
+    "preproject:intelligence:maintainer-decision": "pnpm build",
+    "project:intelligence:controlled-remediation-plan": "node packages/acceptance/dist/run-project-intelligence-controlled-remediation-plan.js",
+    "preproject:intelligence:controlled-remediation-plan": "pnpm build"
   },
   "engines": {
     "node": ">=22"

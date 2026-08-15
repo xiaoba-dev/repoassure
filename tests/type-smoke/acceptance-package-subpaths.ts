@@ -64,6 +64,11 @@ import * as runRepairExecute from '@hardening-mcp/acceptance/run-repair-execute'
 import * as runRepairPatchPlan from '@hardening-mcp/acceptance/run-repair-patch-plan';
 import * as runProjectIntelligenceSnapshot from '@hardening-mcp/acceptance/run-project-intelligence-snapshot';
 import * as runProjectIntelligenceViewer from '@hardening-mcp/acceptance/run-project-intelligence-viewer';
+import * as runProjectIntelligenceBacklog from '@hardening-mcp/acceptance/run-project-intelligence-backlog';
+import * as runProjectIntelligenceDecisionIntake from '@hardening-mcp/acceptance/run-project-intelligence-decision-intake';
+import * as runProjectIntelligenceRecommendationDraft from '@hardening-mcp/acceptance/run-project-intelligence-recommendation-draft';
+import * as runProjectIntelligenceMaintainerDecision from '@hardening-mcp/acceptance/run-project-intelligence-maintainer-decision';
+import * as runProjectIntelligenceControlledRemediationPlan from '@hardening-mcp/acceptance/run-project-intelligence-controlled-remediation-plan';
 
 const packageSubpathModules = [
   acceptance,
@@ -131,7 +136,12 @@ const packageSubpathModules = [
   runRepairExecute,
   runRepairPatchPlan,
   runProjectIntelligenceSnapshot,
-  runProjectIntelligenceViewer
+  runProjectIntelligenceViewer,
+  runProjectIntelligenceBacklog,
+  runProjectIntelligenceDecisionIntake,
+  runProjectIntelligenceRecommendationDraft,
+  runProjectIntelligenceMaintainerDecision,
+  runProjectIntelligenceControlledRemediationPlan
 ] as const;
 
 const runnerMains: Array<() => Promise<number>> = [
@@ -143,7 +153,12 @@ const runnerMains: Array<() => Promise<number>> = [
   runRepairExecute.main,
   runRepairPatchPlan.main,
   runProjectIntelligenceSnapshot.main,
-  runProjectIntelligenceViewer.main
+  runProjectIntelligenceViewer.main,
+  runProjectIntelligenceBacklog.main,
+  runProjectIntelligenceDecisionIntake.main,
+  runProjectIntelligenceRecommendationDraft.main,
+  runProjectIntelligenceMaintainerDecision.main,
+  runProjectIntelligenceControlledRemediationPlan.main
 ];
 
 type RootPackageExportEntry = acceptance.AcceptancePackageExportEntry;

@@ -1,0 +1,140 @@
+/* ============================================================
+   RepoAssure — Color primitives (scales) + semantic tokens.
+   Architecture (Primer-inspired):
+     1. Primitive scales  — raw hues, never used by components.
+     2. Semantic tokens   — theme-aware, the ONLY layer components read.
+   Themes: default (light) on :root, dark via [data-theme="dark"].
+   Console tokens are theme-independent (the always-dark instrument surface).
+   ============================================================ */
+:root{
+  /* -- Neutral: cool navy-tinted ink ramp -------------------- */
+  --ink-0:#f6f8fb; --ink-1:#eef2f7; --ink-2:#e1e8f0; --ink-3:#cbd6e2;
+  --ink-4:#a7b7c9; --ink-5:#8091a7; --ink-6:#5f7089; --ink-7:#47566b;
+  --ink-8:#334255; --ink-9:#212f42; --ink-10:#14202f; --ink-11:#0c1725; --ink-12:#050d18;
+
+  /* -- Assurance green (primary accent) ---------------------- */
+  --green-0:#e6f9ef; --green-1:#c1f0d6; --green-2:#8ce4b6; --green-3:#52d290;
+  --green-4:#22c06f; --green-5:#06a85c; --green-6:#018a4c; --green-7:#036e3e;
+  --green-8:#0a5733; --green-9:#0b3f27;
+
+  /* -- Control blue (informational) -------------------------- */
+  --blue-0:#eaf1ff; --blue-1:#cfe0ff; --blue-2:#a6c6ff; --blue-3:#7aa5ff;
+  --blue-4:#5286ff; --blue-5:#356bf0; --blue-6:#2653cf; --blue-7:#1d40a3;
+  --blue-8:#1a3379; --blue-9:#152551;
+
+  /* -- Red (P0 / danger) ------------------------------------- */
+  --red-0:#fdecec; --red-1:#fbcfcf; --red-2:#f5a3a3; --red-3:#ec7373;
+  --red-4:#e04848; --red-5:#cf2f2f; --red-6:#ad2020; --red-7:#871b1b;
+  --red-8:#661818; --red-9:#481414;
+
+  /* -- Amber (P1 / warning) ---------------------------------- */
+  --amber-0:#fdf1dd; --amber-1:#fbe0b3; --amber-2:#f7c877; --amber-3:#f0ab3a;
+  --amber-4:#e0900f; --amber-5:#c2790a; --amber-6:#9c6008; --amber-7:#7a4b0a;
+  --amber-8:#5c390b; --amber-9:#422a0b;
+
+  /* -- Violet (integrity / content-hash accent) --------------- */
+  --violet-0:#f0ecfe; --violet-1:#ddd3fc; --violet-2:#c1adf8; --violet-3:#a184f2;
+  --violet-4:#8460e8; --violet-5:#6d47d6; --violet-6:#5836b5; --violet-7:#452a8f;
+  --violet-8:#35226c; --violet-9:#271a4d;
+
+  /* -- Console (always-dark instrument surface, theme-agnostic) */
+  --console-bg:#0a1420;
+  --console-bg-chrome:#061019;
+  --console-surface:#101f31;
+  --console-fg:#e7edf5;
+  --console-fg-muted:#8698ad;
+  --console-border:rgba(148,163,184,.16);
+}
+
+/* ================= LIGHT (default) ========================= */
+:root,[data-theme="light"]{
+  color-scheme:light;
+  --fg-default:var(--ink-11);
+  --fg-muted:var(--ink-7);
+  --fg-subtle:var(--ink-6);
+  --fg-on-emphasis:#ffffff;
+
+  --canvas-default:#ffffff;
+  --canvas-subtle:var(--ink-0);
+  --canvas-inset:var(--ink-1);
+  --surface-default:#ffffff;
+  --surface-raised:#ffffff;
+  --surface-overlay:#ffffff;
+
+  --border-default:var(--ink-2);
+  --border-muted:var(--ink-1);
+  --border-strong:var(--ink-3);
+
+  /* --accent-fg is the text-grade accent. green-6 (#018a4c) reaches only 4.43:1 on the
+     light canvas, which fails AA for the 12px eyebrow and 13px chip labels that use it;
+     green-7 reaches 5.82:1. --accent-emphasis keeps green-5 for fills and strokes, where
+     no contrast minimum applies. */
+  --accent-fg:var(--green-7);
+  --accent-emphasis:var(--green-5);
+  /* The one accent fill that carries white text. green-5 under #fff is 3.10:1, so a
+     primary button fails AA at every size the system offers (14-16px, weight 600 — never
+     large text). Kept separate from --accent-emphasis so the brand mark, checkbox fill,
+     and tab underline keep the vivid green, where no contrast minimum applies. */
+  --accent-emphasis-strong:var(--green-7);
+  --accent-muted:var(--green-2);
+  --accent-subtle:var(--green-0);
+
+  --link-fg:var(--blue-5);
+  --link-hover-fg:var(--blue-6);
+
+  --info-fg:var(--blue-6);    --info-emphasis:var(--blue-5);  --info-muted:var(--blue-2);   --info-subtle:var(--blue-0);
+  --success-fg:var(--green-6);--success-emphasis:var(--green-5);--success-muted:var(--green-2);--success-subtle:var(--green-0);
+  --danger-fg:var(--red-6);   --danger-emphasis:var(--red-5); --danger-muted:var(--red-2);  --danger-subtle:var(--red-0);
+  --warning-fg:var(--amber-6);--warning-emphasis:var(--amber-4);--warning-muted:var(--amber-2);--warning-subtle:var(--amber-0);
+  --verified-fg:var(--violet-6);--verified-emphasis:var(--violet-5);--verified-muted:var(--violet-2);--verified-subtle:var(--violet-0);
+
+  /* severity aliases (P0/P1/P2) */
+  --sev-p0-fg:var(--danger-fg); --sev-p0-subtle:var(--danger-subtle); --sev-p0-muted:var(--danger-muted);
+  --sev-p1-fg:var(--warning-fg);--sev-p1-subtle:var(--warning-subtle);--sev-p1-muted:var(--warning-muted);
+  --sev-p2-fg:var(--info-fg);   --sev-p2-subtle:var(--info-subtle);   --sev-p2-muted:var(--info-muted);
+
+  --focus-ring:var(--blue-4);
+}
+
+/* ================= DARK ==================================== */
+[data-theme="dark"]{
+  color-scheme:dark;
+  --fg-default:var(--ink-0);
+  --fg-muted:var(--ink-4);
+  --fg-subtle:var(--ink-5);
+  --fg-on-emphasis:#ffffff;
+
+  --canvas-default:var(--ink-12);
+  --canvas-subtle:var(--ink-11);
+  --canvas-inset:#04101d;
+  --surface-default:var(--ink-10);
+  --surface-raised:var(--ink-9);
+  --surface-overlay:var(--ink-9);
+
+  --border-default:rgba(148,163,184,.18);
+  --border-muted:rgba(148,163,184,.10);
+  --border-strong:rgba(148,163,184,.30);
+
+  --accent-fg:var(--green-3);
+  --accent-emphasis:var(--green-5);
+  /* Same reason as light: the primary button's white label needs a darker fill than the
+     brand green to clear AA. */
+  --accent-emphasis-strong:var(--green-7);
+  --accent-muted:rgba(6,168,92,.42);
+  --accent-subtle:rgba(6,168,92,.14);
+
+  --link-fg:var(--blue-3);
+  --link-hover-fg:var(--blue-2);
+
+  --info-fg:var(--blue-3);    --info-emphasis:var(--blue-5);  --info-muted:rgba(82,134,255,.42);   --info-subtle:rgba(82,134,255,.14);
+  --success-fg:var(--green-3);--success-emphasis:var(--green-5);--success-muted:rgba(6,168,92,.42);--success-subtle:rgba(6,168,92,.14);
+  --danger-fg:var(--red-3);   --danger-emphasis:var(--red-5); --danger-muted:rgba(224,72,72,.42);  --danger-subtle:rgba(224,72,72,.14);
+  --warning-fg:var(--amber-3);--warning-emphasis:var(--amber-4);--warning-muted:rgba(224,144,15,.42);--warning-subtle:rgba(224,144,15,.14);
+  --verified-fg:var(--violet-3);--verified-emphasis:var(--violet-5);--verified-muted:rgba(132,96,232,.42);--verified-subtle:rgba(132,96,232,.16);
+
+  --sev-p0-fg:var(--danger-fg); --sev-p0-subtle:var(--danger-subtle); --sev-p0-muted:var(--danger-muted);
+  --sev-p1-fg:var(--warning-fg);--sev-p1-subtle:var(--warning-subtle);--sev-p1-muted:var(--warning-muted);
+  --sev-p2-fg:var(--info-fg);   --sev-p2-subtle:var(--info-subtle);   --sev-p2-muted:var(--info-muted);
+
+  --focus-ring:var(--green-3);
+}

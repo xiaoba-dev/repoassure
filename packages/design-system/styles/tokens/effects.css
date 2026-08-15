@@ -1,0 +1,37 @@
+:root{
+  --radius-sm:6px;
+  --radius-control:10px;
+  --radius-card:12px;
+  --radius-panel:16px;
+  --radius-lg:20px;
+  --radius-pill:999px;
+
+  --border-w:1px;
+
+  /* elevation — soft, cool-tinted; overridden for dark below */
+  --shadow-resting:0 1px 2px rgba(15,30,50,.06),0 1px 3px rgba(15,30,50,.08);
+  --shadow-raised:0 6px 16px rgba(15,30,50,.10);
+  --shadow-overlay:0 16px 48px rgba(15,30,50,.18);
+  --shadow-panel:0 28px 90px rgba(5,13,24,.28);
+  /* Tinted from the fill the primary button actually uses (--accent-emphasis-strong,
+     green-7), not from green-5. A glow 2.5x brighter than the surface it sits under does
+     not read as bloom, it reads as a halo in the wrong colour. */
+  --shadow-cta:0 10px 24px rgba(3,110,62,.34),inset 0 1px 0 rgba(255,255,255,.16);
+
+  --duration-fast:.12s; /* @kind other */
+  --duration-base:.18s; /* @kind other */
+  --ease-out:cubic-bezier(.16,1,.3,1); /* @kind other */
+  --ease-standard:cubic-bezier(.4,0,.2,1); /* @kind other */
+
+  /* console instrument texture */
+  --grid-line:rgba(148,163,184,.05); /* @kind other */
+  --grid-size:56px;
+  --gradient-ambient:radial-gradient(ellipse 900px 500px at 70% -10%,rgba(6,168,92,.16),transparent 60%); /* @kind other */
+}
+[data-theme="dark"]{
+  --shadow-resting:0 1px 2px rgba(0,0,0,.4);
+  --shadow-raised:0 8px 24px rgba(0,0,0,.45);
+  --shadow-overlay:0 20px 60px rgba(0,0,0,.6);
+  --shadow-panel:0 30px 90px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.04);
+  --shadow-cta:0 12px 28px rgba(3,110,62,.42),inset 0 1px 0 rgba(255,255,255,.14);
+}

@@ -1,0 +1,9 @@
+/* RepoAssure Design System v2 — token + base layer.
+   Deliberately loads no fonts. Consumers that want the self-hosted brand faces
+   import './fonts.css' as well; surfaces that must stay free of external
+   references (the Project Intelligence Console) import only this file. */
+@import './tokens/colors.css';
+@import './tokens/typography.css';
+@import './tokens/spacing.css';
+@import './tokens/effects.css';
+@import './base.css';

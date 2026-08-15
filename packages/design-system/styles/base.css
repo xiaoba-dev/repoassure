@@ -1,0 +1,7 @@
+/* Minimal base — sets document typography & link colors from tokens.
+   Consumers linking styles.css get sensible defaults; components never depend on it. */
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-family:var(--font-sans);font-size:var(--text-body);line-height:var(--leading-body);color:var(--fg-default);background:var(--canvas-default);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:var(--link-fg);text-decoration:none}
+a:hover{color:var(--link-hover-fg)}
+::selection{background:var(--accent-muted);color:var(--fg-on-emphasis)}

@@ -41,6 +41,77 @@ describe('createPlaywrightBrowserDriver', () => {
     expect(packageBrowser.closed).toBe(true);
   });
 
+  it('navigates with the load wait strategy by default so HMR dev servers do not time out', async () => {
+    const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-wait-until-default-'));
+    const page = new FakePage();
+    const browser = new FakeBrowser(page);
+    const driver = await packageCreatePlaywrightBrowserDriver({
+      launcher: {
+        launch: async () => browser
+      }
+    });
+
+    await driver.snapshot('http://localhost:3000/', {
+      artifactsDir,
+      maxActionsPerRoute: 0
+    });
+    await driver.close();
+
+    expect(page.gotoCalls).toEqual([{ waitUntil: 'load', timeout: 15_000 }]);
+  });
+
+  it('honors an explicit waitUntil override for navigation', async () => {
+    const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-wait-until-override-'));
+    const page = new FakePage();
+    const browser = new FakeBrowser(page);
+    const driver = await packageCreatePlaywrightBrowserDriver({
+      launcher: {
+        launch: async () => browser
+      },
+      waitUntil: 'domcontentloaded',
+      navigationTimeoutMs: 5_000
+    });
+
+    await driver.snapshot('http://localhost:3000/', {
+      artifactsDir,
+      maxActionsPerRoute: 0
+    });
+    await driver.close();
+
+    expect(page.gotoCalls).toEqual([{ waitUntil: 'domcontentloaded', timeout: 5_000 }]);
+  });
+
+  it('surfaces an actionable BrowserUnavailableError when the browser executable is missing', async () => {
+    await expect(
+      packageCreatePlaywrightBrowserDriver({
+        launcher: {
+          launch: async () => {
+            throw new Error(
+              "browserType.launch: Executable doesn't exist at /caches/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell"
+            );
+          }
+        }
+      })
+    ).rejects.toMatchObject({
+      name: 'BrowserUnavailableError',
+      message: expect.stringContaining('npx playwright install chromium')
+    });
+  });
+
+  it('rethrows launch failures that are not about a missing browser executable', async () => {
+    const createDriver = (): Promise<unknown> =>
+      packageCreatePlaywrightBrowserDriver({
+        launcher: {
+          launch: async () => {
+            throw new Error('browserType.launch: unexpected crash');
+          }
+        }
+      });
+
+    await expect(createDriver()).rejects.toThrow('browserType.launch: unexpected crash');
+    await expect(createDriver()).rejects.toMatchObject({ name: 'Error' });
+  });
+
   it('captures page runtime signals and screenshot artifacts', async () => {
     const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-artifacts-'));
     const page = new FakePage();
@@ -621,6 +692,7 @@ class FakePage {
   closed = false;
   clickedSelectors: string[] = [];
   filledFields: Array<{ selector: string; value: string }> = [];
+  gotoCalls: Array<{ waitUntil: string; timeout: number }> = [];
 
   private readonly handlers = new Map<string, Array<(value: unknown) => void>>();
 
@@ -639,7 +711,10 @@ class FakePage {
     this.handlers.set(event, [...(this.handlers.get(event) ?? []), handler]);
   }
 
-  async goto(): Promise<{ status: () => number }> {
+  async goto(_url?: string, options?: { waitUntil: string; timeout: number }): Promise<{ status: () => number }> {
+    if (options) {
+      this.gotoCalls.push(options);
+    }
     this.emit('console', {
       type: () => 'error',
       text: () => 'ReferenceError: widget is not defined'

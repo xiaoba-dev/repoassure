@@ -1,3 +1,5 @@
+import { join } from 'node:path';
+
 import { version } from '../../index.js';
 import { runAnalyzeRepoTool } from '../../tools/analyze-repo-tool.js';
 import { runExploreAppTool } from '../../tools/explore-app-tool.js';
@@ -6,7 +8,7 @@ import { runGenerateRepairPlanTool } from '../../tools/generate-repair-plan-tool
 import { runHardenReportTool } from '../../tools/harden-report-tool.js';
 import { runHardeningTool } from '../../tools/run-hardening-tool.js';
 import { runSecurityImportTool } from '../../tools/security-import-tool.js';
-import { createPlaywrightBrowserDriver } from '../../domain/explore/playwright-driver.js';
+import { BrowserUnavailableError, createPlaywrightBrowserDriver } from '../../domain/explore/playwright-driver.js';
 import { redactSensitiveText } from '../../shared/privacy-redaction.js';
 
 export interface CliIO {
@@ -23,6 +25,7 @@ export interface RepoUrlCliOptions {
   maxActionsPerRoute?: number;
   startCommand?: string;
   bootTimeoutMs?: number;
+  runDir?: string;
   workspaceOutputDir?: string;
   storageStatePath?: string;
   trace?: boolean;
@@ -174,6 +177,12 @@ async function runHardening(args: string[], io: CliIO): Promise<number> {
     return 1;
   }
 
+  if (!options.runDir) {
+    io.writeStderr(
+      `Writing run artifacts into ${join(options.root, '.hardening')} and the report into the repo root (pass --run-dir <dir> to keep the target repo untouched).\n`
+    );
+  }
+
   try {
     const browserDriver = options.useBrowser
         ? await createPlaywrightBrowserDriver({
@@ -189,12 +198,18 @@ async function runHardening(args: string[], io: CliIO): Promise<number> {
       ...(options.maxActionsPerRoute !== undefined ? { maxActionsPerRoute: options.maxActionsPerRoute } : {}),
       ...(options.startCommand ? { startCommand: options.startCommand } : {}),
       ...(options.bootTimeoutMs ? { bootTimeoutMs: options.bootTimeoutMs } : {}),
+      ...(options.runDir ? { runDir: options.runDir } : {}),
       ...(options.workspaceOutputDir ? { workspaceOutputDir: options.workspaceOutputDir } : {}),
       ...(browserDriver ? { browserDriver } : {})
     });
     io.writeStdout(formatCliJsonOutput(result));
     return 0;
   } catch (error) {
+    if (error instanceof BrowserUnavailableError) {
+      writeCliError(io, error.message);
+      return 1;
+    }
+
     const message = error instanceof Error ? error.message : 'Unknown error';
     writeCliError(io, `Failed to run hardening flow: ${message}`);
     return 1;
@@ -227,11 +242,19 @@ async function runExplore(args: string[], io: CliIO): Promise<number> {
       criticalPaths: options.criticalPaths,
       maxRoutes: options.maxRoutes ?? 20,
       maxActionsPerRoute: options.maxActionsPerRoute ?? 20,
+      ...(options.runDir
+        ? { runDir: join(options.runDir, 'run'), artifactsDir: join(options.runDir, 'artifacts') }
+        : {}),
       ...(browserDriver ? { browserDriver } : {})
     });
     io.writeStdout(formatCliJsonOutput(result));
     return 0;
   } catch (error) {
+    if (error instanceof BrowserUnavailableError) {
+      writeCliError(io, error.message);
+      return 1;
+    }
+
     const message = error instanceof Error ? error.message : 'Unknown error';
     writeCliError(io, `Failed to explore app: ${message}`);
     return 1;
@@ -330,12 +353,12 @@ function helpText(): string {
 
 Usage:
   hardening analyze <repo>
-  hardening explore <repo> <url> [--browser] [--critical-path <path-or-intent>] [--max-routes <n>] [--max-actions-per-route <n>] [--storage-state <path>] [--trace]
+  hardening explore <repo> <url> [--browser] [--critical-path <path-or-intent>] [--max-routes <n>] [--max-actions-per-route <n>] [--storage-state <path>] [--trace] [--run-dir <dir>]
   hardening generate-tests <findingsPath> <outputDir> [--smoke-route <path-or-url>] [--base-url <url>]
   hardening plan <repo> [--run-dir <dir>]
   hardening report <runDir> <outputPath>
   hardening security import --provider <provider> --scan-dir <dir> --repo <repo> --run-dir <dir>
-  hardening run <repo> [url] [--browser] [--critical-path <path-or-intent>] [--max-routes <n>] [--max-actions-per-route <n>] [--storage-state <path>] [--trace] [--start-command <command>] [--boot-timeout-ms <ms>] [--workspace-output <dir>]
+  hardening run <repo> [url] [--browser] [--critical-path <path-or-intent>] [--max-routes <n>] [--max-actions-per-route <n>] [--storage-state <path>] [--trace] [--start-command <command>] [--boot-timeout-ms <ms>] [--run-dir <dir>] [--workspace-output <dir>]
 
 Options:
   --help, -h     Show this help.
@@ -364,7 +387,7 @@ Options:
     return `hardening explore
 
 Usage:
-  hardening explore <repo> <url> [--browser] [--critical-path <path-or-intent>] [--max-routes <n>] [--max-actions-per-route <n>] [--storage-state <path>] [--trace]
+  hardening explore <repo> <url> [--browser] [--critical-path <path-or-intent>] [--max-routes <n>] [--max-actions-per-route <n>] [--storage-state <path>] [--trace] [--run-dir <dir>]
 
 Arguments:
   <repo>  Path to the target repository.
@@ -377,6 +400,7 @@ Options:
   --max-actions-per-route <n>  Limit interactions per route. Use 0 to disable interactions.
   --storage-state <path>       Reuse a Playwright storage state file.
   --trace                      Capture trace artifacts when browser mode is enabled.
+  --run-dir <dir>              Write findings and artifacts under this directory instead of <repo>/.hardening.
   --help, -h                   Show this help.
 
 `;
@@ -436,7 +460,7 @@ Options:
     return `hardening run
 
 Usage:
-  hardening run <repo> [url] [--browser] [--critical-path <path-or-intent>] [--max-routes <n>] [--max-actions-per-route <n>] [--storage-state <path>] [--trace] [--start-command <command>] [--boot-timeout-ms <ms>] [--workspace-output <dir>]
+  hardening run <repo> [url] [--browser] [--critical-path <path-or-intent>] [--max-routes <n>] [--max-actions-per-route <n>] [--storage-state <path>] [--trace] [--start-command <command>] [--boot-timeout-ms <ms>] [--run-dir <dir>] [--workspace-output <dir>]
 
 Arguments:
   <repo>  Path to the target repository.
@@ -451,7 +475,8 @@ Options:
   --trace                      Capture trace artifacts when browser mode is enabled.
   --start-command <command>    Override the detected app start command.
   --boot-timeout-ms <ms>       Override app boot timeout.
-  --workspace-output <dir>     Also copy this repo run bundle into a shared multi-repo workspace output directory.
+  --run-dir <dir>              Write every run artifact (report and generated tests included) under this directory and leave the target repo untouched. Default: <repo>/.hardening plus <repo>/hardening-report.md.
+  --workspace-output <dir>     Also copy this repo run bundle into a shared multi-repo workspace output directory. Does not redirect the run artifacts themselves; use --run-dir for that.
   --help, -h                   Show this help.
 
 `;
@@ -689,6 +714,7 @@ export function parseRepoUrlOptions(args: string[]): RepoUrlCliOptions {
   let maxActionsPerRoute: number | undefined;
   let startCommand: string | undefined;
   let bootTimeoutMs: number | undefined;
+  let runDir: string | undefined;
   let workspaceOutputDir: string | undefined;
   let storageStatePath: string | undefined;
   let trace = false;
@@ -802,6 +828,19 @@ export function parseRepoUrlOptions(args: string[]): RepoUrlCliOptions {
       continue;
     }
 
+    if (arg === '--run-dir' || arg.startsWith('--run-dir=')) {
+      const value = readOptionValue(args, index, '--run-dir');
+      if (value.consumedNext) {
+        index += 1;
+      }
+      if (value.error) {
+        error = value.error;
+      } else if (value.value) {
+        runDir = value.value;
+      }
+      continue;
+    }
+
     if (arg.startsWith('-')) {
       error = `Unknown option: ${arg}`;
       continue;
@@ -820,6 +859,7 @@ export function parseRepoUrlOptions(args: string[]): RepoUrlCliOptions {
     ...(maxActionsPerRoute !== undefined ? { maxActionsPerRoute } : {}),
     ...(startCommand ? { startCommand } : {}),
     ...(bootTimeoutMs ? { bootTimeoutMs } : {}),
+    ...(runDir ? { runDir } : {}),
     ...(workspaceOutputDir ? { workspaceOutputDir } : {}),
     ...(storageStatePath ? { storageStatePath } : {}),
     ...(trace ? { trace: true } : {}),

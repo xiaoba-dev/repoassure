@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, readFile, readlink, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readdir, readFile, readlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -326,6 +326,92 @@ describe('runHardeningTool', () => {
     expect(spec).not.toContain('Generated smoke path');
   });
 
+  it('writes generated smoke tests under .hardening instead of the target tests directory by default', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'hardening-run-tool-default-test-dir-'));
+
+    await writeFile(
+      join(root, 'package.json'),
+      JSON.stringify({
+        scripts: { dev: 'vite' },
+        devDependencies: { vite: '8.0.0' }
+      })
+    );
+
+    const result = await runHardeningTool({
+      root,
+      url: 'https://app.example.test/dashboard',
+      maxRoutes: 1,
+      browserDriver: {
+        snapshot: async (url) => ({
+          url,
+          status: 200,
+          html: '<html><body><main>ok</main></body></html>',
+          bodyText: 'ok',
+          links: [],
+          consoleErrors: [],
+          pageErrors: [],
+          failedRequests: [],
+          artifactFiles: [],
+          interactions: []
+        }),
+        close: async () => undefined
+      }
+    });
+
+    expect(result.testGeneration.createdFiles.length).toBeGreaterThan(0);
+    for (const createdFile of result.testGeneration.createdFiles) {
+      expect(createdFile.startsWith(join(root, '.hardening', 'run', 'generated-tests'))).toBe(true);
+    }
+    await expect(readdir(join(root, 'tests'))).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
+  it('keeps the target repo untouched when runDir redirects all artifacts', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'hardening-run-tool-run-dir-target-'));
+    const runDir = await mkdtemp(join(tmpdir(), 'hardening-run-tool-run-dir-out-'));
+
+    await writeFile(
+      join(root, 'package.json'),
+      JSON.stringify({
+        scripts: { dev: 'vite' },
+        devDependencies: { vite: '8.0.0' }
+      })
+    );
+
+    const result = await runHardeningTool({
+      root,
+      url: 'https://app.example.test/dashboard',
+      maxRoutes: 1,
+      runDir,
+      browserDriver: {
+        snapshot: async (url, options) => ({
+          url,
+          status: 200,
+          html: '<html><body><main>ok</main></body></html>',
+          bodyText: 'ok',
+          links: [],
+          consoleErrors: [],
+          pageErrors: [],
+          failedRequests: [],
+          artifactFiles: [join(options.artifactsDir, 'home.png')],
+          interactions: []
+        }),
+        close: async () => undefined
+      }
+    });
+
+    expect(await readdir(root)).toEqual(['package.json']);
+
+    expect(result.profilePath.startsWith(runDir)).toBe(true);
+    expect(result.findingsPath.startsWith(runDir)).toBe(true);
+    expect(result.reportPath).toBe(join(runDir, 'hardening-report.md'));
+    expect(result.artifactBundle.runDir.startsWith(join(runDir, 'runs'))).toBe(true);
+    expect(result.artifactBundle.latestPath).toBe(join(runDir, 'latest'));
+    for (const createdFile of result.testGeneration.createdFiles) {
+      expect(createdFile.startsWith(join(runDir, 'run', 'generated-tests'))).toBe(true);
+    }
+    await expect(readFile(result.reportPath, 'utf8')).resolves.toContain('# hardening-mcp 硬化报告');
+  });
+
   it('records default ports for already-running HTTP and HTTPS URLs', async () => {
     const root = await mkdtemp(join(tmpdir(), 'hardening-run-tool-default-port-'));
 
@@ -485,6 +571,7 @@ describe('runHardeningTool', () => {
             url: 'http://localhost:5173',
             port: 5173,
             logsPath: join(root, '.hardening', 'run', 'app.log'),
+            daemon: false,
             blockers: [],
             errors: []
           })
@@ -495,6 +582,7 @@ describe('runHardeningTool', () => {
           url: 'http://localhost:5173',
           port: 5173,
           logsPath: join(root, '.hardening', 'run', 'app.log'),
+          daemon: false,
           blockers: [],
           errors: [],
           resultPath: bootResultPath,
@@ -549,6 +637,7 @@ describe('runHardeningTool', () => {
             url: null,
             port: null,
             logsPath: join(root, '.hardening', 'run', 'app.log'),
+            daemon: false,
             blockers: [],
             errors: ['Timed out waiting for app URL']
           })
@@ -559,6 +648,7 @@ describe('runHardeningTool', () => {
           url: null,
           port: null,
           logsPath: join(root, '.hardening', 'run', 'app.log'),
+          daemon: false,
           blockers: [],
           errors: ['Timed out waiting for app URL'],
           resultPath: bootResultPath,

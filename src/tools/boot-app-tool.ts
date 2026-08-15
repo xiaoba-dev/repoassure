@@ -19,6 +19,7 @@ export function toSerializableBootResult(session: BootAppSession): BootAppResult
     url: session.url ? redactSensitiveText(session.url) : null,
     port: session.port,
     logsPath: redactSensitiveText(session.logsPath),
+    daemon: session.daemon,
     blockers: session.blockers.map((blocker) => redactSensitiveText(blocker)),
     errors: session.errors.map((error) => redactSensitiveText(error))
   };
@@ -26,7 +27,7 @@ export function toSerializableBootResult(session: BootAppSession): BootAppResult
 
 export async function runBootAppTool(input: BootAppInput): Promise<BootAppToolSession> {
   const session = await bootApp(input);
-  const runDir = join(input.root, '.hardening', 'run');
+  const runDir = input.runDir ?? join(input.root, '.hardening', 'run');
   const resultPath = join(runDir, 'boot-result.json');
 
   await mkdir(runDir, { recursive: true });

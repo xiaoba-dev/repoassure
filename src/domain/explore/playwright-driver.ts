@@ -1,5 +1,6 @@
-export { createPlaywrightBrowserDriver } from '../../../packages/browser-explorer/dist/playwright-driver.js';
+export { BrowserUnavailableError, createPlaywrightBrowserDriver } from '../../../packages/browser-explorer/dist/playwright-driver.js';
 export type {
   CreatePlaywrightBrowserDriverInput,
-  PlaywrightBrowserLauncher
+  PlaywrightBrowserLauncher,
+  PlaywrightWaitUntil
 } from '../../../packages/browser-explorer/dist/playwright-driver.js';

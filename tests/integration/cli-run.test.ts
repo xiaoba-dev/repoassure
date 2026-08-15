@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { mkdtemp, readdir, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -41,7 +41,8 @@ describe('CLI run', () => {
     };
 
     expect(exitCode).toBe(0);
-    expect(stderr).toBe('');
+    expect(stderr).toContain('Writing run artifacts into');
+    expect(stderr).toContain('--run-dir');
     expect(output.profilePath).toBe(join(root, '.hardening', 'run', 'repo-profile.json'));
     expect(output.findingsPath).toBe(join(root, '.hardening', 'run', 'findings.json'));
     expect(output.reportPath).toBe(join(root, 'hardening-report.md'));
@@ -49,10 +50,53 @@ describe('CLI run', () => {
     expect(output.repairPlan.repairPlanPath.endsWith('repair-plan.json')).toBe(true);
     expect(output.repairPlan.repairTaskPackagePath.endsWith('repair-task-package.json')).toBe(true);
     expect(output.repairPlan.taskCount).toBe(0);
-    expect(output.testGeneration.createdFiles[0]).toBe(join(root, 'tests', 'hardening', 'generated-findings.spec.ts'));
+    expect(output.testGeneration.createdFiles[0]).toBe(
+      join(root, '.hardening', 'run', 'generated-tests', 'generated-findings.spec.ts')
+    );
     await expect(readFile(output.reportPath, 'utf8')).resolves.toContain('# hardening-mcp 硬化报告');
     await expect(readFile(output.repairPlan.repairPlanPath, 'utf8')).resolves.toContain('"schemaVersion": 1');
     await expect(readFile(output.repairPlan.repairTaskPackageMarkdownPath, 'utf8')).resolves.toContain('# Executable Repair Task Package');
+  });
+
+  it('keeps the target repo untouched and stays quiet when --run-dir is provided', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'hardening-cli-run-dir-root-'));
+    const runDir = await mkdtemp(join(tmpdir(), 'hardening-cli-run-dir-out-'));
+    let stdout = '';
+    let stderr = '';
+
+    await writeFile(
+      join(root, 'package.json'),
+      JSON.stringify({
+        scripts: { dev: 'vite' },
+        devDependencies: { vite: '8.0.0' }
+      })
+    );
+
+    const exitCode = await runCli(
+      ['run', root, 'data:text/html,<html><body>ok</body></html>', '--run-dir', runDir],
+      {
+        writeStdout: (chunk) => {
+          stdout += chunk;
+        },
+        writeStderr: (chunk) => {
+          stderr += chunk;
+        }
+      }
+    );
+    const output = JSON.parse(stdout) as {
+      profilePath: string;
+      reportPath: string;
+      testGeneration: { createdFiles: string[] };
+    };
+
+    expect(exitCode).toBe(0);
+    expect(stderr).toBe('');
+    expect(await readdir(root)).toEqual(['package.json']);
+    expect(output.profilePath).toBe(join(runDir, 'run', 'repo-profile.json'));
+    expect(output.reportPath).toBe(join(runDir, 'hardening-report.md'));
+    expect(output.testGeneration.createdFiles[0]).toBe(
+      join(runDir, 'run', 'generated-tests', 'generated-findings.spec.ts')
+    );
   });
 
   it('generates a repair plan from the latest run through the plan command', async () => {

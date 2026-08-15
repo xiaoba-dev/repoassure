@@ -6,6 +6,8 @@ import { exploreApp, type ExploreAppInput, type ExploreAppResult } from '../doma
 
 export interface ExploreAppToolInput extends Omit<ExploreAppInput, 'artifactsDir'> {
   root: string;
+  runDir?: string;
+  artifactsDir?: string;
 }
 
 export interface ExploreAppToolResult extends ExploreAppResult {
@@ -13,8 +15,8 @@ export interface ExploreAppToolResult extends ExploreAppResult {
 }
 
 export async function runExploreAppTool(input: ExploreAppToolInput): Promise<ExploreAppToolResult> {
-  const runDir = join(input.root, '.hardening', 'run');
-  const artifactsDir = join(input.root, '.hardening', 'artifacts');
+  const runDir = input.runDir ?? join(input.root, '.hardening', 'run');
+  const artifactsDir = input.artifactsDir ?? join(input.root, '.hardening', 'artifacts');
   const findingsPath = join(runDir, 'findings.json');
   const result = await exploreApp({
     ...input,

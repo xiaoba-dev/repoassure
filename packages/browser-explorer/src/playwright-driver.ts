@@ -7,10 +7,34 @@ export interface PlaywrightBrowserLauncher {
   launch: (options: { headless: boolean }) => Promise<PlaywrightBrowserLike>;
 }
 
+export type PlaywrightWaitUntil = 'load' | 'domcontentloaded' | 'networkidle' | 'commit';
+
+export class BrowserUnavailableError extends Error {
+  readonly installCommand = 'npx playwright install chromium';
+
+  constructor(cause: Error) {
+    super(
+      'Playwright browser executable is missing, so browser mode cannot start. ' +
+        'Run `npx playwright install chromium` (or `npx playwright install chromium-headless-shell`) and retry. ' +
+        `Original error: ${cause.message}`
+    );
+    this.name = 'BrowserUnavailableError';
+    this.cause = cause;
+  }
+}
+
+function isMissingExecutableError(error: unknown): error is Error {
+  return (
+    error instanceof Error &&
+    /executable doesn't exist|download new browsers/iu.test(error.message)
+  );
+}
+
 export interface CreatePlaywrightBrowserDriverInput {
   launcher?: PlaywrightBrowserLauncher;
   headless?: boolean;
   navigationTimeoutMs?: number;
+  waitUntil?: PlaywrightWaitUntil;
   storageStatePath?: string;
   trace?: boolean;
 }
@@ -32,7 +56,7 @@ interface PlaywrightBrowserContextLike {
 
 interface PlaywrightPageLike {
   on: (event: string, handler: (value: unknown) => void) => void;
-  goto: (url: string, options: { waitUntil: 'networkidle'; timeout: number }) => Promise<PlaywrightResponseLike | null>;
+  goto: (url: string, options: { waitUntil: PlaywrightWaitUntil; timeout: number }) => Promise<PlaywrightResponseLike | null>;
   content: () => Promise<string>;
   locator: (selector: string) => { innerText: () => Promise<string> };
   $$eval: (selector: string, pageFunction: (elements: unknown[]) => unknown) => Promise<unknown>;
@@ -277,8 +301,21 @@ return elements.flatMap(function(element, index) {
 
 export async function createPlaywrightBrowserDriver(input: CreatePlaywrightBrowserDriverInput = {}): Promise<ExploreBrowserDriver> {
   const launcher = input.launcher ?? (await loadDefaultLauncher());
-  const browser = await launcher.launch({ headless: input.headless ?? true });
+  let browser: PlaywrightBrowserLike;
+
+  try {
+    browser = await launcher.launch({ headless: input.headless ?? true });
+  } catch (error) {
+    if (isMissingExecutableError(error)) {
+      throw new BrowserUnavailableError(error);
+    }
+
+    throw error;
+  }
   const navigationTimeoutMs = input.navigationTimeoutMs ?? 15_000;
+  /* 'load' instead of 'networkidle': dev servers with HMR sockets never reach network
+     idle, so 'networkidle' turns every healthy local app into a navigation timeout. */
+  const waitUntil = input.waitUntil ?? 'load';
 
   return {
     snapshot: async (url, options) => {
@@ -312,7 +349,7 @@ export async function createPlaywrightBrowserDriver(input: CreatePlaywrightBrows
         }
 
         const response = await page.goto(url, {
-          waitUntil: 'networkidle',
+          waitUntil,
           timeout: navigationTimeoutMs
         });
         const html = await page.content();

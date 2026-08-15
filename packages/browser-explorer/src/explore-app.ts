@@ -25,7 +25,15 @@ export interface ExplorePageResult {
 
 export type FetchPage = (url: string) => Promise<ExplorePageResult>;
 
-export type BrowserInteractionOutcome = 'ok' | 'dead_control' | 'form_failure' | 'skipped_unsafe';
+export type BrowserInteractionOutcome =
+  | 'ok'
+  | 'dead_control'
+  | 'form_failure'
+  | 'skipped_unsafe'
+  /* Clicked, nothing observable happened, and that is the expected result: the
+     control points at the page it is already on. Recorded rather than dropped so
+     the interaction still shows up as exercised, but it produces no finding. */
+  | 'no_op_self_target';
 
 export interface BrowserInteractionResult {
   description: string;
@@ -267,7 +275,7 @@ function seedQueue(input: ExploreAppInput): string[] {
     }
   };
 
-  enqueue(input.url);
+  enqueue(normalizeSeedUrl(input.url));
 
   for (const criticalPath of input.criticalPaths) {
     for (const url of expandCriticalPathInput(criticalPath, input.url)) {
@@ -458,6 +466,23 @@ function firstPatternPosition(value: string, patterns: RegExp[]): number {
 function normalizeUrl(url: URL): string {
   url.hash = '';
   return url.toString().replace(/\/$/, url.pathname === '/' ? '/' : '');
+}
+
+/* Discovered links are normalized, the seed was not, so `http://host` and the
+   `http://host/` a page links back to counted as two routes: the root was crawled
+   twice, its findings double counted, and the route budget spent on a duplicate.
+   The fragment survives here, unlike in normalizeUrl, because a seed fragment is
+   caller-supplied app state (hash routers, OAuth callbacks) rather than crawl noise. */
+function normalizeSeedUrl(rawUrl: string): string {
+  const parsed = safeUrl(rawUrl);
+
+  if (!parsed) {
+    return rawUrl;
+  }
+
+  const fragment = parsed.hash;
+
+  return `${normalizeUrl(parsed)}${fragment}`;
 }
 
 function normalizeSameOriginLinks(links: string[], baseUrl: string): string[] {

@@ -119,6 +119,67 @@ describe('generateHardenReport', () => {
     expect(patchDiff).not.toContain('a/.hardening/run/generated-tests');
   });
 
+  it('labels the score with the environment it measured and flags adapter routes when self-booted', async () => {
+    const runDir = await createRunDir();
+    const outputPath = join(runDir, 'hardening-report.md');
+
+    await writeFile(
+      join(runDir, 'boot-result.json'),
+      JSON.stringify({
+        status: 'running',
+        url: 'http://localhost:4321',
+        port: 4321,
+        environment: 'self-booted',
+        blockers: [],
+        errors: []
+      })
+    );
+    await writeFile(
+      join(runDir, 'findings.json'),
+      JSON.stringify({
+        findings: [
+          {
+            severity: 'P1',
+            type: 'network_error',
+            title: 'Route emitted failed network requests',
+            reproSteps: ['Go to /'],
+            evidence: ['GET http://localhost:4321/api/stats :: 404 (fetch)']
+          }
+        ]
+      })
+    );
+
+    await generateHardenReport({ runDir, outputPath });
+    const report = await readFile(outputPath, 'utf8');
+
+    expect(report).toContain('| 测量环境 | 自启动应用 |');
+    expect(report).toContain('本次评分测量的是自启动的本地应用');
+    expect(report).toContain('Cloudflare Pages Functions');
+  });
+
+  it('does not flag adapter routes when the run measured a provided url', async () => {
+    const runDir = await createRunDir();
+    const outputPath = join(runDir, 'hardening-report.md');
+
+    await writeFile(
+      join(runDir, 'boot-result.json'),
+      JSON.stringify({
+        status: 'running',
+        url: 'https://app.example.test',
+        port: 443,
+        environment: 'provided-url',
+        blockers: [],
+        errors: []
+      })
+    );
+
+    await generateHardenReport({ runDir, outputPath });
+    const report = await readFile(outputPath, 'utf8');
+
+    expect(report).toContain('| 测量环境 | 指定 URL |');
+    expect(report).not.toContain('Cloudflare Pages Functions');
+  });
+
   it('escapes markdown table cells in report metadata', async () => {
     const runDir = await createRunDir();
     const outputPath = join(runDir, 'hardening-report.md');

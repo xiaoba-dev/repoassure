@@ -200,6 +200,120 @@ describe('createPlaywrightBrowserDriver', () => {
     expect(snapshot.artifactFiles).toContain(browser.contexts[0]?.traceStops[0]?.path);
   });
 
+  it('records which resource failed instead of an anonymous console string', async () => {
+    const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-network-context-'));
+    const page = new FakePage({
+      consoleErrors: [
+        {
+          text: 'Failed to load resource: the server responded with a status of 404 ()',
+          locationUrl: 'http://localhost:3000/api/stats'
+        }
+      ],
+      responses: [
+        { url: 'http://localhost:3000/api/stats', status: 404, method: 'GET', resourceType: 'fetch' }
+      ]
+    });
+    const driver = await legacyCreatePlaywrightBrowserDriver({
+      launcher: {
+        launch: async () => new FakeBrowser(page)
+      }
+    });
+
+    const snapshot = await driver.snapshot('http://localhost:3000/settings', {
+      artifactsDir,
+      maxActionsPerRoute: 0
+    });
+    await driver.close();
+
+    expect(snapshot.failedRequests).toContain('GET http://localhost:3000/api/stats :: 404 (fetch)');
+    // The console line carries no URL, so the network line replaces it rather than
+    // reporting the same failure twice.
+    expect(snapshot.consoleErrors.join('\n')).not.toContain('Failed to load resource');
+  });
+
+  it('keeps the resource url on a console error that has no matching response event', async () => {
+    const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-console-location-'));
+    const page = new FakePage({
+      consoleErrors: [
+        {
+          text: 'Failed to load resource: the server responded with a status of 404 ()',
+          locationUrl: 'http://localhost:3000/api/orphan'
+        }
+      ]
+    });
+    const driver = await legacyCreatePlaywrightBrowserDriver({
+      launcher: {
+        launch: async () => new FakeBrowser(page)
+      }
+    });
+
+    const snapshot = await driver.snapshot('http://localhost:3000/', {
+      artifactsDir,
+      maxActionsPerRoute: 0
+    });
+    await driver.close();
+
+    expect(snapshot.consoleErrors).toContain(
+      'Failed to load resource: the server responded with a status of 404 () :: http://localhost:3000/api/orphan'
+    );
+  });
+
+  it('collapses repeated failures of the same resource into one evidence line', async () => {
+    const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-network-dedup-'));
+    const page = new FakePage({
+      responses: [
+        { url: 'http://localhost:3000/api/stats', status: 404, method: 'GET', resourceType: 'fetch' },
+        { url: 'http://localhost:3000/api/stats', status: 404, method: 'GET', resourceType: 'fetch' },
+        { url: 'http://localhost:3000/api/feed', status: 500, method: 'POST', resourceType: 'xhr' },
+        { url: 'http://localhost:3000/ok.png', status: 200, method: 'GET', resourceType: 'image' }
+      ]
+    });
+    const driver = await legacyCreatePlaywrightBrowserDriver({
+      launcher: {
+        launch: async () => new FakeBrowser(page)
+      }
+    });
+
+    const snapshot = await driver.snapshot('http://localhost:3000/settings', {
+      artifactsDir,
+      maxActionsPerRoute: 0
+    });
+    await driver.close();
+
+    expect(snapshot.failedRequests).toEqual([
+      'http://localhost:3000/api/user :: net::ERR_FAILED',
+      'GET http://localhost:3000/api/stats :: 404 (fetch)',
+      'POST http://localhost:3000/api/feed :: 500 (xhr)'
+    ]);
+  });
+
+  it('names the document a request failed on when an interaction navigated away from the route', async () => {
+    const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-network-document-'));
+    const page = new FakePage({
+      responses: [
+        { url: 'http://localhost:3000/api/stats', status: 404, method: 'GET', resourceType: 'fetch' }
+      ]
+    });
+    const driver = await legacyCreatePlaywrightBrowserDriver({
+      launcher: {
+        launch: async () => new FakeBrowser(page)
+      }
+    });
+
+    // FakePage reports its url as /settings, so this snapshot's route differs from
+    // the document the failure was observed on, exactly as it does after a click
+    // navigates mid-snapshot.
+    const snapshot = await driver.snapshot('http://localhost:3000/about', {
+      artifactsDir,
+      maxActionsPerRoute: 0
+    });
+    await driver.close();
+
+    expect(snapshot.failedRequests).toContain(
+      'GET http://localhost:3000/api/stats :: 404 (fetch, on http://localhost:3000/settings)'
+    );
+  });
+
   it('records dead controls when clicks do not change url or body text', async () => {
     const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-actions-'));
     const page = new FakePage({
@@ -230,6 +344,70 @@ describe('createPlaywrightBrowserDriver', () => {
       }
     ]);
     expect(page.clickedSelectors).toEqual(['button:nth-of-type(1)']);
+  });
+
+  it('does not report a link pointing at the current page as a dead control', async () => {
+    const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-self-link-'));
+    const page = new FakePage({
+      interactionCandidates: [
+        {
+          selector: 'a:nth-of-type(1)',
+          description: 'Click "rotifer.ai"',
+          href: 'http://localhost:3000/settings'
+        },
+        {
+          selector: 'a:nth-of-type(2)',
+          description: 'Click "Top"',
+          href: '#'
+        }
+      ]
+    });
+    const driver = await legacyCreatePlaywrightBrowserDriver({
+      launcher: {
+        launch: async () => new FakeBrowser(page)
+      }
+    });
+
+    const snapshot = await driver.snapshot('http://localhost:3000/settings', {
+      artifactsDir,
+      maxActionsPerRoute: 2
+    });
+    await driver.close();
+
+    expect(snapshot.interactions.map((interaction) => interaction.outcome)).toEqual([
+      'no_op_self_target',
+      'no_op_self_target'
+    ]);
+    expect(snapshot.interactions[0]?.evidence).toContain('self_target=true');
+  });
+
+  it('still reports a fragment link as observable when clicking it changes the page', async () => {
+    const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-fragment-control-'));
+    const page = new FakePage({
+      interactionCandidates: [
+        {
+          selector: '[data-testid="menu"]',
+          description: 'Click "Menu"',
+          href: '#'
+        }
+      ],
+      elementStates: {
+        '[data-testid="menu"]': ['aria-expanded=false', 'aria-expanded=true']
+      }
+    });
+    const driver = await legacyCreatePlaywrightBrowserDriver({
+      launcher: {
+        launch: async () => new FakeBrowser(page)
+      }
+    });
+
+    const snapshot = await driver.snapshot('http://localhost:3000/settings', {
+      artifactsDir,
+      maxActionsPerRoute: 1
+    });
+    await driver.close();
+
+    expect(snapshot.interactions[0]?.outcome).toBe('ok');
   });
 
   it('skips invisible interaction targets instead of reporting dead controls', async () => {
@@ -698,12 +876,14 @@ class FakePage {
 
   constructor(
     private readonly options: {
-      interactionCandidates?: Array<{ selector: string; description: string; kind?: string; riskText?: string }>;
+      interactionCandidates?: Array<{ selector: string; description: string; kind?: string; riskText?: string; href?: string }>;
       rawInteractionElements?: FakeElement[];
       fieldCandidates?: Array<{ selector: string; value: string; riskText: string }>;
       clickFailures?: Record<string, string>;
       downloadSelectors?: Set<string>;
       elementStates?: Record<string, string[]>;
+      consoleErrors?: Array<{ text: string; locationUrl?: string }>;
+      responses?: Array<{ url: string; status: number; method?: string; resourceType?: string }>;
     } = {}
   ) {}
 
@@ -719,11 +899,30 @@ class FakePage {
       type: () => 'error',
       text: () => 'ReferenceError: widget is not defined'
     });
+    for (const consoleError of this.options.consoleErrors ?? []) {
+      this.emit('console', {
+        type: () => 'error',
+        text: () => consoleError.text,
+        ...(consoleError.locationUrl
+          ? { location: () => ({ url: consoleError.locationUrl, lineNumber: 0, columnNumber: 0 }) }
+          : {})
+      });
+    }
     this.emit('pageerror', new Error('render failed'));
     this.emit('requestfailed', {
       url: () => 'http://localhost:3000/api/user',
       failure: () => ({ errorText: 'net::ERR_FAILED' })
     });
+    for (const response of this.options.responses ?? []) {
+      this.emit('response', {
+        url: () => response.url,
+        status: () => response.status,
+        request: () => ({
+          method: () => response.method ?? 'GET',
+          resourceType: () => response.resourceType ?? 'fetch'
+        })
+      });
+    }
 
     return { status: () => 200 };
   }

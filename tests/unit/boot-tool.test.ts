@@ -8,6 +8,7 @@ describe('toSerializableBootResult', () => {
       port: 3000,
       logsPath: '/tmp/app.log',
       daemon: false,
+      environment: 'self-booted' as const,
       blockers: [],
       errors: [],
       stop: async () => {}
@@ -19,6 +20,7 @@ describe('toSerializableBootResult', () => {
       port: 3000,
       logsPath: '/tmp/app.log',
       daemon: false,
+      environment: 'self-booted' as const,
       blockers: [],
       errors: []
     });
@@ -33,6 +35,7 @@ describe('toSerializableBootResult', () => {
       port: 3000,
       logsPath: '/tmp/app.log',
       daemon: false,
+      environment: 'self-booted' as const,
       blockers: [],
       errors: [],
       stop: async () => {}
@@ -53,6 +56,7 @@ describe('toSerializableBootResult', () => {
       port: null,
       logsPath: '/tmp/app.log?token=log-secret',
       daemon: false,
+      environment: 'self-booted' as const,
       blockers: ['blocked by API_KEY=sk-blocker-secret'],
       errors: ['startup failed with client_secret=error-secret'],
       stop: async () => {}

@@ -93,6 +93,39 @@ describe('exploreApp', () => {
     });
   });
 
+  it('does not crawl the root twice when the seed url omits the trailing slash', async () => {
+    const visited: string[] = [];
+    const result = await exploreApp({
+      url: 'http://localhost:3000',
+      criticalPaths: [],
+      maxRoutes: 5,
+      maxActionsPerRoute: 0,
+      artifactsDir: '/tmp/hardening-artifacts',
+      browserDriver: {
+        snapshot: async (url) => {
+          visited.push(url);
+
+          return {
+            url,
+            status: 200,
+            html: '<html><body><a href="/">Home</a></body></html>',
+            bodyText: 'Home',
+            links: ['http://localhost:3000/'],
+            consoleErrors: [],
+            pageErrors: [],
+            failedRequests: [],
+            artifactFiles: [],
+            interactions: []
+          };
+        },
+        close: async () => undefined
+      }
+    });
+
+    expect(result.visitedRoutes).toEqual(['http://localhost:3000/']);
+    expect(visited).toEqual(['http://localhost:3000/']);
+  });
+
   it('uses a browser driver to capture runtime findings and artifacts', async () => {
     const result = await exploreApp({
       url: 'http://localhost:3000/',
@@ -332,6 +365,39 @@ describe('exploreApp', () => {
     expect(serializedResult).not.toContain('oauth-secret');
     expect(serializedResult).not.toContain('fragment-secret');
     expect(serializedResult).not.toContain('interaction-token-secret');
+  });
+
+  it('records self-targeting no-op interactions without creating findings', async () => {
+    const result = await exploreApp({
+      url: 'http://localhost:3000/',
+      criticalPaths: [],
+      maxRoutes: 1,
+      maxActionsPerRoute: 1,
+      browserDriver: {
+        snapshot: async (url) => ({
+          url,
+          status: 200,
+          html: '<html><body><a href="/">rotifer.ai</a></body></html>',
+          bodyText: 'rotifer.ai',
+          links: [],
+          consoleErrors: [],
+          pageErrors: [],
+          failedRequests: [],
+          artifactFiles: [],
+          interactions: [
+            {
+              description: 'Click "rotifer.ai"',
+              outcome: 'no_op_self_target',
+              evidence: ['url_unchanged=true', 'body_text_unchanged=true', 'self_target=true']
+            }
+          ]
+        }),
+        close: async () => undefined
+      }
+    });
+
+    expect(result.interactions).toEqual(['Click "rotifer.ai"']);
+    expect(result.findings).toEqual([]);
   });
 
   it('records skipped unsafe interactions without creating findings', async () => {

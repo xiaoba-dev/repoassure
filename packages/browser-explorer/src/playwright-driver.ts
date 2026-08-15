@@ -77,6 +77,7 @@ interface InteractionCandidate {
   description: string;
   kind: 'click' | 'form';
   riskText: string;
+  href: string | null;
 }
 
 interface FillCandidate {
@@ -219,7 +220,8 @@ return elements.flatMap(function(element, index) {
     selector: selector,
     description: verb + ' "' + label.slice(0, 80) + '"',
     kind: kind,
-    riskText: [label, ariaLabel, title, name, testId, id, href, action, selected ? 'state:selected' : ''].join(' ')
+    riskText: [label, ariaLabel, title, name, testId, id, href, action, selected ? 'state:selected' : ''].join(' '),
+    href: href || null
   }];
 });
 `
@@ -321,17 +323,18 @@ export async function createPlaywrightBrowserDriver(input: CreatePlaywrightBrows
     snapshot: async (url, options) => {
       const traceEnabled = input.trace === true;
       const { page, context, closeContext } = await newPageForSnapshot(browser, input.storageStatePath, traceEnabled);
-      const consoleErrors: string[] = [];
+      const consoleErrors: ConsoleErrorRecord[] = [];
       const pageErrors: string[] = [];
       const failedRequests: string[] = [];
+      const failedResponses: FailedResponseRecord[] = [];
       const artifactPath = artifactPathForUrl(options.artifactsDir, url);
       const tracePath = traceEnabled ? tracePathForUrl(options.artifactsDir, url) : null;
       let traceStarted = false;
 
       page.on('console', (message) => {
-        const text = getConsoleErrorText(message);
-        if (text) {
-          consoleErrors.push(text);
+        const consoleError = getConsoleError(message);
+        if (consoleError) {
+          consoleErrors.push(consoleError);
         }
       });
       page.on('pageerror', (error) => {
@@ -339,6 +342,16 @@ export async function createPlaywrightBrowserDriver(input: CreatePlaywrightBrows
       });
       page.on('requestfailed', (request) => {
         failedRequests.push(formatFailedRequest(request));
+      });
+      /* requestfailed does not fire for HTTP 4xx/5xx — those are successful
+         responses as far as the browser is concerned — so a 404 subresource would
+         otherwise leave only Chrome's console text, which deliberately omits the
+         URL. Watching responses is what turns it into an actionable finding. */
+      page.on('response', (response) => {
+        const failedResponse = getFailedResponse(response, readPageUrl(page));
+        if (failedResponse) {
+          failedResponses.push(failedResponse);
+        }
       });
 
       try {
@@ -372,9 +385,12 @@ export async function createPlaywrightBrowserDriver(input: CreatePlaywrightBrows
           html,
           bodyText,
           links,
-          consoleErrors,
+          consoleErrors: buildConsoleErrorEvidence(consoleErrors, failedResponses),
           pageErrors,
-          failedRequests,
+          failedRequests: dedupe([
+            ...failedRequests,
+            ...failedResponses.map((failedResponse) => formatFailedResponse(failedResponse, url))
+          ]),
           artifactFiles,
           interactions
         };
@@ -546,6 +562,10 @@ async function collectInteractions(page: PlaywrightPageLike, maxActionsPerRoute:
     const downloadObserved = downloadCount > beforeDownloadCount;
     const observableResult = !urlUnchanged || !bodyTextUnchanged || elementStateChanged || downloadObserved;
 
+    /* Judged only when nothing observable happened: a self-targeting control that
+       does react (a `#` anchor driving a menu) has already been proven alive above,
+       so the click is never skipped up front and JS-driven controls keep coverage. */
+    const selfTarget = targetsCurrentPage(candidate.href, beforeUrl);
     const failedOutcome = candidate.kind === 'form' ? 'form_failure' : 'dead_control';
     const formFillEvidence =
       formFill.filled > 0 || formFill.skipped > 0 ? [`fields_filled=${formFill.filled}`, `fields_skipped=${formFill.skipped}`] : [];
@@ -553,15 +573,17 @@ async function collectInteractions(page: PlaywrightPageLike, maxActionsPerRoute:
       observableResult && urlUnchanged && bodyTextUnchanged
         ? [`element_state_changed=${elementStateChanged}`, `download_observed=${downloadObserved}`]
         : [];
+    const selfTargetEvidence = !observableResult && selfTarget ? ['self_target=true', `href=${candidate.href ?? ''}`] : [];
 
     interactions.push({
       description: candidate.description,
-      outcome: observableResult ? 'ok' : failedOutcome,
+      outcome: observableResult ? 'ok' : selfTarget ? 'no_op_self_target' : failedOutcome,
       evidence: [
         ...formFillEvidence,
         `url_unchanged=${urlUnchanged}`,
         `body_text_unchanged=${bodyTextUnchanged}`,
-        ...observableEvidence
+        ...observableEvidence,
+        ...selfTargetEvidence
       ]
     });
 
@@ -570,6 +592,44 @@ async function collectInteractions(page: PlaywrightPageLike, maxActionsPerRoute:
   }
 
   return interactions;
+}
+
+/* A brand link on the page it points at, `href="#"`, `href=""`, and an in-page
+   anchor already scrolled into view all produce no observable change by design.
+   Reporting them as dead controls fires on nearly every site, so compare the
+   resolved target with the page it was clicked on, ignoring the fragment. */
+function targetsCurrentPage(href: string | null, currentUrl: string): boolean {
+  if (href === null) {
+    return false;
+  }
+
+  const trimmedHref = href.trim();
+
+  if (trimmedHref === '' || trimmedHref === '#') {
+    return true;
+  }
+
+  if (/^(?:javascript|mailto|tel):/iu.test(trimmedHref)) {
+    return false;
+  }
+
+  let target: URL;
+  let current: URL;
+
+  try {
+    current = new URL(currentUrl);
+    target = new URL(trimmedHref, current);
+  } catch {
+    return false;
+  }
+
+  return target.origin === current.origin
+    && stripTrailingSlash(target.pathname) === stripTrailingSlash(current.pathname)
+    && target.search === current.search;
+}
+
+function stripTrailingSlash(pathname: string): string {
+  return pathname.length > 1 ? pathname.replace(/\/$/u, '') : pathname;
 }
 
 async function fillSafeFormFields(page: PlaywrightPageLike): Promise<FormFillResult> {
@@ -614,7 +674,8 @@ async function readInteractionCandidates(page: PlaywrightPageLike): Promise<Inte
         selector: candidate.selector,
         description: candidate.description,
         kind,
-        riskText
+        riskText,
+        href: typeof candidate.href === 'string' && candidate.href ? candidate.href : null
       }
     ];
   });
@@ -747,14 +808,118 @@ function tracePathForUrl(artifactsDir: string, url: string): string {
   return artifactPathForUrl(artifactsDir, url).replace(/\.png$/u, '.trace.zip');
 }
 
-function getConsoleErrorText(message: unknown): string | null {
+interface ConsoleErrorRecord {
+  text: string;
+  url: string | null;
+}
+
+interface FailedResponseRecord {
+  url: string;
+  status: number;
+  method: string;
+  resourceType: string;
+  document: string | null;
+}
+
+function getConsoleError(message: unknown): ConsoleErrorRecord | null {
   const type = callStringMethod(message, 'type');
 
   if (type !== 'error') {
     return null;
   }
 
-  return callStringMethod(message, 'text') ?? 'Unknown console error';
+  return {
+    text: callStringMethod(message, 'text') ?? 'Unknown console error',
+    /* Chrome leaves the failing URL out of the console text but keeps it on the
+       message location, so this recovers it even without the response event. */
+    url: readConsoleLocationUrl(message)
+  };
+}
+
+function readConsoleLocationUrl(message: unknown): string | null {
+  const location = callUnknownMethod(message, 'location');
+
+  if (!isRecord(location) || typeof location.url !== 'string' || !location.url) {
+    return null;
+  }
+
+  return location.url;
+}
+
+function getFailedResponse(response: unknown, document: string | null): FailedResponseRecord | null {
+  const status = callUnknownMethod(response, 'status');
+  const url = callStringMethod(response, 'url');
+
+  if (typeof status !== 'number' || status < 400 || !url) {
+    return null;
+  }
+
+  const request = callUnknownMethod(response, 'request');
+
+  return {
+    url,
+    status,
+    method: callStringMethod(request, 'method') ?? 'GET',
+    resourceType: callStringMethod(request, 'resourceType') ?? 'other',
+    document
+  };
+}
+
+/* Interactions can navigate mid-snapshot, so a request is not always attributable
+   to the route the finding names. Recording the document it actually fired on
+   keeps the evidence true when they differ. */
+function formatFailedResponse(response: FailedResponseRecord, routeUrl: string): string {
+  const context =
+    response.document && !sameDocument(response.document, routeUrl)
+      ? `${response.resourceType}, on ${response.document}`
+      : response.resourceType;
+
+  return `${response.method} ${response.url} :: ${response.status} (${context})`;
+}
+
+function sameDocument(left: string, right: string): boolean {
+  try {
+    return new URL(left).toString() === new URL(right).toString();
+  } catch {
+    return left === right;
+  }
+}
+
+function readPageUrl(page: PlaywrightPageLike): string | null {
+  try {
+    return page.url();
+  } catch {
+    return null;
+  }
+}
+
+/* A resource-load console line whose URL is already reported as a failed response
+   would say strictly less than that response, so it is dropped instead of listed
+   beside it — that duplication is what turned four broken endpoints into seven
+   identical, unactionable rows. */
+function buildConsoleErrorEvidence(
+  consoleErrors: ConsoleErrorRecord[],
+  failedResponses: FailedResponseRecord[]
+): string[] {
+  const reportedUrls = new Set(failedResponses.map((response) => response.url));
+
+  return dedupe(
+    consoleErrors.flatMap((consoleError) => {
+      if (consoleError.url && reportedUrls.has(consoleError.url) && isResourceLoadFailure(consoleError.text)) {
+        return [];
+      }
+
+      return [consoleError.url ? `${consoleError.text} :: ${consoleError.url}` : consoleError.text];
+    })
+  );
+}
+
+function isResourceLoadFailure(text: string): boolean {
+  return /failed to load resource/iu.test(text);
+}
+
+function dedupe(values: string[]): string[] {
+  return Array.from(new Set(values));
 }
 
 function formatUnknownError(error: unknown): string {

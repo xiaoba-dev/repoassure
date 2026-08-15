@@ -646,6 +646,7 @@ async function writeExternalUrlBootResult(runDir: string, url: string): Promise<
         port: readPort(url),
         logsPath: '',
         daemon: false,
+        environment: 'provided-url',
         blockers: [],
         errors: []
       },
@@ -668,6 +669,7 @@ async function writeFailedBootResult(runDir: string, error: string): Promise<voi
         port: null,
         logsPath: '',
         daemon: false,
+        environment: 'self-booted',
         blockers: [],
         errors: [error]
       },

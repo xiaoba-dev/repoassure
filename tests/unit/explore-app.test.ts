@@ -93,6 +93,39 @@ describe('exploreApp', () => {
     });
   });
 
+  it('does not crawl the root twice when the seed url omits the trailing slash', async () => {
+    const visited: string[] = [];
+    const result = await exploreApp({
+      url: 'http://localhost:3000',
+      criticalPaths: [],
+      maxRoutes: 5,
+      maxActionsPerRoute: 0,
+      artifactsDir: '/tmp/hardening-artifacts',
+      browserDriver: {
+        snapshot: async (url) => {
+          visited.push(url);
+
+          return {
+            url,
+            status: 200,
+            html: '<html><body><a href="/">Home</a></body></html>',
+            bodyText: 'Home',
+            links: ['http://localhost:3000/'],
+            consoleErrors: [],
+            pageErrors: [],
+            failedRequests: [],
+            artifactFiles: [],
+            interactions: []
+          };
+        },
+        close: async () => undefined
+      }
+    });
+
+    expect(result.visitedRoutes).toEqual(['http://localhost:3000/']);
+    expect(visited).toEqual(['http://localhost:3000/']);
+  });
+
   it('uses a browser driver to capture runtime findings and artifacts', async () => {
     const result = await exploreApp({
       url: 'http://localhost:3000/',

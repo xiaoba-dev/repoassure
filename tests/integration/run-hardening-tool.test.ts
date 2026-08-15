@@ -537,7 +537,7 @@ describe('runHardeningTool', () => {
       await readFile(join(root, '.hardening', 'run', 'boot-result.json'), 'utf8')
     ) as { url: string; port: number | null };
 
-    expect(exploredUrls).toEqual(['http://127.0.0.1:5173']);
+    expect(exploredUrls).toEqual(['http://127.0.0.1:5173/']);
     expect(bootResult).toMatchObject({
       url: 'http://127.0.0.1:5173',
       port: 5173

@@ -37,8 +37,8 @@ describe('runExploreAppTool', () => {
       }
     });
 
-    expect(visitedUrls).toEqual(['http://127.0.0.1:5173']);
-    expect(result.visitedRoutes).toEqual(['http://127.0.0.1:5173']);
+    expect(visitedUrls).toEqual(['http://127.0.0.1:5173/']);
+    expect(result.visitedRoutes).toEqual(['http://127.0.0.1:5173/']);
   });
 
   it('normalizes IPv6 unspecified input urls before exploration', async () => {
@@ -57,7 +57,7 @@ describe('runExploreAppTool', () => {
       }
     });
 
-    expect(visitedUrls).toEqual(['http://127.0.0.1:5173']);
-    expect(result.visitedRoutes).toEqual(['http://127.0.0.1:5173']);
+    expect(visitedUrls).toEqual(['http://127.0.0.1:5173/']);
+    expect(result.visitedRoutes).toEqual(['http://127.0.0.1:5173/']);
   });
 });

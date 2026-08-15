@@ -11,7 +11,7 @@
     "hardening-mcp": "dist/adapters/mcp/index.js"
   },
   "scripts": {
-    "build": "pnpm build:packages && pnpm build:src && pnpm build:website",
+    "build": "pnpm build:tokens && pnpm build:packages && pnpm build:src && pnpm build:website",
     "build:website": "pnpm --filter @repoassure/website build",
     "build:src": "tsc -p tsconfig.build.json",
     "build:packages": "pnpm build:shared && pnpm build:security-assurance && pnpm build:browser-explorer && pnpm build:repair-planner && pnpm build:acceptance",
@@ -85,7 +85,10 @@
     "prerepair:execute": "pnpm build",
     "repair:execute": "node packages/acceptance/dist/run-repair-execute.js",
     "prerepair:patch-plan": "pnpm build",
-    "repair:patch-plan": "node packages/acceptance/dist/run-repair-patch-plan.js"
+    "repair:patch-plan": "node packages/acceptance/dist/run-repair-patch-plan.js",
+    "project:intelligence": "node packages/acceptance/dist/run-project-intelligence-snapshot.js",
+    "project:intelligence:view": "node packages/acceptance/dist/run-project-intelligence-viewer.js",
+    "build:tokens": "node scripts/generate-console-tokens.mjs"
   },
   "engines": {
     "node": ">=22"

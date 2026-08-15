@@ -792,3 +792,37 @@ export {
   type GoalAuditRunInput,
   type GoalAuditWorkspaceInput
 } from './run-goal-audit.js';
+
+export {
+  buildProjectIntelligenceSnapshot,
+  formatProjectIntelligenceSnapshotMarkdown,
+  isDirectRun as isProjectIntelligenceSnapshotDirectRun,
+  isProjectIntelligenceSnapshotHelpRequest,
+  main as runProjectIntelligenceSnapshotCli,
+  parseProjectIntelligenceSnapshotArgs,
+  projectIntelligenceSnapshotHelpText,
+  runProjectIntelligenceSnapshot,
+  type ProjectIntelligenceEdge,
+  type ProjectIntelligenceEdgeType,
+  type ProjectIntelligenceGraph,
+  type ProjectIntelligenceGraphName,
+  type ProjectIntelligenceNode,
+  type ProjectIntelligenceNodeType,
+  type ProjectIntelligenceSnapshot,
+  type ProjectIntelligenceSnapshotCliOptions,
+  type ProjectIntelligenceSnapshotRunInput,
+  type ProjectIntelligenceSnapshotRunResult
+} from './run-project-intelligence-snapshot.js';
+
+export {
+  formatProjectIntelligenceViewerHtml,
+  isDirectRun as isProjectIntelligenceViewerDirectRun,
+  isProjectIntelligenceViewerHelpRequest,
+  main as runProjectIntelligenceViewerCli,
+  parseProjectIntelligenceViewerArgs,
+  projectIntelligenceViewerHelpText,
+  runProjectIntelligenceViewer,
+  type ProjectIntelligenceViewerCliOptions,
+  type ProjectIntelligenceViewerRunInput,
+  type ProjectIntelligenceViewerRunResult
+} from './run-project-intelligence-viewer.js';

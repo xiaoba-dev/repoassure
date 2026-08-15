@@ -62,6 +62,8 @@ import * as runUserAcceptanceHandoff from '@hardening-mcp/acceptance/run-user-ac
 import * as runRepairHandoff from '@hardening-mcp/acceptance/run-repair-handoff';
 import * as runRepairExecute from '@hardening-mcp/acceptance/run-repair-execute';
 import * as runRepairPatchPlan from '@hardening-mcp/acceptance/run-repair-patch-plan';
+import * as runProjectIntelligenceSnapshot from '@hardening-mcp/acceptance/run-project-intelligence-snapshot';
+import * as runProjectIntelligenceViewer from '@hardening-mcp/acceptance/run-project-intelligence-viewer';
 
 const packageSubpathModules = [
   acceptance,
@@ -127,7 +129,9 @@ const packageSubpathModules = [
   runUserAcceptanceHandoff,
   runRepairHandoff,
   runRepairExecute,
-  runRepairPatchPlan
+  runRepairPatchPlan,
+  runProjectIntelligenceSnapshot,
+  runProjectIntelligenceViewer
 ] as const;
 
 const runnerMains: Array<() => Promise<number>> = [
@@ -137,7 +141,9 @@ const runnerMains: Array<() => Promise<number>> = [
   runUserAcceptanceHandoff.main,
   runRepairHandoff.main,
   runRepairExecute.main,
-  runRepairPatchPlan.main
+  runRepairPatchPlan.main,
+  runProjectIntelligenceSnapshot.main,
+  runProjectIntelligenceViewer.main
 ];
 
 type RootPackageExportEntry = acceptance.AcceptancePackageExportEntry;

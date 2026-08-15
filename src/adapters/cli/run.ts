@@ -10,6 +10,7 @@ import { runHardeningTool } from '../../tools/run-hardening-tool.js';
 import { runSecurityImportTool } from '../../tools/security-import-tool.js';
 import { runVerifyEnvironmentTool } from '../../tools/verify-environment-tool.js';
 import { BrowserUnavailableError, createPlaywrightBrowserDriver } from '../../domain/explore/playwright-driver.js';
+import { verifyArtifactIntegrity } from '../../domain/integrity/artifact-integrity.js';
 import { redactSensitiveText } from '../../shared/privacy-redaction.js';
 
 export interface CliIO {
@@ -98,6 +99,10 @@ export async function runCli(args: string[], io: CliIO): Promise<number> {
 
   if (command === 'report') {
     return runReport(rest, io);
+  }
+
+  if (command === 'verify') {
+    return runVerify(rest, io);
   }
 
   if (command === 'security') {
@@ -420,6 +425,34 @@ async function runAnalyze(args: string[], io: CliIO): Promise<number> {
   }
 }
 
+async function runVerify(args: string[], io: CliIO): Promise<number> {
+  const [target] = args;
+  const argumentError = unexpectedPositionalArgument(args, 1);
+
+  if (!target) {
+    writeCliError(io, 'Missing required argument: <runDirOrManifest>');
+    return 1;
+  }
+
+  if (argumentError) {
+    writeCliError(io, argumentError);
+    return 1;
+  }
+
+  try {
+    const manifestPath = target.endsWith('.json') ? target : join(target, 'manifest.json');
+    const result = await verifyArtifactIntegrity(manifestPath);
+    io.writeStdout(formatCliJsonOutput(result));
+    // A mismatch is a finding, not a crash: the command succeeded in telling the
+    // reviewer that the bundle no longer matches what the run produced.
+    return result.ok ? 0 : 1;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    writeCliError(io, `Failed to verify artifacts: ${message}`);
+    return 1;
+  }
+}
+
 function writeCliError(io: CliIO, message: string): void {
   io.writeStderr(`${redactSensitiveText(message)}\n`);
 }
@@ -437,6 +470,7 @@ Usage:
   hardening generate-tests <findingsPath> <outputDir> [--smoke-route <path-or-url>] [--base-url <url>]
   hardening plan <repo> [--run-dir <dir>]
   hardening report <runDir> <outputPath>
+  hardening verify <runDirOrManifest>
   hardening security import --provider <provider> --scan-dir <dir> --repo <repo> --run-dir <dir>
   hardening verify-env <runDir> --deployed-url <url>
   hardening run <repo> [url] [--browser] [--critical-path <path-or-intent>] [--max-routes <n>] [--max-actions-per-route <n>] [--storage-state <path>] [--trace] [--start-command <command>] [--boot-timeout-ms <ms>] [--run-dir <dir>] [--workspace-output <dir>]
@@ -514,6 +548,33 @@ Usage:
 Arguments:
   <runDir>      Hardening run artifact directory.
   <outputPath>  Markdown report output path.
+
+Options:
+  --help, -h  Show this help.
+
+`;
+  }
+
+  if (command === 'verify') {
+    return `hardening verify
+
+Usage:
+  hardening verify <runDirOrManifest>
+
+Recomputes the content hash of every artifact recorded in a run manifest and reports
+whether each one still matches. Use it to confirm an evidence bundle was not edited
+after the run produced it.
+
+Paths resolve relative to the manifest, so a bundle stays verifiable after it is moved
+to another machine.
+
+Arguments:
+  <runDirOrManifest>  A run directory, or a manifest.json path directly.
+                      Defaults to manifest.json inside the directory.
+
+Exit codes:
+  0  Every artifact matches.
+  1  An artifact was modified or is missing, or the manifest cannot be verified.
 
 Options:
   --help, -h  Show this help.

@@ -34,6 +34,7 @@ interface RepoProfileSummary {
 interface BootResultSummary {
   status: string;
   url: string | null;
+  environment: string;
   blockers: string[];
   errors: string[];
 }
@@ -237,7 +238,8 @@ function buildReport(input: {
 | P2 | ${input.issueCounts.P2} |
 | 启动状态 | ${formatTableCell(input.bootResult.status)} |
 | 应用 URL | ${formatTableCell(input.bootResult.url ?? '未检测到')} |
-
+| 测量环境 | ${formatTableCell(formatBootEnvironment(input.bootResult.environment))} |
+${formatEnvironmentCaveat(input.bootResult.environment)}
 ## Repo Profile
 
 | 字段 | 值 |
@@ -269,6 +271,35 @@ ${formatFindings(input.findings)}
 ## 阻塞项和错误
 
 ${formatBlockersAndErrors(input.repoProfile, input.bootResult, input.testGeneration)}
+`;
+}
+
+function formatBootEnvironment(environment: string): string {
+  if (environment === 'self-booted') {
+    return '自启动应用';
+  }
+
+  if (environment === 'provided-url') {
+    return '指定 URL';
+  }
+
+  return '未知';
+}
+
+/* A framework dev command does not serve routes that a deploy adapter runs
+   separately, so those routes 404 locally while working in production. Without
+   this note the score reads as a verdict on the deployed app instead of on what
+   the run could actually reach. */
+function formatEnvironmentCaveat(environment: string): string {
+  if (environment !== 'self-booted') {
+    return '';
+  }
+
+  return `
+> 本次评分测量的是自启动的本地应用，不等同于生产环境就绪度。
+> 由部署适配器单独运行的路由（Cloudflare Pages Functions、Netlify Functions、Vercel serverless、SvelteKit adapter endpoints 等）
+> 不会被框架 dev 命令服务，因此这类路由在本地返回 404 属于环境差异而非应用缺陷。
+> 针对已部署 URL 重跑（\`hardening run <repo> <deployed-url>\`）可以区分两者。
 `;
 }
 
@@ -354,6 +385,7 @@ async function readBootResult(path: string): Promise<BootResultSummary> {
   return {
     status: readString(record.status, 'unknown'),
     url: typeof record.url === 'string' ? record.url : null,
+    environment: readString(record.environment, 'unknown'),
     blockers: readStringArray(record.blockers),
     errors: readStringArray(record.errors)
   };

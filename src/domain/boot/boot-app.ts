@@ -9,6 +9,11 @@ import { parseShellWords } from '../../shared/shell-words.js';
 
 export type BootStatus = 'running' | 'blocked' | 'failed';
 
+/* Which app the run actually measured: one this tool started from the repo's own
+   start command, or one the caller pointed it at. The readiness score means
+   different things in each case, so the report states which it was. */
+export type BootEnvironment = 'self-booted' | 'provided-url';
+
 export interface BootAppInput {
   root: string;
   startCommand: string;
@@ -28,6 +33,7 @@ export interface BootAppResult {
   port: number | null;
   logsPath: string;
   daemon: boolean;
+  environment: BootEnvironment;
   blockers: string[];
   errors: string[];
 }
@@ -335,6 +341,7 @@ function buildSession(input: {
     port,
     logsPath: input.logsPath,
     daemon: input.daemon,
+    environment: 'self-booted',
     blockers: input.blockers,
     errors: input.errors.filter(Boolean),
     stop: async () => {

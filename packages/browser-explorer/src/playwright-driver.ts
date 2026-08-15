@@ -348,7 +348,7 @@ export async function createPlaywrightBrowserDriver(input: CreatePlaywrightBrows
          otherwise leave only Chrome's console text, which deliberately omits the
          URL. Watching responses is what turns it into an actionable finding. */
       page.on('response', (response) => {
-        const failedResponse = getFailedResponse(response);
+        const failedResponse = getFailedResponse(response, readPageUrl(page));
         if (failedResponse) {
           failedResponses.push(failedResponse);
         }
@@ -387,7 +387,10 @@ export async function createPlaywrightBrowserDriver(input: CreatePlaywrightBrows
           links,
           consoleErrors: buildConsoleErrorEvidence(consoleErrors, failedResponses),
           pageErrors,
-          failedRequests: dedupe([...failedRequests, ...failedResponses.map(formatFailedResponse)]),
+          failedRequests: dedupe([
+            ...failedRequests,
+            ...failedResponses.map((failedResponse) => formatFailedResponse(failedResponse, url))
+          ]),
           artifactFiles,
           interactions
         };
@@ -815,6 +818,7 @@ interface FailedResponseRecord {
   status: number;
   method: string;
   resourceType: string;
+  document: string | null;
 }
 
 function getConsoleError(message: unknown): ConsoleErrorRecord | null {
@@ -842,7 +846,7 @@ function readConsoleLocationUrl(message: unknown): string | null {
   return location.url;
 }
 
-function getFailedResponse(response: unknown): FailedResponseRecord | null {
+function getFailedResponse(response: unknown, document: string | null): FailedResponseRecord | null {
   const status = callUnknownMethod(response, 'status');
   const url = callStringMethod(response, 'url');
 
@@ -856,12 +860,37 @@ function getFailedResponse(response: unknown): FailedResponseRecord | null {
     url,
     status,
     method: callStringMethod(request, 'method') ?? 'GET',
-    resourceType: callStringMethod(request, 'resourceType') ?? 'other'
+    resourceType: callStringMethod(request, 'resourceType') ?? 'other',
+    document
   };
 }
 
-function formatFailedResponse(response: FailedResponseRecord): string {
-  return `${response.method} ${response.url} :: ${response.status} (${response.resourceType})`;
+/* Interactions can navigate mid-snapshot, so a request is not always attributable
+   to the route the finding names. Recording the document it actually fired on
+   keeps the evidence true when they differ. */
+function formatFailedResponse(response: FailedResponseRecord, routeUrl: string): string {
+  const context =
+    response.document && !sameDocument(response.document, routeUrl)
+      ? `${response.resourceType}, on ${response.document}`
+      : response.resourceType;
+
+  return `${response.method} ${response.url} :: ${response.status} (${context})`;
+}
+
+function sameDocument(left: string, right: string): boolean {
+  try {
+    return new URL(left).toString() === new URL(right).toString();
+  } catch {
+    return left === right;
+  }
+}
+
+function readPageUrl(page: PlaywrightPageLike): string | null {
+  try {
+    return page.url();
+  } catch {
+    return null;
+  }
 }
 
 /* A resource-load console line whose URL is already reported as a failed response

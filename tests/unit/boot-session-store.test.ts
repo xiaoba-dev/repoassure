@@ -10,6 +10,7 @@ describe('BootSessionStore', () => {
       port: 3000,
       logsPath: '/tmp/app.log',
       daemon: false,
+      environment: 'self-booted' as const,
       blockers: [],
       errors: [],
       resultPath: '/tmp/boot-result.json',

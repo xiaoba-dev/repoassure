@@ -219,7 +219,7 @@ describe('createPlaywrightBrowserDriver', () => {
       }
     });
 
-    const snapshot = await driver.snapshot('http://localhost:3000/', {
+    const snapshot = await driver.snapshot('http://localhost:3000/settings', {
       artifactsDir,
       maxActionsPerRoute: 0
     });
@@ -274,7 +274,7 @@ describe('createPlaywrightBrowserDriver', () => {
       }
     });
 
-    const snapshot = await driver.snapshot('http://localhost:3000/', {
+    const snapshot = await driver.snapshot('http://localhost:3000/settings', {
       artifactsDir,
       maxActionsPerRoute: 0
     });
@@ -285,6 +285,33 @@ describe('createPlaywrightBrowserDriver', () => {
       'GET http://localhost:3000/api/stats :: 404 (fetch)',
       'POST http://localhost:3000/api/feed :: 500 (xhr)'
     ]);
+  });
+
+  it('names the document a request failed on when an interaction navigated away from the route', async () => {
+    const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-network-document-'));
+    const page = new FakePage({
+      responses: [
+        { url: 'http://localhost:3000/api/stats', status: 404, method: 'GET', resourceType: 'fetch' }
+      ]
+    });
+    const driver = await legacyCreatePlaywrightBrowserDriver({
+      launcher: {
+        launch: async () => new FakeBrowser(page)
+      }
+    });
+
+    // FakePage reports its url as /settings, so this snapshot's route differs from
+    // the document the failure was observed on, exactly as it does after a click
+    // navigates mid-snapshot.
+    const snapshot = await driver.snapshot('http://localhost:3000/about', {
+      artifactsDir,
+      maxActionsPerRoute: 0
+    });
+    await driver.close();
+
+    expect(snapshot.failedRequests).toContain(
+      'GET http://localhost:3000/api/stats :: 404 (fetch, on http://localhost:3000/settings)'
+    );
   });
 
   it('records dead controls when clicks do not change url or body text', async () => {

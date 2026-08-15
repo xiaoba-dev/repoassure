@@ -10,141 +10,29 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./compatibility": {
-      "types": "./dist/compatibility.d.ts",
-      "default": "./dist/compatibility.js"
+    "./ai-ide-approved-repair-execution-plan": {
+      "types": "./dist/ai-ide-approved-repair-execution-plan.d.ts",
+      "default": "./dist/ai-ide-approved-repair-execution-plan.js"
     },
-    "./markdown": {
-      "types": "./dist/markdown.d.ts",
-      "default": "./dist/markdown.js"
-    },
-    "./report": {
-      "types": "./dist/report.d.ts",
-      "default": "./dist/report.js"
-    },
-    "./goal-audit": {
-      "types": "./dist/goal-audit.d.ts",
-      "default": "./dist/goal-audit.js"
-    },
-    "./goal-audit-requirements": {
-      "types": "./dist/goal-audit-requirements.d.ts",
-      "default": "./dist/goal-audit-requirements.js"
-    },
-    "./goal-audit-user-acceptance": {
-      "types": "./dist/goal-audit-user-acceptance.d.ts",
-      "default": "./dist/goal-audit-user-acceptance.js"
-    },
-    "./goal-audit-user-acceptance-materials": {
-      "types": "./dist/goal-audit-user-acceptance-materials.d.ts",
-      "default": "./dist/goal-audit-user-acceptance-materials.js"
-    },
-    "./goal-audit-sources": {
-      "types": "./dist/goal-audit-sources.d.ts",
-      "default": "./dist/goal-audit-sources.js"
-    },
-    "./goal-audit-delivery": {
-      "types": "./dist/goal-audit-delivery.d.ts",
-      "default": "./dist/goal-audit-delivery.js"
-    },
-    "./goal-audit-runtime": {
-      "types": "./dist/goal-audit-runtime.d.ts",
-      "default": "./dist/goal-audit-runtime.js"
-    },
-    "./goal-audit-workflow-artifacts": {
-      "types": "./dist/goal-audit-workflow-artifacts.d.ts",
-      "default": "./dist/goal-audit-workflow-artifacts.js"
-    },
-    "./goal-audit-observability-security": {
-      "types": "./dist/goal-audit-observability-security.d.ts",
-      "default": "./dist/goal-audit-observability-security.js"
-    },
-    "./goal-audit-process-governance": {
-      "types": "./dist/goal-audit-process-governance.d.ts",
-      "default": "./dist/goal-audit-process-governance.js"
-    },
-    "./goal-audit-evidence-documents": {
-      "types": "./dist/goal-audit-evidence-documents.d.ts",
-      "default": "./dist/goal-audit-evidence-documents.js"
-    },
-    "./goal-audit-current-items": {
-      "types": "./dist/goal-audit-current-items.d.ts",
-      "default": "./dist/goal-audit-current-items.js"
-    },
-    "./goal-audit-v03-distribution": {
-      "types": "./dist/goal-audit-v03-distribution.d.ts",
-      "default": "./dist/goal-audit-v03-distribution.js"
-    },
-    "./goal-audit-public-release-readiness": {
-      "types": "./dist/goal-audit-public-release-readiness.d.ts",
-      "default": "./dist/goal-audit-public-release-readiness.js"
-    },
-    "./user-acceptance": {
-      "types": "./dist/user-acceptance.d.ts",
-      "default": "./dist/user-acceptance.js"
-    },
-    "./user-acceptance-handoff": {
-      "types": "./dist/user-acceptance-handoff.d.ts",
-      "default": "./dist/user-acceptance-handoff.js"
-    },
-    "./fatal-error": {
-      "types": "./dist/fatal-error.d.ts",
-      "default": "./dist/fatal-error.js"
-    },
-    "./redaction": {
-      "types": "./dist/redaction.d.ts",
-      "default": "./dist/redaction.js"
-    },
-    "./repo-preflight": {
-      "types": "./dist/repo-preflight.d.ts",
-      "default": "./dist/repo-preflight.js"
-    },
-    "./python-cli-profile": {
-      "types": "./dist/python-cli-profile.d.ts",
-      "default": "./dist/python-cli-profile.js"
-    },
-    "./python-cli-checks": {
-      "types": "./dist/python-cli-checks.d.ts",
-      "default": "./dist/python-cli-checks.js"
-    },
-    "./python-cli-artifacts": {
-      "types": "./dist/python-cli-artifacts.d.ts",
-      "default": "./dist/python-cli-artifacts.js"
-    },
-    "./target-repo-feedback-summary": {
-      "types": "./dist/target-repo-feedback-summary.d.ts",
-      "default": "./dist/target-repo-feedback-summary.js"
+    "./ai-ide-authorized-target-repo-repair-goal-task-package": {
+      "types": "./dist/ai-ide-authorized-target-repo-repair-goal-task-package.d.ts",
+      "default": "./dist/ai-ide-authorized-target-repo-repair-goal-task-package.js"
     },
     "./ai-ide-handoff-package": {
       "types": "./dist/ai-ide-handoff-package.d.ts",
       "default": "./dist/ai-ide-handoff-package.js"
     },
-    "./user-validation-evidence-loop": {
-      "types": "./dist/user-validation-evidence-loop.d.ts",
-      "default": "./dist/user-validation-evidence-loop.js"
-    },
-    "./ai-ide-repair-playbook": {
-      "types": "./dist/ai-ide-repair-playbook.d.ts",
-      "default": "./dist/ai-ide-repair-playbook.js"
-    },
     "./ai-ide-playbook-consumption-report": {
       "types": "./dist/ai-ide-playbook-consumption-report.d.ts",
       "default": "./dist/ai-ide-playbook-consumption-report.js"
-    },
-    "./ai-ide-repair-decision-package": {
-      "types": "./dist/ai-ide-repair-decision-package.d.ts",
-      "default": "./dist/ai-ide-repair-decision-package.js"
     },
     "./ai-ide-repair-approval-receipt": {
       "types": "./dist/ai-ide-repair-approval-receipt.d.ts",
       "default": "./dist/ai-ide-repair-approval-receipt.js"
     },
-    "./ai-ide-approved-repair-execution-plan": {
-      "types": "./dist/ai-ide-approved-repair-execution-plan.d.ts",
-      "default": "./dist/ai-ide-approved-repair-execution-plan.js"
-    },
-    "./ai-ide-repair-execution-evidence-report": {
-      "types": "./dist/ai-ide-repair-execution-evidence-report.d.ts",
-      "default": "./dist/ai-ide-repair-execution-evidence-report.js"
+    "./ai-ide-repair-decision-package": {
+      "types": "./dist/ai-ide-repair-decision-package.d.ts",
+      "default": "./dist/ai-ide-repair-decision-package.js"
     },
     "./ai-ide-repair-evidence-bundle-manifest": {
       "types": "./dist/ai-ide-repair-evidence-bundle-manifest.d.ts",
@@ -154,37 +42,33 @@
       "types": "./dist/ai-ide-repair-evidence-consumer-contract.d.ts",
       "default": "./dist/ai-ide-repair-evidence-consumer-contract.js"
     },
+    "./ai-ide-repair-execution-evidence-report": {
+      "types": "./dist/ai-ide-repair-execution-evidence-report.d.ts",
+      "default": "./dist/ai-ide-repair-execution-evidence-report.js"
+    },
     "./ai-ide-repair-execution-replay-readiness": {
       "types": "./dist/ai-ide-repair-execution-replay-readiness.d.ts",
       "default": "./dist/ai-ide-repair-execution-replay-readiness.js"
     },
-    "./ai-ide-target-repo-repair-goal-proposal-package": {
-      "types": "./dist/ai-ide-target-repo-repair-goal-proposal-package.d.ts",
-      "default": "./dist/ai-ide-target-repo-repair-goal-proposal-package.js"
-    },
-    "./ai-ide-target-repo-repair-goal-authorization-receipt": {
-      "types": "./dist/ai-ide-target-repo-repair-goal-authorization-receipt.d.ts",
-      "default": "./dist/ai-ide-target-repo-repair-goal-authorization-receipt.js"
-    },
-    "./ai-ide-authorized-target-repo-repair-goal-task-package": {
-      "types": "./dist/ai-ide-authorized-target-repo-repair-goal-task-package.d.ts",
-      "default": "./dist/ai-ide-authorized-target-repo-repair-goal-task-package.js"
-    },
-    "./ai-ide-target-repo-repair-goal-execution-evidence-intake-report": {
-      "types": "./dist/ai-ide-target-repo-repair-goal-execution-evidence-intake-report.d.ts",
-      "default": "./dist/ai-ide-target-repo-repair-goal-execution-evidence-intake-report.js"
+    "./ai-ide-repair-playbook": {
+      "types": "./dist/ai-ide-repair-playbook.d.ts",
+      "default": "./dist/ai-ide-repair-playbook.js"
     },
     "./ai-ide-target-repair-evidence-review-decision-package": {
       "types": "./dist/ai-ide-target-repair-evidence-review-decision-package.d.ts",
       "default": "./dist/ai-ide-target-repair-evidence-review-decision-package.js"
     },
-    "./blocked-goal-recovery-package": {
-      "types": "./dist/blocked-goal-recovery-package.d.ts",
-      "default": "./dist/blocked-goal-recovery-package.js"
+    "./ai-ide-target-repo-repair-goal-authorization-receipt": {
+      "types": "./dist/ai-ide-target-repo-repair-goal-authorization-receipt.d.ts",
+      "default": "./dist/ai-ide-target-repo-repair-goal-authorization-receipt.js"
     },
-    "./blocked-goal-recovery-lifecycle-campaign-summary": {
-      "types": "./dist/blocked-goal-recovery-lifecycle-campaign-summary.d.ts",
-      "default": "./dist/blocked-goal-recovery-lifecycle-campaign-summary.js"
+    "./ai-ide-target-repo-repair-goal-execution-evidence-intake-report": {
+      "types": "./dist/ai-ide-target-repo-repair-goal-execution-evidence-intake-report.d.ts",
+      "default": "./dist/ai-ide-target-repo-repair-goal-execution-evidence-intake-report.js"
+    },
+    "./ai-ide-target-repo-repair-goal-proposal-package": {
+      "types": "./dist/ai-ide-target-repo-repair-goal-proposal-package.d.ts",
+      "default": "./dist/ai-ide-target-repo-repair-goal-proposal-package.js"
     },
     "./blocked-goal-recovery-consumption-report": {
       "types": "./dist/blocked-goal-recovery-consumption-report.d.ts",
@@ -194,13 +78,13 @@
       "types": "./dist/blocked-goal-recovery-decision-receipt.d.ts",
       "default": "./dist/blocked-goal-recovery-decision-receipt.js"
     },
-    "./blocked-goal-recovery-resume-attempt-task-package": {
-      "types": "./dist/blocked-goal-recovery-resume-attempt-task-package.d.ts",
-      "default": "./dist/blocked-goal-recovery-resume-attempt-task-package.js"
+    "./blocked-goal-recovery-lifecycle-campaign-summary": {
+      "types": "./dist/blocked-goal-recovery-lifecycle-campaign-summary.d.ts",
+      "default": "./dist/blocked-goal-recovery-lifecycle-campaign-summary.js"
     },
-    "./blocked-goal-recovery-resume-attempt-execution-evidence-intake": {
-      "types": "./dist/blocked-goal-recovery-resume-attempt-execution-evidence-intake.d.ts",
-      "default": "./dist/blocked-goal-recovery-resume-attempt-execution-evidence-intake.js"
+    "./blocked-goal-recovery-package": {
+      "types": "./dist/blocked-goal-recovery-package.d.ts",
+      "default": "./dist/blocked-goal-recovery-package.js"
     },
     "./blocked-goal-recovery-resume-attempt-closure-receipt": {
       "types": "./dist/blocked-goal-recovery-resume-attempt-closure-receipt.d.ts",
@@ -210,29 +94,109 @@
       "types": "./dist/blocked-goal-recovery-resume-attempt-evidence-review-decision-package.d.ts",
       "default": "./dist/blocked-goal-recovery-resume-attempt-evidence-review-decision-package.js"
     },
+    "./blocked-goal-recovery-resume-attempt-execution-evidence-intake": {
+      "types": "./dist/blocked-goal-recovery-resume-attempt-execution-evidence-intake.d.ts",
+      "default": "./dist/blocked-goal-recovery-resume-attempt-execution-evidence-intake.js"
+    },
+    "./blocked-goal-recovery-resume-attempt-task-package": {
+      "types": "./dist/blocked-goal-recovery-resume-attempt-task-package.d.ts",
+      "default": "./dist/blocked-goal-recovery-resume-attempt-task-package.js"
+    },
     "./campaign-summary": {
       "types": "./dist/campaign-summary.d.ts",
       "default": "./dist/campaign-summary.js"
     },
-    "./user-acceptance-args": {
-      "types": "./dist/user-acceptance-args.d.ts",
-      "default": "./dist/user-acceptance-args.js"
+    "./compatibility": {
+      "types": "./dist/compatibility.d.ts",
+      "default": "./dist/compatibility.js"
     },
-    "./shell-quote": {
-      "types": "./dist/shell-quote.d.ts",
-      "default": "./dist/shell-quote.js"
+    "./fatal-error": {
+      "types": "./dist/fatal-error.d.ts",
+      "default": "./dist/fatal-error.js"
     },
-    "./shell-words": {
-      "types": "./dist/shell-words.d.ts",
-      "default": "./dist/shell-words.js"
+    "./goal-audit": {
+      "types": "./dist/goal-audit.d.ts",
+      "default": "./dist/goal-audit.js"
     },
-    "./user-acceptance-record": {
-      "types": "./dist/user-acceptance-record.d.ts",
-      "default": "./dist/user-acceptance-record.js"
+    "./goal-audit-current-items": {
+      "types": "./dist/goal-audit-current-items.d.ts",
+      "default": "./dist/goal-audit-current-items.js"
     },
-    "./user-acceptance-runner-helpers": {
-      "types": "./dist/user-acceptance-runner-helpers.d.ts",
-      "default": "./dist/user-acceptance-runner-helpers.js"
+    "./goal-audit-delivery": {
+      "types": "./dist/goal-audit-delivery.d.ts",
+      "default": "./dist/goal-audit-delivery.js"
+    },
+    "./goal-audit-evidence-documents": {
+      "types": "./dist/goal-audit-evidence-documents.d.ts",
+      "default": "./dist/goal-audit-evidence-documents.js"
+    },
+    "./goal-audit-observability-security": {
+      "types": "./dist/goal-audit-observability-security.d.ts",
+      "default": "./dist/goal-audit-observability-security.js"
+    },
+    "./goal-audit-process-governance": {
+      "types": "./dist/goal-audit-process-governance.d.ts",
+      "default": "./dist/goal-audit-process-governance.js"
+    },
+    "./goal-audit-public-release-readiness": {
+      "types": "./dist/goal-audit-public-release-readiness.d.ts",
+      "default": "./dist/goal-audit-public-release-readiness.js"
+    },
+    "./goal-audit-requirements": {
+      "types": "./dist/goal-audit-requirements.d.ts",
+      "default": "./dist/goal-audit-requirements.js"
+    },
+    "./goal-audit-runtime": {
+      "types": "./dist/goal-audit-runtime.d.ts",
+      "default": "./dist/goal-audit-runtime.js"
+    },
+    "./goal-audit-sources": {
+      "types": "./dist/goal-audit-sources.d.ts",
+      "default": "./dist/goal-audit-sources.js"
+    },
+    "./goal-audit-user-acceptance": {
+      "types": "./dist/goal-audit-user-acceptance.d.ts",
+      "default": "./dist/goal-audit-user-acceptance.js"
+    },
+    "./goal-audit-user-acceptance-materials": {
+      "types": "./dist/goal-audit-user-acceptance-materials.d.ts",
+      "default": "./dist/goal-audit-user-acceptance-materials.js"
+    },
+    "./goal-audit-v03-distribution": {
+      "types": "./dist/goal-audit-v03-distribution.d.ts",
+      "default": "./dist/goal-audit-v03-distribution.js"
+    },
+    "./goal-audit-workflow-artifacts": {
+      "types": "./dist/goal-audit-workflow-artifacts.d.ts",
+      "default": "./dist/goal-audit-workflow-artifacts.js"
+    },
+    "./markdown": {
+      "types": "./dist/markdown.d.ts",
+      "default": "./dist/markdown.js"
+    },
+    "./python-cli-artifacts": {
+      "types": "./dist/python-cli-artifacts.d.ts",
+      "default": "./dist/python-cli-artifacts.js"
+    },
+    "./python-cli-checks": {
+      "types": "./dist/python-cli-checks.d.ts",
+      "default": "./dist/python-cli-checks.js"
+    },
+    "./python-cli-profile": {
+      "types": "./dist/python-cli-profile.d.ts",
+      "default": "./dist/python-cli-profile.js"
+    },
+    "./redaction": {
+      "types": "./dist/redaction.d.ts",
+      "default": "./dist/redaction.js"
+    },
+    "./repo-preflight": {
+      "types": "./dist/repo-preflight.d.ts",
+      "default": "./dist/repo-preflight.js"
+    },
+    "./report": {
+      "types": "./dist/report.d.ts",
+      "default": "./dist/report.js"
     },
     "./run-acceptance": {
       "types": "./dist/run-acceptance.d.ts",
@@ -242,6 +206,26 @@
       "types": "./dist/run-goal-audit.d.ts",
       "default": "./dist/run-goal-audit.js"
     },
+    "./run-project-intelligence-snapshot": {
+      "types": "./dist/run-project-intelligence-snapshot.d.ts",
+      "default": "./dist/run-project-intelligence-snapshot.js"
+    },
+    "./run-project-intelligence-viewer": {
+      "types": "./dist/run-project-intelligence-viewer.d.ts",
+      "default": "./dist/run-project-intelligence-viewer.js"
+    },
+    "./run-repair-execute": {
+      "types": "./dist/run-repair-execute.d.ts",
+      "default": "./dist/run-repair-execute.js"
+    },
+    "./run-repair-handoff": {
+      "types": "./dist/run-repair-handoff.d.ts",
+      "default": "./dist/run-repair-handoff.js"
+    },
+    "./run-repair-patch-plan": {
+      "types": "./dist/run-repair-patch-plan.d.ts",
+      "default": "./dist/run-repair-patch-plan.js"
+    },
     "./run-user-acceptance": {
       "types": "./dist/run-user-acceptance.d.ts",
       "default": "./dist/run-user-acceptance.js"
@@ -250,17 +234,41 @@
       "types": "./dist/run-user-acceptance-handoff.d.ts",
       "default": "./dist/run-user-acceptance-handoff.js"
     },
-    "./run-repair-handoff": {
-      "types": "./dist/run-repair-handoff.d.ts",
-      "default": "./dist/run-repair-handoff.js"
+    "./shell-quote": {
+      "types": "./dist/shell-quote.d.ts",
+      "default": "./dist/shell-quote.js"
     },
-    "./run-repair-execute": {
-      "types": "./dist/run-repair-execute.d.ts",
-      "default": "./dist/run-repair-execute.js"
+    "./shell-words": {
+      "types": "./dist/shell-words.d.ts",
+      "default": "./dist/shell-words.js"
     },
-    "./run-repair-patch-plan": {
-      "types": "./dist/run-repair-patch-plan.d.ts",
-      "default": "./dist/run-repair-patch-plan.js"
+    "./target-repo-feedback-summary": {
+      "types": "./dist/target-repo-feedback-summary.d.ts",
+      "default": "./dist/target-repo-feedback-summary.js"
+    },
+    "./user-acceptance": {
+      "types": "./dist/user-acceptance.d.ts",
+      "default": "./dist/user-acceptance.js"
+    },
+    "./user-acceptance-args": {
+      "types": "./dist/user-acceptance-args.d.ts",
+      "default": "./dist/user-acceptance-args.js"
+    },
+    "./user-acceptance-handoff": {
+      "types": "./dist/user-acceptance-handoff.d.ts",
+      "default": "./dist/user-acceptance-handoff.js"
+    },
+    "./user-acceptance-record": {
+      "types": "./dist/user-acceptance-record.d.ts",
+      "default": "./dist/user-acceptance-record.js"
+    },
+    "./user-acceptance-runner-helpers": {
+      "types": "./dist/user-acceptance-runner-helpers.d.ts",
+      "default": "./dist/user-acceptance-runner-helpers.js"
+    },
+    "./user-validation-evidence-loop": {
+      "types": "./dist/user-validation-evidence-loop.d.ts",
+      "default": "./dist/user-validation-evidence-loop.js"
     }
   }
 }

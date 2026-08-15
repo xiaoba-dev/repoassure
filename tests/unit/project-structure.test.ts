@@ -5098,7 +5098,7 @@ describe('project structure', () => {
       readFile('docs/architecture/specs/monorepo-structure-spec-v0.1.md', 'utf8')
     ]);
 
-    expect(rootPackageJson).toContain('"build": "pnpm build:packages && pnpm build:src && pnpm build:website"');
+    expect(rootPackageJson).toContain('"build": "pnpm build:tokens && pnpm build:packages && pnpm build:src && pnpm build:website"');
     expect(rootPackageJson).toContain('"build:website": "pnpm --filter @repoassure/website build"');
     expect(rootPackageJson).toContain('"build:src": "tsc -p tsconfig.build.json"');
     expect(rootPackageJson).toContain('"build:packages": "pnpm build:shared && pnpm build:security-assurance && pnpm build:browser-explorer && pnpm build:repair-planner && pnpm build:acceptance"');
@@ -5978,6 +5978,9 @@ describe('project structure', () => {
       .filter((path) => path.endsWith('.ts'))
       .map((path) => path.replace('packages/acceptance/src/', '').replace(/\.ts$/, ''))
       .filter((moduleName) => moduleName !== 'index')
+      // `generated/` holds build output baked in from the design system. It is an internal
+      // implementation detail of the console, not part of the package's export surface.
+      .filter((moduleName) => !moduleName.startsWith('generated/'))
       .sort();
     const packageJson = JSON.parse(packageJsonText) as {
       exports?: Record<string, { types?: string; default?: string } | string>;
@@ -6037,6 +6040,8 @@ describe('project structure', () => {
       'report',
       'run-acceptance',
       'run-goal-audit',
+      'run-project-intelligence-snapshot',
+      'run-project-intelligence-viewer',
       'run-repair-execute',
       'run-repair-handoff',
       'run-repair-patch-plan',
@@ -6184,7 +6189,14 @@ describe('project structure', () => {
     expect(acceptancePackageDistOutputEntries.map((entry) => entry.exportPath).sort()).toEqual(
       acceptancePackageExportEntries.map((entry) => entry.exportPath).sort()
     );
-    expect(packageDistFiles.filter((path) => path.endsWith('.js') || path.endsWith('.d.ts') || path.endsWith('.js.map')).sort()).toEqual(expectedDistPaths);
+    /* `generated/` is compiled build output baked in from the design system so the shipped
+       console carries no runtime dependency on a private workspace package. It has no
+       export entry by design, so the compatibility contract does not describe it. */
+    const contractedDistFiles = packageDistFiles.filter(
+      (path) => !path.startsWith('packages/acceptance/dist/generated/')
+    );
+
+    expect(contractedDistFiles.filter((path) => path.endsWith('.js') || path.endsWith('.d.ts') || path.endsWith('.js.map')).sort()).toEqual(expectedDistPaths);
   });
 
   it('keeps generated legacy acceptance dist outputs described by the package compatibility contract', async () => {

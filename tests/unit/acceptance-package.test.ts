@@ -75,7 +75,9 @@ describe('acceptance package', () => {
       userHandoff: 'run-user-acceptance-handoff.js',
       repairHandoff: 'run-repair-handoff.js',
       repairExecute: 'run-repair-execute.js',
-      repairPatchPlan: 'run-repair-patch-plan.js'
+      repairPatchPlan: 'run-repair-patch-plan.js',
+      projectIntelligenceSnapshot: 'run-project-intelligence-snapshot.js',
+      projectIntelligenceViewer: 'run-project-intelligence-viewer.js'
     });
   });
 

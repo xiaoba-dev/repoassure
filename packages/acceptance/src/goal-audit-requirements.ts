@@ -22,6 +22,7 @@ export interface GoalAuditTextRequirementInput {
   text: string;
   needles: string[];
   evidence: string[];
+  enforcement?: 'blocking' | 'advisory';
 }
 
 export interface GoalAuditFileRequirementInput {
@@ -41,6 +42,7 @@ export function buildGoalAuditTextRequirement(input: GoalAuditTextRequirementInp
     requirement: input.requirement,
     status: missingNeedles.length === 0 ? 'passed' : 'missing',
     evidence: missingNeedles.length === 0 ? input.evidence : [`missing text markers: ${missingNeedles.join(', ')}`],
+    ...(input.enforcement ? { enforcement: input.enforcement } : {}),
     ...(missingNeedles.length > 0 ? { nextAction: '补齐实现或文档证据后重新运行 goal audit。' } : {})
   };
 }

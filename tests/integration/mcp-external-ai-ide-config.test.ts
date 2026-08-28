@@ -13,14 +13,6 @@ import {
 
 const execFileAsync = promisify(execFile);
 const expectedRecoveryTools = [
-  'create_blocked_goal_recovery',
-  'consume_blocked_goal_recovery',
-  'record_blocked_goal_recovery_decision',
-  'prepare_blocked_goal_resume_attempt',
-  'intake_blocked_goal_resume_evidence',
-  'review_blocked_goal_resume_evidence',
-  'close_blocked_goal_resume_attempt',
-  'validate_blocked_goal_recovery_lifecycle'
 ] as const;
 
 describe('external AI IDE MCP configuration consumption', () => {

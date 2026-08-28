@@ -10,8 +10,17 @@
     "hardening": "dist/adapters/cli/index.js",
     "hardening-mcp": "dist/adapters/mcp/index.js"
   },
+  "files": [
+    "dist",
+    "packages/acceptance/dist",
+    "packages/browser-explorer/dist",
+    "packages/repair-planner/dist",
+    "packages/security-assurance/dist",
+    "packages/shared/dist"
+  ],
   "scripts": {
     "build": "pnpm build:tokens && pnpm build:packages && pnpm build:src && pnpm build:website",
+    "prepack": "pnpm build:packages && pnpm build:src && node scripts/prepare-packed-cli.mjs",
     "build:website": "pnpm --filter @repoassure/website build",
     "build:src": "tsc -p tsconfig.build.json",
     "build:packages": "pnpm build:shared && pnpm build:security-assurance && pnpm build:browser-explorer && pnpm build:repair-planner && pnpm build:acceptance",
@@ -105,6 +114,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@hardening-mcp/acceptance": "workspace:*",
+    "@hardening-mcp/browser-explorer": "workspace:*",
+    "@hardening-mcp/repair-planner": "workspace:*",
+    "@hardening-mcp/security-assurance": "workspace:*",
+    "@hardening-mcp/shared": "workspace:*",
     "@playwright/test": "^1.61.0",
     "@repoassure/design-system": "workspace:*",
     "@types/node": "^25.9.3",
@@ -115,11 +129,6 @@
     "vitest": "^4.1.9"
   },
   "dependencies": {
-    "@hardening-mcp/acceptance": "workspace:*",
-    "@hardening-mcp/browser-explorer": "workspace:*",
-    "@hardening-mcp/repair-planner": "workspace:*",
-    "@hardening-mcp/security-assurance": "workspace:*",
-    "@hardening-mcp/shared": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "playwright": "^1.61.0"
   }

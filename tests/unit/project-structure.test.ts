@@ -5593,6 +5593,7 @@ describe('project structure', () => {
     const rootPackageJson = JSON.parse(rootPackageJsonText) as {
       scripts?: Record<string, string>;
       dependencies?: Record<string, string>;
+      devDependencies?: Record<string, string>;
     };
     const securityPackageJson = JSON.parse(securityPackageJsonText) as {
       name?: string;
@@ -5605,7 +5606,8 @@ describe('project structure', () => {
       .filter((moduleName) => moduleName !== 'index')
       .sort();
 
-    expect(rootPackageJson.dependencies?.['@hardening-mcp/security-assurance']).toBe('workspace:*');
+    expect(rootPackageJson.dependencies?.['@hardening-mcp/security-assurance']).toBeUndefined();
+    expect(rootPackageJson.devDependencies?.['@hardening-mcp/security-assurance']).toBe('workspace:*');
     expect(rootPackageJson.scripts?.['build:security-assurance']).toBe('tsc -p packages/security-assurance/tsconfig.build.json');
     expect(rootPackageJson.scripts?.['typecheck:security-assurance']).toBe('tsc -p packages/security-assurance/tsconfig.json --noEmit');
     expect(securityPackageJson.name).toBe('@hardening-mcp/security-assurance');
@@ -6266,6 +6268,7 @@ describe('project structure', () => {
     const rootPackageJson = JSON.parse(rootPackageJsonText) as {
       scripts?: Record<string, string>;
       dependencies?: Record<string, string>;
+      devDependencies?: Record<string, string>;
     };
     const sharedPackageJson = JSON.parse(sharedPackageJsonText) as {
       name?: string;
@@ -6294,7 +6297,8 @@ describe('project structure', () => {
     expect(rootPackageJson.scripts?.['typecheck:browser-explorer']).toBe('tsc -p packages/browser-explorer/tsconfig.json --noEmit');
     expect(rootPackageJson.scripts?.['typecheck:repair-planner']).toBe('tsc -p packages/repair-planner/tsconfig.json --noEmit');
     expect(rootPackageJson.scripts?.['typecheck:acceptance']).toBe('tsc -p packages/acceptance/tsconfig.json --noEmit');
-    expect(rootPackageJson.dependencies?.['@hardening-mcp/shared']).toBe('workspace:*');
+    expect(rootPackageJson.dependencies?.['@hardening-mcp/shared']).toBeUndefined();
+    expect(rootPackageJson.devDependencies?.['@hardening-mcp/shared']).toBe('workspace:*');
 
     expect(sharedPackageJson.name).toBe('@hardening-mcp/shared');
     expect(sharedPackageJson.main).toBe('dist/index.js');
@@ -6403,6 +6407,7 @@ describe('project structure', () => {
     const rootPackageJson = JSON.parse(rootPackageJsonText) as {
       scripts?: Record<string, string>;
       dependencies?: Record<string, string>;
+      devDependencies?: Record<string, string>;
     };
     const repairPlannerPackageJson = JSON.parse(repairPlannerPackageJsonText) as {
       name?: string;
@@ -6426,7 +6431,8 @@ describe('project structure', () => {
     expect(rootPackageJson.scripts?.['build:repair-planner']).toBe('tsc -p packages/repair-planner/tsconfig.build.json');
     expect(rootPackageJson.scripts?.['typecheck:packages']).toBe('pnpm typecheck:shared && pnpm typecheck:security-assurance && pnpm typecheck:browser-explorer && pnpm typecheck:repair-planner && pnpm typecheck:acceptance');
     expect(rootPackageJson.scripts?.['typecheck:repair-planner']).toBe('tsc -p packages/repair-planner/tsconfig.json --noEmit');
-    expect(rootPackageJson.dependencies?.['@hardening-mcp/repair-planner']).toBe('workspace:*');
+    expect(rootPackageJson.dependencies?.['@hardening-mcp/repair-planner']).toBeUndefined();
+    expect(rootPackageJson.devDependencies?.['@hardening-mcp/repair-planner']).toBe('workspace:*');
 
     expect(repairPlannerPackageJson.name).toBe('@hardening-mcp/repair-planner');
     expect(repairPlannerPackageJson.main).toBe('dist/index.js');
@@ -6530,6 +6536,7 @@ describe('project structure', () => {
     const rootPackageJson = JSON.parse(rootPackageJsonText) as {
       scripts?: Record<string, string>;
       dependencies?: Record<string, string>;
+      devDependencies?: Record<string, string>;
     };
     const browserExplorerPackageJson = JSON.parse(browserExplorerPackageJsonText) as {
       name?: string;
@@ -6551,7 +6558,8 @@ describe('project structure', () => {
     expect(rootPackageJson.scripts?.['build:browser-explorer']).toBe('tsc -p packages/browser-explorer/tsconfig.build.json');
     expect(rootPackageJson.scripts?.['typecheck:packages']).toBe('pnpm typecheck:shared && pnpm typecheck:security-assurance && pnpm typecheck:browser-explorer && pnpm typecheck:repair-planner && pnpm typecheck:acceptance');
     expect(rootPackageJson.scripts?.['typecheck:browser-explorer']).toBe('tsc -p packages/browser-explorer/tsconfig.json --noEmit');
-    expect(rootPackageJson.dependencies?.['@hardening-mcp/browser-explorer']).toBe('workspace:*');
+    expect(rootPackageJson.dependencies?.['@hardening-mcp/browser-explorer']).toBeUndefined();
+    expect(rootPackageJson.devDependencies?.['@hardening-mcp/browser-explorer']).toBe('workspace:*');
 
     expect(browserExplorerPackageJson.name).toBe('@hardening-mcp/browser-explorer');
     expect(browserExplorerPackageJson.main).toBe('dist/index.js');

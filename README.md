@@ -221,14 +221,6 @@ pnpm --silent mcp:config -- --client codex
 - `generate_repair_plan`
 - `harden_report`
 - `run_hardening`
-- `create_blocked_goal_recovery`
-- `consume_blocked_goal_recovery`
-- `record_blocked_goal_recovery_decision`
-- `prepare_blocked_goal_resume_attempt`
-- `intake_blocked_goal_resume_evidence`
-- `review_blocked_goal_resume_evidence`
-- `close_blocked_goal_resume_attempt`
-- `validate_blocked_goal_recovery_lifecycle`
 
 `boot_app` 会返回 `sessionId`。独立调用 `boot_app` 后，应调用 `stop_app` 清理进程。`run_hardening` 内部会自动清理自己的 boot session。
 

@@ -9,12 +9,6 @@ import { runGenerateTestsTool } from '../../tools/generate-tests-tool.js';
 import { runGenerateRepairPlanTool } from '../../tools/generate-repair-plan-tool.js';
 import { runHardenReportTool } from '../../tools/harden-report-tool.js';
 import { runHardeningTool } from '../../tools/run-hardening-tool.js';
-import {
-  isBlockedGoalRecoveryToolName,
-  listBlockedGoalRecoveryTools,
-  runBlockedGoalRecoveryTool,
-  type BlockedGoalRecoveryToolName
-} from './blocked-goal-recovery-tools.js';
 import { bootSessionStore } from './boot-session-store.js';
 
 type JsonObject = Record<string, unknown>;
@@ -27,8 +21,7 @@ type HardeningToolName =
   | 'generate_tests'
   | 'generate_repair_plan'
   | 'harden_report'
-  | 'run_hardening'
-  | BlockedGoalRecoveryToolName;
+  | 'run_hardening';
 
 export function listHardeningTools(): Tool[] {
   return [
@@ -191,8 +184,7 @@ export function listHardeningTools(): Tool[] {
         idempotentHint: false,
         openWorldHint: true
       }
-    },
-    ...listBlockedGoalRecoveryTools()
+    }
   ];
 }
 
@@ -211,9 +203,6 @@ export async function callHardeningTool(name: string, args: unknown): Promise<Ca
 }
 
 async function runNamedTool(name: HardeningToolName, args: JsonObject): Promise<JsonObject> {
-  if (isBlockedGoalRecoveryToolName(name)) {
-    return runBlockedGoalRecoveryTool(name, args);
-  }
   switch (name) {
     case 'analyze_repo':
       return toJsonObject(

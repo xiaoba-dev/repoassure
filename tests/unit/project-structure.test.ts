@@ -3773,7 +3773,6 @@ describe('project structure', () => {
     expect(joined).toContain('does not execute');
     expect(joined).toContain('outputDir');
     for (const toolName of recoveryToolNames) expect(joined).toContain(toolName);
-    await expectPath('src/adapters/mcp/blocked-goal-recovery-tools.ts');
   });
 
   it('records real stdio MCP client consumption validation and its CI gate', async () => {

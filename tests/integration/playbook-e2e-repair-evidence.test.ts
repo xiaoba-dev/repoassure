@@ -7,7 +7,6 @@ import { promisify } from 'node:util';
 
 import { describe, expect, it } from 'vitest';
 
-import { connectRealMcpClient } from '../support/real-mcp-client.js';
 
 const execFileAsync = promisify(execFile);
 const SCRIPT_TEST_TIMEOUT_MS = 120_000;
@@ -535,37 +534,11 @@ describe('AI IDE repair evidence end-to-end campaign fixture', () => {
         artifactDir: `recovery-lifecycle-campaign/${expectedOutcome}`
       }))
     }, null, 2)}\n`);
-    const realClient = await connectRealMcpClient({
-      args: [join(process.cwd(), 'dist', 'adapters', 'mcp', 'index.js')]
-    });
-    let lifecycleMcpResult: Awaited<ReturnType<typeof realClient.client.callTool>>;
-    try {
-      lifecycleMcpResult = await realClient.client.callTool({
-        name: 'validate_blocked_goal_recovery_lifecycle',
-        arguments: { inputDir: root, outputDir }
-      }, undefined, { timeout: 10_000 });
-    } finally {
-      await realClient.close();
-    }
-    expect(lifecycleMcpResult.isError).not.toBe(true);
-    expect(lifecycleMcpResult.structuredContent).toMatchObject({
-      schemaVersion: 'repoassure.mcp-blocked-goal-recovery-tool-result.v1',
-      toolName: 'validate_blocked_goal_recovery_lifecycle',
-      stage: 'lifecycle_campaign_summary',
-      boundaryCompliance: {
-        commandsExecuted: false,
-        externalStateChanged: false,
-        targetRepoMutation: false
-      }
-    });
-    const lifecycleStructured = lifecycleMcpResult.structuredContent as Record<string, unknown>;
-    const lifecycleContent = lifecycleMcpResult.content as Array<{ type: string; text?: string }>;
-    const lifecycleText = lifecycleContent.find((item) => item.type === 'text')?.text;
-    expect(lifecycleText ? JSON.parse(lifecycleText) : null).toEqual(lifecycleStructured);
-    expect(lifecycleStructured.artifacts).toMatchObject({
-      jsonPath: expect.stringMatching(/blocked-goal-recovery-lifecycle-campaign-summary\.json$/u),
-      markdownPath: expect.stringMatching(/blocked-goal-recovery-lifecycle-campaign-summary\.md$/u)
-    });
+
+    /* The lifecycle summary used to be produced by an MCP tool. That surface is gone —
+       it managed autopilot goals, not repository readiness — so the campaign runs through
+       the CLI script that still owns it, and the artifact contract below is unchanged. */
+    await runScript(['goal:recover:validate-lifecycle', '--', '--from-dir', root, '--output', outputDir]);
 
     const symlinkCampaignDir = join(root, 'symlink-lifecycle-campaign');
     await mkdir(symlinkCampaignDir, { recursive: true });

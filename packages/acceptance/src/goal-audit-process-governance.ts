@@ -12,6 +12,14 @@ import {
 } from './goal-audit-sources.js';
 import { buildGoalAuditTextRequirement } from './goal-audit-requirements.js';
 
+/*
+ * The first three items check that a development process was recorded, not that the
+ * product works: nothing a user installs depends on the dev log spelling `Red：`. They
+ * stay in the report as drift signals but are advisory, so a stale process note can no
+ * longer block a release. Everything below them is a structural contract — package
+ * exports and compatibility wrappers whose drift breaks imports for real — and stays
+ * blocking.
+ */
 export function buildProcessGovernanceGoalAuditItems(
   sources: Partial<GoalAuditTextSources>
 ): GoalAuditItem[] {
@@ -33,7 +41,8 @@ export function buildProcessGovernanceGoalAuditItems(
         '完整 `pnpm test:integration`',
         '真实 Chromium trace E2E'
       ],
-      evidence: ['codex goal defines TDD and testing pyramid; test strategy documents unit/integration/E2E layers; dev log records Red/Green slices and full-gate validation points']
+      evidence: ['codex goal defines TDD and testing pyramid; test strategy documents unit/integration/E2E layers; dev log records Red/Green slices and full-gate validation points'],
+      enforcement: 'advisory'
     }),
     buildGoalAuditTextRequirement({
       category: '日志治理',
@@ -56,7 +65,8 @@ export function buildProcessGovernanceGoalAuditItems(
         '已记录到 `docs/logs/blockers.md`',
         '决策日志已更新'
       ],
-      evidence: ['codex goal defines blocker and decision logging rules; blockers log records environment blockers with attempts and external conditions; decision log records long-lived architecture and acceptance decisions; dev log references blocker and decision-log maintenance']
+      evidence: ['codex goal defines blocker and decision logging rules; blockers log records environment blockers with attempts and external conditions; decision log records long-lived architecture and acceptance decisions; dev log references blocker and decision-log maintenance'],
+      enforcement: 'advisory'
     }),
     buildGoalAuditTextRequirement({
       category: 'Token 控制',
@@ -80,7 +90,8 @@ export function buildProcessGovernanceGoalAuditItems(
         'goalLastUpdatedText',
         'pathExists: async'
       ],
-      evidence: ['codex goal defines token control rules; dev log records small Red/Green slices and repeated goal-audit checkpoints; goal audit implementation uses explicit targeted evidence files and grouped test-source reads instead of broad repository scans']
+      evidence: ['codex goal defines token control rules; dev log records small Red/Green slices and repeated goal-audit checkpoints; goal audit implementation uses explicit targeted evidence files and grouped test-source reads instead of broad repository scans'],
+      enforcement: 'advisory'
     }),
     buildLegacyAcceptanceWrapperGoalAuditItem(sources),
     buildAcceptancePackageTypedModuleExportsGoalAuditItem(sources),

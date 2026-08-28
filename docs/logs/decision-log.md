@@ -1739,3 +1739,7 @@ Maintainer 在真实 Codex session 中发现八个 recovery tools，并只调用
 ## 2026-07-14 - Public release manual gate reconciliation
 
 Public Release Manual Gate Closure v0.2 的 2026-07-01 private/no-go 结论保留为历史快照。当前只读核验确认 `xiaoba-dev/repoassure` 已是 `PUBLIC`，`main` 由 `Quality Gates` 保护，最新 main CI 成功，且 `pnpm release:check` 报告 `yes`。这与既有 equivalent-control、source-release、native-branch-protection 和 post-merge hygiene 记录一致。本轮未变更外部状态，也不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。
+
+## 2026-08-28 - goal audit advisory process records
+
+接受 ADR-0042。`goal:audit` 的三项流程记录检查（TDD 记录、阻塞与决策记录、Token 控制）改为 advisory：仍然计算、仍然写进审计文档、仍然显示缺失的 marker，但不再计入 `missing`，因此不再决定 CI 退出码。`GoalAuditItem.enforcement` 缺省即 blocking，其余 32 项权重不变；同模块的 7 项 `架构迁移` package export / wrapper 契约保持阻塞，12 条 `REQUIRED_DOCUMENT_PATHS` 存在性检查保持阻塞。`tests/unit/goal-audit.test.ts` 中三条针对工作树 prose 的 `status: 'passed'` 断言由一条 enforcement 契约测试取代，因此流程记录漂移也不再让 `pnpm test:unit` 变红。该决策只收窄门禁阻塞范围，不删除门禁、不改 artifact schema，也不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。

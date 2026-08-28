@@ -10,12 +10,19 @@ export interface GoalAuditItem {
   status: GoalAuditItemStatus;
   evidence: string[];
   nextAction?: string;
+  /**
+   * Absent means blocking. Advisory items are still reported, but they never fail the
+   * gate: they record that a development process was followed, which nothing a user of
+   * the product can observe depends on.
+   */
+  enforcement?: 'blocking' | 'advisory';
 }
 
 export interface GoalAuditSummary {
   total: number;
   passed: number;
   missing: number;
+  advisory: number;
   manualRequired: number;
   overallStatus: GoalAuditOverallStatus;
 }
@@ -28,13 +35,16 @@ export interface BuildGoalAuditMarkdownInput {
 
 export function summarizeGoalAudit(items: GoalAuditItem[]): GoalAuditSummary {
   const passed = items.filter((item) => item.status === 'passed').length;
-  const missing = items.filter((item) => item.status === 'missing').length;
+  const missingItems = items.filter((item) => item.status === 'missing');
+  const missing = missingItems.filter((item) => !isAdvisory(item)).length;
+  const advisory = missingItems.filter(isAdvisory).length;
   const manualRequired = items.filter((item) => item.status === 'manual_required').length;
 
   return {
     total: items.length,
     passed,
     missing,
+    advisory,
     manualRequired,
     overallStatus: missing > 0 ? 'incomplete' : manualRequired > 0 ? 'ready_for_user_acceptance' : 'complete'
   };
@@ -57,6 +67,7 @@ export function buildGoalAuditMarkdown(input: BuildGoalAuditMarkdownInput): stri
 | 检查项总数 | ${input.summary.total} |
 | 已通过 | ${input.summary.passed} |
 | 缺失 | ${input.summary.missing} |
+| 流程记录漂移（不阻塞） | ${input.summary.advisory} |
 | 需要人工确认 | ${input.summary.manualRequired} |
 
 ${sections}
@@ -83,7 +94,7 @@ ${items.map(formatItemRow).join('\n')}`;
 }
 
 function formatItemRow(item: GoalAuditItem): string {
-  return `| ${formatAuditTableCell(item.requirement)} | ${formatItemStatus(item.status)} | ${formatAuditTableCell(item.evidence.join('; '))} | ${formatAuditTableCell(item.nextAction ?? '')} |`;
+  return `| ${formatAuditTableCell(item.requirement)} | ${formatItemStatus(item)} | ${formatAuditTableCell(item.evidence.join('; '))} | ${formatAuditTableCell(item.nextAction ?? '')} |`;
 }
 
 function formatAuditTableCell(value: string): string {
@@ -102,16 +113,20 @@ function formatOverallStatus(status: GoalAuditOverallStatus): string {
   return status === 'ready_for_user_acceptance' ? '已准备好请求用户验收' : '仍有缺失项';
 }
 
-function formatItemStatus(status: GoalAuditItemStatus): string {
-  if (status === 'passed') {
+function formatItemStatus(item: GoalAuditItem): string {
+  if (item.status === 'passed') {
     return '已通过';
   }
 
-  if (status === 'manual_required') {
+  if (item.status === 'manual_required') {
     return '需要人工确认';
   }
 
-  return '缺失';
+  return isAdvisory(item) ? '未达标（不阻塞）' : '缺失';
+}
+
+function isAdvisory(item: GoalAuditItem): boolean {
+  return item.enforcement === 'advisory';
 }
 
 function formatConclusion(summary: GoalAuditSummary): string {

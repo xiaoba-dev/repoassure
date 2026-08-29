@@ -1759,3 +1759,11 @@ Public Release Manual Gate Closure v0.2 的 2026-07-01 private/no-go 结论保�
 ## 2026-08-29 - repair workflow CLI and MCP surface
 
 接受 ADR-0043。`run-repair-handoff` / `run-repair-execute` / `run-repair-patch-plan` 三个既有 runner 同时接到 MCP（`prepare_repair_handoff`、`preview_repair_execution`、`generate_repair_patch_plan`，工具面 8 → 11，全部为产品工具）和 CLI（`hardening repair <handoff|execute|patch-plan>`）。两侧都只是 adapter，不重实现生命周期；`--apply` / `--write` / `--auto-fix` / `--commit` / `--push` / `--pull-request` 在 CLI 边界拒绝而不是忽略。同时修复接线时发现的脱敏缺口：`buildRepairHandoffPackage` 曾把 `manifest.artifacts` 原样复制进 `sourceArtifacts`，使 manifest 中 secret 形状的值未脱敏地进入交给 AI IDE 的 `repair-handoff-package.json`；已加回归测试，去掉修复即失败。`assemble_repair_evidence_package` 与 `run-repair-evidence-package` 不在本次范围内——它们依赖三个 runner 的新增字段，属于三份已发布契约的 schema 演进，应单独决策。该决策不改变 handoff 包的 `nextCommands` 字符串，也不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。
+
+## 2026-08-29 - project intelligence watch, decoupled from the goal workspace
+
+从 `design-system-v2` 只捞 `run-project-intelligence-watch`，不带 `run-project-intelligence-agent-context` 与 `run-project-intelligence-watch-handoff`。分支上 watch 的刷新链是 snapshot → agent-context，而 agent-context 的 `currentGoal` / `recommendedNextGoals` / `blockers` 全部读自 `.autopilot/progress/snapshot.json` 与 `.autopilot/goals/*.json`——那是 autopilot 的目标模型，正是本轮剥离对象，且 #73 之后干净检出里没有该目录，它只会输出 `unknown`。watch 本身与 autopilot 无关：监视源码目录、防抖、重算项目情报快照。
+
+因此落地版本去掉 agent-context 调用与 `agentContextPath` 字段，刷新链收敛为 snapshot；`.autopilot/` 从 `watchedPrefixes`、`watchedRootDirectories`、`watchedScope` 中移除，写入该目录不再触发刷新（单测与 smoke 测试都对此有正向断言，不是靠删断言绕过）。新增 `pnpm project:intelligence:watch`，包导出面按既有派生规则从 `packageOwnedModules` 单点扩展。
+
+按 ADR-0017，project intelligence 仍是本地内部可观测面，不构成产品声称，因此不新增 ADR。该决策不改产品 schema、对外接口或授权边界，也不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。

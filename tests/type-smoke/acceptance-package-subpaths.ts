@@ -69,6 +69,7 @@ import * as runProjectIntelligenceDecisionIntake from '@hardening-mcp/acceptance
 import * as runProjectIntelligenceRecommendationDraft from '@hardening-mcp/acceptance/run-project-intelligence-recommendation-draft';
 import * as runProjectIntelligenceMaintainerDecision from '@hardening-mcp/acceptance/run-project-intelligence-maintainer-decision';
 import * as runProjectIntelligenceControlledRemediationPlan from '@hardening-mcp/acceptance/run-project-intelligence-controlled-remediation-plan';
+import * as runProjectIntelligenceWatch from '@hardening-mcp/acceptance/run-project-intelligence-watch';
 
 const packageSubpathModules = [
   acceptance,
@@ -141,7 +142,8 @@ const packageSubpathModules = [
   runProjectIntelligenceDecisionIntake,
   runProjectIntelligenceRecommendationDraft,
   runProjectIntelligenceMaintainerDecision,
-  runProjectIntelligenceControlledRemediationPlan
+  runProjectIntelligenceControlledRemediationPlan,
+  runProjectIntelligenceWatch
 ] as const;
 
 const runnerMains: Array<() => Promise<number>> = [
@@ -158,7 +160,8 @@ const runnerMains: Array<() => Promise<number>> = [
   runProjectIntelligenceDecisionIntake.main,
   runProjectIntelligenceRecommendationDraft.main,
   runProjectIntelligenceMaintainerDecision.main,
-  runProjectIntelligenceControlledRemediationPlan.main
+  runProjectIntelligenceControlledRemediationPlan.main,
+  runProjectIntelligenceWatch.main
 ];
 
 type RootPackageExportEntry = acceptance.AcceptancePackageExportEntry;

@@ -82,7 +82,8 @@ describe('acceptance package', () => {
       projectIntelligenceDecisionIntake: 'run-project-intelligence-decision-intake.js',
       projectIntelligenceRecommendationDraft: 'run-project-intelligence-recommendation-draft.js',
       projectIntelligenceMaintainerDecision: 'run-project-intelligence-maintainer-decision.js',
-      projectIntelligenceControlledRemediationPlan: 'run-project-intelligence-controlled-remediation-plan.js'
+      projectIntelligenceControlledRemediationPlan: 'run-project-intelligence-controlled-remediation-plan.js',
+      projectIntelligenceWatch: 'run-project-intelligence-watch.js'
     });
   });
 

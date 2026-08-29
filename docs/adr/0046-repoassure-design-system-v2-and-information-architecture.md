@@ -1,4 +1,4 @@
-# ADR-0022: RepoAssure Design System v2 and information architecture redesign
+# ADR-0046: RepoAssure Design System v2 and information architecture redesign
 
 Status: Accepted
 Date: 2026-07-18
@@ -113,5 +113,5 @@ Shipping code remains a separate gate from shipping pixels. The public website i
 - Surface separation basis: [ADR-0017](0017-public-website-and-project-intelligence-console.md)
 - Localization basis: [ADR-0018](0018-public-website-localization-strategy.md)
 - Superseded design system decision: [ADR-0019](0019-public-website-enterprise-design-system.md)
-- Deferral released: [docs/operations/public-website-design-work-deferred-v0.1.md](../operations/public-website-design-work-deferred-v0.1.md)
-- Unfreeze record: [docs/operations/repoassure-design-system-v2-unfreeze-v0.1.md](../operations/repoassure-design-system-v2-unfreeze-v0.1.md)
+- Deferral released: `docs/operations/public-website-design-work-deferred-v0.1.md` — carried by the unmerged `design-system-v2` branch, not present in this tree; see [unmerged branch inventory](../operations/unmerged-branch-inventory-v0.1.md)
+- Unfreeze record: `docs/operations/repoassure-design-system-v2-unfreeze-v0.1.md` — same branch, same inventory

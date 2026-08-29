@@ -51,6 +51,8 @@ ADR records long-lived architecture decisions. Use `docs/logs/decision-log.md` f
 | [0043](0043-repair-workflow-cli-and-mcp-surface.md) | Accepted | Repair workflow CLI and MCP surface |
 | [0044](0044-blocked-goal-recovery-mcp-surface-removal.md) | Accepted | Retire the blocked goal recovery MCP surface |
 | [0045](0045-security-provider-discovery-and-structured-import-errors.md) | Accepted | Security provider discovery and structured import errors |
+| [0046](0046-repoassure-design-system-v2-and-information-architecture.md) | Accepted | RepoAssure Design System v2 and information architecture redesign |
+| [0047](0047-public-marketing-site-reachability-boundary.md) | Accepted | Public marketing site reachability boundary |
 
 ## Template
 

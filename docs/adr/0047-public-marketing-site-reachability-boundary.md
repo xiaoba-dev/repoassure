@@ -1,4 +1,4 @@
-# ADR-0023: Public marketing site reachability boundary
+# ADR-0047: Public marketing site reachability boundary
 
 Status: Accepted
 Date: 2026-07-19
@@ -76,6 +76,6 @@ The branch protection gate remains deferred and continues to block public releas
 - Execution plan: [docs/PLAN.md](../PLAN.md)
 - Amended: [ADR-0020](0020-public-website-private-preview-deployment.md), [ADR-0021](0021-private-preview-hosting-fallback.md)
 - Release boundary retained: [ADR-0012](0012-branch-protection-and-release-boundary.md)
-- Design and IA basis: [ADR-0022](0022-repoassure-design-system-v2-and-information-architecture.md)
+- Design and IA basis: [ADR-0046](0046-repoassure-design-system-v2-and-information-architecture.md)
 - Claim guard: `tests/unit/public-website.test.ts`, `scripts/package-website-preview.mjs`
 - Deployment record: [docs/operations/public-website-custom-domain-deployment-v0.1.md](../operations/public-website-custom-domain-deployment-v0.1.md)

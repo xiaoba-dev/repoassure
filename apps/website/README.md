@@ -19,7 +19,7 @@ node scripts/verify-website.mjs        # browser-level checks, default port 5174
 
 ## Information architecture
 
-Organised around the four questions [ADR-0013](../../docs/adr/0013-codex-security-and-security-assurance-lane.md) records the product as answering — is this repo ready to ship, what evidence proves it, what is still blocking acceptance, and what should the next AI IDE fix first. [ADR-0022](../../docs/adr/0022-repoassure-design-system-v2-and-information-architecture.md) records the restructure.
+Organised around the four questions [ADR-0013](../../docs/adr/0013-codex-security-and-security-assurance-lane.md) records the product as answering — is this repo ready to ship, what evidence proves it, what is still blocking acceptance, and what should the next AI IDE fix first. [ADR-0046](../../docs/adr/0046-repoassure-design-system-v2-and-information-architecture.md) records the restructure.
 
 ```
 Header · Hero · #answers · #assurance-graph · #how-it-works

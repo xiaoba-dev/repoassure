@@ -1,4 +1,5 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
 
 import {
   acceptanceCompatibilityContract,
@@ -7045,7 +7046,72 @@ describe('project structure', () => {
     expect(trackedDocs).toContain('waiting_for_reviewer_feedback');
     expect(feedbackIntake).not.toContain('accepted / changes_requested / blocked');
   });
+  it('keeps the ADR trail free of duplicate numbers, index gaps, and dangling links', async () => {
+    const records = (await readdir('docs/adr'))
+      .filter((name) => /^\d{4}-.+\.md$/u.test(name))
+      .sort();
+    const index = await readFile('docs/adr/README.md', 'utf8');
+
+    /* One record per number. Two branches picking the same next free number is
+       how 0022 and 0023 each ended up naming two different decisions. */
+    const byNumber = new Map<string, string[]>();
+    for (const name of records) {
+      const number = name.slice(0, 4);
+      byNumber.set(number, [...(byNumber.get(number) ?? []), name]);
+    }
+    expect([...byNumber].filter(([, names]) => names.length > 1)).toEqual([]);
+
+    // The index and the directory agree in both directions.
+    expect(records.filter((name) => !index.includes(`(${name})`))).toEqual([]);
+    const indexed = [...index.matchAll(/\((\d{4}-[a-z0-9-]+\.md)\)/gu)]
+      .map(([, name]) => name)
+      .filter((name): name is string => name !== undefined);
+    expect(indexed.filter((name) => !records.includes(name))).toEqual([]);
+
+    /* Every markdown link into docs/adr resolves, wherever it is written.
+       Renumbering a record and following only the links inside docs/adr is how
+       inbound references from packages/ and apps/ get left pointing at a file
+       name that no longer exists. */
+    const dangling: string[] = [];
+    for (const file of await collectMarkdownFiles('.')) {
+      const text = await readFile(file, 'utf8');
+      for (const [, target] of text.matchAll(/\]\(([^)#][^)]*\.md)\)/gu)) {
+        if (target === undefined) {
+          continue;
+        }
+        const resolved = join(dirname(file), target);
+        if (!resolved.startsWith('docs/adr/')) {
+          continue;
+        }
+        try {
+          await stat(resolved);
+        } catch {
+          dangling.push(`${file} -> ${target}`);
+        }
+      }
+    }
+    expect(dangling).toEqual([]);
+  });
 });
+
+async function collectMarkdownFiles(directory: string): Promise<string[]> {
+  const skipped = new Set(['node_modules', '.git', 'dist', 'coverage', '.hardening', '.autopilot']);
+  const files: string[] = [];
+
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    if (skipped.has(entry.name)) {
+      continue;
+    }
+    const path = directory === '.' ? entry.name : join(directory, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...(await collectMarkdownFiles(path)));
+    } else if (entry.name.endsWith('.md')) {
+      files.push(path);
+    }
+  }
+
+  return files;
+}
 
 async function expectPath(path: string): Promise<void> {
   await expect(stat(path)).resolves.toEqual(expect.objectContaining({

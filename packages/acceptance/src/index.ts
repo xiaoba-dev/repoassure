@@ -900,3 +900,23 @@ export {
   type ProjectIntelligenceControlledRemediationPlanRunInput,
   type ProjectIntelligenceControlledRemediationPlanRunResult
 } from './run-project-intelligence-controlled-remediation-plan.js';
+
+export {
+  createProjectIntelligenceWatchController,
+  isDirectRun as isProjectIntelligenceWatchDirectRun,
+  isProjectIntelligenceWatchHelpRequest,
+  main as runProjectIntelligenceWatchCli,
+  parseProjectIntelligenceWatchArgs,
+  projectIntelligenceWatchHelpText,
+  runProjectIntelligenceWatch,
+  shouldRefreshProjectIntelligencePath,
+  type ProjectIntelligenceWatchCliOptions,
+  type ProjectIntelligenceWatchController,
+  type ProjectIntelligenceWatchRefresh,
+  type ProjectIntelligenceWatchRefreshInput,
+  type ProjectIntelligenceWatchRefreshResult,
+  type ProjectIntelligenceWatchRunInput,
+  type ProjectIntelligenceWatchRunResult,
+  type ProjectIntelligenceWatchStatus,
+  type ProjectIntelligenceWatchStatusState
+} from './run-project-intelligence-watch.js';

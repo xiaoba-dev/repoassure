@@ -214,6 +214,10 @@
       "types": "./dist/run-project-intelligence-controlled-remediation-plan.d.ts",
       "default": "./dist/run-project-intelligence-controlled-remediation-plan.js"
     },
+    "./run-project-intelligence-watch": {
+      "types": "./dist/run-project-intelligence-watch.d.ts",
+      "default": "./dist/run-project-intelligence-watch.js"
+    },
     "./run-project-intelligence-decision-intake": {
       "types": "./dist/run-project-intelligence-decision-intake.d.ts",
       "default": "./dist/run-project-intelligence-decision-intake.js"

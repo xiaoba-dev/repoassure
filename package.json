@@ -107,7 +107,9 @@
     "project:intelligence:maintainer-decision": "node packages/acceptance/dist/run-project-intelligence-maintainer-decision.js",
     "preproject:intelligence:maintainer-decision": "pnpm build",
     "project:intelligence:controlled-remediation-plan": "node packages/acceptance/dist/run-project-intelligence-controlled-remediation-plan.js",
-    "preproject:intelligence:controlled-remediation-plan": "pnpm build"
+    "preproject:intelligence:controlled-remediation-plan": "pnpm build",
+    "project:intelligence:watch": "node packages/acceptance/dist/run-project-intelligence-watch.js",
+    "preproject:intelligence:watch": "pnpm build"
   },
   "engines": {
     "node": ">=22"

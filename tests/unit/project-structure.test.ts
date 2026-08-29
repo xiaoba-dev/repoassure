@@ -6108,6 +6108,7 @@ describe('project structure', () => {
       'run-project-intelligence-recommendation-draft',
       'run-project-intelligence-snapshot',
       'run-project-intelligence-viewer',
+      'run-project-intelligence-watch',
       'run-repair-execute',
       'run-repair-handoff',
       'run-repair-patch-plan',

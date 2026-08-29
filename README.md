@@ -57,7 +57,7 @@ RepoAssure 是一个本地优先的 AI 代码验收与交付保障层，用于�
 
 RepoAssure source is currently public and `main` is protected by GitHub `Quality Gates`; the historical public-release evidence and the current-state reconciliation are recorded in `docs/operations/public-release-manual-gate-closure-v0.2.md`. This does not authorize npm publication, GitHub release creation, public launch, production marketing, customer outreach, or SaaS, Team Cloud, Enterprise, or hosted dashboard availability claims.
 - Repair task actionability runtime：`repair-task-package.json` 和 `repair-handoff-package.json` 的每个任务包含 `actionability` 元数据，覆盖 `dependencies`、`suggestedVerificationCommands`、`patchApplicabilityEvidence`、`aiIdeExecutionPrompt`、`manualReviewBoundary`、`riskNotes` 和 `noAutoApplyBoundary`。该 runtime 让 AI IDE / maintainer 更容易判断先读什么、验证什么、哪些 patch applicability evidence 需要人工审查，并明确 no-auto-apply boundary；它不自动修改目标 repo、不创建 branch/commit/PR/issue/advisory，也不授权 public launch 或商业版 availability claims。
-- Security Assurance Lane Phase 1：可通过 `hardening security import --provider codex-security --scan-dir <dir> --repo <repo> --run-dir <dir>` 从本地 provider scan directory 导入安全证据，提供 local-first provider security evidence import，生成 `.hardening/runs/<run-id>/security/security-summary.json`、`security-findings.json`、provider `import-manifest.json` 和 `normalized-findings.json`；导入过程保留 provider provenance、写入前脱敏证据，并让 repair plan / repair task package 消费 security findings。该能力不运行 Codex Security 插件、不联网、不上传目标 repo、不创建 issue/PR/advisory、不修改目标 repo，也不是当前 MVP 必需验收门槛。
+- Security Assurance Lane Phase 1：提供 local-first provider security evidence import。可通过 `hardening security providers` / MCP `list_security_providers` 发现六-provider normalized-envelope contract，再通过 `hardening security import --provider codex-security --scan-dir <dir> --repo <repo> --run-dir <repo>/.hardening/runs/<run-id>` 或 MCP `import_security_evidence` 导入本地安全证据。Importer 只接受不超过 10 MiB 的 regular non-symlink `scan.json`，严格校验 `repoassure.normalized-security-scan.v1`、finding 必填字段与 P0-P3 severity、脱敏元数据和 repo-local output boundary；拒绝 symbolic-link escape 与既有 evidence 覆盖。P0-P3 均进入 repair task summary；security task 在任何 provider content 前暴露 `trustBoundary`，使用非 provider 控制的通用标题，并对 Markdown 中的 provider text 做字面化转义；remediation/verification 不会自动进入执行命令。该能力不运行 Codex Security 插件、不联网、不上传目标 repo、不创建 issue/PR/advisory、不修改目标 repo，也不是当前 MVP 必需验收门槛。
 - CLI：成功 stdout JSON 和 stderr 错误输出都会在写入前脱敏，避免上游工具结果或异常消息中的敏感值直接进入终端。
 - MCP Server：通过 stdio 暴露 hardening tools，供 Agent/IDE 调用；tool 成功响应和错误响应写入 `content` 与 `structuredContent` 前都会脱敏，进程级启动失败写入 stderr 前也会脱敏；`sessionId` 作为 `stop_app` 所需操作句柄会保留在成功响应的 `structuredContent` 中。
 
@@ -139,6 +139,7 @@ pnpm dev explore <repo> <url> --browser --critical-path /login --max-routes 20 -
 pnpm dev generate-tests <findingsPath> <outputDir> --smoke-route /login --base-url http://127.0.0.1:5173
 pnpm dev plan <repo>
 pnpm dev report <runDir> <outputPath>
+pnpm dev security providers
 pnpm dev security import --provider codex-security --scan-dir <dir> --repo <repo> --run-dir <repo>/.hardening/runs/<run-id>
 pnpm dev run <repo> [url]
 pnpm dev run <repo> [url] --browser --critical-path /login --start-command "pnpm dev" --boot-timeout-ms 30000
@@ -222,6 +223,8 @@ pnpm --silent mcp:config -- --client codex
 - `prepare_repair_handoff`
 - `preview_repair_execution`
 - `generate_repair_patch_plan`
+- `list_security_providers`
+- `import_security_evidence`
 - `harden_report`
 - `run_hardening`
 
@@ -230,6 +233,8 @@ pnpm --silent mcp:config -- --client codex
 `explore_app` 和 `run_hardening` 支持 `criticalPaths`、`maxRoutes`、`maxActionsPerRoute`、`storageStatePath`、`trace` 与 `browser`。`criticalPaths` 可传同源 URL/path，也可传短自然语言关键路径意图；外部 origin 会被忽略。`generate_tests` 支持 `smokeRoutes` 和 `baseUrl`，用于独立生成关键路径 smoke tests 并指定 generated spec 的安全默认 origin。`generate_repair_plan` 默认读取 `<repo>/.hardening/latest`，也可传 `runDir` 刷新指定 run 的 repair plan 和可执行修复任务包。`run_hardening` 额外支持 `startCommand`、`bootTimeoutMs` 和 `workspaceOutputDir`，并会自动生成 repair plan 与修复任务包。
 
 `prepare_repair_handoff`、`preview_repair_execution` 和 `generate_repair_patch_plan` 把已有的 `pnpm repair:handoff` / `repair:execute` / `repair:patch-plan` 暴露到 MCP，供 AI IDE 直接调用，无需 shell 知识；同样的入口也可用 `hardening repair <handoff|execute|patch-plan>`。它们读取既有 run bundle 并在旁边写证据，不执行修复、不修改目标 repo 文件、不创建 branch/commit/PR；`--apply`、`--write`、`--auto-fix`、`--commit`、`--push`、`--pull-request` 会在 CLI 边界被拒绝。
+
+`hardening security providers` and MCP `list_security_providers` expose the same local catalog and normalized `scan.json` contract. MCP `import_security_evidence` and the CLI import return `repairPlanningHandoff` for `hardening plan` / `generate_repair_plan`. Native provider formats are not accepted in v0.1; every listed provider currently requires schema `repoassure.normalized-security-scan.v1`, and import never runs a scanner or modifies target source.
 
 Blocked-goal recovery 生命周期不在 MCP 面上。它的八个 stage tools 已由 ADR-0044（supersedes ADR-0041）随 `src/adapters/mcp/blocked-goal-recovery-tools.ts` 一并移除。生命周期本身未被移除：stage writers 仍在 `packages/acceptance`，仍由 `pnpm goal:recover:*` 按 package → consumption → decision → task → intake → review → closure → lifecycle validation 顺序驱动，artifact schema 不变。CLI 入口与各 stage 契约见 `docs/operations/blocked-goal-recovery-mcp-surface-v0.1.md`。
 

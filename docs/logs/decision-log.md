@@ -1767,3 +1767,13 @@ Public Release Manual Gate Closure v0.2 的 2026-07-01 private/no-go 结论保�
 因此落地版本去掉 agent-context 调用与 `agentContextPath` 字段，刷新链收敛为 snapshot；`.autopilot/` 从 `watchedPrefixes`、`watchedRootDirectories`、`watchedScope` 中移除，写入该目录不再触发刷新（单测与 smoke 测试都对此有正向断言，不是靠删断言绕过）。新增 `pnpm project:intelligence:watch`，包导出面按既有派生规则从 `packageOwnedModules` 单点扩展。
 
 按 ADR-0017，project intelligence 仍是本地内部可观测面，不构成产品声称，因此不新增 ADR。该决策不改产品 schema、对外接口或授权边界，也不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。
+
+## 2026-08-29 - security provider discovery and structured import errors
+
+接受 ADR-0045，落地 PR #62 的已评审内容。#62 的基线早于 ADR-0041 的移除，直接 rebase 会把 #71 摘掉的 8 个治理 MCP 工具装回去，因此关闭原 PR 重切：`packages/security-assurance/`、`packages/repair-planner/`、fixture 与包内测试原样搬（main 分叉后未动过这些文件），adapter 层对着 #75 之后的 main 重写。
+
+新增 `security-provider-contracts` 子路径作为 provider id 的唯一事实来源，CLI 里手工维护的 provider 列表删除，两侧改为经包解析；`SecurityImportError` 带机器可读 `code` 与 `guidance`，CLI 与 MCP 的错误都改为 `[code] message Guidance: ...`。MCP 增加 `list_security_providers`（只读、无参数）与 `import_security_evidence`，工具面 11 → 13；两者用 strict input schema，多余键报错而不是忽略。CLI 增加 `hardening security providers`。repair planner 增加 `P3` 档与 `trustBoundary` 字段——安全发现可能是信息级的，且 provider 可控文本进入 agent 会读的修复任务前必须标注为不可信。
+
+未纳入：#62 的 real-stdio-client 集成用例（依赖四个在 #71 随治理工具一起删掉的测试 helper），MCP 路径由 `mcp-server.test.ts` 新增的 transport 级用例覆盖；#62 对 goal 文档 "Next Codex Goal" 指针的改动（属 autopilot 治理记录，#72 后已非阻塞）。
+
+Import 仍不运行扫描器、不联网、不上传目标 repo、不创建 issue/PR/advisory、不修改目标源码；产物 create-only 不覆盖既有证据；不接受 native provider 格式。不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。

@@ -306,14 +306,139 @@ describe('runCli argument validation', () => {
       securityFindingsPath: string;
       findingCount: number;
       highestSeverity: string;
+      repairPlanningHandoff: {
+        status: string;
+        securityFindingsPath: string;
+        cli: { command: string; argv: string[] };
+        mcp: { tool: string; arguments: { root: string; runDir: string } };
+        reviewBoundary: { autoApply: boolean; targetMutation: boolean; maintainerReviewRequired: boolean };
+      };
     };
 
     expect(result.exitCode).toBe(0);
     expect(result.stderr).toBe('');
     expect(output.findingCount).toBe(1);
     expect(output.highestSeverity).toBe('P1');
+    expect(output.repairPlanningHandoff).toEqual({
+      status: 'ready',
+      securityFindingsPath: output.securityFindingsPath,
+      cli: {
+        command: 'hardening plan',
+        argv: [repoRoot, '--run-dir', runDir]
+      },
+      mcp: {
+        tool: 'generate_repair_plan',
+        arguments: { root: repoRoot, runDir }
+      },
+      reviewBoundary: {
+        autoApply: false,
+        targetMutation: false,
+        maintainerReviewRequired: true
+      }
+    });
     await expect(readFile(output.securitySummaryPath, 'utf8')).resolves.toContain('"providerCount": 1');
     await expect(readFile(output.securityFindingsPath, 'utf8')).resolves.toContain('"provider": "codex-security"');
+  });
+
+  it('lists every supported security provider and its honest normalized input contract', async () => {
+    const result = await runCliForTest(['security', 'providers']);
+    const output = JSON.parse(result.stdout) as {
+      providers: Array<{ id: string; nativeFormatSupport: boolean; inputContract: { requiredFile: string; schema: string } }>;
+    };
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(output.providers.map((provider) => provider.id)).toEqual([
+      'codex-security',
+      'codeql',
+      'semgrep',
+      'gitleaks',
+      'osv',
+      'manual-import'
+    ]);
+    expect(output.providers.every((provider) => provider.nativeFormatSupport === false)).toBe(true);
+    expect(output.providers[0]?.inputContract).toEqual({
+      sourceType: 'scan-dir',
+      requiredFile: 'scan.json',
+      schema: 'repoassure.normalized-security-scan.v1'
+    });
+  });
+
+  it('documents provider discovery and the normalized-envelope boundary in security help', async () => {
+    const result = await runCliForTest(['security', '--help']);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('hardening security providers');
+    expect(result.stdout).toContain('repoassure.normalized-security-scan.v1');
+    expect(result.stdout).toContain('below <repo>/.hardening/');
+    expect(result.stdout).toContain('create-only');
+    expect(result.stdout).toContain('Native provider formats are not accepted');
+  });
+
+  it('names only the missing security import options', async () => {
+    const result = await runCliForTest(['security', 'import', '--provider', 'codex-security', '--repo', '/tmp/repo']);
+
+    expect(result).toEqual({
+      exitCode: 1,
+      stdout: '',
+      stderr: 'Missing required options: --scan-dir, --run-dir\n'
+    });
+  });
+
+  it('guides unsupported providers to the provider catalog', async () => {
+    const result = await runCliForTest(['security', 'import', '--provider', 'native-sarif']);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('provider_unsupported');
+    expect(result.stderr).toContain('hardening security providers');
+    expect(result.stderr).toContain('normalized scan.json');
+  });
+
+  it('returns a stable redacted import error with actionable guidance', async () => {
+    const repoRoot = await mkdtemp(join(tmpdir(), 'repoassure-cli-security-error-repo-'));
+    const scanDir = join(repoRoot, 'scan-sk-cli-secret');
+    const result = await runCliForTest([
+      'security',
+      'import',
+      '--provider',
+      'codex-security',
+      '--scan-dir',
+      scanDir,
+      '--repo',
+      repoRoot,
+      '--run-dir',
+      join(repoRoot, '.hardening', 'runs', 'run-error')
+    ]);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('scan_file_missing');
+    expect(result.stderr).toContain('Guidance:');
+    expect(result.stderr).not.toContain(scanDir);
+    expect(result.stderr).not.toContain('sk-cli-secret');
+  });
+
+  it('rejects security import output outside the repo-local .hardening directory', async () => {
+    const repoRoot = await mkdtemp(join(tmpdir(), 'repoassure-cli-security-boundary-repo-'));
+    const runDir = await mkdtemp(join(tmpdir(), 'repoassure-cli-security-outside-'));
+    const result = await runCliForTest([
+      'security',
+      'import',
+      '--provider',
+      'codex-security',
+      '--scan-dir',
+      join(process.cwd(), 'fixtures/security/codex-security-basic'),
+      '--repo',
+      repoRoot,
+      '--run-dir',
+      runDir
+    ]);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('run_dir_invalid');
+    expect(result.stderr).not.toContain(runDir);
   });
 });
 

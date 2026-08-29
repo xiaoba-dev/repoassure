@@ -1,5 +1,17 @@
 import { join } from 'node:path';
 
+import {
+  parseRepairExecuteArgs,
+  parseRepairHandoffArgs,
+  parseRepairPatchPlanArgs,
+  repairExecuteHelpText,
+  repairHandoffHelpText,
+  repairPatchPlanHelpText,
+  runRepairExecute,
+  runRepairHandoff,
+  runRepairPatchPlan
+} from '@hardening-mcp/acceptance';
+
 import { version } from '../../index.js';
 import { runAnalyzeRepoTool } from '../../tools/analyze-repo-tool.js';
 import { runExploreAppTool } from '../../tools/explore-app-tool.js';
@@ -81,6 +93,10 @@ export async function runCli(args: string[], io: CliIO): Promise<number> {
     return 0;
   }
 
+  if (command === 'repair') {
+    return runRepair(rest, io);
+  }
+
   if (command === 'analyze') {
     return runAnalyze(rest, io);
   }
@@ -119,6 +135,47 @@ export async function runCli(args: string[], io: CliIO): Promise<number> {
 
   writeCliError(io, `Unknown command: ${command}`);
   return 1;
+}
+
+async function runRepair(args: string[], io: CliIO): Promise<number> {
+  const [subcommand, ...rest] = args;
+
+  if (!subcommand || subcommand === '--help' || subcommand === '-h') {
+    io.writeStdout(repairHelpText());
+    return 0;
+  }
+
+  const help = repairSubcommandHelpText(subcommand);
+  if (!help) {
+    writeCliError(io, `Unknown repair subcommand: ${subcommand}`);
+    return 1;
+  }
+
+  if (isHelpRequest(rest)) {
+    io.writeStdout(help);
+    return 0;
+  }
+
+  const prohibitedFlag = findProhibitedRepairWriteFlag(rest);
+  if (prohibitedFlag) {
+    writeCliError(io, `Target repository writes are not supported by the repair CLI: ${prohibitedFlag}`);
+    return 1;
+  }
+
+  try {
+    const result = subcommand === 'handoff'
+      ? await runRepairHandoff(parseRepairHandoffArgs(rest))
+      : subcommand === 'execute'
+        ? await runRepairExecute(parseRepairExecuteArgs(rest))
+        : await runRepairPatchPlan(parseRepairPatchPlanArgs(rest));
+
+    io.writeStdout(formatCliJsonOutput(result));
+    return 0;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    writeCliError(io, `Failed to run repair ${subcommand}: ${message}`);
+    return 1;
+  }
 }
 
 async function runSecurity(args: string[], io: CliIO): Promise<number> {
@@ -471,6 +528,7 @@ Usage:
   hardening plan <repo> [--run-dir <dir>]
   hardening report <runDir> <outputPath>
   hardening verify <runDirOrManifest>
+  hardening repair <handoff|execute|patch-plan> [options]
   hardening security import --provider <provider> --scan-dir <dir> --repo <repo> --run-dir <dir>
   hardening verify-env <runDir> --deployed-url <url>
   hardening run <repo> [url] [--browser] [--critical-path <path-or-intent>] [--max-routes <n>] [--max-actions-per-route <n>] [--storage-state <path>] [--trace] [--start-command <command>] [--boot-timeout-ms <ms>] [--run-dir <dir>] [--workspace-output <dir>]
@@ -482,7 +540,55 @@ Options:
 `;
 }
 
+function repairHelpText(): string {
+  return `hardening repair
+
+Usage:
+  hardening repair <subcommand> [options]
+
+Subcommands:
+  handoff     Generate an AI IDE repair handoff from an existing run bundle.
+  execute     Create a dry-run plan or run validation commands without editing source files.
+  patch-plan  Generate a maintainer-reviewed patch plan without applying changes.
+
+Target repository writes, automatic patch application, branches, commits, and pull requests are not supported.
+
+Options:
+  --help, -h  Show this help.
+
+`;
+}
+
+function repairSubcommandHelpText(subcommand: string): string | undefined {
+  if (subcommand === 'handoff') {
+    return repairHandoffHelpText();
+  }
+
+  if (subcommand === 'execute') {
+    return repairExecuteHelpText();
+  }
+
+  if (subcommand === 'patch-plan') {
+    return repairPatchPlanHelpText();
+  }
+
+  return undefined;
+}
+
+/* The repair CLI reads a finished run bundle and writes evidence beside it. These flags
+   all mean "change the target repository", which no repair subcommand does, so reject
+   them at the boundary rather than silently ignoring them. */
+function findProhibitedRepairWriteFlag(args: string[]): string | undefined {
+  const prohibitedFlags = ['--apply', '--write', '--auto-fix', '--commit', '--push', '--pull-request'];
+
+  return args.find((arg) => prohibitedFlags.some((flag) => arg === flag || arg.startsWith(`${flag}=`)));
+}
+
 function commandHelpText(command: string): string | undefined {
+  if (command === 'repair') {
+    return repairHelpText();
+  }
+
   if (command === 'analyze') {
     return `hardening analyze
 

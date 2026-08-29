@@ -92,6 +92,30 @@ describe('repair handoff', () => {
     expect(formatVerificationPlanMarkdown(pkg)).toContain('mypy .');
   });
 
+  it('redacts the manifest artifact map it copies into the handoff package', () => {
+    const pkg = buildRepairHandoffPackage({
+      generatedAt: '2026-08-29T00:00:00.000Z',
+      runDir: '/tmp/agent-reach/.hardening/runs/run-fixed',
+      manifest: {
+        schemaVersion: 1,
+        mode: 'cli',
+        runId: 'run-fixed',
+        repoRoot: '/tmp/agent-reach',
+        artifacts: {
+          reportPath: '/tmp/agent-reach/hardening-report.md',
+          publishedCredential: 'API_KEY=sk-handoff-artifact-secret'
+        },
+        commandResults: [
+          { command: 'ruff', args: ['check', '.'], exitCode: 1, stdout: 'failed', stderr: '', timedOut: false }
+        ],
+        checks: []
+      }
+    });
+
+    expect(JSON.stringify(pkg)).not.toContain('sk-handoff-artifact-secret');
+    expect(pkg.sourceArtifacts.reportPath).toBe('/tmp/agent-reach/hardening-report.md');
+  });
+
   it('writes repair handoff artifacts from a run manifest', async () => {
     const repoRoot = await mkdtemp(join(tmpdir(), 'hardening-repair-handoff-repo-'));
     const runDir = join(repoRoot, '.hardening', 'runs', 'run-fixed');

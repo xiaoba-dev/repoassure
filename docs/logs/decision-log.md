@@ -1747,3 +1747,7 @@ Public Release Manual Gate Closure v0.2 的 2026-07-01 private/no-go 结论保�
 ## 2026-08-28 - autopilot workspace stays out of the repository
 
 `.autopilot/` 与 `.claude/settings.local.json` 进入 `.gitignore`。`.autopilot/` 是本地治理工作区（goal JSON、progress snapshot），不是产品物料；main 上从未跟踪过其中任何文件，所有测试引用都是临时夹具或反向断言（`packed-cli-installation.test.ts` 断言打包产物**不含** `.autopilot`），因此本次忽略不改变任何现有行为，只防止该工作区在 main 检出中被意外提交。`.claude/settings.local.json` 是个人会话配置，仓库已 PUBLIC，不应随产品材料公开。`run-project-intelligence-snapshot.ts` 的 `scanRoots` 保留 `.autopilot`：该 root 缺失时快照正常降级生成，PI 按既定「留观」处理，不在本次改动范围内。该决策只影响本地工作区边界，不改产品行为、artifact schema 或对外接口，因此不新增 ADR。
+
+## 2026-08-29 - repair workflow CLI and MCP surface
+
+接受 ADR-0043。`run-repair-handoff` / `run-repair-execute` / `run-repair-patch-plan` 三个既有 runner 同时接到 MCP（`prepare_repair_handoff`、`preview_repair_execution`、`generate_repair_patch_plan`，工具面 8 → 11，全部为产品工具）和 CLI（`hardening repair <handoff|execute|patch-plan>`）。两侧都只是 adapter，不重实现生命周期；`--apply` / `--write` / `--auto-fix` / `--commit` / `--push` / `--pull-request` 在 CLI 边界拒绝而不是忽略。同时修复接线时发现的脱敏缺口：`buildRepairHandoffPackage` 曾把 `manifest.artifacts` 原样复制进 `sourceArtifacts`，使 manifest 中 secret 形状的值未脱敏地进入交给 AI IDE 的 `repair-handoff-package.json`；已加回归测试，去掉修复即失败。`assemble_repair_evidence_package` 与 `run-repair-evidence-package` 不在本次范围内——它们依赖三个 runner 的新增字段，属于三份已发布契约的 schema 演进，应单独决策。该决策不改变 handoff 包的 `nextCommands` 字符串，也不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。

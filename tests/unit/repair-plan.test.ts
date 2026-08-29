@@ -135,7 +135,7 @@ describe('generateRepairPlan', () => {
       runId: string;
       repoRoot: string;
       sourceManifest: string;
-      summary: { totalTasks: number; p0: number; p1: number; p2: number };
+      summary: { totalTasks: number; p0: number; p1: number; p2: number; p3: number };
       tasks: Array<{
         taskId: string;
         severity: string;
@@ -188,7 +188,7 @@ describe('generateRepairPlan', () => {
       runId: 'run-fixed',
       repoRoot,
       sourceManifest: sourceManifestPath,
-      summary: { totalTasks: 2, p0: 1, p1: 1, p2: 0 }
+      summary: { totalTasks: 2, p0: 1, p1: 1, p2: 0, p3: 0 }
     });
     expect(plan.tasks.map((task) => task.severity)).toEqual(['P0', 'P1']);
     expect(plan.tasks[0]?.taskId).toBe('p0-white-screen-dashboard-white-screen');

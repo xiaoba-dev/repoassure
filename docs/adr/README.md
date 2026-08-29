@@ -50,6 +50,7 @@ ADR records long-lived architecture decisions. Use `docs/logs/decision-log.md` f
 | [0042](0042-goal-audit-advisory-process-records.md) | Accepted | Goal audit advisory process records |
 | [0043](0043-repair-workflow-cli-and-mcp-surface.md) | Accepted | Repair workflow CLI and MCP surface |
 | [0044](0044-blocked-goal-recovery-mcp-surface-removal.md) | Accepted | Retire the blocked goal recovery MCP surface |
+| [0045](0045-security-provider-discovery-and-structured-import-errors.md) | Accepted | Security provider discovery and structured import errors |
 
 ## Template
 

@@ -17,6 +17,10 @@
     "./import-security-evidence": {
       "types": "./dist/import-security-evidence.d.ts",
       "default": "./dist/import-security-evidence.js"
+    },
+    "./security-provider-contracts": {
+      "types": "./dist/security-provider-contracts.d.ts",
+      "default": "./dist/security-provider-contracts.js"
     }
   },
   "dependencies": {

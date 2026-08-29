@@ -20,6 +20,8 @@ describe('MCP tool registry', () => {
       'prepare_repair_handoff',
       'preview_repair_execution',
       'generate_repair_patch_plan',
+      'list_security_providers',
+      'import_security_evidence',
       'harden_report',
       'run_hardening',
     ]);
@@ -114,6 +116,24 @@ describe('MCP tool registry', () => {
         }
       },
       {
+        name: 'list_security_providers',
+        annotations: {
+          readOnlyHint: true,
+          destructiveHint: false,
+          idempotentHint: true,
+          openWorldHint: false
+        }
+      },
+      {
+        name: 'import_security_evidence',
+        annotations: {
+          readOnlyHint: false,
+          destructiveHint: false,
+          idempotentHint: false,
+          openWorldHint: false
+        }
+      },
+      {
         name: 'harden_report',
         annotations: {
           readOnlyHint: false,
@@ -173,7 +193,7 @@ describe('MCP tool registry', () => {
       name: tool.name,
       inputSchema: tool.inputSchema,
       annotations: tool.annotations
-    }))).toHaveLength(10);
+    }))).toHaveLength(12);
   });
 
   it('fails closed when repair preview task selection is missing, ambiguous, or unsafe', async () => {
@@ -241,7 +261,7 @@ describe('MCP tool registry', () => {
     });
     expect(repairPatchPlan?.inputSchema.properties).not.toHaveProperty('validationOnly');
     expect(repairPatchPlan?.inputSchema.properties).not.toHaveProperty('command');
-    expect(tools.filter((tool) => tool.name !== 'generate_repair_patch_plan')).toHaveLength(10);
+    expect(tools.filter((tool) => tool.name !== 'generate_repair_patch_plan')).toHaveLength(12);
   });
 
   it('fails closed for missing, unsupported, or sensitive repair patch plan inputs', async () => {

@@ -1,4 +1,10 @@
 import type { CallToolResult, Tool } from '@modelcontextprotocol/sdk/types.js';
+import {
+  formatSecurityImportError,
+  listSecurityProviderDescriptors,
+  parseSecurityProvider,
+  SecurityImportError
+} from '@hardening-mcp/security-assurance/security-provider-contracts';
 
 import { createPlaywrightBrowserDriver } from '../../domain/explore/playwright-driver.js';
 import { redactSensitiveText } from '../../shared/privacy-redaction.js';
@@ -11,6 +17,7 @@ import { runGenerateRepairPatchPlanTool } from '../../tools/generate-repair-patc
 import { runPrepareRepairHandoffTool } from '../../tools/prepare-repair-handoff-tool.js';
 import { runPreviewRepairExecutionTool } from '../../tools/preview-repair-execution-tool.js';
 import { runHardenReportTool } from '../../tools/harden-report-tool.js';
+import { runSecurityImportTool } from '../../tools/security-import-tool.js';
 import { runHardeningTool } from '../../tools/run-hardening-tool.js';
 import { bootSessionStore } from './boot-session-store.js';
 
@@ -26,6 +33,8 @@ type HardeningToolName =
   | 'prepare_repair_handoff'
   | 'preview_repair_execution'
   | 'generate_repair_patch_plan'
+  | 'list_security_providers'
+  | 'import_security_evidence'
   | 'harden_report'
   | 'run_hardening';
 
@@ -204,6 +213,39 @@ export function listHardeningTools(): Tool[] {
       }
     },
     {
+      name: 'list_security_providers',
+      title: 'List Security Providers',
+      description: 'List local security evidence provider ids and the normalized scan.json input contract. Does not contact providers.',
+      inputSchema: strictObjectSchema({}, []),
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false
+      }
+    },
+    {
+      name: 'import_security_evidence',
+      title: 'Import Security Evidence',
+      description: 'Import a local normalized scan.json into RepoAssure run artifacts. Does not run scanners or modify target source.',
+      inputSchema: strictObjectSchema(
+        {
+          provider: stringSchema('Provider id returned by list_security_providers.'),
+          sourcePath: stringSchema('Local directory containing normalized scan.json.'),
+          repoRoot: stringSchema('Target repository root used for repair-planning context.'),
+          runDir: stringSchema('New or artifact-empty RepoAssure run directory below repoRoot/.hardening/. Symbolic links and artifact overwrite are rejected.'),
+          runId: stringSchema('Optional run id. Defaults to the final runDir segment.')
+        },
+        ['provider', 'sourcePath', 'repoRoot', 'runDir']
+      ),
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: false
+      }
+    },
+    {
       name: 'harden_report',
       title: 'Write Hardening Report',
       description: 'Write the hardening markdown report from run artifacts.',
@@ -260,6 +302,11 @@ export async function callHardeningTool(name: string, args: unknown): Promise<Ca
     const result = await runNamedTool(name, record);
     return toToolResult(result);
   } catch (error) {
+    if (error instanceof SecurityImportError) {
+      const formatted = formatSecurityImportError(error);
+      return toToolError(`Security import failed [${formatted.code}]: ${formatted.message} Guidance: ${formatted.guidance}`);
+    }
+
     return toToolError(error instanceof Error ? error.message : 'Unknown hardening tool error');
   }
 }
@@ -374,6 +421,24 @@ async function runNamedTool(name: HardeningToolName, args: JsonObject): Promise<
           ...(outputDir ? { outputDir } : {})
         })
       );
+    }
+    case 'list_security_providers':
+      assertAllowedArguments(args, 'list_security_providers', []);
+      return { providers: listSecurityProviderDescriptors() };
+    case 'import_security_evidence': {
+      assertAllowedArguments(
+        args,
+        'import_security_evidence',
+        ['provider', 'sourcePath', 'repoRoot', 'runDir', 'runId']
+      );
+      const runId = readOptionalString(args, 'runId');
+      return toJsonObject(await runSecurityImportTool({
+        provider: parseSecurityProvider(readRequiredString(args, 'provider')),
+        sourcePath: readRequiredString(args, 'sourcePath'),
+        repoRoot: readRequiredString(args, 'repoRoot'),
+        runDir: readRequiredString(args, 'runDir'),
+        ...(runId ? { runId } : {})
+      }));
     }
     case 'harden_report':
       return toJsonObject(
@@ -607,6 +672,15 @@ function readOptionalNonEmptyStringArray(record: JsonObject, key: string): strin
   }
 
   return value.map((item) => (item as string).trim());
+}
+
+/* The security tools take a fixed argument set, so an unexpected key is a caller bug
+   worth surfacing rather than ignoring. */
+function strictObjectSchema(properties: Record<string, object>, required: string[]): Tool['inputSchema'] {
+  return {
+    ...objectSchema(properties, required),
+    additionalProperties: false
+  };
 }
 
 function objectSchema(properties: Record<string, object>, required: string[]): Tool['inputSchema'] {

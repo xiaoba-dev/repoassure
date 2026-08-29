@@ -49,7 +49,7 @@ export async function ensureAcceptanceBuild(
     await rm(statePath, { force: true });
     await options.build();
     await assertOutputs(options.requiredOutputs);
-    await writeStateAtomically(statePath, options.fingerprint);
+    await writeStateAtomically(statePath, options.fingerprint, options.requiredOutputs);
     return 'built';
   } finally {
     await releaseLock(lockPath, leaseToken);
@@ -69,12 +69,33 @@ export async function calculateAcceptanceBuildFingerprint(repoRoot: string): Pro
     join(repoRoot, 'scripts', 'lib', 'acceptance-build-coordinator.ts'),
     ...(await listFiles(sourceRoot))
   ].sort();
+  /* The acceptance sources import @hardening-mcp/security-assurance, so that
+     package's types feed the emitted .d.ts. Left out of the fingerprint, a
+     dependency change would keep the previous state reusable and serve output
+     compiled against the old types. Optional because a caller may point at a
+     root that does not carry the dependency. */
+  const dependencyRoot = join(repoRoot, 'packages', 'security-assurance');
+  const optionalInputPaths = [
+    join(dependencyRoot, 'package.json'),
+    ...(await listFilesIfPresent(join(dependencyRoot, 'src')))
+  ].sort();
   const hash = createHash('sha256');
 
   for (const path of inputPaths) {
     hash.update(relative(repoRoot, path));
     hash.update('\0');
     hash.update(await readFile(path));
+    hash.update('\0');
+  }
+
+  for (const path of optionalInputPaths) {
+    const content = await readFileIfPresent(path);
+    if (content === undefined) {
+      continue;
+    }
+    hash.update(relative(repoRoot, path));
+    hash.update('\0');
+    hash.update(content);
     hash.update('\0');
   }
 
@@ -137,26 +158,53 @@ async function isFreshBuild(
   requiredOutputs: string[]
 ): Promise<boolean> {
   try {
-    const state = JSON.parse(await readFile(statePath, 'utf8')) as { fingerprint?: unknown };
+    const state = JSON.parse(await readFile(statePath, 'utf8')) as {
+      fingerprint?: unknown;
+      outputsDigest?: unknown;
+    };
     if (state.fingerprint !== fingerprint) {
       return false;
     }
-    await assertOutputs(requiredOutputs);
-    return true;
+    /* Existence is not enough. If anything outside this coordinator rewrites an
+       emitted file - an interrupted compiler, a concurrent writer - the state
+       still names a successful build and the file is still there, so an
+       existence-only check would serve the drifted output for every later run.
+       Reuse is bound to the bytes the recorded build actually emitted. A state
+       written before this field existed has no digest and rebuilds once. */
+    return state.outputsDigest === (await calculateOutputsDigest(requiredOutputs));
   } catch {
     return false;
   }
+}
+
+async function calculateOutputsDigest(paths: string[]): Promise<string> {
+  const hash = createHash('sha256');
+
+  for (const path of [...paths].sort()) {
+    const content = await readFile(path);
+    hash.update(String(content.byteLength));
+    hash.update('\0');
+    hash.update(content);
+    hash.update('\0');
+  }
+
+  return hash.digest('hex');
 }
 
 async function assertOutputs(paths: string[]): Promise<void> {
   await Promise.all(paths.map((path) => access(path)));
 }
 
-async function writeStateAtomically(statePath: string, fingerprint: string): Promise<void> {
+async function writeStateAtomically(
+  statePath: string,
+  fingerprint: string,
+  requiredOutputs: string[]
+): Promise<void> {
+  const outputsDigest = await calculateOutputsDigest(requiredOutputs);
   const temporaryPath = `${statePath}.${process.pid}.${Date.now()}.tmp`;
   await writeFile(
     temporaryPath,
-    `${JSON.stringify({ fingerprint, completedAt: new Date().toISOString() })}\n`
+    `${JSON.stringify({ fingerprint, outputsDigest, completedAt: new Date().toISOString() })}\n`
   );
   await rename(temporaryPath, statePath);
 }
@@ -204,6 +252,28 @@ async function releaseLock(lockPath: string, leaseToken: string): Promise<void> 
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
       throw error;
     }
+  }
+}
+
+async function listFilesIfPresent(directory: string): Promise<string[]> {
+  try {
+    return await listFiles(directory);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return [];
+    }
+    throw error;
+  }
+}
+
+async function readFileIfPresent(path: string): Promise<Buffer | undefined> {
+  try {
+    return await readFile(path);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return undefined;
+    }
+    throw error;
   }
 }
 

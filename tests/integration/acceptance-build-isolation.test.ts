@@ -69,6 +69,26 @@ describe('acceptance build runtime isolation', () => {
     }
   });
 
+  it('does not reuse a cached success whose output no longer matches the recorded build', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-acceptance-drifted-'));
+
+    try {
+      await runWorker(root, 'source-v1');
+      /* Something outside the coordinator replaces an emitted file: an interrupted
+         compiler, a concurrent writer, a restored editor buffer. The cache still
+         records a successful build of source-v1, and the file still exists, so an
+         existence-only freshness check keeps serving the wrong output forever. */
+      await writeFile(join(root, 'dist', 'index.js'), 'export const fingerprint = "drifted";\n');
+
+      await runWorker(root, 'source-v1');
+
+      expect(await buildCount(root)).toBe(2);
+      expect(await readFile(join(root, 'dist', 'index.js'), 'utf8')).toContain('source-v1');
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
   it('recovers an orphaned lock after the owning process exits', async () => {
     const root = await mkdtemp(join(tmpdir(), 'repoassure-acceptance-orphan-'));
 

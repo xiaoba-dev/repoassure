@@ -37,6 +37,48 @@ describe('acceptance build runtime contract', () => {
     }
   });
 
+  it('invalidates the fingerprint when a package the acceptance sources import changes', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'repoassure-acceptance-dependency-'));
+
+    try {
+      await mkdir(join(root, 'packages', 'acceptance', 'src'), { recursive: true });
+      await mkdir(join(root, 'packages', 'security-assurance', 'src'), { recursive: true });
+      await mkdir(join(root, 'scripts', 'lib'), { recursive: true });
+      await writeFile(join(root, 'package.json'), '{}\n');
+      await writeFile(join(root, 'pnpm-lock.yaml'), 'lockfileVersion: 9\n');
+      await writeFile(join(root, 'tsconfig.json'), '{}\n');
+      await writeFile(join(root, 'packages', 'acceptance', 'package.json'), '{}\n');
+      await writeFile(join(root, 'packages', 'acceptance', 'tsconfig.json'), '{}\n');
+      await writeFile(join(root, 'packages', 'acceptance', 'tsconfig.build.json'), '{}\n');
+      await writeFile(
+        join(root, 'packages', 'acceptance', 'src', 'index.ts'),
+        "export { evidence } from '@hardening-mcp/security-assurance';\n"
+      );
+      await writeFile(join(root, 'packages', 'security-assurance', 'package.json'), '{"version":"0.1.0"}\n');
+      await writeFile(
+        join(root, 'packages', 'security-assurance', 'src', 'index.ts'),
+        'export const evidence: string = "v1";\n'
+      );
+      await writeFile(join(root, 'scripts', 'build-acceptance.ts'), 'build v1\n');
+      await writeFile(join(root, 'scripts', 'lib', 'acceptance-build-coordinator.ts'), 'lock v1\n');
+
+      const initial = await calculateAcceptanceBuildFingerprint(root);
+      /* The acceptance sources import this package, so its types reach the
+         emitted .d.ts. A change here must not be reusable under the old state. */
+      await writeFile(
+        join(root, 'packages', 'security-assurance', 'src', 'index.ts'),
+        'export const evidence: number = 2;\n'
+      );
+      const dependencySourceChanged = await calculateAcceptanceBuildFingerprint(root);
+      await writeFile(join(root, 'packages', 'security-assurance', 'package.json'), '{"version":"0.2.0"}\n');
+      const dependencyManifestChanged = await calculateAcceptanceBuildFingerprint(root);
+
+      expect(new Set([initial, dependencySourceChanged, dependencyManifestChanged])).toHaveLength(3);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
   it('prebuilds package and root runtime outputs before the parallel Vitest suite', async () => {
     const packageJson = JSON.parse(await readFile('package.json', 'utf8')) as {
       scripts: Record<string, string>;

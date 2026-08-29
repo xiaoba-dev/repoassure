@@ -93,6 +93,34 @@ describe('acceptance build runtime contract', () => {
     expect(vitestConfig).toContain('maxWorkers: 4');
   });
 
+  it('never runs a compiled entry point without a build in front of it', async () => {
+    const packageJson = JSON.parse(await readFile('package.json', 'utf8')) as {
+      scripts: Record<string, string>;
+    };
+    const scripts = packageJson.scripts;
+    const runsCompiledEntry = /\bnode\s+(?:packages\/[^\s]*\/dist\/|dist\/)/u;
+    const builds = /\bpnpm\s+build/u;
+
+    const unguarded = Object.entries(scripts)
+      .filter(([name]) => !name.startsWith('pre') && !name.startsWith('post'))
+      .filter(([, command]) => runsCompiledEntry.test(command))
+      .filter(([name, command]) => !builds.test(command) && !builds.test(scripts[`pre${name}`] ?? ''))
+      .map(([name]) => name);
+
+    expect(unguarded).toEqual([]);
+  });
+
+  it('pins the pnpm setting that decides whether those pre hooks run', async () => {
+    /* The guards above are mostly `pre*` hooks. pnpm runs them only when
+       enable-pre-post-scripts is on, and that default has differed across pnpm
+       majors, so a contributor on another version would silently run every
+       compiled entry point against whatever dist happened to be there. The
+       repository pins the setting instead of inheriting it. */
+    const npmrc = await readFile('.npmrc', 'utf8');
+
+    expect(npmrc).toMatch(/^enable-pre-post-scripts=true$/mu);
+  });
+
   it('routes acceptance builds through the cross-process coordinator', async () => {
     const packageJson = JSON.parse(await readFile('package.json', 'utf8')) as {
       scripts: Record<string, string>;

@@ -1,7 +1,16 @@
 # ADR-0041: Blocked Goal Recovery MCP Surface
 
-Status: Accepted
+Status: Superseded by ADR-0044
 Date: 2026-07-13
+
+> **Superseded on 2026-08-28 by [ADR-0044](0044-blocked-goal-recovery-mcp-surface-removal.md).**
+> The eight MCP tools described below no longer exist. PR #71 (commit `6b78bf9`) removed
+> `src/adapters/mcp/blocked-goal-recovery-tools.ts` and their registry entries; the MCP surface
+> is now the product tools listed in ADR-0044. The blocked-goal recovery lifecycle itself
+> was not removed — `packages/acceptance` still owns the stage writers and the
+> `pnpm goal:recover:*` scripts still drive them, under ADR-0033 through ADR-0040. Read the
+> decision below as the historical record of a transport that has since been retired, not as a
+> description of an available surface.
 
 ## Context
 

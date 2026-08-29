@@ -129,9 +129,11 @@ RepoAssure must convert only an accepted or accepted-with-risk evidence review p
 
 RepoAssure must validate accepted, accepted-risk, blocked, failed, incomplete, environment-blocked, boundary-violating, and tampered recovery chains from local artifacts. The summary must derive outcomes from schemas, hashes, and boundary evidence rather than trusting self-reported pass flags. It does not execute commands or authorize external actions.
 
-## Blocked Goal Recovery MCP Surface v0.1
+## MCP Product Tool Surface v0.1
 
-RepoAssure must let AI IDE clients discover and call every blocked-goal recovery evidence stage over MCP without shell-specific orchestration. The product requirement is eight explicit tools with strict directory-only inputs, typed `repoassure.mcp-blocked-goal-recovery-tool-result.v1` responses, contained local outputs, client-readable redacted errors, and explicit proof that no commands, external state changes, or target repo mutations were performed by RepoAssure.
+RepoAssure's MCP server must advertise exactly the tools that answer whether an AI-generated repository is ready to ship: `analyze_repo`, `boot_app`, `stop_app`, `explore_app`, `generate_tests`, `generate_repair_plan`, `harden_report`, and `run_hardening`. It must not advertise tools for managing RepoAssure's own development goals.
+
+The blocked-goal recovery lifecycle was previously exposed as eight additional MCP tools. That surface was retired by [ADR-0044](adr/0044-blocked-goal-recovery-mcp-surface-removal.md), superseding ADR-0041. The lifecycle itself remains a product of this repository and is driven by the `pnpm goal:recover:*` commands; it is not an MCP requirement.
 
 ## Blocked Goal Recovery MCP Real Client Consumption Validation v0.1
 
@@ -139,8 +141,8 @@ The official SDK `Client` and `StdioClientTransport` must discover and consume t
 
 ## Blocked Goal Recovery MCP External AI IDE Configuration Validation v0.1
 
-RepoAssure must generate copy-pasteable Cursor, VS Code, and Codex local stdio configurations that point to the user-facing `apps/mcp-server/index.js` entry with absolute argv-safe paths. Automated acceptance must consume every generated envelope from a repository-external workspace, discover all eight recovery tools, prove the SDK harness does not serialize or forward an unrelated test secret, enforce deterministic cleanup, and remain non-writing and non-executing for client settings, recovery commands, target repositories, and external state. Actual IDE environment inheritance is a manual acceptance item, not an automated claim.
+RepoAssure must generate copy-pasteable Cursor, VS Code, and Codex local stdio configurations that point to the user-facing `apps/mcp-server/index.js` entry with absolute argv-safe paths. Automated acceptance must consume every generated envelope from a repository-external workspace, assert the exact advertised product tool set, prove the SDK harness does not serialize or forward an unrelated test secret, enforce deterministic cleanup, and remain non-writing for client settings and non-mutating for target repositories and external state. Actual IDE environment inheritance is a manual acceptance item, not an automated claim.
 
 ## Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1
 
-RepoAssure must provide a safe manual path for one installed AI IDE to consume its generated MCP configuration. The manual path must use a versioned disposable fixture with no recovery/resume commands or target-repository data, require discovery of all eight tools, allow only `create_blocked_goal_recovery`, and preserve explicit no-command, no-external-state, and no-target-mutation evidence. The maintainer must record a redacted accepted, changes_requested, or deferred decision; neither saving configuration nor passing SDK integration proves this requirement.
+RepoAssure must provide a safe manual path for one installed AI IDE to consume its generated MCP configuration. The manual path must use a disposable throwaway directory with no target-repository data, require discovery of the exact advertised product tool set with no `blocked_goal` tool listed, allow only a single non-mutating `analyze_repo` call, and preserve evidence that the source checkout was left unchanged. The maintainer must record a redacted accepted, changes_requested, or deferred decision; neither saving configuration nor passing SDK integration proves this requirement. The completed 2026-07-14 acceptance covered the retired recovery surface and does not carry forward.

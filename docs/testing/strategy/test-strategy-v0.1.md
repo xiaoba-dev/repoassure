@@ -639,33 +639,32 @@ This validation must not upload target repo material, automatically modify targe
 
 ## Blocked Goal Recovery MCP Surface v0.1
 
-- Unit tests cover the eight-name registry, strict input/output schemas, argument expansion, recursive redaction, boundary preservation, non-execution receipts, invalid directory types, input-artifact symlink escape, and output-directory symlink escape.
-- Adversarial unit tests cover non-blocking FIFO rejection, regular-file enforcement, the 8 MiB input cap, directory device/inode replacement rejection, existing output-symlink rejection without target mutation, typed credential redaction, stage payload schema binding, and fixed artifact suffix contracts.
-- Resource-amplification tests reject campaigns above 32 scenarios, reject duplicate artifact directories, and prove the scenario worker pool never exceeds four concurrent validations.
-- MCP transport integration calls recovery package, consumption, decision, task, intake, review, and closure in raw-byte-bound order.
-- Near-real campaign integration calls `validate_blocked_goal_recovery_lifecycle` and verifies the common MCP response boundary.
+Retired on 2026-08-28 by ADR-0044. The eight recovery MCP tools and their adapter were removed, and the unit, adversarial, resource-amplification, and transport-integration suites that exercised that adapter went with them.
+
+- The lifecycle is still covered through the CLI path it actually runs on: eight stage unit test files in `tests/unit/`, plus `tests/integration/playbook-e2e-repair-evidence.test.ts`, which now drives the lifecycle campaign summary through the `pnpm goal:recover:validate-lifecycle` script rather than an MCP tool call.
+- `tests/unit/project-structure.test.ts` asserts that no current-state document presents a `blocked_goal` MCP tool as available and that ADR-0041 is recorded as superseded.
 - Full gates include typecheck, lint, unit, integration, E2E, full Vitest, repo hygiene, release check, goal audit, independent review, PR CI, and main CI.
 
-## Blocked Goal Recovery MCP Real Client Consumption Validation v0.1
+## MCP Real Client Consumption Validation v0.1
 
-- Contract: official SDK `Client` and `StdioClientTransport` initialize the compiled server and discover all eight recovery tools.
-- Integration: a real child process consumes package through closure, rejects an incomplete lifecycle campaign, successfully validates the near-real eight-outcome campaign, and proves success text/structured agreement plus client-readable standard errors.
-- Attack and resilience: missing artifact, unexpected argument, secret-like path, raw-secret stderr, bounded stderr capture, safe environment inheritance, request timeout, and enforced deterministic cleanup are covered.
+- Contract: official SDK `Client` and `StdioClientTransport` drive the compiled server as a real stdio child process.
+- Integration: `tests/integration/mcp-real-client.test.ts` covers the tool-independent transport contract — bounded initialization timeout, deterministic termination of the observed child PID, and SDK safe default environment isolation verified with a sentinel secret.
+- Attack and resilience: unexpected argument, secret-like path, raw-secret stderr, bounded stderr capture, safe environment inheritance, request timeout, and enforced deterministic cleanup are covered.
 - CI: `pnpm test:mcp-real-client` builds required dist outputs and runs as a dedicated GitHub Quality Gates step.
 
 ## Blocked Goal Recovery MCP External AI IDE Configuration Validation v0.1
 
 - Unit: strict rendering covers Cursor `mcpServers` JSON, VS Code `servers` stdio JSON, Codex `mcp_servers` TOML, absolute path spaces, argument parsing, unsupported clients, and argument expansion rejection.
-- Integration: `pnpm test:mcp-external-config` generates each configuration from a repository-external cwd, points it at `apps/mcp-server/index.js` through a path-with-spaces source-checkout alias, starts it through official SDK `StdioClientTransport`, discovers all eight recovery tools, and verifies deterministic child cleanup.
+- Integration: `pnpm test:mcp-external-config` generates each configuration from a repository-external cwd, points it at `apps/mcp-server/index.js` through a path-with-spaces source-checkout alias, starts it through official SDK `StdioClientTransport`, asserts the exact advertised product tool set, and verifies deterministic child cleanup.
 - Security boundary: generated output contains no caller env values, the SDK harness uses its safe default environment, stderr remains empty, missing build modules produce a fixed path-safe error, and the generator does not write client configuration. Actual IDE environment inheritance remains a manual acceptance item.
 - CI: External AI IDE MCP config is an independent GitHub Quality Gates step after real stdio client validation.
 
 ## Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1
 
-- Contract: `tests/unit/mcp-real-ai-ide-manual-acceptance.test.ts` guards the maintainer runbook, the redacted evidence template, the no-command fixture, the documented configuration generator, and the explicit manual-decision boundary.
-- Integration: `tests/integration/mcp-manual-acceptance-fixture.test.ts` starts the compiled app entry, copies the committed fixture to a temporary directory, and proves the one allowed call emits the explicit zero-side-effect flags with no resume commands. Existing `pnpm test:mcp-external-config` remains the integration proof for generated envelopes and real stdio process consumption.
-- Manual acceptance: one maintainer used Codex Desktop to discover all eight tools and call only `create_blocked_goal_recovery` against a disposable fixture. The returned boundary flags, empty resume-command list, explicit accepted decision, and configuration-removal decision are recorded in the dated redacted evidence file.
-- Non-substitution: CI cannot claim installed-client UI behavior or environment inheritance. The accepted Codex record closes this v0.1 one-client gate; additional client coverage remains separate work.
+- Contract: `tests/unit/mcp-real-ai-ide-manual-acceptance.test.ts` guards the maintainer runbook, the redacted evidence template, the documented configuration generator, and the explicit manual-decision boundary.
+- Integration: `pnpm test:mcp-external-config` is the integration proof for generated envelopes and real stdio process consumption. The fixture-call integration that covered this gate was removed with the recovery MCP tools by ADR-0044.
+- Manual acceptance: the dated 2026-07-14 Codex record exercised the retired recovery MCP surface and is preserved as history. It does not cover the current surface, and the updated runbook — exact product tool discovery plus one non-mutating `analyze_repo` call — has not been re-run.
+- Non-substitution: CI cannot claim installed-client UI behavior or environment inheritance. No manual acceptance is currently claimed for the product tool surface.
 
 ## Public Release State Reconciliation v0.2
 

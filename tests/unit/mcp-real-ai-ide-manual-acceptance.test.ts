@@ -26,16 +26,19 @@ describe('blocked goal recovery MCP real AI IDE manual acceptance contract', () 
     expect(plan).toMatch(
       /## Next Codex Goal\n\nSecurity Assurance Lane Provider Import Ergonomics v0\.1/u
     );
-    expect(operation).toContain('Status: completed');
+    expect(operation).toContain('not yet re-run');
     expect(operation).toContain('pnpm --silent mcp:config -- --client codex');
-    expect(operation).toContain('one non-executing fixture call');
-    expect(operation).toMatch(/do not execute recovery or resume commands/iu);
+    expect(operation).toContain('one bounded, non-mutating call');
+    expect(operation).toMatch(/no `blocked_goal` tool appears/iu);
     expect(operation).toMatch(/remove or retain the configuration by explicit decision/iu);
     expect(template).toContain('Decision: pending | accepted | changes_requested | deferred');
     expect(template).toContain('Do not include absolute paths, environment values, tokens, or target repository data.');
     expect(template).toMatch(/tool discovery evidence/iu);
-    expect(template).toMatch(/non-executing fixture evidence/iu);
+    expect(template).toMatch(/bounded call evidence/iu);
+    expect(template).toContain('analyze_repo');
+    expect(template).not.toContain('create_blocked_goal_recovery');
     expect(evidence).toContain('Decision: accepted');
+    expect(evidence).toContain('Describes a surface that has since been removed.');
     expect(evidence).toContain('Codex CLI 0.144.2');
     expect(evidence).toContain('commandsExecuted: false');
     expect(evidence).toContain('externalStateChanged: false');
@@ -44,7 +47,8 @@ describe('blocked goal recovery MCP real AI IDE manual acceptance contract', () 
     expect(evidence).not.toContain('/private/tmp');
     expect(evidence).not.toContain('/Users/');
     expect(checklist).toContain('Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1');
-    expect(readme).toContain('Codex 的首次人工验收已接受并保留脱敏证据');
+    expect(checklist).toContain('This gate is open.');
+    expect(readme).toContain('脱敏证据作为历史记录保留、不再代表当前面的验收');
     expect(strategy).toContain('Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1');
   });
 });

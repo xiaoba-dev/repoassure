@@ -1,44 +1,65 @@
-# Blocked Goal Recovery MCP Real Client Consumption Validation v0.1
+# MCP Real Client Consumption Validation v0.1
 
 Status: implemented
 
+> Historically titled *Blocked Goal Recovery MCP Real Client Consumption Validation v0.1*, when
+> this gate consumed the blocked-goal recovery lifecycle over MCP. Those tools were removed by
+> PR #71 (commit `6b78bf9`); see
+> [ADR-0044](../adr/0044-blocked-goal-recovery-mcp-surface-removal.md). The file name is kept so
+> existing links resolve. The recovery lifecycle itself still runs from the CLI — see
+> [blocked-goal-recovery-mcp-surface-v0.1.md](blocked-goal-recovery-mcp-surface-v0.1.md).
+
 ## Purpose
 
-Validate the bounded recovery MCP surface through the official SDK `Client` and `StdioClientTransport`, with the compiled MCP server running as a real child process. This closes the gap between in-memory transport coverage and an AI IDE-shaped stdio consumer.
+Validate that the compiled MCP server behaves correctly as a real stdio child process driven by
+the official SDK `Client` and `StdioClientTransport`. This closes the gap between in-memory
+transport coverage and an AI IDE-shaped stdio consumer.
 
-## Consumer Flow
+## What This Gate Covers Now
 
-1. Spawn `dist/adapters/mcp/index.js` through `StdioClientTransport` using the SDK safe default environment.
-2. Complete MCP initialization, inspect instructions, and discover all eight recovery tools.
-3. Consume package, consumption, decision, task, intake, review, and closure through `tools/call`.
-4. Call lifecycle validation through the same process for both a client-readable rejected campaign and a successful eight-outcome near-real campaign.
-5. Verify successful text `content` and `structuredContent` contain the same JSON.
-6. Close the client and prove deterministic cleanup of the child PID.
+`tests/integration/mcp-real-client.test.ts` validates the transport contract that is independent
+of any particular tool:
 
-The flow imports reviewed fixture evidence but does not execute recovery or resume commands.
+- A non-responsive stdio child fails the bounded initialization timeout rather than hanging.
+- The observed child PID is terminated deterministically after a failed connect, with TERM and
+  KILL fallback; the check fails if the PID remains alive.
+- The SDK safe default environment is honoured: a sentinel secret present in the parent process
+  environment must not reach the child.
 
-## Contract Corrections
+Tool discovery and per-tool call behaviour are covered by
+`tests/integration/mcp-external-ai-ide-config.test.ts`, which starts the server through each
+generated client configuration and asserts the exact advertised tool set, and by
+`tests/unit/mcp-tool-registry.test.ts` and `tests/integration/mcp-server.test.ts` for the product
+tools themselves.
 
-Real SDK validation exposed two issues that the in-memory transport did not:
+## Contract Corrections Retained From The Recovery Surface
 
-- Error results previously included `{ error }` in `structuredContent`. For tools with a success output schema, the SDK rejected that shape before the AI IDE could read the tool error. Error results now use text `content` plus `isError: true` and omit `structuredContent`.
-- Redaction of a secret-like output directory could consume the fixed artifact basename. `jsonPath` and `markdownPath` now redact the directory while preserving the basename required by the output schema.
+Real SDK validation against the recovery tools exposed two issues that the in-memory transport
+did not. Both fixes live in shared code and still apply:
 
-Missing fixed inputs return `Missing input artifact: <file-name>` without exposing the caller's directory.
+- Error results previously included `{ error }` in `structuredContent`. For a tool with a success
+  output schema, the SDK rejected that shape before the client could read the tool error. Error
+  results use text `content` plus `isError: true` and omit `structuredContent`.
+- Redaction of a secret-like output directory could consume a fixed artifact basename. Path
+  redaction preserves the basename required by an output schema while redacting the directory.
 
 ## Failure And Cleanup Coverage
 
-- Missing artifacts and unexpected arguments remain client-readable MCP errors.
-- Early exit is surfaced through a bounded 64 KiB stderr tail and the harness redacts raw secrets, including nested error metadata.
+- Unexpected arguments remain client-readable MCP errors.
+- Early exit is surfaced through a bounded 64 KiB stderr tail, and the harness redacts raw
+  secrets, including nested error metadata.
 - Initialization timeout is bounded.
-- Failed connection and normal close terminate the observed child PID, with TERM and KILL fallback; cleanup fails if the PID remains alive.
-- SDK safe default environment inheritance is verified with a sentinel secret that must remain absent in the child.
+- Failed connection and normal close terminate the observed child PID.
 - The harness never returns unredacted stderr.
 
 ## CI Gate
 
-`pnpm test:mcp-real-client` builds package and source outputs and runs the real-client integration. GitHub `Quality Gates` executes this command after unit tests.
+`pnpm test:mcp-real-client` builds package and source outputs and runs the real-client
+integration alongside `tests/integration/playbook-e2e-repair-evidence.test.ts`. GitHub
+`Quality Gates` executes this command after unit tests.
 
 ## Boundary
 
-This validation does not execute recovery/resume commands, mutate a target repository, change external state, publish, launch, contact customers, change pricing/spend or repository visibility, or claim commercial/hosted availability.
+This validation does not mutate a target repository, change external state, publish, launch,
+contact customers, change pricing, spend, or repository visibility, or claim commercial or hosted
+availability.

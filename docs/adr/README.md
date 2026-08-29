@@ -46,9 +46,10 @@ ADR records long-lived architecture decisions. Use `docs/logs/decision-log.md` f
 | [0038](0038-blocked-goal-recovery-resume-attempt-evidence-review-decision-package.md) | Accepted | Blocked goal recovery resume attempt evidence review decision package |
 | [0039](0039-blocked-goal-recovery-resume-attempt-closure-receipt.md) | Accepted | Blocked goal recovery resume attempt closure receipt |
 | [0040](0040-blocked-goal-recovery-full-lifecycle-campaign-validation.md) | Accepted | Blocked goal recovery full lifecycle campaign validation |
-| [0041](0041-blocked-goal-recovery-mcp-surface.md) | Accepted | Bounded blocked goal recovery MCP surface |
+| [0041](0041-blocked-goal-recovery-mcp-surface.md) | Superseded by [0044](0044-blocked-goal-recovery-mcp-surface-removal.md) | Bounded blocked goal recovery MCP surface |
 | [0042](0042-goal-audit-advisory-process-records.md) | Accepted | Goal audit advisory process records |
 | [0043](0043-repair-workflow-cli-and-mcp-surface.md) | Accepted | Repair workflow CLI and MCP surface |
+| [0044](0044-blocked-goal-recovery-mcp-surface-removal.md) | Accepted | Retire the blocked goal recovery MCP surface |
 
 ## Template
 

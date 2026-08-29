@@ -1,6 +1,12 @@
-# Blocked Goal Recovery MCP External AI IDE Configuration Validation v0.1
+# MCP External AI IDE Configuration Validation v0.1
 
 Status: implemented
+
+> Historically titled *Blocked Goal Recovery MCP External AI IDE Configuration Validation v0.1*,
+> when the server also advertised eight blocked-goal recovery tools. Those were removed by PR #71
+> (commit `6b78bf9`); see
+> [ADR-0044](../adr/0044-blocked-goal-recovery-mcp-surface-removal.md). The file name is kept so
+> existing links resolve. Configuration generation and validation are otherwise unchanged.
 
 ## Purpose
 
@@ -30,7 +36,7 @@ The generated output follows the public client envelopes documented by [Cursor](
 3. Generates Cursor, VS Code, and Codex configurations from that external cwd.
 4. Parses each client envelope into a command plus argv array.
 5. Starts `apps/mcp-server/index.js` through the official SDK `StdioClientTransport`.
-6. Discovers all eight blocked-goal recovery tools, checks non-execution instructions, captures no stderr, and proves deterministic child cleanup.
+6. Asserts the exact advertised product tool set — `analyze_repo`, `boot_app`, `stop_app`, `explore_app`, `generate_tests`, `generate_repair_plan`, `prepare_repair_handoff`, `preview_repair_execution`, `generate_repair_patch_plan`, `harden_report`, `run_hardening` — checks the server's non-mutation instructions, captures no stderr, and proves deterministic child cleanup.
 7. Uses the SDK harness safe default environment so an unrelated test-process secret is not forwarded to the server.
 
 GitHub Quality Gates run this command independently after the existing real-client gate.
@@ -46,8 +52,8 @@ GitHub Quality Gates run this command independently after the existing real-clie
 
 ## Boundary
 
-The generator does not write client configuration, alter Cursor, VS Code, Codex, or user profile files, and does not publish a package. Automated safe-environment evidence belongs to the SDK test harness; actual IDE environment inheritance and optional client sandbox settings remain a manual acceptance check. Validation does not execute recovery or resume commands, mutate a target repository, change external state, launch the product, contact customers, change pricing/spend or repository visibility, or claim commercial/hosted availability.
+The generator does not write client configuration, alter Cursor, VS Code, Codex, or user profile files, and does not publish a package. Automated safe-environment evidence belongs to the SDK test harness; actual IDE environment inheritance and optional client sandbox settings remain a manual acceptance check. Validation does not mutate a target repository, apply repair patches, change external state, launch the product, contact customers, change pricing/spend or repository visibility, or claim commercial/hosted availability.
 
 ## Manual Follow-up
 
-Parallel Test Runtime Build Isolation v0.1 has removed the shared acceptance-dist rebuild race from the standard full-suite path. The next gate is Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1: a maintainer selects one installed client, merges the generated entry, confirms tool discovery and one non-executing fixture call, records redacted evidence, and removes or retains the configuration by explicit decision.
+Vendor UI behaviour and real IDE environment inheritance remain a manual gate: a maintainer selects one installed client, merges the generated entry, confirms tool discovery, records redacted evidence, and removes or retains the configuration by explicit decision. See [blocked-goal-recovery-mcp-real-ai-ide-manual-acceptance-v0.1.md](blocked-goal-recovery-mcp-real-ai-ide-manual-acceptance-v0.1.md).

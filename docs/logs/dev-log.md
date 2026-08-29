@@ -13801,3 +13801,14 @@ Phase 0：项目初始化。
 - Boundary：不自动写入 Cursor、VS Code 或 Codex configuration；不执行 recovery/resume commands、不修改目标仓库、不发布、不 launch、不联系客户、不改变 pricing/spend/visibility，也不声明 hosted/commercial availability。
 - Manual acceptance closure：maintainer 在 Codex Desktop session 中发现八个 recovery tools，并调用唯一允许的 disposable fixture。输出的 commandsExecuted、externalStateChanged 和 targetRepoMutation 均为 false，resumeCommands 为空。Maintainer 明确选择 accepted 并移除临时 MCP config；将通过 document contract、quality gates、PR CI 和 merged-main CI 记录交付。
 - Public Release Manual Gate Closure v0.2 reconciliation：保留 historical private/no-go snapshot，并以只读 GitHub 与 local release evidence 调和当前 `PUBLIC` source、protected `main`、successful main CI 与 `pnpm release:check` `yes`。新增结构契约，防止计划继续指向已完成 gate；本轮不改变 repository visibility，也不执行 npm publication、GitHub release、public launch、customer contact、pricing/spend 或 commercial/hosted claims。
+
+## 2026年8月28日 - Blocked Goal Recovery MCP Surface 退役与文档调和
+
+### TDD 记录
+
+- Red：把 `tests/unit/project-structure.test.ts` 中「文档必须包含八个 recovery tool 名」的断言改为「现状文档不得把 `blocked_goal` 工具呈现为可用、且 ADR-0041 记为 superseded」后失败——十余份文档仍将已移除的 surface 描述为现状，`docs/architecture/overview.md` 甚至仍指向已删除的 `src/adapters/mcp/blocked-goal-recovery-tools.ts`。
+- Green：新增 ADR-0044 supersede ADR-0041 并更新 ADR 索引；PRD、SPEC、PLAN、architecture overview、test strategy、acceptance checklist、README 与四份 MCP operations 文档改为描述当前的产品工具面与仍然可用的 `pnpm goal:recover:*` CLI；evidence、blockers、decision/dev log 与 superpowers 设计稿按日期标注为「所述 surface 已移除」，不改写。
+- 附带修正两处 #71 留下的实质漂移：MCP server 的 `instructions` 字符串仍向每个连接的客户端宣告 recovery tools，已改为描述产品工具面；`tests/integration/mcp-external-ai-ide-config.test.ts` 的 `expectedRecoveryTools` 被清空为 `[]`，使 `expect.arrayContaining([])` 恒真、工具发现断言空转，已改为对精确的产品工具集做全等断言（rebase 到 #75 后为 11 个）。
+- Rebase 修正：本轮开 PR 后 #75（ADR-0043，repair workflow CLI/MCP 接线）先合入 main，造成两处必须修的碰撞——ADR 编号 0043 被占用，本记录改编为 ADR-0044；MCP 工具面从 8 变为 11（新增 `prepare_repair_handoff`、`preview_repair_execution`、`generate_repair_patch_plan`，均为产品工具）。所有「恰好八个」的现状声明已按 11 更新，dated 记录保留原数字并加注。ADR-0044 的判据改为写规则而不是写数字：能帮助回答「仓库能否发布」的工具才属于这个面。
+- Boundary：只移除一个 transport。recovery lifecycle 未被移除——`packages/acceptance` 的八个 stage writers、`pnpm goal:recover:*` 脚本与 artifact schema 均未改动，ADR-0033 至 ADR-0040 继续有效。2026-07-14 的 Codex 人工验收针对已移除的 surface，保留为历史记录并重新打开该门禁；不声明任何 signed artifact、SaaS/hosted availability，也不授权 npm publication、GitHub release、public launch、客户联系、pricing/spend 或 repository visibility 变更。
+

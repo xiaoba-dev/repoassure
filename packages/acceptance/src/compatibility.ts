@@ -7,13 +7,21 @@ export const acceptanceEntrypointFiles = {
   repairExecute: 'run-repair-execute.js',
   repairPatchPlan: 'run-repair-patch-plan.js',
   repairEvidencePackage: 'run-repair-evidence-package.js',
+  falsePositiveCatalog: 'run-false-positive-catalog.js',
+  falsePositiveCatalogConsumption: 'run-false-positive-catalog-consumption.js',
+  falsePositiveDetectorCalibrationContract: 'run-false-positive-detector-calibration-contract.js',
+  falsePositiveDetectorCalibrationContractConsumption: 'run-false-positive-detector-calibration-contract-consumption.js',
+  autopilotProgressConsistency: 'run-autopilot-progress-consistency.js',
   projectIntelligenceSnapshot: 'run-project-intelligence-snapshot.js',
   projectIntelligenceViewer: 'run-project-intelligence-viewer.js',
   projectIntelligenceBacklog: 'run-project-intelligence-backlog.js',
   projectIntelligenceDecisionIntake: 'run-project-intelligence-decision-intake.js',
   projectIntelligenceRecommendationDraft: 'run-project-intelligence-recommendation-draft.js',
   projectIntelligenceMaintainerDecision: 'run-project-intelligence-maintainer-decision.js',
-  projectIntelligenceControlledRemediationPlan: 'run-project-intelligence-controlled-remediation-plan.js'
+  projectIntelligenceControlledRemediationPlan: 'run-project-intelligence-controlled-remediation-plan.js',
+  projectIntelligenceAgentContext: 'run-project-intelligence-agent-context.js',
+  projectIntelligenceWatch: 'run-project-intelligence-watch.js',
+  projectIntelligenceWatchHandoff: 'run-project-intelligence-watch-handoff.js'
 } as const;
 
 export type AcceptanceEntrypointKind = keyof typeof acceptanceEntrypointFiles;
@@ -21,7 +29,7 @@ export type AcceptanceEntrypointKind = keyof typeof acceptanceEntrypointFiles;
 export const acceptanceCompatibilityContract = {
   packageName: '@hardening-mcp/acceptance',
   legacyDistRoot: 'dist/internal/acceptance',
-  packageOwnedModules: ['compatibility', 'markdown', 'report', 'goal-audit', 'goal-audit-requirements', 'goal-audit-user-acceptance', 'goal-audit-user-acceptance-materials', 'goal-audit-sources', 'goal-audit-delivery', 'goal-audit-runtime', 'goal-audit-workflow-artifacts', 'goal-audit-observability-security', 'goal-audit-process-governance', 'goal-audit-evidence-documents', 'goal-audit-current-items', 'goal-audit-v03-distribution', 'goal-audit-public-release-readiness', 'user-acceptance', 'user-acceptance-handoff', 'fatal-error', 'redaction', 'repo-preflight', 'python-cli-profile', 'python-cli-checks', 'python-cli-artifacts', 'user-acceptance-args', 'run-acceptance', 'run-user-acceptance-handoff', 'run-repair-handoff', 'run-repair-execute', 'run-repair-patch-plan', 'run-repair-evidence-package', 'run-project-intelligence-snapshot', 'run-project-intelligence-viewer', 'run-project-intelligence-backlog', 'run-project-intelligence-decision-intake', 'run-project-intelligence-recommendation-draft', 'run-project-intelligence-maintainer-decision', 'run-project-intelligence-controlled-remediation-plan', 'shell-quote', 'shell-words', 'user-acceptance-record', 'user-acceptance-runner-helpers', 'run-user-acceptance', 'run-goal-audit'],
+  packageOwnedModules: ['compatibility', 'markdown', 'report', 'goal-audit', 'goal-audit-requirements', 'goal-audit-user-acceptance', 'goal-audit-user-acceptance-materials', 'goal-audit-sources', 'goal-audit-delivery', 'goal-audit-runtime', 'goal-audit-workflow-artifacts', 'goal-audit-observability-security', 'goal-audit-process-governance', 'goal-audit-evidence-documents', 'goal-audit-current-items', 'goal-audit-v03-distribution', 'goal-audit-public-release-readiness', 'user-acceptance', 'user-acceptance-handoff', 'fatal-error', 'redaction', 'workspace-repair-summary', 'workspace-repair-summary-consumption', 'false-positive-catalog', 'run-false-positive-catalog', 'run-false-positive-catalog-consumption', 'run-false-positive-detector-calibration-contract', 'run-false-positive-detector-calibration-contract-consumption', 'run-autopilot-progress-consistency', 'repo-preflight', 'python-cli-profile', 'python-cli-checks', 'python-cli-artifacts', 'user-acceptance-args', 'run-acceptance', 'run-user-acceptance-handoff', 'run-repair-handoff', 'run-repair-execute', 'run-repair-patch-plan', 'run-repair-evidence-package', 'run-project-intelligence-snapshot', 'run-project-intelligence-viewer', 'run-project-intelligence-backlog', 'run-project-intelligence-decision-intake', 'run-project-intelligence-recommendation-draft', 'run-project-intelligence-maintainer-decision', 'run-project-intelligence-controlled-remediation-plan', 'run-project-intelligence-agent-context', 'run-project-intelligence-watch', 'run-project-intelligence-watch-handoff', 'shell-quote', 'shell-words', 'user-acceptance-record', 'user-acceptance-runner-helpers', 'run-user-acceptance', 'run-goal-audit'],
   outputPaths: {
     acceptanceRun: 'docs/acceptance/acceptance-run.md',
     goalCompletionAudit: 'docs/acceptance/goal-completion-audit.md',

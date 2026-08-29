@@ -1,0 +1,66 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-watch-mode-recovery-ux-real-workspace-smoke-v0.1",
+  "status": "completed",
+  "objective": "Validate the Project Intelligence watch mode recoveryPlan UX against real RepoAssure workspace artifacts and a simulated failing status fixture, confirming generated JSON/Markdown handoff outputs are actionable, redacted, local-only, and consistent with the operator playbook.",
+  "source_spec": "docs/operations/project-intelligence-watch-mode-recovery-command-ux-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite"
+  ],
+  "acceptance": [
+    "Run local Project Intelligence watch smoke generation against the current workspace and regenerate the watch handoff.",
+    "Verify recoveryPlan status is not_needed for fresh successful artifacts and required for a simulated failing watch status fixture.",
+    "Confirm generated Markdown includes readable recovery guidance, redaction boundaries, and no manual generated-artifact edit path.",
+    "Cascade real-workspace smoke findings into operations docs, README, PRD, SPEC, PLAN, testing strategy, acceptance checklist, logs, and .autopilot progress."
+  ],
+  "summary": {
+    "operation_record": "docs/operations/project-intelligence-watch-mode-recovery-ux-real-workspace-smoke-v0.1.md",
+    "integration_test": "tests/integration/project-intelligence-watch-recovery-ux-smoke.test.ts",
+    "real_workspace": {
+      "watch_status": "stopped",
+      "recovery_status": "not_needed",
+      "freshness_checks": "all_passed",
+      "handoff_json": "artifacts/project-graph/project-intelligence-watch-handoff.json",
+      "handoff_markdown": "artifacts/project-graph/project-intelligence-watch-handoff.md"
+    },
+    "failing_fixture": {
+      "watch_status": "failed",
+      "recovery_status": "required",
+      "failed_checks": [
+        "watch_refresh_count",
+        "watch_commands"
+      ],
+      "redaction_verified": true
+    },
+    "recovery_commands": [
+      "pnpm project:intelligence:watch -- --once",
+      "pnpm project:intelligence:watch-handoff",
+      "cat artifacts/project-graph/project-intelligence-watch-handoff.md"
+    ],
+    "boundary": {
+      "local_only": true,
+      "manual_generated_artifact_edits": false,
+      "target_repo_writes": false,
+      "hosted_dashboard": false,
+      "telemetry": false,
+      "cloud_sync": false
+    },
+    "verification": [
+      "pnpm vitest run tests/integration/project-intelligence-watch-recovery-ux-smoke.test.ts"
+    ]
+  },
+  "next_goal_id": "project-intelligence-watch-mode-completion-audit-v0.1"
+}

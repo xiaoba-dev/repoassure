@@ -1,0 +1,60 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-multi-repo-workspace-repair-summary-ai-ide-consumption-validation-v0.1",
+  "title": "RepoAssure Multi-Repo Workspace Repair Summary AI IDE Consumption Validation v0.1",
+  "status": "completed",
+  "objective": "Validate that an AI IDE can consume the package-owned local workspace repair summary deterministically across ready, partial, blocked, and empty fixtures, follow the declared read order, select no blocked task, preserve maintainer review and redaction boundaries, and leave every target repository unchanged without adding CLI or MCP entrypoints.",
+  "source_spec": "docs/product/specs/multi-repo-workspace-repair-summary-contract-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "installed_cli_entrypoint",
+    "mcp_tool_addition",
+    "mcp_tool_rename",
+    "validation_only_mcp_exposure",
+    "arbitrary_command_execution",
+    "automatic_patch_application",
+    "target_repo_write",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "detector_confidence_threshold_change",
+    "acceptance_policy_change",
+    "team_cloud_runtime",
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "customer_contact",
+    "pricing_change",
+    "spend_change"
+  ],
+  "acceptance": [
+    "Validate ready, partial, blocked, and empty workspace summaries through deterministic non-private fixtures.",
+    "Prove an AI IDE consumer follows agentContract.readOrder, rejects blocked repository selection, and treats queue rank as recommendation rather than authorization.",
+    "Validate JSON and Markdown readability, schema identity, diagnostics, maintainer review decisions, redaction, and exact output allowlists.",
+    "Prove target repository source content, modification times, and directory listings remain unchanged during consumption validation.",
+    "Do not add CLI or MCP entrypoints, execute verification commands, apply patches, write target repositories, or implement Team Cloud or hosted dashboard capabilities.",
+    "Cascade validation evidence through canonical docs, testing and acceptance records, logs, and Autopilot state, then select at most one bounded next Goal."
+  ],
+  "conclusion": "workspace_repair_summary_ai_ide_consumption_validated_without_entrypoints_or_target_writes",
+  "next_goal_id": "repoassure-multi-repo-workspace-repair-summary-completion-audit-v0.1",
+  "summary": {
+    "operation_record": "docs/operations/repoassure-multi-repo-workspace-repair-summary-ai-ide-consumption-validation-v0.1.md",
+    "implementation_module": "packages/acceptance/src/workspace-repair-summary-consumption.ts",
+    "workspace_states": [
+      "ready",
+      "partial",
+      "blocked",
+      "empty"
+    ],
+    "dedicated_test_count": 10,
+    "selected_next_goal_id": "repoassure-multi-repo-workspace-repair-summary-completion-audit-v0.1",
+    "cli_entrypoint_added": false,
+    "mcp_tool_added": false,
+    "target_repo_writes": false
+  }
+}

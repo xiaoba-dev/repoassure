@@ -252,10 +252,12 @@ export function repairExecuteHelpText(): string {
   return `hardening repair execute
 
 Usage:
-  pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --dry-run
-  pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --validation-only
-  pnpm repair:execute -- --package <repair-handoff-package.json> --all --validation-only
-  pnpm repair:execute -- --help
+  hardening repair execute --package <repair-handoff-package.json> --task <taskId> --dry-run
+  hardening repair execute --package <repair-handoff-package.json> --task <taskId> --validation-only
+  hardening repair execute --package <repair-handoff-package.json> --all --validation-only
+
+Script compatibility:
+  pnpm repair:execute -- --package <repair-handoff-package.json> (--task <taskId> | --all) (--dry-run | --validation-only)
 
 Options:
   --package <path>             repair-handoff-package.json path.
@@ -432,7 +434,7 @@ function buildRepairExecutionAgentContract(): RepairExecutionAgentContract {
       skipped: 'A selected task had no runnable verification command in this local context.'
     },
     nextCommands: {
-      patchPlan: 'pnpm repair:patch-plan -- --report <repair-execution-report.json>'
+      patchPlan: 'hardening repair patch-plan --report <repair-execution-report.json>'
     },
     boundaries: [
       'Validation-only mode does not modify target repository files.',

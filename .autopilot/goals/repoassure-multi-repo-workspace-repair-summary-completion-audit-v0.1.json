@@ -1,0 +1,102 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-multi-repo-workspace-repair-summary-completion-audit-v0.1",
+  "title": "RepoAssure Multi-Repo Workspace Repair Summary Completion Audit v0.1",
+  "status": "completed",
+  "objective": "Audit the planning, implementation, and AI IDE consumption evidence for the package-owned local workspace repair summary, determine whether the current local-only slice is complete, identify residual gaps without expanding scope, and select at most one evidence-backed next Goal.",
+  "source_spec": "docs/product/specs/multi-repo-workspace-repair-summary-contract-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "installed_cli_entrypoint",
+    "mcp_tool_addition",
+    "mcp_tool_rename",
+    "validation_only_mcp_exposure",
+    "arbitrary_command_execution",
+    "automatic_patch_application",
+    "target_repo_write",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "detector_confidence_threshold_change",
+    "acceptance_policy_change",
+    "team_cloud_runtime",
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "customer_contact",
+    "pricing_change",
+    "spend_change"
+  ],
+  "acceptance": [
+    "Determine whether the current local-only workspace repair summary slice is complete using planning, implementation, package, consumption, and no-write evidence.",
+    "Audit ready, partial, blocked, and empty state coverage, AI IDE read order, diagnostics, maintainer review, redaction, exact output allowlist, and fail-closed behavior.",
+    "Confirm package root and typed subpath ownership without adding a CLI or MCP entrypoint.",
+    "Record implemented, residual, blocked, deferred, and manual-gated findings without executing commands, applying patches, or writing target repositories.",
+    "Cascade the audit conclusion through canonical docs, testing and acceptance records, logs, and Autopilot state.",
+    "Select at most one evidence-backed next Goal; do not infer authorization for product entrypoint expansion."
+  ],
+  "conclusion": "workspace_repair_summary_local_only_slice_closed_without_entrypoint_expansion_or_target_writes",
+  "summary": {
+    "operation_record": "docs/operations/repoassure-multi-repo-workspace-repair-summary-completion-audit-v0.1.md",
+    "audit_verdict": "complete_for_current_local_only_slice",
+    "audited_workspace_states": [
+      "ready",
+      "partial",
+      "blocked",
+      "empty"
+    ],
+    "package_owned": true,
+    "root_export_present": true,
+    "typed_subpath_present": true,
+    "dedicated_test_count": 10,
+    "full_test_count": 792,
+    "residual_gaps": [
+      "installed_cli_or_mcp_product_entrypoint",
+      "real_customer_workspace_evidence",
+      "product_wide_completion_reassessment"
+    ],
+    "blocked_gaps": [
+      "false_positive_detector_runtime_calibration",
+      "public_source_release",
+      "npm_publication",
+      "github_release",
+      "team_cloud_enterprise"
+    ],
+    "deferred_gaps": [
+      "workspace_summary_entrypoint_productization",
+      "website_design_system_external_follow_up",
+      "hosted_workspace_history_and_collaboration",
+      "additional_real_workspace_validation"
+    ],
+    "manual_gates": [
+      "maintainer_review_before_any_repair_execution",
+      "maintainer_approval_before_entrypoint_expansion",
+      "final_user_acceptance",
+      "public_release_authorization"
+    ],
+    "cli_entrypoint_added": false,
+    "mcp_tool_added": false,
+    "commands_executed": false,
+    "patches_applied": false,
+    "target_repo_writes": false
+  },
+  "tests": [
+    "pnpm vitest run tests/unit/project-structure.test.ts",
+    "pnpm typecheck",
+    "pnpm lint",
+    "pnpm build:acceptance",
+    "pnpm build:src",
+    "pnpm test",
+    "pnpm repo:hygiene",
+    "pnpm release:check",
+    "pnpm goal:audit",
+    "pnpm autopilot:progress:check -- --json",
+    "git diff --check"
+  ],
+  "next_goal_id": "repoassure-product-completion-gap-audit-refresh-v0.7"
+}

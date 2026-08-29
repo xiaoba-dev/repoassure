@@ -1,0 +1,54 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-watch-mode-end-to-end-local-fixture-validation-v0.1",
+  "status": "completed",
+  "objective": "Validate the complete local Project Intelligence watch loop in an isolated fixture so snapshot generation, agent context export, watch status, and AI IDE watch handoff artifacts are mutually consistent, fresh, and local-only.",
+  "source_spec": "docs/operations/project-intelligence-watch-mode-ai-ide-consumption-handoff-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite"
+  ],
+  "acceptance": [
+    "Create or reuse an isolated fixture that can generate a Project Intelligence snapshot without private source.",
+    "Run snapshot, agent context, watch once or controlled watch refresh, and watch handoff in order.",
+    "Add contract/integration tests proving all four artifact families point to each other correctly and keep local-only boundaries.",
+    "Cascade the end-to-end validation result into PRD, SPEC, PLAN, Project Intelligence spec/architecture, testing strategy, acceptance checklist, decision log, dev log, and .autopilot progress.",
+    "Run focused tests and repository quality gates before completion."
+  ],
+  "summary": {
+    "operation_record": "docs/operations/project-intelligence-watch-mode-end-to-end-local-fixture-validation-v0.1.md",
+    "integration_test": "tests/integration/project-intelligence-watch-e2e-fixture.test.ts",
+    "validated_chain": [
+      "project-intelligence-snapshot.json",
+      "project-intelligence-agent-context.json",
+      "project-intelligence-watch-status.json",
+      "project-intelligence-watch-handoff.json"
+    ],
+    "runtime_fix": "project-intelligence-watch-handoff marks generated local snapshot and agent-context Markdown artifacts as available when present",
+    "boundary": {
+      "local_only": true,
+      "hosted_dashboard": false,
+      "cloud_sync": false,
+      "telemetry": false,
+      "deployment": false,
+      "target_repo_writes": false
+    },
+    "verification": [
+      "pnpm vitest run tests/integration/project-intelligence-watch-e2e-fixture.test.ts",
+      "pnpm vitest run tests/unit/project-intelligence-watch-handoff.test.ts"
+    ]
+  },
+  "next_goal_id": "project-intelligence-watch-mode-operator-playbook-v0.1"
+}

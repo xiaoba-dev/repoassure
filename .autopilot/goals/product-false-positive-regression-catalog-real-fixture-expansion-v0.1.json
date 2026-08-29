@@ -1,0 +1,70 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "product-false-positive-regression-catalog-real-fixture-expansion-v0.1",
+  "status": "completed",
+  "objective": "Expand the false-positive regression catalog with non-private real or near-real fixtures and regression evidence while preserving local-only boundaries and without changing runtime detector behavior.",
+  "source_spec": "docs/operations/product-false-positive-regression-catalog-completion-audit-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade"
+  ],
+  "acceptance": [
+    "Add or identify non-private real or near-real false-positive fixture candidates without using private target repo source or secrets.",
+    "Extend catalog coverage only through fixture data, expected snapshots, review fields, and local regression evidence.",
+    "Validate generated catalog artifacts and consumption validation still pass with redaction, AI IDE read order, maintainer review boundary, and no target repo write constraints.",
+    "Do not modify runtime detectors, suppress findings, downgrade severities automatically, write target repositories, publish, deploy, or claim hosted availability."
+  ],
+  "completed_at": "2026-07-23T00:50:00.000+08:00",
+  "result": {
+    "status": "completed",
+    "operation_record": "docs/operations/product-false-positive-regression-catalog-real-fixture-expansion-v0.1.md",
+    "conclusion": "real_fixtures_expanded_without_detection_behavior_change"
+  },
+  "summary": {
+    "entries_before": 5,
+    "entries_after": 7,
+    "new_fixture_category": "real_world_fixture_regressions",
+    "near_real_public_fixture_count": 2,
+    "fixture_origin_field": true,
+    "privacy_metadata": {
+      "non_private": true,
+      "source_code_included": false,
+      "secrets_included": false
+    },
+    "generated_artifacts": [
+      "artifacts/project-graph/false-positive-regression-catalog.json",
+      "artifacts/project-graph/false-positive-regression-catalog.md",
+      "artifacts/project-graph/false-positive-regression-catalog-consumption-validation.json",
+      "artifacts/project-graph/false-positive-regression-catalog-consumption-validation.md"
+    ],
+    "boundary": {
+      "local_only": true,
+      "target_repo_writes": false,
+      "runtime_detection_behavior_change": false,
+      "finding_suppression": false,
+      "automatic_severity_downgrade": false,
+      "hosted_dashboard": false,
+      "cloud_sync": false,
+      "telemetry": false,
+      "deployment": false,
+      "public_release": false
+    },
+    "selected_next_goal_id": "product-false-positive-regression-catalog-detector-calibration-planning-v0.1"
+  },
+  "next_goal_id": "product-false-positive-regression-catalog-detector-calibration-planning-v0.1"
+}

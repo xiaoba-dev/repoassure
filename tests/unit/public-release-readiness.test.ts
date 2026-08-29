@@ -100,6 +100,11 @@ describe('public release readiness checker', () => {
       expect.objectContaining({ id: 'public-release-notes-draft', status: 'passed' }),
       expect.objectContaining({ id: 'manual-publication-authorization', status: 'not_ready' })
     ]));
+    const authorization = result.checks.find(
+      (check: { id: string }) => check.id === 'manual-publication-authorization'
+    );
+    expect(authorization?.summary).toContain('additional publication actions');
+    expect(authorization?.summary).not.toContain('before making anything public');
   });
 });
 

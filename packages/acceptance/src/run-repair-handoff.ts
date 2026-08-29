@@ -204,9 +204,11 @@ export function repairHandoffHelpText(): string {
   return `hardening repair handoff
 
 Usage:
-  pnpm repair:handoff -- --run <run-dir>
-  pnpm repair:handoff -- --run <run-dir> --output <output-dir>
-  pnpm repair:handoff -- --help
+  hardening repair handoff --run <run-dir>
+  hardening repair handoff --run <run-dir> --output <output-dir>
+
+Script compatibility:
+  pnpm repair:handoff -- --run <run-dir> [--output <output-dir>]
 
 Options:
   --run <run-dir>       Existing hardening run bundle directory containing manifest.json.
@@ -370,9 +372,9 @@ function buildRepairHandoffAgentContract(): RepairHandoffAgentContract {
     ],
     maintainerReviewBoundary: buildMaintainerReviewBoundary(),
     nextCommands: {
-      dryRun: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --dry-run',
-      validationOnly: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --validation-only',
-      patchPlan: 'pnpm repair:patch-plan -- --report <repair-execution-report.json>'
+      dryRun: 'hardening repair execute --package <repair-handoff-package.json> --task <taskId> --dry-run',
+      validationOnly: 'hardening repair execute --package <repair-handoff-package.json> --task <taskId> --validation-only',
+      patchPlan: 'hardening repair patch-plan --report <repair-execution-report.json>'
     },
     boundaries: [
       'Does not modify target repository files.',

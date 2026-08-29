@@ -1,0 +1,81 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-product-completion-gap-audit-refresh-v0.8",
+  "title": "RepoAssure Product Completion Gap Audit Refresh v0.8",
+  "status": "completed",
+  "objective": "Reassess the remaining RepoAssure product gaps after public source release reconciliation and the explicit historical personal-identifier accept-risk decision; classify implemented, blocked or manual-gated, external-input-gated, deferred, and safe auto-executable work, then select one bounded next Execution Goal without changing runtime behavior or external state.",
+  "source_spec": "docs/PLAN.md",
+  "priority": "P0",
+  "blocked_actions": [
+    "git_history_rewrite",
+    "force_push",
+    "repository_replacement",
+    "repository_visibility_change",
+    "permission_change",
+    "branch_protection_change",
+    "repository_ruleset_change",
+    "npm_publication",
+    "github_release",
+    "public_launch",
+    "deployment",
+    "customer_contact",
+    "reviewer_contact",
+    "pricing_change",
+    "spend_change",
+    "runtime_detection_behavior_change",
+    "acceptance_policy_change",
+    "target_repo_write",
+    "automatic_patch_application"
+  ],
+  "acceptance": [
+    "Compare docs/PLAN.md, docs/SPEC.md, docs/PRD.md, implemented code, tests, and current operation evidence.",
+    "Preserve the recorded accept_risk decision without performing Git-history remediation or claiming that third-party copies were removed.",
+    "Classify remaining work as implemented, blocked or manual-gated, external-input-gated, deferred, or safe auto-executable.",
+    "Select exactly one bounded next safe Execution Goal from the canonical source-of-truth hierarchy.",
+    "Do not change runtime behavior, external state, repository controls, publication state, deployment state, pricing, spend, or target repositories."
+  ],
+  "conclusion": "completion_gap_audit_refreshed_with_final_product_acceptance_closure_campaign_next",
+  "summary": {
+    "operation_record": "docs/operations/repoassure-product-completion-gap-audit-refresh-v0.8.md",
+    "implemented_surface_count": 12,
+    "public_source_release_verified": true,
+    "native_branch_protection_verified": true,
+    "additional_publication_actions_ready": false,
+    "detector_pending_decision_count": 2,
+    "historical_identifier_risk_decision": "accept_risk",
+    "history_rewritten": false,
+    "runtime_behavior_changed": false,
+    "product_entrypoints_added": false,
+    "target_repo_writes": false,
+    "blocked_or_manual_gated": [
+      "false_positive_detector_runtime_calibration",
+      "npm_publication",
+      "github_release",
+      "public_launch",
+      "final_product_acceptance",
+      "workspace_summary_product_entrypoint",
+      "team_cloud_enterprise"
+    ],
+    "external_input_gated": [
+      "real_customer_workspace_evidence",
+      "future_private_preview_feedback",
+      "additional_security_provider_onboarding"
+    ],
+    "deferred": [
+      "workspace_summary_entrypoint_productization",
+      "website_design_follow_up",
+      "hosted_workspace_history_and_collaboration",
+      "packages_core_extraction",
+      "benchmark_package_ownership_cleanup"
+    ],
+    "safe_auto_executable": [
+      "final_product_acceptance_closure_campaign_v0.1"
+    ]
+  },
+  "tests": [
+    "tests/unit/project-structure.test.ts",
+    "tests/unit/autopilot-progress-consistency.test.ts",
+    "tests/unit/public-release-readiness.test.ts"
+  ],
+  "next_goal_id": "repoassure-final-product-acceptance-closure-campaign-v0.1"
+}

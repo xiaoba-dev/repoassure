@@ -6,8 +6,8 @@ let _i=false;function _inject(){if(_i||typeof document==='undefined')return;_i=t
 .ra-btn[data-size=md]{height:44px;padding:0 18px;font-size:15px}
 .ra-btn[data-size=lg]{height:52px;padding:0 24px;font-size:16px}
 .ra-btn[data-block=true]{width:100%}
-.ra-btn[data-variant=primary]{background:var(--accent-emphasis);color:#fff;box-shadow:var(--shadow-cta)}
-.ra-btn[data-variant=primary]:hover:not([disabled]){background:var(--green-6)}
+.ra-btn[data-variant=primary]{background:var(--accent-emphasis-strong,var(--accent-emphasis));color:#fff;box-shadow:var(--shadow-cta)}
+.ra-btn[data-variant=primary]:hover:not([disabled]){background:var(--green-8)}
 .ra-btn[data-variant=secondary]{background:var(--surface-default);border-color:var(--border-strong);color:var(--fg-default)}
 .ra-btn[data-variant=secondary]:hover:not([disabled]){background:var(--canvas-subtle);border-color:var(--fg-subtle)}
 .ra-btn[data-variant=ghost]{background:transparent;color:var(--fg-muted)}

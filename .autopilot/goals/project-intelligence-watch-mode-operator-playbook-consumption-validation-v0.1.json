@@ -1,0 +1,61 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-watch-mode-operator-playbook-consumption-validation-v0.1",
+  "status": "completed",
+  "objective": "Validate that a maintainer, Codex, or AI IDE can consume the operator playbook as an execution guide, follow the Project Intelligence watch artifact read order, identify freshness failures, respect maintainer review boundaries, and avoid target repo writes or hosted/cloud behavior.",
+  "source_spec": "docs/operations/project-intelligence-watch-mode-operator-playbook-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite"
+  ],
+  "acceptance": [
+    "Create a local-only consumption validation fixture or contract test that reads the operator playbook and generated handoff artifacts in the documented order.",
+    "Validate freshness failure recognition and maintainer review boundary handling without editing generated artifacts by hand.",
+    "Cascade validation results into README, PRD, SPEC, PLAN, Project Intelligence spec/architecture, testing strategy, acceptance checklist, decision log, dev log, and .autopilot progress.",
+    "Run focused tests and repository quality gates before completion."
+  ],
+  "summary": {
+    "operation_record": "docs/operations/project-intelligence-watch-mode-operator-playbook-consumption-validation-v0.1.md",
+    "contract_test": "tests/unit/project-intelligence-watch-operator-playbook.test.ts",
+    "validated_consumption": [
+      "operator playbook command sequence",
+      "AI IDE read order",
+      "freshness failure blocking",
+      "maintainer review boundary",
+      "no target repo write boundary"
+    ],
+    "boundary": {
+      "local_only": true,
+      "target_repo_writes": false,
+      "hosted_dashboard": false,
+      "telemetry": false,
+      "cloud_sync": false,
+      "deployment": false
+    },
+    "verification": [
+      "pnpm vitest run tests/unit/project-intelligence-watch-operator-playbook.test.ts",
+      "pnpm vitest run tests/unit/project-intelligence-watch-operator-playbook.test.ts tests/unit/project-structure.test.ts",
+      "pnpm project:intelligence:watch -- --once",
+      "pnpm project:intelligence:watch-handoff",
+      "pnpm repo:hygiene",
+      "pnpm release:check",
+      "pnpm typecheck",
+      "pnpm lint",
+      "pnpm test",
+      "pnpm goal:audit"
+    ]
+  },
+  "next_goal_id": "project-intelligence-watch-mode-recovery-command-ux-v0.1"
+}

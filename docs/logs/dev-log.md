@@ -1,5 +1,2658 @@
 # 开发日志
 
+## 2026-08-03 — K1 contract-specification authorization intake governance closure
+
+Completed RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Intake v0.1 with conclusion `k1_contract_specification_authorization_intake_prepared_without_inferred_choice_specification_schema_or_runtime_changes`. Created one blank four-option intake and one operation record; recorded 0/1 decisions, left 1/1 pending, and created RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1 as the sole successor (`ready_to_execute`, `execution_authorization: null`). Original contracts and artifact bytes remain authoritative, K1 remains non-authoritative, M1 remains incomplete, and `auth_redirect` remains `request_revision`. No specification, schema, authoritative contract, adapter/runtime, dependency, detector/behavior test, fixture, target, receipt, publication, deployment, launch, commit, push, or pull-request action occurred.
+
+Verification: baseline structure 162/162; focused RED 1 failed with 162 skipped; focused GREEN 1/1; final structure 163/163; progress consistency 6/6 unit and 8/8 direct; JSON/invariants, lint, diff, and 12/12 protected hashes passed. Product, QA, and Docs final review P1/P2=0/0. Three specialist returns were delivered directly; platform usage-limit review rejected their temporary typed-handoff files and no workaround was attempted.
+
+Preserved K1 governance sequence: RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Intake v0.1 (`m1_open_evidence_kernel_candidate_boundary_decision_intake_prepared_without_selected_decision_or_contract_changes`) → RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Recording v0.1 (`maintainer_approved_k1_for_separately_gated_contract_design_without_schema_or_runtime_implementation_authorization`) → RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Design Planning v0.1 (`k1_non_authoritative_contract_design_plan_prepared_without_schema_authoritative_contract_or_runtime_implementation`).
+
+## 2026年8月3日 - RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Design Planning v0.1 - completed
+
+Completed Goal: RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Design Planning v0.1.
+
+Conclusion:
+`k1_non_authoritative_contract_design_plan_prepared_without_schema_authoritative_contract_or_runtime_implementation`.
+
+Prior next Goal at that time: RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Intake v0.1 (`ready_to_execute`, `execution_authorization: null`).
+
+### Governance TDD 与 Team Handoff
+
+- Baseline project-structure：161/161 passed。
+- RED：新增 lifecycle assertion 后，因 design plan 缺失按预期 1 failed、
+  161 skipped。
+- Architecture、QA、Docs 三路 `project-autopilot/specialist-handoff@1` typed
+  handoff 均通过 validator；一致要求原 contracts/bytes 权威、loss/unknown
+  fail closed，以及 specification/acceptance/implementation 三道独立门禁。
+- Exactly one 非权威 design plan 已创建；schema、权威 contract、adapter/runtime
+  修改为 0。
+- Focused GREEN 1/1、project-structure 162/162、progress unit 6/6、read-only
+  runner 8/8、JSON/invariant、唯一 ready Goal、blocked projection、六项 defer、
+  targeted lint、diff 与 12/12 protected hashes 通过。
+- 最终 Architecture、QA、Docs 独立只读复核均通过，P1=0、P2=0；Docs 首轮
+  发现的两处 stale current/next 叙事已修正并复核清零。
+
+### 边界
+
+- Detector、behavior、fixture、browser、target、build、install、dependency 测试
+  与动作均未执行。
+- M1 remains incomplete；M2 incomplete；M3-M5 strategy-only；
+  `auth_redirect` 保持 `request_revision`。
+- Final acceptance 与 Web、Python/CLI、MCP/Agent acquisition/execution 均
+  保持 `defer`；receipt、publish、deploy、launch 与 Git 动作为 0。
+
+## 2026年8月3日 - RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Recording v0.1 - completed
+
+Completed Goal: RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Recording v0.1.
+
+Conclusion:
+`maintainer_approved_k1_for_separately_gated_contract_design_without_schema_or_runtime_implementation_authorization`.
+
+Next Goal: RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Design Planning v0.1 (`ready_to_execute`, `execution_authorization: null`).
+
+### TDD 与授权隔离
+
+- Baseline：project-structure 160/160 passed。
+- RED：新增 explicit-choice 生命周期断言；因 successor Goal 尚不存在而按预期
+  1 failed、160 skipped。
+- 维护者明确选择 `approve_for_separately_gated_contract_design`；1/1 decisions
+  recorded、0/1 pending。此前 Goal execution authorization 没有被当作选择。
+- 新 Goal 不继承授权；K1 仍为非权威候选，原 contracts 继续权威。
+
+### 验证结果
+
+- Focused GREEN：1/1 passed。
+- Project structure：161/161 passed。
+- Autopilot progress consistency：unit 6/6、read-only runner 8/8 passed。
+- JSON/invariant、唯一 ready Goal、blocked-action projection、targeted lint、diff
+  与 12/12 protected hashes passed。
+- Product、QA、Docs 三路 typed handoff 已验证；独立复核 P1/P2 findings 为 0。
+
+### 边界
+
+- M1 remains incomplete；M2 incomplete；M3–M5 strategy-only；
+  `auth_redirect` 保持 `request_revision`。
+- Final acceptance 与 Web、Python/CLI、MCP/Agent acquisition/execution 均
+  保持 `defer`。
+- 未运行 detector/行为测试；未创建 schema、指定或实现 contract/adapter/
+  runtime；未访问 target，未签发 receipt，未 publication、deployment、
+  launch、commit、push 或 PR。
+
+## 2026年8月3日 - RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Recording v0.1 - awaiting explicit choice
+
+Active Goal: RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Recording v0.1.
+
+Interim conclusion:
+`m1_open_evidence_kernel_candidate_boundary_decision_record_prepared_without_inferred_choice`.
+
+Human Approval Policy: `pending_confirmation`.
+
+### TDD 与授权隔离
+
+- Baseline：project-structure 159/159 passed。
+- RED：新增 authorization-without-choice 生命周期断言；因 pending decision
+  record 尚不存在而按预期 1 failed、159 skipped。
+- 本精确 Goal 的执行授权已记录，但用户未提供四个允许选项中的任意一个；
+  授权未被解释为 candidate-boundary decision。
+- 当前状态为 0/1 decisions recorded、1/1 pending、selected=`pending`；Goal
+  继续 active / `ready_to_execute`，不完成、不派生 successor Goal。
+
+### 验证结果
+
+- Focused GREEN：1/1 passed。
+- Project structure：160/160 passed。
+- Autopilot progress consistency：unit 6/6、read-only runner 8/8 passed。
+- JSON/invariant、唯一 ready Goal、blocked-action projection、targeted lint、diff
+  与 12/12 protected hashes passed。
+- Product、QA、Docs 三路独立只读复核均通过，P1/P2 findings 为 0。
+
+### 边界
+
+- M1 remains incomplete；M2 incomplete；M3–M5 strategy-only；
+  `auth_redirect` 保持 `request_revision`。
+- Final acceptance 与 Web、Python/CLI、MCP/Agent acquisition/execution 均
+  保持 `defer`。
+- 未运行 detector/行为测试；未创建 schema、指定或实现 contract/adapter/
+  runtime；未访问 target，未签发 receipt，未 publication、deployment、
+  launch、commit、push 或 PR。
+
+## 2026年8月3日 - RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Intake v0.1 - completed
+
+Completed Goal: RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Intake v0.1.
+
+Next Goal: RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Recording v0.1.
+
+Conclusion:
+`m1_open_evidence_kernel_candidate_boundary_decision_intake_prepared_without_selected_decision_or_contract_changes`.
+
+### TDD 与决策隔离
+
+- 当前磁盘核验确认本轮开始时唯一 ready Goal 是本 intake，
+  `execution_authorization: null`、selected=`pending`、0/1 recorded、1/1
+  pending；随后只把用户“授权执行”绑定到这个精确 Goal。
+- Governance baseline 为 project-structure 158/158。新增 lifecycle assertion
+  后，focused RED 精确因 intake 文件不存在而得到 1 failed / 158 skipped。
+- 决策卡中立列出四个选项，无推荐、默认或预选；普通 Goal 执行授权没有被
+  当作 K1 决定。M1 remains incomplete，`auth_redirect` 保持
+  `request_revision`，final acceptance 与六个 representative lane 保持
+  `defer`。
+
+### 边界与下一步
+
+- Schema、contract、adapter、runtime、detector、fixture、dependency、target、
+  receipt、publication、deployment、launch、commit、push、PR 动作均为 0；
+  detector/行为测试执行 0。
+- 唯一下一 Goal 是 RepoAssure M1 Open Evidence Kernel Candidate Boundary
+  Maintainer Decision Recording v0.1，`ready_to_execute`、
+  `execution_authorization: null`；它还需要维护者明确给出一个选项，本轮未执行。
+- Focused GREEN 1/1、完整 project-structure 159/159、progress consistency unit
+  6/6、read-only direct runner 8/8 均通过。
+- 5 份 lifecycle JSON 可解析；唯一 ready Goal、下一授权为 null、四选项
+  pending 0/1、无推荐/默认、blocked-action 完整投影、六个 `defer` 均通过。
+- Targeted ESLint、`git diff --check` 和 12/12 protected hashes 通过；Product
+  Manager、QA、Docs Maintainer typed handoff 均通过 schema validator。
+- 三角色对最终磁盘状态的独立只读复核全部 PASS：P1=0、P2=0；期间发现并
+  修正 PLAN Current Stage 与 Planning Order 的 stale intake pointer，复核后无
+  current/next 漂移。
+
+## 2026年8月3日 - RepoAssure M1 Open Evidence Kernel Contract Gap Planning v0.1 - completed
+
+Conclusion:
+`m1_open_evidence_kernel_contract_gap_plan_prepared_with_one_candidate_boundary_without_schema_or_runtime_changes`.
+
+### 规划结果
+
+- 盘点 8 类当前本地 evidence/acceptance contract family，并映射 M1 的
+  versioned contract、deterministic local evidence、integrity、human review、
+  no-write proof 五类退出证据。
+- 主状态为 reuse=1、gap=2、conflict=2、unknown=0。混合 schema identity 与
+  review vocabulary 记录为 conflict；跨契约 integrity 与统一 no-write proof
+  记录为 gap；确定性本地证据原语可 reuse。
+- 唯一候选为
+  `provider_neutral_read_only_evidence_envelope_adapter_boundary`。它只是一条
+  非权威、只读、附加式、引用原始 artifact 的未来适配边界；原契约继续权威。
+- Schema files created、contract/adapter/runtime implementation、Roadmap
+  milestones advanced 均为 0。M1 remains incomplete，M2 incomplete，M3–M5
+  strategy-only，auth redirect 保持 `request_revision`。
+
+### TDD 与治理级联
+
+- Baseline：`project-structure.test.ts` 157/157 passed。
+- RED：新增单一生命周期断言后，focused filter 因规划记录尚不存在得到
+  1 failed / 157 skipped。
+- GREEN：focused 1/1，完整 `project-structure.test.ts` 158/158；Autopilot
+  progress consistency unit 6/6，read-only direct runner 8/8。
+- `pnpm exec tsx` 直接入口曾因沙箱禁止临时 IPC pipe 返回 `EPERM`；改用不创建
+  IPC 的 `node --import tsx` 读取同一源文件后 8/8 通过，未申请权限或联网。
+- 四个生命周期 JSON parse、唯一 ready Goal、null authorization、完整 blocked
+  projection、lint 与 `git diff --check` 通过。
+- 12 个受保护 detector/fixture/schema-adjacent/dependency/历史记录文件哈希与
+  前置基线完全一致。
+
+### 下一步与边界
+
+- 新增唯一下一 Goal：RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Intake v0.1，`ready_to_execute`、`execution_authorization: null`。
+- 该 Goal 未来也只能在单独授权后准备一个未填写的维护者选择；本轮记录
+  candidate decisions 0/1，未把执行授权当作候选决定。
+- Detector/行为测试执行 0；fixture、依赖、provider、target、receipt、
+  publication、deployment、launch、commit、push、PR 动作均为 0。
+- Final acceptance 以及 Web、Python/CLI、MCP/Agent acquisition/execution
+  全部保持 `defer`。
+- 架构、QA、文档三个角色的最终只读复核全部 PASS；P1=0、P2=0。Typed
+  specialist handoffs 已返回 Project Autopilot；未触发任何被禁止的产品或外部
+  动作。
+
+## 2026年8月3日 - RepoAssure Product Completion Gap Audit Refresh v0.10 - completed
+
+Conclusion:
+`completion_gap_audit_refreshed_with_m1_open_evidence_kernel_contract_gap_planning_next`.
+
+### 审计结果
+
+- 对照 v0.9、PLAN/SPEC/PRD、conditional dead-control 实现/审计和 durable
+  addendum 重建六类矩阵；计数保持 12/3/9/3/5/1。
+- Conditional dead-control 是既有 product surface 的 implemented
+  subcapability；auth redirect 保持 `request_revision`，整族 calibration 不再
+  被统一标为 blocked。
+- Stale current/next findings 从 v0.9 的 8 降为 0；修复 PRD 中一段过时的
+  0/2 pending 当前态叙事。
+
+### TDD 与治理级联
+
+- Baseline：`project-structure.test.ts` 156/156 passed。
+- RED：先更新生命周期断言，得到 119 passed / 38 expected failures，失败原因
+  是 v0.10 operation record、下一 Goal、index/snapshot 和 canonical cascade
+  尚不存在。
+- GREEN：`project-structure.test.ts` 157/157；progress consistency unit 6/6，
+  read-only runner 8/8；JSON/blocked projection、lint、`git diff --check` 和
+  12 个受保护哈希核验通过。
+- 独立最终只读审查：PASS；P1=0，P2=0。
+- 新增唯一下一 Goal：RepoAssure M1 Open Evidence Kernel Contract Gap Planning
+  v0.1，`ready_to_execute`、`execution_authorization: null`。
+- 只更新治理测试、Goal/index/progress、canonical docs、acceptance/testing/
+  architecture projection 和日志；未修改产品、detector、fixture、schema、
+  auth redirect、依赖或历史证据记录。
+
+### 保护边界
+
+- Detector/行为测试执行 0；Roadmap milestones advanced 0。
+- Final acceptance 与 representative acquisition/execution 全部保持 `defer`。
+- Target、receipt、publication、deployment、launch、commit、push、PR 动作均为 0。
+
+## 2026年8月3日 - RepoAssure Conditional Dead Control Calibration Verification Evidence Reconciliation v0.1 - completed
+
+Conclusion:
+`conditional_dead_control_verification_evidence_reconciled_with_durable_errata_without_product_or_historical_record_changes`.
+
+### 证据协调
+
+- 新增 durable errata/addendum，固定 authoritative bounded command = 23、
+  full driver = 39、companion aggregate = 76，以及 independent downstream
+  aggregate = 81；集合关系只写作 `23 ⊂ 39 ⊂ 76`。
+- Vitest 4.1.9 serial flags 固定为
+  `--maxWorkers=1 --no-file-parallelism`；旧 `--minWorkers=1` 和只命中 6 条的
+  title filter 仅保留为历史 command drift。
+- 当前 SDK declaration/resolution 为 `^1.29.0` / `1.29.0`；历史 lockless
+  packed 1.30.0 claim 因无 stderr/receipt/replay 保持
+  `unverified_historical_diagnostic`。
+- Architecture Handoff 与实现 operation record 未改写；dirty/untracked
+  worktree provenance 限制继续显式保留。
+
+### TDD、边界与下一步
+
+- RED：project-structure 为 120 passed / 36 expected lifecycle failures，
+  其中 1 项精确指向 addendum 不存在。
+- Detector、行为测试、fixture、schema、auth redirect、dependency、target、
+  receipt、publication、deployment、launch、commit、push、PR 动作均为 0。
+- Next Goal: RepoAssure Product Completion Gap Audit Refresh v0.10 —
+  `ready_to_execute`、`execution_authorization: null`；本轮未执行。
+
+### 最终验证
+
+- GREEN：project-structure 156/156；progress consistency 8/8；其 unit 6/6。
+- 关键 JSON、唯一 ready Goal、next authorization null、blocked-action 完整投影、
+  lint 与 `git diff --check` 通过。
+- 10 个受保护产品/测试/依赖文件与 2 份历史记录哈希前后一致；本 Goal 运行
+  detector/行为测试 0 次。
+
+## 2026年8月3日 - RepoAssure Conditional Dead Control Calibration Bounded Detector Implementation Completion Audit v0.1 - completed
+
+Conclusion:
+`bounded_detector_implementation_audit_qualified_with_material_evidence_drift_without_product_surface_changes`.
+
+### 审计与治理闭环
+
+- 只读审计确认实现边界通过，无 unresolved P1/P2；23/23 bounded、39/39
+  driver、76/76 companion 通过，关系为 `23 ⊂ 39 ⊂ 76`；81/81 downstream
+  是独立 aggregate。
+- 记录两项 command drift：旧 focused filter 只命中 6 条；Vitest 4.1.9 应使用
+  `--maxWorkers=1 --no-file-parallelism`，不支持 `--minWorkers=1`。
+- 当前 workspace SDK 为 1.29.0；历史 packed-consumer 1.30.0 缺少可复放
+  stderr/receipt，仅保留为 unverified historical diagnostic。
+- 按维护者额外授权，只更新 `project-structure.test.ts` 生命周期断言、当前
+  Goal、index、snapshot、canonical docs/logs，并创建未授权的证据协调 Goal。
+
+### 边界与下一步
+
+- Detector、行为测试、fixture、schema、auth redirect、依赖与产品表面修改：0。
+- Target、receipt、publication、deployment、launch、commit、push、PR：0。
+- Next Goal: RepoAssure Conditional Dead Control Calibration Verification
+  Evidence Reconciliation v0.1 — `ready_to_execute`、
+  `execution_authorization: null`，本次未执行。
+
+### 最终验证
+
+- TDD RED：119 passed / 36 expected lifecycle failures；GREEN：155/155。
+- Autopilot progress consistency：8/8 checks；unit：6/6。
+- 唯一 `ready_to_execute` Goal 与其 null authorization、4 个关键 JSON、lint、
+  `git diff --check` 均通过。
+- 受保护 detector、行为测试、fixture、schema、auth redirect、package/lock
+  hashes 前后一致；本治理闭环执行 detector 行为测试 0 次。
+
+## 2026年8月3日 - RepoAssure Conditional Dead Control Calibration Bounded Detector Implementation v0.1 - completed
+
+Conclusion:
+`conditional_dead_control_bounded_detector_implemented_with_visible_p1_classification_and_fail_closed_prerequisite_evidence`.
+
+### Architecture Handoff 与 TDD
+
+- 在任何 detector/test 修改前记录 `ready_for_build` Architecture Handoff，
+  锁定 browser-runtime + private classifier seam、现有 evidence array、无
+  public schema change 和三文件 detector/test allowlist。
+- 先添加 positive、counter、missing/unsafe/unobservable/contradictory RED，
+  再做最小实现。
+- 两轮独立审查继续发现 route termination、唯一 owner form、单次 fill、
+  cross-page、direct value transition、point-of-use page/form recheck、危险
+  disabled submit budget 可见性与 candidate-page binding 问题；每项均先补
+  RED，再修复到 GREEN。
+
+### 实现结果
+
+- 只实现
+  `conditional_dead_control_should_consider_form_dirty_prerequisites`；
+  `auth_redirect_route_should_preserve_maintainer_review_boundary` 继续
+  `request_revision` 并排除。
+- 所有 positive/counter/fail-closed 分支保持 visible P1 `dead_control`；
+  disabled submit click/submit 为 0，最多 fill 一个同表单非敏感字段，
+  `form_state_inferred=false`。
+- Public finding schema 未改变；三个 synthetic fixture/test 文件未修改，
+  SHA-256 保持不变。
+
+### 验证
+
+- Bounded conditional behavior：23/23 passed。
+- Full Playwright driver：39/39 passed。
+- Driver + fixture/catalog/calibration companion：76/76 passed。
+- CLI/MCP/report/generation/repair/downstream：81/81 passed。
+- `pnpm typecheck:browser-explorer`、repository typecheck、lint、diff check：
+  passed。
+- 两位最终独立只读审查员：无 unresolved P1/P2。
+- Packed MCP isolated consumer 的 forced-offline 复跑确认 pnpm store 缺少
+  `@modelcontextprotocol/sdk@1.30.0`；未联网、未安装依赖，作为下一只读审计
+  的环境证据缺口保留。
+
+### 边界与下一步
+
+- Receipt、target acquire/analyze/execute/write、publication、deployment、
+  launch、commit、push、PR 均为 0 / no。
+- Next Goal: RepoAssure Conditional Dead Control Calibration Bounded Detector
+  Implementation Completion Audit v0.1 — `ready_to_execute`、
+  `execution_authorization: null`、read-only。
+
+## 2026年8月2日 - RepoAssure Conditional Dead Control Calibration Bounded Detector Implementation Authorization Maintainer Decision Recording v0.1 - completed
+
+Conclusion:
+`maintainer_authorized_bounded_detector_implementation_for_separately_authorized_local_goal_without_detector_changes`.
+
+### TDD 与决定记录
+
+- RED：先新增 focused structure contract；首次运行精确因新的 decision
+  record 文件不存在而失败（1 failed，153 skipped）。
+- GREEN：记录维护者明确数字选择 `1` →
+  `authorize_bounded_detector_implementation`，完成 current Goal，新增 strategy
+  decision record、operation record，并派生下一 bounded implementation Goal。
+- Implementation authorization decisions recorded：1/1；pending：0/1；Goal
+  execution authorization 未被当作四选一答案。
+
+### 状态与保护边界
+
+- 下一 Goal：RepoAssure Conditional Dead Control Calibration Bounded Detector
+  Implementation v0.1，`ready_to_execute`、`execution_authorization: null`。
+- 独立 QA 发现 catalog P2/classification 与 browser runtime P1/no-classification
+  seam 尚未锁定；下一 Goal 须在 detector/test edits 前完成 Architecture
+  Handoff，无法安全决策时返回 `request_implementation_plan_revision`。
+- 本 Goal 未修改或运行 detector/fixture，未改变 suppression、severity、
+  threshold 或 acceptance policy；未发 receipt、操作 target、使用外部系统、
+  发布、部署或 launch。
+
+### 最终验证
+
+- Focused GREEN：1/1 passed，153 skipped。
+- Project structure：154/154 passed。
+- Autopilot progress consistency：8/8 passed；canonical active/next Goal 均为
+  bounded detector implementation，且唯一 `ready_to_execute`。
+- Typecheck：passed；lint：passed；4 个关键 JSON 解析、唯一 ready Goal 检查和
+  `git diff --check`：passed。
+- 沙箱内全量测试因本地监听受限及隔离安装超时失败；同一 `pnpm test` 在允许
+  本地监听/安装的环境中原样复跑为 83 files / 831 tests passed，1 file / 1
+  test skipped。
+- 两名独立只读审查者确认核心状态一致；其发现的 governance-test 措辞、
+  Architecture Handoff/唯一 ready Goal 回归保护和 fixture read-only 机器边界
+  已在最终补丁中修正。
+
+## 2026年8月2日 - RepoAssure Conditional Dead Control Calibration Bounded Detector Implementation Authorization Intake v0.1 - completed
+
+Conclusion:
+`bounded_detector_implementation_authorization_intake_prepared_without_inferred_choice_or_detector_changes`.
+
+### TDD 与文档级联
+
+- RED：新增 focused structure contract；首次运行因 authorization intake
+  文档尚不存在而按预期失败（1 failed，152 skipped）。
+- GREEN：新增 strategy intake、operation record、completed Goal metadata 和
+  下一 decision-recording Goal，并级联 index、progress、README、PRD、SPEC、
+  PLAN、acceptance、architecture、testing 与日志。
+- Implementation authorization options prepared: 4/4；Implementation
+  authorization decisions recorded: 0/1；Preselected choice: none。
+
+### 状态与边界
+
+- 下一 Goal：RepoAssure Conditional Dead Control Calibration Bounded Detector
+  Implementation Authorization Maintainer Decision Recording v0.1，
+  `ready_to_execute`，仍需单独授权。
+- 当前普通 Goal 授权不算四选一答案；5/5 manual gates 不授权 detector
+  implementation。
+- 未修改 detector、fixture、threshold、severity、suppression 或 acceptance
+  policy；未发 receipt、操作 target、使用外部系统、发布、部署或 launch。
+
+### 最终验证
+
+- Focused GREEN：1/1 passed，152 skipped。
+- Project structure：153/153 passed。
+- Autopilot progress consistency：8/8 passed；canonical active/next Goal 均为
+  bounded detector implementation authorization maintainer decision recording。
+- Typecheck：passed；lint：passed；目标 JSON 解析与 scoped
+  `git diff --check`：passed。
+- 沙箱内全量测试的本地启动用例因 `listen 127.0.0.1` 被环境以 `EPERM`
+  拒绝；同一 `pnpm test` 在允许本地监听的测试环境中复跑后为 83 files /
+  830 tests passed，1 file / 1 test skipped。
+
+## 2026年8月2日 - RepoAssure Unified Long-Term Product Strategy v0.1 - documented
+
+Conclusion:
+`unified_long_term_strategy_recorded_without_execution_authorization`.
+
+### 文档级联
+
+- 新增统一长期战略，记录 canonical vision、第一性原理、三条主轴、彩色
+  Mermaid 战略架构、三年五里程碑、影响力与商业飞轮、指标和安全边界。
+- 更新 canonical PRD、SPEC 和 PLAN，使长期方向、目标架构与候选 Roadmap
+  相互一致，同时保留当前 local-first 产品事实。
+- 对齐 Commercialization Strategy，并在决策日志中记录 owner 确认与授权
+  分离。
+
+### 状态与边界
+
+- 当前 active Goal、id、title 和 `ready_to_execute` 状态保持不变；本次
+  文档补丁未编辑 `.autopilot` 文件，其既有未提交状态保持原样。
+- 代表性目标获取决定继续 3/3 `defer`，执行决定另为 3/3 `defer`；未来
+  贡献网络、impact ledger、Team Cloud、Enterprise 和标准化均未被写成
+  已实现能力。
+- 未访问或改变任何 target、external system、runtime、detector、acceptance、
+  release、deployment、launch、repository-control、contact、pricing 或 spend
+  状态。
+
+### 最终验证
+
+- Project structure：1 file / 152 tests passed。
+- Autopilot progress consistency：8/8 passed；canonical Goal 的 id、title
+  和 `ready_to_execute` 状态与 index、snapshot、PLAN、PRD、SPEC 一致；
+  checker 报告 `localOnly=true`、`readOnly=true`。
+- 新战略引用的 7 个本地文档目标均存在；目标文档 `git diff --check`
+  passed。
+- 最终差异审查确认：本次补丁未编辑 `.autopilot` 状态，未替换当前 Goal，
+  未执行外部动作。
+
+## 2026年7月29日 - RepoAssure Conditional Dead Control Calibration Synthetic Fixture Manual Gate Maintainer Decision Recording v0.1 - completed
+
+Conclusion:
+`maintainer_approved_all_five_synthetic_fixture_manual_gates_without_detector_implementation_authorization`.
+
+### TDD
+
+- RED：先扩展 fixture 与治理结构合同；focused run 为 154 passed / 2
+  failed，失败分别精确指向 manifest 仍为 pending/0 和决定记录缺失。
+- GREEN：记录维护者明确输入 `全部 approve_gate_evidence`，更新五项门禁、
+  fixture 审阅元数据、Goal/index/progress、canonical docs 与治理日志。
+
+### 结果
+
+- Gate decisions recorded：5/5；approved：5/5；pending：0/5。
+- Manual gates completed：5/5。
+- 普通 Goal 执行授权未被当作门禁答案；非约束性建议也未被当作答案。
+- `auth_redirect_route_should_preserve_maintainer_review_boundary` 保持
+  `request_revision` 并继续排除。
+- Detector implementation execution authorized：no；detector changes：no。
+
+### 下一步
+
+RepoAssure Conditional Dead Control Calibration Bounded Detector
+Implementation Authorization Intake v0.1 — `ready_to_execute`。它仍需单独
+执行授权，且只可准备四个未选择的实现授权选项，不能实现检测器。
+
+### 边界
+
+- Fixture behavior files modified：0；仅更新 1 份本地 manifest 审阅元数据。
+- Receipt / target acquired / executed / written：0 / 0 / 0 / 0。
+- 未访问网络、目标仓库或外部系统，未发布、部署或 launch。
+
+## 2026年7月29日 - RepoAssure Conditional Dead Control Calibration Synthetic Fixture Manual Review Package v0.1 - completed
+
+Conclusion:
+`synthetic_fixture_manual_review_package_prepared_with_five_pending_gate_decisions_without_detector_changes`.
+
+### TDD
+
+- Red：新增五门禁人工审阅包治理合同后，结构测试为 150 passed /
+  1 failed；唯一失败原因是审阅包文件尚不存在。
+- Green：建立五个 evidence-to-gate 审阅包、每门禁四个未选择选项和
+  非约束性建议，并同步 Goal、index、progress、PLAN、SPEC、PRD、
+  README 与治理日志。
+- 现有 synthetic fixture 证据测试保持 4/4 passed。
+
+### 结果
+
+- Review evidence packets prepared: 5/5.
+- Gate decisions recorded: 0/5；pending: 5/5；preselected: 0/5.
+- Manual gates completed: 0/5.
+- 推荐项均为 `approve_gate_evidence`，但建议不等于决定。
+- 普通 Goal 执行授权没有被当作任何门禁答案。
+- auth redirect 保持 `request_revision`，继续排除在实现范围外。
+- Detector changes performed: no；fixture files modified: 0.
+
+### 下一步
+
+RepoAssure Conditional Dead Control Calibration Synthetic Fixture Manual Gate
+Maintainer Decision Recording v0.1 — `ready_to_execute`。它仍需单独执行授权，
+且只能记录五项明确选择；即使五项都批准，也不授权检测器实现。
+
+### 最终验证
+
+- Focused fixture + structure：2 files / 155 tests passed。
+- Full unit suite：61 files / 784 tests passed。
+- Autopilot progress consistency：8/8 passed。
+- Typecheck、lint、build、repo hygiene 和 `git diff --check` passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项未自动关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。
+- 未 stage、commit、push、发布、部署或 launch。
+- 关键 JSON parse、严格 3 文件 fixture 清单和 `git diff --check`：
+  passed。
+
+## 2026年7月29日 - RepoAssure Conditional Dead Control Calibration Synthetic Fixture Bounded Implementation v0.1 - completed
+
+Conclusion:
+`synthetic_fixture_implemented_and_locally_validated_without_detector_changes_or_manual_gate_completion`.
+
+### TDD
+
+- RED：新增四项真实 JSON fixture 合同，4/4 仅因两份 fixture JSON
+  尚不存在而按预期失败。
+- GREEN：新增两份原始本地 JSON 和一份 unit test，focused fixture tests
+  4/4 passed。
+- 治理 RED：新增实现完成与状态级联合同，因 operation record 与下一 Goal
+  尚不存在而按预期失败。
+
+### 实现结果
+
+- Synthetic fixture files implemented：3/3。
+- Required states：5/5。
+- Expected snapshots：positive / counter / fail-closed 共 3/3。
+- 原始本地数据：yes；raw source / network / target dependency：no / no / no。
+- Manual gates completed：0/5。
+
+### 边界
+
+- Auth redirect 保持 `request_revision` 并排除在实现之外。
+- Detector behavior / suppression / severity downgrade / threshold / policy
+  change：全部 no。
+- Receipt / target acquired / executed / written：0 / 0 / 0 / 0。
+- 未发布、部署或 launch。
+
+### 下一步
+
+Next Goal: RepoAssure Conditional Dead Control Calibration Synthetic Fixture
+Manual Review Package v0.1.
+
+它仍需单独“授权执行”，且只可准备五个人工门禁的本地审查材料，不得自动
+完成人工门禁或修改 detector。
+
+### 最终验证
+
+- Focused fixture tests：4/4 passed；governance structure：150/150 passed。
+- Full unit suite（single worker）：61 files / 783 tests passed。首次并发
+  full run 有 5 个未改动测试超过默认 5 秒；四个受影响文件随后分别
+  1/1、30/30、57/57、107/107 passed，串行完整复跑 783/783 passed。
+- Autopilot progress consistency：8/8 passed。
+- Typecheck、lint、build、repo hygiene：passed。
+- Goal audit：34 passed / 0 missing / 1 manual；长期产品人工验收项未自动
+  关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。
+
+## 2026年7月29日 - RepoAssure Conditional Dead Control Calibration Synthetic Fixture Implementation Authorization Maintainer Decision Recording v0.1 - completed
+
+Conclusion:
+`maintainer_approved_synthetic_fixture_implementation_for_separately_authorized_local_fixture_goal_without_fixture_or_detector_work`.
+
+### TDD
+
+- RED：新增 explicit approve 决定记录结构合同；因 maintainer decision record
+  文件不存在而按预期失败。
+- GREEN：将维护者明确输入
+  `approve_synthetic_fixture_implementation` 记录为唯一决定，派生仍需单独
+  授权的 bounded implementation Goal，并保持三个 fixture 文件不存在。
+- Focused decision contract：1/1 passed。
+- Governance structure：149/149 passed。
+
+### 决策状态
+
+- Selected choice：`approve_synthetic_fixture_implementation`。
+- Implementation decisions：1/1 recorded、0/1 pending。
+- Implementation direction approved：yes。
+- Implementation Goal derivation authorized：yes。
+- Implementation execution authorized now：no。
+- Manual gates：0/5 completed。
+
+### 边界
+
+- 三个 proposed fixture/test files 实际均不存在；fixture created/executed：
+  no / no。
+- Auth redirect 保持 `request_revision` 并排除在实现之外。
+- Detector change / receipt / target acquired / executed / written：
+  no / 0 / 0 / 0 / 0。
+- 未访问 raw fixture/target，未发布、部署或 launch。
+
+### 下一步
+
+Next Goal: RepoAssure Conditional Dead Control Calibration Synthetic Fixture
+Bounded Implementation v0.1.
+
+它仍需单独“授权执行”，之后才可创建并运行三个本地 synthetic
+fixture/test 文件；不得访问 raw fixture/target 或修改 detector。
+
+### 最终验证
+
+- Full unit suite：60 files / 778 tests passed。
+- Typecheck、lint 和 build：passed。
+- Autopilot progress consistency：8/8 passed，活动 Goal 与 canonical
+  documents 一致。
+- Repo hygiene、4 个关键 JSON parse、fixture 三个 proposed paths
+  不存在，以及 `git diff --check`：passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项保持未自动关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。
+
+## 2026年7月29日 - RepoAssure Conditional Dead Control Calibration Synthetic Fixture Implementation Authorization Intake v0.1 - completed
+
+Conclusion:
+`synthetic_fixture_implementation_authorization_intake_prepared_without_inferred_choice_or_fixture_work`.
+
+### TDD
+
+- RED：新增 synthetic fixture implementation authorization intake 结构合同；
+  因 intake 文件不存在而按预期失败。
+- GREEN：准备 4/4 未预选实现授权选项、非约束建议、五种 synthetic 状态
+  摘要、三个未来文件与三个 expected snapshots 摘要，并保持全部 fixture
+  工作为零。
+- Focused intake contract：1/1 passed。
+- Governance structure：148/148 passed。
+
+### Intake 状态
+
+- Implementation authorization options prepared：4/4。
+- Decisions recorded：0/1；pending：1/1。
+- Preselected choice：none。
+- Recommended option：`approve_synthetic_fixture_implementation`，仅为非约束
+  建议。
+- Manual gates：0/5 completed。
+
+### 边界
+
+- 当前普通“授权执行”只授权本 intake Goal，未被当成四选一答案。
+- 未创建、访问、获取、安装、分析、启动或运行 fixture/target。
+- Auth redirect 保持 `request_revision` 并排除在实现之外。
+- Detector change / receipt / target acquired / executed / written：
+  no / 0 / 0 / 0 / 0。
+- 未发布、部署或 launch。
+
+### 下一步
+
+Next Goal: RepoAssure Conditional Dead Control Calibration Synthetic Fixture
+Implementation Authorization Maintainer Decision Recording v0.1.
+
+它只记录一个明确完整的四选一答案；本次授权不执行该 Goal，也不会实施或
+运行 fixture。
+
+### 最终验证
+
+- Full unit suite：60 files / 777 tests passed。
+- Typecheck、lint 和 build：passed。
+- Autopilot progress consistency：8/8 passed，活动 Goal 与 canonical
+  documents 一致。
+- Repo hygiene、4 个关键 JSON parse、fixture 三个 proposed future paths
+  不存在，以及 `git diff --check`：passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项保持未自动关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。
+
+## 2026年7月29日 - RepoAssure Conditional Dead Control Calibration Synthetic Fixture Bounded Planning v0.1 - completed
+
+Conclusion:
+`synthetic_fixture_bounded_plan_prepared_without_fixture_creation_execution_or_detector_changes`.
+
+### TDD
+
+- RED：新增 five-state synthetic fixture 规划结构合同；因 bounded plan 文件
+  不存在而按预期失败。
+- GREEN：完成五种概念状态、三个未来文件、三组 expected snapshots、
+  positive/counter/fail-closed regression、review 与 rollback 的有界计划。
+- Focused planning contract：1/1 passed。
+- Governance structure：147/147 passed。
+
+### 规划状态
+
+- Synthetic states defined：5/5。
+- Proposed future files：3；实际创建：0。
+- Expected snapshots planned：3；实际执行：0。
+- Positive / counter / fail-closed regressions planned：1 / 1 / 1。
+- Manual gates：0/5 completed。
+- Synthetic fixture implementation / created / executed：no / no / no。
+
+### 边界
+
+- 当前普通“授权执行”只授权本规划 Goal，未被当成下一条 implementation
+  authorization choice。
+- 未访问、获取、安装、分析、启动、创建或运行 fixture/target。
+- Auth redirect 保持 `request_revision` 并排除在实现之外。
+- Detector change / receipt / target acquired / executed / written：
+  no / 0 / 0 / 0 / 0。
+- 未发布、部署或 launch。
+
+### 下一步
+
+Next Goal: RepoAssure Conditional Dead Control Calibration Synthetic Fixture
+Implementation Authorization Intake v0.1.
+
+它只准备四个未选择的实现授权选项；不得推断选项，不得创建或运行
+fixture，也不得修改 detector。
+
+### 最终验证
+
+- Full unit suite：60 files / 776 tests passed。第一次并行资源竞争复跑中，
+  一个未改动的 user-acceptance 测试触发 5 秒超时；原失败症状随后 focused
+  复跑 1/1 passed，空闲状态完整套件复跑 776/776 passed。
+- Typecheck、lint 和 build：passed。
+- Autopilot progress consistency：8/8 passed，活动 Goal 与 canonical
+  documents 一致。
+- Repo hygiene、4 个关键 JSON parse、fixture 三个 proposed future paths
+  不存在，以及 `git diff --check`：passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项保持未自动关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。
+
+## 2026年7月29日 - RepoAssure Conditional Dead Control Calibration Fixture Evidence Readiness and Authorization Maintainer Decision Recording v0.1 - completed
+
+Conclusion:
+`maintainer_requested_synthetic_local_fixture_plan_without_fixture_access_or_detector_changes`.
+
+### TDD
+
+- RED：新增选项 2 的 plan-only 决策结构合同；因维护者决定记录文件不存在
+  而按预期失败。
+- GREEN：将明确输入 `2` 映射为
+  `request_synthetic_local_fixture_plan`，完成当前 Goal，并创建下一条
+  plan-only synthetic fixture Goal。
+- Governance structure：146/146 passed。
+
+### 决策状态
+
+- Fixture evidence decisions：1/1 recorded、0/1 pending。
+- Synthetic fixture plan direction authorized：yes。
+- Synthetic fixture planning execution authorized：no。
+- Synthetic fixture implementation / created / executed：no / no / no。
+- Manual gates：0/5 completed。
+
+### 边界
+
+- 普通“授权执行”未被当作四选一答案；本决定证据仅使用明确输入 `2`。
+- 未访问、获取、创建、安装、分析、启动或运行 fixture/target。
+- Auth redirect 保持 `request_revision` 并排除在实现之外。
+- Detector change / receipt / target acquired / executed / written：
+  no / 0 / 0 / 0 / 0。
+- 未发布、部署或 launch。
+
+### 下一步
+
+Next Goal: RepoAssure Conditional Dead Control Calibration Synthetic Fixture
+Bounded Planning v0.1.
+
+它只规划五种 synthetic 状态、未来文件布局、回归预期、审查与回滚；仍需
+单独执行授权，且不得创建或运行 fixture，也不得修改 detector。
+
+### 最终验证
+
+- Focused option-2 contract：1/1 passed。
+- Governance structure：146/146 passed。
+- Full unit suite：60 files / 775 tests passed。
+- Autopilot progress consistency：8/8 passed。
+- Typecheck、lint、build、repo hygiene、4 个关键 JSON parse 和
+  `git diff --check`：passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项保持未自动关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。
+
+## 2026年7月29日 - RepoAssure Conditional Dead Control Calibration Fixture Evidence Readiness and Authorization Intake v0.1 - completed
+
+Conclusion:
+`conditional_dead_control_fixture_evidence_readiness_and_authorization_intake_prepared_without_inferred_choice_or_fixture_access`.
+
+### TDD
+
+- RED：新增 fixture-evidence intake 结构合同；因 intake 文件不存在而按
+  预期失败，原有 144 项结构测试继续通过。
+- GREEN：准备 4/4 未预选 owner choices、八项 minimum non-secret evidence
+  fields 和一张明确的授权分离表。
+
+### Intake 状态
+
+- Fixture evidence options prepared：4/4。
+- Fixture evidence decisions recorded：0/1；pending：1/1。
+- Preselected choice：none。
+- Recommended option：`request_synthetic_local_fixture_plan`，仅为建议。
+- Raw fixture availability/privacy confirmed：no / no。
+
+### 边界
+
+- 普通“授权执行”未被当成 fixture evidence choice。
+- Fixture access/acquisition authorized：no / no。
+- Manual gates completed：0/5。
+- Auth redirect 保持 `request_revision` 并排除在实现之外。
+- Detector change / receipt / target acquired / executed / written：
+  no / 0 / 0 / 0 / 0。
+- 未访问 fixture 或 target，未发布、部署或 launch。
+
+### 下一步
+
+Next Goal: RepoAssure Conditional Dead Control Calibration Fixture Evidence Readiness and Authorization Maintainer Decision Recording v0.1.
+
+它只记录一个明确完整的四选一答案，不执行答案指向的动作。
+
+### 最终验证
+
+- Focused fixture-evidence intake contract：1/1 passed。
+- Governance structure：145/145 passed。
+- Full unit suite：60 files / 774 tests passed。
+- Autopilot progress consistency：8/8 passed。
+- Typecheck、lint、build、repo hygiene、JSON parse 和 `git diff --check`：
+  passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项保持未自动关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。
+
+## 2026年7月29日 - RepoAssure Conditional Dead Control Calibration Implementation Gate Evidence Preparation v0.1 - completed
+
+Conclusion:
+`conditional_dead_control_gate_evidence_package_prepared_with_all_manual_gates_fail_closed`.
+
+### TDD
+
+- RED：新增五门禁证据结构合同；因 evidence package 文件不存在而按预期
+  失败，原有 143 项结构测试继续通过。
+- GREEN：准备 5/5 门禁证据包，同时保持 0/5 人工门禁完成。
+
+### 证据状态
+
+- Maintainer classification：
+  `prepared_pending_final_gate_confirmation`。
+- Fixture privacy：
+  `blocked_missing_fixture_availability_and_privacy_confirmation`。
+- Expected snapshot：
+  `prepared_pending_fixture_and_maintainer_confirmation`。
+- Confidence threshold：
+  `prepared_no_threshold_change_proposed_pending_confirmation`。
+- Regression artifact：
+  `prepared_pending_fixture_execution_and_review`。
+
+### 边界
+
+- Raw fixture availability/privacy confirmed：no / no。
+- Confidence-threshold change proposed：no。
+- Fixture-specific regression execution：no。
+- Auth redirect 保持 `request_revision` 并排除在实现之外。
+- Detector change / receipt / target acquired / executed / written：
+  no / 0 / 0 / 0 / 0。
+- 未访问 fixture 或 target，未发布、部署或 launch。
+
+### 下一步
+
+Next Goal: RepoAssure Conditional Dead Control Calibration Fixture Evidence Readiness and Authorization Intake v0.1.
+
+它只准备未选择的 fixture 证据就绪与授权选项，不访问 fixture，也不改
+detector。
+
+### 最终验证
+
+- Focused gate-evidence contract：1/1 passed。
+- Governance structure：144/144 passed。
+- Full unit suite：60 files / 773 tests passed。
+- Autopilot progress consistency：8/8 passed。
+- Typecheck、lint、build、repo hygiene、JSON parse 和 `git diff --check`：
+  passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项保持未自动关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。
+
+## 2026年7月29日 - RepoAssure False-Positive Detector Runtime Calibration Implementation Authorization Maintainer Decision Recording v0.1 - completed
+
+Conclusion:
+`maintainer_approved_conditional_dead_control_implementation_and_requested_auth_redirect_revision_without_detector_changes`.
+
+### TDD
+
+- RED：新增逐题实现决定结构合同，因决策记录文件不存在而按预期失败。
+- GREEN：记录第一题 `approve_implementation`、第二题
+  `request_revision`，完成当前 Goal，并创建只准备第一题五项门禁证据的
+  下一 Goal。
+
+### 决策状态
+
+- Implementation authorization decisions：2/2 recorded。
+- Approved implementation directions：1/2。
+- Revision requests：1/2；pending：0/2。
+- Detector implementation execution authorized now：no。
+- Detector changes performed：no。
+
+### 边界
+
+- 五个人工门禁全部保留，当前 completed gates 为 0/5。
+- 原始 fixture 可用性与隐私未被推断。
+- Action Authorization Receipts：0。
+- Target acquired / executed / written：0 / 0 / 0。
+- 未修改 detector、finding、severity、threshold 或 acceptance policy；
+  未发布、部署或 launch。
+
+### 下一步
+
+Next Goal: RepoAssure Conditional Dead Control Calibration Implementation Gate Evidence Preparation v0.1.
+
+它只准备第一题的五项本地证据；第二题继续修订，本轮仍不改 detector。
+
+### 最终验证
+
+- Focused decision-recording contract：1/1 passed。
+- Governance structure：143/143 passed。
+- Full unit suite：60 files / 772 tests passed。
+- Autopilot progress consistency：8/8 passed。
+- Typecheck、lint、build、repo hygiene、JSON parse 和 `git diff --check`：
+  passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项保持未自动关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。
+
+## 2026年7月29日 - RepoAssure False-Positive Detector Runtime Calibration Implementation Authorization Intake v0.1 - completed
+
+Conclusion:
+`implementation_authorization_intake_prepared_without_inferred_decisions_or_detector_changes`.
+
+### TDD
+
+- RED：implementation-authorization intake 结构合同因新 intake 文件不存在
+  而按预期失败。
+- GREEN：建立两道未填写的四选一实现授权题、证据/风险/回滚摘要、五个人工
+  门禁、完成 Goal 与下一决策记录 Goal。
+
+### 当前决定状态
+
+- Implementation authorization questions prepared：2/2。
+- Decisions recorded：0/2；pending：2/2。
+- Goal execution authorization treated as per-question answer：no。
+- Default or inferred choice allowed：no。
+
+### 边界
+
+- Detector implementation / runtime behavior / suppression / severity /
+  threshold / policy changes：0。
+- Action Authorization Receipts：0。
+- Target acquired / executed / written：0 / 0 / 0。
+- 未获取、安装、启动、分析、执行或写入任何目标；未发布、部署或 launch。
+
+### 下一步
+
+Next Goal: RepoAssure False-Positive Detector Runtime Calibration Implementation Authorization Maintainer Decision Recording v0.1.
+
+它只记录维护者逐题明确给出的答案；普通“授权执行”不算答案，也不改
+detector。
+
+### 最终验证
+
+- Focused implementation-authorization intake contract：1/1 passed。
+- Governance structure：142/142 passed。
+- Full unit suite：60 files / 771 tests passed。
+- Autopilot progress consistency：8/8 passed。
+- Typecheck、lint、build、repo hygiene、JSON parse 和 `git diff --check`：
+  passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项保持未自动关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。
+
+## 2026年7月29日 - RepoAssure False-Positive Detector Runtime Calibration Bounded Design Planning v0.1 - completed
+
+Conclusion:
+`bounded_false_positive_detector_calibration_design_plan_prepared_without_runtime_implementation_or_behavior_change`.
+
+### TDD
+
+- RED：bounded-design 结构合同因新设计方案不存在而按预期失败。
+- GREEN：完成 2/2 问题级证据模型、失败关闭矩阵、验证/回归要求、
+  回滚条件、五个人工门禁与未来实现授权边界。
+
+### 边界
+
+- Detector implementation / runtime behavior / suppression / severity /
+  threshold / policy changes：0。
+- Action Authorization Receipts：0。
+- Target acquired / executed / written：0 / 0 / 0。
+- 未获取、安装、启动、分析、执行或写入任何目标；未发布、部署或 launch。
+- Catalog 中的原始 fixture 路径只作为元数据存在，本 Goal 未读取或执行；
+  可用性与隐私确认保留为未来实现门禁。
+
+### 下一步
+
+Next Goal: RepoAssure False-Positive Detector Runtime Calibration Implementation Authorization Intake v0.1.
+
+它只准备两个未填写的逐题实现授权问题，不记录答案、不改 detector。
+
+### 最终验证
+
+- Focused bounded-design contract：1/1 passed。
+- Governance structure：141/141 passed。
+- Full unit suite：60 files / 770 tests passed。
+- Autopilot progress consistency：8/8 passed。
+- Typecheck、lint、build、repo hygiene、JSON parse 和 `git diff --check`：
+  passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项保持未自动关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。
+
+## 2026年7月29日 - RepoAssure False-Positive Detector Runtime Calibration Per-Question Maintainer Decision Recording v0.1 - completed
+
+Conclusion:
+`maintainer_approved_both_false_positive_detector_calibration_questions_for_separately_gated_design_planning_without_detector_implementation_authorization`.
+
+### TDD
+
+- RED：explicit-approval 结构合同因新的 bounded design-planning Goal
+  不存在而按预期失败。
+- GREEN：记录两项 `approve`、完成当前 Goal，并创建仍需单独授权的
+  RepoAssure False-Positive Detector Runtime Calibration Bounded Design Planning v0.1；未修改 detector。
+
+### 决策状态
+
+- Explicit calibration decisions: 2/2；approved: 2/2；pending: 0/2。
+- Bounded design planning authorized: yes。
+- Detector implementation authorized: no。
+
+### 边界
+
+- Detector changes authorized: no。
+- Action Authorization Receipts、目标获取、执行与写入均为 0。
+- 未访问外部系统或目标，未改变 detector/acceptance behavior，未发布、
+  部署或 launch。
+
+### 最终验证
+
+- Governance structure：140/140 passed。
+- Unit suite：60 files / 769 tests passed。
+- Autopilot progress consistency：8/8 passed。
+- Typecheck、lint、build、repo hygiene、JSON parse 和
+  `git diff --check`：passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项未自动关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。
+
+## 2026年7月29日 - RepoAssure False-Positive Detector Runtime Calibration Per-Question Maintainer Decision Recording v0.1 - awaiting decisions
+
+Interim conclusion:
+`per_question_calibration_decision_record_prepared_without_inferred_answers`.
+
+### TDD
+
+- RED：新增 pending-state 结构合同因逐题决策记录不存在而按预期失败。
+- GREEN：新增未预填 decision/operation records，更新 active Goal summary、
+  index/progress 和 canonical docs，未完成当前 Goal、未派生下一 Goal。
+
+### 当前状态
+
+- Explicit calibration decisions: 0/2；pending: 2/2。
+- Goal execution authorization treated as per-question answer: no。
+- Human Approval Policy: `pending_confirmation`。
+- Current Goal：RepoAssure False-Positive Detector Runtime Calibration
+  Per-Question Maintainer Decision Recording v0.1，继续
+  `ready_to_execute`。
+
+### 边界
+
+- Detector changes authorized: no。
+- Action Authorization Receipts、目标获取、执行与写入均为 0。
+- 未访问外部系统或目标，未改变 detector/acceptance behavior，未发布、
+  部署或 launch。
+
+### 验证
+
+- Governance structure：139/139 passed。
+- Unit suite：60 files / 768 tests passed。
+- Autopilot progress consistency：8/8 passed。
+- Typecheck、lint、build、repo hygiene、JSON parse 和
+  `git diff --check`：passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项未自动关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。
+
+## 2026年7月29日 - RepoAssure False-Positive Detector Runtime Calibration Decision Reopening Preparation v0.1 - completed
+
+Conclusion:
+`false_positive_detector_runtime_calibration_decision_reopening_package_prepared_without_per_question_decisions_or_detector_changes`.
+
+### TDD
+
+- RED：新增结构合同因刷新决策包不存在而按预期失败。
+- GREEN：新增本地刷新包、operation record、completed Goal、唯一下一
+  Goal、index/progress 和 canonical documentation cascade。
+
+### 决策状态
+
+- Calibration decisions recorded: 0/2；pending: 2/2。
+- 两题均保留 `approve`、`reject`、`defer`、`accept-risk`，没有预填答案。
+- 五个人工门禁完整保留。
+- Next Goal: RepoAssure False-Positive Detector Runtime Calibration Per-Question Maintainer Decision Recording v0.1。
+
+### 边界
+
+- Direction selection treated as per-question calibration approval: no。
+- Detector changes authorized: no。
+- Action Authorization Receipts、目标获取、执行与写入均为 0。
+- 未访问外部系统或目标，未改变 detector/acceptance behavior，未发布、
+  部署或 launch。
+
+### 最终验证
+
+- Governance structure：138/138 passed。
+- Unit suite：60 files / 767 tests passed。
+- Autopilot progress consistency：8/8 passed。
+- Typecheck、lint、build、repo hygiene、JSON parse 和
+  `git diff --check`：passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项未自动关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。
+
+## 2026年7月29日 - RepoAssure Remaining Gated Product Work Maintainer Direction Decision Recording v0.1 - completed
+
+Conclusion:
+`maintainer_selected_false_positive_detector_runtime_calibration_without_underlying_work_authorization`.
+
+### TDD
+
+- RED：新增最终方向状态级联合同，因 RepoAssure False-Positive Detector
+  Runtime Calibration Decision Reopening Preparation v0.1 Goal 记录不存在而
+  按预期失败。
+- GREEN：记录明确方向、完成当前 Goal、创建仅准备决策包的下一 Goal，并
+  级联 index、Progress Snapshot 与 canonical docs。
+
+### 结果
+
+- Selected direction: `false_positive_detector_runtime_calibration`.
+- Explicit direction decisions: 1/1；pending: 0/1。
+- Calibration decisions recorded: 0/2；pending: 2/2。
+- 其余六个方向保持 unselected。
+- 下一 Goal：RepoAssure False-Positive Detector Runtime Calibration Decision
+  Reopening Preparation v0.1。
+
+Next Goal: RepoAssure False-Positive Detector Runtime Calibration Decision Reopening Preparation v0.1.
+
+### 边界
+
+- Direction selection authorizes underlying work: no。
+- Action Authorization Receipts、目标获取、执行与写入均为 0。
+- 未改变 runtime detector、finding suppression、severity、confidence
+  threshold 或 acceptance policy；未发布、部署或 launch。
+
+## 2026年7月29日 - RepoAssure Remaining Gated Product Work Maintainer Direction Decision Recording v0.1 - pending explicit choice
+
+Interim conclusion:
+`maintainer_direction_decision_record_prepared_without_inferred_choice`.
+
+### TDD
+
+- RED：新增待决策状态合同，因
+  `remaining-gated-product-work-maintainer-direction-decision-record-v0.1.md`
+  不存在而按预期失败。
+- GREEN：新增未预填 decision record 与 awaiting operation record，并级联
+  active Goal summary、Progress Snapshot 和 canonical documentation。
+
+### 当前状态
+
+- Explicit direction decisions: 0/1.
+- Pending direction decisions: 1/1.
+- Goal execution authorization treated as direction choice: no.
+- Human Approval Policy: `pending_explicit_direction_choice`.
+- 推荐 `false_positive_detector_runtime_calibration` 保持 advisory /
+  unselected。
+- 当前 Goal 继续 active / `ready_to_execute`，未创建或执行下一 Goal。
+
+### 边界
+
+- Web、Python/CLI、MCP/Agent 获取与执行保持 `defer`，最终验收保持
+  `defer`。
+- Action Authorization Receipts、获取目标、执行目标、目标写入均为 0。
+- 未获取、克隆、安装、分析、启动、运行或写入目标；未访问外部系统。
+- 未改变 runtime/acceptance/entrypoint；未发布、部署或 launch。
+
+## 2026年7月25日 - RepoAssure Multi-Repo Workspace Repair Summary AI IDE Consumption Validation v0.1
+
+### 完成内容
+
+- 按 TDD 新增 `packages/acceptance/src/workspace-repair-summary-consumption.ts`；首轮 RED 证明模块缺失，第二轮 RED 证明 diagnostics 契约缺失，再以最小实现转绿。
+- 新增 6 个 unit/contract 测试，覆盖四种 workspace 状态、JSON-first、blocked exclusion、queue rank 非授权、maintainer decision、tamper 和 redaction。
+- 新增 4 个 integration/no-write 测试，通过真实 summary generator 验证 ready/partial/blocked/empty，并保持 exact two-file output allowlist。
+- 对每个 fixture 验证目标 source content、mtime 和 recursive directory listing 不变。
+- 通过 package root/subpath 导出、compatibility ownership、type smoke 和 structure guard 暴露 read-only validator；未新增 CLI/MCP。
+- focused implementation/package/structure gate 为 4 files、166 tests passed；完整测试为 82 files passed / 1 skipped、791 tests passed / 1 skipped。
+- typecheck、lint、acceptance/package/source/website builds、repo hygiene、release automated prerequisites、Autopilot 8/8 consistency 和 `git diff --check` 均通过。
+- goal audit 为 34/35、0 missing，仅保留既有人工用户验收；public release 仍为 `no`。
+- 结论记录为 `workspace_repair_summary_ai_ide_consumption_validated_without_entrypoints_or_target_writes`。
+
+### 下一步
+
+RepoAssure Multi-Repo Workspace Repair Summary Completion Audit v0.1：审计 planning、implementation、consumption、package exports、tests、docs 和 no-write 边界是否共同闭环。
+
+### 边界
+
+- 不执行命令、不应用补丁、不写目标 repo。
+- 不改变 detector/acceptance behavior，不实现 Team Cloud 或 hosted dashboard。
+- 不发布 npm、不部署、不公开发布、不联系客户、不改变 pricing/spend。
+
+## 2026年7月25日 - RepoAssure Multi-Repo Workspace Repair Summary Contract Implementation v0.1
+
+### 完成内容
+
+- 按 TDD 实现 `packages/acceptance/src/workspace-repair-summary.ts`，并通过 package root/subpath 暴露 typed API。
+- 生成且只生成 `workspace-repair-summary.json` 与 `workspace-repair-summary.md`。
+- 实现 ready/no_tasks/stale/missing_artifacts/invalid_artifacts/identity_collision 和 ready/partial/blocked/empty 状态。
+- 实现 P0/P1/P2、repoSlug、taskId 确定性排序，AI IDE 读取顺序、redaction、maintainer review 和 no-write proof。
+- 对 workspace/run/repair task package/repair plan 结构与身份、artifact latestRunDir 路径、重复 task、identity collision 失败关闭。
+- focused unit/integration/package contract 为 49/49；integration 重复运行并证明目标 repo content/mtime/directory 不变。
+- 完整测试为 80 files passed / 1 skipped、779 tests passed / 1 skipped；typecheck、lint、acceptance/src builds、repo hygiene、release automated prerequisites、Autopilot 8/8 consistency 和 `git diff --check` 均通过。
+- goal audit 为 34/35、0 missing，仅保留既有人工用户验收；public release 仍为 `no`，本 Goal 未执行发布。
+- 未新增 CLI/MCP 入口，未执行命令、应用补丁或写目标 repo。
+
+### 下一步
+
+RepoAssure Multi-Repo Workspace Repair Summary AI IDE Consumption Validation v0.1：用非私密 fixture 验证 AI IDE 对 ready/partial/blocked/empty 摘要的读取与阻断行为。
+
+### 边界
+
+- 不增加 CLI/MCP 入口，不修改 detector 或 acceptance behavior。
+- 不执行目标 repo repair/validation command、不应用补丁、不写目标 repo。
+- 不发布 npm、不部署、不公开发布、不联系客户、不改变 pricing/spend。
+
+## 2026年7月25日 - RepoAssure Multi-Repo Workspace Repair Summary Planning v0.1
+
+### 完成内容
+
+- 按 TDD 增加 planning completion structure contract；RED 时 115 项既有测试通过，新契约因 planning operation record 缺失按预期失败。
+- 复核 workspace manifest 的 `repoSlug/repoRoot/latestRunId/latestRunDir/latestManifest` 与 per-repo repair plan/task package 现状。
+- 新增 `docs/product/specs/multi-repo-workspace-repair-summary-contract-v0.1.md`，定义 `repoassure.workspace-repair-summary.v1`、JSON/Markdown 输出、AI IDE 读取顺序、确定性 P0/P1/P2 队列、repository/workspace states、collision、redaction、maintainer review 和 no-write proof。
+- 明确 v1 不做跨 repo dependency inference、任务合并、自动去重、CLI/MCP productization、Team Cloud 或 hosted dashboard。
+- 结论记录为 `multi_repo_workspace_repair_summary_contract_planned_without_production_implementation`；未修改生产代码、未执行目标 repo repair/validation command、应用补丁或写目标 repo。
+- GREEN structure 为 116/116；完整测试为 78 files passed / 1 skipped、765 tests passed / 1 skipped。
+- typecheck、lint、acceptance/src builds、repo hygiene、`git diff --check` 和 Autopilot 8/8 consistency 均通过。
+- release check 的自动前置项通过但 public release 仍为 `no`；goal audit 为 34/35，0 项证据缺失，仅保留 1 项既有人工用户验收。
+
+### 下一步
+
+RepoAssure Multi-Repo Workspace Repair Summary Contract Implementation v0.1：在 `@hardening-mcp/acceptance` 中实现 typed local generator 和测试金字塔，生成确定性的 JSON/Markdown 摘要。
+
+### 边界
+
+- 不增加 CLI/MCP 入口，不修改 detector 或 acceptance behavior。
+- 不执行目标 repo repair/validation command、不应用补丁、不写目标 repo。
+- 不发布 npm、不部署、不公开发布、不联系客户、不改变 pricing/spend。
+
+## 2026年7月25日 - RepoAssure Product Completion Gap Audit Refresh v0.6
+
+### 完成内容
+
+- 按 TDD 增加 product-completion structure contract；RED 时 114 项既有测试通过，新契约因 v0.6 operation record 缺失按预期失败。
+- 对照 PLAN、SPEC、PRD、代码、测试、package/distribution 证据、manual gates、external-input state 和 deferred work 完成全量分类。
+- 确认 MCP convergence slice 已关闭、registry 保持 12 个工具，现有 local multi-repo workspace manifest 已实现，但 cross-repo repair summary 尚未实现。
+- 结论记录为 `completion_gap_audit_refreshed_with_multi_repo_workspace_repair_summary_planning_next`，并级联 canonical docs、测试策略、验收清单、日志和 Autopilot 状态。
+- 未修改生产代码，未执行命令、应用补丁或写目标 repo。
+- GREEN structure 为 115/115；完整测试复跑为 78 files passed / 1 skipped、764 tests passed / 1 skipped。
+- 首次完整测试仅有一个既有 external-process integration test 达到 5 秒超时；该测试单独在 904 ms 通过，随后完整套件通过，确认为瞬时负载而非产品回归。
+- typecheck、lint、acceptance/src builds、repo hygiene、release check、goal audit、Autopilot 8/8 consistency 和 `git diff --check` 均通过；public release 仍为 `no`。
+
+### 下一步
+
+RepoAssure Multi-Repo Workspace Repair Summary Planning v0.1：先定义本地跨 repo 修复摘要的输入、物料、读取顺序、优先级、异常处理、redaction、maintainer review 和 no-write 契约，不直接实现。
+
+### 边界
+
+- 不实现 Team Cloud、hosted dashboard、cloud sync 或 telemetry。
+- 不修改 detector、acceptance behavior 或 MCP registry。
+- 不发布 npm、不部署、不公开发布、不联系客户、不改变 pricing/spend。
+
+## 2026年7月25日 - RepoAssure AI IDE Repair Workflow MCP Convergence Completion Audit v0.1
+
+### 完成内容
+
+- 按 TDD 先增加 project-structure 完成合同；RED 因 completion audit operation record 缺失按预期失败，其他 113 项通过。
+- 将 `prepare_repair_handoff`、`preview_repair_execution`、`generate_repair_patch_plan` 和 `assemble_repair_evidence_package` 作为一条完整 artifact-only MCP 工作流完成审计。
+- 核对十二工具 registry、既有工具兼容、真实 `tools/list` / `tools/call`、隔离 packed consumer、redaction、maintainer review、verification checklist、no-command、no-patch 和目标源码 no-write 证据。
+- 关闭 ADR-0024 当前收敛切片，并级联 convergence contract、README、PRD、SPEC、PLAN、架构、测试策略、验收清单和 Autopilot 状态。
+- 未修改 MCP 生产代码，未新增或重命名工具。
+- GREEN structure 为 114/114；完整本地权限下 focused pyramid 为 4 files / 141 tests passed。
+- 完整测试为 78 files passed / 1 skipped、763 tests passed / 1 skipped；typecheck、lint、acceptance/src builds、repo hygiene、release check、goal audit、Autopilot 8/8 consistency 和 `git diff --check` 均通过。Public release 仍为 `no`，保留人工 legal、trademark、branch-protection 和 publication authorization 门禁。
+
+### 下一步
+
+RepoAssure Product Completion Gap Audit Refresh v0.6：从全产品视角重新核对文档、代码、测试、package 证据、人工门禁、外部输入和暂缓事项，并只选择一个安全、可自动执行的后续 Goal。
+
+### 边界
+
+- validation-only 仍为 CLI-only；MCP 未执行验证命令。
+- 未应用补丁、未写目标 repo、未修改 detector 或 acceptance behavior。
+- 未发布 npm、未部署、未公开发布、未联系客户、未改变 pricing/spend。
+
+## 2026年7月24日 - RepoAssure Product Completion Gap Audit Refresh v0.4
+
+### 完成内容
+
+- 以 TDD structure contract 对照 PLAN、SPEC、PRD、CLI/MCP/package 入口、tests、manual gates 和 external-input state 刷新产品完成度。
+- 将剩余工作分为 implemented、blocked/manual-gated、external-input-gated、deferred 和 safe auto-executable。
+- 确认 packaged `hardening` CLI 已完成隔离安装验证，而 `node_modules/.bin/hardening-mcp` 尚未完成真实 MCP protocol acceptance。
+- 结论记录为 `completion_gap_audit_refreshed_with_packed_mcp_protocol_validation_next`，并级联 canonical docs 与 Autopilot state。
+- 验证：structure 106/106、full suite 77 files / 741 tests passed（1 file / 1 test skipped）；typecheck、lint、repo hygiene、release check、goal audit、Autopilot 8/8 consistency 和 `git diff --check` passed。Release 仍为 `public release ready: no`，人工验收保留 1 项。
+
+### 下一步
+
+RepoAssure Packed MCP Server Installation and Protocol Validation v0.1：本地 pack 后安装到隔离 consumer，通过 installed `hardening-mcp` 验证 `initialize`、现有八工具 `tools/list` 和一个 bounded read-only `tools/call`。
+
+### 边界
+
+- 未修改 production code、runtime detector behavior、finding suppression、severity、confidence threshold 或 acceptance policy。
+- 未写目标 repo、未应用补丁、未扩展 MCP registry。
+- 未发布 npm、未部署、未公开发布、未联系客户、未改变 pricing/spend。
+
+## 2026年7月24日 - RepoAssure AI IDE Repair Workflow Packed CLI Installation Validation v0.1
+
+### 完成内容
+
+- 新增 `tests/integration/packed-cli-installation.test.ts`，真实执行本地 pack、隔离 install、installed bin help 和 repair handoff。
+- 在 root package 增加发布文件 allowlist 与 fresh-build `prepack`，仅携带正式 `dist`、内部运行时 dist、README 和 LICENSE。
+- 新增 `.pnpmfile.cjs` `beforePacking` 边界，仅在打包时移除私有 workspace dependencies，不改变源 package manifest。
+- 新增 `scripts/prepare-packed-cli.mjs`，把 freshly built 内部 imports 改为 package-relative runtime 路径，并在约定漂移时 fail closed。
+- 验证 tarball 为 `hardening-mcp-0.1.0.tgz`，安装后入口为 `node_modules/.bin/hardening`。
+- 结论：`packed_cli_installed_and_validated_without_publication_or_target_writes`。
+
+### TDD / 验证
+
+- RED 1：tarball 包含 `tests`、`.autopilot` 等开发内容。
+- RED 2：isolated linker 拒绝 bundled workspace dependencies。
+- RED 3：`.pnpmfile.mjs` 未被 pnpm 10 加载，packed manifest 仍保留内部 workspace dependency。
+- Green：改用 `files` allowlist、`.pnpmfile.cjs` `beforePacking` 和 package-relative internal runtime 后，隔离安装/运行 1/1 passed。
+- Installed smoke：`repair --help` 和近真实 `repair handoff` 通过，schema、Markdown、redaction 与 no-write proof 通过。
+- Target proof：目标源码内容、mtime 和目录清单不变；未发布 npm。
+
+### 下一步
+
+RepoAssure Product Completion Gap Audit Refresh v0.4：对照 PLAN、SPEC、PRD、代码入口、测试和人工门禁刷新产品完成度，并只选择一项安全、可自动执行的下一 Goal。
+
+### 边界
+
+- 未写目标 repo，未自动应用补丁，未扩展 MCP registry。
+- 未修改 runtime detector behavior、finding suppression、severity、confidence threshold 或 acceptance policy。
+- 未执行部署、发布、客户联系、价格或支出变更。
+
+## 2026年7月24日 - RepoAssure AI IDE Repair Workflow Installed CLI Real Campaign Validation v0.1
+
+### 完成内容
+
+- 新增 `tests/integration/installed-cli-repair-real-campaign.test.ts`。
+- 使用近真实非私密 fixture，通过五个独立 `node dist/adapters/cli/index.js` 外部进程运行 handoff、dry-run、validation-only、patch-plan 和 evidence-package。
+- 验证结构化 JSON stdout、返回的 JSON/Markdown 路径、四类 schema、AI IDE read order、maintainer review、verification checklist 和 no-write proof。
+- 受控假 `pnpm` 产生 1 passed / 1 failed / 2 skipped validation evidence，并验证 secret-like output 全部脱敏。
+- 验证目标源码内容、mtime 和目录清单完全不变；生产代码未修改。
+- 结论：`installed_cli_real_campaign_validated_without_target_repo_writes`。
+
+### TDD / 验证
+
+- Characterization RED：首次测试按 package runner Markdown summary 解析 stdout，真实 built root CLI 返回 JSON，测试按真实契约修正。
+- Contract refinement RED：按现有 artifact heading 和 `repoassure.repair-execution-report.v1` schema 对齐，未改变产品行为。
+- Integration acceptance：1/1 passed。
+- Structure governance：先因 operation record 缺失出现 RED，再通过 operation record、goal metadata、canonical docs 和 Autopilot state 完成 Green。
+- Final pyramid：repair focused 6 files / 17 tests passed；structure 104/104 passed；完整权限下 `pnpm test` 为 76 passed / 1 skipped test files、738 passed / 1 skipped tests。受限沙箱的 4 个 localhost-listener failures 以原命令权限重跑排除。
+- `pnpm typecheck`、`pnpm lint`、`pnpm repo:hygiene`、`pnpm release:check`、`pnpm goal:audit` 和 `pnpm autopilot:progress:check -- --json` passed；release 仍正确保持 `public release ready: no`，Autopilot 8/8 checks 为 `consistent`。
+
+### 下一步
+
+RepoAssure AI IDE Repair Workflow Packed CLI Installation Validation v0.1：本地创建 tarball，安装到隔离 consumer，验证 package contents、`hardening` bin 和 no-write smoke；不发布 npm。
+
+### 边界
+
+- 未修改 production code、runtime detector behavior、finding suppression、severity、confidence threshold 或 acceptance policy。
+- 未写目标 repo，未自动应用补丁，未扩展 MCP registry。
+- 未执行部署、发布、客户联系、价格或支出变更。
+
+## 2026年7月24日 - RepoAssure AI IDE Repair Workflow CLI Productization v0.1
+
+### 完成内容
+
+- 在正式 CLI 中增加 `hardening repair handoff`、`hardening repair execute`、`hardening repair patch-plan` 和 `hardening repair evidence-package`。
+- CLI 委托现有 `@hardening-mcp/acceptance` runners，复用 schema、redaction、错误语义、maintainer review、verification checklist 和 no-write proof。
+- 对 `--apply`、`--write`、`--auto-fix`、`--commit`、`--push`、`--pull-request` fail closed，并在 artifact access 前拒绝。
+- 生成的 AI IDE `nextCommands` 改为 installed `hardening repair` 命令；`pnpm repair:*` 继续作为兼容入口并出现在 runner help 中。
+- 新增 CLI integration chain，覆盖 handoff -> dry-run -> validation-only -> patch-plan -> evidence-package，并验证 sentinel target source file 不变。
+- 结论：`repair_workflow_cli_productized_without_target_repo_writes`。
+
+### TDD / 验证
+
+- Red：CLI tests 首次出现 11 failures，因为 `repair` namespace 不存在。
+- Green：实现 namespace 与 delegation 后，CLI/integration 45/45 passed。
+- Contract Red：4 tests 因 AI IDE `nextCommands` 仍使用 `pnpm repair:*` 按预期失败；更新 package runners 后恢复 Green。
+- 聚焦 repair suite：6 files / 60 tests passed。
+- `pnpm build:acceptance`、`pnpm build:src` passed。
+- `node dist/adapters/cli/index.js repair --help` 与 `repair patch-plan --help` smoke passed。
+- Structure governance 先新增 RED guard，再通过 operation record、goal metadata、canonical docs 与 Autopilot state 级联闭环。
+- Final pyramid：repair + structure 7 files / 163 tests passed；acceptance package compatibility 36 tests passed；完整权限下 `pnpm test` 75/75 test files、736/736 tests passed，1 skipped。受限沙箱的 4 个 localhost-listener failures 已按环境限制记录并以原命令权限重跑排除。
+- `pnpm typecheck`、`pnpm lint`、`pnpm repo:hygiene`、`pnpm release:check`、`pnpm goal:audit` 和 `pnpm autopilot:progress:check -- --json` passed；release 仍正确保持 `public release ready: no`，Autopilot 8/8 checks 为 `consistent`。
+
+### 下一步
+
+RepoAssure AI IDE Repair Workflow Installed CLI Real Campaign Validation v0.1：用 built CLI 外部进程消费近真实非私密 campaign fixture，验证退出码、物料、schema、Markdown、redaction、maintainer review 和 no-write proof。
+
+### 边界
+
+- 未修改 runtime detector behavior、finding suppression、severity、confidence threshold 或 acceptance policy。
+- 未写目标 repo，未自动应用补丁，未扩展 MCP registry。
+- 未执行部署、发布、客户联系、价格或支出变更。
+
+## 2026年7月24日 - RepoAssure Product Completion Gap Audit Refresh v0.3
+
+### 完成内容
+
+- 对照 PLAN、SPEC、PRD、README、正式 CLI/MCP 入口、private acceptance package、root scripts、测试和近期 operation records 完成产品缺口复核。
+- 将剩余工作分类为 implemented、blocked/manual-gated、external-input-gated、deferred 和 safe auto-executable。
+- 确认 AI IDE repair engine / evidence contracts 已实现，但稳定 installed CLI 入口缺失。
+- 完成 operation record、completed goal record、next-goal contract、Autopilot state 和 canonical docs cascade。
+- 选择 RepoAssure AI IDE Repair Workflow CLI Productization v0.1 为下一 Goal；MCP 扩展不纳入同一验收范围。
+
+### TDD / 验证
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 v0.3 operation record、分类 summary、evidence、边界、completed metadata 和下一 Goal metadata；初始因 `docs/operations/repoassure-product-completion-gap-audit-refresh-v0.3.md` 不存在按预期失败。
+- Green：补齐 operation record、goal/index/progress machine state、PLAN/PRD/SPEC/README、testing、acceptance、decision log 和 dev log 级联。
+- Verification：
+  - `pnpm exec vitest run tests/unit/project-structure.test.ts` — passed，102/102。
+  - `pnpm autopilot:progress:check -- --json` — passed，8/8 checks，status `consistent`。
+  - `pnpm typecheck` — passed。
+  - `pnpm lint` — passed。
+  - `pnpm repo:hygiene` — passed。
+  - `pnpm release:check` — passed automated prerequisites；仍正确报告 `public release ready: no`。
+  - `pnpm goal:audit` — passed automated checks；保留 1 个人工用户验收项。
+  - `pnpm test` — sandbox run 因 localhost server listening 限制出现 4 个环境失败；正常本地权限重跑 passed，74/74 test files、724/724 tests，1 skipped。
+
+### 边界
+
+- 未修改 runtime detector behavior、finding suppression、severity、confidence threshold 或 acceptance policy。
+- 未写目标 repo，未自动应用补丁，未扩展 MCP registry。
+- 未恢复暂缓的网站设计系统任务。
+- 未执行部署、发布、客户联系、价格或支出变更。
+
+## 2026年7月24日 - RepoAssure Autopilot Progress Consistency Guard v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/run-autopilot-progress-consistency.ts` 和 `pnpm autopilot:progress:check`。
+- 新增 `@hardening-mcp/acceptance/run-autopilot-progress-consistency` package export、compatibility entrypoint 和 type-smoke coverage。
+- 检查 Goal index/record、snapshot active/next、progress Markdown、PLAN、README、PRD 和 SPEC，共 8 个 check。
+- 新增 operation record、completed goal metadata，并把下一 Goal 推进到 RepoAssure Product Completion Gap Audit Refresh v0.3。
+- 级联写入 PLAN、README、PRD、SPEC、testing strategy、acceptance checklist、decision log、dev log 和 Autopilot progress state。
+
+### TDD / 验证
+
+- Red：先新增 `tests/unit/autopilot-progress-consistency.test.ts`；首次运行因 runner 不存在失败。
+- Green：实现只读 runner、CLI parser、结构化报告、0/1 exit code、package/command contracts。
+- Pyramid：unit/contract 覆盖一致、snapshot drift、document drift、missing input、mutating option rejection 和 real workspace；integration 覆盖 built CLI consistent/inconsistent exit code。
+- Focused verification：4 files / 146 tests passed，包含 runner unit/contract、built CLI integration、package export 和 brownfield structure cascade。
+- `pnpm typecheck` — passed，包含全部 package、root source 和 website typecheck。
+- `pnpm lint` — passed。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — automated prerequisites passed；仍正确报告 `public release ready: no`，因为 manual legal/trademark/branch-protection/publication authorization gate 未关闭。
+- `pnpm test` — sandbox run 因本地端口监听限制出现 4 个 boot/MCP integration failures；允许本地端口监听后的同命令重跑通过，74/74 test files passed、724/724 tests passed、1 skipped。
+- `pnpm goal:audit` — 34/34 automated checks passed，1 项用户验收保留为 manual confirmation。
+- `pnpm autopilot:progress:check -- --json` — `consistent`，8/8 checks passed，canonical next Goal 为 RepoAssure Product Completion Gap Audit Refresh v0.3。
+
+### 边界
+
+- 未自动修改文档或 Autopilot state。
+- 未修改 runtime detector behavior、finding suppression、severity、threshold 或 acceptance policy。
+- 未写目标 repo。
+- 未执行 hosted dashboard、telemetry/cloud sync、deployment、public release、customer contact、pricing 或 spend change。
+
+## 2026年7月24日 - RepoAssure Canonical Product Narrative Freshness Cleanup v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/repoassure-canonical-product-narrative-freshness-cleanup-v0.1.md`，记录 canonical narrative freshness cleanup 结果。
+- 更新 `.autopilot/goals/repoassure-canonical-product-narrative-freshness-cleanup-v0.1.json` 为 completed，并登记结论 `canonical_product_narrative_freshness_cleaned`。
+- 新增 `.autopilot/goals/repoassure-autopilot-progress-consistency-guard-v0.1.json`，作为下一步 ready goal。
+- 更新 `.autopilot/goals/index.json`、`.autopilot/progress/snapshot.json` 和 `.autopilot/progress/PROGRESS_SNAPSHOT.md`，把 active goal 推进到 progress consistency guard。
+- 级联写入 README、PRD、SPEC、PLAN、testing strategy、acceptance checklist、decision log 和 dev log。
+
+### TDD / 验证
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 narrative freshness operation record、completed goal summary、cleaned surfaces、preserved historical records、stale current/next pattern removal、RepoAssure Autopilot Progress Consistency Guard v0.1 next-goal metadata、canonical doc cascade 和 progress state 存在；初始因 operation record 缺失失败。
+- Green：补齐 narrative freshness cleanup 文档、completed goal record、progress consistency guard next-goal metadata、progress state 和 canonical docs cascade。
+- Verification：
+  - `pnpm vitest run tests/unit/project-structure.test.ts` — passed，102/102 tests passed。
+  - `pnpm typecheck` — passed。
+  - `pnpm lint` — passed。
+  - `pnpm repo:hygiene` — passed。
+  - `pnpm release:check` — passed automated public release prerequisites；仍正确报告 `public release ready: no`，因为 manual publication authorization gate 未关闭。
+  - `pnpm goal:audit` — passed automated checks；仍正确保留用户验收为人工确认项。
+  - `pnpm test` — sandbox run hit local dev-server listening failures；non-sandbox rerun passed，72/72 test files passed，716/716 tests passed，1 skipped。
+
+### 边界
+
+- 未修改 runtime detector behavior。
+- 未 suppression findings。
+- 未自动降级 severity。
+- 未调整 detector confidence threshold。
+- 未改变 acceptance policy。
+- 未写目标 repo。
+- 未执行 hosted dashboard、telemetry/cloud sync、deployment、public release、customer contact、pricing 或 spend change。
+
+## 2026年7月24日 - RepoAssure Product Completion Gap Audit Refresh v0.2
+
+### 完成内容
+
+- 新增 `docs/operations/repoassure-product-completion-gap-audit-refresh-v0.2.md`，记录产品完成度缺口刷新结果。
+- 更新 `.autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.2.json` 为 completed，并登记结论 `completion_gap_audit_refreshed_with_narrative_cleanup_next`。
+- 新增 `.autopilot/goals/repoassure-canonical-product-narrative-freshness-cleanup-v0.1.json`，作为下一步 ready goal。
+- 更新 `.autopilot/goals/index.json`、`.autopilot/progress/snapshot.json` 和 `.autopilot/progress/PROGRESS_SNAPSHOT.md`，把 active goal 推进到 narrative freshness cleanup。
+- 级联写入 README、PRD、SPEC、PLAN、testing strategy、acceptance checklist、decision log 和 dev log。
+
+### TDD / 验证
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 completion gap audit refresh operation record、completed goal summary、implemented / blocked / deferred / safe auto-executable gaps、selected next goal RepoAssure Canonical Product Narrative Freshness Cleanup v0.1、canonical doc cascade、progress state 和 next-goal metadata 存在；初始因 operation record 缺失失败。
+- Green：补齐 completion gap audit refresh 文档、completed goal record、narrative freshness cleanup next-goal metadata、progress state 和 canonical docs cascade。
+- Verification：
+  - `pnpm vitest run tests/unit/project-structure.test.ts` — passed，102/102 tests passed。
+  - `pnpm typecheck` — passed。
+  - `pnpm lint` — passed。
+  - `pnpm repo:hygiene` — passed。
+  - `pnpm release:check` — passed automated public release prerequisites；仍正确报告 `public release ready: no`，因为 manual publication authorization gate 未关闭。
+  - `pnpm goal:audit` — passed automated checks；仍正确保留用户验收为人工确认项。
+  - `pnpm test` — sandbox run hit local dev-server listening failures；non-sandbox rerun passed，72/72 test files passed，716/716 tests passed，1 skipped。
+
+### 边界
+
+- 未修改 runtime detector behavior。
+- 未 suppression findings。
+- 未自动降级 severity。
+- 未调整 detector confidence threshold。
+- 未改变 acceptance policy。
+- 未写目标 repo。
+- 未执行 hosted dashboard、telemetry/cloud sync、deployment、public release、customer contact、pricing 或 spend change。
+
+## 2026年7月24日 - RepoAssure Product Backlog Reprioritization After Detector Decision Block v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/repoassure-product-backlog-reprioritization-after-detector-decision-block-v0.1.md`，记录 backlog reprioritization 结果。
+- 更新 `.autopilot/goals/repoassure-product-backlog-reprioritization-after-detector-decision-block-v0.1.json` 为 completed，并登记结论 `backlog_reprioritized_to_non_blocked_local_gap_audit`。
+- 新增 `.autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.2.json`，作为下一步 ready goal。
+- 更新 `.autopilot/goals/index.json`、`.autopilot/progress/snapshot.json` 和 `.autopilot/progress/PROGRESS_SNAPSHOT.md`，把 active goal 推进到 completion gap audit refresh。
+- 级联写入 README、PRD、SPEC、PLAN、testing strategy、acceptance checklist、decision log 和 dev log。
+
+### TDD / 验证
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 backlog reprioritization operation record、completed goal summary、blocked detector calibration line、candidate review、selected next goal RepoAssure Product Completion Gap Audit Refresh v0.2、canonical doc cascade、progress state 和 next-goal metadata 存在；初始因 operation record 缺失失败。
+- Green：补齐 backlog reprioritization 文档、completed goal record、completion gap audit refresh next-goal metadata、progress state 和 canonical docs cascade。
+- Verification：
+  - `pnpm vitest run tests/unit/project-structure.test.ts` — passed，102/102 tests passed。
+  - `pnpm typecheck` — passed。
+  - `pnpm lint` — passed。
+  - `pnpm repo:hygiene` — passed。
+  - `pnpm release:check` — passed automated public release prerequisites；仍正确报告 `public release ready: no`，因为 manual publication authorization gate 未关闭。
+  - `pnpm goal:audit` — passed automated checks；仍正确保留用户验收为人工确认项。
+  - `pnpm test` — sandbox run hit local dev-server listening failures；non-sandbox rerun passed，72/72 test files passed，716/716 tests passed，1 skipped。
+
+### 边界
+
+- 未修改 runtime detector behavior。
+- 未 suppression findings。
+- 未自动降级 severity。
+- 未调整 detector confidence threshold。
+- 未改变 acceptance policy。
+- 未写目标 repo。
+- 未执行 hosted dashboard、telemetry/cloud sync、deployment、public release、customer contact、pricing 或 spend change。
+
+## 2026年7月24日 - Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Follow-up v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-follow-up-v0.1.md`，记录 follow-up 结果。
+- 更新 `.autopilot/goals/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-follow-up-v0.1.json` 为 completed，并登记结论 `maintainer_decision_follow_up_recorded_without_explicit_decisions`。
+- 新增 `.autopilot/goals/repoassure-product-backlog-reprioritization-after-detector-decision-block-v0.1.json`，作为下一步 ready goal。
+- 更新 `.autopilot/goals/index.json`、`.autopilot/progress/snapshot.json` 和 `.autopilot/progress/PROGRESS_SNAPSHOT.md`，把 active goal 推进到 backlog reprioritization。
+- 级联写入 README、PRD、SPEC、PLAN、testing strategy、acceptance checklist、decision log 和 dev log。
+
+### TDD / 验证
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 maintainer decision follow-up operation record、completed goal summary、0 个 recorded decisions、2 个 pending decisions、execution authorization is not calibration approval、detector calibration implementation blocked、canonical doc cascade、progress state 和 RepoAssure Product Backlog Reprioritization After Detector Decision Block v0.1 next-goal metadata 存在；初始因 operation record 缺失失败。
+- Green：补齐 follow-up 文档、completed goal record、backlog reprioritization next-goal metadata、progress state 和 canonical docs cascade。
+- Verification：
+  - `pnpm vitest run tests/unit/project-structure.test.ts` — passed，102/102 tests passed。
+  - `pnpm typecheck` — passed。
+  - `pnpm lint` — passed。
+  - `pnpm repo:hygiene` — passed。
+  - `pnpm release:check` — passed automated public release prerequisites；仍正确报告 `public release ready: no`，因为 manual publication authorization gate 未关闭。
+  - `pnpm goal:audit` — passed automated checks；仍正确保留用户验收为人工确认项。
+  - `pnpm test` — sandbox run hit local dev-server listening failures；non-sandbox rerun passed，72/72 test files passed，716/716 tests passed，1 skipped。
+
+### 边界
+
+- 未修改 runtime detector behavior。
+- 未 suppression findings。
+- 未自动降级 severity。
+- 未调整 detector confidence threshold。
+- 未改变 acceptance policy。
+- 未写目标 repo。
+- 未执行 hosted dashboard、telemetry/cloud sync、deployment、public release、customer contact、pricing 或 spend change。
+
+## 2026年7月24日 - Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Recording v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1.md`，正式记录当前 maintainer decision state。
+- 更新 `.autopilot/goals/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1.json` 为 completed，并登记结论 `maintainer_decision_record_created_with_pending_decisions`。
+- 新增 `.autopilot/goals/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-follow-up-v0.1.json`，作为下一步 ready goal。
+- 更新 `.autopilot/goals/index.json`、`.autopilot/progress/snapshot.json` 和 `.autopilot/progress/PROGRESS_SNAPSHOT.md`，把 active goal 推进到 follow-up。
+- 级联写入 README、PRD、SPEC、PLAN、testing strategy、acceptance checklist、decision log 和 dev log。
+
+### TDD / 验证
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 maintainer decision recording operation record、completed goal summary、0 个 recorded decisions、2 个 pending decisions、preserved decision slots、canonical doc cascade、progress state 和 Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Follow-up v0.1 next-goal metadata 存在；初始因 operation record 缺失失败。
+- Green：补齐 decision recording 文档、completed goal record、follow-up next-goal metadata、progress state 和 canonical docs cascade。
+- Verification：
+  - `pnpm vitest run tests/unit/project-structure.test.ts` — passed，102/102 tests passed。
+  - `pnpm typecheck` — passed。
+  - `pnpm lint` — passed。
+  - `pnpm repo:hygiene` — passed。
+  - `pnpm release:check` — passed automated public release prerequisites；仍正确报告 `public release ready: no`，因为 manual publication authorization gate 未关闭。
+  - `pnpm goal:audit` — passed automated checks；仍正确保留用户验收为人工确认项。
+  - `pnpm test` — sandbox run hit local dev-server listening failures；non-sandbox rerun passed，72/72 test files passed，716/716 tests passed，1 skipped。
+
+### 边界
+
+- 未修改 runtime detector behavior。
+- 未 suppression findings。
+- 未自动降级 severity。
+- 未调整 detector confidence threshold。
+- 未改变 acceptance policy。
+- 未写目标 repo。
+- 未执行 hosted dashboard、telemetry/cloud sync、deployment、public release、customer contact、pricing 或 spend change。
+
+## 2026年7月24日 - RepoAssure Product Applicability Boundary Documentation Cascade v0.1
+
+### 完成内容
+
+- 新增 `docs/product/strategy/product-applicability-boundary-v0.1.md`，定义 Core、Extended、Partner / Plugin 和 Out of Scope 产品适用边界。
+- 新增 `.autopilot/goals/repoassure-product-applicability-boundary-documentation-cascade-v0.1.json`，登记结论 `product_applicability_boundary_documented`。
+- 更新 `.autopilot/goals/index.json`、`.autopilot/progress/snapshot.json` 和 `.autopilot/progress/PROGRESS_SNAPSHOT.md`，把本轮文档级联标记为 completed，并把 next goal 恢复为 Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Recording v0.1。
+- 级联写入 README、PRD、SPEC、PLAN、testing strategy、acceptance checklist、decision log 和 dev log。
+
+### TDD / 验证
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 product applicability boundary strategy doc、completed goal summary、Core / Extended / Partner-or-Plugin / Out-of-Scope tiers、prohibited claims、canonical doc cascade、progress state 和 Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Recording v0.1 next-goal metadata 存在；初始因 `docs/product/strategy/product-applicability-boundary-v0.1.md` 缺失失败。
+- Green：补齐 strategy doc、completed goal record、progress state 和 canonical docs cascade。
+- Verification：
+  - `pnpm vitest run tests/unit/project-structure.test.ts` — passed，102/102 tests passed。
+  - `pnpm typecheck` — passed。
+  - `pnpm lint` — passed。
+  - `pnpm repo:hygiene` — passed。
+  - `pnpm release:check` — passed automated public release prerequisites；仍正确报告 `public release ready: no`，因为 manual publication authorization gate 未关闭。
+  - `pnpm goal:audit` — passed automated checks；仍正确保留用户验收为人工确认项。
+  - `pnpm test` — sandbox run hit local dev-server listening failures；non-sandbox rerun passed，72/72 test files passed，716/716 tests passed，1 skipped。
+
+### 边界
+
+- 未修改 runtime behavior。
+- 未修改 runtime detectors。
+- 未 suppression findings。
+- 未自动降级 severity。
+- 未改变 acceptance policy。
+- 未写目标 repo。
+- 未执行 hosted dashboard、telemetry/cloud sync、deployment、public release、customer contact、pricing 或 spend change。
+
+## 2026年7月23日 - Product False-Positive Regression Catalog Detector Calibration Authorization Intake v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1.md`，创建本地 maintainer decision intake。
+- 更新 `.autopilot/goals/product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1.json` 为 completed，并登记结论 `authorization_intake_created_pending_maintainer_decisions`。
+- 新增 `.autopilot/goals/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1.json`，作为下一步 ready goal。
+- 更新 `.autopilot/goals/index.json`、`.autopilot/progress/snapshot.json` 和 `.autopilot/progress/PROGRESS_SNAPSHOT.md`，把 active goal 推进到 maintainer decision recording。
+- 级联写入 README、PRD、SPEC、PLAN、Project Intelligence product spec、architecture spec、testing strategy、acceptance checklist、decision log 和 dev log。
+
+### TDD / 验证
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 authorization intake operation record、completed goal summary、pending decision slots、manual gates、future authorization boundary、canonical doc cascade、progress state 和 Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Recording v0.1 next-goal metadata 存在，初始因 operation record 缺失失败。
+- Green：补齐 authorization intake 文档、completed goal record、maintainer decision recording next-goal metadata 和 canonical docs cascade。
+- `pnpm vitest run tests/unit/project-structure.test.ts` — Red 阶段因 missing authorization intake operation record 失败，Green 后 passed，102 tests。
+- `pnpm typecheck` — passed。
+- `pnpm lint` — passed。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — automated prerequisites passed；`public release ready: no` remains expected because manual publication authorization gates are still required。
+- `pnpm goal:audit` — passed automated evidence scope and reports ready for user acceptance；manual MVP/user confirmation remains required。
+- `pnpm test` — sandbox run failed on local app/MCP localhost listening tests；localhost-permitted rerun passed，72 files passed，1 skipped；716 tests passed，1 skipped。
+
+### 边界
+
+- 未修改 runtime detectors。
+- 未 suppression findings。
+- 未自动降级 severity。
+- 未调整 detector confidence threshold。
+- 未改变 acceptance policy。
+- 未写目标 repo。
+- 未执行 hosted dashboard、telemetry/cloud sync、deployment、public release、customer contact、pricing 或 spend change。
+
+## 2026年7月23日 - Product False-Positive Regression Catalog Detector Calibration Completion Audit v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/product-false-positive-regression-catalog-detector-calibration-completion-audit-v0.1.md`，关闭当前 local-only detector calibration 产品切片。
+- 更新 `.autopilot/goals/product-false-positive-regression-catalog-detector-calibration-completion-audit-v0.1.json` 为 completed，并登记结论 `complete_for_current_local_only_detector_calibration_slice`。
+- 新增 `.autopilot/goals/product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1.json`，作为下一步 ready goal。
+- 新增下一步 goal：Product False-Positive Regression Catalog Detector Calibration Authorization Intake v0.1。
+- 更新 `.autopilot/goals/index.json`、`.autopilot/progress/snapshot.json` 和 `.autopilot/progress/PROGRESS_SNAPSHOT.md`，把 active goal 推进到 authorization intake。
+- 级联写入 README、PRD、SPEC、PLAN、Project Intelligence product spec、architecture spec、testing strategy、acceptance checklist、decision log 和 dev log。
+
+### TDD / 验证
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 detector calibration completion audit operation record、completed goal summary、generated local artifacts、canonical doc cascade、progress state 和下一步 authorization intake goal 存在，初始因 operation record 缺失失败。
+- Green：补齐 completion audit 文档、completed goal record、authorization intake next-goal metadata 和 canonical docs cascade。
+- `pnpm vitest run tests/unit/project-structure.test.ts` — passed，102 tests。
+- `pnpm vitest run tests/unit/false-positive-detector-calibration-contract.test.ts tests/unit/false-positive-detector-calibration-contract-consumption.test.ts tests/unit/acceptance-package.test.ts tests/type-smoke/acceptance-package-subpaths.ts tests/unit/project-structure.test.ts` — passed，4 test files，149 tests。
+- `pnpm typecheck` — passed。
+- `pnpm lint` — passed。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — automated prerequisites passed；`public release ready: no` remains expected because manual publication authorization gates are still required。
+- `pnpm goal:audit` — passed automated evidence scope and reports ready for user acceptance；manual MVP/user confirmation remains required。
+- `pnpm test` — sandbox run failed on local app/MCP localhost listening tests；localhost-permitted rerun passed，72 files passed，1 skipped；716 tests passed，1 skipped。
+
+### 边界
+
+- 未修改 runtime detectors。
+- 未 suppression findings。
+- 未自动降级 severity。
+- 未调整 detector confidence threshold。
+- 未改变 acceptance policy。
+- 未写目标 repo。
+- 未执行 hosted dashboard、telemetry/cloud sync、deployment、public release、customer contact、pricing 或 spend change。
+
+## 2026年7月23日 - Product False-Positive Regression Catalog Detector Calibration Contract Consumption Validation v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/run-false-positive-detector-calibration-contract-consumption.ts`。
+- 新增 `pnpm false-positive:calibration-contract:validate`。
+- 新增 `@hardening-mcp/acceptance/run-false-positive-detector-calibration-contract-consumption` package export、compatibility entrypoint registration 和 type-smoke 覆盖。
+- 生成 local-only `artifacts/project-graph/false-positive-detector-calibration-contract-consumption-validation.json` / `.md`。
+- Consumption validation 验证 AI IDE read order、2 个 calibration questions、manual gates、future authorization boundary、maintainer review boundary、Markdown readability、redaction、fail-closed runtime-change checks 和 no target repo write boundary。
+- 新增下一步 goal：Product False-Positive Regression Catalog Detector Calibration Completion Audit v0.1。
+- 级联更新 README、PRD、SPEC、PLAN、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 `.autopilot` progress。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/false-positive-detector-calibration-contract-consumption.test.ts`，要求 consumption runner、schema、read order、manual gates、future authorization、Markdown readability、redaction、fail-closed runtime detector change / suppression / severity downgrade / target repo write checks 存在；测试因模块缺失按预期失败。
+- Green：实现 consumption validation runner、root/subpath exports、compatibility registration、root script 和 generated validation artifact writer，使 focused contract/package tests 通过。
+
+### 验证
+
+- `pnpm vitest run tests/unit/false-positive-detector-calibration-contract-consumption.test.ts` — Red 阶段因 missing module 失败，Green 后 passed。
+- `pnpm build:acceptance` — passed。
+- `pnpm vitest run tests/unit/false-positive-detector-calibration-contract-consumption.test.ts tests/unit/acceptance-package.test.ts tests/unit/project-structure.test.ts` — passed，3 test files，144 tests。
+- `pnpm false-positive:calibration-contract:validate -- --generated-at 2026-07-23T09:00:00.000+08:00` — passed，13 checks。
+- `pnpm typecheck` — passed。
+- `pnpm lint` — passed。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — automated prerequisites passed；`public release ready: no` remains expected because manual authorization gates are still required。
+- `pnpm goal:audit` — passed automated evidence scope and reports ready for user acceptance；manual MVP/user confirmation remains required。
+- `pnpm test` — initial sandbox run failed because local integration tests could not listen on `127.0.0.1`; non-sandbox localhost-permitted rerun passed，72 test files passed，1 skipped；716 tests passed，1 skipped。
+
+### 边界
+
+- No runtime detection behavior change was implemented。
+- No finding suppression was implemented。
+- No automatic severity downgrade was implemented。
+- No detector confidence threshold change was implemented。
+- No acceptance policy change was implemented。
+- No target repo write was authorized。
+- No private target repo source or secrets were added。
+
+## 2026年7月23日 - Product False-Positive Regression Catalog Detector Calibration Contract v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/run-false-positive-detector-calibration-contract.ts`。
+- 新增 `pnpm false-positive:calibration-contract`。
+- 新增 `@hardening-mcp/acceptance/run-false-positive-detector-calibration-contract` package export、compatibility entrypoint registration 和 type-smoke 覆盖。
+- 生成 local-only `artifacts/project-graph/false-positive-detector-calibration-contract.json` / `.md`。
+- Contract 固化 AI IDE read order、2 个 calibration questions、manual gates、future implementation authorization boundary、redaction metadata 和 no runtime detector behavior change / no target repo write boundary。
+- 新增下一步 goal：Product False-Positive Regression Catalog Detector Calibration Contract Consumption Validation v0.1。
+- 级联更新 README、PRD、SPEC、PLAN、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 `.autopilot` progress。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/false-positive-detector-calibration-contract.test.ts`，要求 contract runner、schema、AI IDE read order、calibration questions、manual gates、future authorization boundary、Markdown readability、artifact writer 和 boundary validation 存在；测试因模块缺失按预期失败。
+- Green：实现 contract runner、root/subpath exports、compatibility registration、root script 和 generated artifact writer，使 focused contract/package tests 通过。
+
+### 验证
+
+- `pnpm vitest run tests/unit/false-positive-detector-calibration-contract.test.ts` — Red 阶段因 missing module 失败，Green 后 passed。
+- `pnpm vitest run tests/unit/false-positive-detector-calibration-contract.test.ts tests/unit/acceptance-package.test.ts` — passed，2 test files，40 tests。
+- `pnpm vitest run tests/unit/project-structure.test.ts` — passed，102 tests，验证 operation record、goal index、progress snapshot 和文档级联。
+- `pnpm vitest run tests/unit/false-positive-detector-calibration-contract.test.ts tests/unit/acceptance-package.test.ts tests/unit/project-structure.test.ts` — passed，3 test files，142 tests。
+- `pnpm build:acceptance` — passed。
+- `pnpm typecheck` — passed。
+- `pnpm lint` — passed。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — automated prerequisites passed；`public release ready: no` remains expected because manual legal/trademark/branch-protection publication authorization is still required。
+- `pnpm goal:audit` — passed automated evidence scope and reports ready for user acceptance；manual MVP/user confirmation remains required。
+- `pnpm test` — initial sandbox run failed because local integration tests could not listen on `127.0.0.1` (`listen EPERM`); non-sandbox localhost-permitted rerun passed，71 test files passed，1 skipped；709 tests passed，1 skipped。
+- `pnpm false-positive:calibration-contract -- --generated-at 2026-07-23T08:00:00.000+08:00` — passed，2 calibration questions，validation passed。
+
+### 边界
+
+- No runtime detection behavior change was implemented。
+- No finding suppression was implemented。
+- No automatic severity downgrade was implemented。
+- No detector confidence threshold change was implemented。
+- No acceptance policy change was implemented。
+- No target repo write was authorized。
+- No private target repo source or secrets were added。
+
+## 2026年7月23日 - Product False-Positive Regression Catalog Detector Calibration Planning v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/product-false-positive-regression-catalog-detector-calibration-planning-v0.1.md`。
+- 将 `real-fixture:react-disabled-save-control` 映射到 `conditional_dead_control_should_consider_form_dirty_prerequisites` calibration question。
+- 将 `real-fixture:vite-auth-redirect-route` 映射到 `auth_redirect_route_should_preserve_maintainer_review_boundary` calibration question。
+- 定义 manual review gates：maintainer classification、fixture privacy、expected snapshot、confidence threshold 和 regression artifact review。
+- 明确 future implementation authorization：runtime detector change、finding suppression、automatic severity downgrade、confidence threshold change 和 acceptance policy change 必须另开 goal。
+- 新增下一步 goal：Product False-Positive Regression Catalog Detector Calibration Contract v0.1。
+- 级联更新 README、PRD、SPEC、PLAN、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 `.autopilot` progress。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 detector calibration planning operation record、completed goal summary、calibration questions、manual gates、future authorization boundary、下一步 contract goal 和 canonical doc cascade 存在；测试因 planning operation record 缺失按预期失败。
+- Green：新增 planning operation record、completed goal metadata、next contract goal 和文档级联。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-structure.test.ts` — Red 阶段因 missing detector calibration planning operation record 失败，Green 后 passed，102 tests。
+- `pnpm typecheck` — passed。
+- `pnpm lint` — passed。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — automated prerequisites passed；`public release ready: no` remains expected because manual legal/trademark/branch-protection publication authorization is still required。
+- `pnpm goal:audit` — passed automated evidence scope and reports ready for user acceptance；manual MVP/user confirmation remains required。
+- `pnpm test` — passed in elevated localhost-permitted environment，70 test files passed，1 skipped；703 tests passed，1 skipped。
+
+### 边界
+
+- No runtime detection behavior change was implemented。
+- No finding suppression was implemented。
+- No automatic severity downgrade was implemented。
+- No target repo write was authorized。
+- No private target repo source or secrets were added。
+- No hosted dashboard、cloud sync、telemetry、deployment、public release、repository visibility change、npm publication、GitHub release、customer contact、pricing、or spend change was authorized。
+- Website design-system work remains deferred by owner direction。
+
+## 2026年7月25日 - RepoAssure AI IDE Repair Workflow MCP Convergence Decision and Contract v0.1
+
+### 完成内容
+
+- 新增 ADR-0024，接受四个分阶段 artifact-only MCP 候选工具。
+- 新增 `docs/product/specs/ai-ide-repair-workflow-mcp-convergence-contract-v0.1.md`，定义精确 input/output、annotations、兼容性、错误、脱敏、maintainer review、verification 和 no-write 契约。
+- 明确 validation-only remains CLI-only，MCP resources and prompts deferred。
+- 选择 RepoAssure AI IDE Repair Handoff MCP Tool Implementation v0.1 为下一 Goal。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/project-structure.test.ts` 契约测试；109 项中仅新增测试因 ADR/契约/执行记录缺失而失败，原有 108 项通过。
+- Green：补齐 ADR、契约、执行记录、canonical docs 和 Autopilot state，不修改生产代码或 MCP registry。
+
+### 边界
+
+- Existing MCP registry remains eight tools。
+- No validation-only MCP exposure。
+- No target repo write or automatic patch application。
+- No npm publication, deployment, public release, hosted claim, customer contact, pricing, or spend change。
+
+### 验证
+
+- Focused structure：109/109 passed。
+- Autopilot progress consistency：8/8 passed。
+- Typecheck、lint、repo hygiene、release check、goal audit：passed。
+- Full test pyramid：745 passed、1 skipped；78 files passed、1 skipped。
+- 沙箱内首次 full run 的本地监听与并行 packed-install 失败，经受控定向复跑和单 worker 全量复跑确认均为环境/并发限制，不是本 Goal 回归。
+
+## 2026年7月23日 - Product False-Positive Regression Catalog Real Fixture Expansion v0.1
+
+### 完成内容
+
+- 在 `packages/acceptance/src/false-positive-catalog.ts` 新增 `real_world_fixture_regressions` fixture category。
+- 新增 2 条 near-real public fixture candidates：`real-fixture:react-disabled-save-control` 和 `real-fixture:vite-auth-redirect-route`。
+- 为 catalog entries 新增 `fixtureOrigin` 和 privacy metadata，明确 `nonPrivate=true`、`sourceCodeIncluded=false`、`secretsIncluded=false`。
+- 更新 catalog validation，要求所有 entries 保持非私密、无源码、无 secrets；real-world fixture origin 必须是 public origin。
+- 更新 `packages/acceptance/src/run-false-positive-catalog.ts`，在 generated Markdown 中展示 fixture origin 和 non-private status。
+- 更新 `packages/acceptance/src/run-false-positive-catalog-consumption.ts`，要求 consumption validation 覆盖 `real_world_fixture_regressions`。
+- 新增 `docs/operations/product-false-positive-regression-catalog-real-fixture-expansion-v0.1.md`。
+- 新增下一步 goal：Product False-Positive Regression Catalog Detector Calibration Planning v0.1。
+- 级联更新 README、PRD、SPEC、PLAN、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 `.autopilot` progress。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/false-positive-catalog.test.ts`，要求 `real_world_fixture_regressions`、2 条 near-real public fixtures、`fixtureOrigin` 和 privacy metadata；初始 4 个 tests 按预期失败。
+- Green：补齐 catalog contract、default entries、validation、artifact Markdown 和 consumption validation，使 focused catalog tests 通过。
+
+### 验证
+
+- `pnpm vitest run tests/unit/false-positive-catalog.test.ts` — Red 阶段按预期失败，缺少 `real_world_fixture_regressions` 和 near-real entries。
+- `pnpm vitest run tests/unit/false-positive-catalog.test.ts tests/unit/false-positive-catalog-artifacts.test.ts tests/unit/false-positive-catalog-consumption.test.ts` — passed，3 test files，13 tests。
+- `pnpm vitest run tests/unit/acceptance-package.test.ts tests/type-smoke/acceptance-package-subpaths.ts` — passed，package exports/type-smoke 正常。
+- `pnpm false-positive:catalog -- --generated-at 2026-07-23T00:00:00.000+08:00` — passed，7 entries，validation passed。
+- `pnpm false-positive:catalog:validate -- --generated-at 2026-07-23T00:00:00.000+08:00` — passed，13 checks，validation passed。
+- `pnpm vitest run tests/unit/user-acceptance.test.ts` — passed after giving the Python CLI subprocess acceptance test an explicit 15s integration-style timeout budget。
+- `pnpm test` — passed in elevated localhost-permitted environment，70 test files passed，1 skipped；703 tests passed，1 skipped。
+- `pnpm typecheck` — passed。
+- `pnpm lint` — passed。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — automated prerequisites passed；`public release ready: no` remains expected because manual legal/trademark/branch-protection publication authorization is still required。
+- `pnpm goal:audit` — passed automated evidence scope and reports ready for user acceptance；manual MVP/user confirmation remains required。
+
+### 边界
+
+- No runtime detection behavior change was implemented。
+- No finding suppression was implemented。
+- No automatic severity downgrade was implemented。
+- No target repo write was authorized。
+- No private target repo source or secrets were added。
+- No hosted dashboard, cloud sync, telemetry, deployment, public release, repository visibility change, npm publication, GitHub release, customer contact, pricing, or spend change was authorized。
+- Website design-system work remains deferred by owner direction。
+
+## 2026年7月22日 - Product False-Positive Regression Catalog Completion Audit v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/product-false-positive-regression-catalog-completion-audit-v0.1.md`，审计 planning、contract implementation、artifact generation 和 consumption validation 四步是否作为 local-only catalog 产品切片完整关闭。
+- 更新 `.autopilot/goals/product-false-positive-regression-catalog-completion-audit-v0.1.json`，状态改为 completed，结论为 `complete_for_current_local_only_catalog_slice`。
+- 新增 `.autopilot/goals/product-false-positive-regression-catalog-real-fixture-expansion-v0.1.json`，作为下一步 ready goal。
+- 新增下一步 goal：Product False-Positive Regression Catalog Real Fixture Expansion v0.1。
+- 级联更新 README、PRD、SPEC、PLAN、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 `.autopilot` progress。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 completion audit operation record、completed goal summary、confirmed generated artifacts、canonical doc cascade 和下一步 real fixture expansion goal 存在，初始因 operation record 缺失失败。
+- Green：补齐 completion audit 文档、goal summary、next-goal metadata 和 canonical docs，使结构测试进入可通过状态。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-structure.test.ts` — Red 阶段因 missing completion audit operation record 失败，Green 后 passed，102 tests。
+- `pnpm vitest run tests/unit/false-positive-catalog.test.ts tests/unit/false-positive-catalog-artifacts.test.ts tests/unit/false-positive-catalog-consumption.test.ts tests/unit/acceptance-package.test.ts tests/unit/project-structure.test.ts` — passed，5 test files，148 tests。
+- `pnpm false-positive:catalog -- --generated-at 2026-07-22T00:00:00.000+08:00` — passed，5 entries，validation passed。
+- `pnpm false-positive:catalog:validate -- --generated-at 2026-07-22T00:00:00.000+08:00` — passed，13 checks，validation passed。
+- `pnpm typecheck` — passed。
+- `pnpm lint` — passed。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — automated prerequisites passed；`public release ready: no` remains expected because manual legal/trademark/branch-protection publication authorization is still required。
+- `pnpm test` — sandbox run failed on localhost boot/MCP listen tests；elevated localhost-permitted rerun passed：70 test files passed，1 skipped；702 tests passed，1 skipped。
+- `pnpm goal:audit` — passed automated evidence scope and reports ready for user acceptance；manual MVP/user confirmation remains required。
+
+### 边界
+
+- No runtime detection behavior change was implemented。
+- No finding suppression was implemented。
+- No automatic severity downgrade was implemented。
+- No target repo write was authorized。
+- No hosted dashboard, cloud sync, telemetry, deployment, public release, repository visibility change, npm publication, GitHub release, customer contact, pricing, or spend change was authorized。
+- Website design-system work remains deferred by owner direction。
+
+## 2026年7月22日 - Product False-Positive Regression Catalog Consumption Validation v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/run-false-positive-catalog-consumption.ts`，读取 generated catalog JSON/Markdown 并输出 local-only consumption validation report。
+- 新增 `pnpm false-positive:catalog:validate`，默认输出 `artifacts/project-graph/false-positive-regression-catalog-consumption-validation.json` 和 `.md`。
+- 新增 `@hardening-mcp/acceptance/run-false-positive-catalog-consumption` package export、compatibility entrypoint registration 和 type-smoke 覆盖。
+- 新增 `tests/unit/false-positive-catalog-consumption.test.ts`，覆盖 JSON-first read order、Markdown readability、maintainer review boundary、fixture categories、expected snapshot fields、review fields、verification checklist、redaction、no target repo write、no runtime detection behavior change、fail-closed Markdown boundary 和 CLI argument parsing。
+- 新增 operation record，并级联更新 README、PRD、SPEC、PLAN、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 `.autopilot` progress。
+- 新增下一步 goal：Product False-Positive Regression Catalog Completion Audit v0.1。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/false-positive-catalog-consumption.test.ts`，要求 consumption runner、report schema、JSON/Markdown consumption checks、fail-closed behavior 和 no-write/no-behavior-change boundary 存在，初始因模块缺失失败。
+- Green：实现 `run-false-positive-catalog-consumption.ts`、root/subpath exports、compatibility registration 和 root script，使 focused consumption/package tests 通过。
+- Refine：实际运行 `pnpm false-positive:catalog:validate` 暴露相对路径与绝对路径 read order 对比问题，随后在 validator 内按 resolved path 判断等价关系，不改变 generated artifact 格式。
+- Cascade：补齐 structure/documentation guard，防止 consumption validation goal 与 canonical docs、operation record 和 `.autopilot` next-goal metadata 脱节。
+
+### 验证
+
+- `pnpm vitest run tests/unit/false-positive-catalog-consumption.test.ts` — passed，1 test file，5 tests。
+- `pnpm vitest run tests/unit/false-positive-catalog-consumption.test.ts tests/unit/acceptance-package.test.ts` — passed，2 test files，39 tests。
+- `pnpm build:acceptance` — passed。
+- `pnpm false-positive:catalog:validate -- --generated-at 2026-07-22T00:00:00.000+08:00` — passed，13 checks，validation passed。
+- `pnpm vitest run tests/unit/false-positive-catalog-consumption.test.ts tests/unit/false-positive-catalog-artifacts.test.ts tests/unit/acceptance-package.test.ts tests/unit/project-structure.test.ts` — passed，4 test files，145 tests。
+- `pnpm typecheck` — passed。
+- `pnpm lint` — passed。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — automated prerequisites passed；`public release ready: no` remains expected because manual legal/trademark/branch-protection publication authorization is still required。
+- `pnpm test` — sandbox run failed on localhost boot/MCP listen tests；elevated localhost-permitted rerun passed：70 test files passed，1 skipped；702 tests passed，1 skipped。
+- `pnpm goal:audit` — passed automated evidence scope and reports ready for user acceptance；manual MVP/user confirmation remains required。
+
+### 边界
+
+- No hosted dashboard was authorized。
+- No cloud sync was authorized。
+- No telemetry was authorized。
+- No deployment or public release was authorized。
+- No target repo write was authorized。
+- No runtime detection behavior change was implemented。
+- No finding suppression or automatic severity downgrade was implemented。
+- Website design-system work remains deferred by owner direction。
+
+## 2026年7月22日 - Product False-Positive Regression Catalog Artifact Generation v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/run-false-positive-catalog.ts`，把 false-positive regression catalog contract 转换为 local-only JSON/Markdown artifact bundle。
+- 新增 `pnpm false-positive:catalog`，默认输出 `artifacts/project-graph/false-positive-regression-catalog.json` 和 `artifacts/project-graph/false-positive-regression-catalog.md`。
+- 新增 `@hardening-mcp/acceptance/run-false-positive-catalog` package export、compatibility entrypoint registration 和 type-smoke 覆盖。
+- 新增 `tests/unit/false-positive-catalog-artifacts.test.ts`，覆盖 artifact schema、Markdown readability、AI IDE read order、maintainer review boundary、redaction metadata、no target repo write 和 no runtime detection behavior change boundary。
+- 新增 operation record，并级联更新 README、PRD、SPEC、PLAN、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 `.autopilot` progress。
+- 新增下一步 goal：Product False-Positive Regression Catalog Consumption Validation v0.1。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/false-positive-catalog-artifacts.test.ts`，要求 artifact runner、JSON/Markdown 输出、AI IDE read order、maintainer boundary 和 no-write/no-behavior-change boundary 存在，初始因模块缺失失败。
+- Green：实现 `run-false-positive-catalog.ts`、root/subpath exports、compatibility registration 和 root script，使 focused artifact/package tests 通过。
+- Cascade：补齐 structure/documentation guard，防止 generated artifact goal 与 canonical docs、operation record 和 `.autopilot` next-goal metadata 脱节。
+
+### 验证
+
+- `pnpm vitest run tests/unit/false-positive-catalog-artifacts.test.ts tests/unit/acceptance-package.test.ts` — passed，2 test files，37 tests。
+- `pnpm vitest run tests/unit/false-positive-catalog.test.ts tests/unit/false-positive-catalog-artifacts.test.ts tests/unit/acceptance-package.test.ts tests/unit/project-structure.test.ts` — passed，4 test files，142 tests。
+- `pnpm build:acceptance` — passed。
+- `node packages/acceptance/dist/run-false-positive-catalog.js --generated-at 2026-07-22T00:00:00.000+08:00` — passed，5 entries，validation passed。
+- `pnpm false-positive:catalog -- --generated-at 2026-07-22T00:00:00.000+08:00` — passed，root script build prehook and artifact generation both passed。
+- `pnpm typecheck` — passed。
+- `pnpm lint` — passed。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — automated prerequisites passed；`public release ready: no` remains expected because manual legal/trademark/branch-protection publication authorization is still required。
+- `pnpm test` — sandbox run failed on localhost boot/MCP listen tests；elevated localhost-permitted rerun passed：69 test files passed，1 skipped；696 tests passed，1 skipped。
+- `pnpm goal:audit` — passed automated evidence scope and reports ready for user acceptance；manual MVP/user confirmation remains required。
+
+### 边界
+
+- No hosted dashboard was authorized。
+- No cloud sync was authorized。
+- No telemetry was authorized。
+- No deployment or public release was authorized。
+- No target repo write was authorized。
+- No runtime detection behavior change was implemented。
+- No finding suppression or automatic severity downgrade was implemented。
+- Website design-system work remains deferred by owner direction。
+
+## 2026年7月22日 - Product False-Positive Regression Catalog Contract Implementation v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/false-positive-catalog.ts`，实现 local-only catalog contract、builder 和 validator。
+- 覆盖 browser hardening、Project Intelligence、security assurance、repair planner consumption 和 mixed run bundle regression 五类 fixture category。
+- 新增 `tests/unit/false-positive-catalog.test.ts`，验证 expected finding snapshots、severity/rationale review fields、maintainer decision fields、redaction、no target repo write 和 no runtime detection behavior change boundary。
+- 扩展 acceptance package root export、subpath export、compatibility module registration 和 type-smoke。
+- 新增 operation record，并级联更新 README、PRD、SPEC、PLAN、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 `.autopilot` progress。
+- 新增下一步 goal：Product False-Positive Regression Catalog Artifact Generation v0.1。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/false-positive-catalog.test.ts`，要求 catalog module、fixture categories、expected snapshots、review fields 和 no-write boundary 存在，初始因模块缺失失败。
+- Green：实现 `false-positive-catalog.ts`、package exports 和 compatibility registration，使 focused contract/package tests 通过。
+- Cascade：补齐 structure/documentation guard，防止该 implementation goal 与 canonical docs 脱节。
+
+### 验证
+
+- `pnpm vitest run tests/unit/false-positive-catalog.test.ts tests/unit/acceptance-package.test.ts` — passed，2 test files，35 tests。
+- `pnpm vitest run tests/unit/false-positive-catalog.test.ts tests/unit/acceptance-package.test.ts tests/unit/project-structure.test.ts` — passed，3 test files，137 tests。
+- JSON metadata parse check — passed。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — automated prerequisites passed；`public release ready: no` remains expected because manual publication gates are not closed。
+- `pnpm typecheck` — passed。
+- `pnpm lint` — passed。
+- `pnpm test` — sandbox run failed on localhost boot/MCP listen tests；elevated localhost-permitted rerun passed：68 test files passed，1 skipped；691 tests passed，1 skipped。
+- `pnpm goal:audit` — passed automated evidence scope and reports ready for user acceptance；manual MVP/user confirmation remains required。
+
+### 边界
+
+- No hosted dashboard was authorized。
+- No cloud sync was authorized。
+- No telemetry was authorized。
+- No deployment or public release was authorized。
+- No target repo write was authorized。
+- No runtime detection behavior change was implemented。
+- No finding suppression or automatic severity downgrade was implemented。
+- Website design-system work remains deferred by owner direction。
+
+## 2026年7月21日 - Product False-Positive Regression Catalog Planning v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/product-false-positive-regression-catalog-planning-v0.1.md`。
+- 审计 browser hardening findings、Project Intelligence findings、security assurance findings 和 repair planner consumption 的初始 catalog 覆盖面。
+- 定义 fixture categories、expected finding snapshots、severity/rationale review fields、maintainer review boundary 和 no runtime detection behavior change 边界。
+- 新增下一步 goal：Product False-Positive Regression Catalog Contract Implementation v0.1。
+- 级联更新 README、PRD、SPEC、PLAN、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 `.autopilot` progress。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 planning operation record、completed goal summary、catalog plan fields、next contract implementation goal 和 canonical doc cascade 同时存在。
+- Green：补齐 planning operation record、goal metadata、progress state 和文档级联。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-structure.test.ts` — passed，102 tests。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — automated prerequisites passed；`public release ready: no` remains expected because manual publication gates are not closed。
+- `pnpm typecheck` — passed。
+- `pnpm lint` — passed。
+- `pnpm test` — sandbox run failed on localhost boot/MCP listen tests；elevated localhost-permitted rerun passed：67 test files passed，1 skipped；687 tests passed，1 skipped。
+- `pnpm goal:audit` — passed automated evidence scope and reports ready for user acceptance；manual MVP/user confirmation remains required。
+
+### 边界
+
+- No hosted dashboard was authorized。
+- No cloud sync was authorized。
+- No telemetry was authorized。
+- No deployment or public release was authorized。
+- No target repo write was authorized。
+- No runtime detection behavior change was implemented。
+- No finding suppression or automatic severity downgrade was implemented。
+- Website design-system work remains deferred by owner direction。
+
+## 2026年7月21日 - Project Intelligence Watch Mode Completion Audit v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/project-intelligence-watch-mode-completion-audit-v0.1.md`。
+- 审计 watch mode runtime、generated artifacts、operator playbook、recovery UX、tests、docs 和 boundaries。
+- 记录 watch mode 当前 local-only 产品切片为 `complete_for_current_local_only_slice`。
+- 确认真实 generated handoff 为 6/6 freshness checks passed，`recoveryPlan.status=not_needed`。
+- 新增下一步 goal：Product False-Positive Regression Catalog Planning v0.1。
+- 级联更新 README、PRD、SPEC、PLAN、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 `.autopilot` progress。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-structure.test.ts`，要求 completion audit operation record、completed goal summary、next false-positive catalog planning goal 和 canonical doc cascade 同时存在。
+- Green：补齐 operation record、goal metadata、progress state 和文档级联。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-structure.test.ts` — passed，102 tests。
+- `pnpm project:intelligence:watch -- --once` — passed，watch status stopped，refresh count 1。
+- `pnpm project:intelligence:watch-handoff` — passed，6 freshness checks passed。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — automated prerequisites passed；`public release ready: no` remains expected because manual release gates are not closed。
+- `pnpm typecheck` — passed。
+- `pnpm lint` — passed。
+- `pnpm test` — sandbox run failed on localhost boot/MCP listen tests；elevated localhost-permitted rerun passed：67 test files passed，1 skipped；687 tests passed，1 skipped。
+- `pnpm goal:audit` — passed automated evidence scope and reports ready for user acceptance；manual MVP/user confirmation remains required。
+
+### 边界
+
+- No hosted dashboard was authorized。
+- No cloud sync was authorized。
+- No telemetry was authorized。
+- No deployment or public release was authorized。
+- No target repo write was authorized。
+- No runtime detection behavior change was implemented。
+- Website design-system work remains deferred by owner direction。
+
+## 2026年7月21日 - Project Intelligence Watch Mode Recovery UX Real Workspace Smoke v0.1
+
+### 完成内容
+
+- 新增 `tests/integration/project-intelligence-watch-recovery-ux-smoke.test.ts`。
+- 验证真实 RepoAssure workspace 的 `runProjectIntelligenceWatch({ once: true })` -> `runProjectIntelligenceWatchHandoff(...)` 路径。
+- 验证 fresh handoff 的 `recoveryPlan.status=not_needed`、freshness checklist 全部通过、Markdown Recovery Plan 可读。
+- 构造隔离 failing watch status fixture，验证 `recoveryPlan.status=required`、`watch_refresh_count` / `watch_commands` failed checks、本地恢复命令和 no manual generated-artifact edit boundary。
+- 验证 synthetic `ghp_SECRET` / `sk-live-token` 不会出现在 generated handoff JSON/Markdown。
+- 级联更新 PRD、SPEC、PLAN、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log 和 autopilot state。
+
+### TDD 记录
+
+- Red/Contract：新增 integration smoke，锁定真实工作区 `not_needed` 与失败 fixture `required` 两条恢复 UX 路径。
+- Green：现有 Recovery Command UX runtime 已满足该 contract，无需修改运行时代码。
+
+### 验证
+
+- `pnpm vitest run tests/integration/project-intelligence-watch-recovery-ux-smoke.test.ts` — passed。
+- `pnpm vitest run tests/integration/project-intelligence-watch-recovery-ux-smoke.test.ts tests/unit/project-structure.test.ts` — passed。
+- `pnpm project:intelligence:watch -- --once` — passed，watch status stopped，refresh count 1。
+- `pnpm project:intelligence:watch-handoff` — passed，6/6 freshness checks passed。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — automated prerequisites passed；`public release ready: no` remains expected because manual release gates are still required。
+- `pnpm typecheck` — passed。
+- `pnpm lint` — passed。
+- `pnpm test` — sandbox run failed on localhost boot/MCP listen tests; rerun with elevated localhost permissions passed: 67 test files passed, 1 skipped; 687 tests passed, 1 skipped。
+- `pnpm goal:audit` — passed automated evidence scope and reports ready for user acceptance; manual MVP/user confirmation remains required。
+
+### 边界
+
+- No hosted dashboard was authorized。
+- No cloud sync was authorized。
+- No telemetry was authorized。
+- No deployment or public release was authorized。
+- No target repo write was authorized。
+- Website design-system work remains deferred by owner direction。
+
+## 2026年7月25日 - RepoAssure Product Completion Gap Audit Refresh v0.5
+
+### 完成内容
+
+- 对照 PLAN、SPEC、PRD、README、代码、测试、packed CLI、packed MCP、
+  manual gates、external-input state 和 deferred work 重新盘点产品完成度。
+- 将剩余工作分类为 implemented、blocked/manual-gated、
+  external-input-gated、deferred 和 safe auto-executable。
+- 确认 installed CLI repair surface 已覆盖 handoff、execute、patch-plan 和
+  evidence-package，现有 MCP registry 保持 8 个工具。
+- 选择 RepoAssure AI IDE Repair Workflow MCP Convergence Decision and Contract v0.1 作为唯一下一 Goal。
+- 级联更新 canonical docs、testing strategy、acceptance checklist、
+  decision log、dev log 和 Autopilot state。
+
+### TDD 记录
+
+- Red：`tests/unit/project-structure.test.ts` 新增 v0.5 cascade contract，
+  首次运行 108 项中 1 项按预期失败，缺失 operation record。
+- Green：补齐 operation record、completed Goal、next Goal 和九个 canonical
+  cascade surfaces；聚焦测试 108/108 passed。
+
+### 验证
+
+- `pnpm autopilot:progress:check -- --json` — 8/8 passed。
+- `pnpm typecheck`、`pnpm lint`、`pnpm repo:hygiene` — passed。
+- `pnpm release:check` — automated prerequisites passed，`public release ready: no`。
+- `pnpm goal:audit` — 34 passed、0 missing、1 manual required。
+- `pnpm test` — authorized local-listener rerun: 78 files passed、1 skipped；
+  744 tests passed、1 skipped。
+- 默认沙箱中的 6 个 integration failures 来自 local-listener / isolated
+  install 环境限制；允许本地监听后全部对应测试通过。
+
+### 边界
+
+- No production code was changed。
+- No MCP registry expansion or rename was authorized。
+- No repair MCP productization was authorized。
+- No target repo write or automatic patch application was authorized。
+- No npm publication、deployment、public release 或 customer contact was
+  authorized。
+
+## 2026年7月25日 - RepoAssure Packed MCP Server Installation and Protocol Validation v0.1
+
+### 完成内容
+
+- 新增 `tests/integration/packed-mcp-server-protocol.test.ts`。
+- 本地创建 `hardening-mcp-0.1.0.tgz`，安装到隔离 consumer，并启动
+  installed `node_modules/.bin/hardening-mcp`。
+- 通过官方 MCP SDK 验证 `initialize`、现有八工具 `tools/list` 和
+  unknown-session `stop_app`。
+- 验证 protocol framing、schema compatibility、redaction、deterministic
+  shutdown、source-workspace independence 和 no target-repo write。
+- 新增 operation record、完成态 Goal、下一 Goal，并级联 README、PRD、
+  SPEC、PLAN、testing strategy、acceptance checklist、decision log 和
+  Autopilot progress state。
+
+### TDD / 5A
+
+- Red：受限沙箱首次停在隔离依赖安装，外部网络边界重跑后暴露 macOS
+  `/var` 与 `/private/var` canonical path 差异。
+- Red：路径规范化后，测试暴露 unknown-session error 已按既有隐私合同
+  返回 `[REDACTED]`，原断言错误地期待原始 session 值。
+- Green：期望路径 canonicalize，并将 redaction 作为显式协议合同后，
+  focused packed MCP test 1/1 passed。
+- Documentation Red：structure test 因本轮 operation record 缺失失败。
+- Adapt：未修改生产 runtime、MCP registry、detector 或 acceptance policy。
+
+### 边界
+
+- Target repository writes: no。
+- MCP tool additions or renames: no。
+- npm publication: no。
+- Deployment or public release: no。
+- Customer contact, pricing, or spend change: no。
+- 下一 Goal：RepoAssure Product Completion Gap Audit Refresh v0.5。
+
+### 最终验证
+
+- packed CLI + packed MCP concurrent package regression：2 files / 2 tests
+  passed。
+- structure cascade：107/107 passed。
+- typecheck、lint、repo hygiene：passed。
+- Autopilot progress consistency：8/8 passed。
+- release check：automated prerequisites passed，`public release ready: no`。
+- goal audit：34/35 automated checks passed，1 manual user acceptance item
+  retained。
+- full test：78 files / 743 tests passed，1 optional file / test skipped。
+
+## 2026年7月21日 - Project Intelligence Watch Mode Recovery Command UX v0.1
+
+### 完成内容
+
+- 在 `project-intelligence-watch-handoff.json` 中新增 `recoveryPlan`。
+- 在 `project-intelligence-watch-handoff.md` 中新增 `## Recovery Plan`。
+- Recovery UX 覆盖 healthy `not_needed` 和 failing `required` 两种状态。
+- 失败状态会列出 failed freshness check IDs，并给出 local-only 恢复命令：`pnpm project:intelligence:watch -- --once`、`pnpm project:intelligence:watch-handoff`、`cat artifacts/project-graph/project-intelligence-watch-handoff.md`。
+- Recovery boundary 明确禁止手工编辑 generated artifacts 作为修复路径、禁止 target repo writes，并保持 no hosted dashboard、no telemetry、no cloud sync。
+- 新增下一步 goal：Project Intelligence Watch Mode Recovery UX Real Workspace Smoke v0.1。
+
+### TDD 记录
+
+- Red：先扩展 `tests/unit/project-intelligence-watch-handoff.test.ts`，要求 healthy handoff 输出 `recoveryPlan.status=not_needed`，failing watch status 输出 `recoveryPlan.status=required`、failed check IDs、local-only recovery commands、Markdown recovery guidance 和 redaction boundary。
+- Green：在 `packages/acceptance/src/run-project-intelligence-watch-handoff.ts` 中实现 `recoveryPlan` 构建和 Markdown 渲染。
+- Refine：级联 operation record、canonical docs、Project Intelligence docs、acceptance/testing/log cascade 和 `.autopilot` metadata。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-intelligence-watch-handoff.test.ts` — passed，1 file / 3 tests。
+- `pnpm vitest run tests/unit/project-intelligence-watch-handoff.test.ts tests/unit/project-structure.test.ts` — passed，2 files / 105 tests。
+- `pnpm project:intelligence:watch -- --once` — passed，`status: stopped`，`refreshCount: 1`。
+- `pnpm project:intelligence:watch-handoff` — passed，6/6 freshness checks passed。
+- `rg` artifact smoke confirmed `recoveryPlan.status=not_needed`, `manualArtifactEditsAllowed=false`, and Markdown `## Recovery Plan` in generated handoff artifacts。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — passed automated prerequisites；`public release ready: no` remains expected because manual publication authorization gates are not closed。
+- `pnpm typecheck` — passed。
+- `pnpm lint` — passed。
+- `pnpm test` — passed in elevated environment，66 test files passed，685 tests passed，1 skipped。Sandbox run failed on localhost listen integration tests, consistent with local sandbox limitations。
+- `pnpm goal:audit` — passed automated evidence scope；manual MVP acceptance remains required。
+
+### 边界
+
+- No hosted dashboard was authorized。
+- No cloud sync was authorized。
+- No telemetry was authorized。
+- No deployment or public release was authorized。
+- No target repo write was authorized。
+- Website design-system work remains deferred by owner direction。
+
+## 2026年7月21日 - Project Intelligence Watch Mode Operator Playbook Consumption Validation v0.1
+
+### 完成内容
+
+- 新增 `tests/unit/project-intelligence-watch-operator-playbook.test.ts`。
+- 新增 `docs/operations/project-intelligence-watch-mode-operator-playbook-consumption-validation-v0.1.md`。
+- 验证 operator playbook 和 generated handoff 的 command sequence、AI IDE read order、freshness failure blocking、failure recovery guidance、maintainer review boundary 和 no target repo write boundary。
+- 级联更新 README、PRD、SPEC、PLAN、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 `.autopilot` progress。
+- 新增下一步 goal：Project Intelligence Watch Mode Recovery Command UX v0.1。
+
+### TDD 记录
+
+- Red：先新增 operator playbook consumption contract test，要求 playbook 与 generated handoff 在读取顺序和边界上保持一致，并覆盖 freshness failure 场景。
+- Green：现有 handoff/playbook 契约满足新增断言，证明该 goal 是 consumption validation 和 cascade hardening，不需要扩大 runtime。
+- Refine：将 validation result 写入 operation record、canonical docs、Project Intelligence docs、acceptance/testing/log cascade 和 `.autopilot` metadata。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-intelligence-watch-operator-playbook.test.ts` — passed。
+- `pnpm vitest run tests/unit/project-intelligence-watch-operator-playbook.test.ts tests/unit/project-structure.test.ts` — passed，2 files / 105 tests。
+- `pnpm project:intelligence:watch -- --once` — passed，`status: stopped`，`refreshCount: 1`。
+- `pnpm project:intelligence:watch-handoff` — passed，6/6 freshness checks passed。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — passed automated prerequisites；`public release ready: no` remains expected because manual publication authorization gates are not closed。
+- `pnpm typecheck` — passed。
+- `pnpm lint` — passed。
+- `pnpm test` — passed in elevated environment，66 test files passed，684 tests passed，1 skipped。Sandbox run failed on localhost listen integration tests and one 5s timeout, consistent with local sandbox limitations.
+- `pnpm goal:audit` — passed automated evidence scope；manual MVP acceptance remains required。
+
+### 边界
+
+- No hosted dashboard was authorized。
+- No cloud sync was authorized。
+- No telemetry was authorized。
+- No deployment or public release was authorized。
+- No target repo write was authorized。
+- Website design-system work remains deferred by owner direction。
+
+## 2026年7月21日 - Project Intelligence Watch Mode Operator Playbook v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/project-intelligence-watch-mode-operator-playbook-v0.1.md`。
+- 手册覆盖本地 command sequence、AI IDE read order、Freshness Diagnosis、Failure Recovery、Stop Boundary 和 Prohibited Actions。
+- 级联更新 README、PRD、SPEC、PLAN、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 `.autopilot` progress。
+- 新增下一步 goal：Project Intelligence Watch Mode Operator Playbook Consumption Validation v0.1。
+
+### TDD 记录
+
+- Red：先更新 `tests/unit/project-structure.test.ts`，要求 operator playbook 文件、completed goal metadata、command sequence、read order、freshness diagnosis、failure recovery、stop boundary 和 next-goal cascade 存在；首次 focused test 因缺少 playbook 文件失败。
+- Green：补齐 operator playbook、canonical docs、Project Intelligence docs、acceptance/testing/log cascade 和 `.autopilot` metadata。
+- Refine：保持该 goal 为 operations/documentation contract，不新增 watcher runtime、hosted dashboard、cloud sync、telemetry、deployment、public release 或 target repo write 行为。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-structure.test.ts` — passed。
+- `pnpm project:intelligence:watch -- --once` — passed，`status: stopped`，`refreshCount: 1`。
+- `pnpm project:intelligence:watch-handoff` — passed，6/6 freshness checks passed。
+- Handoff JSON spot check — all key artifacts `available`，`targetRepoWrite=false`，`cloud=false`，`telemetry=false`。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — automated prerequisites passed；`public release ready: no` remains expected because manual publication authorization gates are not closed。
+- `pnpm typecheck` — passed。
+- `pnpm lint` — passed。
+- `pnpm vitest run tests/unit/user-acceptance.test.ts -t "writes a Python CLI acceptance record without running web hardening"` — passed after one full-test timeout retry。
+- `pnpm test` — passed，65 test files passed，681 tests passed，1 skipped。
+- `pnpm goal:audit` — passed automated evidence scope；manual MVP acceptance remains required。
+
+### 边界
+
+- No hosted dashboard was authorized。
+- No cloud sync was authorized。
+- No telemetry was authorized。
+- No deployment or public release was authorized。
+- No target repo write was authorized。
+- Website design-system work remains deferred by owner direction。
+
+## 2026年7月20日 - Project Intelligence Watch Mode End-to-End Local Fixture Validation v0.1
+
+### 完成内容
+
+- 新增 `tests/integration/project-intelligence-watch-e2e-fixture.test.ts`。
+- fixture 在临时目录中创建非私密 repo 形态，包含 docs、package source、unit test 和 `.autopilot` state。
+- 集成测试依次执行 snapshot、agent context、watch `--once` 和 watch handoff runner。
+- 修复 `packages/acceptance/src/run-project-intelligence-watch-handoff.ts`：当本地 snapshot 和 agent-context Markdown 已存在时，handoff artifact status 标记为 `available`。
+- 级联更新 PRD、SPEC、PLAN、README、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 Autopilot progress state。
+- 新增下一步 goal：Project Intelligence Watch Mode Operator Playbook v0.1。
+
+### TDD 记录
+
+- Red：新增 E2E fixture integration test，首次运行失败，原因是 handoff 对两个已生成本地物料仍返回 `expected`。
+- Green：补充 handoff artifact existence check，只更新本地可用性 metadata。
+- Refine：保留 local-only / no hosted dashboard / no telemetry / no cloud sync / no target repo write 边界。
+
+### 验证
+
+- `pnpm vitest run tests/integration/project-intelligence-watch-e2e-fixture.test.ts` — passed。
+- `pnpm vitest run tests/unit/project-intelligence-watch-handoff.test.ts` — passed。
+
+### 边界
+
+- No hosted dashboard was authorized。
+- No cloud sync was authorized。
+- No telemetry was authorized。
+- No deployment or public release was authorized。
+- No target repo write was authorized。
+- Website design-system work remains deferred by owner direction。
+
+## 2026年7月20日 - Project Intelligence Watch Mode Local Smoke Validation v0.1
+
+### 完成内容
+
+- 新增 `tests/integration/project-intelligence-watch-smoke.test.ts`。
+- 新增 `docs/operations/project-intelligence-watch-mode-local-smoke-validation-v0.1.md`。
+- 将 `pnpm project:intelligence:watch` runtime 从 recursive `fs.watch` 调整为 bounded polling，避免本地 `EMFILE` 文件描述符压力。
+- 新增 watcher ready hook，确保 integration smoke 能在 watcher 可消费变更后再写入 fixture。
+- 更新 PRD、SPEC、PLAN、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log、dev log 和 Autopilot progress state。
+- 新增下一步 goal：Project Intelligence Watch Mode AI IDE Consumption Handoff v0.1。
+
+### TDD 记录
+
+- Red：新增 integration smoke 后首次运行超时，并暴露 watcher cleanup / ready synchronization 缺口。
+- Green：新增 ready hook 和 cleanup 后继续运行，真实 smoke 暴露 recursive `fs.watch` 的 `EMFILE` 风险。
+- Refactor：改为 bounded polling，仅扫描 docs/src/packages/apps/tests/.autopilot 中允许的 `.md/.json/.ts/.tsx` 文件，并继续跳过 generated/dependency/cache/secret paths。
+
+### 验证
+
+- `pnpm vitest run tests/integration/project-intelligence-watch-smoke.test.ts` — 1 test passed。
+- `pnpm vitest run tests/unit/project-intelligence-watch.test.ts tests/integration/project-intelligence-watch-smoke.test.ts tests/unit/project-structure.test.ts` — 108 tests passed。
+- `pnpm project:intelligence:watch -- --once` — passed，`status: stopped`，`refreshCount: 1`。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — passed automated prerequisites；public release remains `no` pending manual gates。
+- `pnpm typecheck` — passed。
+- `pnpm lint` — passed。
+- `pnpm goal:audit` — passed automated checks；manual user confirmation remains by design。
+- `pnpm test` — sandbox run failed on local server / MCP transport listener restrictions；escalated rerun passed 63 files / 678 tests，1 skipped。
+
+### 边界
+
+- 不执行 hosted dashboard、cloud sync、telemetry、deployment、public release、repository visibility change、npm publication、GitHub release、target repo write、customer contact、pricing/spend change 或 website design-system rewrite。
+- 不创建 daemon、launch agent、cron job 或后台服务。
+
+## 2026年7月19日 - Project Intelligence Watch Mode Implementation v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/run-project-intelligence-watch.ts`。
+- 新增 `pnpm project:intelligence:watch` 和 `--once` smoke mode。
+- 新增 local-only watch status artifact：`artifacts/project-graph/project-intelligence-watch-status.json`。
+- 更新 acceptance package export、compatibility entrypoint、type-smoke import 和 README 命令说明。
+- 新增下一步 goal：Project Intelligence Watch Mode Local Smoke Validation v0.1。
+
+### TDD 记录
+
+- Red：先新增 `tests/unit/project-intelligence-watch.test.ts`，测试因 `run-project-intelligence-watch` 模块缺失失败。
+- Green：实现 include/ignore matcher、CLI parser、debounce controller、one-shot refresh、status serialization、failure redaction、package export 和 root script。
+- Smoke：`pnpm project:intelligence:watch -- --once` 成功生成 status artifact，`status: stopped`，`refreshCount: 1`。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-intelligence-watch.test.ts` — 5 tests passed。
+- `pnpm vitest run tests/unit/acceptance-package.test.ts` — 31 tests passed。
+- `pnpm vitest run tests/unit/project-structure.test.ts` — 102 tests passed。
+- `pnpm build:acceptance` — passed。
+- `pnpm project:intelligence:watch -- --once` — passed。
+- `pnpm repo:hygiene` — passed。
+- `pnpm release:check` — passed automated prerequisites；public release remains `no` pending manual gates。
+- `pnpm typecheck` — passed。
+- `pnpm lint` — passed。
+- `pnpm goal:audit` — passed automated checks；manual user confirmation remains by design。
+- `pnpm test` — sandbox run failed on local server/timeout restrictions；escalated rerun passed 62 files / 677 tests, 1 skipped。
+
+### 边界
+
+- 不执行 hosted dashboard、cloud sync、telemetry、deployment、public release、repository visibility change、npm publication、GitHub release、target repo write、customer contact、pricing/spend change 或 website design-system rewrite。
+- 不创建 daemon、launch agent、cron job 或后台服务。
+
+## 2026年7月19日 - Project Intelligence Watch Mode Planning v0.1
+
+### 完成内容
+
+- 新增 `docs/operations/project-intelligence-watch-mode-planning-v0.1.md`。
+- 定义 future `pnpm project:intelligence:watch` 的本地-only 行为：
+  - bounded file-change scope；
+  - generated/dependency/cache/secrets ignore scope；
+  - 1500ms debounce；
+  - `pnpm project:intelligence` -> `pnpm project:intelligence:agent-context` refresh order；
+  - sanitized failure status；
+  - foreground `Ctrl+C` manual stop boundary。
+- 新增 `.autopilot/goals/project-intelligence-watch-mode-implementation-v0.1.json`，将 Project Intelligence Watch Mode Implementation v0.1 作为下一个 Codex goal。
+
+### TDD 记录
+
+- Red：先更新 `project-structure.test.ts`，要求 watch mode planning record 存在、goal 状态为 completed、planning summary 包含 scope / debounce / refresh order / stop boundary，并要求下一个 implementation goal 进入生命周期。
+- Green：补齐 operations planning record、`.autopilot` 状态和 PRD/SPEC/PLAN/testing/acceptance/logs/README 级联。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-structure.test.ts`
+- `pnpm repo:hygiene`
+- `pnpm typecheck`
+- `pnpm lint`
+- `pnpm goal:audit` — automated checks passed; user confirmation remains manual long-goal gate
+- `pnpm test` — sandbox run hit local server integration failures; escalated rerun passed 61 files / 672 tests, 1 skipped
+
+### 边界
+
+- 本轮只完成规划，不实现长期 watcher。
+- 不执行 hosted dashboard、cloud sync、telemetry、deployment、public release、repository visibility change、npm publication、GitHub release、target repo write、customer contact、pricing/spend change 或 website design-system rewrite。
+
+## 2026年7月19日 - Project Intelligence Agent Context Export v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/run-project-intelligence-agent-context.ts`。
+- 新增 `pnpm project:intelligence:agent-context`，输出：
+  - `artifacts/project-graph/project-intelligence-agent-context.json`
+  - `artifacts/project-graph/project-intelligence-agent-context.md`
+- 新增 `@hardening-mcp/acceptance/run-project-intelligence-agent-context` package export，并同步 package source / dist / type-smoke contracts。
+- 将下一个 Codex goal 记录为 Project Intelligence Watch Mode Planning v0.1。
+
+### TDD 记录
+
+- Red：先新增 `project-intelligence-agent-context.test.ts`，引用尚不存在的 runtime，确认缺失模块失败。
+- Green：实现 local-only runtime、schema、Markdown formatter、CLI args、redaction、blocked action boundary 和 package exports。
+- Contract：更新 `project-structure.test.ts` 和 type-smoke 子路径，防止 package export / dist output 漂移。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-intelligence-agent-context.test.ts`
+- `pnpm build:acceptance`
+- `pnpm vitest run tests/unit/project-structure.test.ts`
+- `pnpm project:intelligence` — 492 nodes / 1145 edges
+- `pnpm project:intelligence:agent-context` — 4 product surfaces / 16 blockers / 1 recommended goal
+- `pnpm repo:hygiene`
+- `pnpm typecheck`
+- `pnpm lint`
+- `pnpm goal:audit` — automated checks passed; user confirmation remains manual long-goal gate
+- `pnpm test` — sandbox run hit local server integration failures; escalated rerun passed 61 files / 672 tests, 1 skipped
+
+### 边界
+
+- 不执行 hosted dashboard、cloud sync、telemetry、deployment、public release、repository visibility change、npm publication、GitHub release、target repo write、customer contact、pricing/spend change 或 website design-system rewrite。
+
+## 2026年7月19日 - RepoAssure Product Completion Gap Audit v0.1
+
+### 完成内容
+
+- 扫描 PRD、SPEC、PLAN、MVP v0.3 spec、Project Intelligence spec、public website spec、Team Cloud spec、public release checklist、private preview feedback intake、`.autopilot` 状态、package scripts、代码入口和测试入口。
+- 将剩余任务分为 implemented、blocked/manual-gated、external-input blocked、future commercial implementation、owner-deferred 和 safe auto-executable。
+- 选择 `Project Intelligence Agent Context Export v0.1` 作为下一个 Codex goal。
+
+### 结论
+
+- 已实现：CLI/MCP、run bundles、AI IDE repair evidence、browser/Python CLI acceptance、Project Intelligence snapshot/viewer/ADR cascade workflow、官网、release readiness checks。
+- 不自动执行：public release、npm、GitHub release、production launch、Team Cloud / hosted dashboard、Enterprise integrations、私测反馈 triage、官网设计系统后续。
+- 可自动执行：Project Intelligence Agent Context Export v0.1。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-structure.test.ts`
+- `pnpm repo:hygiene`
+- `pnpm typecheck`
+- `pnpm lint`
+- `pnpm goal:audit`
+- `pnpm test` — sandbox run hit local server integration failures; escalated rerun passed 60 files / 670 tests, 1 skipped
+
+### 边界
+
+- 不执行 hosted dashboard、cloud sync、telemetry、deployment、public release、repository visibility change、npm publication、GitHub release、target repo write、customer contact、pricing/spend change 或 website design-system rewrite。
+
+## 2026年7月19日 - Project Intelligence Detection Rule Calibration v0.1
+
+### 完成内容
+
+- 将 `findOrphanCode` 的 ownership README 判据从“任意所含路径以 `/README.md` 结尾”收紧为“精确等于 `${node.id}/README.md`”。
+- 新增 `apps/nested-readme/docs/README.md` fixture，证明深层 README 不能让 `apps/nested-readme` 通过 ownership documentation 检查。
+- 将下一个 Codex goal 记录为 RepoAssure Product Completion Gap Audit v0.1。
+
+### TDD 记录
+
+- Red：先让 fixture 中的 nested README app 被期望识别为 `orphan_code`，旧规则实际误判为通过。
+- Green：改为 app/package 根 README 精确匹配，focused unit test 通过。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-intelligence-snapshot.test.ts`
+- `pnpm vitest run tests/unit/project-intelligence-snapshot.test.ts tests/unit/project-structure.test.ts` — 2 files / 104 tests passed
+- `pnpm project:intelligence` — 486 nodes / 1129 edges / findings 0
+- `pnpm project:intelligence:backlog` — items 0 / missing cascade findings 0
+- `pnpm repo:hygiene`
+- `pnpm release:check`
+- `pnpm typecheck`
+- `pnpm lint`
+- `pnpm goal:audit`
+- `pnpm test` — sandbox run hit local server integration failures; escalated rerun passed 60 files / 670 tests, 1 skipped
+
+### 边界
+
+- 不执行 hosted dashboard、cloud sync、telemetry、deployment、public release、repository visibility change、npm publication、GitHub release、target repo write、customer contact、pricing/spend change 或 website design-system rewrite。
+
 ## 2026年7月19日 - Project Intelligence ADR Cascade Remediation Closure v0.1
 
 ### 完成内容
@@ -12950,3 +15603,931 @@ Phase 0：项目初始化。
 - No GitHub release was authorized。
 - No public launch or production marketing announcement was authorized。
 - No SaaS、Team Cloud、Enterprise 或 hosted dashboard availability claim was authorized。
+
+## 2026年7月20日 - Project Intelligence Watch Mode AI IDE Consumption Handoff v0.1
+
+### 完成内容
+
+- 新增 `packages/acceptance/src/run-project-intelligence-watch-handoff.ts`。
+- 新增 `pnpm project:intelligence:watch-handoff`。
+- 新增 `@hardening-mcp/acceptance/run-project-intelligence-watch-handoff` package export 和 type-smoke import。
+- 新增 `project-intelligence-watch-handoff.json` / `.md`，用于 AI IDE 读取 watch status、agent context、snapshot、autopilot state 和 canonical docs。
+- 级联更新 PRD、SPEC、PLAN、Project Intelligence spec/architecture、testing strategy、acceptance checklist、decision log 和 autopilot state。
+
+### TDD 记录
+
+- Red：新增 `tests/unit/project-intelligence-watch-handoff.test.ts`，首次运行因 runner 不存在失败。
+- Green：实现 handoff runner、CLI parser、Markdown formatter、freshness checklist、redaction boundary 和 package export。
+- Refine：更新 package compatibility contract、type-smoke、structure tests 和真实 CLI smoke。
+
+### 验证
+
+- `pnpm vitest run tests/unit/project-intelligence-watch-handoff.test.ts` — passed。
+- `pnpm build:acceptance` — passed。
+- `pnpm vitest run tests/unit/acceptance-package.test.ts tests/unit/project-structure.test.ts` — passed。
+- `pnpm project:intelligence:watch-handoff` — passed，6/6 freshness checks passed。
+
+### 边界
+
+- No hosted dashboard was authorized。
+- No cloud sync was authorized。
+- No telemetry was authorized。
+- No deployment or public release was authorized。
+- No target repo write was authorized。
+- Website design-system work remains deferred by owner direction。
+
+## 2026年7月25日 - RepoAssure AI IDE Repair Handoff MCP Tool Implementation v0.1
+
+### 完成内容
+
+- 新增 `src/tools/prepare-repair-handoff-tool.ts`，复用 `@hardening-mcp/acceptance/run-repair-handoff`。
+- MCP registry 只新增 `prepare_repair_handoff`，总数从 8 增加到 9；原有工具名称、schema、annotations 和行为保持不变。
+- 输入合同为 required `runDir` 和 optional `outputDir`；输出限制为 paths、task count、highest priority 和 `status=generated`。
+- `scripts/prepare-packed-cli.mjs` 新增 acceptance runner import rewrite，保证 tarball consumer 使用内嵌 runtime。
+- 新增 unit、in-memory MCP transport、packed stdio consumer、redaction、fail-closed 和 no-write 覆盖。
+
+### TDD 与 5A
+
+- Red：`mcp-tool-registry.test.ts` 出现 4 个预期失败，证明新工具、schema 和 call path 尚不存在。
+- Green：新增薄 adapter 和 registry entry 后，聚焦 unit 14/14 通过。
+- Assess：in-memory `tools/list` / `tools/call` 通过；packed test 在沙箱内因已知安装超时达到 120 秒，在沙箱外单 worker 9.77 秒通过。
+- Advance：下一 Goal 为 RepoAssure AI IDE Repair Execution Preview MCP Tool Implementation v0.1。
+
+### 当前验证
+
+- `pnpm exec vitest run tests/unit/mcp-tool-registry.test.ts` — 14/14 passed。
+- `pnpm exec vitest run tests/integration/mcp-server.test.ts -t "prepares a repair handoff"` — passed。
+- `pnpm exec vitest run tests/integration/packed-mcp-server-protocol.test.ts --maxWorkers=1` — passed outside sandbox。
+- focused MCP / installed-consumer / structure suite — 4 files、128/128 tests passed。
+- full Vitest suite — 78 files、750 tests passed；1 file、1 test skipped。
+- `pnpm build:acceptance` — passed。
+- `pnpm build:src` — passed。
+- `pnpm typecheck`、`pnpm lint`、`pnpm repo:hygiene`、`git diff --check` — passed。
+- `pnpm release:check` — automated prerequisites passed；public release 仍正确保持 `no`，等待既有 manual gates。
+- `pnpm goal:audit` — 34/35 passed；只保留既有产品级用户确认人工项。
+- `pnpm autopilot:progress:check -- --json` — consistent，8/8 checks passed。
+
+### 边界
+
+- No validation-only MCP exposure。
+- No arbitrary command execution。
+- No target repo write or automatic patch application。
+- No npm publication、deployment、public release、customer contact、pricing change or spend。
+
+## 2026-07-26 - Public Repository State and Release Boundary Reconciliation v0.1
+
+### 完成内容
+
+- 只读核验公开仓库、`main` protection、最近 CI、GitHub Releases、npm 状态、
+  `origin/main` release checker、本地分支差异、当前树和公开历史。
+- 确认 public source release 已完成并验证；public launch 与其他追加发布动作
+  仍未授权。
+- 修正 release checker 文案，避免把缺少追加发布授权误写成“尚未公开”。
+- 当前树个人标识命中为 0；公开历史中有 6 个提交保留历史个人标识，文档未
+  披露具体标识值。
+- 完成 README、PRD、SPEC、PLAN、architecture、testing strategy、
+  acceptance checklist、decision log、dev log 与 Autopilot 级联。
+
+### TDD 与边界
+
+- Red：focused unit/structure tests 出现 2 个预期失败，分别证明旧 release
+  checker 文案和缺失 reconciliation operation record。
+- Green：补齐 operation record、Goal metadata、canonical cascade 和新的
+  release wording。
+- 未新增 ADR；未修改 GitHub 状态；未重写历史、force push、发布、部署、
+  联系用户、改变价格或产生支出。
+
+### 下一步
+
+Public Git History Personal-Identifier Remediation Planning v0.1 只生成脱敏的
+maintainer 选择包，不执行任何历史修复或外部动作。
+
+### 最终验证
+
+- Focused：4 files、134 tests passed。
+- Autopilot consistency：8/8 passed。
+- 沙箱内完整测试：789 passed、6 environment failures、1 skipped；失败集中于
+  local port binding 与 isolated package installation。
+- 沙箱外相同 `pnpm test`：82 files、795 tests passed；1 file、1 test
+  skipped。
+- `pnpm typecheck`、`pnpm lint`、`pnpm build:src`、`pnpm repo:hygiene`、
+  `pnpm goal:audit`、`git diff --check`：passed。
+- 本地 `pnpm release:check`：automated prerequisites passed，
+  `public release ready: no`；缺失项仅指 additional publication actions 的
+  manual authorization。
+
+## 2026-07-26 - Public Release Manual Decision Input Review v0.2
+
+- TDD Red：`tests/unit/project-structure.test.ts` 的 120 个既有测试通过，
+  新增测试因 v0.2 review operation record 缺失按预期失败。
+- 只读 GitHub 证据刷新：repository visibility 为 `PUBLIC`；`main` branch
+  protection 要求 strict `Quality Gates`，enforce admins、linear history 和
+  conversation resolution 已启用，force push 与 deletion 已禁用。
+- 最近三次 `RepoAssure CI` 均成功；最新 run 为 `29322762162`。
+- 本地证据：`pnpm repo:hygiene` passed；`pnpm release:check` 自动前置项
+  passed 且仍报告 `public release ready: no`。
+- 当前 `design-system-v2` HEAD 为
+  `58ed41d267d2a69aff6955ac63c3f4c1edc5a14c`，相对
+  `origin/main` 为 10 ahead / 65 behind；worktree 保留既有大量未提交工作。
+- Green：新增七项决定复核记录、completed Goal metadata、Public Repository State and Release Boundary Reconciliation v0.1 next Goal、canonical docs 和 Autopilot state 级联。
+- `tests/unit/project-structure.test.ts` 最终 121/121 passed；focused pyramid
+  3 files、129/129 tests passed；Autopilot consistency 8/8 passed。
+- 沙箱内 `pnpm test` 记录 788 passed、6 个环境限制失败、1 skipped；授权的
+  沙箱外重跑为 82 files、794/794 tests passed、1 file 和 1 test skipped。
+- `pnpm typecheck`、`pnpm lint`、`pnpm build:src`、`pnpm repo:hygiene`、
+  `pnpm release:check`、`pnpm goal:audit` 和 `git diff --check` passed。
+- Release readiness 保持 `public release ready: no`；Goal audit 保持 34/35，
+  仅剩产品级用户验收人工项。
+- 本轮只观察外部状态，没有修改 repository visibility、branch protection、
+  rulesets、permissions、npm、GitHub Release、deployment、public launch、
+  marketing、customer contact、pricing、spend 或 target repo。
+
+## 2026-07-26 - RepoAssure Product Completion Gap Audit Refresh v0.7
+
+- Audited PLAN, SPEC, PRD, README, code/package surfaces, tests, workspace
+  summary completion evidence, detector decision state, release decisions,
+  external inputs, and owner-deferred work.
+- TDD Red: `tests/unit/project-structure.test.ts` passed 119 existing checks
+  and failed the new check because the v0.7 operation record did not exist.
+- Green cascade adds the v0.7 audit, completed Goal metadata, canonical
+  documentation and Autopilot state, and Public Release Manual Decision Input Review v0.2 as the single next Goal.
+- Focused verification passed 3 files and 128 tests; Autopilot progress
+  consistency passed 8/8 checks.
+- The sandboxed full suite recorded 787 passed, 6 environment failures, and 1
+  skipped because localhost listeners and temporary package installation were
+  restricted. The authorized non-sandbox rerun passed 82 files and 793 tests,
+  with 1 file and 1 test skipped.
+- `pnpm typecheck`, `pnpm lint`, `pnpm build:acceptance`, `pnpm build:src`,
+  `pnpm repo:hygiene`, `pnpm release:check`, and `pnpm goal:audit` passed.
+  Release readiness remains `public release ready: no`; Goal audit remains
+  34/35 because final user acceptance is manual.
+- No runtime behavior, product entrypoint, detector, acceptance policy, target
+  repository, deployment, publication, pricing, spend, or customer-contact
+  action was changed.
+
+## 2026-07-26 — RepoAssure Multi-Repo Workspace Repair Summary Completion Audit v0.1
+
+### 完成内容
+
+- 新增完成审计记录，结论为 `workspace_repair_summary_local_only_slice_closed_without_entrypoint_expansion_or_target_writes`。
+- 审计 planning、implementation、package root/typed subpath ownership、ready/partial/blocked/empty consumption、AI IDE read order、diagnostics、maintainer review、redaction、exact output allowlist、fail-closed 和 no-write evidence。
+- 当前 Goal 标记 completed，并登记 RepoAssure Product Completion Gap Audit Refresh v0.7 为唯一 ready-to-execute Goal。
+- 级联 README、PRD、SPEC、PLAN、architecture、testing strategy、acceptance checklist、decision log、dev log 和 Autopilot progress。
+
+### TDD
+
+- RED：`tests/unit/project-structure.test.ts` 119 tests 中 3 个预期失败，分别证明完成审计文档、completed 状态和 v0.7 Goal 尚未存在。
+- GREEN：完成审计记录、Goal ledger、canonical docs 和 progress state 已补齐。
+- Focused：summary completion、Autopilot consistency、generation、consumption 和 no-write 共 6 files、147 tests passed。
+- Full suite first run：81 files、791 tests passed；1 file、1 test skipped；仅 Autopilot current-goal narrative consistency 1 test failed。
+- 修复后 `pnpm autopilot:progress:check -- --json` 为 consistent、8/8 passed，focused 147/147 passed。
+- 用户明确恢复授权后，沙箱外最终 `pnpm test` 通过：82 files、792 tests passed；1 file、1 test skipped。
+- `pnpm typecheck`、`pnpm lint`、`pnpm build:acceptance`、`pnpm build:src`、`pnpm repo:hygiene`、`pnpm release:check`、`pnpm goal:audit` 和 `git diff --check` passed。
+- `pnpm release:check` 继续报告 `public release ready: no`。
+
+### 边界
+
+- CLI entrypoint added: no。
+- MCP tool added: no。
+- Commands executed: no。
+- Patches applied: no。
+- Target repository writes: no。
+- No detector/acceptance behavior change、design-system execution、publication、deployment、hosted claim、customer contact、pricing or spend change。
+
+## 2026年7月25日 - RepoAssure AI IDE Repair Patch Plan MCP Tool Implementation v0.1
+
+### 完成内容
+
+- 新增 `src/tools/generate-repair-patch-plan-tool.ts`，复用 `@hardening-mcp/acceptance/run-repair-patch-plan`。
+- MCP registry 只新增 `generate_repair_patch_plan`，总数从 10 增加到 11；原有工具名称、schema、annotations 和行为保持不变。
+- 输入合同为 required `reportPath` 和 optional `outputDir`；输出限制为 `planPath`、`markdownPath`、`actionCount`、`autoFixCandidates` 和 `status`。
+- `scripts/prepare-packed-cli.mjs` 新增 patch-plan runner import rewrite，保证 tarball consumer 使用内嵌 runtime。
+- 新增 unit、in-memory MCP transport、packed stdio consumer、strict allowlist、text/structured redaction、fail-closed、command non-execution、patch non-application 和 no-write 覆盖。
+
+### TDD 与 5A
+
+- Red：`mcp-tool-registry.test.ts` 出现 5 个预期失败，证明第十一个工具、schema 和 call path 尚不存在。
+- Green：新增薄 adapter 和 registry entry 后，聚焦 unit 20/20 通过。
+- Assess：in-memory `tools/list` / `tools/call` 3/3 通过；packed installed consumer 1/1 通过。
+- Advance：下一 Goal 为 RepoAssure AI IDE Repair Evidence Package MCP Tool Implementation v0.1。
+
+### 当前验证
+
+- `pnpm exec vitest run tests/unit/mcp-tool-registry.test.ts` - 20/20 passed。
+- `pnpm exec vitest run tests/integration/mcp-server.test.ts` - 3/3 passed outside sandbox。
+- `pnpm exec vitest run tests/integration/packed-mcp-server-protocol.test.ts` - 1/1 passed outside sandbox。
+- `pnpm exec vitest run tests/unit/project-structure.test.ts` - 112/112 passed。
+- `pnpm test` - 78 files、758 tests passed；1 file、1 test skipped。
+- `pnpm typecheck`、`pnpm lint`、`pnpm repo:hygiene`、`git diff --check` - passed。
+- `pnpm release:check` - automated prerequisites passed；public release 仍保持 `no`。
+- `pnpm goal:audit` - 34/35 passed；只保留既有产品级用户确认人工项。
+- `pnpm autopilot:progress:check -- --json` - consistent，8/8 checks passed。
+
+### 边界
+
+- No validation-only MCP exposure or verification command execution。
+- No arbitrary command execution。
+- No target repo write or automatic patch application。
+- No npm publication、deployment、public release、customer contact、pricing change or spend。
+
+## 2026年7月25日 - RepoAssure AI IDE Repair Evidence Package MCP Tool Implementation v0.1
+
+### 完成内容
+
+- 新增 `src/tools/assemble-repair-evidence-package-tool.ts`，复用 `@hardening-mcp/acceptance/run-repair-evidence-package`。
+- MCP registry 只新增 `assemble_repair_evidence_package`，总数从 11 增加到 12；原有工具名称、schema、annotations 和行为保持不变。
+- 输入合同为 required `handoffPackagePath`、`dryRunReportPath`、`validationReportPath`、`patchPlanPath` 和 optional `outputDir`；输出限制为 `packagePath`、`markdownPath`、`taskCount` 和 `status`。
+- `scripts/prepare-packed-cli.mjs` 新增 evidence-package runner import rewrite，保证 tarball consumer 使用内嵌 runtime。
+- 新增 unit、in-memory MCP transport、packed stdio consumer、strict allowlist、text/structured redaction、fail-closed、maintainer review、verification checklist、command non-execution、patch non-application 和 no-write 覆盖。
+
+### TDD 与 5A
+
+- Red：`mcp-tool-registry.test.ts` 出现 6 个预期失败，证明第十二个工具、schema、call path 和 fail-closed 行为尚不存在。
+- Green：新增薄 adapter 和 registry entry 后，聚焦 unit 23/23 通过。
+- Assess：in-memory `tools/list` / `tools/call` focused integration 通过；packed installed consumer 1/1 通过。
+- Advance：下一 Goal 为 RepoAssure AI IDE Repair Workflow MCP Convergence Completion Audit v0.1。
+
+### 当前验证
+
+- `pnpm exec vitest run tests/unit/mcp-tool-registry.test.ts` - 23/23 passed。
+- `pnpm exec vitest run tests/integration/mcp-server.test.ts -t "prepares repair evidence"` - passed。
+- `pnpm exec vitest run tests/integration/packed-mcp-server-protocol.test.ts` - 1/1 passed outside sandbox。
+- Focused pyramid - 4 files、140 tests passed。
+- `pnpm exec vitest run tests/unit/project-structure.test.ts` - 113/113 passed。
+- `pnpm test` - 78 files、762 tests passed；1 file、1 test skipped。
+- `pnpm typecheck`、`pnpm lint`、`pnpm build:acceptance`、`pnpm build:src`、`pnpm repo:hygiene`、`git diff --check` - passed。
+- `pnpm release:check` - automated prerequisites passed；public release 仍保持 `no`。
+- `pnpm goal:audit` - 34/35 passed；只保留既有产品级用户确认人工项。
+- `pnpm autopilot:progress:check -- --json` - consistent，8/8 checks passed。
+
+### 边界
+
+- No validation-only MCP exposure or verification command execution。
+- No arbitrary command execution。
+- No target repo write or automatic patch application。
+- No npm publication、deployment、public release、customer contact、pricing change or spend。
+
+## 2026年7月25日 - RepoAssure AI IDE Repair Execution Preview MCP Tool Implementation v0.1
+
+### 完成内容
+
+- 新增 `src/tools/preview-repair-execution-tool.ts`，复用 `@hardening-mcp/acceptance/run-repair-execute`，固定 `dryRun: true` 和 `validationOnly: false`。
+- MCP registry 只新增 `preview_repair_execution`，总数从 9 增加到 10；原有工具名称、schema、annotations 和行为保持不变。
+- 输入合同为 required `packagePath`、optional `outputDir`，以及 non-empty `taskIds` 或 `all: true` 严格二选一；输出限制为 `reportPath`、`markdownPath`、`taskCount` 和 `status=planned`。
+- `scripts/prepare-packed-cli.mjs` 新增 execution runner import rewrite，保证 tarball consumer 使用内嵌 runtime。
+- 新增 unit、in-memory MCP transport、packed stdio consumer、strict selection、redaction、fail-closed、command non-execution 和 no-write 覆盖。
+
+### TDD 与 5A
+
+- Red：`mcp-tool-registry.test.ts` 出现 4 个预期失败，证明第十个工具、schema 和 call path 尚不存在。
+- Green：新增薄 adapter 和 registry entry 后，聚焦 unit 17/17 通过。
+- Assess：in-memory `tools/list` / `tools/call` 通过；packed installed consumer 单 worker 通过。
+- Advance：下一 Goal 为 RepoAssure AI IDE Repair Patch Plan MCP Tool Implementation v0.1。
+
+### 当前验证
+
+- `pnpm exec vitest run tests/unit/mcp-tool-registry.test.ts` - 17/17 passed。
+- `pnpm exec vitest run tests/integration/mcp-server.test.ts -t "prepares a repair handoff and previews execution" --maxWorkers=1` - passed。
+- `pnpm exec vitest run tests/integration/packed-mcp-server-protocol.test.ts --maxWorkers=1` - passed outside sandbox。
+- `pnpm build:acceptance` - passed。
+- `pnpm build:src` - passed。
+- `pnpm exec vitest run tests/unit/project-structure.test.ts` - 111/111 passed。
+- `pnpm test` - 78 files、754 tests passed；1 file、1 test skipped。
+- `pnpm typecheck`、`pnpm lint`、`pnpm repo:hygiene`、`git diff --check` - passed。
+- `pnpm release:check` - automated prerequisites passed；public release 仍保持 `no`。
+- `pnpm goal:audit` - 34/35 passed；只保留既有产品级用户确认人工项。
+- `pnpm autopilot:progress:check -- --json` - consistent，8/8 checks passed。
+
+### 边界
+
+- No validation-only MCP exposure or verification command execution。
+- No arbitrary command execution。
+- No target repo write or automatic patch application。
+- No npm publication、deployment、public release、customer contact、pricing change or spend。
+## 2026-07-26 - Public Git History Personal-Identifier Remediation Planning v0.1
+
+Next Goal: Public Git History Personal-Identifier Remediation Maintainer Decision Recording v0.1.
+
+Decision intake status: `pending_explicit_maintainer_choice`. A RED contract requires explicit choice evidence and prevents execution authorization from being treated as `accept_risk`.
+
+### 完成内容
+
+- 新增脱敏 planning record，记录 6 个受影响提交、16 个路径和
+  2026-06-27 至 2026-06-28 的影响范围。
+- 将材料归类为 `personal_contact_data`，记录 credential exposure 为 false、
+  current-tree match 为 0，且不在任何新增材料中复述标识值。
+- 对比 `accept_risk`、`rewrite public Git history` 和 `replace repository`，
+  并记录 clone、fork、pull request、commit signature、branch protection、
+  rollback、notification 与 verification 后果。
+- 当前推荐 `accept_risk`，但保持 maintainer decision pending。
+- 级联更新 canonical product docs、architecture、testing、acceptance、
+  decision log 和 Autopilot progress。
+
+### TDD
+
+- Red：结构合同出现 3 个预期失败，分别证明新决策包、新 Goal 和状态迁移
+  尚不存在。
+- Green：补齐 planning record、完成 Goal、创建 maintainer decision Goal，
+  并将 active/next 指向该 Goal。
+- Verify：structure 123/123、focused 131/131、Autopilot 8/8、完整串行套件
+  82 files / 796 tests passed，1 file / 1 test skipped；typecheck、lint、
+  build、hygiene、goal audit 和 diff check 通过。
+- 默认并行完整套件发现 packed tests 共享 `dist` 的既有竞态；受影响测试
+  单独通过，完整套件单 worker 通过。该问题已记录到 blockers log。
+
+### 边界
+
+- No identifier value reproduction.
+- No Git history rewrite, force push, branch/tag rewrite, repository
+  replacement, credential rotation, contact, GitHub setting change,
+  publication, launch, deployment, pricing or spend.
+
+### 下一步
+
+Public Git History Personal-Identifier Remediation Maintainer Decision Recording
+v0.1 只记录 maintainer 的一个明确选择，不执行任何修复或外部动作。
+
+## 2026-07-26 - Public Git History Personal-Identifier Remediation Maintainer Decision Recording v0.1
+
+Conclusion: `maintainer_explicitly_accepted_historical_personal_identifier_recoverability_risk`.
+
+### 完成内容
+
+- 记录维护者独立明确提供的 `accept_risk`，未把 Goal 执行授权当作风险决定。
+- 记录历史个人联系信息仍可恢复、隐私与垃圾信息暴露、fork/mirror/cache
+  持续存在三类已接受风险。
+- 保留 6 个受影响提交、16 个路径、0 个当前树匹配、无 credential
+  exposure evidence 的脱敏事实。
+- 完成 operation record、canonical docs、architecture、testing、
+  acceptance、decision log 和 Autopilot state 级联。
+- 创建 RepoAssure Product Completion Gap Audit Refresh v0.8 作为下一 Goal。
+
+### TDD
+
+- Red：结构合同 6 个预期失败，证明最终决策、Goal 完成状态、v0.8 和活动指针尚未落地。
+- Green：完成 operation record、当前 Goal、v0.8 Goal、canonical cascade 和
+  Autopilot 活动指针迁移；结构合同 124/124 通过。
+- Verify：focused governance 134/134；完整串行回归 82 files、797 tests
+  passed，1 file、1 test skipped；Autopilot 8/8；typecheck、lint、
+  build:src、repo hygiene 和 diff check 通过；release automated
+  prerequisites 通过但保持 `public release ready: no`；goal audit 34/35，
+  只保留既有产品级用户验收人工项。
+
+### 边界
+
+- No identifier value reproduction.
+- No Git history rewrite, force push, branch/tag rewrite, repository
+  replacement, credential rotation, contact, GitHub setting change,
+  publication, launch, deployment, pricing or spend.
+
+### 下一步
+
+RepoAssure Product Completion Gap Audit Refresh v0.8 复核剩余产品缺口并选择
+一个安全、受限的后续 Execution Goal，不改变运行时行为或外部状态。
+
+## 2026年7月26日 - RepoAssure Product Completion Gap Audit Refresh v0.8
+
+Conclusion: `completion_gap_audit_refreshed_with_final_product_acceptance_closure_campaign_next`.
+
+### 完成
+
+- 对照 PLAN、SPEC、PRD、代码、测试、acceptance 和最新 operation evidence
+  重新分类产品状态。
+- 记录 12 个已实现产品 surface，确认公开源码发布和原生分支保护已验证。
+- 保留 7 个人工门禁、3 个外部输入门禁和 5 个暂缓项。
+- 保留 2 个 pending detector calibration decisions。
+- 保留历史个人标识 `accept_risk` 决策；未改写历史、未复述标识值。
+- 创建 RepoAssure Final Product Acceptance Closure Campaign v0.1 作为唯一下一 Goal。
+
+### TDD
+
+- Red：`tests/unit/project-structure.test.ts` 出现 7 个预期失败，证明 v0.8
+  operation record、完成状态、新 Goal 和 active 指针尚未落地。
+- Green：完成 operation record、Goal/index/progress 状态和 canonical docs
+  级联；focused governance 135/135 通过。
+- Verify：Autopilot consistency 8/8；typecheck、lint、build:src、
+  repo:hygiene 通过；release 自动前置条件通过但保持
+  `public release ready: no`；goal audit 34/35，仅保留最终产品验收人工项。
+- 完整串行回归在沙箱内出现 6 个 local port / child process / isolated
+  tarball install 环境失败；授权在沙箱外重跑后 82 files、798 tests
+  passed，1 file、1 test skipped。
+
+### 边界
+
+- No runtime behavior, product entrypoint, detector, acceptance policy, target
+  repository, Git history, publication, deployment, repository-control,
+  customer-contact, pricing, or spend change.
+
+### 下一步
+
+RepoAssure Final Product Acceptance Closure Campaign v0.1 刷新自动化证据，
+核验真实项目验收记录的新鲜度，并生成不预填决定的
+`accepted / changes_requested / defer` maintainer 决策包。
+
+## 2026年7月26日 - RepoAssure Final Product Acceptance Closure Campaign v0.1
+
+Conclusion: `final_product_acceptance_decision_package_prepared_without_inferred_decision`.
+
+### 完成
+
+- 刷新并汇总自动质量、release readiness、goal audit 和 Autopilot consistency
+  证据。
+- 审计 `docs/acceptance/user-acceptance-record.md`：2026-06-23 OpenClaw
+  browser 验收保留为有效历史 evidence，但对当前收束标记为 stale。
+- 新增 `docs/acceptance/final-product-acceptance-decision-package-v0.1.md`，
+  仅提供未选中的 `accepted / changes_requested / defer`。
+- 创建 RepoAssure Final Product Acceptance Maintainer Decision Recording v0.1
+  作为唯一下一 Goal。
+
+### TDD
+
+- Red：focused structure test 因 closure operation record 和 decision package
+  不存在而失败。
+- Green：补齐 operation record、decision package、Goal/index/progress 和
+  canonical docs 级联。
+- Verify：focused governance、Autopilot consistency、typecheck、lint、build、
+  repo hygiene、release check、goal audit 与完整测试金字塔全部复跑。
+- Final evidence：focused governance 126/126；Autopilot 8/8；沙箱内完整回归
+  因 local port / child process / isolated tarball install 出现 6 个环境失败；
+  授权沙箱外重跑后 82 files、799 tests passed，1 file、1 test skipped。
+
+### 边界
+
+- Goal audit: 34 passed, 1 manual.
+- Historical real-project acceptance: stale for current closure.
+- Release automated prerequisites: passed.
+- Public release ready: no.
+- Target repository executed: no.
+- Target repository writes: no.
+- Acceptance decision inferred: no.
+- No runtime, detector, acceptance-policy, publication, deployment, launch,
+  repository-control, contact, pricing, spend, hosted availability, or Git
+  history change.
+
+### 下一步
+
+RepoAssure Final Product Acceptance Maintainer Decision Recording v0.1 只在
+maintainer 单独明确回复 `accepted / changes_requested / defer` 及具体备注后
+记录决定；普通“授权执行”不得被当作验收结论。
+
+## 2026年7月26日 - RepoAssure Final Product Acceptance Maintainer Decision Recording v0.1（等待明确决定）
+
+### 已完成的准备
+
+- TDD Red：新增 pending 决策记录结构测试，因记录文件不存在而按预期失败。
+- TDD Green：新增
+  `docs/acceptance/final-product-acceptance-maintainer-decision-record-v0.1.md`。
+- Goal metadata 记录 `decision_status: pending`、
+  `explicit_decision_found: false` 和
+  `execution_authorization_treated_as_acceptance: false`。
+- README、PRD、SPEC、PLAN、architecture、testing strategy、acceptance
+  checklist、decision log 和 Progress Snapshot 已级联引用 pending 入口。
+
+### 当前人工门
+
+- 明确决定：缺失。
+- 具体 maintainer 备注：缺失。
+- 当前 Goal：保持 active / `ready_to_execute`。
+- 最终产品验收：未完成。
+
+### 边界
+
+- 未推断 `accepted`、`changes_requested` 或 `defer`。
+- 未运行或写入目标 repo。
+- 未执行发布、部署、launch、仓库控制、外部联系、价格、支出、runtime、
+  detector、acceptance policy 或 Git history 变更。
+
+## 2026年7月26日 - RepoAssure Final Product Acceptance Maintainer Decision Recording v0.1 完成
+
+Conclusion: `maintainer_explicitly_deferred_final_product_acceptance_pending_representative_multi_mode_validation`.
+
+### 明确输入
+
+- Decision: `defer`.
+- Maintainer notes：当前自动化质量证据已通过，暂未发现必须返工的产品缺陷；
+  当前真实项目验收早于产品现状且只覆盖 browser 场景，需完成 Web、
+  Python/CLI、MCP/Agent 三类代表性验收并关闭关键误报和人工决策项。
+
+### TDD
+
+- Red：决策记录测试要求 `defer`、完整理由、operation record、完成态 Goal
+  和下一 Goal，因下一 Goal 文件不存在而失败。
+- Green：更新决策记录，新增 operation record 与
+  RepoAssure Representative Multi-Mode Acceptance Campaign Planning v0.1。
+- Boundary：Goal 执行授权未被当作验收决定；`defer` 未被扩大为任何外部
+  动作或目标 repo 执行授权。
+
+### 下一步
+
+RepoAssure Representative Multi-Mode Acceptance Campaign Planning v0.1
+规划三类代表性验收及独立 target execution authorization intake，不运行或
+写入目标 repo。
+
+### 最终验证
+
+- Governance structure：127/127 passed。
+- Autopilot progress consistency：8/8 passed，active/next 均为新 planning
+  Goal，状态 `ready_to_execute`。
+- `git diff --check`、JSON parse、repo hygiene、release check、typecheck、
+  lint 和 build：全部通过。
+- Goal audit：34 passed，1 manual；人工项保持未自动完成。
+- 沙箱内完整测试因本地端口和隔离安装限制出现 6 项环境失败。
+- 沙箱外并发完整测试的 3 项 5 秒超时，在串行复跑中 7/7 通过；最终沙箱外
+  单 worker 完整套件为 82 files passed、1 skipped，800 tests passed、
+  1 skipped。
+- Public release ready 仍为 `no`；未执行发布、部署、launch 或目标 repo
+  读写。
+
+## 2026年7月26日 - RepoAssure Representative Multi-Mode Acceptance Campaign Planning v0.1
+
+Conclusion: `representative_multi_mode_acceptance_campaign_planned_without_target_execution`.
+
+### 完成
+
+- 新增 Web、Python/CLI、MCP/Agent 三条代表性验收通道规划。
+- 新增 `repoassure.representative-multi-mode-acceptance-evidence@1` JSON/Markdown
+  证据契约，规定 AI IDE 读取顺序、lane result 和 campaign eligibility。
+- 新增 fail-closed 目标与执行授权 intake；三条通道均保持 pending。
+- 创建下一 Goal，仅用于登记明确目标与执行授权决定。
+- 级联更新 README、PRD、SPEC、PLAN、architecture、testing strategy、
+  acceptance checklist、decision log 和 Progress Snapshot。
+
+### TDD
+
+- Red：新增结构契约测试，因 planning operation record 不存在而按预期失败。
+- Green：补齐 campaign plan、evidence contract、authorization intake、
+  operation record、Goal/index/progress 与 canonical docs。
+- Verify：focused planning contract 1/1；governance structure 128/128；
+  Autopilot consistency 8/8；JSON parse、`git diff --check`、repo hygiene、
+  release check、typecheck、lint、build 全部通过。
+- Goal audit：34 passed / 1 manual；人工验收项未自动关闭。
+- 沙箱内串行套件复现 packed CLI/MCP 隔离安装超时；沙箱外单 worker 完整
+  套件为 82 files passed、1 skipped，801 tests passed、1 skipped。
+- Release 自动前置条件通过，但 `public release ready: no` 保持不变。
+
+### 边界
+
+- Target selected/acquired/executed/written: no.
+- Final acceptance inferred: no；现有 `defer` 保持有效。
+- 未执行 publication、deployment、launch、repository control、contact、
+  pricing、spend、detector、acceptance policy 或 Git history 变更。
+
+## 2026年7月26日 - RepoAssure Representative Multi-Mode Acceptance Target and Execution Authorization Decision Recording v0.1 - decision preparation
+
+Interim conclusion:
+`decision_preparation_completed_without_inferred_lane_authorization`.
+
+### TDD
+
+- Red：新增 fail-closed 决策准备结构合同；因 operation record 和 decision
+  preparation 文档不存在而失败，其他 128 项通过。
+- Green：新增三通道候选核验与推荐材料，更新 authorization intake，并将
+  pending 状态级联到 PLAN、SPEC、PRD、验收清单、测试策略和日志。
+
+### 当前结果
+
+- Web、Python/CLI、MCP/Agent 的候选与缺失批准前提已记录。
+- 当前建议均为 `defer`，但未预填为 maintainer 决定。
+- 显式通道决定仍为 0/3，本 Goal 状态为
+  `awaiting_explicit_maintainer_decisions`。
+- 本轮未获取、安装、启动、分析、执行或写入任何目标 repo。
+
+### 验证
+
+- 聚焦结构合同：129/129 passed。
+- 结构合同与 Autopilot 一致性聚焦：135/135 passed。
+- 完整单元测试：60 files / 758 tests passed。
+- Repo hygiene、release check、typecheck、lint、build 与
+  `git diff --check`：passed。
+- Goal audit：34 passed / 1 manual；人工门禁未被自动关闭。
+- `public release ready: no` 保持不变。
+
+## 2026年7月26日 - RepoAssure Representative Multi-Mode Acceptance Target and Execution Authorization Decision Recording v0.1 - completed
+
+Conclusion:
+`maintainer_explicitly_deferred_all_representative_lanes_pending_target_readiness`.
+
+### TDD
+
+- Red：将结构合同升级为要求 3/3 明确 `defer`、完成态 Goal、下一 Goal
+  和一致机器状态；因下一 Goal 文件不存在而按预期失败。
+- Green：将 maintainer 明确回复写入 decision preparation、authorization
+  intake、operation record、Goal/index/progress 和 canonical docs。
+
+### 决策与边界
+
+- Web、Python/CLI、MCP/Agent 均为 `defer`。
+- 显式决定 3/3，批准目标 0/3。
+- Goal 执行授权未被当成通道授权。
+- 未获取、克隆、安装、启动、分析、运行或写入目标 repo。
+- 未执行发布、部署、launch、仓库控制、外部联系、价格或支出变更。
+
+### 下一步
+
+RepoAssure Representative Multi-Mode Acceptance Target Readiness and
+Acquisition Authorization Package v0.1 仅准备后续授权材料，不执行目标获取
+或验收。
+
+### 最终验证
+
+- 聚焦结构合同：129/129 passed。
+- 结构合同与 Autopilot 一致性：135/135 passed。
+- 完整单元测试：60 files / 758 tests passed。
+- 最终沙箱外完整测试：82 files / 802 tests passed；1 file / 1 test
+  skipped。
+- 沙箱内首次完整测试的本地端口、隔离安装和外部进程失败，经沙箱外复跑
+  收敛为测试时间预算问题；为三个多进程或真实工作区集成测试设置了明确的
+  30 秒级测试预算，未改变产品命令超时、目标写入或网络授权边界。
+- Typecheck、lint、build、repo hygiene、release check、JSON 解析和
+  `git diff --check` passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项保持未自动关闭。
+- `public release ready: no` 保持不变。
+
+## 2026年7月27日 - RepoAssure Representative Multi-Mode Acceptance Target Readiness and Acquisition Authorization Package v0.1
+
+Conclusion:
+`target_readiness_and_acquisition_authorization_package_prepared_without_target_acquisition`.
+
+### TDD
+
+- Red：新增聚焦治理结构测试，要求三张通道就绪卡、未来获取授权模板、完成态
+  Goal、下一人工决策 Goal 和 0/3 获取授权状态；测试因就绪包不存在而按预期
+  失败。
+- Green：新增就绪与获取授权包、operation record、下一 Goal，并级联更新
+  Goal/index/progress、README、PRD、SPEC、PLAN、architecture、testing
+  strategy、acceptance checklist、decision/blocker logs 和 Progress Snapshot。
+
+### 就绪结果
+
+- Web：保留 `openclaw/openclaw` 为未核验候选，仅准备 owner/license/revision/
+  privacy/reproducibility/isolation/stop/cleanup 计划。
+- Python/CLI：保留 `Panniantong/Agent-Reach` 为未核验候选，仅准备同类计划。
+- MCP/Agent：保持 blocked on current source-lane bundle，未选择外部 client。
+- 代表性执行决定保持 3/3 `defer`；获取授权决定为 0/3。
+
+### 边界
+
+- Goal 执行授权未被当成目标获取授权或通道执行授权。
+- 未访问候选来源，未获取、克隆、安装、启动、分析、运行或写入任何目标。
+- 未虚构 SHA、许可证结论、隐私结论或运行证据。
+- 未发布、部署、launch、修改仓库控制、联系外部人员或改变价格/支出。
+
+### 下一步
+
+Next Goal: RepoAssure Representative Multi-Mode Acceptance Target Acquisition Authorization Maintainer Decision Recording v0.1.
+它只记录每条通道的 `approve_acquisition / reject / defer` 明确决定，不执行
+获取或验收。
+
+### 最终验证
+
+- 聚焦治理结构合同：130/130 passed。
+- 完整单元测试：60 files / 759 tests passed。
+- Autopilot progress consistency：8/8 passed，active/next 均为下一人工决策
+  Goal，状态 `ready_to_execute`。
+- Typecheck、lint、build、repo hygiene、JSON 解析和 `git diff --check`
+  passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项保持未自动关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。
+
+## 2026年7月29日 - RepoAssure Remaining Gated Product Work Direction Preparation v0.1 - completed
+
+Conclusion:
+`remaining_gated_product_work_direction_package_prepared_without_decision_or_execution`.
+
+### TDD
+
+- Red：新增方向准备状态级联合同，因
+  `docs/product/strategy/remaining-gated-product-work-direction-preparation-v0.1.md`
+  不存在而按预期失败。
+- Green：完成 17 项方向包、operation record、当前 Goal、下一 Goal、
+  index/progress 和 canonical documentation cascade。
+
+### 结果
+
+- Blocked/manual-gated：9/9 prepared。
+- External-input-gated：3/3 prepared。
+- Deferred：5/5 prepared。
+- 每项均记录 consequence、prerequisite、evidence gap 和 reversible next
+  step。
+- 单一 advisory recommendation：
+  `false_positive_detector_runtime_calibration`。
+- Maintainer direction decision：`pending`。
+- 下一 Goal：RepoAssure Remaining Gated Product Work Maintainer Direction Decision Recording v0.1。
+
+### 边界
+
+- 最终验收和 Web / Python/CLI / MCP/Agent 获取、执行均保持 `defer`。
+- Action Authorization Receipts、已获取目标、已执行目标和目标写入均为 0。
+- 未访问、获取、克隆、安装、分析、启动、运行或写入任何目标。
+- 未访问外部系统、改变运行时或验收行为、扩展 entrypoint、发布、部署或
+  launch。
+
+### 最终验证
+
+- 聚焦 direction-preparation contract：1/1 passed；governance structure：
+  135/135 passed。
+- Direction inventory：17/17 items；required state fields：10/10。
+- Unit suite：60 files / 764 tests passed。
+- Autopilot progress consistency：8/8 passed；关键 JSON：5/5 parsed。
+- Typecheck、lint、build、repo hygiene、goal audit、release automated
+  prerequisites 和 `git diff --check` passed。
+- Goal audit：34 passed / 0 missing / 1 manual；既有长期人工验收项未自动关闭。
+- `public release ready: no` 保持不变。
+
+## 2026年7月29日 - RepoAssure Canonical Product Narrative Freshness Cleanup v0.2 - completed
+
+Conclusion:
+`canonical_product_narrative_freshness_cleaned_with_gated_work_direction_preparation_next`.
+
+### TDD
+
+- Red：新增 cleanup v0.2 状态级联合同，因 cleanup 操作记录和下一 Goal
+  记录不存在而按预期失败。
+- Green：完成 8 处 canonical current/next 叙述清理、当前 Goal、下一
+  Goal、index、progress 和 documentation cascade。
+
+### 结果
+
+- README：3/3 findings removed。
+- PLAN：1/1 finding removed。
+- SPEC：2/2 findings removed。
+- PRD：2/2 findings removed。
+- 历史 Goal 名称、结论和顺序证据保留。
+- 下一 Goal：RepoAssure Remaining Gated Product Work Direction Preparation v0.1。
+
+### 边界
+
+- 最终验收和 Web / Python/CLI / MCP/Agent 获取、执行均保持 `defer`。
+- 未访问、获取、克隆、安装、分析、启动、运行或写入任何目标。
+- 未访问外部系统、改变运行时或验收行为、发布、部署或 launch。
+
+### 最终验证
+
+- 聚焦 cleanup contract：1/1 passed；governance structure：134/134 passed。
+- 精确 stale-claim 检查：8/8 removed；关键 JSON：5/5 parsed。
+- Unit suite：60 files / 763 tests passed。
+- Autopilot progress consistency：8/8 passed。
+- Typecheck、lint、build、repo hygiene、goal audit、release automated
+  prerequisites 和 `git diff --check` passed。
+- Goal audit：34 passed / 0 missing / 1 manual；既有长期人工验收项未自动关闭。
+- `public release ready: no` 保持不变。
+
+## 2026年7月29日 - RepoAssure Product Completion Gap Audit Refresh v0.9 - completed
+
+Conclusion:
+`completion_gap_audit_refreshed_with_canonical_narrative_freshness_cleanup_v0.2_next`.
+
+### TDD
+
+- Red：新增 v0.9 状态级联结构合同，因审计记录与 cleanup v0.2 Goal 不存在
+  而按预期失败。
+- Green：完成产品/治理 surface、blocked/manual、external-input、deferred、
+  safe-local 分类，并级联当前 Goal、下一 Goal、index、progress 和
+  canonical documentation。
+
+### 结果
+
+- Implemented product surfaces：12。
+- Implemented governance surfaces：3。
+- Blocked/manual-gated：9；external-input-gated：3；deferred：5。
+- Safe local：1；stale current/next findings：8。
+- 下一 Goal：RepoAssure Canonical Product Narrative Freshness Cleanup v0.2。
+
+### 边界
+
+- 最终验收和 Web / Python/CLI / MCP/Agent 获取、执行均保持 `defer`。
+- 未访问、获取、克隆、安装、分析、启动、运行或写入任何目标。
+- 未访问外部系统、改变运行时或验收行为、发布、部署或 launch。
+
+### 最终验证
+
+- 聚焦 v0.9 contract：1/1 passed。
+- Governance structure：133/133 passed。
+- Unit suite：60 files / 762 tests passed。
+- Autopilot progress consistency：8/8 passed；JSON parse：4/4 passed。
+- Typecheck、lint、build、repo hygiene、goal audit、release check 和
+  `git diff --check` passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项未自动关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。
+
+## 2026年7月28日 - RepoAssure Product Backlog Reprioritization After Representative Acquisition Defer v0.1 - completed
+
+Conclusion:
+`backlog_reprioritized_to_local_product_completion_gap_audit_after_representative_acquisition_defer`.
+
+### TDD
+
+- Red：新增状态级联结构合同，因 backlog reprioritization 操作记录与 v0.9
+  Goal 尚不存在而按预期失败。
+- Green：完成 7 个候选的本地分类、操作记录、当前 Goal、v0.9 Goal、
+  index/progress 和 canonical documentation cascade。
+
+### 结果
+
+- 代表性获取决定：Web / Python/CLI / MCP/Agent 均为 `defer`。
+- 最终产品验收：`defer`。
+- 批准获取：0/3；Action Authorization Receipt：0。
+- 选择的唯一安全本地后续：
+  RepoAssure Product Completion Gap Audit Refresh v0.9。
+
+### 边界
+
+- 未访问、获取、克隆、安装、分析、启动、运行或写入任何目标。
+- 未访问外部系统，未改变 detector/acceptance 行为，未发布、部署或
+  launch。
+
+### 最终验证
+
+- 聚焦 reprioritization contract：1/1 passed。
+- Governance structure：132/132 passed。
+- Unit suite：60 files / 761 tests passed。
+- Autopilot progress consistency：8/8 passed；JSON parse：4/4 passed。
+- Typecheck、lint、build、repo hygiene、goal audit、release check 和
+  `git diff --check` passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项未自动关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。
+
+## 2026年7月28日 - RepoAssure Representative Multi-Mode Acceptance Target Acquisition Authorization Maintainer Decision Recording v0.1 - completed
+
+Conclusion:
+`maintainer_explicitly_deferred_all_representative_target_acquisitions_without_target_access`.
+
+### 决定
+
+- Web：`defer`。
+- Python/CLI：`defer`。
+- MCP/Agent：`defer`。
+- 明确决定：3/3；批准获取：0/3；Action Authorization Receipt：0。
+- `备注: <可选>` 被视为未填写占位符，未记录成备注。
+
+### TDD
+
+- Red：最终决策结构合同因新的 backlog reprioritization Goal 元数据不存在而按预期失败。
+- Green：完成三通道决策记录、当前 Goal、下一 Goal、index/progress 和 canonical documentation cascade。
+
+### 边界
+
+- 未访问、获取、克隆、安装、分析、启动、运行或写入任何目标。
+- 未发布、部署、launch、修改仓库控制、联系外部人员、改变价格或支出。
+- 最终产品验收继续保持 `defer`。
+
+### 下一步
+
+Next Goal: RepoAssure Product Backlog Reprioritization After Representative Acquisition Defer v0.1.
+它仅允许本地重排 backlog，不允许接触目标或外部系统。
+
+### 最终验证
+
+- Final decision contract：1/1 passed。
+- Governance structure：131/131 passed。
+- Unit suite：60 files / 760 tests passed。
+- Local-fixture boot/MCP integration recheck outside the restricted sandbox：
+  3 files / 6 tests passed。
+- Full integration attempt：16 files / 37 tests passed；packed CLI/MCP install
+  tests were not retried outside the sandbox because the restricted run could
+  not resolve `registry.npmjs.org` and this Goal does not authorize dependency
+  installation or external network access。
+- Autopilot progress consistency：8/8 passed。
+- Typecheck、lint、build、repo hygiene、JSON parse 和 `git diff --check`：
+  passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项保持未自动关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。
+
+## 2026年7月28日 - RepoAssure Representative Multi-Mode Acceptance Target Acquisition Authorization Maintainer Decision Recording v0.1 - pending decisions (historical interim)
+
+Interim conclusion:
+`acquisition_authorization_decision_record_prepared_without_inferred_lane_decisions`.
+
+### TDD
+
+- Red：新增待决策结构合同，因三通道获取授权 decision record 不存在而按预期失败。
+- Green：新增未预填的 Web、Python/CLI、MCP/Agent decision record 和
+  awaiting-decisions operation record，并级联 Goal summary、PLAN、SPEC、
+  PRD、acceptance checklist、testing strategy、decision/blocker logs 和
+  Progress Snapshot。
+
+### 当前状态
+
+- Explicit acquisition decisions: 0/3.
+- Pending decisions: 3/3.
+- Human Approval Policy: `pending_confirmation`.
+- Action Authorization Receipts issued: 0.
+- Goal execution authorization treated as acquisition authorization: no.
+- 当前 Goal 继续保持 active / `ready_to_execute`，不创建或执行下一 Goal。
+
+### 边界
+
+- 未访问候选来源，未获取、克隆、安装、分析、启动、运行或写入任何目标。
+- 未发布、部署、launch、修改仓库控制、联系外部人员、改变价格或支出。
+- 最终产品验收继续保持 `defer`。
+
+### 验证
+
+- Focused pending-decision contract：1/1 passed。
+- Governance structure：131/131 passed。
+- Full unit suite：60 files / 760 tests passed。
+- Autopilot progress consistency：8/8 passed。
+- Typecheck、lint、build、repo hygiene、JSON parse 和 `git diff --check`：
+  passed。
+- Goal audit：34 passed / 1 manual；长期产品人工验收项保持未自动关闭。
+- Release 自动前置条件 passed；`public release ready: no` 保持不变。

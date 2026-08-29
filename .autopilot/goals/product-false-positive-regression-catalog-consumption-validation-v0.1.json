@@ -1,0 +1,73 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "product-false-positive-regression-catalog-consumption-validation-v0.1",
+  "status": "completed",
+  "objective": "Validate false-positive regression catalog artifact consumption by maintainers and AI IDEs using the generated JSON/Markdown read order, review boundary, and no target repo write constraints.",
+  "source_spec": "docs/operations/product-false-positive-regression-catalog-artifact-generation-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade"
+  ],
+  "acceptance": [
+    "Add consumption validation tests that load generated false-positive catalog JSON/Markdown fixtures and enforce the documented read order.",
+    "Validate that AI IDE and maintainer guidance exposes fixture categories, expected finding snapshots, maintainer review fields, and verification checklist without authorizing detector behavior changes.",
+    "Validate that consumption artifacts preserve redaction and no target repo write boundaries.",
+    "Do not modify runtime detectors, suppress findings, downgrade severities automatically, write target repositories, publish, deploy, or claim hosted availability."
+  ],
+  "summary": {
+    "operation_record": "docs/operations/product-false-positive-regression-catalog-consumption-validation-v0.1.md",
+    "conclusion": "consumption_validated_without_detection_behavior_change",
+    "command": "pnpm false-positive:catalog:validate",
+    "runner": "packages/acceptance/src/run-false-positive-catalog-consumption.ts",
+    "package_export": "@hardening-mcp/acceptance/run-false-positive-catalog-consumption",
+    "artifacts": [
+      "artifacts/project-graph/false-positive-regression-catalog-consumption-validation.json",
+      "artifacts/project-graph/false-positive-regression-catalog-consumption-validation.md"
+    ],
+    "checks": 13,
+    "validated_consumption": [
+      "json first read order",
+      "markdown readability",
+      "maintainer review boundary",
+      "fixture category coverage",
+      "expected snapshot fields",
+      "review fields",
+      "verification checklist",
+      "redaction boundary",
+      "no target repo write boundary",
+      "no runtime detection behavior change boundary"
+    ],
+    "boundary": {
+      "local_only": true,
+      "target_repo_writes": false,
+      "runtime_detection_behavior_change": false,
+      "finding_suppression": false,
+      "automatic_severity_downgrade": false,
+      "hosted_dashboard": false,
+      "telemetry": false,
+      "cloud_sync": false
+    },
+    "verification": [
+      "pnpm vitest run tests/unit/false-positive-catalog-consumption.test.ts tests/unit/acceptance-package.test.ts",
+      "pnpm build:acceptance",
+      "pnpm false-positive:catalog:validate -- --generated-at 2026-07-22T00:00:00.000+08:00"
+    ],
+    "selected_next_goal_id": "product-false-positive-regression-catalog-completion-audit-v0.1"
+  },
+  "next_goal_id": "product-false-positive-regression-catalog-completion-audit-v0.1"
+}

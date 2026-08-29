@@ -1,0 +1,81 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-false-positive-detector-runtime-calibration-bounded-design-planning-v0.1",
+  "title": "RepoAssure False-Positive Detector Runtime Calibration Bounded Design Planning v0.1",
+  "status": "completed",
+  "objective": "Prepare a local-only bounded detector calibration design plan for the two explicitly approved questions, preserving all manual gates and without changing runtime detector behavior.",
+  "source_spec": "docs/product/strategy/false-positive-detector-runtime-calibration-per-question-maintainer-decision-record-v0.1.md",
+  "priority": "P0",
+  "blocked_actions": [
+    "runtime_detector_implementation",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "detector_confidence_threshold_change",
+    "acceptance_policy_change",
+    "authorization_receipt_issuance",
+    "target_repository_acquisition",
+    "network_access_for_target",
+    "dependency_installation",
+    "target_repository_analysis",
+    "target_repository_execution",
+    "target_repository_write",
+    "automatic_patch_application",
+    "publication",
+    "npm_publication",
+    "github_release",
+    "deployment",
+    "launch",
+    "repository_visibility_change",
+    "permission_change",
+    "customer_contact",
+    "reviewer_contact",
+    "pricing_change",
+    "spend_change",
+    "git_history_rewrite",
+    "force_push"
+  ],
+  "acceptance": [
+    "Prepare a question-specific bounded design proposal for conditional_dead_control_should_consider_form_dirty_prerequisites without changing detector code or runtime behavior.",
+    "Prepare a question-specific bounded design proposal for auth_redirect_route_should_preserve_maintainer_review_boundary without changing detector code or runtime behavior.",
+    "Preserve maintainer classification, fixture privacy, expected snapshot, confidence threshold, and regression artifact review as manual gates.",
+    "Define local verification evidence, regression coverage, rollback criteria, and a future implementation authorization boundary for each approved question.",
+    "Do not implement detector changes, suppress findings, downgrade severity, change confidence thresholds or acceptance policy, issue a receipt, access a target, publish, deploy, or launch."
+  ],
+  "conclusion": "bounded_false_positive_detector_calibration_design_plan_prepared_without_runtime_implementation_or_behavior_change",
+  "next_goal_id": "repoassure-false-positive-detector-runtime-calibration-implementation-authorization-intake-v0.1",
+  "summary": {
+    "trigger_conclusion": "maintainer_approved_both_false_positive_detector_calibration_questions_for_separately_gated_design_planning_without_detector_implementation_authorization",
+    "decision_record": "docs/product/strategy/false-positive-detector-runtime-calibration-per-question-maintainer-decision-record-v0.1.md",
+    "approved_question_count": 2,
+    "approved_questions": [
+      "conditional_dead_control_should_consider_form_dirty_prerequisites",
+      "auth_redirect_route_should_preserve_maintainer_review_boundary"
+    ],
+    "manual_gates": [
+      "maintainer_classification_required_before_detector_change",
+      "fixture_privacy_confirmation_required",
+      "expected_snapshot_confirmation_required",
+      "confidence_threshold_review_required",
+      "regression_artifact_review_required"
+    ],
+    "bounded_design_planning_authorized": true,
+    "design_plan": "docs/product/strategy/false-positive-detector-runtime-calibration-bounded-design-plan-v0.1.md",
+    "operation_record": "docs/operations/repoassure-false-positive-detector-runtime-calibration-bounded-design-planning-v0.1.md",
+    "designed_question_count": 2,
+    "question_design_statuses": {
+      "conditional_dead_control_should_consider_form_dirty_prerequisites": "bounded_design_prepared",
+      "auth_redirect_route_should_preserve_maintainer_review_boundary": "bounded_design_prepared"
+    },
+    "detector_implementation_authorized": false,
+    "detector_changes_authorized": false,
+    "finding_suppression_authorized": false,
+    "automatic_severity_downgrade_authorized": false,
+    "confidence_threshold_change_authorized": false,
+    "acceptance_policy_change_authorized": false,
+    "authorization_receipts_issued": 0,
+    "target_repositories_acquired": 0,
+    "target_repositories_executed": 0,
+    "target_repository_writes": 0
+  }
+}

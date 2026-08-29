@@ -4,6 +4,8 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+pnpmfileChecksum: sha256-WYK6CtboQhuAREERVtep5gfY4x6mhY01Y/mOp43x9dM=
+
 importers:
 
   .:
@@ -26,9 +28,6 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.29.0
         version: 1.29.0(zod@4.4.3)
-      '@repoassure/design-system':
-        specifier: workspace:*
-        version: link:packages/design-system
       playwright:
         specifier: ^1.61.0
         version: 1.61.0
@@ -39,6 +38,9 @@ importers:
       '@playwright/test':
         specifier: ^1.61.0
         version: 1.61.0
+      '@repoassure/design-system':
+        specifier: workspace:*
+        version: link:packages/design-system
       '@types/node':
         specifier: ^25.9.3
         version: 25.9.3
@@ -90,7 +92,7 @@ importers:
         version: 6.0.3
 
   packages/acceptance:
-    dependencies:
+    devDependencies:
       '@repoassure/design-system':
         specifier: workspace:*
         version: link:../design-system

@@ -1,0 +1,113 @@
+{
+  "schema": "repoassure.conditional-dead-control.synthetic-form-dirty-states@1",
+  "fixtureId": "conditional-dead-control-synthetic-v0.1",
+  "records": [
+    {
+      "stateId": "initial_disabled_before_dirty",
+      "initialDirty": false,
+      "initialDisabled": true,
+      "transitionKind": "none",
+      "transitionSafe": false,
+      "afterDirty": false,
+      "afterDisabled": true,
+      "observable": true
+    },
+    {
+      "stateId": "safe_dirty_transition_available",
+      "initialDirty": false,
+      "initialDisabled": true,
+      "transitionKind": "controlled_local_input_available",
+      "transitionSafe": true,
+      "afterDirty": true,
+      "afterDisabled": null,
+      "observable": true
+    },
+    {
+      "stateId": "enabled_after_safe_dirty_transition",
+      "initialDirty": false,
+      "initialDisabled": true,
+      "transitionKind": "controlled_local_input",
+      "transitionSafe": true,
+      "afterDirty": true,
+      "afterDisabled": false,
+      "observable": true
+    },
+    {
+      "stateId": "still_disabled_after_safe_dirty_transition",
+      "initialDirty": false,
+      "initialDisabled": true,
+      "transitionKind": "controlled_local_input",
+      "transitionSafe": true,
+      "afterDirty": true,
+      "afterDisabled": true,
+      "observable": true
+    },
+    {
+      "stateId": "dirty_transition_not_safely_observable",
+      "initialDirty": false,
+      "initialDisabled": true,
+      "transitionKind": "unavailable_or_unsafe",
+      "transitionSafe": false,
+      "afterDirty": null,
+      "afterDisabled": null,
+      "observable": false
+    }
+  ],
+  "snapshots": {
+    "positive": {
+      "statePath": [
+        "initial_disabled_before_dirty",
+        "safe_dirty_transition_available",
+        "enabled_after_safe_dirty_transition"
+      ],
+      "transitionExecuted": true,
+      "findingVisible": true,
+      "classification": "false_positive_candidate",
+      "prerequisiteEvidence": {
+        "initialDisabled": true,
+        "safeDirtyTransitionObserved": true,
+        "enabledAfterTransition": true
+      },
+      "formStateInferred": false
+    },
+    "counter": {
+      "statePath": [
+        "initial_disabled_before_dirty",
+        "safe_dirty_transition_available",
+        "still_disabled_after_safe_dirty_transition"
+      ],
+      "transitionExecuted": true,
+      "findingVisible": true,
+      "classification": "actionable_conditional_dead_control",
+      "prerequisiteEvidence": {
+        "initialDisabled": true,
+        "safeDirtyTransitionObserved": true,
+        "stillDisabledAfterTransition": true
+      },
+      "formStateInferred": false
+    },
+    "failClosed": {
+      "statePath": [
+        "initial_disabled_before_dirty",
+        "dirty_transition_not_safely_observable"
+      ],
+      "transitionExecuted": false,
+      "findingVisible": true,
+      "classification": "needs_maintainer_review",
+      "prerequisiteEvidence": {
+        "initialDisabled": true,
+        "safeDirtyTransitionObserved": false,
+        "postTransitionStateKnown": false
+      },
+      "formStateInferred": false
+    }
+  },
+  "findingPolicy": {
+    "findingVisibility": "visible_in_all_snapshots",
+    "detectorBehaviorChanged": false,
+    "findingSuppressionAuthorized": false,
+    "automaticSeverityDowngradeAuthorized": false,
+    "confidenceThresholdChangeAuthorized": false,
+    "acceptancePolicyChangeAuthorized": false
+  }
+}

@@ -53,6 +53,193 @@ describe('hardening MCP server', () => {
     await server.close();
   });
 
+  it('prepares repair evidence through the bounded AI IDE workflow over MCP transport', async () => {
+    const targetRepo = await mkdtemp(join(tmpdir(), 'hardening-mcp-server-handoff-target-'));
+    const runDir = await mkdtemp(join(tmpdir(), 'hardening-mcp-server-handoff-run-'));
+    const outputDir = join(runDir, 'handoff');
+    const previewOutputDir = join(runDir, 'preview');
+    const validationOutputDir = join(runDir, 'validation');
+    const patchOutputDir = join(runDir, 'patch-plan');
+    const evidenceOutputDir = join(runDir, 'evidence-package');
+    const { server, transport } = await connectMcpServer();
+
+    try {
+      await writeFile(join(runDir, 'manifest.json'), JSON.stringify({
+        schemaVersion: 1,
+        mode: 'cli',
+        runId: 'run-transport',
+        repoRoot: targetRepo,
+        artifacts: {},
+        checks: [
+          {
+            name: 'required acceptance check',
+            required: true,
+            status: 'blocked',
+            evidence: 'Missing local dependency'
+          }
+        ]
+      }));
+
+      const tools = await listTools(transport, 20);
+      const repairHandoff = tools.find((tool) => tool.name === 'prepare_repair_handoff');
+
+      expect(repairHandoff).toMatchObject({
+        annotations: {
+          readOnlyHint: false,
+          destructiveHint: false,
+          idempotentHint: false,
+          openWorldHint: false
+        },
+        inputSchema: {
+          required: ['runDir']
+        }
+      });
+
+      const handoff = await callTool(transport, 21, 'prepare_repair_handoff', {
+        runDir,
+        outputDir
+      });
+
+      expect(handoff).toEqual({
+        packagePath: join(outputDir, 'repair-handoff-package.json'),
+        markdownPath: join(outputDir, 'repair-handoff-package.md'),
+        verificationPlanPath: join(outputDir, 'verification-plan.md'),
+        taskCount: 1,
+        highestPriority: 'P0',
+        status: 'generated'
+      });
+      await expect(readFile(join(outputDir, 'repair-handoff-package.json'), 'utf8')).resolves.toContain(
+        '"requiresMaintainerReview": true'
+      );
+
+      const previewTool = tools.find((tool) => tool.name === 'preview_repair_execution');
+      expect(previewTool).toMatchObject({
+        annotations: {
+          readOnlyHint: false,
+          destructiveHint: false,
+          idempotentHint: false,
+          openWorldHint: false
+        },
+        inputSchema: {
+          required: ['packagePath']
+        }
+      });
+      const preview = await callTool(transport, 22, 'preview_repair_execution', {
+        packagePath: handoff.packagePath,
+        all: true,
+        outputDir: previewOutputDir
+      });
+
+      expect(preview).toEqual({
+        reportPath: join(previewOutputDir, 'repair-execution-report.json'),
+        markdownPath: join(previewOutputDir, 'repair-execution-report.md'),
+        taskCount: 1,
+        status: 'planned'
+      });
+      await expect(readFile(join(previewOutputDir, 'repair-execution-report.json'), 'utf8')).resolves.toContain(
+        '"mode": "dry-run"'
+      );
+
+      const patchPlanTool = tools.find((tool) => tool.name === 'generate_repair_patch_plan');
+      expect(patchPlanTool).toMatchObject({
+        annotations: {
+          readOnlyHint: false,
+          destructiveHint: false,
+          idempotentHint: false,
+          openWorldHint: false
+        },
+        inputSchema: {
+          required: ['reportPath']
+        }
+      });
+      const patchPlan = await callTool(transport, 23, 'generate_repair_patch_plan', {
+        reportPath: preview.reportPath,
+        outputDir: patchOutputDir
+      });
+
+      expect(patchPlan).toEqual({
+        planPath: join(patchOutputDir, 'patch-plan.json'),
+        markdownPath: join(patchOutputDir, 'patch-plan.md'),
+        actionCount: 1,
+        autoFixCandidates: 0,
+        status: 'review_required'
+      });
+      await expect(readFile(join(patchOutputDir, 'patch-plan.json'), 'utf8')).resolves.toContain(
+        '"patchesApplied": false'
+      );
+      await expect(readFile(join(patchOutputDir, 'patch-plan.md'), 'utf8')).resolves.toContain(
+        'Verification Checklist'
+      );
+
+      const dryRunReport = JSON.parse(
+        await readFile(join(previewOutputDir, 'repair-execution-report.json'), 'utf8')
+      ) as {
+        summary: Record<string, number>;
+        tasks: Array<Record<string, unknown>>;
+      };
+      const validationReportPath = join(validationOutputDir, 'repair-execution-report.json');
+      await mkdir(validationOutputDir, { recursive: true });
+      await writeFile(validationReportPath, `${JSON.stringify({
+        ...dryRunReport,
+        mode: 'validation-only',
+        status: 'skipped',
+        summary: {
+          ...dryRunReport.summary,
+          verificationCommands: 0,
+          passed: 0,
+          failed: 0,
+          skipped: 1
+        },
+        tasks: dryRunReport.tasks.map((task) => ({
+          ...task,
+          mode: 'validation-only',
+          executionStatus: 'skipped',
+          verificationResults: []
+        }))
+      }, null, 2)}\n`);
+
+      const evidenceTool = tools.find((tool) => tool.name === 'assemble_repair_evidence_package');
+      expect(evidenceTool).toMatchObject({
+        annotations: {
+          readOnlyHint: false,
+          destructiveHint: false,
+          idempotentHint: false,
+          openWorldHint: false
+        },
+        inputSchema: {
+          required: [
+            'handoffPackagePath',
+            'dryRunReportPath',
+            'validationReportPath',
+            'patchPlanPath'
+          ]
+        }
+      });
+      const evidence = await callTool(transport, 24, 'assemble_repair_evidence_package', {
+        handoffPackagePath: handoff.packagePath,
+        dryRunReportPath: preview.reportPath,
+        validationReportPath,
+        patchPlanPath: patchPlan.planPath,
+        outputDir: evidenceOutputDir
+      });
+
+      expect(evidence).toEqual({
+        packagePath: join(evidenceOutputDir, 'ai-ide-repair-evidence-package.json'),
+        markdownPath: join(evidenceOutputDir, 'ai-ide-repair-evidence-package.md'),
+        taskCount: 1,
+        status: 'review_required'
+      });
+      await expect(
+        readFile(join(evidenceOutputDir, 'ai-ide-repair-evidence-package.json'), 'utf8')
+      ).resolves.toContain('"targetRepoWriteAuthorized": false');
+      await expect(
+        readFile(join(evidenceOutputDir, 'ai-ide-repair-evidence-package.md'), 'utf8')
+      ).resolves.toContain('Maintainer Review');
+    } finally {
+      await server.close();
+    }
+  });
+
   it('runs the P0 hardening tool chain over MCP transport', async () => {
     const root = await createServerRepo();
     const { server, transport } = await connectMcpServer();

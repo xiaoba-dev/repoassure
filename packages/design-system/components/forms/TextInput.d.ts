@@ -1,6 +1,10 @@
-import {ReactNode, ChangeEvent, ReactElement } from 'react';
+import {ReactNode, ChangeEvent, ReactElement, InputHTMLAttributes } from 'react';
 /** @startingPoint section="Forms" subtitle="Single-line text field with optional leading icon" viewport="420x120" */
-export interface TextInputProps {
+/* The implementation spreads `...rest` onto the underlying <input>, so every native
+   input attribute reaches the DOM. Declaring only the named props would type away
+   attributes the component genuinely forwards (`required`, `name`, `autoComplete`). */
+export interface TextInputProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange' | 'value' | 'defaultValue'> {
   id?: string;
   type?: 'text' | 'email' | 'password' | 'search' | 'url' | 'number';
   placeholder?: string;

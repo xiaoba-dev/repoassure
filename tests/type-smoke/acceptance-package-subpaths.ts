@@ -20,6 +20,12 @@ import * as userAcceptance from '@hardening-mcp/acceptance/user-acceptance';
 import * as userAcceptanceHandoff from '@hardening-mcp/acceptance/user-acceptance-handoff';
 import * as fatalError from '@hardening-mcp/acceptance/fatal-error';
 import * as redaction from '@hardening-mcp/acceptance/redaction';
+import * as falsePositiveCatalog from '@hardening-mcp/acceptance/false-positive-catalog';
+import * as runFalsePositiveCatalog from '@hardening-mcp/acceptance/run-false-positive-catalog';
+import * as runFalsePositiveCatalogConsumption from '@hardening-mcp/acceptance/run-false-positive-catalog-consumption';
+import * as runFalsePositiveDetectorCalibrationContract from '@hardening-mcp/acceptance/run-false-positive-detector-calibration-contract';
+import * as runFalsePositiveDetectorCalibrationContractConsumption from '@hardening-mcp/acceptance/run-false-positive-detector-calibration-contract-consumption';
+import * as runAutopilotProgressConsistency from '@hardening-mcp/acceptance/run-autopilot-progress-consistency';
 import * as repoPreflight from '@hardening-mcp/acceptance/repo-preflight';
 import * as pythonCliProfile from '@hardening-mcp/acceptance/python-cli-profile';
 import * as pythonCliChecks from '@hardening-mcp/acceptance/python-cli-checks';
@@ -44,6 +50,12 @@ import * as runProjectIntelligenceDecisionIntake from '@hardening-mcp/acceptance
 import * as runProjectIntelligenceRecommendationDraft from '@hardening-mcp/acceptance/run-project-intelligence-recommendation-draft';
 import * as runProjectIntelligenceMaintainerDecision from '@hardening-mcp/acceptance/run-project-intelligence-maintainer-decision';
 import * as runProjectIntelligenceControlledRemediationPlan from '@hardening-mcp/acceptance/run-project-intelligence-controlled-remediation-plan';
+import * as runProjectIntelligenceAgentContext from '@hardening-mcp/acceptance/run-project-intelligence-agent-context';
+import * as runProjectIntelligenceWatch from '@hardening-mcp/acceptance/run-project-intelligence-watch';
+import * as runProjectIntelligenceWatchHandoff from '@hardening-mcp/acceptance/run-project-intelligence-watch-handoff';
+import * as workspaceRepairSummary from '@hardening-mcp/acceptance/workspace-repair-summary';
+import * as workspaceRepairSummaryConsumption
+  from '@hardening-mcp/acceptance/workspace-repair-summary-consumption';
 
 const packageSubpathModules = [
   acceptance,
@@ -68,6 +80,12 @@ const packageSubpathModules = [
   userAcceptanceHandoff,
   fatalError,
   redaction,
+  falsePositiveCatalog,
+  runFalsePositiveCatalog,
+  runFalsePositiveCatalogConsumption,
+  runFalsePositiveDetectorCalibrationContract,
+  runFalsePositiveDetectorCalibrationContractConsumption,
+  runAutopilotProgressConsistency,
   repoPreflight,
   pythonCliProfile,
   pythonCliChecks,
@@ -85,11 +103,20 @@ const packageSubpathModules = [
   runRepairExecute,
   runRepairPatchPlan,
   runRepairEvidencePackage,
+  runFalsePositiveCatalog,
+  runFalsePositiveCatalogConsumption,
+  runFalsePositiveDetectorCalibrationContract,
+  runFalsePositiveDetectorCalibrationContractConsumption,
   runProjectIntelligenceBacklog,
   runProjectIntelligenceDecisionIntake,
   runProjectIntelligenceRecommendationDraft,
   runProjectIntelligenceMaintainerDecision,
   runProjectIntelligenceControlledRemediationPlan,
+  runProjectIntelligenceAgentContext,
+  runProjectIntelligenceWatch,
+  runProjectIntelligenceWatchHandoff,
+  workspaceRepairSummary,
+  workspaceRepairSummaryConsumption,
   runProjectIntelligenceSnapshot,
   runProjectIntelligenceViewer
 ] as const;
@@ -103,11 +130,19 @@ const runnerMains: Array<() => Promise<number>> = [
   runRepairExecute.main,
   runRepairPatchPlan.main,
   runRepairEvidencePackage.main,
+  runFalsePositiveCatalog.main,
+  runFalsePositiveCatalogConsumption.main,
+  runFalsePositiveDetectorCalibrationContract.main,
+  runFalsePositiveDetectorCalibrationContractConsumption.main,
+  runAutopilotProgressConsistency.main,
   runProjectIntelligenceBacklog.main,
   runProjectIntelligenceDecisionIntake.main,
   runProjectIntelligenceRecommendationDraft.main,
   runProjectIntelligenceMaintainerDecision.main,
   runProjectIntelligenceControlledRemediationPlan.main,
+  runProjectIntelligenceAgentContext.main,
+  runProjectIntelligenceWatch.main,
+  runProjectIntelligenceWatchHandoff.main,
   runProjectIntelligenceSnapshot.main,
   runProjectIntelligenceViewer.main
 ];
@@ -122,6 +157,101 @@ type RootLegacyAcceptanceDistOutputEntry = acceptance.LegacyAcceptanceDistOutput
 type CompatibilityLegacyAcceptanceDistOutputEntry = compatibility.LegacyAcceptanceDistOutputEntry;
 type RootLegacyAcceptanceWrapperSourceEntry = acceptance.LegacyAcceptanceWrapperSourceEntry;
 type CompatibilityLegacyAcceptanceWrapperSourceEntry = compatibility.LegacyAcceptanceWrapperSourceEntry;
+type RootFalsePositiveRegressionCatalog = acceptance.FalsePositiveRegressionCatalog;
+type SubpathFalsePositiveRegressionCatalog = falsePositiveCatalog.FalsePositiveRegressionCatalog;
+type RootFalsePositiveRegressionCatalogArtifactBundle = acceptance.FalsePositiveRegressionCatalogArtifactBundle;
+type SubpathFalsePositiveRegressionCatalogArtifactBundle =
+  runFalsePositiveCatalog.FalsePositiveRegressionCatalogArtifactBundle;
+type RootFalsePositiveRegressionCatalogConsumptionReport =
+  acceptance.FalsePositiveRegressionCatalogConsumptionValidationReport;
+type SubpathFalsePositiveRegressionCatalogConsumptionReport =
+  runFalsePositiveCatalogConsumption.FalsePositiveRegressionCatalogConsumptionValidationReport;
+type RootFalsePositiveDetectorCalibrationContract = acceptance.FalsePositiveDetectorCalibrationContract;
+type SubpathFalsePositiveDetectorCalibrationContract =
+  runFalsePositiveDetectorCalibrationContract.FalsePositiveDetectorCalibrationContract;
+type RootFalsePositiveDetectorCalibrationContractConsumptionReport =
+  acceptance.FalsePositiveDetectorCalibrationContractConsumptionValidationReport;
+type SubpathFalsePositiveDetectorCalibrationContractConsumptionReport =
+  runFalsePositiveDetectorCalibrationContractConsumption.FalsePositiveDetectorCalibrationContractConsumptionValidationReport;
+
+const falsePositiveCatalogContractSmoke = falsePositiveCatalog.falsePositiveRegressionCatalogContract;
+const falsePositiveCatalogSmoke: RootFalsePositiveRegressionCatalog | SubpathFalsePositiveRegressionCatalog =
+  falsePositiveCatalog.buildFalsePositiveRegressionCatalog({
+    generatedAt: '2026-07-22T00:00:00.000+08:00'
+  });
+const falsePositiveCatalogArtifactSmoke:
+  RootFalsePositiveRegressionCatalogArtifactBundle | SubpathFalsePositiveRegressionCatalogArtifactBundle =
+    runFalsePositiveCatalog.buildFalsePositiveRegressionCatalogArtifactBundle({
+      generatedAt: '2026-07-22T00:00:00.000+08:00'
+    });
+const falsePositiveCatalogConsumptionReportSmoke:
+  RootFalsePositiveRegressionCatalogConsumptionReport | SubpathFalsePositiveRegressionCatalogConsumptionReport = {
+    schema: 'repoassure.false-positive-regression-catalog-consumption-validation@1',
+    generatedAt: '2026-07-22T00:00:00.000+08:00',
+    status: 'passed',
+    readOrder: [],
+    inputArtifacts: {
+      catalogJsonPath: '',
+      catalogMarkdownPath: ''
+    },
+    consumption: {
+      aiIdeCanConsume: true,
+      maintainerCanReview: true,
+      fixtureCategoriesCovered: [],
+      expectedSnapshotFields: [],
+      reviewFields: [],
+      verificationChecklist: []
+    },
+    boundary: {
+      localOnly: true,
+      targetRepoWrites: false,
+      runtimeDetectionBehaviorChange: false,
+      findingSuppression: false,
+      automaticSeverityDowngrade: false,
+      hostedDashboardImplemented: false,
+      telemetryEnabled: false,
+      cloudSyncEnabled: false,
+      prohibitedContentPresent: false
+    },
+    checks: []
+  };
+const falsePositiveDetectorCalibrationContractSmoke:
+  RootFalsePositiveDetectorCalibrationContract | SubpathFalsePositiveDetectorCalibrationContract =
+    runFalsePositiveDetectorCalibrationContract.buildFalsePositiveDetectorCalibrationContract({
+      generatedAt: '2026-07-23T08:00:00.000+08:00'
+    });
+const falsePositiveDetectorCalibrationContractConsumptionReportSmoke:
+  RootFalsePositiveDetectorCalibrationContractConsumptionReport
+  | SubpathFalsePositiveDetectorCalibrationContractConsumptionReport = {
+    schema: 'repoassure.false-positive-detector-calibration-contract-consumption-validation@1',
+    generatedAt: '2026-07-23T09:00:00.000+08:00',
+    status: 'passed',
+    readOrder: [],
+    inputArtifacts: {
+      contractJsonPath: '',
+      contractMarkdownPath: ''
+    },
+    consumption: {
+      aiIdeCanConsume: true,
+      maintainerCanReview: true,
+      calibrationQuestionIds: [],
+      manualGates: [],
+      futureImplementationAuthorization: [],
+      verificationChecklist: []
+    },
+    boundary: {
+      localOnly: true,
+      targetRepoWrites: false,
+      runtimeDetectionBehaviorChange: false,
+      findingSuppression: false,
+      automaticSeverityDowngrade: false,
+      hostedDashboardImplemented: false,
+      telemetryEnabled: false,
+      cloudSyncEnabled: false,
+      prohibitedContentPresent: false
+    },
+    checks: []
+  };
 
 const packageExportEntryContracts: readonly [
   readonly RootPackageExportEntry[],
@@ -211,6 +341,12 @@ export {
   packageSourceEntryContracts,
   packageSubpathModules,
   legacyDistSourceMapSourceSpecContracts,
+  falsePositiveCatalogContractSmoke,
+  falsePositiveCatalogArtifactSmoke,
+  falsePositiveCatalogConsumptionReportSmoke,
+  falsePositiveDetectorCalibrationContractSmoke,
+  falsePositiveDetectorCalibrationContractConsumptionReportSmoke,
+  falsePositiveCatalogSmoke,
   runnerMains,
   runtimeContractSpecifierContracts
 };

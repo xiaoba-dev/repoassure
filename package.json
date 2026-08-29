@@ -6,12 +6,20 @@
   "type": "module",
   "packageManager": "pnpm@10.28.1",
   "description": "Local-first Code Hardening MCP Server and CLI for AI-generated Web Apps.",
+  "files": [
+    "dist",
+    "packages/acceptance/dist",
+    "packages/browser-explorer/dist",
+    "packages/repair-planner/dist",
+    "packages/security-assurance/dist",
+    "packages/shared/dist"
+  ],
   "bin": {
     "hardening": "dist/adapters/cli/index.js",
     "hardening-mcp": "dist/adapters/mcp/index.js"
   },
   "scripts": {
-    "build": "pnpm build:packages && pnpm build:src && pnpm build:website",
+    "build": "pnpm build:tokens && pnpm build:packages && pnpm build:src && pnpm build:website",
     "build:website": "pnpm --filter @repoassure/website build",
     "build:src": "tsc -p tsconfig.build.json",
     "build:packages": "pnpm build:shared && pnpm build:security-assurance && pnpm build:browser-explorer && pnpm build:repair-planner && pnpm build:acceptance",
@@ -20,6 +28,7 @@
     "build:browser-explorer": "tsc -p packages/browser-explorer/tsconfig.build.json",
     "build:repair-planner": "tsc -p packages/repair-planner/tsconfig.build.json",
     "build:acceptance": "tsc -p packages/acceptance/tsconfig.build.json",
+    "prepack": "pnpm build:packages && pnpm build:src && node scripts/prepare-packed-cli.mjs",
     "repo:hygiene": "node scripts/check-repo-hygiene.mjs",
     "release:check": "node scripts/check-public-release-readiness.mjs",
     "typecheck": "pnpm build:packages && tsc --noEmit && pnpm typecheck:packages && pnpm typecheck:website",
@@ -61,6 +70,16 @@
     "repair:patch-plan": "node packages/acceptance/dist/run-repair-patch-plan.js",
     "prerepair:evidence-package": "pnpm build",
     "repair:evidence-package": "node packages/acceptance/dist/run-repair-evidence-package.js",
+    "prefalse-positive:catalog": "pnpm build",
+    "false-positive:catalog": "node packages/acceptance/dist/run-false-positive-catalog.js",
+    "prefalse-positive:catalog:validate": "pnpm build",
+    "false-positive:catalog:validate": "node packages/acceptance/dist/run-false-positive-catalog-consumption.js",
+    "prefalse-positive:calibration-contract": "pnpm build",
+    "false-positive:calibration-contract": "node packages/acceptance/dist/run-false-positive-detector-calibration-contract.js",
+    "prefalse-positive:calibration-contract:validate": "pnpm build",
+    "false-positive:calibration-contract:validate": "node packages/acceptance/dist/run-false-positive-detector-calibration-contract-consumption.js",
+    "preautopilot:progress:check": "pnpm build:acceptance",
+    "autopilot:progress:check": "node packages/acceptance/dist/run-autopilot-progress-consistency.js",
     "preproject:intelligence": "pnpm build",
     "project:intelligence": "node packages/acceptance/dist/run-project-intelligence-snapshot.js",
     "preproject:intelligence:view": "pnpm build",
@@ -74,7 +93,14 @@
     "preproject:intelligence:maintainer-decision": "pnpm build",
     "project:intelligence:maintainer-decision": "node packages/acceptance/dist/run-project-intelligence-maintainer-decision.js",
     "preproject:intelligence:controlled-remediation-plan": "pnpm build",
-    "project:intelligence:controlled-remediation-plan": "node packages/acceptance/dist/run-project-intelligence-controlled-remediation-plan.js"
+    "project:intelligence:controlled-remediation-plan": "node packages/acceptance/dist/run-project-intelligence-controlled-remediation-plan.js",
+    "preproject:intelligence:agent-context": "pnpm build",
+    "project:intelligence:agent-context": "node packages/acceptance/dist/run-project-intelligence-agent-context.js",
+    "preproject:intelligence:watch": "pnpm build",
+    "project:intelligence:watch": "node packages/acceptance/dist/run-project-intelligence-watch.js",
+    "preproject:intelligence:watch-handoff": "pnpm build",
+    "project:intelligence:watch-handoff": "node packages/acceptance/dist/run-project-intelligence-watch-handoff.js",
+    "build:tokens": "node scripts/generate-console-tokens.mjs"
   },
   "engines": {
     "node": ">=22"
@@ -82,6 +108,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.61.0",
+    "@repoassure/design-system": "workspace:*",
     "@types/node": "^25.9.3",
     "eslint": "^10.5.0",
     "tsx": "^4.22.4",
@@ -96,7 +123,6 @@
     "@hardening-mcp/security-assurance": "workspace:*",
     "@hardening-mcp/shared": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@repoassure/design-system": "workspace:*",
     "playwright": "^1.61.0"
   }
 }

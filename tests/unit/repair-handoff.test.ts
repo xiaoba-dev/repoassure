@@ -49,9 +49,9 @@ describe('repair handoff', () => {
       schema: 'repoassure.repair-handoff.v1',
       primaryReadPath: '.hardening/latest/repair-handoff-package.json',
       nextCommands: {
-        dryRun: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --dry-run',
-        validationOnly: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --validation-only',
-        patchPlan: 'pnpm repair:patch-plan -- --report <repair-execution-report.json>'
+        dryRun: 'hardening repair execute --package <repair-handoff-package.json> --task <taskId> --dry-run',
+        validationOnly: 'hardening repair execute --package <repair-handoff-package.json> --task <taskId> --validation-only',
+        patchPlan: 'hardening repair patch-plan --report <repair-execution-report.json>'
       }
     });
     expect(pkg.agentContract.boundaries).toContain('Does not modify target repository files.');

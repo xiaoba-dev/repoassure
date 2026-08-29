@@ -1,0 +1,64 @@
+{
+  "schema": "repoassure.conditional-dead-control.synthetic-fixture-manifest@1",
+  "fixtureId": "conditional-dead-control-synthetic-v0.1",
+  "fixtureVersion": "0.1",
+  "sourceCategory": "synthetic_local",
+  "provenance": "repoassure_authored_from_bounded_plan",
+  "externalSourceCopied": false,
+  "licenseStatus": "not_applicable_original_synthetic",
+  "localOnly": true,
+  "networkDependency": false,
+  "targetRepositoryDependency": false,
+  "privacy": {
+    "containsCredentials": false,
+    "containsTokens": false,
+    "containsCookies": false,
+    "containsPrivateSource": false,
+    "containsPersonalContactData": false,
+    "containsProductionValues": false
+  },
+  "review": {
+    "status": "approved_manual_review",
+    "reviewer": "maintainer",
+    "reviewedAt": "2026-07-29",
+    "evidenceLocation": "tests/unit/conditional-dead-control-synthetic-fixture.test.ts"
+  },
+  "requiredStateIds": [
+    "initial_disabled_before_dirty",
+    "safe_dirty_transition_available",
+    "enabled_after_safe_dirty_transition",
+    "still_disabled_after_safe_dirty_transition",
+    "dirty_transition_not_safely_observable"
+  ],
+  "manualGates": {
+    "total": 5,
+    "completed": 5,
+    "entries": [
+      {
+        "id": "maintainer_classification_required_before_detector_change",
+        "status": "completed"
+      },
+      {
+        "id": "fixture_privacy_confirmation_required",
+        "status": "completed"
+      },
+      {
+        "id": "expected_snapshot_confirmation_required",
+        "status": "completed"
+      },
+      {
+        "id": "confidence_threshold_review_required",
+        "status": "completed"
+      },
+      {
+        "id": "regression_artifact_review_required",
+        "status": "completed"
+      }
+    ]
+  },
+  "excludedCalibrationQuestion": {
+    "id": "auth_redirect_route_should_preserve_maintainer_review_boundary",
+    "decision": "request_revision",
+    "excludedFromImplementation": true
+  }
+}

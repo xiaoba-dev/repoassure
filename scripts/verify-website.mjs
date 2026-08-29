@@ -100,14 +100,16 @@ try {
   await desktop.click('button[role="tab"]:has-text("Repair plan")');
   const selectedTab = await desktop.locator('button[role="tab"][aria-selected="true"]').innerText();
   const repairDetailVisible = await desktop
-    .getByText('38 actions, sequenced for AI IDE or maintainer execution.')
+    .getByText('1 action, sequenced for AI IDE or maintainer execution.')
     .isVisible();
 
   await desktop.fill('#preview-email', 'reviewer@example.com');
   await desktop.click('form[data-testid="private-preview-form"] button[type="submit"]');
   const formStatus = await desktop.locator('form[data-testid="private-preview-form"] [role="status"]').innerText();
   const heading = await desktop.locator('h1').innerText();
-  const assuranceGraphText = await desktop.locator('[data-testid="assurance-graph"]').innerText();
+  /* Scoped to the section, not the graph element: the panel around the graph supplies the
+     eyebrow and title, so the vocabulary this asserts on is split across both. */
+  const assuranceGraphText = await desktop.locator('[data-testid="assurance-graph-section"]').innerText();
   const normalizedAssuranceGraphText = assuranceGraphText.toLowerCase();
   const assuranceGraphSectionVisible = await desktop.locator('[data-testid="assurance-graph-section"]').isVisible();
   const cliDemoVisible = await desktop.locator('[data-testid="cli-demo"]').isVisible();
@@ -115,10 +117,10 @@ try {
   await desktop.selectOption('[data-testid="language-switcher"] select', 'zh-CN');
   const zhLang = await desktop.locator('html').getAttribute('lang');
   const zhHeading = await desktop.locator('h1').innerText();
-  const zhAssuranceGraphText = await desktop.locator('[data-testid="assurance-graph"]').innerText();
+  const zhAssuranceGraphText = await desktop.locator('[data-testid="assurance-graph-section"]').innerText();
   await desktop.click('button[role="tab"]:has-text("修复计划")');
   const zhSelectedTab = await desktop.locator('button[role="tab"][aria-selected="true"]').innerText();
-  const zhRepairDetailVisible = await desktop.getByText('38 个动作，可交给 AI IDE 或维护者执行。').isVisible();
+  const zhRepairDetailVisible = await desktop.getByText('1 个动作，可交给 AI IDE 或维护者执行。').isVisible();
   const zhScreenshot = join(outDir, 'desktop-zh-full.png');
   await desktop.screenshot({ path: zhScreenshot, fullPage: true });
   await desktop.locator('#preview-email').scrollIntoViewIfNeeded();
@@ -144,8 +146,17 @@ try {
   const mobileMenuScreenshot = join(outDir, 'mobile-menu.png');
   await mobile.screenshot({ path: mobileMenuScreenshot, fullPage: false });
 
+  /* The side-by-side against the original concept art is a reviewer convenience, and the
+     concept lives outside the repository — a path in someone's home directory that a
+     fresh clone, a second machine, or CI will not have. It must not be able to fail the
+     run: when it is missing the comparison is skipped and reported as skipped. */
+  const sourceData = await readFile(sourceConcept)
+    .then((buffer) => `data:image/png;base64,${buffer.toString('base64')}`)
+    .catch(() => null);
+  let comparisonScreenshot = null;
+
+  if (sourceData) {
   const comparison = await browser.newPage({ viewport: { width: 2200, height: 1400 }, deviceScaleFactor: 1 });
-  const sourceData = `data:image/png;base64,${(await readFile(sourceConcept)).toString('base64')}`;
   const desktopData = `data:image/png;base64,${(await readFile(desktopScreenshot)).toString('base64')}`;
   await comparison.setContent(
     `<!doctype html><html><head><style>
@@ -160,8 +171,11 @@ try {
     </div></body></html>`,
     { waitUntil: 'load' }
   );
-  const comparisonScreenshot = join(outDir, 'comparison-desktop.png');
+  comparisonScreenshot = join(outDir, 'comparison-desktop.png');
   await comparison.screenshot({ path: comparisonScreenshot, fullPage: true });
+  } else {
+    console.warn(`Source concept not found, skipping side-by-side comparison: ${sourceConcept}`);
+  }
 
   /* Contrast audit against the rendered page.
 
@@ -171,7 +185,16 @@ try {
      boundaries. None of them looks at colour, so the most visible possible defect was
      also the least detectable one. */
   const contrastFailures = await desktop.evaluate(() => {
-    const px = (value) => (value.match(/[\d.]+/g) || []).map(Number);
+    /* Two serialisations reach this parser. `rgb()`/`rgba()` carry 0-255 channels, but
+       anything Chrome resolves through `color-mix()` comes back as `color(srgb r g b / a)`
+       with 0-1 channels. Reading the second as if it were the first turns the sticky
+       header's 82%-opaque white into near-black and reports every link on it as failing,
+       so the two forms have to be told apart before scaling. */
+    const px = (value) => {
+      const parts = (value.match(/[\d.]+/g) || []).map(Number);
+      if (!/^color\(/.test(value)) return parts;
+      return parts.map((part, index) => (index < 3 ? part * 255 : part));
+    };
     const luminance = (rgb) => {
       const [r, g, b] = rgb.map((v) => {
         const c = v / 255;

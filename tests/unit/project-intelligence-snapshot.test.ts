@@ -38,9 +38,9 @@ describe('project intelligence snapshot', () => {
     expect(json.summary.graphs).toEqual(['docsGraph', 'codeGraph', 'progressGraph']);
     expect(json.summary.outputBytes).toBeLessThan(250_000);
     expect(json.summary.findings).toEqual({
-      total: 4,
+      total: 5,
       high: 1,
-      medium: 3,
+      medium: 4,
       low: 0
     });
 
@@ -95,6 +95,13 @@ describe('project intelligence snapshot', () => {
         path: 'apps/orphan'
       }),
       expect.objectContaining({
+        id: 'orphan-code:apps/nested-readme',
+        category: 'orphan_code',
+        severity: 'medium',
+        path: 'apps/nested-readme',
+        evidence: expect.arrayContaining(['apps/nested-readme/docs/README.md'])
+      }),
+      expect.objectContaining({
         id: 'missing-test-link:packages/untested',
         category: 'missing_test_link',
         severity: 'medium',
@@ -110,6 +117,7 @@ describe('project intelligence snapshot', () => {
     expect(json.findings.map((finding) => finding.category).sort()).toEqual([
       'missing_cascade',
       'missing_test_link',
+      'orphan_code',
       'orphan_code',
       'progress_state_mismatch'
     ]);
@@ -203,6 +211,10 @@ async function mkFixtureRepo(): Promise<string> {
   await mkdir(join(root, 'packages', 'untested', 'src'), { recursive: true });
   await writeFile(join(root, 'packages', 'untested', 'src', 'index.ts'), 'export const untested = true;');
   await writeFile(join(root, 'apps', 'website', 'README.md'), '# Website');
+  await mkdir(join(root, 'apps', 'nested-readme', 'docs'), { recursive: true });
+  await mkdir(join(root, 'apps', 'nested-readme', 'src'), { recursive: true });
+  await writeFile(join(root, 'apps', 'nested-readme', 'docs', 'README.md'), '# Nested docs only');
+  await writeFile(join(root, 'apps', 'nested-readme', 'src', 'index.ts'), 'export const nestedReadme = true;');
   await mkdir(join(root, 'apps', 'orphan', 'src'), { recursive: true });
   await writeFile(join(root, 'apps', 'orphan', 'src', 'index.ts'), 'export const orphan = true;');
   await writeFile(join(root, 'src', 'adapters', 'cli', 'run.ts'), 'export const cli = true;');

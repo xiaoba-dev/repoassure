@@ -45,9 +45,9 @@ function buildPackage(repoRoot: string): RepairHandoffPackage {
         allowedDecisions: ['approve', 'reject', 'defer', 'accept_risk']
       },
       nextCommands: {
-        dryRun: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --dry-run',
-        validationOnly: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --validation-only',
-        patchPlan: 'pnpm repair:patch-plan -- --report <repair-execution-report.json>'
+        dryRun: 'hardening repair execute --package <repair-handoff-package.json> --task <taskId> --dry-run',
+        validationOnly: 'hardening repair execute --package <repair-handoff-package.json> --task <taskId> --validation-only',
+        patchPlan: 'hardening repair patch-plan --report <repair-execution-report.json>'
       },
       boundaries: ['Does not modify target repository files.']
     },
@@ -172,7 +172,7 @@ describe('repair execute', () => {
         failed: 'At least one selected verification command failed or timed out.'
       },
       nextCommands: {
-        patchPlan: 'pnpm repair:patch-plan -- --report <repair-execution-report.json>'
+        patchPlan: 'hardening repair patch-plan --report <repair-execution-report.json>'
       }
     });
     expect(report.agentContract.boundaries).toContain('Validation-only mode does not modify target repository files.');

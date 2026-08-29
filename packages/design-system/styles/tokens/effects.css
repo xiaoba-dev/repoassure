@@ -13,7 +13,10 @@
   --shadow-raised:0 6px 16px rgba(15,30,50,.10);
   --shadow-overlay:0 16px 48px rgba(15,30,50,.18);
   --shadow-panel:0 28px 90px rgba(5,13,24,.28);
-  --shadow-cta:0 10px 24px rgba(6,168,92,.30),inset 0 1px 0 rgba(255,255,255,.16);
+  /* Tinted from the fill the primary button actually uses (--accent-emphasis-strong,
+     green-7), not from green-5. A glow 2.5x brighter than the surface it sits under does
+     not read as bloom, it reads as a halo in the wrong colour. */
+  --shadow-cta:0 10px 24px rgba(3,110,62,.34),inset 0 1px 0 rgba(255,255,255,.16);
 
   --duration-fast:.12s; /* @kind other */
   --duration-base:.18s; /* @kind other */
@@ -30,5 +33,5 @@
   --shadow-raised:0 8px 24px rgba(0,0,0,.45);
   --shadow-overlay:0 20px 60px rgba(0,0,0,.6);
   --shadow-panel:0 30px 90px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.04);
-  --shadow-cta:0 12px 28px rgba(6,168,92,.34),inset 0 1px 0 rgba(255,255,255,.14);
+  --shadow-cta:0 12px 28px rgba(3,110,62,.42),inset 0 1px 0 rgba(255,255,255,.14);
 }

@@ -1,4 +1,5 @@
-import { SeverityChip, StatusChip } from './components/ui/StatusChip.tsx';
+import { KeyValueList, Panel, SeverityChip, StatusChip, TabList } from '@repoassure/design-system';
+
 import type { ArtifactId } from './i18n.ts';
 
 type ArtifactPreviewItem = {
@@ -29,6 +30,11 @@ type ArtifactPreviewProps = {
   onSelect: (artifactId: ArtifactId) => void;
 };
 
+/* The design system's SeverityChip keys severity lowercase (`p0`); findings carry it
+   uppercase because that is how the artifacts on disk record it. Mapping here keeps the
+   on-disk spelling authoritative and confines the translation to one line. */
+const severityLevel = { P0: 'p0', P1: 'p1', P2: 'p2' } as const;
+
 export function ArtifactPreview({
   artifactOrder,
   items,
@@ -39,34 +45,30 @@ export function ArtifactPreview({
   const activeArtifact = items[selectedArtifactId] ?? items[artifactOrder[0]!]!;
 
   return (
-    <div className="artifact-preview" data-testid="artifact-preview-tabs">
-      <div className="tab-list" role="tablist" aria-label={labels.tabLabel}>
-        {artifactOrder.map((artifactId) => {
-          const artifact = items[artifactId]!;
-          return (
-            <button
-              key={artifactId}
-              type="button"
-              role="tab"
-              aria-selected={artifactId === selectedArtifactId}
-              onClick={() => onSelect(artifactId)}
-            >
-              {artifact.name}
-            </button>
-          );
-        })}
-      </div>
+    <div className="console-scope" data-testid="artifact-preview-tabs">
+      <Panel
+        eyebrow={labels.previewLabel}
+        title={activeArtifact.previewHeading}
+        action={<StatusChip status="hashed">{activeArtifact.status}</StatusChip>}
+      >
+        <div style={{ marginBottom: 16 }}>
+          <TabList
+            value={selectedArtifactId}
+            onChange={(artifactId: string) => onSelect(artifactId as ArtifactId)}
+            tabs={artifactOrder.map((artifactId) => ({
+              id: artifactId,
+              label: items[artifactId]!.name
+            }))}
+          />
+        </div>
 
-      <article className="artifact-detail">
-        <div className="artifact-preview-panel artifact-preview-panel-leading" aria-label={labels.previewLabel}>
-          <p className="artifact-preview-panel-label">{labels.previewLabel}</p>
-          <h4>{activeArtifact.previewHeading}</h4>
-          <div className="artifact-preview-surface">
+        <div className="console-grid">
+          <div className="artifact-surface" aria-label={labels.previewLabel}>
             {activeArtifact.previewLines.map((line, index) => {
               if (line.kind === 'finding') {
                 return (
                   <div className="artifact-finding" key={`${line.text}-${index}`}>
-                    <SeverityChip severity={line.severity ?? 'P2'} />
+                    <SeverityChip level={severityLevel[line.severity ?? 'P2']} />
                     <p>{line.text}</p>
                   </div>
                 );
@@ -74,7 +76,7 @@ export function ArtifactPreview({
 
               if (line.kind === 'code' || line.kind === 'json') {
                 return (
-                  <pre className={`artifact-code artifact-code-${line.kind}`} key={`${line.text}-${index}`}>
+                  <pre className="artifact-code" key={`${line.text}-${index}`}>
                     <code>{line.text}</code>
                   </pre>
                 );
@@ -88,28 +90,16 @@ export function ArtifactPreview({
               );
             })}
           </div>
-        </div>
 
-        <header className="artifact-detail-header artifact-detail-header-compact">
-          <div className="artifact-detail-title">
-            <StatusChip tone="success">{activeArtifact.status}</StatusChip>
-            <h3>{activeArtifact.name}</h3>
-            <p className="artifact-detail-summary">{activeArtifact.summary}</p>
-          </div>
-          <dl className="artifact-detail-meta artifact-detail-meta-inline">
-            <div>
-              <dt>{labels.evidenceLabel}</dt>
-              <dd>
-                <code>{activeArtifact.evidence}</code>
-              </dd>
-            </div>
-            <div>
-              <dt>{labels.detailLabel}</dt>
-              <dd>{activeArtifact.detail}</dd>
-            </div>
-          </dl>
-        </header>
-      </article>
+          <KeyValueList
+            items={[
+              { label: labels.evidenceLabel, value: activeArtifact.evidence, mono: true },
+              { label: labels.detailLabel, value: activeArtifact.detail },
+              { label: activeArtifact.name, value: activeArtifact.summary }
+            ]}
+          />
+        </div>
+      </Panel>
     </div>
   );
 }

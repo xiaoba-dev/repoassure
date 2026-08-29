@@ -39,7 +39,7 @@ function buildExecutionReport(): RepairExecutionReport {
         skipped: 'A selected task had no runnable verification command in this local context.'
       },
       nextCommands: {
-        patchPlan: 'pnpm repair:patch-plan -- --report <repair-execution-report.json>'
+        patchPlan: 'hardening repair patch-plan --report <repair-execution-report.json>'
       },
       boundaries: ['Validation-only mode does not modify target repository files.']
     },
@@ -138,7 +138,7 @@ describe('repair patch plan', () => {
       schema: 'repoassure.patch-plan.v1',
       applyPolicy: 'manual-review-only',
       nextCommands: {
-        validate: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --validation-only'
+        validate: 'hardening repair execute --package <repair-handoff-package.json> --task <taskId> --validation-only'
       }
     });
     expect(plan.agentContract.boundaries).toContain('Does not write target repository files.');

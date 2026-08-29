@@ -16,6 +16,9 @@ export type TrustLedgerPreviewCopy = {
   subtitle: string;
   runIdLabel: string;
   runId: string;
+  /* The design system's StatusChip ships English default labels; this site renders two
+     locales, so every chip has to be handed its own copy. */
+  hashedBadge: string;
   sidebar: string[];
   columns: {
     artifact: string;
@@ -322,6 +325,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       subtitle: 'Evidence generated locally',
       runIdLabel: 'Run ID',
       runId: 'run-2026-06-18T10-48-49-735Z',
+      hashedBadge: 'Content-hashed',
       sidebar: ['Overview', 'Hardening report', 'Repair plan', 'Patch plan', 'Acceptance', 'Environment', 'Provenance'],
       columns: {
         artifact: 'Artifact',
@@ -648,6 +652,7 @@ export const locales: Record<SupportedLocale, WebsiteCopy> = {
       subtitle: '本地生成的证据',
       runIdLabel: '运行 ID',
       runId: 'run-2026-06-18T10-48-49-735Z',
+      hashedBadge: '已生成内容指纹',
       sidebar: ['概览', '硬化报告', '修复计划', '补丁计划', '验收决策', '环境', '来源'],
       columns: {
         artifact: '物料',

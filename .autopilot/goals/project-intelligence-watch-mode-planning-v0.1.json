@@ -1,0 +1,67 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-watch-mode-planning-v0.1",
+  "status": "completed",
+  "objective": "Plan a local-only Project Intelligence watch mode that can refresh graph snapshots and agent context exports when docs or code change, without starting hosted dashboard, telemetry, cloud sync, deployment, or target repo writes.",
+  "source_spec": "docs/product/specs/project-intelligence-console-spec-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite"
+  ],
+  "acceptance": [
+    "Produce a local-only watch mode planning record before implementing any long-running watcher.",
+    "Define file-change scope, debounce behavior, output artifacts, failure handling, and manual stop boundary.",
+    "Specify how watch mode refreshes project-intelligence-snapshot and project-intelligence-agent-context artifacts.",
+    "Do not implement hosted dashboard, telemetry, deployment, public release, or target repo writes."
+  ],
+  "planning_summary": {
+    "planning_record": "docs/operations/project-intelligence-watch-mode-planning-v0.1.md",
+    "file_change_scope": [
+      "docs/**/*.md",
+      "packages/**/*.ts",
+      "src/**/*.ts",
+      ".autopilot/**/*.json"
+    ],
+    "ignored_scope": [
+      "artifacts/**",
+      ".hardening/**",
+      "dist/**",
+      "packages/*/dist/**",
+      "apps/*/dist/**",
+      "node_modules/**",
+      ".git/**",
+      ".autopilot/runs/**",
+      ".autopilot/cache/**",
+      ".autopilot/secrets/**"
+    ],
+    "debounce_ms": 1500,
+    "refresh_order": [
+      "pnpm project:intelligence",
+      "pnpm project:intelligence:agent-context"
+    ],
+    "manual_stop_boundary": "Foreground process; user stops with Ctrl+C; no daemon, launch agent, cron job, or background service.",
+    "hosted_dashboard_implemented": false,
+    "target_repo_writes": false
+  },
+  "tests": [
+    "pnpm vitest run tests/unit/project-structure.test.ts",
+    "pnpm repo:hygiene",
+    "pnpm typecheck",
+    "pnpm lint",
+    "pnpm goal:audit",
+    "pnpm test"
+  ],
+  "next_goal_id": "project-intelligence-watch-mode-implementation-v0.1"
+}

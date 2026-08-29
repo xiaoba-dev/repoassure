@@ -18,8 +18,11 @@ export const GRAPH_NODE_COORDS: Record<GraphNodeId, { x: number; y: number }> = 
   tests: { x: 562, y: 168 },
   adrs: { x: 78, y: 312 },
   patch: { x: 562, y: 312 },
-  repair: { x: 320, y: 342 },
-  acceptance: { x: 320, y: 426 }
+  /* These two sit on the same vertical, so they are the pair that collides first. Each
+     node carries three lines since reachability moved onto the desktop card, which needs
+     ~90px of height; 100px apart clears it. */
+  repair: { x: 320, y: 334 },
+  acceptance: { x: 320, y: 434 }
 };
 
 export type GraphEdgeKind = 'verified' | 'produces';

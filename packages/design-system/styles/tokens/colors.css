@@ -65,8 +65,17 @@
   --border-muted:var(--ink-1);
   --border-strong:var(--ink-3);
 
-  --accent-fg:var(--green-6);
+  /* --accent-fg is the text-grade accent. green-6 (#018a4c) reaches only 4.43:1 on the
+     light canvas, which fails AA for the 12px eyebrow and 13px chip labels that use it;
+     green-7 reaches 5.82:1. --accent-emphasis keeps green-5 for fills and strokes, where
+     no contrast minimum applies. */
+  --accent-fg:var(--green-7);
   --accent-emphasis:var(--green-5);
+  /* The one accent fill that carries white text. green-5 under #fff is 3.10:1, so a
+     primary button fails AA at every size the system offers (14-16px, weight 600 — never
+     large text). Kept separate from --accent-emphasis so the brand mark, checkbox fill,
+     and tab underline keep the vivid green, where no contrast minimum applies. */
+  --accent-emphasis-strong:var(--green-7);
   --accent-muted:var(--green-2);
   --accent-subtle:var(--green-0);
 
@@ -108,6 +117,9 @@
 
   --accent-fg:var(--green-3);
   --accent-emphasis:var(--green-5);
+  /* Same reason as light: the primary button's white label needs a darker fill than the
+     brand green to clear AA. */
+  --accent-emphasis-strong:var(--green-7);
   --accent-muted:rgba(6,168,92,.42);
   --accent-subtle:rgba(6,168,92,.14);
 

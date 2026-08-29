@@ -7,6 +7,11 @@ This package owns acceptance implementation modules and runner entrypoints while
 Current package responsibilities:
 
 - Own package runner entrypoints for `acceptance`, `goal:audit`, `user:accept`, and `user:handoff`.
+- Own the local read-only `autopilot:progress:check` runner and its eight-surface active/next Goal consistency report.
+- Own the package-exported `workspace-repair-summary` local-only generator,
+  which produces deterministic JSON/Markdown cross-repository repair summaries
+  without a CLI/MCP entrypoint, command execution, patch application, or target
+  repository writes.
 - Link the root package to this workspace package through `@hardening-mcp/acceptance: workspace:*` so package subpath exports can be resolved by name.
 - Resolve package runner calls to package-owned `packages/acceptance/dist/*` entrypoints while keeping legacy `dist/internal/acceptance/*` JavaScript and declaration files as compatibility outputs.
 - Build `packages/acceptance` before the root `src` output when legacy compatibility wrappers depend on package dist declarations.
@@ -85,3 +90,20 @@ Deferred responsibilities:
 
 - Benchmark report ownership remains outside this acceptance package migration and stays in `src/internal/benchmark` until a separate package decision exists.
 - Migrate generated acceptance outputs only after compatibility paths or aliases are available.
+
+## Workspace Repair Summary Consumption
+
+The typed `workspace-repair-summary-consumption` subpath owns read-only AI IDE
+consumption validation for local `workspace-repair-summary.json` and
+`workspace-repair-summary.md` artifacts.
+
+- JSON is read first and Markdown is read last.
+- `ready`, `partial`, `blocked`, and `empty` states fail closed.
+- Blocked repositories are never selectable and must expose sanitized
+  diagnostics.
+- Queue rank is recommendation evidence, not execution authorization.
+- Maintainer decisions remain limited to `approve`, `reject`, `defer`, and
+  `accept_risk`.
+- The validator adds no CLI or MCP entrypoint, runs no command, applies no
+  patch, writes no validation artifact, and does not modify target
+  repositories.

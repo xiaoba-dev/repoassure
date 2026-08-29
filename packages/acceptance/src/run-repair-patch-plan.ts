@@ -163,12 +163,14 @@ export function isRepairPatchPlanHelpRequest(args: string[]): boolean {
 }
 
 export function repairPatchPlanHelpText(): string {
-  return `hardening repair patch plan
+  return `hardening repair patch-plan
 
 Usage:
-  pnpm repair:patch-plan -- --report <repair-execution-report.json>
-  pnpm repair:patch-plan -- --report <repair-execution-report.json> --output <output-dir>
-  pnpm repair:patch-plan -- --help
+  hardening repair patch-plan --report <repair-execution-report.json>
+  hardening repair patch-plan --report <repair-execution-report.json> --output <output-dir>
+
+Script compatibility:
+  pnpm repair:patch-plan -- --report <repair-execution-report.json> [--output <output-dir>]
 
 Options:
   --report <path>      repair-execution-report.json path.
@@ -326,7 +328,7 @@ function buildPatchPlanAgentContract(): PatchPlanAgentContract {
       'Rerun validation-only and user acceptance after edits.'
     ],
     nextCommands: {
-      validate: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --validation-only'
+      validate: 'hardening repair execute --package <repair-handoff-package.json> --task <taskId> --validation-only'
     },
     boundaries: [
       'Does not write target repository files.',

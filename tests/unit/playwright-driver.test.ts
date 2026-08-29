@@ -1,7 +1,8 @@
-import { mkdtemp } from 'node:fs/promises';
+import { mkdtemp, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
+import { exploreApp as packageExploreApp } from '../../packages/browser-explorer/src/explore-app.js';
 import { createPlaywrightBrowserDriver as packageCreatePlaywrightBrowserDriver } from '../../packages/browser-explorer/src/playwright-driver.js';
 import { createPlaywrightBrowserDriver as legacyCreatePlaywrightBrowserDriver } from '../../src/domain/explore/playwright-driver.js';
 
@@ -494,6 +495,888 @@ describe('createPlaywrightBrowserDriver', () => {
     ]);
   });
 
+  it('keeps a conditional dead control finding visible when a safe local transition enables the submit control', async () => {
+    const expected = await readConditionalDeadControlSnapshot('positive');
+    const ownerForm = new FakeForm();
+    const submitControl = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'save-settings',
+      disabled: true,
+      form: ownerForm
+    });
+    const page = new FakePage({
+      rawInteractionElements: [submitControl],
+      fieldCandidates: [
+        {
+          selector: '[data-testid="display-name"]',
+          value: 'Hardening Test',
+          riskText: 'text display name'
+        }
+      ],
+      onFill: () => {
+        submitControl.disabled = false;
+      }
+    });
+
+    const result = await exploreConditionalDeadControl(page);
+    const findings = result.findings.filter((finding) => finding.type === 'dead_control');
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({
+      severity: 'P1',
+      type: 'dead_control',
+      evidence: expect.arrayContaining([
+        `conditional_dead_control.classification=${expected.classification}`,
+        `conditional_dead_control.prerequisite.initial_disabled=${expected.prerequisiteEvidence.initialDisabled}`,
+        `conditional_dead_control.prerequisite.safe_dirty_transition_observed=${expected.prerequisiteEvidence.safeDirtyTransitionObserved}`,
+        `conditional_dead_control.prerequisite.enabled_after_transition=${expected.prerequisiteEvidence.enabledAfterTransition}`,
+        `conditional_dead_control.form_state_inferred=${expected.formStateInferred}`
+      ])
+    });
+    expect(page.filledFields).toEqual([
+      {
+        selector: '[data-hardening-form-id="hardening-form-0"] [data-testid="display-name"]',
+        value: 'Hardening Test'
+      }
+    ]);
+    expect(page.clickedSelectors).toEqual([]);
+  });
+
+  it('keeps a conditional dead control actionable when it stays disabled after the safe local transition', async () => {
+    const expected = await readConditionalDeadControlSnapshot('counter');
+    const ownerForm = new FakeForm();
+    const submitControl = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'save-settings',
+      disabled: true,
+      form: ownerForm
+    });
+    const page = new FakePage({
+      rawInteractionElements: [submitControl],
+      fieldCandidates: [
+        {
+          selector: '[data-testid="display-name"]',
+          value: 'Hardening Test',
+          riskText: 'text display name'
+        }
+      ]
+    });
+
+    const result = await exploreConditionalDeadControl(page);
+    const findings = result.findings.filter((finding) => finding.type === 'dead_control');
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({
+      severity: 'P1',
+      type: 'dead_control',
+      evidence: expect.arrayContaining([
+        `conditional_dead_control.classification=${expected.classification}`,
+        `conditional_dead_control.prerequisite.initial_disabled=${expected.prerequisiteEvidence.initialDisabled}`,
+        `conditional_dead_control.prerequisite.safe_dirty_transition_observed=${expected.prerequisiteEvidence.safeDirtyTransitionObserved}`,
+        `conditional_dead_control.prerequisite.still_disabled_after_transition=${expected.prerequisiteEvidence.stillDisabledAfterTransition}`,
+        `conditional_dead_control.form_state_inferred=${expected.formStateInferred}`
+      ])
+    });
+    expect(page.filledFields).toHaveLength(1);
+    expect(page.clickedSelectors).toEqual([]);
+  });
+
+  it.each([
+    { evidenceGap: 'missing', fieldRiskText: null, afterFill: 'unchanged' },
+    { evidenceGap: 'unsafe', fieldRiskText: 'password', afterFill: 'unchanged' },
+    { evidenceGap: 'unobservable', fieldRiskText: 'text display name', afterFill: 'hidden' },
+    { evidenceGap: 'contradictory', fieldRiskText: 'text display name', afterFill: 'duplicate' }
+  ] as const)(
+    'fails a conditional dead control closed for $evidenceGap prerequisite evidence',
+    async ({ fieldRiskText, afterFill }) => {
+      const expected = await readConditionalDeadControlSnapshot('failClosed');
+      const ownerForm = new FakeForm();
+      const submitControl = new FakeElement({
+        tagName: 'INPUT',
+        type: 'submit',
+        testId: 'save-settings',
+        disabled: true,
+        form: ownerForm
+      });
+      const rawInteractionElements = [submitControl];
+      const page = new FakePage({
+        rawInteractionElements,
+        fieldCandidates: fieldRiskText === null
+          ? []
+          : [
+              {
+                selector: '[data-testid="display-name"]',
+                value: 'Hardening Test',
+                riskText: fieldRiskText
+              }
+            ],
+        onFill: () => {
+          if (afterFill === 'hidden') {
+            submitControl.hidden = true;
+          }
+          if (afterFill === 'duplicate') {
+            rawInteractionElements.push(
+              new FakeElement({
+                tagName: 'INPUT',
+                type: 'submit',
+                testId: 'save-settings',
+                disabled: false,
+                form: ownerForm
+              })
+            );
+          }
+        }
+      });
+
+      const result = await exploreConditionalDeadControl(page);
+      const findings = result.findings.filter((finding) => finding.type === 'dead_control');
+
+      expect(findings).toHaveLength(1);
+      expect(findings[0]).toMatchObject({
+        severity: 'P1',
+        type: 'dead_control',
+        evidence: expect.arrayContaining([
+          `conditional_dead_control.classification=${expected.classification}`,
+          `conditional_dead_control.prerequisite.initial_disabled=${expected.prerequisiteEvidence.initialDisabled}`,
+          `conditional_dead_control.prerequisite.safe_dirty_transition_observed=${expected.prerequisiteEvidence.safeDirtyTransitionObserved}`,
+          `conditional_dead_control.prerequisite.post_transition_state_known=${expected.prerequisiteEvidence.postTransitionStateKnown}`,
+          `conditional_dead_control.form_state_inferred=${expected.formStateInferred}`
+        ])
+      });
+      expect(page.clickedSelectors).toEqual([]);
+    }
+  );
+
+  it('never clicks a conditional submit control after a safe fill changes its selector', async () => {
+    const ownerForm = new FakeForm();
+    const submitControl = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'save-settings',
+      disabled: true,
+      form: ownerForm
+    });
+    const page = new FakePage({
+      rawInteractionElements: [submitControl],
+      fieldCandidates: [
+        {
+          selector: '[data-testid="display-name"]',
+          value: 'Hardening Test',
+          riskText: 'text display name'
+        }
+      ],
+      onFill: () => {
+        submitControl.disabled = false;
+        submitControl.input.testId = 'save-settings-after-dirty';
+      }
+    });
+
+    const result = await exploreConditionalDeadControl(page, 2);
+
+    expect(result.findings.filter((finding) => finding.type === 'dead_control')).toHaveLength(1);
+    expect(page.clickedSelectors).toEqual([]);
+  });
+
+  it('fails closed without filling when the page changes during interaction candidate collection', async () => {
+    const expected = await readConditionalDeadControlSnapshot('failClosed');
+    const ownerForm = new FakeForm();
+    const submitControl = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'save-settings',
+      disabled: true,
+      form: ownerForm
+    });
+    let navigationTriggered = false;
+    const page = new FakePage({
+      rawInteractionElements: [submitControl],
+      fieldCandidates: [
+        {
+          selector: '[data-testid="display-name"]',
+          value: 'Hardening Test',
+          currentValue: '',
+          riskText: 'text display name'
+        }
+      ],
+      onEvaluate: (selector, currentPage) => {
+        if (!navigationTriggered && selector === 'button, [role="button"], input[type="submit"], a[href]') {
+          navigationTriggered = true;
+          currentPage.setUrl('http://localhost:3000/other-settings');
+        }
+      }
+    });
+
+    const result = await exploreConditionalDeadControl(page);
+    const finding = result.findings.find((candidate) => candidate.type === 'dead_control');
+
+    expect(finding).toMatchObject({
+      severity: 'P1',
+      evidence: expect.arrayContaining([
+        `conditional_dead_control.classification=${expected.classification}`,
+        'conditional_dead_control.fail_closed_reason=candidate_observation_page_changed'
+      ])
+    });
+    expect(page.filledFields).toEqual([]);
+    expect(page.clickedSelectors).toEqual([]);
+  });
+
+  it('fails closed before filling when the owner form selector is not unique', async () => {
+    const expected = await readConditionalDeadControlSnapshot('failClosed');
+    const ownerForm = new FakeForm();
+    const submitControl = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'save-settings',
+      disabled: true,
+      form: ownerForm
+    });
+    const page = new FakePage({
+      rawInteractionElements: [submitControl],
+      selectorMatchCounts: {
+        '[data-hardening-form-id="hardening-form-0"]': 2
+      },
+      fieldCandidates: [
+        {
+          selector: '[data-testid="display-name"]',
+          value: 'Hardening Test',
+          riskText: 'text display name'
+        }
+      ]
+    });
+
+    const result = await exploreConditionalDeadControl(page);
+    const finding = result.findings.find((candidate) => candidate.type === 'dead_control');
+
+    expect(finding).toMatchObject({
+      severity: 'P1',
+      evidence: expect.arrayContaining([
+        `conditional_dead_control.classification=${expected.classification}`,
+        'conditional_dead_control.fail_closed_reason=owner_form_not_unique'
+      ])
+    });
+    expect(page.filledFields).toEqual([]);
+    expect(page.clickedSelectors).toEqual([]);
+  });
+
+  it('fails closed after the first safe fill attempt fails without trying a second field', async () => {
+    const expected = await readConditionalDeadControlSnapshot('failClosed');
+    const ownerForm = new FakeForm();
+    const submitControl = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'save-settings',
+      disabled: true,
+      form: ownerForm
+    });
+    const page = new FakePage({
+      rawInteractionElements: [submitControl],
+      fieldCandidates: [
+        {
+          selector: '[data-testid="display-name"]',
+          value: 'Hardening Test',
+          riskText: 'text display name'
+        },
+        {
+          selector: '[data-testid="team-name"]',
+          value: 'Hardening Test',
+          riskText: 'text team name'
+        }
+      ],
+      fillFailures: {
+        '[data-testid="display-name"]': 'fill failed after input event'
+      },
+      onFill: () => {
+        submitControl.disabled = false;
+      }
+    });
+
+    const result = await exploreConditionalDeadControl(page);
+    const finding = result.findings.find((candidate) => candidate.type === 'dead_control');
+
+    expect(finding).toMatchObject({
+      severity: 'P1',
+      evidence: expect.arrayContaining([
+        `conditional_dead_control.classification=${expected.classification}`,
+        'conditional_dead_control.fail_closed_reason=form_field_fill_failed'
+      ])
+    });
+    expect(page.filledFields).toHaveLength(1);
+    expect(page.filledFields[0]?.selector).toContain('[data-testid="display-name"]');
+    expect(page.clickedSelectors).toEqual([]);
+  });
+
+  it('fails closed when a safe fill navigates away from the original loopback origin', async () => {
+    const expected = await readConditionalDeadControlSnapshot('failClosed');
+    const ownerForm = new FakeForm();
+    const submitControl = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'save-settings',
+      disabled: true,
+      form: ownerForm
+    });
+    const page = new FakePage({
+      rawInteractionElements: [submitControl],
+      fieldCandidates: [
+        {
+          selector: '[data-testid="display-name"]',
+          value: 'Hardening Test',
+          riskText: 'text display name'
+        }
+      ],
+      onFill: (_selector, _value, currentPage) => {
+        submitControl.disabled = false;
+        currentPage.setUrl('https://example.com/settings');
+      }
+    });
+
+    const result = await exploreConditionalDeadControl(page);
+    const finding = result.findings.find((candidate) => candidate.type === 'dead_control');
+
+    expect(finding).toMatchObject({
+      severity: 'P1',
+      evidence: expect.arrayContaining([
+        `conditional_dead_control.classification=${expected.classification}`,
+        'conditional_dead_control.fail_closed_reason=post_transition_page_changed'
+      ])
+    });
+    expect(page.clickedSelectors).toEqual([]);
+  });
+
+  it('fails closed before filling when the scoped safe field selector is not unique', async () => {
+    const expected = await readConditionalDeadControlSnapshot('failClosed');
+    const ownerForm = new FakeForm();
+    const submitControl = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'save-settings',
+      disabled: true,
+      form: ownerForm
+    });
+    const scopedFieldSelector =
+      '[data-hardening-form-id="hardening-form-0"] [data-testid="display-name"]';
+    const page = new FakePage({
+      rawInteractionElements: [submitControl],
+      selectorMatchCounts: {
+        [scopedFieldSelector]: 2
+      },
+      fieldCandidates: [
+        {
+          selector: '[data-testid="display-name"]',
+          value: 'Hardening Test',
+          riskText: 'text display name'
+        }
+      ]
+    });
+
+    const result = await exploreConditionalDeadControl(page);
+    const finding = result.findings.find((candidate) => candidate.type === 'dead_control');
+
+    expect(finding).toMatchObject({
+      severity: 'P1',
+      evidence: expect.arrayContaining([
+        `conditional_dead_control.classification=${expected.classification}`,
+        'conditional_dead_control.fail_closed_reason=form_field_not_uniquely_observable'
+      ])
+    });
+    expect(page.filledFields).toEqual([]);
+    expect(page.clickedSelectors).toEqual([]);
+  });
+
+  it('fails closed without filling when the page changes during live field observation', async () => {
+    const expected = await readConditionalDeadControlSnapshot('failClosed');
+    const ownerForm = new FakeForm();
+    const submitControl = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'save-settings',
+      disabled: true,
+      form: ownerForm
+    });
+    const scopedFieldSelector =
+      '[data-hardening-form-id="hardening-form-0"] [data-testid="display-name"]';
+    let navigationTriggered = false;
+    const page = new FakePage({
+      rawInteractionElements: [submitControl],
+      fieldCandidates: [
+        {
+          selector: '[data-testid="display-name"]',
+          value: 'Hardening Test',
+          currentValue: '',
+          riskText: 'text display name'
+        }
+      ],
+      onEvaluate: (selector, currentPage) => {
+        if (!navigationTriggered && selector === scopedFieldSelector) {
+          navigationTriggered = true;
+          currentPage.setUrl('https://example.com/settings');
+        }
+      }
+    });
+
+    const result = await exploreConditionalDeadControl(page);
+    const finding = result.findings.find((candidate) => candidate.type === 'dead_control');
+
+    expect(finding).toMatchObject({
+      severity: 'P1',
+      evidence: expect.arrayContaining([
+        `conditional_dead_control.classification=${expected.classification}`,
+        'conditional_dead_control.fail_closed_reason=pre_fill_page_changed'
+      ])
+    });
+    expect(page.filledFields).toEqual([]);
+    expect(page.clickedSelectors).toEqual([]);
+  });
+
+  it('fails closed without filling when the owner form becomes non-unique during live field observation', async () => {
+    const expected = await readConditionalDeadControlSnapshot('failClosed');
+    const ownerForm = new FakeForm();
+    const submitControl = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'save-settings',
+      disabled: true,
+      form: ownerForm
+    });
+    const formSelector = '[data-hardening-form-id="hardening-form-0"]';
+    const scopedFieldSelector = `${formSelector} [data-testid="display-name"]`;
+    const selectorMatchCounts: Record<string, number> = {
+      [formSelector]: 1
+    };
+    let duplicateTriggered = false;
+    const page = new FakePage({
+      rawInteractionElements: [submitControl],
+      selectorMatchCounts,
+      fieldCandidates: [
+        {
+          selector: '[data-testid="display-name"]',
+          value: 'Hardening Test',
+          currentValue: '',
+          riskText: 'text display name'
+        }
+      ],
+      onEvaluate: (selector) => {
+        if (!duplicateTriggered && selector === scopedFieldSelector) {
+          duplicateTriggered = true;
+          selectorMatchCounts[formSelector] = 2;
+        }
+      }
+    });
+
+    const result = await exploreConditionalDeadControl(page);
+    const finding = result.findings.find((candidate) => candidate.type === 'dead_control');
+
+    expect(finding).toMatchObject({
+      severity: 'P1',
+      evidence: expect.arrayContaining([
+        `conditional_dead_control.classification=${expected.classification}`,
+        'conditional_dead_control.fail_closed_reason=pre_fill_owner_form_not_unique'
+      ])
+    });
+    expect(page.filledFields).toEqual([]);
+    expect(page.clickedSelectors).toEqual([]);
+  });
+
+  it('fails closed without filling on a non-http loopback-looking page', async () => {
+    const expected = await readConditionalDeadControlSnapshot('failClosed');
+    const ownerForm = new FakeForm();
+    const submitControl = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'save-settings',
+      disabled: true,
+      form: ownerForm
+    });
+    const page = new FakePage({
+      rawInteractionElements: [submitControl],
+      fieldCandidates: [
+        {
+          selector: '[data-testid="display-name"]',
+          value: 'Hardening Test',
+          riskText: 'text display name'
+        }
+      ]
+    });
+
+    const result = await exploreConditionalDeadControl(
+      page,
+      1,
+      'file://127.0.0.1/settings'
+    );
+    const finding = result.findings.find((candidate) => candidate.type === 'dead_control');
+
+    expect(finding).toMatchObject({
+      severity: 'P1',
+      evidence: expect.arrayContaining([
+        `conditional_dead_control.classification=${expected.classification}`,
+        'conditional_dead_control.fail_closed_reason=non_loopback_page'
+      ])
+    });
+    expect(page.filledFields).toEqual([]);
+    expect(page.clickedSelectors).toEqual([]);
+  });
+
+  it('fails closed if the origin changes during post-transition observation', async () => {
+    const expected = await readConditionalDeadControlSnapshot('failClosed');
+    const ownerForm = new FakeForm();
+    const submitControl = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'save-settings',
+      disabled: true,
+      form: ownerForm
+    });
+    let fillObserved = false;
+    const page = new FakePage({
+      rawInteractionElements: [submitControl],
+      fieldCandidates: [
+        {
+          selector: '[data-testid="display-name"]',
+          value: 'Hardening Test',
+          riskText: 'text display name'
+        }
+      ],
+      onFill: () => {
+        fillObserved = true;
+        submitControl.disabled = false;
+      },
+      onEvaluate: (selector, currentPage) => {
+        if (fillObserved && selector === 'button, [role="button"], input[type="submit"], a[href]') {
+          currentPage.setUrl('https://example.com/settings');
+        }
+      }
+    });
+
+    const result = await exploreConditionalDeadControl(page);
+    const finding = result.findings.find((candidate) => candidate.type === 'dead_control');
+
+    expect(finding).toMatchObject({
+      severity: 'P1',
+      evidence: expect.arrayContaining([
+        `conditional_dead_control.classification=${expected.classification}`,
+        'conditional_dead_control.fail_closed_reason=post_transition_page_changed'
+      ])
+    });
+    expect(page.clickedSelectors).toEqual([]);
+  });
+
+  it('uses a deterministic distinct value when the preferred safe fill value is already present', async () => {
+    const expected = await readConditionalDeadControlSnapshot('counter');
+    const ownerForm = new FakeForm();
+    const submitControl = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'save-settings',
+      disabled: true,
+      form: ownerForm
+    });
+    const page = new FakePage({
+      rawInteractionElements: [submitControl],
+      fieldCandidates: [
+        {
+          selector: '[data-testid="display-name"]',
+          value: 'Hardening Test',
+          currentValue: 'Hardening Test',
+          riskText: 'text display name'
+        }
+      ]
+    });
+
+    const result = await exploreConditionalDeadControl(page);
+    const finding = result.findings.find((candidate) => candidate.type === 'dead_control');
+
+    expect(finding).toMatchObject({
+      severity: 'P1',
+      evidence: expect.arrayContaining([
+        `conditional_dead_control.classification=${expected.classification}`,
+        'conditional_dead_control.prerequisite.safe_dirty_transition_observed=true'
+      ])
+    });
+    expect(page.filledFields).toEqual([
+      expect.objectContaining({ value: 'Hardening Test 2' })
+    ]);
+    expect(page.clickedSelectors).toEqual([]);
+  });
+
+  it('fails closed when a successful fill does not produce an observed field value change', async () => {
+    const expected = await readConditionalDeadControlSnapshot('failClosed');
+    const ownerForm = new FakeForm();
+    const submitControl = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'save-settings',
+      disabled: true,
+      form: ownerForm
+    });
+    const scopedFieldSelector =
+      '[data-hardening-form-id="hardening-form-0"] [data-testid="display-name"]';
+    const page = new FakePage({
+      rawInteractionElements: [submitControl],
+      fieldCandidates: [
+        {
+          selector: '[data-testid="display-name"]',
+          value: 'Hardening Test',
+          currentValue: 'Original value',
+          riskText: 'text display name'
+        }
+      ],
+      preserveFieldValueOnFill: new Set([scopedFieldSelector]),
+      onFill: () => {
+        submitControl.disabled = false;
+      }
+    });
+
+    const result = await exploreConditionalDeadControl(page);
+    const finding = result.findings.find((candidate) => candidate.type === 'dead_control');
+
+    expect(finding).toMatchObject({
+      severity: 'P1',
+      evidence: expect.arrayContaining([
+        `conditional_dead_control.classification=${expected.classification}`,
+        'conditional_dead_control.fail_closed_reason=form_field_value_unchanged'
+      ])
+    });
+    expect(page.filledFields).toHaveLength(1);
+    expect(page.clickedSelectors).toEqual([]);
+  });
+
+  it('fails closed without filling when the selected field becomes sensitive before fill', async () => {
+    const expected = await readConditionalDeadControlSnapshot('failClosed');
+    const ownerForm = new FakeForm();
+    const submitControl = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'save-settings',
+      disabled: true,
+      form: ownerForm
+    });
+    const scopedFieldSelector =
+      '[data-hardening-form-id="hardening-form-0"] [data-testid="display-name"]';
+    const page = new FakePage({
+      rawInteractionElements: [submitControl],
+      fieldCandidates: [
+        {
+          selector: '[data-testid="display-name"]',
+          value: 'Hardening Test',
+          currentValue: '',
+          riskText: 'text display name'
+        }
+      ],
+      fieldStateOverrides: {
+        [scopedFieldSelector]: {
+          riskText: 'password current-password'
+        }
+      }
+    });
+
+    const result = await exploreConditionalDeadControl(page);
+    const finding = result.findings.find((candidate) => candidate.type === 'dead_control');
+
+    expect(finding).toMatchObject({
+      severity: 'P1',
+      evidence: expect.arrayContaining([
+        `conditional_dead_control.classification=${expected.classification}`,
+        'conditional_dead_control.fail_closed_reason=form_field_became_unsafe'
+      ])
+    });
+    expect(page.filledFields).toEqual([]);
+    expect(page.clickedSelectors).toEqual([]);
+  });
+
+  it('fails closed when the owner form selector becomes non-unique after fill', async () => {
+    const expected = await readConditionalDeadControlSnapshot('failClosed');
+    const ownerForm = new FakeForm();
+    const submitControl = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'save-settings',
+      disabled: true,
+      form: ownerForm
+    });
+    const formSelector = '[data-hardening-form-id="hardening-form-0"]';
+    const selectorMatchCounts: Record<string, number> = {
+      [formSelector]: 1
+    };
+    const page = new FakePage({
+      rawInteractionElements: [submitControl],
+      selectorMatchCounts,
+      fieldCandidates: [
+        {
+          selector: '[data-testid="display-name"]',
+          value: 'Hardening Test',
+          currentValue: '',
+          riskText: 'text display name'
+        }
+      ],
+      onFill: () => {
+        submitControl.disabled = false;
+        selectorMatchCounts[formSelector] = 2;
+      }
+    });
+
+    const result = await exploreConditionalDeadControl(page);
+    const finding = result.findings.find((candidate) => candidate.type === 'dead_control');
+
+    expect(finding).toMatchObject({
+      severity: 'P1',
+      evidence: expect.arrayContaining([
+        `conditional_dead_control.classification=${expected.classification}`,
+        'conditional_dead_control.fail_closed_reason=post_transition_owner_form_not_unique'
+      ])
+    });
+    expect(page.clickedSelectors).toEqual([]);
+  });
+
+  it('fails closed when fill navigates to a different path on the same origin', async () => {
+    const expected = await readConditionalDeadControlSnapshot('failClosed');
+    const ownerForm = new FakeForm();
+    const submitControl = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'save-settings',
+      disabled: true,
+      form: ownerForm
+    });
+    const page = new FakePage({
+      rawInteractionElements: [submitControl],
+      fieldCandidates: [
+        {
+          selector: '[data-testid="display-name"]',
+          value: 'Hardening Test',
+          currentValue: '',
+          riskText: 'text display name'
+        }
+      ],
+      onFill: (_selector, _value, currentPage) => {
+        submitControl.disabled = false;
+        currentPage.setUrl('http://localhost:3000/other-settings');
+      }
+    });
+
+    const result = await exploreConditionalDeadControl(page);
+    const finding = result.findings.find((candidate) => candidate.type === 'dead_control');
+
+    expect(finding).toMatchObject({
+      severity: 'P1',
+      evidence: expect.arrayContaining([
+        `conditional_dead_control.classification=${expected.classification}`,
+        'conditional_dead_control.fail_closed_reason=post_transition_page_changed'
+      ])
+    });
+    expect(page.clickedSelectors).toEqual([]);
+  });
+
+  it('does not inject a form marker while collecting an ordinary enabled control', async () => {
+    const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-enabled-form-control-'));
+    const ownerForm = new FakeForm();
+    const enabledControl = new FakeElement({
+      tagName: 'BUTTON',
+      type: 'button',
+      testId: 'open-options',
+      disabled: false,
+      form: ownerForm
+    });
+    const page = new FakePage({ rawInteractionElements: [enabledControl] });
+    const driver = await packageCreatePlaywrightBrowserDriver({
+      launcher: {
+        launch: async () => new FakeBrowser(page)
+      }
+    });
+
+    await driver.snapshot('http://localhost:3000/settings', {
+      artifactsDir,
+      maxActionsPerRoute: 1
+    });
+    await driver.close();
+
+    expect(ownerForm.getAttribute('data-hardening-form-id')).toBeNull();
+    expect(page.clickedSelectors).toEqual(['[data-testid="open-options"]:visible']);
+  });
+
+  it('keeps a dangerous disabled submit visible as a fail-closed P1 finding without filling or clicking', async () => {
+    const expected = await readConditionalDeadControlSnapshot('failClosed');
+    const ownerForm = new FakeForm();
+    const submitControl = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'delete-account',
+      textContent: 'Delete account',
+      disabled: true,
+      form: ownerForm
+    });
+    const page = new FakePage({
+      rawInteractionElements: [submitControl],
+      fieldCandidates: [
+        {
+          selector: '[data-testid="confirmation"]',
+          value: 'Hardening Test',
+          currentValue: '',
+          riskText: 'text confirmation'
+        }
+      ]
+    });
+
+    const result = await exploreConditionalDeadControl(page);
+    const finding = result.findings.find((candidate) => candidate.type === 'dead_control');
+
+    expect(finding).toMatchObject({
+      severity: 'P1',
+      evidence: expect.arrayContaining([
+        `conditional_dead_control.classification=${expected.classification}`,
+        'conditional_dead_control.fail_closed_reason=unsafe_disabled_control'
+      ])
+    });
+    expect(page.filledFields).toEqual([]);
+    expect(page.clickedSelectors).toEqual([]);
+  });
+
+  it('keeps a dangerous disabled submit visible after the mutation budget is already consumed', async () => {
+    const expected = await readConditionalDeadControlSnapshot('failClosed');
+    const ordinaryControl = new FakeElement({
+      tagName: 'BUTTON',
+      type: 'button',
+      testId: 'open-options',
+      disabled: false
+    });
+    const ownerForm = new FakeForm();
+    const dangerousSubmit = new FakeElement({
+      tagName: 'INPUT',
+      type: 'submit',
+      testId: 'delete-account',
+      textContent: 'Delete account',
+      disabled: true,
+      form: ownerForm
+    });
+    const page = new FakePage({
+      rawInteractionElements: [ordinaryControl, dangerousSubmit],
+      fieldCandidates: [
+        {
+          selector: '[data-testid="confirmation"]',
+          value: 'Hardening Test',
+          currentValue: '',
+          riskText: 'text confirmation'
+        }
+      ]
+    });
+
+    const result = await exploreConditionalDeadControl(page, 1);
+    const unsafeFinding = result.findings.find((finding) =>
+      finding.evidence.includes('conditional_dead_control.fail_closed_reason=unsafe_disabled_control')
+    );
+
+    expect(unsafeFinding).toMatchObject({
+      severity: 'P1',
+      type: 'dead_control',
+      evidence: expect.arrayContaining([
+        `conditional_dead_control.classification=${expected.classification}`
+      ])
+    });
+    expect(page.filledFields).toEqual([]);
+    expect(page.clickedSelectors).toEqual(['[data-testid="open-options"]:visible']);
+  });
+
   it('skips unsafe interactions without counting them against the action limit', async () => {
     const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-safe-actions-'));
     const page = new FakePage({
@@ -694,16 +1577,34 @@ class FakePage {
   filledFields: Array<{ selector: string; value: string }> = [];
   gotoCalls: Array<{ waitUntil: string; timeout: number }> = [];
 
+  private currentUrl = 'http://localhost:3000/settings';
+
   private readonly handlers = new Map<string, Array<(value: unknown) => void>>();
 
   constructor(
     private readonly options: {
       interactionCandidates?: Array<{ selector: string; description: string; kind?: string; riskText?: string }>;
       rawInteractionElements?: FakeElement[];
-      fieldCandidates?: Array<{ selector: string; value: string; riskText: string }>;
+      fieldCandidates?: Array<{
+        selector: string;
+        value: string;
+        currentValue?: string;
+        riskText: string;
+      }>;
+      selectorMatchCounts?: Record<string, number>;
+      fieldStateOverrides?: Record<string, {
+        count?: number;
+        value?: string | null;
+        riskText?: string;
+        editable?: boolean;
+      }>;
       clickFailures?: Record<string, string>;
+      fillFailures?: Record<string, string>;
+      preserveFieldValueOnFill?: Set<string>;
       downloadSelectors?: Set<string>;
       elementStates?: Record<string, string[]>;
+      onFill?: (selector: string, value: string, page: FakePage) => void;
+      onEvaluate?: (selector: string, page: FakePage) => void;
     } = {}
   ) {}
 
@@ -711,7 +1612,10 @@ class FakePage {
     this.handlers.set(event, [...(this.handlers.get(event) ?? []), handler]);
   }
 
-  async goto(_url?: string, options?: { waitUntil: string; timeout: number }): Promise<{ status: () => number }> {
+  async goto(url?: string, options?: { waitUntil: string; timeout: number }): Promise<{ status: () => number }> {
+    if (url) {
+      this.currentUrl = url;
+    }
     if (options) {
       this.gotoCalls.push(options);
     }
@@ -739,12 +1643,44 @@ class FakePage {
   }
 
   async $$eval(selector: string, pageFunction?: (elements: unknown[]) => unknown): Promise<unknown> {
+    this.options.onEvaluate?.(selector, this);
+
     if (selector === 'a[href]') {
       return ['http://localhost:3000/settings'];
     }
 
-    if (selector === 'input, textarea') {
+    if (selector === 'input, textarea' || (selector.includes(' input, ') && selector.endsWith(' textarea'))) {
       return this.options.fieldCandidates ?? [];
+    }
+
+    const directFieldCandidate = this.options.fieldCandidates?.find((candidate) => (
+      selector === candidate.selector || selector.endsWith(` ${candidate.selector}`)
+    ));
+    const pageFunctionSource = pageFunction ? String(pageFunction) : '';
+    if (directFieldCandidate && pageFunctionSource.includes('editable')) {
+      const override = this.options.fieldStateOverrides?.[selector];
+      const count = override?.count ?? this.options.selectorMatchCounts?.[selector] ?? 1;
+      return {
+        count,
+        value: override?.value ?? (count === 1 ? directFieldCandidate.currentValue ?? '' : null),
+        riskText: override?.riskText ?? directFieldCandidate.riskText,
+        editable: override?.editable ?? true
+      };
+    }
+
+    const configuredMatchCount = this.options.selectorMatchCounts?.[selector];
+    if (configuredMatchCount !== undefined) {
+      return configuredMatchCount;
+    }
+
+    if (selector.startsWith('[data-hardening-form-id=')) {
+      return 1;
+    }
+
+    if (this.options.fieldCandidates?.some((candidate) => (
+      selector === candidate.selector || selector.endsWith(` ${candidate.selector}`)
+    ))) {
+      return 1;
     }
 
     const elementStates = this.options.elementStates?.[selector];
@@ -761,7 +1697,11 @@ class FakePage {
   }
 
   url(): string {
-    return 'http://localhost:3000/settings';
+    return this.currentUrl;
+  }
+
+  setUrl(url: string): void {
+    this.currentUrl = url;
   }
 
   async click(selector: string): Promise<void> {
@@ -777,6 +1717,19 @@ class FakePage {
 
   async fill(selector: string, value: string): Promise<void> {
     this.filledFields.push({ selector, value });
+    this.options.onFill?.(selector, value, this);
+    const directCandidate = this.options.fieldCandidates?.find((candidate) => (
+      selector === candidate.selector || selector.endsWith(` ${candidate.selector}`)
+    ));
+    const directSelector = directCandidate?.selector;
+    const failure = this.options.fillFailures?.[selector]
+      ?? (directSelector ? this.options.fillFailures?.[directSelector] : undefined);
+    if (failure) {
+      throw new Error(failure);
+    }
+    if (directCandidate && !this.options.preserveFieldValueOnFill?.has(selector)) {
+      directCandidate.currentValue = value;
+    }
   }
 
   async waitForTimeout(): Promise<void> {
@@ -799,19 +1752,26 @@ class FakePage {
 }
 
 class FakeElement {
-  disabled = false;
+  disabled: boolean;
   hidden = false;
+  readonly form: FakeForm | null;
 
   constructor(
     readonly input: {
       tagName: string;
+      type?: string;
       textContent?: string;
       title?: string;
       ariaLabel?: string;
       id?: string;
       testId?: string;
+      disabled?: boolean;
+      form?: FakeForm | null;
     }
-  ) {}
+  ) {
+    this.disabled = input.disabled ?? false;
+    this.form = input.form ?? null;
+  }
 
   get tagName(): string {
     return this.input.tagName;
@@ -835,6 +1795,8 @@ class FakeElement {
         return this.input.id ?? null;
       case 'data-testid':
         return this.input.testId ?? null;
+      case 'type':
+        return this.input.type ?? null;
       default:
         return null;
     }
@@ -843,4 +1805,62 @@ class FakeElement {
   setAttribute(): void {
     return undefined;
   }
+}
+
+class FakeForm {
+  private readonly attributes = new Map<string, string>();
+
+  getAttribute(name: string): string | null {
+    return this.attributes.get(name) ?? null;
+  }
+
+  setAttribute(name: string, value: string): void {
+    this.attributes.set(name, value);
+  }
+}
+
+type ConditionalDeadControlFixtureSnapshot = {
+  classification: string;
+  prerequisiteEvidence: Record<string, boolean>;
+  formStateInferred: false;
+};
+
+async function readConditionalDeadControlSnapshot(
+  branch: 'positive' | 'counter' | 'failClosed'
+): Promise<ConditionalDeadControlFixtureSnapshot> {
+  const fixture = JSON.parse(
+    await readFile(
+      'tests/fixtures/conditional-dead-control-synthetic/form-dirty-states.json',
+      'utf8'
+    )
+  ) as { snapshots: Record<string, ConditionalDeadControlFixtureSnapshot> };
+  const snapshot = fixture.snapshots[branch];
+
+  if (!snapshot) {
+    throw new Error(`Missing conditional dead control fixture snapshot: ${branch}`);
+  }
+
+  return snapshot;
+}
+
+async function exploreConditionalDeadControl(
+  page: FakePage,
+  maxActionsPerRoute = 1,
+  url = 'http://localhost:3000/settings'
+) {
+  const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-conditional-dead-control-'));
+  const driver = await packageCreatePlaywrightBrowserDriver({
+    launcher: {
+      launch: async () => new FakeBrowser(page)
+    }
+  });
+
+  return packageExploreApp({
+    url,
+    criticalPaths: [],
+    maxRoutes: 1,
+    maxActionsPerRoute,
+    artifactsDir,
+    browserDriver: driver
+  });
 }

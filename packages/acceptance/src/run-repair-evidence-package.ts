@@ -205,11 +205,13 @@ export function isRepairEvidencePackageHelpRequest(args: string[]): boolean {
 }
 
 export function repairEvidencePackageHelpText(): string {
-  return `hardening repair evidence package
+  return `hardening repair evidence-package
 
 Usage:
+  hardening repair evidence-package --handoff <repair-handoff-package.json> --dry-run-report <repair-execution-report.json> --validation-report <repair-execution-report.json> --patch-plan <patch-plan.json>
+
+Script compatibility:
   pnpm repair:evidence-package -- --handoff <repair-handoff-package.json> --dry-run-report <repair-execution-report.json> --validation-report <repair-execution-report.json> --patch-plan <patch-plan.json>
-  pnpm repair:evidence-package -- --help
 
 Options:
   --handoff <path>              repair-handoff-package.json path.
@@ -438,8 +440,8 @@ function buildRepairEvidenceAgentContract(): RepairEvidenceAgentContract {
       'noWriteProof'
     ],
     nextCommands: {
-      rerunValidation: 'pnpm repair:execute -- --package <repair-handoff-package.json> --task <taskId> --validation-only',
-      regeneratePatchPlan: 'pnpm repair:patch-plan -- --report <repair-execution-report.json>'
+      rerunValidation: 'hardening repair execute --package <repair-handoff-package.json> --task <taskId> --validation-only',
+      regeneratePatchPlan: 'hardening repair patch-plan --report <repair-execution-report.json>'
     },
     boundaries: [
       'This package is evidence for AI IDE and maintainer consumption, not permission to modify the target repository.',

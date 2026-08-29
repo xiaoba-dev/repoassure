@@ -1,0 +1,85 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-product-completion-gap-audit-refresh-v0.5",
+  "title": "RepoAssure Product Completion Gap Audit Refresh v0.5",
+  "status": "completed",
+  "objective": "Reconcile docs/PLAN.md, docs/SPEC.md, docs/PRD.md, code, tests, package boundaries, manual gates, and external-input state after both packed CLI and packed MCP validation; classify remaining work and select exactly one bounded next Goal without expanding the MCP registry or changing runtime behavior.",
+  "source_spec": "docs/operations/repoassure-packed-mcp-server-installation-and-protocol-validation-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "detector_confidence_threshold_change",
+    "acceptance_policy_change",
+    "target_repo_write",
+    "automatic_patch_application",
+    "mcp_tool_registry_expansion",
+    "repair_mcp_productization",
+    "website_design_system_rewrite",
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "customer_contact",
+    "pricing_change",
+    "spend_change"
+  ],
+  "acceptance": [
+    "Reconcile implemented product surfaces against PLAN, SPEC, PRD, code, tests, packed CLI evidence, and packed MCP protocol evidence.",
+    "Classify each remaining material gap as blocked or manual-gated, external-input-gated, deferred, or safe auto-executable.",
+    "Do not reinterpret transport validation as authorization to expand the MCP registry, productize repair MCP commands, publish, deploy, or write a target repository.",
+    "Select exactly one acceptance-sized next Codex Goal when supported by evidence, or record that maintainer input is required.",
+    "Cascade the refreshed state through canonical docs, testing and acceptance evidence, logs, and Autopilot state."
+  ],
+  "conclusion": "completion_gap_audit_refreshed_with_repair_workflow_mcp_convergence_decision_next",
+  "completed_at": "2026-07-25T00:54:50.000+08:00",
+  "next_goal_id": "repoassure-ai-ide-repair-workflow-mcp-convergence-decision-and-contract-v0.1",
+  "summary": {
+    "operation_record": "docs/operations/repoassure-product-completion-gap-audit-refresh-v0.5.md",
+    "implemented_surfaces": [
+      "local_cli_and_mcp_hardening_core",
+      "browser_and_python_cli_acceptance",
+      "run_scoped_evidence_integrity_and_redaction",
+      "ai_ide_repair_workflow_installed_cli",
+      "isolated_packed_cli_installation",
+      "isolated_packed_mcp_protocol_validation",
+      "project_intelligence_local_suite",
+      "false_positive_catalog_and_calibration_evidence_contracts",
+      "public_release_readiness_automation"
+    ],
+    "blocked_or_manual_gated_gaps": [
+      "false_positive_detector_runtime_calibration",
+      "public_source_release",
+      "npm_publication",
+      "github_release",
+      "team_cloud_enterprise_product_decision",
+      "final_user_acceptance"
+    ],
+    "external_input_gated_gaps": [
+      "private_preview_feedback_triage",
+      "additional_security_provider_onboarding"
+    ],
+    "deferred_gaps": [
+      "website_design_system_external_follow_up",
+      "packages_core_extraction",
+      "benchmark_package_ownership_cleanup",
+      "hosted_artifact_history_and_dashboard_runtime"
+    ],
+    "safe_auto_executable_gaps": [
+      "repair_workflow_mcp_convergence_decision_and_contract",
+      "multi_repo_workspace_repair_summary_planning"
+    ],
+    "selected_safe_auto_executable_gap": "repair_workflow_mcp_convergence_decision_and_contract",
+    "mcp_registry_tool_count": 8,
+    "packed_cli_installed": true,
+    "packed_mcp_protocol_validated": true,
+    "target_repo_writes": false,
+    "npm_published": false,
+    "production_code_changed": false
+  }
+}

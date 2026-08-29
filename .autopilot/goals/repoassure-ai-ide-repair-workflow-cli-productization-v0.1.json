@@ -1,0 +1,66 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-ai-ide-repair-workflow-cli-productization-v0.1",
+  "title": "RepoAssure AI IDE Repair Workflow CLI Productization v0.1",
+  "status": "completed",
+  "objective": "Expose the existing package-owned AI IDE repair workflow through stable installed hardening repair subcommands while preserving current contracts, redaction, maintainer review, and no-write boundaries.",
+  "source_spec": "docs/operations/repoassure-product-completion-gap-audit-refresh-v0.3.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "detector_confidence_threshold_change",
+    "acceptance_policy_change",
+    "target_repo_write",
+    "automatic_patch_application",
+    "mcp_tool_registry_expansion",
+    "website_design_system_rewrite",
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "customer_contact",
+    "pricing_change",
+    "spend_change"
+  ],
+  "acceptance": [
+    "Add stable hardening repair handoff, execute, patch-plan, and evidence-package CLI subcommands that delegate to existing package-owned runners.",
+    "Keep existing pnpm repair scripts compatible and preserve runner schemas, errors, redaction, maintainer-review boundaries, and no-write proof.",
+    "Cover option parsing and runner delegation with unit tests, installed CLI behavior with integration or smoke tests, and package compatibility with existing tests.",
+    "Fail closed for unsupported write or automatic patch application options.",
+    "Cascade implementation evidence through canonical product, operations, testing, acceptance, decision, development, and Autopilot records.",
+    "Do not expand the MCP tool registry in this acceptance-sized goal."
+  ],
+  "conclusion": "repair_workflow_cli_productized_without_target_repo_writes",
+  "completed_at": "2026-07-24",
+  "next_goal_id": "repoassure-ai-ide-repair-workflow-installed-cli-real-campaign-validation-v0.1",
+  "summary": {
+    "operation_record": "docs/operations/repoassure-ai-ide-repair-workflow-cli-productization-v0.1.md",
+    "cli_subcommands": [
+      "handoff",
+      "execute",
+      "patch-plan",
+      "evidence-package"
+    ],
+    "focused_tests": 60,
+    "installed_cli_smoke": true,
+    "compatibility_scripts_preserved": true,
+    "target_repo_writes": false,
+    "automatic_patch_application": false,
+    "mcp_registry_expanded": false,
+    "evidence": [
+      "src/adapters/cli/run.ts",
+      "packages/acceptance/src/run-repair-handoff.ts",
+      "packages/acceptance/src/run-repair-execute.ts",
+      "packages/acceptance/src/run-repair-patch-plan.ts",
+      "packages/acceptance/src/run-repair-evidence-package.ts",
+      "tests/unit/cli-options.test.ts",
+      "tests/integration/cli-repair-workflow.test.ts"
+    ]
+  }
+}

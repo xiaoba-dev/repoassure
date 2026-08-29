@@ -1,0 +1,85 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-multi-repo-workspace-repair-summary-planning-v0.1",
+  "title": "RepoAssure Multi-Repo Workspace Repair Summary Planning v0.1",
+  "status": "completed",
+  "objective": "Using the implemented local workspace manifest and existing per-repository repair artifacts, define the local-only multi-repo workspace repair summary as an implementation-ready product and artifact contract without changing production code, executing commands, applying patches, or writing target repositories.",
+  "source_spec": "docs/product/specs/mvp-spec-v0.3.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "production_code_change",
+    "cross_repo_summary_implementation",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "detector_confidence_threshold_change",
+    "acceptance_policy_change",
+    "target_repo_write",
+    "automatic_patch_application",
+    "arbitrary_command_execution",
+    "mcp_tool_addition",
+    "mcp_tool_rename",
+    "validation_only_mcp_exposure",
+    "team_cloud_runtime",
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "customer_contact",
+    "pricing_change",
+    "spend_change"
+  ],
+  "acceptance": [
+    "Reconcile the current workspace manifest and per-repository repair artifact contracts before proposing a cross-repository summary.",
+    "Define workspace-summary inputs, JSON and Markdown artifact boundaries, AI IDE read order, cross-repo prioritization, stale or missing repo handling, repo identity collision policy, redaction, maintainer review, and no-write evidence.",
+    "Separate local workspace summary capability from Team Cloud history, collaboration, hosted dashboard, and commercial availability claims.",
+    "Produce an implementation-ready planning record and bounded test matrix without changing production code.",
+    "Select at most one next implementation or validation Goal after the planning contract is accepted."
+  ],
+  "conclusion": "multi_repo_workspace_repair_summary_contract_planned_without_production_implementation",
+  "summary": {
+    "operation_record": "docs/operations/repoassure-multi-repo-workspace-repair-summary-planning-v0.1.md",
+    "contract_record": "docs/product/specs/multi-repo-workspace-repair-summary-contract-v0.1.md",
+    "source_workspace_manifest_schema_version": 1,
+    "output_artifacts": [
+      "workspace-repair-summary.json",
+      "workspace-repair-summary.md"
+    ],
+    "repository_states": [
+      "ready",
+      "no_tasks",
+      "stale",
+      "missing_artifacts",
+      "invalid_artifacts",
+      "identity_collision"
+    ],
+    "priority_order": [
+      "P0",
+      "P1",
+      "P2"
+    ],
+    "selected_next_goal_id": "repoassure-multi-repo-workspace-repair-summary-contract-implementation-v0.1",
+    "production_code_changed": false,
+    "target_repo_writes": false,
+    "team_cloud_runtime_implemented": false,
+    "hosted_dashboard_implemented": false
+  },
+  "tests": [
+    "pnpm vitest run tests/unit/project-structure.test.ts",
+    "pnpm typecheck",
+    "pnpm lint",
+    "pnpm build:acceptance",
+    "pnpm build:src",
+    "pnpm test",
+    "pnpm repo:hygiene",
+    "pnpm release:check",
+    "pnpm goal:audit",
+    "pnpm autopilot:progress:check -- --json",
+    "git diff --check"
+  ],
+  "next_goal_id": "repoassure-multi-repo-workspace-repair-summary-contract-implementation-v0.1"
+}

@@ -1,0 +1,103 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-product-applicability-boundary-documentation-cascade-v0.1",
+  "title": "RepoAssure Product Applicability Boundary Documentation Cascade v0.1",
+  "status": "completed",
+  "created_at": "2026-07-24T00:09:00.000+08:00",
+  "completed_at": "2026-07-24T00:25:00.000+08:00",
+  "objective": "Document RepoAssure product applicability boundaries and cascade the boundary into canonical product, solution, plan, acceptance, testing, log, and Autopilot progress surfaces.",
+  "source_spec": "docs/PRD.md",
+  "priority": "P1",
+  "conclusion": "product_applicability_boundary_documented",
+  "document_basis": [
+    "docs/product/strategy/product-applicability-boundary-v0.1.md",
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "README.md",
+    "docs/testing/strategy/test-strategy-v0.1.md",
+    "docs/acceptance/checklists/acceptance-checklist-v0.1.md",
+    "docs/logs/decision-log.md",
+    "docs/logs/dev-log.md"
+  ],
+  "blocked_actions": [
+    "runtime_behavior_change",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "target_repo_write",
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "public_launch",
+    "customer_contact",
+    "pricing_change",
+    "spend_change"
+  ],
+  "acceptance": [
+    "Create docs/product/strategy/product-applicability-boundary-v0.1.md with Core, Extended, Partner / Plugin, and Out of Scope product type tiers.",
+    "Make prohibited claims explicit: not every product, not universal automatic acceptance, not replacement for human acceptance, and not automatic repair of every AI code issue.",
+    "Cascade the conclusion product_applicability_boundary_documented into PRD, SPEC, PLAN, README, testing strategy, acceptance checklist, decision log, dev log, and Autopilot progress state.",
+    "Restore the next safe goal to Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Recording v0.1."
+  ],
+  "summary": {
+    "strategy_doc": "docs/product/strategy/product-applicability-boundary-v0.1.md",
+    "conclusion": "product_applicability_boundary_documented",
+    "product_type_tiers": [
+      "Core",
+      "Extended",
+      "Partner / Plugin",
+      "Out of Scope"
+    ],
+    "core_types": [
+      "Web App",
+      "CLI",
+      "AI IDE repair loop",
+      "MCP / Agent tooling"
+    ],
+    "extended_types": [
+      "Backend API",
+      "SDK / Library",
+      "Browser Extension",
+      "Desktop App"
+    ],
+    "partner_or_plugin_types": [
+      "Mobile App",
+      "AI Model Evaluation",
+      "Data Pipeline",
+      "Security integrations"
+    ],
+    "out_of_scope_types": [
+      "Hardware",
+      "Pure Design",
+      "Pure Docs",
+      "Offline Business Process"
+    ],
+    "prohibited_claims": [
+      "Do not claim RepoAssure applies to every product",
+      "Do not claim full-stack universal automatic acceptance",
+      "Do not claim RepoAssure replaces human acceptance",
+      "Do not claim RepoAssure automatically fixes every AI code issue"
+    ],
+    "boundary": {
+      "applies_to_every_product": false,
+      "full_stack_universal_automatic_acceptance": false,
+      "replaces_human_acceptance": false,
+      "automatically_fixes_every_ai_code_issue": false,
+      "runtime_behavior_change": false,
+      "target_repo_writes": false,
+      "hosted_dashboard": false,
+      "deployment": false,
+      "public_release": false
+    }
+  },
+  "verification": [
+    "pnpm vitest run tests/unit/project-structure.test.ts"
+  ],
+  "next_goal_id": "product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1"
+}

@@ -1,0 +1,44 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-autopilot-progress-consistency-guard-v0.1",
+  "title": "RepoAssure Autopilot Progress Consistency Guard v0.1",
+  "status": "completed",
+  "objective": "Add a local automated consistency guard so Autopilot active/next goal state stays aligned across goal index, progress snapshot, progress Markdown, PLAN, README, and canonical docs.",
+  "source_spec": "docs/operations/repoassure-canonical-product-narrative-freshness-cleanup-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "detector_confidence_threshold_change",
+    "acceptance_policy_change"
+  ],
+  "acceptance": [
+    "Add or refresh local tests that verify active/next goal state is consistent across goal index, progress snapshot, progress Markdown, PLAN, README, and canonical docs.",
+    "Keep the guard local-only and focused on documentation/progress consistency.",
+    "Do not change runtime detector behavior, target repositories, deployment state, publication state, customer contact, pricing, or spend.",
+    "Record evidence in the standard operations, acceptance, testing, decision-log, and dev-log surfaces."
+  ],
+  "conclusion": "progress_consistency_guard_implemented",
+  "completed_at": "2026-07-24T09:20:00.000+08:00",
+  "next_goal_id": "repoassure-product-completion-gap-audit-refresh-v0.3",
+  "summary": {
+    "operation_record": "docs/operations/repoassure-autopilot-progress-consistency-guard-v0.1.md",
+    "command": "pnpm autopilot:progress:check -- --json",
+    "checks": 8,
+    "local_only": true,
+    "read_only": true
+  }
+}

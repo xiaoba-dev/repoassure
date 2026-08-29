@@ -1,6 +1,6 @@
 # Public Release Readiness v0.2
 
-Status: automated_prerequisites_ready_manual_gates_pending
+Status: public_source_release_complete_launch_gated
 Date: 2026-06-28
 
 ## Purpose
@@ -8,6 +8,24 @@ Date: 2026-06-28
 Public Release Readiness v0.2 records the current public-release preparation state after the private preview website, Cloudflare Access protected review surface, external reviewer dispatch, and feedback intake ledger were created.
 
 This is a readiness checkpoint only. It does not publish the project, change repository visibility, create a GitHub release, publish npm packages, or announce public availability.
+
+## 2026-07-26 Reconciliation
+
+Public source release is already complete on `origin/main`, and the GitHub
+repository is `PUBLIC` with active native `main` branch protection. The
+private-repository and HTTP 403 statements retained later in this document are
+historical checkpoint evidence.
+
+Public launch remains unauthorized. npm publication, GitHub Release,
+production marketing, customer contact, pricing/spend changes, and
+SaaS/Team Cloud/Enterprise/hosted availability claims also remain
+unauthorized.
+
+The current local `design-system-v2` branch reports `public release ready: no`
+because it is 65 commits behind `origin/main` and lacks the authorization
+record already present on the remote mainline. An isolated `origin/main`
+release check reports `public release ready: yes`. These results describe
+different branch contents and are not a remote release rollback.
 
 ## Current Automated Readiness
 
@@ -31,7 +49,9 @@ Expected release checker result:
 public release ready: no
 ```
 
-That result is correct because manual authorization gates remain open.
+That local-branch result is expected because the stale branch does not contain
+the mainline authorization record. It must not be generalized to the current
+remote repository state.
 
 ## Release Boundary Snapshot
 
@@ -42,7 +62,7 @@ That result is correct because manual authorization gates remain open.
 - Private preview reviewer feedback triage is still not an input to public release readiness because no real reviewer feedback has been received.
 - Private Preview Feedback Triage Execution v0.1 remains blocked until real reviewer feedback exists.
 
-## Manual authorization gates
+## Historical manual authorization gates
 
 | Gate | Current status | Required before public release |
 | --- | --- | --- |

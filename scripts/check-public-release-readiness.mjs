@@ -156,7 +156,7 @@ export async function runPublicReleaseReadinessCheck(options = {}) {
       manualAuthorizationExists ? 'passed' : 'not_ready',
       manualAuthorizationExists
         ? 'manual publication authorization record exists'
-        : 'manual legal/trademark/branch-protection publication authorization is still required before making anything public'
+        : 'manual authorization record for additional publication actions is required; source repository visibility is an independent external state'
     )
   ];
   const failed = checks.filter((check) => check.status === 'failed');
@@ -209,7 +209,8 @@ function printHelp() {
   console.log(`Usage: node scripts/check-public-release-readiness.mjs [--cwd <repo>] [--input <tracked-files.txt>]
 
 Checks public-release prerequisites without publishing the repository.
-Automated readiness prerequisites can pass while public release ready remains "no" until manual authorization exists.`);
+Automated readiness prerequisites can pass while public release ready remains "no" until the required authorization record exists.
+Source repository visibility is external state and does not imply npm, GitHub Release, launch, or commercial availability authorization.`);
 }
 
 async function main() {

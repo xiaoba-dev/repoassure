@@ -1,0 +1,53 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-agent-context-export-v0.1",
+  "status": "completed",
+  "objective": "Implement a local-only Project Intelligence agent context export that summarizes graph snapshot state, product surfaces, current/next goal state, blockers, safe next candidates, and non-authorization boundaries for Codex / AI IDE consumption.",
+  "source_spec": "docs/product/specs/project-intelligence-console-spec-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite"
+  ],
+  "acceptance": [
+    "Add a local CLI script such as pnpm project:intelligence:agent-context.",
+    "Read the existing project-intelligence-snapshot.json or generate it when explicitly requested.",
+    "Write ignored local JSON and Markdown context exports under artifacts/project-graph/.",
+    "Include product surfaces, active/next goal, findings summary, blocker summary, safe next candidates, and non-authorization boundaries.",
+    "Cover schema, Markdown readability, redaction, no external references, and no target repo writes with unit tests."
+  ],
+  "summary": {
+    "json_output": "artifacts/project-graph/project-intelligence-agent-context.json",
+    "markdown_output": "artifacts/project-graph/project-intelligence-agent-context.md",
+    "script": "pnpm project:intelligence:agent-context",
+    "product_surfaces": 4,
+    "blockers": 16,
+    "recommended_goals": 1,
+    "local_only": true,
+    "hosted_dashboard_implemented": false,
+    "target_repo_writes": false
+  },
+  "tests": [
+    "pnpm vitest run tests/unit/project-intelligence-agent-context.test.ts",
+    "pnpm vitest run tests/unit/project-structure.test.ts",
+    "pnpm project:intelligence",
+    "pnpm project:intelligence:agent-context",
+    "pnpm repo:hygiene",
+    "pnpm typecheck",
+    "pnpm lint",
+    "pnpm goal:audit",
+    "pnpm test"
+  ],
+  "next_goal_id": "project-intelligence-watch-mode-planning-v0.1"
+}

@@ -3,12 +3,16 @@ import type { CallToolResult, Tool } from '@modelcontextprotocol/sdk/types.js';
 import { createPlaywrightBrowserDriver } from '../../domain/explore/playwright-driver.js';
 import { redactSensitiveText } from '../../shared/privacy-redaction.js';
 import { runAnalyzeRepoTool } from '../../tools/analyze-repo-tool.js';
+import { runAssembleRepairEvidencePackageTool } from '../../tools/assemble-repair-evidence-package-tool.js';
 import { runBootAppTool, toSerializableBootResult } from '../../tools/boot-app-tool.js';
 import { runExploreAppTool } from '../../tools/explore-app-tool.js';
+import { runGenerateRepairPatchPlanTool } from '../../tools/generate-repair-patch-plan-tool.js';
 import { runGenerateTestsTool } from '../../tools/generate-tests-tool.js';
 import { runGenerateRepairPlanTool } from '../../tools/generate-repair-plan-tool.js';
 import { runHardenReportTool } from '../../tools/harden-report-tool.js';
+import { runPreviewRepairExecutionTool } from '../../tools/preview-repair-execution-tool.js';
 import { runHardeningTool } from '../../tools/run-hardening-tool.js';
+import { runPrepareRepairHandoffTool } from '../../tools/prepare-repair-handoff-tool.js';
 import { bootSessionStore } from './boot-session-store.js';
 
 type JsonObject = Record<string, unknown>;
@@ -20,6 +24,10 @@ type HardeningToolName =
   | 'explore_app'
   | 'generate_tests'
   | 'generate_repair_plan'
+  | 'prepare_repair_handoff'
+  | 'preview_repair_execution'
+  | 'generate_repair_patch_plan'
+  | 'assemble_repair_evidence_package'
   | 'harden_report'
   | 'run_hardening';
 
@@ -138,6 +146,88 @@ export function listHardeningTools(): Tool[] {
         readOnlyHint: false,
         destructiveHint: false,
         idempotentHint: true,
+        openWorldHint: false
+      }
+    },
+    {
+      name: 'prepare_repair_handoff',
+      title: 'Prepare Repair Handoff',
+      description: 'Generate a bounded AI IDE repair handoff package and verification plan from an existing run bundle.',
+      inputSchema: objectSchema(
+        {
+          runDir: stringSchema('Existing hardening run directory containing manifest.json.'),
+          outputDir: stringSchema('Optional output directory. Defaults to the run directory.')
+        },
+        ['runDir']
+      ),
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: false
+      }
+    },
+    {
+      name: 'preview_repair_execution',
+      title: 'Preview Repair Execution',
+      description: 'Generate a bounded dry-run repair execution report without running verification commands or modifying target repository files.',
+      inputSchema: objectSchema(
+        {
+          packagePath: stringSchema('Existing repair-handoff-package.json path.'),
+          taskIds: arrayStringSchema('Non-empty repair task id list. Cannot be combined with all=true.'),
+          all: booleanSchema('Select every repair task when true. Cannot be combined with taskIds.'),
+          outputDir: stringSchema('Optional output directory. Defaults next to the handoff package.')
+        },
+        ['packagePath']
+      ),
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: false
+      }
+    },
+    {
+      name: 'generate_repair_patch_plan',
+      title: 'Generate Repair Patch Plan',
+      description: 'Generate bounded repair patch-plan JSON and Markdown from a repair execution report without running commands or applying patches.',
+      inputSchema: objectSchema(
+        {
+          reportPath: stringSchema('Existing repair-execution-report.json path.'),
+          outputDir: stringSchema('Optional output directory. Defaults next to the execution report.')
+        },
+        ['reportPath']
+      ),
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: false
+      }
+    },
+    {
+      name: 'assemble_repair_evidence_package',
+      title: 'Assemble Repair Evidence Package',
+      description: 'Assemble existing repair handoff, dry-run, validation, and patch-plan evidence without running commands or modifying target repository files.',
+      inputSchema: objectSchema(
+        {
+          handoffPackagePath: stringSchema('Existing repair-handoff-package.json path.'),
+          dryRunReportPath: stringSchema('Existing dry-run repair-execution-report.json path.'),
+          validationReportPath: stringSchema('Existing validation-only repair-execution-report.json path.'),
+          patchPlanPath: stringSchema('Existing patch-plan.json path.'),
+          outputDir: stringSchema('Optional output directory. Defaults next to the patch plan.')
+        },
+        [
+          'handoffPackagePath',
+          'dryRunReportPath',
+          'validationReportPath',
+          'patchPlanPath'
+        ]
+      ),
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
         openWorldHint: false
       }
     },
@@ -264,6 +354,75 @@ async function runNamedTool(name: HardeningToolName, args: JsonObject): Promise<
         await runGenerateRepairPlanTool({
           root: readRequiredString(args, 'root'),
           ...(runDir ? { runDir } : {})
+        })
+      );
+    }
+    case 'prepare_repair_handoff': {
+      const outputDir = readOptionalString(args, 'outputDir');
+      return toJsonObject(
+        await runPrepareRepairHandoffTool({
+          runDir: readRequiredString(args, 'runDir'),
+          ...(outputDir ? { outputDir } : {})
+        })
+      );
+    }
+    case 'preview_repair_execution': {
+      assertAllowedArguments(
+        args,
+        'preview_repair_execution',
+        ['packagePath', 'taskIds', 'all', 'outputDir']
+      );
+      const taskIds = readOptionalNonEmptyStringArray(args, 'taskIds');
+      const all = readOptionalBooleanArgument(args, 'all');
+
+      if ((taskIds !== null) === (all === true)) {
+        throw new Error('Exactly one of non-empty taskIds or all=true is required');
+      }
+
+      const outputDir = readOptionalString(args, 'outputDir');
+      return toJsonObject(
+        await runPreviewRepairExecutionTool({
+          packagePath: readRequiredString(args, 'packagePath'),
+          ...(taskIds ? { taskIds } : {}),
+          ...(all === true ? { all: true } : {}),
+          ...(outputDir ? { outputDir } : {})
+        })
+      );
+    }
+    case 'generate_repair_patch_plan': {
+      assertAllowedArguments(
+        args,
+        'generate_repair_patch_plan',
+        ['reportPath', 'outputDir']
+      );
+      const outputDir = readOptionalString(args, 'outputDir');
+      return toJsonObject(
+        await runGenerateRepairPatchPlanTool({
+          reportPath: readRequiredString(args, 'reportPath'),
+          ...(outputDir ? { outputDir } : {})
+        })
+      );
+    }
+    case 'assemble_repair_evidence_package': {
+      assertAllowedArguments(
+        args,
+        'assemble_repair_evidence_package',
+        [
+          'handoffPackagePath',
+          'dryRunReportPath',
+          'validationReportPath',
+          'patchPlanPath',
+          'outputDir'
+        ]
+      );
+      const outputDir = readOptionalString(args, 'outputDir');
+      return toJsonObject(
+        await runAssembleRepairEvidencePackageTool({
+          handoffPackagePath: readRequiredString(args, 'handoffPackagePath'),
+          dryRunReportPath: readRequiredString(args, 'dryRunReportPath'),
+          validationReportPath: readRequiredString(args, 'validationReportPath'),
+          patchPlanPath: readRequiredString(args, 'patchPlanPath'),
+          ...(outputDir ? { outputDir } : {})
         })
       );
     }
@@ -396,6 +555,19 @@ function readOptionalBoolean(record: JsonObject, key: string): boolean {
   return record[key] === true;
 }
 
+function readOptionalBooleanArgument(record: JsonObject, key: string): boolean | null {
+  if (!(key in record)) {
+    return null;
+  }
+
+  const value = record[key];
+  if (typeof value !== 'boolean') {
+    throw new Error(`Invalid boolean argument: ${key}`);
+  }
+
+  return value;
+}
+
 function readOptionalStringArray(record: JsonObject, key: string): string[] | null {
   const value = record[key];
 
@@ -404,6 +576,35 @@ function readOptionalStringArray(record: JsonObject, key: string): string[] | nu
   }
 
   return value.flatMap((item) => (typeof item === 'string' ? [item] : []));
+}
+
+function readOptionalNonEmptyStringArray(record: JsonObject, key: string): string[] | null {
+  if (!(key in record)) {
+    return null;
+  }
+
+  const value = record[key];
+  if (
+    !Array.isArray(value)
+    || value.length === 0
+    || value.some((item) => typeof item !== 'string' || !item.trim())
+  ) {
+    throw new Error(`Invalid non-empty string array argument: ${key}`);
+  }
+
+  return value.map((item) => (item as string).trim());
+}
+
+function assertAllowedArguments(
+  record: JsonObject,
+  toolName: string,
+  allowed: readonly string[]
+): void {
+  const unsupported = Object.keys(record).find((key) => !allowed.includes(key));
+
+  if (unsupported) {
+    throw new Error(`Unsupported argument for ${toolName}: ${unsupported}`);
+  }
 }
 
 function asRecord(value: unknown): JsonObject {

@@ -1,12 +1,32 @@
 # Branch Protection and Release Boundary v0.1
 
-Status: Blocked by GitHub plan permissions
+Status: Current control active
 Date: 2026-06-22
 Source ADR: [ADR-0012](../adr/0012-branch-protection-and-release-boundary.md)
 
 ## Purpose
 
-Define the operational target state for protecting `main` and preserving the private pre-release boundary.
+Define the operational target state and evidence history for protecting `main`
+while keeping source visibility separate from package, release, launch, and
+commercial availability boundaries.
+
+## 2026-07-26 Current Status
+
+- Repository visibility: `PUBLIC`
+- Default branch: `main`
+- Required status check: `Quality Gates`
+- Require branches to be up to date: enabled
+- Administrator enforcement: enabled
+- Linear history: enabled
+- Conversation resolution: enabled
+- Force pushes: disabled
+- Branch deletion: disabled
+- Latest five observed `RepoAssure CI` runs on `main`: successful
+
+The earlier private-repository HTTP 403 state below is historical evidence.
+The current native branch protection gate is passed. Source repository
+visibility does not authorize npm publication, GitHub Release, public launch,
+deployment, marketing, or hosted/commercial availability claims.
 
 ## Desired Branch Protection
 
@@ -25,7 +45,7 @@ Recommended settings:
 - Require the `Quality Gates` status check.
 - Do not allow bypass for normal development.
 
-## Current Status
+## Historical Status
 
 GitHub API returned HTTP 403 for both branch protection and repository rulesets on the private repository.
 
@@ -77,6 +97,9 @@ gh repo view xiaoba-dev/repoassure --json visibility
 
 6. Mark the blocker in `docs/logs/blockers.md` as resolved.
 
-## Current Blocker
+## Historical Blocker
 
 See `docs/logs/blockers.md`: GitHub branch protection and repository rulesets are unavailable for the private repo under the current plan.
+
+This blocker is no longer current. It was superseded after the source
+repository became public and native `main` protection was enabled.

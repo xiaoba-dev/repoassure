@@ -1,0 +1,48 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "public-git-history-personal-identifier-remediation-planning-v0.1",
+  "title": "Public Git History Personal-Identifier Remediation Planning v0.1",
+  "status": "completed",
+  "objective": "Prepare a bounded remediation decision packet for historical personal identifiers that remain recoverable from the public Git history, without exposing the identifier values, rewriting history, force pushing, rotating credentials, contacting people, or changing repository and release state.",
+  "source_spec": "docs/operations/public-repository-state-and-release-boundary-reconciliation-v0.1.md",
+  "priority": "P0",
+  "blocked_actions": [
+    "git_history_rewrite",
+    "force_push",
+    "branch_deletion",
+    "tag_rewrite",
+    "credential_rotation",
+    "repository_visibility_change",
+    "permission_change",
+    "npm_publication",
+    "github_release",
+    "public_launch",
+    "deployment",
+    "customer_contact",
+    "reviewer_contact",
+    "pricing_change",
+    "spend_change"
+  ],
+  "acceptance": [
+    "Inventory affected public-history commits and paths without recording the personal identifier values.",
+    "Classify the material as personal contact data rather than credentials unless evidence proves otherwise.",
+    "Compare accept-risk, history-rewrite, and repository replacement options with clone, fork, PR, signature, and branch-protection consequences.",
+    "Produce rollback, notification, verification, and maintainer-decision requirements without executing remediation.",
+    "Do not expose the identifier values in the planning record or generated evidence.",
+    "Do not rewrite Git history, force push, rotate credentials, contact reviewers or customers, publish, launch, deploy, or change repository settings."
+  ],
+  "conclusion": "redacted_history_identifier_decision_packet_ready_maintainer_decision_required",
+  "summary": {
+    "operation_record": "docs/operations/public-git-history-personal-identifier-remediation-planning-v0.1.md",
+    "affected_commits": 6,
+    "affected_paths": 16,
+    "data_classification": "personal_contact_data",
+    "credential_exposure": false,
+    "current_tree_identifier_matches": 0,
+    "identifier_values_reproduced": false,
+    "recommended_option": "accept_risk",
+    "history_rewritten": false,
+    "repository_state_changed": false
+  },
+  "next_goal_id": "public-git-history-personal-identifier-remediation-maintainer-decision-recording-v0.1"
+}

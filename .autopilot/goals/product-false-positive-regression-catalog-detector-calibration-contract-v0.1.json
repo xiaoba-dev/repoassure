@@ -1,0 +1,72 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "product-false-positive-regression-catalog-detector-calibration-contract-v0.1",
+  "status": "completed",
+  "objective": "Create a local-only detector calibration contract artifact from the completed planning record, with tests for calibration questions, manual gates, future authorization boundary, and no runtime detector behavior change.",
+  "source_spec": "docs/operations/product-false-positive-regression-catalog-detector-calibration-planning-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade"
+  ],
+  "acceptance": [
+    "Define a machine-readable local-only calibration contract that references false-positive catalog fixture IDs and calibration questions.",
+    "Add contract tests proving the contract preserves maintainer review gates and future implementation authorization boundaries.",
+    "Generate or document local artifact read order for AI IDE consumption without changing runtime detector behavior.",
+    "Cascade the contract boundary into PRD, SPEC, PLAN, testing strategy, acceptance checklist, decision log, dev log, and autopilot progress."
+  ],
+  "completed_at": "2026-07-23T08:00:00.000+08:00",
+  "conclusion": "calibration_contract_generated_without_runtime_behavior_change",
+  "summary": {
+    "operation_record": "docs/operations/product-false-positive-regression-catalog-detector-calibration-contract-v0.1.md",
+    "implementation": [
+      "packages/acceptance/src/run-false-positive-detector-calibration-contract.ts",
+      "pnpm false-positive:calibration-contract",
+      "@hardening-mcp/acceptance/run-false-positive-detector-calibration-contract"
+    ],
+    "generated_artifacts": [
+      "artifacts/project-graph/false-positive-detector-calibration-contract.json",
+      "artifacts/project-graph/false-positive-detector-calibration-contract.md"
+    ],
+    "calibration_questions": [
+      "conditional_dead_control_should_consider_form_dirty_prerequisites",
+      "auth_redirect_route_should_preserve_maintainer_review_boundary"
+    ],
+    "manual_gates": [
+      "maintainer_classification_required_before_detector_change",
+      "catalog_fixture_privacy_review_required",
+      "expected_snapshot_review_required",
+      "confidence_threshold_review_required",
+      "regression_artifact_review_required"
+    ],
+    "required_future_authorization": [
+      "runtime_detector_change",
+      "finding_suppression",
+      "automatic_severity_downgrade",
+      "detector_confidence_threshold_change",
+      "acceptance_policy_change"
+    ],
+    "boundary": {
+      "runtime_detection_behavior_change": false,
+      "finding_suppression": false,
+      "automatic_severity_downgrade": false,
+      "target_repo_write": false
+    },
+    "next_goal_id": "product-false-positive-regression-catalog-detector-calibration-contract-consumption-validation-v0.1"
+  },
+  "next_goal_id": "product-false-positive-regression-catalog-detector-calibration-contract-consumption-validation-v0.1"
+}

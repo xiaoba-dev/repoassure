@@ -531,7 +531,7 @@ function findOrphanCodeEntries(codeGraph: ProjectIntelligenceGraph): ProjectInte
 
   return codeGraph.nodes
     .filter((node) => node.type === 'app')
-    .filter((node) => !(outgoingContains.get(node.id) ?? []).some((path) => path.endsWith('/README.md')))
+    .filter((node) => !(outgoingContains.get(node.id) ?? []).some((path) => path === `${node.id}/README.md`))
     .map((node): ProjectIntelligenceFinding => ({
       id: `orphan-code:${node.id}`,
       category: 'orphan_code',

@@ -29,6 +29,7 @@ ADR records long-lived architecture decisions. Use `docs/logs/decision-log.md` f
 | [0021](0021-private-preview-hosting-fallback.md) | Accepted | Private preview hosting fallback decision |
 | [0022](0022-repoassure-design-system-v2-and-information-architecture.md) | Accepted | RepoAssure Design System v2 and information architecture redesign |
 | [0023](0023-public-marketing-site-reachability-boundary.md) | Accepted | Public marketing site reachability boundary |
+| [0024](0024-ai-ide-repair-workflow-mcp-convergence.md) | Accepted | Artifact-only AI IDE repair workflow MCP convergence |
 
 ## Template
 

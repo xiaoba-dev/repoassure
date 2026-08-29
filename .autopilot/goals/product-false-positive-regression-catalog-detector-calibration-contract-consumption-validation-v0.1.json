@@ -1,0 +1,75 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "product-false-positive-regression-catalog-detector-calibration-contract-consumption-validation-v0.1",
+  "status": "completed",
+  "objective": "Validate AI IDE and maintainer consumption of the generated false-positive detector calibration contract artifacts, including read order, manual gate interpretation, future authorization boundary, redaction, and no runtime detector behavior change.",
+  "source_spec": "docs/operations/product-false-positive-regression-catalog-detector-calibration-contract-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "detector_confidence_threshold_change",
+    "acceptance_policy_change"
+  ],
+  "acceptance": [
+    "Validate the generated calibration contract JSON and Markdown can be consumed in the documented AI IDE read order.",
+    "Prove consumption preserves manual gates, future implementation authorization requirements, and maintainer review boundary.",
+    "Fail closed when contract artifacts imply runtime detector behavior change, finding suppression, automatic severity downgrade, target repo writes, or prohibited secret-like content.",
+    "Cascade consumption-validation evidence into PRD, SPEC, PLAN, testing strategy, acceptance checklist, decision log, dev log, and autopilot progress."
+  ],
+  "completed_at": "2026-07-23T09:00:00.000+08:00",
+  "conclusion": "contract_consumption_validated_without_runtime_behavior_change",
+  "summary": {
+    "operation_record": "docs/operations/product-false-positive-regression-catalog-detector-calibration-contract-consumption-validation-v0.1.md",
+    "implementation": [
+      "packages/acceptance/src/run-false-positive-detector-calibration-contract-consumption.ts",
+      "pnpm false-positive:calibration-contract:validate",
+      "@hardening-mcp/acceptance/run-false-positive-detector-calibration-contract-consumption"
+    ],
+    "generated_artifacts": [
+      "artifacts/project-graph/false-positive-detector-calibration-contract-consumption-validation.json",
+      "artifacts/project-graph/false-positive-detector-calibration-contract-consumption-validation.md"
+    ],
+    "checks_passed": 13,
+    "calibration_questions": [
+      "conditional_dead_control_should_consider_form_dirty_prerequisites",
+      "auth_redirect_route_should_preserve_maintainer_review_boundary"
+    ],
+    "manual_gates": [
+      "maintainer_classification_required_before_detector_change",
+      "catalog_fixture_privacy_review_required",
+      "expected_snapshot_review_required",
+      "confidence_threshold_review_required",
+      "regression_artifact_review_required"
+    ],
+    "required_future_authorization": [
+      "runtime_detector_change",
+      "finding_suppression",
+      "automatic_severity_downgrade",
+      "detector_confidence_threshold_change",
+      "acceptance_policy_change"
+    ],
+    "boundary": {
+      "runtime_detection_behavior_change": false,
+      "finding_suppression": false,
+      "automatic_severity_downgrade": false,
+      "target_repo_write": false
+    },
+    "next_goal_id": "product-false-positive-regression-catalog-detector-calibration-completion-audit-v0.1"
+  },
+  "next_goal_id": "product-false-positive-regression-catalog-detector-calibration-completion-audit-v0.1"
+}

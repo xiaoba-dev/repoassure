@@ -1,0 +1,59 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "public-git-history-personal-identifier-remediation-maintainer-decision-recording-v0.1",
+  "title": "Public Git History Personal-Identifier Remediation Maintainer Decision Recording v0.1",
+  "status": "completed",
+  "objective": "Record the maintainer's explicit choice among accept_risk, authorize_rewrite_planning, replace_repository_planning, or defer, preserve redacted evidence and authority boundaries, and select a bounded follow-up without executing any Git-history or external-state change.",
+  "source_spec": "docs/operations/public-git-history-personal-identifier-remediation-planning-v0.1.md",
+  "priority": "P0",
+  "blocked_actions": [
+    "git_history_rewrite",
+    "force_push",
+    "branch_deletion",
+    "tag_rewrite",
+    "repository_replacement",
+    "credential_rotation",
+    "repository_visibility_change",
+    "permission_change",
+    "branch_protection_change",
+    "repository_ruleset_change",
+    "npm_publication",
+    "github_release",
+    "public_launch",
+    "deployment",
+    "customer_contact",
+    "reviewer_contact",
+    "pricing_change",
+    "spend_change"
+  ],
+  "acceptance": [
+    "Record exactly one explicit maintainer choice: accept_risk, authorize_rewrite_planning, replace_repository_planning, or defer.",
+    "Keep every identifier value redacted in the decision record and evidence.",
+    "Record the decision rationale, accepted risk, and authority boundary without treating planning authorization as execution authorization.",
+    "Select a bounded follow-up Goal consistent with the explicit choice.",
+    "Do not rewrite Git history, force push, replace the repository, rotate credentials, contact anyone, publish, launch, deploy, or change repository settings."
+  ],
+  "conclusion": "maintainer_explicitly_accepted_historical_personal_identifier_recoverability_risk",
+  "summary": {
+    "operation_record": "docs/operations/public-git-history-personal-identifier-remediation-maintainer-decision-recording-v0.1.md",
+    "decision": "accept_risk",
+    "decision_source": "explicit_maintainer_response",
+    "goal_execution_authorization_treated_as_decision": false,
+    "affected_commits": 6,
+    "affected_paths": 16,
+    "current_tree_identifier_matches": 0,
+    "data_classification": "personal_contact_data",
+    "credential_exposure": false,
+    "identifier_values_reproduced": false,
+    "accepted_risks": [
+      "historical_personal_contact_data_remains_recoverable",
+      "privacy_and_spam_exposure",
+      "fork_mirror_cache_persistence"
+    ],
+    "history_rewritten": false,
+    "force_push_performed": false,
+    "repository_replaced": false,
+    "repository_state_changed": false
+  },
+  "next_goal_id": "repoassure-product-completion-gap-audit-refresh-v0.8"
+}

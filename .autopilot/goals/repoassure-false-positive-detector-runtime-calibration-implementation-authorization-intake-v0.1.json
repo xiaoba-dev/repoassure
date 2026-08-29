@@ -1,0 +1,85 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-false-positive-detector-runtime-calibration-implementation-authorization-intake-v0.1",
+  "title": "RepoAssure False-Positive Detector Runtime Calibration Implementation Authorization Intake v0.1",
+  "status": "completed",
+  "objective": "Prepare a local-only per-question implementation authorization intake for the two bounded detector calibration designs without recording decisions or changing detector behavior.",
+  "source_spec": "docs/product/strategy/false-positive-detector-runtime-calibration-bounded-design-plan-v0.1.md",
+  "priority": "P0",
+  "blocked_actions": [
+    "runtime_detector_implementation",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "detector_confidence_threshold_change",
+    "acceptance_policy_change",
+    "implementation_authorization_decision_inference",
+    "authorization_receipt_issuance",
+    "target_repository_acquisition",
+    "network_access_for_target",
+    "dependency_installation",
+    "target_repository_analysis",
+    "target_repository_execution",
+    "target_repository_write",
+    "automatic_patch_application",
+    "publication",
+    "npm_publication",
+    "github_release",
+    "deployment",
+    "launch",
+    "repository_visibility_change",
+    "permission_change",
+    "customer_contact",
+    "reviewer_contact",
+    "pricing_change",
+    "spend_change",
+    "git_history_rewrite",
+    "force_push"
+  ],
+  "acceptance": [
+    "Prepare an unfilled implementation authorization question for conditional_dead_control_should_consider_form_dirty_prerequisites with approve_implementation, request_revision, defer, and reject choices.",
+    "Prepare an unfilled implementation authorization question for auth_redirect_route_should_preserve_maintainer_review_boundary with approve_implementation, request_revision, defer, and reject choices.",
+    "Summarize the evidence model, rollback criteria, five manual gates, raw-fixture availability/privacy limitation, and residual risk for each question.",
+    "State that Goal execution authorization is not a per-question implementation authorization answer and that no default or inferred choice is allowed.",
+    "Do not record decisions, implement detector changes, suppress findings, downgrade severity, change confidence thresholds or acceptance policy, issue a receipt, access a target, publish, deploy, or launch."
+  ],
+  "conclusion": "implementation_authorization_intake_prepared_without_inferred_decisions_or_detector_changes",
+  "next_goal_id": "repoassure-false-positive-detector-runtime-calibration-implementation-authorization-maintainer-decision-recording-v0.1",
+  "summary": {
+    "trigger_conclusion": "bounded_false_positive_detector_calibration_design_plan_prepared_without_runtime_implementation_or_behavior_change",
+    "design_plan": "docs/product/strategy/false-positive-detector-runtime-calibration-bounded-design-plan-v0.1.md",
+    "authorization_intake": "docs/product/strategy/false-positive-detector-runtime-calibration-implementation-authorization-intake-v0.1.md",
+    "operation_record": "docs/operations/repoassure-false-positive-detector-runtime-calibration-implementation-authorization-intake-v0.1.md",
+    "question_count": 2,
+    "implementation_authorization_decisions_recorded": 0,
+    "implementation_authorization_decisions_pending": 2,
+    "pending_questions": [
+      "conditional_dead_control_should_consider_form_dirty_prerequisites",
+      "auth_redirect_route_should_preserve_maintainer_review_boundary"
+    ],
+    "decision_options": [
+      "approve_implementation",
+      "request_revision",
+      "defer",
+      "reject"
+    ],
+    "per_question_decisions": {
+      "conditional_dead_control_should_consider_form_dirty_prerequisites": "pending",
+      "auth_redirect_route_should_preserve_maintainer_review_boundary": "pending"
+    },
+    "manual_gates": [
+      "maintainer_classification_required_before_detector_change",
+      "fixture_privacy_confirmation_required",
+      "expected_snapshot_confirmation_required",
+      "confidence_threshold_review_required",
+      "regression_artifact_review_required"
+    ],
+    "goal_execution_authorization_treated_as_per_question_answer": false,
+    "detector_implementation_authorized": false,
+    "detector_changes_authorized": false,
+    "authorization_receipts_issued": 0,
+    "target_repositories_acquired": 0,
+    "target_repositories_executed": 0,
+    "target_repository_writes": 0
+  }
+}

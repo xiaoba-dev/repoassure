@@ -1,0 +1,62 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "public-release-manual-decision-input-review-v0.2",
+  "title": "Public Release Manual Decision Input Review v0.2",
+  "status": "completed",
+  "objective": "Review the seven recorded public release manual decisions against current local and documented evidence, confirm the unresolved branch protection or equivalent repository ruleset boundary, preserve public release no-go, and return any required maintainer choice without executing publication or changing repository state.",
+  "source_spec": "docs/operations/public-release-manual-decision-intake-v0.2.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "public_launch",
+    "production_marketing_announcement",
+    "deployment",
+    "branch_protection_change",
+    "repository_ruleset_change",
+    "permission_change",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "hosted_availability_claim",
+    "team_cloud_availability_claim",
+    "enterprise_availability_claim"
+  ],
+  "acceptance": [
+    "Review all seven decisions recorded in docs/operations/public-release-manual-decision-intake-v0.2.md against current documented and automated evidence.",
+    "Distinguish maintainer decisions and accepted risk from professional legal or trademark clearance.",
+    "Keep public release no-go while the branch protection or equivalent repository ruleset decision remains deferred.",
+    "Determine whether the existing decisions are internally consistent and identify the exact maintainer choice still required for an equivalent release control.",
+    "Do not change repository visibility, publish npm, create a GitHub release, launch, deploy, change repository controls, contact customers, or make hosted or commercial availability claims.",
+    "Cascade the review result through canonical release, testing, acceptance, log, and Autopilot records without treating this Goal as publication authorization."
+  ],
+  "conclusion": "seven_manual_decisions_reviewed_public_state_drift_requires_reconciliation",
+  "summary": {
+    "operation_record": "docs/operations/public-release-manual-decision-input-review-v0.2.md",
+    "decisions_reviewed": 7,
+    "approved": 3,
+    "accepted_risk": 3,
+    "deferred": 1,
+    "public_release_ready": false,
+    "repository_visibility": "PUBLIC",
+    "branch_protection_gate": "passed",
+    "local_branch_ahead": 10,
+    "local_branch_behind": 65,
+    "repository_state_changed": false
+  },
+  "tests": [
+    "pnpm exec vitest run tests/unit/project-structure.test.ts",
+    "pnpm typecheck",
+    "pnpm lint",
+    "pnpm build:acceptance",
+    "pnpm build:src",
+    "pnpm test",
+    "pnpm repo:hygiene",
+    "pnpm release:check",
+    "pnpm goal:audit",
+    "pnpm autopilot:progress:check -- --json",
+    "git diff --check"
+  ],
+  "next_goal_id": "public-repository-state-and-release-boundary-reconciliation-v0.1"
+}

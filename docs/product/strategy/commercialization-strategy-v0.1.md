@@ -12,6 +12,25 @@ Define the first commercialization path for RepoAssure without changing the curr
 
 RepoAssure is the AI code quality and delivery assurance layer between AI IDEs, coding agents, and production delivery.
 
+## Owner-Confirmed Long-Term Alignment
+
+The owner confirmed
+[RepoAssure Unified Long-Term Product Strategy v0.1](repoassure-unified-long-term-strategy-v0.1.md)
+on 2026-08-02. It preserves this document's local-first commercialization
+boundary while clarifying three durable roles:
+
+- Open Core distributes the open acceptance evidence kernel and local reference
+  engine.
+- A future maintainer-first, opt-in contribution network may amplify trusted
+  outcomes, but it must never optimize for bulk scan or pull-request volume.
+- Future Team Cloud and Enterprise products may monetize shared evidence
+  history, collaboration, policy, audit, identity, retention, and private
+  control without forking or weakening the open artifact contract.
+
+This alignment is strategic only. It does not claim current cloud availability,
+set pricing, contact customers, operate a contribution network, access a target,
+publish, deploy, or launch.
+
 Implementation note: `hardening-mcp` remains the current internal package and CLI/MCP implementation name until a separate rename migration is accepted.
 
 Security positioning note: ADR-0013 defines Codex Security and similar scanners as future security evidence providers for RepoAssure, not as products RepoAssure should directly imitate. RepoAssure should commercialize the broader repo readiness, evidence, and repair workflow.

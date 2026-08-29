@@ -1,0 +1,72 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-ai-ide-repair-workflow-installed-cli-real-campaign-validation-v0.1",
+  "title": "RepoAssure AI IDE Repair Workflow Installed CLI Real Campaign Validation v0.1",
+  "status": "completed",
+  "objective": "Validate the built installed hardening repair CLI end to end against a near-real non-private campaign fixture, including process exit codes, artifact contracts, Markdown readability, redaction, maintainer review, verification checklists, and no-write proof.",
+  "source_spec": "docs/operations/repoassure-ai-ide-repair-workflow-cli-productization-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "detector_confidence_threshold_change",
+    "acceptance_policy_change",
+    "target_repo_write",
+    "automatic_patch_application",
+    "mcp_tool_registry_expansion",
+    "website_design_system_rewrite",
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "customer_contact",
+    "pricing_change",
+    "spend_change"
+  ],
+  "acceptance": [
+    "Invoke the built dist/adapters/cli/index.js repair command family as external processes against a near-real non-private campaign fixture.",
+    "Validate handoff, dry-run, validation-only, patch-plan, and evidence-package exit codes and generated JSON and Markdown artifacts.",
+    "Verify installed CLI outputs preserve schema compatibility, AI IDE read order, maintainer review boundaries, verification checklists, redaction, and no-write proof.",
+    "Prove target repository source files remain unchanged and no patch, branch, commit, push, or pull request is applied or created.",
+    "Keep pnpm repair scripts as compatibility entrypoints and do not expand the MCP tool registry.",
+    "Cascade validation evidence through operations, testing, acceptance, canonical docs, logs, and Autopilot state."
+  ],
+  "conclusion": "installed_cli_real_campaign_validated_without_target_repo_writes",
+  "completed_at": "2026-07-24",
+  "next_goal_id": "repoassure-ai-ide-repair-workflow-packed-cli-installation-validation-v0.1",
+  "summary": {
+    "operation_record": "docs/operations/repoassure-ai-ide-repair-workflow-installed-cli-real-campaign-validation-v0.1.md",
+    "fixture": "fixtures/campaigns/ai-ide-repair-decision-package/manifest.json",
+    "external_process_entry": "dist/adapters/cli/index.js",
+    "external_process_steps": [
+      "handoff",
+      "dry-run",
+      "validation-only",
+      "patch-plan",
+      "evidence-package"
+    ],
+    "process_exit_codes": {
+      "handoff": 0,
+      "dry_run": 0,
+      "validation_only": 0,
+      "patch_plan": 0,
+      "evidence_package": 0
+    },
+    "schema_compatibility_preserved": true,
+    "markdown_readability_validated": true,
+    "redaction_validated": true,
+    "production_code_changed": false,
+    "target_repo_writes": false,
+    "automatic_patch_application": false,
+    "mcp_registry_expanded": false,
+    "evidence": [
+      "tests/integration/installed-cli-repair-real-campaign.test.ts",
+      "fixtures/campaigns/ai-ide-repair-decision-package/manifest.json"
+    ]
+  }
+}

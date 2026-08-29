@@ -1,0 +1,89 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1",
+  "status": "completed",
+  "created_at": "2026-07-23T22:30:00.000+08:00",
+  "completed_at": "2026-07-24T00:43:00.000+08:00",
+  "objective": "Record explicit maintainer decisions from the detector calibration authorization intake, preserving pending decision slots when no explicit decision has been supplied.",
+  "source_spec": "docs/operations/product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1.md",
+  "priority": "P1",
+  "conclusion": "maintainer_decision_record_created_with_pending_decisions",
+  "document_basis": [
+    "docs/operations/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1.md",
+    "docs/operations/product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1.md",
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "README.md",
+    "docs/testing/strategy/test-strategy-v0.1.md",
+    "docs/acceptance/checklists/acceptance-checklist-v0.1.md",
+    "docs/logs/decision-log.md",
+    "docs/logs/dev-log.md"
+  ],
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "detector_confidence_threshold_change",
+    "acceptance_policy_change"
+  ],
+  "acceptance": [
+    "Read the authorization intake and record only explicit maintainer decisions with evidence.",
+    "Do not invent or prefill maintainer decisions when the intake still has pending decision slots.",
+    "If decisions remain pending, produce a pending-decision record and keep detector behavior changes blocked.",
+    "Do not implement runtime detector behavior change, finding suppression, automatic severity downgrade, detector confidence threshold change, acceptance policy change, or target repo writes."
+  ],
+  "summary": {
+    "operation_record": "docs/operations/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1.md",
+    "decision_record_status": "pending_maintainer_decisions",
+    "source_intake": "docs/operations/product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1.md",
+    "recorded_decisions": 0,
+    "pending_decision_count": 2,
+    "pending_questions": [
+      "conditional_dead_control_should_consider_form_dirty_prerequisites",
+      "auth_redirect_route_should_preserve_maintainer_review_boundary"
+    ],
+    "preserved_decision_slots": [
+      {
+        "id": "conditional_dead_control_should_consider_form_dirty_prerequisites",
+        "fixture_id": "real-fixture:react-disabled-save-control",
+        "decision": "pending",
+        "evidence": "missing_explicit_maintainer_decision"
+      },
+      {
+        "id": "auth_redirect_route_should_preserve_maintainer_review_boundary",
+        "fixture_id": "real-fixture:vite-auth-redirect-route",
+        "decision": "pending",
+        "evidence": "missing_explicit_maintainer_decision"
+      }
+    ],
+    "detector_changes_authorized": false,
+    "boundary": {
+      "runtime_detection_behavior_change": false,
+      "finding_suppression": false,
+      "automatic_severity_downgrade": false,
+      "detector_confidence_threshold_change": false,
+      "acceptance_policy_change": false,
+      "target_repo_writes": false,
+      "hosted_dashboard": false,
+      "cloud_sync": false,
+      "telemetry": false,
+      "deployment": false,
+      "public_release": false
+    }
+  },
+  "next_goal_id": "product-false-positive-regression-catalog-detector-calibration-maintainer-decision-follow-up-v0.1"
+}

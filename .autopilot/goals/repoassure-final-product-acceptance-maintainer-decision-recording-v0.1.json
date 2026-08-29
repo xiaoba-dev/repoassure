@@ -1,0 +1,73 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-final-product-acceptance-maintainer-decision-recording-v0.1",
+  "title": "RepoAssure Final Product Acceptance Maintainer Decision Recording v0.1",
+  "status": "completed",
+  "created_at": "2026-07-26T18:06:00.000+08:00",
+  "completed_at": "2026-07-26T18:15:00.000+08:00",
+  "conclusion": "maintainer_explicitly_deferred_final_product_acceptance_pending_representative_multi_mode_validation",
+  "objective": "Record exactly one explicit maintainer decision of accepted, changes_requested, or defer from the final product acceptance decision package, preserve concrete notes and evidence boundaries, and select a bounded follow-up without inferring a decision or changing product, target repository, release, or external state.",
+  "source_spec": "docs/acceptance/final-product-acceptance-decision-package-v0.1.md",
+  "priority": "P0",
+  "document_basis": [
+    "docs/acceptance/final-product-acceptance-decision-package-v0.1.md",
+    "docs/acceptance/final-product-acceptance-maintainer-decision-record-v0.1.md",
+    "docs/operations/repoassure-final-product-acceptance-maintainer-decision-recording-v0.1.md",
+    "docs/operations/repoassure-final-product-acceptance-closure-campaign-v0.1.md",
+    "docs/PLAN.md",
+    "docs/SPEC.md",
+    "docs/PRD.md"
+  ],
+  "blocked_actions": [
+    "acceptance_decision_inference",
+    "target_repo_execution",
+    "target_repo_write",
+    "runtime_detection_behavior_change",
+    "acceptance_policy_change",
+    "repository_visibility_change",
+    "permission_change",
+    "branch_protection_change",
+    "repository_ruleset_change",
+    "npm_publication",
+    "github_release",
+    "public_launch",
+    "deployment",
+    "customer_contact",
+    "reviewer_contact",
+    "pricing_change",
+    "spend_change",
+    "hosted_availability_claim",
+    "git_history_rewrite",
+    "force_push",
+    "repository_replacement"
+  ],
+  "acceptance": [
+    "Record only an explicit maintainer choice of accepted, changes_requested, or defer; do not infer a choice from Goal execution authorization.",
+    "Require concrete maintainer notes and preserve the evidence, freshness, and coverage boundaries from the decision package.",
+    "If no explicit choice is provided, keep the decision pending and do not claim final product acceptance.",
+    "Select a bounded follow-up consistent with the explicit choice without treating product acceptance as publication, deployment, launch, target repository, or hosted availability authorization.",
+    "Do not run or write a target repository, change runtime or acceptance policy, publish, deploy, launch, modify repository controls, contact anyone, change pricing or spend, claim hosted availability, or rewrite Git history."
+  ],
+  "summary": {
+    "decision_package": "docs/acceptance/final-product-acceptance-decision-package-v0.1.md",
+    "decision_record": "docs/acceptance/final-product-acceptance-maintainer-decision-record-v0.1.md",
+    "operation_record": "docs/operations/repoassure-final-product-acceptance-maintainer-decision-recording-v0.1.md",
+    "decision_status": "defer",
+    "explicit_decision_found": true,
+    "execution_authorization_treated_as_acceptance": false,
+    "allowed_decisions": [
+      "accepted",
+      "changes_requested",
+      "defer"
+    ],
+    "maintainer_notes_present": true,
+    "maintainer_notes": "当前自动化质量证据已通过，暂未发现必须返工的产品缺陷；但现有真实项目验收早于当前产品状态，且只覆盖单一 browser 场景。等待当前版本完成 Web、Python/CLI、MCP/Agent 三类代表性真实验收闭环，并关闭关键误报与人工决策项后，再进行最终 accepted 决策。",
+    "final_product_acceptance_granted": false,
+    "release_authorized": false,
+    "target_repo_execution_authorized": false,
+    "target_repo_executed": false,
+    "target_repo_writes": false,
+    "external_actions_performed": false
+  },
+  "next_goal_id": "repoassure-representative-multi-mode-acceptance-campaign-planning-v0.1"
+}

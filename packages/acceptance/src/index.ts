@@ -155,6 +155,122 @@ export {
 } from './redaction.js';
 
 export {
+  formatWorkspaceRepairSummaryMarkdown,
+  runWorkspaceRepairSummary,
+  type RunWorkspaceRepairSummaryInput,
+  type WorkspaceRepairAgentContract,
+  type WorkspaceRepairDiagnostic,
+  type WorkspaceRepairMaintainerReview,
+  type WorkspaceRepairNoWriteProof,
+  type WorkspaceRepairQueueItem,
+  type WorkspaceRepairRedaction,
+  type WorkspaceRepairRepository,
+  type WorkspaceRepairRepositoryState,
+  type WorkspaceRepairSeverity,
+  type WorkspaceRepairSummaryArtifact,
+  type WorkspaceRepairSummaryCounts,
+  type WorkspaceRepairSummaryRunResult,
+  type WorkspaceRepairSummaryStatus
+} from './workspace-repair-summary.js';
+
+export {
+  validateWorkspaceRepairSummaryConsumption,
+  type ValidateWorkspaceRepairSummaryConsumptionInput,
+  type WorkspaceRepairSummaryConsumptionCheck,
+  type WorkspaceRepairSummaryConsumptionCheckStatus,
+  type WorkspaceRepairSummaryConsumptionNextAction,
+  type WorkspaceRepairSummaryConsumptionReport
+} from './workspace-repair-summary-consumption.js';
+
+export {
+  buildFalsePositiveRegressionCatalog,
+  falsePositiveRegressionCatalogContract,
+  validateFalsePositiveRegressionCatalog,
+  type BuildFalsePositiveRegressionCatalogInput,
+  type FalsePositiveExpectedClassification,
+  type FalsePositiveExpectedFindingSnapshot,
+  type FalsePositiveMaintainerDecision,
+  type FalsePositiveRegressionCatalog,
+  type FalsePositiveRegressionCatalogBoundary,
+  type FalsePositiveRegressionCatalogContract,
+  type FalsePositiveRegressionCatalogEntry,
+  type FalsePositiveRegressionCatalogFixtureCategory,
+  type FalsePositiveRegressionCatalogReview,
+  type FalsePositiveRegressionCatalogValidation,
+  type FalsePositiveRisk
+} from './false-positive-catalog.js';
+
+export {
+  buildFalsePositiveRegressionCatalogArtifactBundle,
+  falsePositiveRegressionCatalogHelpText,
+  formatFalsePositiveRegressionCatalogMarkdown,
+  isDirectRun as isFalsePositiveRegressionCatalogDirectRun,
+  isFalsePositiveRegressionCatalogHelpRequest,
+  main as runFalsePositiveRegressionCatalogCli,
+  parseFalsePositiveRegressionCatalogArgs,
+  runFalsePositiveRegressionCatalogArtifacts,
+  type FalsePositiveRegressionCatalogArtifactBundle,
+  type FalsePositiveRegressionCatalogArtifactDescriptor,
+  type FalsePositiveRegressionCatalogCliOptions,
+  type FalsePositiveRegressionCatalogRunInput,
+  type FalsePositiveRegressionCatalogRunResult
+} from './run-false-positive-catalog.js';
+
+export {
+  falsePositiveRegressionCatalogConsumptionHelpText,
+  formatFalsePositiveRegressionCatalogConsumptionMarkdown,
+  isDirectRun as isFalsePositiveRegressionCatalogConsumptionDirectRun,
+  isFalsePositiveRegressionCatalogConsumptionHelpRequest,
+  main as runFalsePositiveRegressionCatalogConsumptionCli,
+  parseFalsePositiveRegressionCatalogConsumptionArgs,
+  runFalsePositiveRegressionCatalogConsumptionValidation,
+  validateFalsePositiveRegressionCatalogConsumptionArtifacts,
+  type FalsePositiveRegressionCatalogConsumptionCheck,
+  type FalsePositiveRegressionCatalogConsumptionCheckStatus,
+  type FalsePositiveRegressionCatalogConsumptionCliOptions,
+  type FalsePositiveRegressionCatalogConsumptionRunInput,
+  type FalsePositiveRegressionCatalogConsumptionRunResult,
+  type FalsePositiveRegressionCatalogConsumptionValidationReport
+} from './run-false-positive-catalog-consumption.js';
+
+export {
+  buildFalsePositiveDetectorCalibrationContract,
+  falsePositiveDetectorCalibrationContractHelpText,
+  formatFalsePositiveDetectorCalibrationContractMarkdown,
+  isDirectRun as isFalsePositiveDetectorCalibrationContractDirectRun,
+  isFalsePositiveDetectorCalibrationContractHelpRequest,
+  main as runFalsePositiveDetectorCalibrationContractCli,
+  parseFalsePositiveDetectorCalibrationContractArgs,
+  runFalsePositiveDetectorCalibrationContractArtifacts,
+  validateFalsePositiveDetectorCalibrationContract,
+  type FalsePositiveDetectorCalibrationContract,
+  type FalsePositiveDetectorCalibrationContractBoundary,
+  type FalsePositiveDetectorCalibrationContractCliOptions,
+  type FalsePositiveDetectorCalibrationContractRunInput,
+  type FalsePositiveDetectorCalibrationContractRunResult,
+  type FalsePositiveDetectorCalibrationContractValidation,
+  type FalsePositiveDetectorCalibrationProposedAction,
+  type FalsePositiveDetectorCalibrationQuestion
+} from './run-false-positive-detector-calibration-contract.js';
+
+export {
+  falsePositiveDetectorCalibrationContractConsumptionHelpText,
+  formatFalsePositiveDetectorCalibrationContractConsumptionMarkdown,
+  isDirectRun as isFalsePositiveDetectorCalibrationContractConsumptionDirectRun,
+  isFalsePositiveDetectorCalibrationContractConsumptionHelpRequest,
+  main as runFalsePositiveDetectorCalibrationContractConsumptionCli,
+  parseFalsePositiveDetectorCalibrationContractConsumptionArgs,
+  runFalsePositiveDetectorCalibrationContractConsumptionValidation,
+  validateFalsePositiveDetectorCalibrationContractConsumptionArtifacts,
+  type FalsePositiveDetectorCalibrationContractConsumptionCheck,
+  type FalsePositiveDetectorCalibrationContractConsumptionCheckStatus,
+  type FalsePositiveDetectorCalibrationContractConsumptionCliOptions,
+  type FalsePositiveDetectorCalibrationContractConsumptionRunInput,
+  type FalsePositiveDetectorCalibrationContractConsumptionRunResult,
+  type FalsePositiveDetectorCalibrationContractConsumptionValidationReport
+} from './run-false-positive-detector-calibration-contract-consumption.js';
+
+export {
   buildPackageJsonManifestCheck,
   buildPlaceholderRepoRootCheck,
   buildPyprojectTomlManifestCheck,
@@ -429,6 +545,20 @@ export {
 } from './run-project-intelligence-maintainer-decision.js';
 
 export {
+  autopilotProgressConsistencyHelpText,
+  isAutopilotProgressConsistencyHelpRequest,
+  isDirectRun as isAutopilotProgressConsistencyDirectRun,
+  main as runAutopilotProgressConsistencyCli,
+  parseAutopilotProgressConsistencyArgs,
+  runAutopilotProgressConsistency,
+  type AutopilotProgressConsistencyCheck,
+  type AutopilotProgressConsistencyCliOptions,
+  type AutopilotProgressConsistencyGoal,
+  type AutopilotProgressConsistencyReport,
+  type AutopilotProgressConsistencyRunInput
+} from './run-autopilot-progress-consistency.js';
+
+export {
   formatProjectIntelligenceControlledRemediationPlanMarkdown,
   isDirectRun as isProjectIntelligenceControlledRemediationPlanDirectRun,
   isProjectIntelligenceControlledRemediationPlanHelpRequest,
@@ -442,6 +572,57 @@ export {
   type ProjectIntelligenceControlledRemediationPlanRunInput,
   type ProjectIntelligenceControlledRemediationPlanRunResult
 } from './run-project-intelligence-controlled-remediation-plan.js';
+
+export {
+  buildProjectIntelligenceAgentContext,
+  formatProjectIntelligenceAgentContextMarkdown,
+  isDirectRun as isProjectIntelligenceAgentContextDirectRun,
+  isProjectIntelligenceAgentContextHelpRequest,
+  main as runProjectIntelligenceAgentContextCli,
+  parseProjectIntelligenceAgentContextArgs,
+  projectIntelligenceAgentContextHelpText,
+  runProjectIntelligenceAgentContext,
+  type ProjectIntelligenceAgentContext,
+  type ProjectIntelligenceAgentContextCliOptions,
+  type ProjectIntelligenceAgentContextRunInput,
+  type ProjectIntelligenceAgentContextRunResult
+} from './run-project-intelligence-agent-context.js';
+
+export {
+  createProjectIntelligenceWatchController,
+  isDirectRun as isProjectIntelligenceWatchDirectRun,
+  isProjectIntelligenceWatchHelpRequest,
+  main as runProjectIntelligenceWatchCli,
+  parseProjectIntelligenceWatchArgs,
+  projectIntelligenceWatchHelpText,
+  runProjectIntelligenceWatch,
+  shouldRefreshProjectIntelligencePath,
+  type ProjectIntelligenceWatchCliOptions,
+  type ProjectIntelligenceWatchController,
+  type ProjectIntelligenceWatchRefresh,
+  type ProjectIntelligenceWatchRefreshInput,
+  type ProjectIntelligenceWatchRefreshResult,
+  type ProjectIntelligenceWatchRunInput,
+  type ProjectIntelligenceWatchRunResult,
+  type ProjectIntelligenceWatchStatus,
+  type ProjectIntelligenceWatchStatusState
+} from './run-project-intelligence-watch.js';
+
+export {
+  buildProjectIntelligenceWatchHandoff,
+  formatProjectIntelligenceWatchHandoffMarkdown,
+  isProjectIntelligenceWatchHandoffHelpRequest,
+  main as runProjectIntelligenceWatchHandoffCli,
+  parseProjectIntelligenceWatchHandoffArgs,
+  projectIntelligenceWatchHandoffHelpText,
+  runProjectIntelligenceWatchHandoff,
+  type ProjectIntelligenceWatchHandoff,
+  type ProjectIntelligenceWatchHandoffArtifact,
+  type ProjectIntelligenceWatchHandoffChecklistItem,
+  type ProjectIntelligenceWatchHandoffCliOptions,
+  type ProjectIntelligenceWatchHandoffRunInput,
+  type ProjectIntelligenceWatchHandoffRunResult
+} from './run-project-intelligence-watch-handoff.js';
 
 export {
   isDirectRun as isUserAcceptanceDirectRun,

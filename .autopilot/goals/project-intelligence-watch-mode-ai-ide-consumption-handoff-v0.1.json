@@ -1,0 +1,73 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-watch-mode-ai-ide-consumption-handoff-v0.1",
+  "status": "completed",
+  "objective": "Produce and validate a local AI IDE consumption handoff for Project Intelligence watch mode, so Codex / AI IDE sessions know how to run `pnpm project:intelligence:watch`, read `project-intelligence-agent-context`, inspect `project-intelligence-watch-status`, confirm freshness, and stop the foreground watcher without hosted services, telemetry, cloud sync, or target repo writes.",
+  "source_spec": "docs/operations/project-intelligence-watch-mode-local-smoke-validation-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite"
+  ],
+  "acceptance": [
+    "Define the AI IDE read order for watch-generated Project Intelligence artifacts.",
+    "Generate or document a local handoff package that includes command, status path, agent context path, freshness checks, stop instructions, and non-authorization boundary.",
+    "Add contract tests proving the handoff points to existing local artifacts and does not imply hosted dashboard, telemetry, cloud sync, public release, or target repo writes.",
+    "Cascade the handoff contract into PRD, SPEC, PLAN, Project Intelligence spec/architecture, testing strategy, acceptance checklist, decision log, dev log, and .autopilot progress.",
+    "Run focused tests and repository quality gates before completion."
+  ],
+  "summary": {
+    "operation_record": "docs/operations/project-intelligence-watch-mode-ai-ide-consumption-handoff-v0.1.md",
+    "script": "pnpm project:intelligence:watch-handoff",
+    "json_output": "artifacts/project-graph/project-intelligence-watch-handoff.json",
+    "markdown_output": "artifacts/project-graph/project-intelligence-watch-handoff.md",
+    "schema": "repoassure.project-intelligence-watch-handoff@1",
+    "read_order": [
+      "project-intelligence-watch-handoff.json",
+      "project-intelligence-watch-status.json",
+      "project-intelligence-agent-context.json",
+      "project-intelligence-agent-context.md",
+      "project-intelligence-snapshot.json",
+      ".autopilot/progress/snapshot.json",
+      ".autopilot/goals/index.json",
+      ".autopilot/goals/<active-goal>.json",
+      "docs/PLAN.md",
+      "docs/SPEC.md",
+      "docs/PRD.md"
+    ],
+    "freshness_checklist": [
+      "watch_status_schema",
+      "watch_refresh_count",
+      "watch_commands",
+      "agent_context_schema",
+      "watch_boundary",
+      "agent_context_boundary"
+    ],
+    "boundary": {
+      "local_only": true,
+      "daemonized": false,
+      "hosted_dashboard": false,
+      "telemetry": false,
+      "cloud_sync": false,
+      "target_repo_writes": false
+    },
+    "verification": [
+      "pnpm vitest run tests/unit/project-intelligence-watch-handoff.test.ts",
+      "pnpm build:acceptance",
+      "pnpm vitest run tests/unit/acceptance-package.test.ts tests/unit/project-structure.test.ts",
+      "pnpm project:intelligence:watch-handoff"
+    ]
+  },
+  "next_goal_id": "project-intelligence-watch-mode-end-to-end-local-fixture-validation-v0.1"
+}

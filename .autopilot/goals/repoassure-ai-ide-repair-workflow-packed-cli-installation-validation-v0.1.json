@@ -1,0 +1,51 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-ai-ide-repair-workflow-packed-cli-installation-validation-v0.1",
+  "title": "RepoAssure AI IDE Repair Workflow Packed CLI Installation Validation v0.1",
+  "status": "completed",
+  "objective": "Validate a locally packed RepoAssure distribution in an isolated temporary consumer, including package contents, hardening bin resolution, repair command help and a no-write fixture smoke, without publishing npm.",
+  "source_spec": "docs/operations/repoassure-ai-ide-repair-workflow-installed-cli-real-campaign-validation-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "detector_confidence_threshold_change",
+    "acceptance_policy_change",
+    "target_repo_write",
+    "automatic_patch_application",
+    "mcp_tool_registry_expansion",
+    "website_design_system_rewrite",
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "customer_contact",
+    "pricing_change",
+    "spend_change"
+  ],
+  "acceptance": [
+    "Create a local package tarball without publishing it and inspect the packed file manifest for required CLI and runtime files.",
+    "Install the local tarball in an isolated temporary consumer and invoke the resolved hardening bin as an external process.",
+    "Validate repair command help plus a bounded no-write fixture smoke without relying on the source workspace node_modules layout.",
+    "Prove no target repository source change, branch, commit, push, pull request, deployment, or publication occurs.",
+    "Cascade package-installation evidence through operations, testing, acceptance, canonical docs, logs, and Autopilot state."
+  ],
+  "conclusion": "packed_cli_installed_and_validated_without_publication_or_target_writes",
+  "completed_at": "2026-07-24",
+  "next_goal_id": "repoassure-product-completion-gap-audit-refresh-v0.4",
+  "summary": {
+    "operation_record": "docs/operations/repoassure-ai-ide-repair-workflow-packed-cli-installation-validation-v0.1.md",
+    "integration_test": "tests/integration/packed-cli-installation.test.ts",
+    "tarball": "hardening-mcp-0.1.0.tgz",
+    "tarball_installation": "passed",
+    "installed_bin": "node_modules/.bin/hardening",
+    "source_workspace_node_modules_used": false,
+    "target_repo_writes": false,
+    "npm_published": false
+  }
+}

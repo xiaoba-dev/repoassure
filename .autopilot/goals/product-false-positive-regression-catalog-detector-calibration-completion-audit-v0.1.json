@@ -1,0 +1,67 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "product-false-positive-regression-catalog-detector-calibration-completion-audit-v0.1",
+  "status": "completed",
+  "objective": "Audit and close the current local-only false-positive detector calibration slice, covering planning, contract generation, contract consumption validation, generated local artifacts, package exports, tests, documentation cascade, and no runtime detector behavior change / no target repo write boundary.",
+  "source_spec": "docs/operations/product-false-positive-regression-catalog-detector-calibration-contract-consumption-validation-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "detector_confidence_threshold_change",
+    "acceptance_policy_change"
+  ],
+  "acceptance": [
+    "Audit detector calibration planning, contract generation, and contract consumption validation as one local-only product slice.",
+    "Confirm generated calibration contract and consumption validation artifacts are local, ignored, AI IDE readable, and redacted.",
+    "Confirm no runtime detector behavior change, finding suppression, automatic severity downgrade, detector confidence threshold change, acceptance policy change, or target repo write was implemented.",
+    "Cascade completion-audit evidence into PRD, SPEC, PLAN, testing strategy, acceptance checklist, decision log, dev log, and autopilot progress."
+  ],
+  "completed_at": "2026-07-23T11:20:00.000+08:00",
+  "conclusion": "complete_for_current_local_only_detector_calibration_slice",
+  "summary": {
+    "operation_record": "docs/operations/product-false-positive-regression-catalog-detector-calibration-completion-audit-v0.1.md",
+    "audited_sequence": [
+      "detector calibration planning",
+      "detector calibration contract generation",
+      "detector calibration contract consumption validation"
+    ],
+    "confirmed_artifacts": [
+      "artifacts/project-graph/false-positive-detector-calibration-contract.json",
+      "artifacts/project-graph/false-positive-detector-calibration-contract.md",
+      "artifacts/project-graph/false-positive-detector-calibration-contract-consumption-validation.json",
+      "artifacts/project-graph/false-positive-detector-calibration-contract-consumption-validation.md"
+    ],
+    "checks_passed": 13,
+    "boundary": {
+      "local_only": true,
+      "runtime_detection_behavior_change": false,
+      "finding_suppression": false,
+      "automatic_severity_downgrade": false,
+      "detector_confidence_threshold_change": false,
+      "acceptance_policy_change": false,
+      "target_repo_writes": false,
+      "hosted_dashboard": false,
+      "cloud_sync": false,
+      "telemetry": false,
+      "deployment": false,
+      "public_release": false
+    },
+    "selected_next_goal_id": "product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1"
+  },
+  "next_goal_id": "product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1"
+}

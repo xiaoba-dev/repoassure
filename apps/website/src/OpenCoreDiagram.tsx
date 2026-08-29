@@ -21,10 +21,12 @@ const nodeLayout = [
 export function OpenCoreDiagram({ copy }: OpenCoreDiagramProps) {
   return (
     <figure className="open-core-diagram" data-testid="open-core-diagram" aria-label={copy.label}>
-      <svg className="open-core-diagram-svg" viewBox="0 0 520 148" role="img" aria-hidden="true">
+      {/* The last node sits at x=420 and is 112 wide, so the drawing needs 532px plus a
+          little breathing room. A 520 viewBox clipped its right edge. */}
+      <svg className="open-core-diagram-svg" viewBox="0 0 544 148" role="img" aria-hidden="true">
         <defs>
           <marker id="open-core-arrow" markerHeight="8" markerWidth="8" orient="auto" refX="6" refY="4">
-            <path d="M0,0 L8,4 L0,8 Z" fill="#526071" />
+            <path d="M0,0 L8,4 L0,8 Z" fill="var(--border-strong)" />
           </marker>
         </defs>
         {copy.nodes.slice(0, -1).map((node, index) => {
@@ -37,7 +39,7 @@ export function OpenCoreDiagram({ copy }: OpenCoreDiagramProps) {
               x2={end.x - 8}
               y1={start.y + 24}
               y2={end.y + 24}
-              stroke="#94a3b8"
+              stroke="var(--border-strong)"
               strokeWidth="1.5"
               markerEnd="url(#open-core-arrow)"
             />
@@ -47,11 +49,11 @@ export function OpenCoreDiagram({ copy }: OpenCoreDiagramProps) {
           const position = nodeLayout[index]!;
           return (
             <g key={node.id} transform={`translate(${position.x} ${position.y})`}>
-              <rect fill="#f8fafc" height="48" rx="10" stroke="#cbd5e1" strokeWidth="1.5" width="112" />
-              <text fill="#111827" fontSize="12" fontWeight="700" x="56" y="22" textAnchor="middle">
+              <rect fill="var(--surface-default)" height="48" rx="10" stroke="var(--border-default)" strokeWidth="1.5" width="112" />
+              <text fill="var(--fg-default)" fontSize="12" fontWeight="700" x="56" y="22" textAnchor="middle">
                 {node.title}
               </text>
-              <text fill="#526071" fontSize="10" x="56" y="38" textAnchor="middle">
+              <text fill="var(--fg-muted)" fontSize="10" x="56" y="38" textAnchor="middle">
                 {node.caption}
               </text>
             </g>

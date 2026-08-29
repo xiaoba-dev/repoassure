@@ -1,0 +1,96 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-watch-mode-completion-audit-v0.1",
+  "status": "completed",
+  "objective": "Audit the completed Project Intelligence watch mode sequence against PRD, SPEC, PLAN, operator docs, generated artifacts, tests, and boundaries, then decide whether the watch-mode product slice is complete or which remaining gap should become the next automatic Codex goal.",
+  "source_spec": "docs/operations/project-intelligence-watch-mode-recovery-ux-real-workspace-smoke-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite"
+  ],
+  "acceptance": [
+    "Audit the watch mode runtime, generated artifacts, operator playbook, recovery UX, and tests against PRD/SPEC/PLAN.",
+    "Record whether Project Intelligence watch mode is complete for the current local-only product slice.",
+    "If complete, select the next safe automatic product-core goal from docs/PLAN.md > docs/SPEC.md > docs/PRD.md.",
+    "Cascade the completion audit result into operations docs, README, PRD, SPEC, PLAN, testing strategy, acceptance checklist, logs, and .autopilot progress."
+  ],
+  "summary": {
+    "operation_record": "docs/operations/project-intelligence-watch-mode-completion-audit-v0.1.md",
+    "conclusion": "complete_for_current_local_only_slice",
+    "audited_scope": [
+      "runtime",
+      "generated_artifacts",
+      "operator_playbook",
+      "recovery_ux",
+      "tests",
+      "docs",
+      "boundaries"
+    ],
+    "runtime_surface": [
+      "packages/acceptance/src/run-project-intelligence-watch.ts",
+      "packages/acceptance/src/run-project-intelligence-watch-handoff.ts",
+      "pnpm project:intelligence:watch",
+      "pnpm project:intelligence:watch-handoff"
+    ],
+    "tests": [
+      "tests/unit/project-intelligence-watch.test.ts",
+      "tests/integration/project-intelligence-watch-smoke.test.ts",
+      "tests/integration/project-intelligence-watch-e2e-fixture.test.ts",
+      "tests/unit/project-intelligence-watch-handoff.test.ts",
+      "tests/unit/project-intelligence-watch-operator-playbook.test.ts",
+      "tests/integration/project-intelligence-watch-recovery-ux-smoke.test.ts",
+      "tests/unit/project-structure.test.ts"
+    ],
+    "generated_artifacts": {
+      "status": "artifacts/project-graph/project-intelligence-watch-status.json",
+      "handoff_json": "artifacts/project-graph/project-intelligence-watch-handoff.json",
+      "handoff_markdown": "artifacts/project-graph/project-intelligence-watch-handoff.md",
+      "freshness_checks": "6/6 passed",
+      "recovery_status": "not_needed"
+    },
+    "boundary": {
+      "local_only": true,
+      "daemonized": false,
+      "hosted_dashboard": false,
+      "telemetry": false,
+      "cloud_sync": false,
+      "target_repo_writes": false,
+      "manual_generated_artifact_edits": false
+    },
+    "remaining_non_goals": [
+      "public_source_release",
+      "npm_publication",
+      "github_release",
+      "production_marketing_launch",
+      "team_cloud",
+      "hosted_dashboard",
+      "enterprise_integrations",
+      "website_design_system_follow_up"
+    ],
+    "selected_next_goal_id": "product-false-positive-regression-catalog-planning-v0.1",
+    "verification": [
+      "pnpm vitest run tests/unit/project-structure.test.ts",
+      "pnpm project:intelligence:watch -- --once",
+      "pnpm project:intelligence:watch-handoff",
+      "pnpm repo:hygiene",
+      "pnpm release:check",
+      "pnpm typecheck",
+      "pnpm lint",
+      "pnpm test",
+      "pnpm goal:audit"
+    ]
+  },
+  "next_goal_id": "product-false-positive-regression-catalog-planning-v0.1"
+}

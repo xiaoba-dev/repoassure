@@ -1,6 +1,6 @@
 {
   "schema": "project-autopilot/goal-index@1",
-  "active_goal_id": null,
+  "active_goal_id": "repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1",
   "goals": [
     {
       "id": "public-website-p3-pixel-qa-mobile-responsive-polish-v0.1",
@@ -111,6 +111,466 @@
       "id": "project-intelligence-console-redesign-v0.1",
       "path": ".autopilot/goals/project-intelligence-console-redesign-v0.1.json",
       "status": "completed"
+    },
+    {
+      "id": "project-intelligence-detection-rule-calibration-v0.1",
+      "path": ".autopilot/goals/project-intelligence-detection-rule-calibration-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-product-completion-gap-audit-v0.1",
+      "path": ".autopilot/goals/repoassure-product-completion-gap-audit-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-agent-context-export-v0.1",
+      "path": ".autopilot/goals/project-intelligence-agent-context-export-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-watch-mode-planning-v0.1",
+      "path": ".autopilot/goals/project-intelligence-watch-mode-planning-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-watch-mode-implementation-v0.1",
+      "path": ".autopilot/goals/project-intelligence-watch-mode-implementation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-watch-mode-local-smoke-validation-v0.1",
+      "path": ".autopilot/goals/project-intelligence-watch-mode-local-smoke-validation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-watch-mode-ai-ide-consumption-handoff-v0.1",
+      "path": ".autopilot/goals/project-intelligence-watch-mode-ai-ide-consumption-handoff-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-watch-mode-end-to-end-local-fixture-validation-v0.1",
+      "path": ".autopilot/goals/project-intelligence-watch-mode-end-to-end-local-fixture-validation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-watch-mode-operator-playbook-v0.1",
+      "path": ".autopilot/goals/project-intelligence-watch-mode-operator-playbook-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-watch-mode-operator-playbook-consumption-validation-v0.1",
+      "path": ".autopilot/goals/project-intelligence-watch-mode-operator-playbook-consumption-validation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-watch-mode-recovery-command-ux-v0.1",
+      "path": ".autopilot/goals/project-intelligence-watch-mode-recovery-command-ux-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-watch-mode-recovery-ux-real-workspace-smoke-v0.1",
+      "path": ".autopilot/goals/project-intelligence-watch-mode-recovery-ux-real-workspace-smoke-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "project-intelligence-watch-mode-completion-audit-v0.1",
+      "path": ".autopilot/goals/project-intelligence-watch-mode-completion-audit-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "product-false-positive-regression-catalog-planning-v0.1",
+      "path": ".autopilot/goals/product-false-positive-regression-catalog-planning-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "product-false-positive-regression-catalog-contract-implementation-v0.1",
+      "path": ".autopilot/goals/product-false-positive-regression-catalog-contract-implementation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "product-false-positive-regression-catalog-artifact-generation-v0.1",
+      "path": ".autopilot/goals/product-false-positive-regression-catalog-artifact-generation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "product-false-positive-regression-catalog-consumption-validation-v0.1",
+      "path": ".autopilot/goals/product-false-positive-regression-catalog-consumption-validation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "product-false-positive-regression-catalog-completion-audit-v0.1",
+      "path": ".autopilot/goals/product-false-positive-regression-catalog-completion-audit-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "product-false-positive-regression-catalog-real-fixture-expansion-v0.1",
+      "path": ".autopilot/goals/product-false-positive-regression-catalog-real-fixture-expansion-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "product-false-positive-regression-catalog-detector-calibration-planning-v0.1",
+      "path": ".autopilot/goals/product-false-positive-regression-catalog-detector-calibration-planning-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "product-false-positive-regression-catalog-detector-calibration-contract-v0.1",
+      "path": ".autopilot/goals/product-false-positive-regression-catalog-detector-calibration-contract-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "product-false-positive-regression-catalog-detector-calibration-contract-consumption-validation-v0.1",
+      "path": ".autopilot/goals/product-false-positive-regression-catalog-detector-calibration-contract-consumption-validation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "product-false-positive-regression-catalog-detector-calibration-completion-audit-v0.1",
+      "path": ".autopilot/goals/product-false-positive-regression-catalog-detector-calibration-completion-audit-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1",
+      "path": ".autopilot/goals/product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-product-applicability-boundary-documentation-cascade-v0.1",
+      "path": ".autopilot/goals/repoassure-product-applicability-boundary-documentation-cascade-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1",
+      "path": ".autopilot/goals/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "product-false-positive-regression-catalog-detector-calibration-maintainer-decision-follow-up-v0.1",
+      "path": ".autopilot/goals/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-follow-up-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-product-backlog-reprioritization-after-detector-decision-block-v0.1",
+      "path": ".autopilot/goals/repoassure-product-backlog-reprioritization-after-detector-decision-block-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-product-completion-gap-audit-refresh-v0.2",
+      "path": ".autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.2.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-canonical-product-narrative-freshness-cleanup-v0.1",
+      "path": ".autopilot/goals/repoassure-canonical-product-narrative-freshness-cleanup-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-autopilot-progress-consistency-guard-v0.1",
+      "path": ".autopilot/goals/repoassure-autopilot-progress-consistency-guard-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-product-completion-gap-audit-refresh-v0.3",
+      "path": ".autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.3.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-ai-ide-repair-workflow-cli-productization-v0.1",
+      "path": ".autopilot/goals/repoassure-ai-ide-repair-workflow-cli-productization-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-ai-ide-repair-workflow-installed-cli-real-campaign-validation-v0.1",
+      "path": ".autopilot/goals/repoassure-ai-ide-repair-workflow-installed-cli-real-campaign-validation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-ai-ide-repair-workflow-packed-cli-installation-validation-v0.1",
+      "path": ".autopilot/goals/repoassure-ai-ide-repair-workflow-packed-cli-installation-validation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-product-completion-gap-audit-refresh-v0.4",
+      "path": ".autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.4.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-packed-mcp-server-installation-and-protocol-validation-v0.1",
+      "path": ".autopilot/goals/repoassure-packed-mcp-server-installation-and-protocol-validation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-product-completion-gap-audit-refresh-v0.5",
+      "path": ".autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.5.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-ai-ide-repair-workflow-mcp-convergence-decision-and-contract-v0.1",
+      "path": ".autopilot/goals/repoassure-ai-ide-repair-workflow-mcp-convergence-decision-and-contract-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-ai-ide-repair-handoff-mcp-tool-implementation-v0.1",
+      "path": ".autopilot/goals/repoassure-ai-ide-repair-handoff-mcp-tool-implementation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-ai-ide-repair-execution-preview-mcp-tool-implementation-v0.1",
+      "path": ".autopilot/goals/repoassure-ai-ide-repair-execution-preview-mcp-tool-implementation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-ai-ide-repair-patch-plan-mcp-tool-implementation-v0.1",
+      "path": ".autopilot/goals/repoassure-ai-ide-repair-patch-plan-mcp-tool-implementation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-ai-ide-repair-evidence-package-mcp-tool-implementation-v0.1",
+      "path": ".autopilot/goals/repoassure-ai-ide-repair-evidence-package-mcp-tool-implementation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-ai-ide-repair-workflow-mcp-convergence-completion-audit-v0.1",
+      "path": ".autopilot/goals/repoassure-ai-ide-repair-workflow-mcp-convergence-completion-audit-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-product-completion-gap-audit-refresh-v0.6",
+      "path": ".autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.6.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-multi-repo-workspace-repair-summary-planning-v0.1",
+      "path": ".autopilot/goals/repoassure-multi-repo-workspace-repair-summary-planning-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-multi-repo-workspace-repair-summary-contract-implementation-v0.1",
+      "path": ".autopilot/goals/repoassure-multi-repo-workspace-repair-summary-contract-implementation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-multi-repo-workspace-repair-summary-ai-ide-consumption-validation-v0.1",
+      "path": ".autopilot/goals/repoassure-multi-repo-workspace-repair-summary-ai-ide-consumption-validation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-multi-repo-workspace-repair-summary-completion-audit-v0.1",
+      "path": ".autopilot/goals/repoassure-multi-repo-workspace-repair-summary-completion-audit-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-product-completion-gap-audit-refresh-v0.7",
+      "path": ".autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.7.json",
+      "status": "completed"
+    },
+    {
+      "id": "public-release-manual-decision-input-review-v0.2",
+      "path": ".autopilot/goals/public-release-manual-decision-input-review-v0.2.json",
+      "status": "completed"
+    },
+    {
+      "id": "public-repository-state-and-release-boundary-reconciliation-v0.1",
+      "path": ".autopilot/goals/public-repository-state-and-release-boundary-reconciliation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "public-git-history-personal-identifier-remediation-planning-v0.1",
+      "path": ".autopilot/goals/public-git-history-personal-identifier-remediation-planning-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "public-git-history-personal-identifier-remediation-maintainer-decision-recording-v0.1",
+      "path": ".autopilot/goals/public-git-history-personal-identifier-remediation-maintainer-decision-recording-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-product-completion-gap-audit-refresh-v0.8",
+      "path": ".autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.8.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-final-product-acceptance-closure-campaign-v0.1",
+      "path": ".autopilot/goals/repoassure-final-product-acceptance-closure-campaign-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-final-product-acceptance-maintainer-decision-recording-v0.1",
+      "path": ".autopilot/goals/repoassure-final-product-acceptance-maintainer-decision-recording-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-representative-multi-mode-acceptance-campaign-planning-v0.1",
+      "path": ".autopilot/goals/repoassure-representative-multi-mode-acceptance-campaign-planning-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-representative-multi-mode-acceptance-target-and-execution-authorization-decision-recording-v0.1",
+      "path": ".autopilot/goals/repoassure-representative-multi-mode-acceptance-target-and-execution-authorization-decision-recording-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-representative-multi-mode-acceptance-target-readiness-and-acquisition-authorization-package-v0.1",
+      "path": ".autopilot/goals/repoassure-representative-multi-mode-acceptance-target-readiness-and-acquisition-authorization-package-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-representative-multi-mode-acceptance-target-acquisition-authorization-maintainer-decision-recording-v0.1",
+      "path": ".autopilot/goals/repoassure-representative-multi-mode-acceptance-target-acquisition-authorization-maintainer-decision-recording-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-product-backlog-reprioritization-after-representative-acquisition-defer-v0.1",
+      "path": ".autopilot/goals/repoassure-product-backlog-reprioritization-after-representative-acquisition-defer-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-product-completion-gap-audit-refresh-v0.9",
+      "path": ".autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.9.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-canonical-product-narrative-freshness-cleanup-v0.2",
+      "path": ".autopilot/goals/repoassure-canonical-product-narrative-freshness-cleanup-v0.2.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-remaining-gated-product-work-direction-preparation-v0.1",
+      "path": ".autopilot/goals/repoassure-remaining-gated-product-work-direction-preparation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-remaining-gated-product-work-maintainer-direction-decision-recording-v0.1",
+      "path": ".autopilot/goals/repoassure-remaining-gated-product-work-maintainer-direction-decision-recording-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-false-positive-detector-runtime-calibration-decision-reopening-preparation-v0.1",
+      "path": ".autopilot/goals/repoassure-false-positive-detector-runtime-calibration-decision-reopening-preparation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-false-positive-detector-runtime-calibration-per-question-maintainer-decision-recording-v0.1",
+      "path": ".autopilot/goals/repoassure-false-positive-detector-runtime-calibration-per-question-maintainer-decision-recording-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-false-positive-detector-runtime-calibration-bounded-design-planning-v0.1",
+      "path": ".autopilot/goals/repoassure-false-positive-detector-runtime-calibration-bounded-design-planning-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-false-positive-detector-runtime-calibration-implementation-authorization-intake-v0.1",
+      "path": ".autopilot/goals/repoassure-false-positive-detector-runtime-calibration-implementation-authorization-intake-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-false-positive-detector-runtime-calibration-implementation-authorization-maintainer-decision-recording-v0.1",
+      "path": ".autopilot/goals/repoassure-false-positive-detector-runtime-calibration-implementation-authorization-maintainer-decision-recording-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-conditional-dead-control-calibration-implementation-gate-evidence-preparation-v0.1",
+      "path": ".autopilot/goals/repoassure-conditional-dead-control-calibration-implementation-gate-evidence-preparation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-conditional-dead-control-calibration-fixture-evidence-readiness-and-authorization-intake-v0.1",
+      "path": ".autopilot/goals/repoassure-conditional-dead-control-calibration-fixture-evidence-readiness-and-authorization-intake-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-conditional-dead-control-calibration-fixture-evidence-readiness-and-authorization-maintainer-decision-recording-v0.1",
+      "path": ".autopilot/goals/repoassure-conditional-dead-control-calibration-fixture-evidence-readiness-and-authorization-maintainer-decision-recording-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-conditional-dead-control-calibration-synthetic-fixture-bounded-planning-v0.1",
+      "path": ".autopilot/goals/repoassure-conditional-dead-control-calibration-synthetic-fixture-bounded-planning-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-conditional-dead-control-calibration-synthetic-fixture-implementation-authorization-intake-v0.1",
+      "path": ".autopilot/goals/repoassure-conditional-dead-control-calibration-synthetic-fixture-implementation-authorization-intake-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-conditional-dead-control-calibration-synthetic-fixture-implementation-authorization-maintainer-decision-recording-v0.1",
+      "path": ".autopilot/goals/repoassure-conditional-dead-control-calibration-synthetic-fixture-implementation-authorization-maintainer-decision-recording-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-conditional-dead-control-calibration-synthetic-fixture-bounded-implementation-v0.1",
+      "path": ".autopilot/goals/repoassure-conditional-dead-control-calibration-synthetic-fixture-bounded-implementation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-conditional-dead-control-calibration-synthetic-fixture-manual-review-package-v0.1",
+      "path": ".autopilot/goals/repoassure-conditional-dead-control-calibration-synthetic-fixture-manual-review-package-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-conditional-dead-control-calibration-synthetic-fixture-manual-gate-maintainer-decision-recording-v0.1",
+      "path": ".autopilot/goals/repoassure-conditional-dead-control-calibration-synthetic-fixture-manual-gate-maintainer-decision-recording-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-conditional-dead-control-calibration-bounded-detector-implementation-authorization-intake-v0.1",
+      "path": ".autopilot/goals/repoassure-conditional-dead-control-calibration-bounded-detector-implementation-authorization-intake-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-conditional-dead-control-calibration-bounded-detector-implementation-authorization-maintainer-decision-recording-v0.1",
+      "path": ".autopilot/goals/repoassure-conditional-dead-control-calibration-bounded-detector-implementation-authorization-maintainer-decision-recording-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-conditional-dead-control-calibration-bounded-detector-implementation-v0.1",
+      "path": ".autopilot/goals/repoassure-conditional-dead-control-calibration-bounded-detector-implementation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-conditional-dead-control-calibration-bounded-detector-implementation-completion-audit-v0.1",
+      "path": ".autopilot/goals/repoassure-conditional-dead-control-calibration-bounded-detector-implementation-completion-audit-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-conditional-dead-control-calibration-verification-evidence-reconciliation-v0.1",
+      "path": ".autopilot/goals/repoassure-conditional-dead-control-calibration-verification-evidence-reconciliation-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-product-completion-gap-audit-refresh-v0.10",
+      "path": ".autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.10.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-m1-open-evidence-kernel-contract-gap-planning-v0.1",
+      "path": ".autopilot/goals/repoassure-m1-open-evidence-kernel-contract-gap-planning-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-m1-open-evidence-kernel-candidate-boundary-maintainer-decision-intake-v0.1",
+      "path": ".autopilot/goals/repoassure-m1-open-evidence-kernel-candidate-boundary-maintainer-decision-intake-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-m1-open-evidence-kernel-candidate-boundary-maintainer-decision-recording-v0.1",
+      "path": ".autopilot/goals/repoassure-m1-open-evidence-kernel-candidate-boundary-maintainer-decision-recording-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-m1-open-evidence-kernel-candidate-boundary-contract-design-planning-v0.1",
+      "path": ".autopilot/goals/repoassure-m1-open-evidence-kernel-candidate-boundary-contract-design-planning-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-intake-v0.1",
+      "path": ".autopilot/goals/repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-intake-v0.1.json",
+      "status": "completed"
+    },
+    {
+      "id": "repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1",
+      "path": ".autopilot/goals/repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1.json",
+      "status": "ready_to_execute"
     }
   ],
   "deferred_goal_ids": [],
@@ -120,5 +580,5 @@
   "superseded_goal_ids": [
     "public-website-owner-visual-acceptance-p3-follow-up-triage-v0.1"
   ],
-  "last_updated_at": "2026-07-19T02:50:00.000+08:00"
+  "last_updated_at": "2026-08-03T19:16:00+08:00"
 }

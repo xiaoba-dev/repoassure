@@ -1,0 +1,79 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-product-completion-gap-audit-v0.1",
+  "status": "completed",
+  "objective": "Scan PRD, SPEC, PLAN, acceptance checklist, testing strategy, autopilot goal state, and current code to identify remaining product completion gaps, rank the next auto-executable goal, and keep all publish/deploy/customer/target-repo boundaries closed.",
+  "scope": [
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "docs/acceptance/checklists/acceptance-checklist-v0.1.md",
+    "docs/testing/strategy/test-strategy-v0.1.md",
+    ".autopilot/goals/index.json",
+    ".autopilot/progress/snapshot.json"
+  ],
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite"
+  ],
+  "acceptance": [
+    "Produce a ranked product-completion gap list grounded in current docs and code.",
+    "Separate already implemented, deferred, blocked, and auto-executable gaps.",
+    "Select exactly one next Codex goal unless no safe automatic goal remains.",
+    "Do not mutate target repositories, deploy, publish, or contact customers."
+  ],
+  "summary": {
+    "implemented_surfaces": [
+      "local_cli",
+      "mcp_server",
+      "run_scoped_evidence_bundles",
+      "ai_ide_repair_handoff",
+      "repair_execution",
+      "patch_plan",
+      "repair_evidence_package",
+      "browser_acceptance",
+      "python_cli_acceptance",
+      "project_intelligence_snapshot",
+      "project_intelligence_viewer",
+      "project_intelligence_adr_cascade_workflow",
+      "public_website",
+      "public_release_readiness_checks"
+    ],
+    "blocked_or_manual_gated": [
+      "public_source_release_execution",
+      "npm_publication",
+      "github_release",
+      "production_marketing_launch",
+      "private_preview_feedback_triage",
+      "team_cloud_hosted_dashboard",
+      "enterprise_integrations",
+      "website_design_system_follow_up"
+    ],
+    "safe_auto_executable_candidates": [
+      "project-intelligence-agent-context-export-v0.1",
+      "project-intelligence-watch-mode-planning-v0.1",
+      "product-false-positive-regression-catalog-planning-v0.1"
+    ],
+    "selected_next_goal_id": "project-intelligence-agent-context-export-v0.1"
+  },
+  "tests": [
+    "pnpm vitest run tests/unit/project-structure.test.ts",
+    "pnpm repo:hygiene",
+    "pnpm typecheck",
+    "pnpm lint",
+    "pnpm goal:audit",
+    "pnpm test"
+  ],
+  "next_goal_id": "project-intelligence-agent-context-export-v0.1"
+}

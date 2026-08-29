@@ -1,0 +1,79 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-canonical-product-narrative-freshness-cleanup-v0.1",
+  "status": "completed",
+  "objective": "Refresh canonical product narrative sections so PRD, SPEC, PLAN, README, and progress docs no longer present historical completed goals as the current next safe goal.",
+  "source_spec": "docs/operations/repoassure-product-completion-gap-audit-refresh-v0.2.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "detector_confidence_threshold_change",
+    "acceptance_policy_change"
+  ],
+  "acceptance": [
+    "Find canonical product narrative sections that still describe completed historical goals as the current next safe goal.",
+    "Rewrite stale current/next wording into historical completion summaries and point current execution to the latest active goal state.",
+    "Preserve detailed historical operation records without deleting evidence.",
+    "Do not alter runtime detector behavior, target repositories, deployment state, publication state, customer contact, pricing, or spend."
+  ],
+  "completed_at": "2026-07-24T08:20:00.000+08:00",
+  "conclusion": "canonical_product_narrative_freshness_cleaned",
+  "document_basis": [
+    "docs/operations/repoassure-canonical-product-narrative-freshness-cleanup-v0.1.md",
+    ".autopilot/progress/PROGRESS_SNAPSHOT.md",
+    ".autopilot/progress/snapshot.json",
+    "README.md",
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "docs/testing/strategy/test-strategy-v0.1.md",
+    "docs/acceptance/checklists/acceptance-checklist-v0.1.md",
+    "docs/logs/decision-log.md",
+    "docs/logs/dev-log.md"
+  ],
+  "summary": {
+    "operation_record": "docs/operations/repoassure-canonical-product-narrative-freshness-cleanup-v0.1.md",
+    "cleaned_surfaces": [
+      "README.md",
+      "docs/PRD.md",
+      "docs/SPEC.md",
+      "docs/PLAN.md",
+      ".autopilot/progress/PROGRESS_SNAPSHOT.md",
+      "docs/testing/strategy/test-strategy-v0.1.md"
+    ],
+    "preserved_historical_records": [
+      "docs/operations/",
+      "docs/logs/dev-log.md",
+      "docs/logs/decision-log.md"
+    ],
+    "stale_current_next_patterns_removed": [
+      "prd_legacy_selected_next_goal",
+      "spec_legacy_next_implementation_target",
+      "testing_strategy_stale_next_target",
+      "progress_latest_goal_currentness"
+    ],
+    "boundary": {
+      "runtime_detection_behavior_change": false,
+      "target_repo_writes": false,
+      "deployment": false,
+      "public_release": false,
+      "customer_contact": false,
+      "pricing_or_spend_change": false
+    }
+  },
+  "next_goal_id": "repoassure-autopilot-progress-consistency-guard-v0.1"
+}

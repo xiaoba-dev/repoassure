@@ -94,6 +94,38 @@
       "types": "./dist/redaction.d.ts",
       "default": "./dist/redaction.js"
     },
+    "./workspace-repair-summary": {
+      "types": "./dist/workspace-repair-summary.d.ts",
+      "default": "./dist/workspace-repair-summary.js"
+    },
+    "./workspace-repair-summary-consumption": {
+      "types": "./dist/workspace-repair-summary-consumption.d.ts",
+      "default": "./dist/workspace-repair-summary-consumption.js"
+    },
+    "./false-positive-catalog": {
+      "types": "./dist/false-positive-catalog.d.ts",
+      "default": "./dist/false-positive-catalog.js"
+    },
+    "./run-false-positive-catalog": {
+      "types": "./dist/run-false-positive-catalog.d.ts",
+      "default": "./dist/run-false-positive-catalog.js"
+    },
+    "./run-false-positive-catalog-consumption": {
+      "types": "./dist/run-false-positive-catalog-consumption.d.ts",
+      "default": "./dist/run-false-positive-catalog-consumption.js"
+    },
+    "./run-false-positive-detector-calibration-contract": {
+      "types": "./dist/run-false-positive-detector-calibration-contract.d.ts",
+      "default": "./dist/run-false-positive-detector-calibration-contract.js"
+    },
+    "./run-false-positive-detector-calibration-contract-consumption": {
+      "types": "./dist/run-false-positive-detector-calibration-contract-consumption.d.ts",
+      "default": "./dist/run-false-positive-detector-calibration-contract-consumption.js"
+    },
+    "./run-autopilot-progress-consistency": {
+      "types": "./dist/run-autopilot-progress-consistency.d.ts",
+      "default": "./dist/run-autopilot-progress-consistency.js"
+    },
     "./repo-preflight": {
       "types": "./dist/repo-preflight.d.ts",
       "default": "./dist/repo-preflight.js"
@@ -189,9 +221,22 @@
     "./run-project-intelligence-controlled-remediation-plan": {
       "types": "./dist/run-project-intelligence-controlled-remediation-plan.d.ts",
       "default": "./dist/run-project-intelligence-controlled-remediation-plan.js"
+    },
+    "./run-project-intelligence-agent-context": {
+      "types": "./dist/run-project-intelligence-agent-context.d.ts",
+      "default": "./dist/run-project-intelligence-agent-context.js"
+    },
+    "./run-project-intelligence-watch": {
+      "types": "./dist/run-project-intelligence-watch.d.ts",
+      "default": "./dist/run-project-intelligence-watch.js"
+    },
+    "./run-project-intelligence-watch-handoff": {
+      "types": "./dist/run-project-intelligence-watch-handoff.d.ts",
+      "default": "./dist/run-project-intelligence-watch-handoff.js"
     }
   },
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "@repoassure/design-system": "workspace:*"
   }
 }

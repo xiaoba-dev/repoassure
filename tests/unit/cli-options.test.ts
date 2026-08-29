@@ -234,6 +234,7 @@ describe('runCli argument validation', () => {
     ['generate-tests', 'hardening generate-tests <findingsPath> <outputDir>'],
     ['plan', 'hardening plan <repo>'],
     ['report', 'hardening report <runDir> <outputPath>'],
+    ['repair', 'hardening repair <subcommand>'],
     ['security', 'hardening security import --provider <provider> --scan-dir <dir> --repo <repo> --run-dir <dir>'],
     ['run', 'hardening run <repo> [url]']
   ])('prints command help for %s without running the command', async (command, usage) => {
@@ -244,7 +245,7 @@ describe('runCli argument validation', () => {
     });
   });
 
-  it.each(['analyze', 'explore', 'generate-tests', 'plan', 'report', 'security', 'run'])(
+  it.each(['analyze', 'explore', 'generate-tests', 'plan', 'report', 'repair', 'security', 'run'])(
     'prints short command help for %s with the help option documented',
     async (command) => {
       await expect(runCliForTest([command, '-h'])).resolves.toEqual({
@@ -254,6 +255,47 @@ describe('runCli argument validation', () => {
       });
     }
   );
+
+  it.each([
+    ['handoff', 'hardening repair handoff'],
+    ['execute', 'hardening repair execute'],
+    ['patch-plan', 'hardening repair patch-plan'],
+    ['evidence-package', 'hardening repair evidence-package']
+  ])('prints repair %s help without executing the workflow', async (subcommand, usage) => {
+    await expect(runCliForTest(['repair', subcommand, '--help'])).resolves.toEqual({
+      exitCode: 0,
+      stdout: expect.stringContaining(usage),
+      stderr: ''
+    });
+  });
+
+  it.each(['--apply', '--write', '--auto-fix'])(
+    'rejects the unsupported repair write flag %s before reading artifacts',
+    async (flag) => {
+      const result = await runCliForTest([
+        'repair',
+        'execute',
+        '--package',
+        'missing-repair-handoff-package.json',
+        '--all',
+        '--dry-run',
+        flag
+      ]);
+
+      expect(result.exitCode).toBe(1);
+      expect(result.stdout).toBe('');
+      expect(result.stderr).toContain('Target repository writes are not supported');
+      expect(result.stderr).toContain(flag);
+    }
+  );
+
+  it('rejects unknown repair subcommands', async () => {
+    await expect(runCliForTest(['repair', 'apply'])).resolves.toEqual({
+      exitCode: 1,
+      stdout: '',
+      stderr: 'Unknown repair subcommand: apply\n'
+    });
+  });
 
   it('rejects extra positional arguments for analyze', async () => {
     await expect(runCliForTest(['analyze', './app', 'unexpected'])).resolves.toEqual({

@@ -1,5 +1,681 @@
 # 阻塞日志
 
+## 2026-08-03 — Explicit K1 specification-authorization choice remains blocked
+
+RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Intake v0.1 completed with `k1_contract_specification_authorization_intake_prepared_without_inferred_choice_specification_schema_or_runtime_changes`, but it supplied no maintainer answer. RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1 is the only active Goal and has `execution_authorization: null`; it is not authorized to run. A separate execution authorization plus exactly one valid option token is required. Until then, selected decision remains pending, M1 remains incomplete, `auth_redirect` remains `request_revision`, and specification/schema/contract/implementation/target/release/Git actions remain blocked.
+
+Preserved K1 governance sequence: RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Intake v0.1 (`m1_open_evidence_kernel_candidate_boundary_decision_intake_prepared_without_selected_decision_or_contract_changes`) → RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Recording v0.1 (`maintainer_approved_k1_for_separately_gated_contract_design_without_schema_or_runtime_implementation_authorization`) → RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Design Planning v0.1 (`k1_non_authoritative_contract_design_plan_prepared_without_schema_authoritative_contract_or_runtime_implementation`).
+
+## 2026年8月3日 - K1 设计完成；specification authorization intake 尚未授权
+
+Completed Goal: RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Design Planning v0.1.
+
+Conclusion:
+`k1_non_authoritative_contract_design_plan_prepared_without_schema_authoritative_contract_or_runtime_implementation`.
+
+Prior active Goal at that time: RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Intake v0.1 (`ready_to_execute`, `execution_authorization: null`).
+
+Resolved:
+
+- Exactly one 非权威 K1 设计计划已定义 identity/versioning、authoritative
+  reference、loss/unknown、integrity、review、no-write、privacy、compatibility、
+  validation 与 rollback 边界。
+
+Remaining blockers:
+
+- 下一 Goal 未获单独执行授权；不得准备授权 intake，更不得推断选择。
+- Specification drafting、schema、contract acceptance、adapter/runtime 与 M1
+  推进继续 blocked；原 contracts/bytes 继续权威。
+- `auth_redirect` 保持 `request_revision`；final acceptance 与六条
+  representative lane 保持 `defer`；target、receipt、publish、deploy、launch
+  与 Git 动作继续 blocked。
+
+## 2026年8月3日 - K1 选择已记录；设计规划仍等待单独授权
+
+Completed Goal: RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Recording v0.1.
+
+Conclusion:
+`maintainer_approved_k1_for_separately_gated_contract_design_without_schema_or_runtime_implementation_authorization`.
+
+Active Goal: RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Design Planning v0.1 (`ready_to_execute`, `execution_authorization: null`).
+
+Resolved:
+
+- 维护者明确选择 `approve_for_separately_gated_contract_design`；1/1 decisions
+  recorded、0/1 pending，缺少 K1 选择不再是当前 blocker。
+
+Remaining blockers:
+
+- 新 Goal 尚未获得单独执行授权；不得把已完成 Goal 的授权继承给它。
+- 在授权前不得开始设计、创建/升级 schema、接受权威 contract、实现
+  adapter/runtime 或推进 M1。原 contracts 继续权威；M1 remains incomplete。
+- `auth_redirect` 保持 `request_revision`；final acceptance 与六条
+  representative lane 保持 `defer`。
+- Detector/行为测试、target、receipt、publication、deployment、launch 与
+  Git 动作继续 blocked。
+
+## 2026年8月3日 - K1 记录授权已满足；明确候选选择仍缺失
+
+Active Goal: RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Recording v0.1.
+
+Status: `awaiting_explicit_maintainer_choice`
+
+Interim conclusion:
+`m1_open_evidence_kernel_candidate_boundary_decision_record_prepared_without_inferred_choice`.
+
+Human Approval Policy: `pending_confirmation`.
+
+Resolved:
+
+- 本精确 Goal 的执行授权已经记录。
+
+Remaining blockers:
+
+- 维护者尚未明确给出 `approve_for_separately_gated_contract_design`、
+  `request_revision`、`defer` 或 `reject`；0/1 decisions recorded、1/1 pending、
+  selected=`pending`。
+- Goal 执行授权不是候选决定，因此当前 Goal 继续 `ready_to_execute`，不得完成或
+  派生 successor Goal。
+- 候选边界未接受，原契约继续权威；不得创建/升级 schema、指定或实现
+  contract/adapter/runtime 或推进 M1。M1 remains incomplete。
+- `auth_redirect` 保持 `request_revision`；final acceptance 与六条
+  representative lane 保持 `defer`。
+- Detector/行为测试、target、receipt、publication、deployment、launch 与
+  Git 动作继续 blocked。
+
+## 2026年8月3日 - K1 决策入口已完成；记录 Goal 同时等待授权和明确选项
+
+Completed Goal: RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Intake v0.1.
+
+Next Goal: RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Recording v0.1.
+
+Status: k1_candidate_boundary_decision_intake_completed_recording_authorization_and_choice_pending
+
+Conclusion:
+`m1_open_evidence_kernel_candidate_boundary_decision_intake_prepared_without_selected_decision_or_contract_changes`.
+
+Active Goal: RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer
+Decision Recording v0.1 (`ready_to_execute`, `execution_authorization: null`).
+
+Resolved:
+
+- RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision
+  Intake v0.1 已准备四个中立、未填写的选项；0/1 decisions recorded、1/1
+  pending，Goal 执行授权未被当作 K1 决定。
+
+Remaining blockers:
+
+- 下一 Goal 尚未获得单独执行授权，且维护者尚未明确给出四个选项中的一个；
+  缺少任一条件都必须保持 pending，不得推断答案。
+- K1 尚未接受，原契约继续权威；不得创建/升级 schema、指定或实现 contract/
+  adapter/runtime 或推进 M1。M1 remains incomplete。
+- `auth_redirect` 仍为 `request_revision`；final acceptance 与六个
+  representative acquisition/execution 决定仍为 `defer`。
+- Detector/行为测试、fixture、依赖、target、receipt、publication、deployment、
+  launch、commit、push 和 PR 继续 blocked。
+
+## 2026年8月3日 - M1 契约差距规划已完成；候选边界决策入口等待单独授权
+
+Status: m1_contract_gap_planning_completed_candidate_boundary_decision_intake_authorization_pending
+
+Conclusion:
+`m1_open_evidence_kernel_contract_gap_plan_prepared_with_one_candidate_boundary_without_schema_or_runtime_changes`.
+
+Active Goal: RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Intake v0.1
+(`ready_to_execute`, `execution_authorization: null`).
+
+Resolved:
+
+- 已盘点 8 类本地契约并映射 5 类 M1 证据；主状态固定为
+  reuse=1、gap=2、conflict=2、unknown=0。
+- 只识别一个非权威只读候选边界；原契约继续权威，schema/contract/runtime
+  改动为 0。
+
+Remaining blockers:
+
+- 候选边界决策入口未收到单独执行授权；不得准备或预填维护者选择，不得把
+  本 Goal 的执行授权当作候选接受决定。
+- 候选尚未接受；不得创建/升级 schema、指定或实现 contract/adapter/runtime、
+  声称 provider-neutral 实现或正式标准兼容。M1 remains incomplete。
+- Auth redirect 仍为 `request_revision` 且缺少 named change；final acceptance 与
+  六个 representative acquisition/execution 决定仍为 `defer`。
+- Detector/行为测试、fixture、依赖、target、receipt、publication、deployment、
+  launch、commit、push 和 PR 继续 blocked。
+
+## 2026年8月3日 - v0.10 审计已完成；M1 契约差距规划等待单独授权
+
+Status: product_gap_audit_v0_10_completed_m1_contract_gap_planning_authorization_pending
+
+Conclusion:
+`completion_gap_audit_refreshed_with_m1_open_evidence_kernel_contract_gap_planning_next`.
+
+Active Goal: RepoAssure M1 Open Evidence Kernel Contract Gap Planning v0.1
+(`ready_to_execute`, `execution_authorization: null`).
+
+Resolved:
+
+- 条件死控件已从整族 blocker 中拆出并归为既有 implemented subcapability。
+- v0.9 的 8 条 current/next 叙事漂移经已完成 cleanup 保持为 0。
+- PRD 中历史 0/2 pending 叙事已改为当前明确决定链。
+
+Remaining blockers:
+
+- M1 planning 未收到单独执行授权；不得开始 contract inventory 或 gap matrix。
+- M1 仍不完整且未推进；不得创建/升级 schema、实现 provider-neutral contract
+  或声称兼容正式标准。
+- Auth redirect 仍为 `request_revision` 且缺少 named change；final acceptance 与
+  六个 representative acquisition/execution 决定仍为 `defer`。
+- Detector/行为测试、fixture、依赖、target、receipt、publication、deployment、
+  launch、commit、push 和 PR 继续 blocked。
+
+## 2026年8月3日 - 证据协调已完成；v0.10 缺口审计等待单独授权
+
+Status: verification_evidence_reconciled_product_gap_audit_v0_10_authorization_pending
+
+Conclusion:
+`conditional_dead_control_verification_evidence_reconciled_with_durable_errata_without_product_or_historical_record_changes`.
+
+Active Goal: RepoAssure Product Completion Gap Audit Refresh v0.10
+(`ready_to_execute`, `execution_authorization: null`).
+
+Resolved:
+
+- 23/39/76/81 集合解释、Vitest serial flags、SDK 1.29.0 与历史 packed 1.30.0
+  诊断已经 durable addendum 对账。
+- Architecture Handoff 与历史实现记录没有被静默改写。
+
+Remaining blockers:
+
+- v0.10 未收到单独执行授权，不得开始产品缺口矩阵刷新。
+- Auth redirect 仍为 `request_revision`；final acceptance 与 Web、Python/CLI、
+  MCP/Agent acquisition/execution 仍为 `defer`。
+- Detector/行为测试、fixture、schema、依赖、Roadmap 自动推进、target、receipt、
+  publication、deployment、launch、commit、push 和 PR 继续 blocked。
+
+## 2026年8月3日 - 审计已闭环；证据协调等待单独授权
+
+Status: bounded_detector_audit_completed_evidence_reconciliation_authorization_pending
+
+Conclusion:
+`bounded_detector_implementation_audit_qualified_with_material_evidence_drift_without_product_surface_changes`.
+
+Active Goal: RepoAssure Conditional Dead Control Calibration Verification
+Evidence Reconciliation v0.1 (`ready_to_execute`, `execution_authorization: null`).
+
+Remaining blockers:
+
+- 未收到该证据协调 Goal 的单独执行授权，因此不得开始 addendum 工作。
+- 历史 focused command、Vitest serial flag 和 packed SDK 诊断存在实质证据漂移；
+  不得静默重写 Architecture Handoff 或历史实现记录。
+- Detector、行为测试、fixture、schema、auth redirect、依赖、target、receipt、
+  publication、deployment、launch、commit、push 和 PR 继续 blocked。
+
+Resolved by this closure:
+
+- 审计 Goal 授权、完成状态、index、Progress Snapshot 和 canonical current/next
+  projection 已级联；stale operation-record pointer 已改指向本审计记录。
+
+## 2026年8月3日 - 检测器实现完成；只读完成审计等待单独授权
+
+Status: bounded_detector_implementation_completed_completion_audit_authorization_pending
+
+Conclusion:
+`conditional_dead_control_bounded_detector_implemented_with_visible_p1_classification_and_fail_closed_prerequisite_evidence`.
+
+Active Goal: RepoAssure Conditional Dead Control Calibration Bounded Detector
+Implementation Completion Audit v0.1.
+
+Evidence:
+
+- 实现 Goal 已获授权并完成；23/23 bounded behavior、39/39 driver、76/76
+  companion、81/81 downstream 通过，两位独立终审无 unresolved P1/P2。
+- Active audit 的 `execution_authorization` 为 null；实现授权不继承给审计。
+- Packed MCP isolated consumer 仍有本地 pnpm store 缺少
+  `@modelcontextprotocol/sdk@1.30.0` 的环境证据缺口；本 Goal 未授权联网或安装。
+
+Impact:
+
+- Detector 实现本身无开放 P1/P2 阻塞。
+- Completion audit 在收到单独授权前不得执行；不得修改 detector/test/fixture、
+  获取依赖或 target、发布、部署或 launch。
+
+Follow-up:
+
+- 维护者可单独授权只读 completion audit；审计必须保留 offline-cache gap，
+  不能把测试环境缺口误写成产品行为失败或擅自补依赖。
+
+## 2026年8月2日 - 检测器实现方向已明确；执行授权与 Architecture Handoff 仍阻塞
+
+Status: bounded_detector_implementation_direction_authorized_execution_and_architecture_handoff_pending
+
+Conclusion:
+`maintainer_authorized_bounded_detector_implementation_for_separately_authorized_local_goal_without_detector_changes`.
+
+Active Goal: RepoAssure Conditional Dead Control Calibration Bounded Detector
+Implementation v0.1.
+
+Evidence:
+
+- Explicit choice：`1` → `authorize_bounded_detector_implementation`。
+- Implementation authorization decisions recorded：1/1；pending：0/1。
+- Manual gates completed：5/5。
+- Next Goal execution authorization：none；detector changes：no。
+
+Remaining blockers:
+
+- 下一 Goal 仍需单独执行授权。
+- Detector/test edits 前须完成 Architecture Handoff，解决 classifier/runtime
+  seam、P2/P1 severity、evidence schema、disabled control 安全观察、file
+  allowlist 与 pass criteria。
+- 若无法形成安全且无歧义的方案，必须返回
+  `request_implementation_plan_revision`，不得修改 detector。
+
+## 2026年8月2日 - 检测器实现授权选项已就绪；明确维护者选择仍阻塞
+
+Status: bounded_detector_implementation_authorization_options_ready_maintainer_choice_pending
+
+Conclusion:
+`bounded_detector_implementation_authorization_intake_prepared_without_inferred_choice_or_detector_changes`.
+
+Active Goal: RepoAssure Conditional Dead Control Calibration Bounded Detector
+Implementation Authorization Maintainer Decision Recording v0.1.
+
+Evidence:
+
+- Implementation authorization options prepared: 4/4。
+- Implementation authorization decisions recorded: 0/1；pending: 1/1。
+- Preselected choice: none；建议项仅为 non-binding recommendation。
+- Manual gates completed: 5/5。
+- Goal execution authorization treated as implementation authorization choice: no。
+- Detector implementation execution authorized / changed: no / no。
+
+Follow-up:
+
+- 仅在下一 Goal 单独获得执行授权后记录维护者明确给出的一个四选一答案；
+  不推断选择、不修改 detector、不访问 target 或外部系统。
+
+## 2026年7月29日 - 五项 fixture 人工门禁已解除；检测器实现授权仍阻塞
+
+Status: synthetic_fixture_manual_gates_complete_detector_implementation_authorization_intake_pending
+
+Conclusion:
+`maintainer_approved_all_five_synthetic_fixture_manual_gates_without_detector_implementation_authorization`.
+
+Active Goal: RepoAssure Conditional Dead Control Calibration Bounded Detector
+Implementation Authorization Intake v0.1.
+
+Evidence:
+
+- Explicit input：`全部 approve_gate_evidence`。
+- Gate decisions：5/5 recorded、5/5 approved、0/5 pending。
+- Manual gates：5/5 completed。
+- Goal execution authorization treated as gate decisions：no。
+- Detector implementation execution authorized / changed：no / no。
+
+Impact:
+
+- 五项 fixture 证据门禁已解除。
+- 检测器实现仍被独立实现授权阻塞；门禁通过不能自动跨越该边界。
+
+Follow-up:
+
+- 仅在下一 Goal 获得单独“授权执行”后准备四个未选择的实现授权选项；
+  不推断选择、不修改 detector、不访问 target。
+
+## 2026年7月29日 - Synthetic fixture 已实现；五个人工门禁仍待审查材料
+
+Status: synthetic_fixture_implemented_manual_review_package_execution_pending
+
+Conclusion:
+`synthetic_fixture_implemented_and_locally_validated_without_detector_changes_or_manual_gate_completion`.
+
+Active Goal: RepoAssure Conditional Dead Control Calibration Synthetic Fixture
+Manual Review Package v0.1.
+
+Evidence:
+
+- Implemented files：3/3；required states：5/5；expected snapshots：3/3。
+- Focused fixture tests：4/4 passed。
+- Manual gates：0/5 completed。
+- Detector changes：no；raw fixture/target access：no。
+
+Impact:
+
+- 本地 fixture 缺口已经解除，但任何 detector 实现仍被五个人工门禁阻塞。
+- 测试通过不能被推断为 privacy、snapshot、threshold、classification 或
+  regression artifact 的人工批准。
+
+Follow-up:
+
+- 仅在下一 Goal 获得单独“授权执行”后，准备一份本地 review package；
+  不自动完成门禁，不联系 reviewer，不修改 detector。
+
+## 2026年7月29日 - Synthetic fixture 实现方向已批准；Goal 执行仍待单独授权
+
+Status: synthetic_fixture_direction_approved_bounded_implementation_execution_pending
+
+Conclusion:
+`maintainer_approved_synthetic_fixture_implementation_for_separately_authorized_local_fixture_goal_without_fixture_or_detector_work`.
+
+Active Goal: RepoAssure Conditional Dead Control Calibration Synthetic Fixture
+Bounded Implementation v0.1.
+
+Evidence:
+
+- Explicit choice：`approve_synthetic_fixture_implementation`。
+- Decisions：1/1 recorded、0/1 pending。
+- Implementation direction / Goal derivation：approved / authorized。
+- Implementation execution now：not authorized。
+- Proposed fixture files created：0；manual gates：0/5。
+
+Impact:
+
+- 方向选择阻塞已解除，但三个文件的创建与执行仍受下一 Goal 单独授权约束。
+- Raw fixture/target access、detector change、receipt、publication、
+  deployment 和 launch 继续 blocked。
+
+Follow-up:
+
+- 仅在下一 Goal 获得单独“授权执行”后，实现三个本地 synthetic
+  fixture/test 文件和 positive/counter/fail-closed 回归。
+
+## 2026年7月29日 - Synthetic fixture 实现选项已准备；明确选择仍待记录
+
+Status: synthetic_fixture_implementation_options_prepared_owner_choice_pending
+
+Conclusion:
+`synthetic_fixture_implementation_authorization_intake_prepared_without_inferred_choice_or_fixture_work`.
+
+Active Goal: RepoAssure Conditional Dead Control Calibration Synthetic Fixture
+Implementation Authorization Maintainer Decision Recording v0.1.
+
+Evidence:
+
+- Implementation options：4/4 prepared。
+- Decisions：0/1 recorded、1/1 pending；preselected：none。
+- Recommended option：`approve_synthetic_fixture_implementation`，non-binding。
+- Proposed fixture files created：0；manual gates：0/5。
+
+Impact:
+
+- Intake 准备阻塞已解除，但 synthetic fixture 实现仍未授权。
+- Creation/implementation/execution、raw fixture access、detector change、
+  receipt 和 target action 继续 blocked。
+
+Follow-up:
+
+- 下一 Goal 只记录维护者明确给出的一个四选一答案；普通“授权执行”保持
+  非答案。
+
+## 2026年7月29日 - Synthetic 方案已完成；实现授权选择仍待准备
+
+Status: synthetic_fixture_plan_complete_implementation_authorization_intake_next
+
+Conclusion:
+`synthetic_fixture_bounded_plan_prepared_without_fixture_creation_execution_or_detector_changes`.
+
+Active Goal: RepoAssure Conditional Dead Control Calibration Synthetic Fixture
+Implementation Authorization Intake v0.1.
+
+Evidence:
+
+- Five conceptual states：5/5。
+- Proposed future files：3；actual files created：0。
+- Expected snapshot groups：3；confirmed：0。
+- Positive/counter/fail-closed regressions：planned only。
+- Manual gates：0/5 completed。
+
+Impact:
+
+- 规划阻塞已解除，但 synthetic fixture 实现仍未授权。
+- Creation/implementation/execution、raw fixture access、detector change、
+  receipt 和 target action 继续 blocked。
+
+Follow-up:
+
+- 下一 Goal 只准备
+  `approve_synthetic_fixture_implementation`、
+  `request_synthetic_fixture_plan_revision`、
+  `defer_synthetic_fixture_implementation` 或
+  `reject_synthetic_fixture_path` 四个未选择选项。
+
+## 2026年7月29日 - Fixture 方向已明确；规划执行与 fixture 工作仍受阻
+
+Status: synthetic_fixture_plan_requested_planning_execution_pending
+
+Conclusion:
+`maintainer_requested_synthetic_local_fixture_plan_without_fixture_access_or_detector_changes`.
+
+Active Goal: RepoAssure Conditional Dead Control Calibration Synthetic Fixture
+Bounded Planning v0.1.
+
+Evidence:
+
+- Explicit owner input：`2`。
+- Selected option：`request_synthetic_local_fixture_plan`。
+- Fixture evidence decisions：1/1 recorded、0/1 pending。
+- Synthetic plan direction authorized：yes；planning execution authorized：no。
+- Raw fixture availability/privacy：no / no；manual gates：0/5。
+
+Impact:
+
+- 四选一决定阻塞已解除，但只派生 plan-only Goal。
+- Synthetic fixture creation/implementation/execution、raw fixture access、
+  detector change、receipt 和 target action 继续 blocked。
+
+Follow-up:
+
+- 维护者可单独授权下一 Goal；该 Goal 也只能规划五种 synthetic 状态、
+  未来文件布局、回归预期、审查与回滚。
+
+## 2026年7月29日 - Fixture 证据选择待维护者明确回答
+
+Status: fixture_evidence_intake_prepared_explicit_owner_choice_pending
+
+Conclusion:
+`conditional_dead_control_fixture_evidence_readiness_and_authorization_intake_prepared_without_inferred_choice_or_fixture_access`.
+
+Active Goal: RepoAssure Conditional Dead Control Calibration Fixture Evidence Readiness and Authorization Maintainer Decision Recording v0.1.
+
+Evidence:
+
+- Fixture evidence options prepared：4/4。
+- Fixture evidence decisions recorded：0/1；pending：1/1。
+- Preselected choice：none。
+- Raw fixture availability/privacy confirmed：no / no。
+- Manual gates completed：0/5。
+
+Impact:
+
+- 未获得一个明确完整的四选一答案前，fixture evidence path 不前移。
+- 普通 Goal 授权、建议、静默或不完整 metadata 均不能解除阻塞。
+- Fixture access/acquisition、synthetic implementation、detector change、
+  receipt 和 target action 继续 blocked。
+
+Follow-up:
+
+- 下一 Goal 只记录
+  `confirm_existing_local_public_fixture_evidence`、
+  `request_synthetic_local_fixture_plan`、`defer_fixture_evidence` 或
+  `reject_implementation_path` 中一个明确完整答案，不执行该答案指向的动作。
+
+## 2026年7月29日 - 五项证据包已备齐；fixture 证据与人工确认仍阻塞实现
+
+Status: conditional_dead_control_gate_packets_prepared_manual_gates_fail_closed
+
+Conclusion:
+`conditional_dead_control_gate_evidence_package_prepared_with_all_manual_gates_fail_closed`.
+
+Active Goal: RepoAssure Conditional Dead Control Calibration Fixture Evidence Readiness and Authorization Intake v0.1.
+
+Evidence:
+
+- Gate evidence packets prepared：5/5。
+- Manual gates completed：0/5。
+- Raw fixture availability/privacy confirmed：no / no。
+- Expected snapshot、no-threshold-change 和 regression review packet 已准备，
+  但 fixture-specific execution/review 未发生。
+- Auth redirect 继续为 `request_revision`，不在实现范围内。
+
+Impact:
+
+- Detector implementation execution、runtime change、suppression、
+  severity/threshold/policy change、receipt 和 target/fixture action 继续
+  blocked。
+
+Follow-up:
+
+- 下一 Goal 只准备 fixture 证据就绪与授权的未选择 owner 选项；不得把普通
+  Goal 执行授权当成 fixture 访问或获取授权。
+
+## 2026年7月29日 - 一项实现方向已批准；门禁证据与另一项修订仍受控
+
+Status: conditional_dead_control_gate_evidence_preparation_next_auth_redirect_revision_required
+
+Conclusion:
+`maintainer_approved_conditional_dead_control_implementation_and_requested_auth_redirect_revision_without_detector_changes`.
+
+Active Goal: RepoAssure Conditional Dead Control Calibration Implementation Gate Evidence Preparation v0.1.
+
+Historical intake conclusion:
+`implementation_authorization_intake_prepared_without_inferred_decisions_or_detector_changes`.
+
+Historical next Goal from that intake: RepoAssure False-Positive Detector Runtime Calibration Implementation Authorization Maintainer Decision Recording v0.1.
+
+Evidence:
+
+- 第一题为 `approve_implementation`，第二题为 `request_revision`。
+- Implementation authorization decisions：2/2 recorded、0/2 pending。
+- 五个人工门禁和原始 fixture availability/privacy 限制均已保留，当前
+  completed gates 为 0/5。
+
+Impact:
+
+- 第一题只可准备门禁证据；第二题不得进入实现。
+- Detector implementation execution、runtime change、suppression、
+  severity/threshold/policy change、receipt 和 target action 继续 blocked。
+
+Follow-up:
+
+- 下一 Goal 只准备第一题的五项本地门禁证据，并保持 fail-closed。
+
+## 2026年7月29日 - 受限设计完成；实现决定仍受门禁控制
+
+Status: bounded_design_complete_implementation_authorization_intake_next
+
+Conclusion:
+`bounded_false_positive_detector_calibration_design_plan_prepared_without_runtime_implementation_or_behavior_change`.
+
+Active Goal: RepoAssure False-Positive Detector Runtime Calibration Implementation Authorization Intake v0.1.
+
+Evidence:
+
+- 两题的证据模型、决策矩阵、回归要求和回滚条件均已记录。
+- 五个人工门禁全部保留。
+- Catalog 元数据中的原始 fixture 路径在设计 Goal 中不存在或未被访问。
+
+Impact:
+
+- Detector implementation、runtime behavior change、finding suppression、
+  automatic severity downgrade、threshold/policy change、receipt 和 target
+  action 继续 blocked。
+- Goal 执行授权不能被当作逐题实现答案。
+
+Follow-up:
+
+- 下一 Goal 只可准备两个未填写的实现授权问题。
+
+## 2026年7月29日 - Per-question answers resolved; implementation remains gated
+
+Status: explicit_answers_recorded_bounded_design_planning_next
+
+Conclusion:
+`maintainer_approved_both_false_positive_detector_calibration_questions_for_separately_gated_design_planning_without_detector_implementation_authorization`.
+
+Active Goal: RepoAssure False-Positive Detector Runtime Calibration Bounded Design Planning v0.1.
+
+两个逐题答案阻塞已解除：2/2 均为 `approve`，0/2 pending。新的活动 Goal
+仍需单独执行授权，并只可准备设计方案。Detector implementation、runtime
+change、finding suppression、severity/threshold/policy change、receipt 与
+target write 继续 blocked。
+
+## 2026年7月29日 - Per-question record exists; explicit answers still required
+
+Status: awaiting_explicit_per_question_calibration_answers
+
+Interim conclusion:
+`per_question_calibration_decision_record_prepared_without_inferred_answers`.
+
+Active Goal: RepoAssure False-Positive Detector Runtime Calibration Per-Question Maintainer Decision Recording v0.1.
+
+普通执行授权没有携带逐题答案，因此当前 Goal 保持
+`ready_to_execute`，0/2 recorded、2/2 pending。解除条件是维护者为两题
+分别明确提供 `approve`、`reject`、`defer` 或 `accept-risk`。
+
+Detector planning/implementation、runtime change、finding suppression、
+severity downgrade、confidence threshold、acceptance policy、receipt 与
+target write 继续 blocked。本轮不创建下一 Goal。
+
+## 2026年7月29日 - Decision reopening package prepared; two answers remain pending
+
+Status: decision_package_prepared_per_question_answers_pending
+
+Conclusion:
+`false_positive_detector_runtime_calibration_decision_reopening_package_prepared_without_per_question_decisions_or_detector_changes`.
+
+RepoAssure False-Positive Detector Runtime Calibration Decision Reopening
+Preparation v0.1 已完成。Active Goal 是 RepoAssure False-Positive Detector
+Runtime Calibration Per-Question Maintainer Decision Recording v0.1。
+
+Active Goal: RepoAssure False-Positive Detector Runtime Calibration Per-Question Maintainer Decision Recording v0.1.
+
+剩余阻塞：两个 calibration questions 均仍为 pending。必须逐题明确提供
+`approve`、`reject`、`defer` 或 `accept-risk`；普通“授权执行”不等于问题
+答案。Detector planning/implementation、runtime change、suppression、
+severity/threshold/policy change 和 target write 继续 blocked。
+
+## 2026年7月29日 - Direction choice resolved; per-question calibration decisions remain pending
+
+Status: direction_choice_resolved_calibration_answers_pending
+
+Conclusion:
+`maintainer_selected_false_positive_detector_runtime_calibration_without_underlying_work_authorization`.
+
+RepoAssure Remaining Gated Product Work Maintainer Direction Decision Recording
+v0.1 已记录 `false_positive_detector_runtime_calibration`。下一 Goal 是
+RepoAssure False-Positive Detector Runtime Calibration Decision Reopening
+Preparation v0.1。
+
+Active Goal: RepoAssure False-Positive Detector Runtime Calibration Decision Reopening Preparation v0.1.
+
+剩余阻塞：两个 calibration questions 均未选择 `approve`、`reject`、
+`defer` 或 `accept-risk`。方向选择不解除 detector runtime、finding
+suppression、severity、confidence threshold、acceptance policy 或 target
+write 门禁。
+
+## 2026年7月29日 - Remaining gated product work direction awaits one explicit maintainer choice
+
+Interim conclusion:
+`maintainer_direction_decision_record_prepared_without_inferred_choice`.
+
+Resolved on 2026-07-29 by explicit choice
+`false_positive_detector_runtime_calibration`; this historical interim record
+is retained for audit.
+
+Active Goal: RepoAssure Remaining Gated Product Work Maintainer Direction Decision Recording v0.1.
+
+RepoAssure Remaining Gated Product Work Maintainer Direction Decision Recording
+v0.1 已获 Goal 执行授权，但授权文本没有包含七个允许方向之一。Goal 合同
+禁止推断，因此明确方向决定为 0/1、待决定为 1/1，Goal 保持 active /
+`ready_to_execute`。
+
+解除条件：维护者明确提供
+`false_positive_detector_runtime_calibration`、
+`representative_acceptance_evidence`、`distribution_and_launch`、
+`local_summary_productization`、`hosted_product_discovery`、
+`maintenance_and_extension` 或 `defer_all_remaining_gated_work` 之一。
+选择仅记录方向，不批准或执行底层工作。
+
 ## 2026年7月1日 - Public release branch protection gate remains blocked by private repo plan
 
 ### 背景
@@ -518,3 +1194,234 @@ pnpm goal:audit
 ### 当前判断
 
 该阻塞已解除。v0.1 长期 goal 可进入完成审计，后续工作转入 Spec v0.2。
+## 2026-07-26 - Parallel packed tests can race on shared generated dist
+
+Status: non_blocking_test_infrastructure_follow_up
+
+Evidence:
+
+- The default outside-sandbox full suite produced one failure while packed CLI
+  and packed MCP package tests ran concurrently and their prepack steps shared
+  generated `dist` files.
+- The affected packed MCP protocol test passed when run alone.
+- The complete suite passed outside the sandbox with one worker: 82 files and
+  796 tests passed; 1 file and 1 test skipped.
+
+Impact:
+
+- No product runtime failure was reproduced.
+- Parallel full-suite execution can be flaky until package-test workspaces or
+  generated build outputs are isolated.
+- This does not authorize an unrelated test-harness refactor inside the current
+  Git-history planning Goal.
+
+Follow-up:
+
+- A future bounded test-infrastructure Goal may isolate each packed test build
+  or serialize package preparation without weakening coverage.
+
+## 2026-07-26 - Sandbox packed-install timeouts remain environment-only
+
+Status: non_blocking_environment_limitation
+
+Evidence:
+
+- The current single-worker full suite timed out in the sandbox while the
+  packed CLI and packed MCP tests installed isolated local tarballs.
+- The same unchanged single-worker command completed outside the sandbox:
+  82 files passed, 1 skipped; 801 tests passed, 1 skipped.
+
+Impact:
+
+- No product or planning-contract failure was reproduced.
+- The limitation affects sandbox package-install execution only and does not
+  weaken the current acceptance-campaign planning evidence.
+
+Follow-up:
+
+- Keep packed-install verification outside the restricted sandbox until the
+  test-infrastructure isolation follow-up is separately authorized.
+
+## 2026-07-27 - Representative target acquisition remains explicitly unapproved
+
+Status: blocking_representative_lane_acquisition
+
+Evidence:
+
+- The readiness package preserves Web, Python/CLI, and MCP/Agent execution
+  decisions as 3/3 `defer`.
+- Acquisition authorization decisions recorded: 0/3.
+- No immutable target revision or digest has been accepted in a lane-scoped
+  acquisition receipt.
+
+Impact:
+
+- No target remote may be accessed and no target may be acquired, installed,
+  analyzed, executed, or written.
+- Representative multi-mode execution and final product acceptance remain
+  deferred.
+
+Follow-up:
+
+- RepoAssure Representative Multi-Mode Acceptance Target Acquisition
+  Authorization Maintainer Decision Recording v0.1 may record explicit
+  decisions without performing acquisition.
+
+## 2026-07-28 - Lane-scoped acquisition decisions remain missing
+
+Status: blocking_representative_lane_acquisition
+
+Evidence:
+
+- The pending decision record was prepared with interim conclusion
+  `acquisition_authorization_decision_record_prepared_without_inferred_lane_decisions`.
+- Explicit Web, Python/CLI, and MCP/Agent decisions remain 0/3.
+- Human Approval Policy is `pending_confirmation`; Action Authorization
+  Receipts issued remain 0.
+
+Impact:
+
+- The current Goal cannot complete and no target acquisition may occur.
+- Representative lane execution and final product acceptance remain deferred.
+
+Follow-up:
+
+- The maintainer must separately choose `approve_acquisition`, `reject`, or
+  `defer` for each lane. Any approval also requires complete lane-scoped
+  evidence from the readiness package.
+
+## 2026-07-28 - Representative acquisition decisions explicitly deferred
+
+Status: resolved_decision_input_acquisition_remains_deferred
+
+Evidence:
+
+- Web, Python/CLI, and MCP/Agent decisions are explicitly 3/3 `defer`.
+- Conclusion:
+  `maintainer_explicitly_deferred_all_representative_target_acquisitions_without_target_access`.
+- Approved acquisitions and Action Authorization Receipts remain 0.
+
+Impact:
+
+- The decision-recording Goal can complete.
+- Target acquisition and representative execution remain blocked by the
+  maintainer's explicit deferrals.
+
+Follow-up:
+
+- RepoAssure Product Backlog Reprioritization After Representative
+  Acquisition Defer v0.1 may select one safe local non-target follow-up.
+
+## 2026-07-28 - Deferred representative acquisition remains isolated from local backlog progress
+
+Status: representative_acquisition_deferred_local_gap_audit_unblocked
+
+Evidence:
+
+- Web, Python/CLI, and MCP/Agent acquisitions remain explicitly `defer`.
+- RepoAssure Product Backlog Reprioritization After Representative Acquisition
+  Defer v0.1 completed as
+  `backlog_reprioritized_to_local_product_completion_gap_audit_after_representative_acquisition_defer`.
+
+Impact:
+
+- Target acquisition, execution, and final acceptance remain blocked by the
+  maintainer deferrals.
+- Local evidence classification can continue without reopening those actions.
+
+Follow-up:
+
+- RepoAssure Product Completion Gap Audit Refresh v0.9 may re-audit current
+  local product evidence under the preserved no-target boundary.
+
+## 2026-07-29 - Product completion gaps refreshed with only narrative cleanup unblocked
+
+Status: material_product_work_gated_narrative_cleanup_unblocked
+
+Evidence:
+
+- v0.9 confirms 12 implemented product surfaces and 3 implemented governance
+  surfaces.
+- Final acceptance and all three representative acquisition/execution lanes
+  remain explicitly `defer`.
+- Eight canonical current/next claims point at completed historical Goals.
+
+Impact:
+
+- Target-backed acceptance, runtime calibration, release execution, hosted
+  product work, and external-input work cannot proceed under this Goal.
+- Local canonical narrative cleanup can proceed without reopening those gates.
+
+Follow-up:
+
+- RepoAssure Canonical Product Narrative Freshness Cleanup v0.2 may remove only
+  the eight misleading current/next claims while preserving historical
+  evidence.
+
+Resolution:
+
+- RepoAssure Canonical Product Narrative Freshness Cleanup v0.2 completed with
+  conclusion
+  `canonical_product_narrative_freshness_cleaned_with_gated_work_direction_preparation_next`.
+- All 8 identified current/next claims were rewritten as historical evidence;
+  no product gate or defer state changed.
+- RepoAssure Remaining Gated Product Work Direction Preparation v0.1 is ready
+  to prepare prioritization material only. All material product work remains
+  gated until a separate explicit maintainer decision and applicable
+  authorization.
+
+## 2026-07-29 - Direction package complete; underlying product work remains gated
+
+Status: direction_package_complete_maintainer_direction_pending
+
+Evidence:
+
+- RepoAssure Remaining Gated Product Work Direction Preparation v0.1 completed
+  as
+  `remaining_gated_product_work_direction_package_prepared_without_decision_or_execution`.
+- All 17 remaining items now have a consequence, prerequisite, evidence gap,
+  and reversible next step.
+- `false_positive_detector_runtime_calibration` is advisory only; the
+  maintainer direction decision remains `pending`.
+
+Impact:
+
+- No underlying detector, target, acceptance, entrypoint, release, hosted, or
+  external-input work is unblocked by the recommendation.
+- Final acceptance and representative acquisition/execution remain `defer`;
+  receipts and target counts remain zero.
+
+Follow-up:
+
+- RepoAssure Remaining Gated Product Work Maintainer Direction Decision
+  Recording v0.1 may record one explicit direction choice or
+  `defer_all_remaining_gated_work`.
+- Goal authorization alone cannot supply that choice or authorize execution.
+
+## 2026-07-29 - Synthetic-fixture evidence is review-ready; five manual decisions remain gated
+
+Status: synthetic_fixture_manual_review_ready_gate_decisions_pending
+
+Evidence:
+
+- Five review packets map the existing synthetic fixture/test evidence to the
+  five named manual gates.
+- Focused synthetic-fixture validation passes 4/4.
+- Gate decisions recorded: 0/5; pending: 5/5; preselected: 0/5.
+- Recommendations are non-binding, and ordinary Goal authorization is not a
+  gate decision.
+
+Impact:
+
+- The five manual gates remain incomplete and fail closed.
+- Detector changes, finding suppression, severity downgrade, threshold/policy
+  changes, and auth-redirect work remain unauthorized.
+
+Follow-up:
+
+- RepoAssure Conditional Dead Control Calibration Synthetic Fixture Manual
+  Gate Maintainer Decision Recording v0.1 may record one explicit complete
+  choice for each gate after separate execution authorization.
+- Partial answers, recommendations, and execution authorization may not be
+  inferred as gate decisions; even five approvals do not authorize detector
+  implementation.

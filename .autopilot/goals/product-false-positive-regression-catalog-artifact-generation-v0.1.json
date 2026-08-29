@@ -1,0 +1,59 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "product-false-positive-regression-catalog-artifact-generation-v0.1",
+  "status": "completed",
+  "objective": "Generate local false-positive regression catalog artifacts from the implemented contract so maintainers and AI IDEs can consume JSON/Markdown evidence without changing runtime detection behavior or suppressing findings.",
+  "source_spec": "docs/operations/product-false-positive-regression-catalog-contract-implementation-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade"
+  ],
+  "acceptance": [
+    "Add a local artifact generator that writes false-positive regression catalog JSON and Markdown under an ignored RepoAssure artifact directory.",
+    "Ensure generated artifacts include fixture categories, expected finding snapshots, severity/rationale review fields, maintainer decision fields, redaction metadata, and read order for AI IDE consumption.",
+    "Add unit or integration tests for generator output shape, Markdown readability, redaction, and no target repo write boundary.",
+    "Do not modify runtime detectors, do not suppress findings, do not downgrade severities automatically, and do not write target repositories."
+  ],
+  "summary": {
+    "operation_record": "docs/operations/product-false-positive-regression-catalog-artifact-generation-v0.1.md",
+    "conclusion": "artifacts_generated_without_detection_behavior_change",
+    "command": "pnpm false-positive:catalog",
+    "runner": "packages/acceptance/src/run-false-positive-catalog.ts",
+    "package_export": "@hardening-mcp/acceptance/run-false-positive-catalog",
+    "artifacts": [
+      "artifacts/project-graph/false-positive-regression-catalog.json",
+      "artifacts/project-graph/false-positive-regression-catalog.md"
+    ],
+    "boundary": {
+      "local_only": true,
+      "target_repo_writes": false,
+      "runtime_detection_behavior_change": false,
+      "finding_suppression": false,
+      "automatic_severity_downgrade": false,
+      "hosted_dashboard": false,
+      "telemetry": false,
+      "cloud_sync": false
+    },
+    "selected_next_goal_id": "product-false-positive-regression-catalog-consumption-validation-v0.1",
+    "verification": [
+      "pnpm vitest run tests/unit/false-positive-catalog-artifacts.test.ts tests/unit/acceptance-package.test.ts",
+      "pnpm build:acceptance"
+    ]
+  },
+  "next_goal_id": "product-false-positive-regression-catalog-consumption-validation-v0.1"
+}

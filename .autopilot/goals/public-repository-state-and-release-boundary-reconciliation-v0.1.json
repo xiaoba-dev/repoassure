@@ -1,0 +1,63 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "public-repository-state-and-release-boundary-reconciliation-v0.1",
+  "title": "Public Repository State and Release Boundary Reconciliation v0.1",
+  "status": "completed",
+  "objective": "Reconcile the documented private pre-release boundary with the observed PUBLIC repository, active main branch protection, current remote history, local branch divergence, release-check semantics, and exposure-risk evidence without changing GitHub or publication state.",
+  "source_spec": "docs/operations/public-release-manual-decision-input-review-v0.2.md",
+  "priority": "P0",
+  "blocked_actions": [
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "public_launch",
+    "production_marketing_announcement",
+    "deployment",
+    "branch_protection_change",
+    "repository_ruleset_change",
+    "permission_change",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "hosted_availability_claim",
+    "team_cloud_availability_claim",
+    "enterprise_availability_claim",
+    "target_repo_write"
+  ],
+  "acceptance": [
+    "Reconcile canonical release documents with the observed PUBLIC repository and active main branch protection.",
+    "Audit current remote exposure, tracked release materials, Git history risk evidence, local versus origin/main divergence, and release-check semantics using read-only operations.",
+    "Distinguish historical private-preview decisions from the current public repository state without erasing audit history.",
+    "Treat the observed PUBLIC repository and active branch protection as external state evidence, not as authorization for additional release actions.",
+    "Keep npm publication, GitHub Release, public launch, deployment, marketing, hosted/commercial availability claims, permission changes, and repository-control changes unauthorized.",
+    "Return a bounded go/no-go recommendation and at most one next Goal after reconciliation."
+  ],
+  "conclusion": "public_source_release_verified_launch_no_go_history_identifiers_require_planning",
+  "summary": {
+    "operation_record": "docs/operations/public-repository-state-and-release-boundary-reconciliation-v0.1.md",
+    "repository_visibility": "PUBLIC",
+    "public_source_release": "completed_and_verified",
+    "public_launch_ready": false,
+    "branch_protection_gate": "passed",
+    "origin_release_check": "yes",
+    "local_release_check": "no_stale_branch",
+    "local_branch_ahead": 10,
+    "local_branch_behind": 65,
+    "current_tree_personal_identifiers": 0,
+    "public_history_personal_identifier_commits": 6,
+    "repository_state_changed": false
+  },
+  "tests": [
+    "pnpm exec vitest run tests/unit/public-release-readiness.test.ts tests/unit/project-structure.test.ts",
+    "pnpm autopilot:progress:check -- --json",
+    "pnpm typecheck",
+    "pnpm lint",
+    "pnpm build:src",
+    "pnpm test",
+    "pnpm repo:hygiene",
+    "pnpm release:check",
+    "pnpm goal:audit",
+    "git diff --check"
+  ],
+  "next_goal_id": "public-git-history-personal-identifier-remediation-planning-v0.1"
+}

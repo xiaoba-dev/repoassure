@@ -1,0 +1,52 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-watch-mode-recovery-command-ux-v0.1",
+  "status": "completed",
+  "objective": "Improve local Project Intelligence watch mode recovery UX for stale, missing, or malformed watch status, handoff, agent context, and snapshot artifacts by adding or hardening local diagnostics and recovery command guidance without daemonizing, uploading data, or writing to target repositories.",
+  "source_spec": "docs/operations/project-intelligence-watch-mode-operator-playbook-consumption-validation-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite"
+  ],
+  "acceptance": [
+    "Add or harden local diagnostics so stale, missing, or malformed Project Intelligence watch artifacts produce clear recovery guidance.",
+    "Keep recovery commands source-derived and local-only; do not manually edit generated artifacts as the primary repair path.",
+    "Validate the diagnostics with focused unit or integration tests across stale, missing, and malformed artifact scenarios.",
+    "Cascade results into canonical docs, Project Intelligence docs, testing strategy, acceptance checklist, logs, and .autopilot progress."
+  ],
+  "summary": {
+    "operation_record": "docs/operations/project-intelligence-watch-mode-recovery-command-ux-v0.1.md",
+    "runtime_entry": "packages/acceptance/src/run-project-intelligence-watch-handoff.ts",
+    "test": "tests/unit/project-intelligence-watch-handoff.test.ts",
+    "added_contract": "project-intelligence-watch-handoff.json#recoveryPlan",
+    "recovery_commands": [
+      "pnpm project:intelligence:watch -- --once",
+      "pnpm project:intelligence:watch-handoff",
+      "cat artifacts/project-graph/project-intelligence-watch-handoff.md"
+    ],
+    "boundary": {
+      "local_only": true,
+      "manual_generated_artifact_edits": false,
+      "target_repo_writes": false,
+      "hosted_dashboard": false,
+      "telemetry": false,
+      "cloud_sync": false
+    },
+    "verification": [
+      "pnpm vitest run tests/unit/project-intelligence-watch-handoff.test.ts"
+    ]
+  },
+  "next_goal_id": "project-intelligence-watch-mode-recovery-ux-real-workspace-smoke-v0.1"
+}

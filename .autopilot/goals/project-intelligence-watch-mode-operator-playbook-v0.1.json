@@ -1,0 +1,75 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-watch-mode-operator-playbook-v0.1",
+  "status": "completed",
+  "objective": "Create a local-only Project Intelligence watch mode operator playbook for maintainers and AI IDEs, covering start, smoke, artifact read order, freshness diagnosis, failure recovery, foreground stop, and prohibited actions.",
+  "source_spec": "docs/operations/project-intelligence-watch-mode-end-to-end-local-fixture-validation-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite"
+  ],
+  "acceptance": [
+    "Document the Project Intelligence watch mode operator playbook in docs/operations or docs/acceptance with command sequence, artifact read order, freshness checks, failure diagnosis, stop instructions, and recovery boundaries.",
+    "Cascade the playbook into README, PRD, SPEC, PLAN, Project Intelligence spec/architecture, testing strategy, acceptance checklist, decision log, dev log, and .autopilot progress.",
+    "Add or update structure/contract tests that keep the playbook discoverable and aligned with the implemented watch, agent-context, and handoff commands.",
+    "Run focused tests and repository quality gates before completion."
+  ],
+  "summary": {
+    "operation_record": "docs/operations/project-intelligence-watch-mode-operator-playbook-v0.1.md",
+    "playbook": "docs/operations/project-intelligence-watch-mode-operator-playbook-v0.1.md",
+    "command_sequence": [
+      "pnpm project:intelligence:watch",
+      "pnpm project:intelligence:watch -- --once",
+      "pnpm project:intelligence:agent-context",
+      "pnpm project:intelligence:watch-handoff"
+    ],
+    "read_order": [
+      "artifacts/project-graph/project-intelligence-watch-handoff.json",
+      "artifacts/project-graph/project-intelligence-watch-status.json",
+      "artifacts/project-graph/project-intelligence-agent-context.json",
+      "artifacts/project-graph/project-intelligence-agent-context.md",
+      "artifacts/project-graph/project-intelligence-snapshot.json",
+      ".autopilot/progress/snapshot.json",
+      ".autopilot/goals/index.json",
+      ".autopilot/goals/<active-goal>.json",
+      "docs/PLAN.md",
+      "docs/SPEC.md",
+      "docs/PRD.md"
+    ],
+    "recovery_sections": [
+      "freshness diagnosis",
+      "malformed artifact recovery",
+      "stale artifact recovery",
+      "foreground stop boundary"
+    ],
+    "boundary": {
+      "local_only": true,
+      "daemonized": false,
+      "target_repo_writes": false
+    },
+    "verification": [
+      "pnpm vitest run tests/unit/project-structure.test.ts",
+      "pnpm project:intelligence:watch -- --once",
+      "pnpm project:intelligence:watch-handoff",
+      "pnpm repo:hygiene",
+      "pnpm release:check",
+      "pnpm typecheck",
+      "pnpm lint",
+      "pnpm test",
+      "pnpm goal:audit"
+    ]
+  },
+  "next_goal_id": "project-intelligence-watch-mode-operator-playbook-consumption-validation-v0.1"
+}

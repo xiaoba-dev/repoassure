@@ -471,13 +471,13 @@ describe('project structure', () => {
     ]);
 
     expect(readiness).toContain('Public Release Readiness v0.2');
-    expect(readiness).toContain('Status: automated_prerequisites_ready_manual_gates_pending');
+    expect(readiness).toContain('Status: public_source_release_complete_launch_gated');
     expect(readiness).toContain('public release ready: no');
     expect(readiness).toContain('pnpm release:check');
     expect(readiness).toContain('pnpm repo:hygiene');
     expect(readiness).toContain('pnpm acceptance -- --full --browser');
     expect(readiness).toContain('package.json keeps `"private": true`');
-    expect(readiness).toContain('Manual authorization gates');
+    expect(readiness).toContain('Historical manual authorization gates');
     expect(readiness).toContain('Branch protection or equivalent repository ruleset');
     expect(readiness).toContain('Legal review');
     expect(readiness).toContain('Trademark/name review');
@@ -2167,7 +2167,7 @@ describe('project structure', () => {
       readFile('docs/architecture/specs/monorepo-structure-spec-v0.1.md', 'utf8')
     ]);
 
-    expect(rootPackageJson).toContain('"build": "pnpm build:packages && pnpm build:src && pnpm build:website"');
+    expect(rootPackageJson).toContain('"build": "pnpm build:tokens && pnpm build:packages && pnpm build:src && pnpm build:website"');
     expect(rootPackageJson).toContain('"build:website": "pnpm --filter @repoassure/website build"');
     expect(rootPackageJson).toContain('"build:src": "tsc -p tsconfig.build.json"');
     expect(rootPackageJson).toContain('"build:packages": "pnpm build:shared && pnpm build:security-assurance && pnpm build:browser-explorer && pnpm build:repair-planner && pnpm build:acceptance"');
@@ -2228,6 +2228,7 @@ describe('project structure', () => {
     expect(acceptancePackageJson).toContain('"./user-acceptance-handoff":');
     expect(acceptancePackageJson).toContain('"./fatal-error":');
     expect(acceptancePackageJson).toContain('"./redaction":');
+    expect(acceptancePackageJson).toContain('"./false-positive-catalog":');
     expect(acceptancePackageJson).toContain('"./repo-preflight":');
     expect(acceptancePackageJson).toContain('"./user-acceptance-args":');
     expect(acceptancePackageJson).toContain('"./shell-quote":');
@@ -3047,6 +3048,9 @@ describe('project structure', () => {
       .filter((path) => path.endsWith('.ts'))
       .map((path) => path.replace('packages/acceptance/src/', '').replace(/\.ts$/, ''))
       .filter((moduleName) => moduleName !== 'index')
+      // `generated/` holds build output baked in from another package. It is an internal
+      // implementation detail of the console, not part of the package's export surface.
+      .filter((moduleName) => !moduleName.startsWith('generated/'))
       .sort();
     const packageJson = JSON.parse(packageJsonText) as {
       exports?: Record<string, { types?: string; default?: string } | string>;
@@ -3058,6 +3062,7 @@ describe('project structure', () => {
 
     expect(packageModuleNames).toEqual([
       'compatibility',
+      'false-positive-catalog',
       'fatal-error',
       'goal-audit',
       'goal-audit-current-items',
@@ -3081,7 +3086,13 @@ describe('project structure', () => {
       'repo-preflight',
       'report',
       'run-acceptance',
+      'run-autopilot-progress-consistency',
+      'run-false-positive-catalog',
+      'run-false-positive-catalog-consumption',
+      'run-false-positive-detector-calibration-contract',
+      'run-false-positive-detector-calibration-contract-consumption',
       'run-goal-audit',
+      'run-project-intelligence-agent-context',
       'run-project-intelligence-backlog',
       'run-project-intelligence-controlled-remediation-plan',
       'run-project-intelligence-decision-intake',
@@ -3089,6 +3100,8 @@ describe('project structure', () => {
       'run-project-intelligence-recommendation-draft',
       'run-project-intelligence-snapshot',
       'run-project-intelligence-viewer',
+      'run-project-intelligence-watch',
+      'run-project-intelligence-watch-handoff',
       'run-repair-evidence-package',
       'run-repair-execute',
       'run-repair-handoff',
@@ -3101,7 +3114,9 @@ describe('project structure', () => {
       'user-acceptance-args',
       'user-acceptance-handoff',
       'user-acceptance-record',
-      'user-acceptance-runner-helpers'
+      'user-acceptance-runner-helpers',
+      'workspace-repair-summary',
+      'workspace-repair-summary-consumption'
     ]);
     expect([...acceptanceCompatibilityContract.packageOwnedModules].sort()).toEqual(packageModuleNames);
     expect(acceptancePackageSourceEntries.map((entry) => entry.moduleName).sort()).toEqual(packageModuleNames);
@@ -3235,7 +3250,14 @@ describe('project structure', () => {
     expect(acceptancePackageDistOutputEntries.map((entry) => entry.exportPath).sort()).toEqual(
       acceptancePackageExportEntries.map((entry) => entry.exportPath).sort()
     );
-    expect(packageDistFiles.filter((path) => path.endsWith('.js') || path.endsWith('.d.ts') || path.endsWith('.js.map')).sort()).toEqual(expectedDistPaths);
+    /* `generated/` is compiled build output baked in from the design system so the shipped
+       console carries no runtime dependency on a private workspace package. It has no
+       export entry by design, so the compatibility contract does not describe it. */
+    const contractedDistFiles = packageDistFiles.filter(
+      (path) => !path.startsWith('packages/acceptance/dist/generated/')
+    );
+
+    expect(contractedDistFiles.filter((path) => path.endsWith('.js') || path.endsWith('.d.ts') || path.endsWith('.js.map')).sort()).toEqual(expectedDistPaths);
   });
 
   it('keeps generated legacy acceptance dist outputs described by the package compatibility contract', async () => {
@@ -4038,9 +4060,38 @@ describe('project structure', () => {
       projectIntelligenceRecommendationDraft,
       projectIntelligenceMaintainerDecision,
       projectIntelligenceControlledRemediationPlan,
-      projectIntelligenceControlledRemediationExecution,
-      intakeConfirmation,
-      initDocPack,
+	      projectIntelligenceControlledRemediationExecution,
+	      projectIntelligenceDetectionRuleCalibration,
+	      productCompletionGapAudit,
+	      projectIntelligenceAgentContext,
+	      projectIntelligenceWatchModePlanning,
+	      projectIntelligenceWatchModeImplementation,
+	      projectIntelligenceWatchModeEndToEndFixture,
+		      projectIntelligenceWatchModeOperatorPlaybook,
+			      projectIntelligenceWatchModeOperatorPlaybookConsumption,
+			      projectIntelligenceWatchModeRecoveryCommandUx,
+			      projectIntelligenceWatchModeRecoverySmoke,
+			      projectIntelligenceWatchModeCompletionAudit,
+			      falsePositiveRegressionCatalogPlanning,
+			      falsePositiveRegressionCatalogContractImplementation,
+			      falsePositiveRegressionCatalogArtifactGeneration,
+			      falsePositiveRegressionCatalogConsumptionValidation,
+			      falsePositiveRegressionCatalogCompletionAudit,
+			      falsePositiveRegressionCatalogRealFixtureExpansion,
+			      falsePositiveRegressionCatalogDetectorCalibrationPlanning,
+			      falsePositiveRegressionCatalogDetectorCalibrationContract,
+			      falsePositiveRegressionCatalogDetectorCalibrationContractConsumption,
+			      falsePositiveRegressionCatalogDetectorCalibrationCompletionAudit,
+			      falsePositiveRegressionCatalogDetectorCalibrationAuthorizationIntake,
+			      falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionRecording,
+			      falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionFollowUp,
+			      productBacklogReprioritizationAfterDetectorDecisionBlock,
+			      productCompletionGapAuditRefreshV02,
+			      canonicalProductNarrativeFreshnessCleanup,
+			      autopilotProgressConsistencyGuardOperation,
+			      productCompletionGapAuditRefreshV03,
+			      intakeConfirmation,
+	      initDocPack,
       goalRecord,
       productCoreGoalRecord,
       aiIdeGoalRecord,
@@ -4058,8 +4109,42 @@ describe('project structure', () => {
       projectIntelligenceMaintainerDecisionGoalRecord,
       projectIntelligenceControlledRemediationGoalRecord,
       projectIntelligenceControlledRemediationExecutionGoalRecord,
-      projectIntelligenceClosureGoalRecord,
-      goalIndex,
+	      projectIntelligenceClosureGoalRecord,
+	      projectIntelligenceDetectionRuleCalibrationGoalRecord,
+	      productCompletionGapAuditGoalRecord,
+	      agentContextExportGoalRecord,
+	      watchModePlanningGoalRecord,
+	      watchModeImplementationGoalRecord,
+	      watchModeSmokeValidationGoalRecord,
+	      watchModeHandoffGoalRecord,
+	      watchModeEndToEndFixtureGoalRecord,
+		      watchModeOperatorPlaybookGoalRecord,
+		      watchModeOperatorPlaybookConsumptionGoalRecord,
+			      watchModeRecoveryCommandUxGoalRecord,
+			      watchModeRecoverySmokeGoalRecord,
+			      watchModeCompletionAuditGoalRecord,
+			      falsePositiveCatalogPlanningGoalRecord,
+			      falsePositiveCatalogContractGoalRecord,
+			      falsePositiveCatalogArtifactGenerationGoalRecord,
+			      falsePositiveCatalogConsumptionValidationGoalRecord,
+			      falsePositiveCatalogCompletionAuditGoalRecord,
+			      falsePositiveCatalogRealFixtureExpansionGoalRecord,
+			      falsePositiveCatalogDetectorCalibrationPlanningGoalRecord,
+			      falsePositiveCatalogDetectorCalibrationContractGoalRecord,
+			      falsePositiveCatalogDetectorCalibrationContractConsumptionGoalRecord,
+			      falsePositiveCatalogDetectorCalibrationCompletionAuditGoalRecord,
+			      falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoalRecord,
+			      falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoalRecord,
+			      falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoalRecord,
+			      productBacklogReprioritizationAfterDetectorDecisionBlockGoalRecord,
+			      productCompletionGapAuditRefreshV02GoalRecord,
+			      canonicalProductNarrativeFreshnessCleanupGoalRecord,
+			      autopilotProgressConsistencyGuardGoalRecord,
+			      productCompletionGapAuditRefreshV03GoalRecord,
+			      aiIdeRepairWorkflowCliProductizationGoalRecord,
+			      productApplicabilityBoundary,
+			      productApplicabilityBoundaryGoalRecord,
+			      goalIndex,
       snapshot,
       progressMarkdown,
       gitignore,
@@ -4090,8 +4175,64 @@ describe('project structure', () => {
       readFile('docs/operations/project-intelligence-adr-cascade-remediation-recommendation-draft-v0.1.md', 'utf8'),
       readFile('docs/operations/project-intelligence-adr-cascade-maintainer-decision-recording-v0.1.md', 'utf8'),
       readFile('docs/operations/project-intelligence-adr-cascade-controlled-remediation-plan-v0.1.md', 'utf8'),
-      readFile('docs/operations/project-intelligence-adr-cascade-controlled-remediation-execution-v0.1.md', 'utf8'),
-      readFile('.autopilot/progress/intake-confirmation.json', 'utf8'),
+	      readFile('docs/operations/project-intelligence-adr-cascade-controlled-remediation-execution-v0.1.md', 'utf8'),
+	      readFile('docs/operations/project-intelligence-detection-rule-calibration-v0.1.md', 'utf8'),
+	      readFile('docs/operations/repoassure-product-completion-gap-audit-v0.1.md', 'utf8'),
+	      readFile('docs/operations/project-intelligence-agent-context-export-v0.1.md', 'utf8'),
+	      readFile('docs/operations/project-intelligence-watch-mode-planning-v0.1.md', 'utf8'),
+	      readFile('docs/operations/project-intelligence-watch-mode-implementation-v0.1.md', 'utf8'),
+	      readFile('docs/operations/project-intelligence-watch-mode-end-to-end-local-fixture-validation-v0.1.md', 'utf8'),
+		      readFile('docs/operations/project-intelligence-watch-mode-operator-playbook-v0.1.md', 'utf8'),
+			      readFile('docs/operations/project-intelligence-watch-mode-operator-playbook-consumption-validation-v0.1.md', 'utf8'),
+			      readFile('docs/operations/project-intelligence-watch-mode-recovery-command-ux-v0.1.md', 'utf8'),
+			      readFile('docs/operations/project-intelligence-watch-mode-recovery-ux-real-workspace-smoke-v0.1.md', 'utf8'),
+			      readFile('docs/operations/project-intelligence-watch-mode-completion-audit-v0.1.md', 'utf8'),
+			      readFile('docs/operations/product-false-positive-regression-catalog-planning-v0.1.md', 'utf8'),
+			      readFile('docs/operations/product-false-positive-regression-catalog-contract-implementation-v0.1.md', 'utf8'),
+			      readFile('docs/operations/product-false-positive-regression-catalog-artifact-generation-v0.1.md', 'utf8'),
+			      readFile('docs/operations/product-false-positive-regression-catalog-consumption-validation-v0.1.md', 'utf8'),
+			      readFile('docs/operations/product-false-positive-regression-catalog-completion-audit-v0.1.md', 'utf8'),
+			      readFile('docs/operations/product-false-positive-regression-catalog-real-fixture-expansion-v0.1.md', 'utf8'),
+			      readFile('docs/operations/product-false-positive-regression-catalog-detector-calibration-planning-v0.1.md', 'utf8'),
+			      readFile('docs/operations/product-false-positive-regression-catalog-detector-calibration-contract-v0.1.md', 'utf8'),
+			      readFile(
+			        'docs/operations/product-false-positive-regression-catalog-detector-calibration-contract-consumption-validation-v0.1.md',
+			        'utf8'
+			      ),
+			      readFile(
+			        'docs/operations/product-false-positive-regression-catalog-detector-calibration-completion-audit-v0.1.md',
+			        'utf8'
+			      ),
+			      readFile(
+			        'docs/operations/product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1.md',
+			        'utf8'
+			      ),
+			      readFile(
+			        'docs/operations/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1.md',
+			        'utf8'
+			      ),
+			      readFile(
+			        'docs/operations/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-follow-up-v0.1.md',
+			        'utf8'
+			      ),
+			      readFile(
+			        'docs/operations/repoassure-product-backlog-reprioritization-after-detector-decision-block-v0.1.md',
+			        'utf8'
+			      ),
+			      readFile('docs/operations/repoassure-product-completion-gap-audit-refresh-v0.2.md', 'utf8'),
+			      readFile(
+			        'docs/operations/repoassure-canonical-product-narrative-freshness-cleanup-v0.1.md',
+			        'utf8'
+			      ),
+			      readFile(
+			        'docs/operations/repoassure-autopilot-progress-consistency-guard-v0.1.md',
+			        'utf8'
+			      ),
+			      readFile(
+			        'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.3.md',
+			        'utf8'
+			      ),
+			      readFile('.autopilot/progress/intake-confirmation.json', 'utf8'),
       readFile('.autopilot/progress/init-doc-pack.json', 'utf8'),
       readFile('.autopilot/goals/public-website-p3-pixel-qa-mobile-responsive-polish-v0.1.json', 'utf8'),
       readFile('.autopilot/goals/repoassure-product-core-execution-resume-v0.1.json', 'utf8'),
@@ -4111,7 +4252,41 @@ describe('project structure', () => {
       readFile('.autopilot/goals/project-intelligence-adr-cascade-controlled-remediation-plan-v0.1.json', 'utf8'),
       readFile('.autopilot/goals/project-intelligence-adr-cascade-controlled-remediation-execution-v0.1.json', 'utf8'),
       readFile('.autopilot/goals/project-intelligence-adr-cascade-remediation-closure-v0.1.json', 'utf8'),
-      readFile('.autopilot/goals/index.json', 'utf8'),
+	      readFile('.autopilot/goals/project-intelligence-detection-rule-calibration-v0.1.json', 'utf8'),
+	      readFile('.autopilot/goals/repoassure-product-completion-gap-audit-v0.1.json', 'utf8'),
+	      readFile('.autopilot/goals/project-intelligence-agent-context-export-v0.1.json', 'utf8'),
+	      readFile('.autopilot/goals/project-intelligence-watch-mode-planning-v0.1.json', 'utf8'),
+	      readFile('.autopilot/goals/project-intelligence-watch-mode-implementation-v0.1.json', 'utf8'),
+	      readFile('.autopilot/goals/project-intelligence-watch-mode-local-smoke-validation-v0.1.json', 'utf8'),
+	      readFile('.autopilot/goals/project-intelligence-watch-mode-ai-ide-consumption-handoff-v0.1.json', 'utf8'),
+	      readFile('.autopilot/goals/project-intelligence-watch-mode-end-to-end-local-fixture-validation-v0.1.json', 'utf8'),
+	      readFile('.autopilot/goals/project-intelligence-watch-mode-operator-playbook-v0.1.json', 'utf8'),
+		      readFile('.autopilot/goals/project-intelligence-watch-mode-operator-playbook-consumption-validation-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/project-intelligence-watch-mode-recovery-command-ux-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/project-intelligence-watch-mode-recovery-ux-real-workspace-smoke-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/project-intelligence-watch-mode-completion-audit-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/product-false-positive-regression-catalog-planning-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/product-false-positive-regression-catalog-contract-implementation-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/product-false-positive-regression-catalog-artifact-generation-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/product-false-positive-regression-catalog-consumption-validation-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/product-false-positive-regression-catalog-completion-audit-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/product-false-positive-regression-catalog-real-fixture-expansion-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/product-false-positive-regression-catalog-detector-calibration-planning-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/product-false-positive-regression-catalog-detector-calibration-contract-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/product-false-positive-regression-catalog-detector-calibration-contract-consumption-validation-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/product-false-positive-regression-catalog-detector-calibration-completion-audit-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-follow-up-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/repoassure-product-backlog-reprioritization-after-detector-decision-block-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.2.json', 'utf8'),
+			      readFile('.autopilot/goals/repoassure-canonical-product-narrative-freshness-cleanup-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/repoassure-autopilot-progress-consistency-guard-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.3.json', 'utf8'),
+			      readFile('.autopilot/goals/repoassure-ai-ide-repair-workflow-cli-productization-v0.1.json', 'utf8'),
+			      readFile('docs/product/strategy/product-applicability-boundary-v0.1.md', 'utf8'),
+			      readFile('.autopilot/goals/repoassure-product-applicability-boundary-documentation-cascade-v0.1.json', 'utf8'),
+			      readFile('.autopilot/goals/index.json', 'utf8'),
       readFile('.autopilot/progress/snapshot.json', 'utf8'),
       readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8'),
       readFile('.gitignore', 'utf8'),
@@ -4321,6 +4496,868 @@ describe('project structure', () => {
       objective: string;
       blocked_actions: string[];
     };
+    const projectIntelligenceDetectionRuleCalibrationGoal = JSON.parse(
+      projectIntelligenceDetectionRuleCalibrationGoalRecord
+    ) as {
+      schema: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      next_goal_id?: string;
+      summary?: {
+        previous_readme_rule?: string;
+        calibrated_readme_rule?: string;
+        fixture_regression?: string;
+        result?: string;
+        hosted_dashboard_implemented?: boolean;
+        target_repo_writes?: boolean;
+      };
+    };
+	    const productCompletionGapAuditGoal = JSON.parse(productCompletionGapAuditGoalRecord) as {
+	      schema: string;
+	      status: string;
+	      objective: string;
+	      scope?: string[];
+	      blocked_actions: string[];
+	      acceptance?: string[];
+	      next_goal_id?: string;
+	      summary?: {
+	        implemented_surfaces?: string[];
+	        blocked_or_manual_gated?: string[];
+	        safe_auto_executable_candidates?: string[];
+	        selected_next_goal_id?: string;
+	      };
+	    };
+	    const agentContextExportGoal = JSON.parse(agentContextExportGoalRecord) as {
+	      schema: string;
+	      status: string;
+	      objective: string;
+	      source_spec?: string;
+	      priority?: string;
+	      blocked_actions: string[];
+	      acceptance?: string[];
+	      next_goal_id?: string;
+	      summary?: {
+	        json_output?: string;
+	        markdown_output?: string;
+	        script?: string;
+	        product_surfaces?: number;
+	        blockers?: number;
+	        recommended_goals?: number;
+	        local_only?: boolean;
+	        hosted_dashboard_implemented?: boolean;
+	        target_repo_writes?: boolean;
+	      };
+	    };
+	    const watchModePlanningGoal = JSON.parse(watchModePlanningGoalRecord) as {
+	      schema: string;
+	      status: string;
+	      objective: string;
+	      source_spec?: string;
+	      priority?: string;
+	      blocked_actions: string[];
+	      acceptance?: string[];
+	      planning_summary?: {
+	        planning_record?: string;
+	        file_change_scope?: string[];
+	        debounce_ms?: number;
+	        refresh_order?: string[];
+	        manual_stop_boundary?: string;
+	        hosted_dashboard_implemented?: boolean;
+	        target_repo_writes?: boolean;
+	      };
+	      next_goal_id?: string;
+	    };
+	    const watchModeImplementationGoal = JSON.parse(watchModeImplementationGoalRecord) as {
+	      schema: string;
+	      status: string;
+	      objective: string;
+	      source_spec?: string;
+	      priority?: string;
+	      blocked_actions: string[];
+	      acceptance?: string[];
+	      summary?: {
+	        operation_record?: string;
+	        script?: string;
+	        status_output?: string;
+	        schema?: string;
+	        debounce_ms?: number;
+	        refresh_order?: string[];
+	        local_only?: boolean;
+	        daemonized?: boolean;
+	        hosted_dashboard_implemented?: boolean;
+	        telemetry_enabled?: boolean;
+	        target_repo_writes?: boolean;
+	        verification?: string[];
+	      };
+	      next_goal_id?: string;
+	    };
+	    const watchModeSmokeValidationGoal = JSON.parse(watchModeSmokeValidationGoalRecord) as {
+	      schema: string;
+	      status: string;
+	      objective: string;
+	      source_spec?: string;
+	      priority?: string;
+	      blocked_actions: string[];
+	      acceptance?: string[];
+	      summary?: {
+	        operation_record?: string;
+	        smoke_test?: string;
+	        runtime_hardening?: string;
+	        graceful_stop_verified?: boolean;
+	        next_goal_id?: string;
+	        boundary?: { local_only?: boolean; daemonized?: boolean; target_repo_writes?: boolean };
+	      };
+	    };
+	    const watchModeHandoffGoal = JSON.parse(watchModeHandoffGoalRecord) as {
+	      schema: string;
+	      status: string;
+	      objective: string;
+	      source_spec?: string;
+	      priority?: string;
+	      blocked_actions: string[];
+	      acceptance?: string[];
+	      summary?: {
+	        operation_record?: string;
+	        script?: string;
+	        json_output?: string;
+	        markdown_output?: string;
+	        schema?: string;
+	        read_order?: string[];
+	        freshness_checklist?: string[];
+	        boundary?: { local_only?: boolean; daemonized?: boolean; target_repo_writes?: boolean };
+	        verification?: string[];
+	      };
+	      next_goal_id?: string;
+	    };
+	    const watchModeEndToEndFixtureGoal = JSON.parse(watchModeEndToEndFixtureGoalRecord) as {
+	      schema: string;
+	      status: string;
+	      objective: string;
+	      source_spec?: string;
+	      priority?: string;
+	      blocked_actions: string[];
+	      acceptance?: string[];
+	      summary?: {
+	        operation_record?: string;
+	        integration_test?: string;
+	        validated_chain?: string[];
+	        runtime_fix?: string;
+	        boundary?: { local_only?: boolean; target_repo_writes?: boolean };
+	        verification?: string[];
+	      };
+	      next_goal_id?: string;
+	    };
+	    const watchModeOperatorPlaybookGoal = JSON.parse(watchModeOperatorPlaybookGoalRecord) as {
+	      schema: string;
+	      status: string;
+	      objective: string;
+	      source_spec?: string;
+	      priority?: string;
+	      blocked_actions: string[];
+	      acceptance?: string[];
+	      summary?: {
+	        operation_record?: string;
+	        playbook?: string;
+	        command_sequence?: string[];
+	        read_order?: string[];
+	        recovery_sections?: string[];
+	        boundary?: { local_only?: boolean; daemonized?: boolean; target_repo_writes?: boolean };
+	        verification?: string[];
+	      };
+	      next_goal_id?: string;
+	    };
+	    const watchModeOperatorPlaybookConsumptionGoal = JSON.parse(
+	      watchModeOperatorPlaybookConsumptionGoalRecord
+	    ) as {
+	      schema: string;
+	      status: string;
+	      objective: string;
+	      source_spec?: string;
+	      priority?: string;
+	      blocked_actions: string[];
+	      acceptance?: string[];
+	      summary?: {
+	        operation_record?: string;
+	        contract_test?: string;
+	        validated_consumption?: string[];
+	        boundary?: {
+	          local_only?: boolean;
+	          target_repo_writes?: boolean;
+	          hosted_dashboard?: boolean;
+	          telemetry?: boolean;
+	          cloud_sync?: boolean;
+	          deployment?: boolean;
+	        };
+	        verification?: string[];
+	      };
+	      next_goal_id?: string;
+	    };
+	    const watchModeRecoveryCommandUxGoal = JSON.parse(
+	      watchModeRecoveryCommandUxGoalRecord
+	    ) as {
+	      schema: string;
+	      status: string;
+	      objective: string;
+	      source_spec?: string;
+	      priority?: string;
+	      blocked_actions: string[];
+	      acceptance?: string[];
+	      summary?: {
+	        operation_record?: string;
+	        runtime_entry?: string;
+	        test?: string;
+	        added_contract?: string;
+	        recovery_commands?: string[];
+	        boundary?: {
+	          local_only?: boolean;
+	          manual_generated_artifact_edits?: boolean;
+	          target_repo_writes?: boolean;
+	          hosted_dashboard?: boolean;
+	          telemetry?: boolean;
+	          cloud_sync?: boolean;
+	        };
+	        verification?: string[];
+	      };
+	      next_goal_id?: string;
+	    };
+		    const watchModeRecoverySmokeGoal = JSON.parse(watchModeRecoverySmokeGoalRecord) as {
+		      schema: string;
+		      status: string;
+		      objective: string;
+		      source_spec?: string;
+		      priority?: string;
+		      blocked_actions: string[];
+		      acceptance?: string[];
+		      summary?: {
+		        operation_record?: string;
+		        integration_test?: string;
+		        real_workspace?: { watch_status?: string; recovery_status?: string; freshness_checks?: string };
+		        failing_fixture?: { watch_status?: string; recovery_status?: string; failed_checks?: string[]; redaction_verified?: boolean };
+		        recovery_commands?: string[];
+		        boundary?: {
+		          local_only?: boolean;
+		          manual_generated_artifact_edits?: boolean;
+		          target_repo_writes?: boolean;
+		          hosted_dashboard?: boolean;
+		          telemetry?: boolean;
+		          cloud_sync?: boolean;
+		        };
+		        verification?: string[];
+		      };
+		      next_goal_id?: string;
+		    };
+			    const watchModeCompletionAuditGoal = JSON.parse(watchModeCompletionAuditGoalRecord) as {
+			      schema: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      priority?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      summary?: {
+			        operation_record?: string;
+			        conclusion?: string;
+			        audited_scope?: string[];
+			        generated_artifacts?: { freshness_checks?: string; recovery_status?: string };
+			        boundary?: {
+			          local_only?: boolean;
+			          daemonized?: boolean;
+			          hosted_dashboard?: boolean;
+			          telemetry?: boolean;
+			          cloud_sync?: boolean;
+			          target_repo_writes?: boolean;
+			          manual_generated_artifact_edits?: boolean;
+			        };
+			        selected_next_goal_id?: string;
+			        verification?: string[];
+			      };
+			      next_goal_id?: string;
+			    };
+			    const falsePositiveCatalogPlanningGoal = JSON.parse(falsePositiveCatalogPlanningGoalRecord) as {
+			      schema: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      priority?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      summary?: {
+			        operation_record?: string;
+			        conclusion?: string;
+			        catalog_plan?: {
+			          fixture_categories?: string[];
+			          expected_snapshot_fields?: string[];
+			          review_fields?: string[];
+			          finding_sources?: string[];
+			        };
+			        boundaries?: {
+			          local_only?: boolean;
+			          runtime_detection_behavior_change?: boolean;
+			          target_repo_writes?: boolean;
+			          hosted_dashboard?: boolean;
+			          telemetry?: boolean;
+			          cloud_sync?: boolean;
+			        };
+			        selected_next_goal_id?: string;
+			        verification?: string[];
+			      };
+			      next_goal_id?: string;
+			    };
+			    const falsePositiveCatalogContractGoal = JSON.parse(falsePositiveCatalogContractGoalRecord) as {
+			      schema: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      priority?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      summary?: {
+			        operation_record?: string;
+			        conclusion?: string;
+			        implemented_contract?: {
+			          module?: string;
+			          package_export?: string;
+			          root_export?: string;
+			          contract_symbol?: string;
+			          builder_symbol?: string;
+			          validator_symbol?: string;
+			          fixture_categories?: string[];
+			          expected_snapshot_fields?: string[];
+			          review_fields?: string[];
+			        };
+			        boundaries?: {
+			          local_only?: boolean;
+			          runtime_detection_behavior_change?: boolean;
+			          finding_suppression?: boolean;
+			          automatic_severity_downgrade?: boolean;
+			          target_repo_writes?: boolean;
+			          hosted_dashboard?: boolean;
+			          telemetry?: boolean;
+			          cloud_sync?: boolean;
+			        };
+			        selected_next_goal_id?: string;
+			        verification?: string[];
+			      };
+			      next_goal_id?: string;
+			    };
+			    const falsePositiveCatalogArtifactGenerationGoal = JSON.parse(falsePositiveCatalogArtifactGenerationGoalRecord) as {
+			      schema: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      priority?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      summary?: {
+			        operation_record?: string;
+			        conclusion?: string;
+			        command?: string;
+			        artifacts?: string[];
+			        boundary?: {
+			          local_only?: boolean;
+			          target_repo_writes?: boolean;
+			          runtime_detection_behavior_change?: boolean;
+			          finding_suppression?: boolean;
+			          automatic_severity_downgrade?: boolean;
+			        };
+			        selected_next_goal_id?: string;
+			        verification?: string[];
+			      };
+			      next_goal_id?: string;
+			    };
+			    const falsePositiveCatalogConsumptionValidationGoal = JSON.parse(falsePositiveCatalogConsumptionValidationGoalRecord) as {
+			      schema: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      priority?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      summary?: {
+			        operation_record?: string;
+			        conclusion?: string;
+			        command?: string;
+			        artifacts?: string[];
+			        checks?: number;
+			        validated_consumption?: string[];
+			        boundary?: {
+			          local_only?: boolean;
+			          target_repo_writes?: boolean;
+			          runtime_detection_behavior_change?: boolean;
+			          finding_suppression?: boolean;
+			          automatic_severity_downgrade?: boolean;
+			        };
+			        selected_next_goal_id?: string;
+			        verification?: string[];
+			      };
+			      next_goal_id?: string;
+			    };
+			    const falsePositiveCatalogCompletionAuditGoal = JSON.parse(falsePositiveCatalogCompletionAuditGoalRecord) as {
+			      schema: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      priority?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      summary?: {
+			        operation_record?: string;
+			        conclusion?: string;
+			        audited_sequence?: string[];
+			        confirmed_artifacts?: string[];
+			        boundary?: {
+			          local_only?: boolean;
+			          target_repo_writes?: boolean;
+			          runtime_detection_behavior_change?: boolean;
+			          finding_suppression?: boolean;
+			          automatic_severity_downgrade?: boolean;
+			          hosted_dashboard?: boolean;
+			          cloud_sync?: boolean;
+			          telemetry?: boolean;
+			          deployment?: boolean;
+			          public_release?: boolean;
+			        };
+			        selected_next_goal_id?: string;
+			        verification?: string[];
+			      };
+			      next_goal_id?: string;
+			    };
+			    const falsePositiveCatalogRealFixtureExpansionGoal = JSON.parse(falsePositiveCatalogRealFixtureExpansionGoalRecord) as {
+			      schema: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      priority?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      summary?: {
+			        entries_before?: number;
+			        entries_after?: number;
+			        new_fixture_category?: string;
+			        near_real_public_fixture_count?: number;
+			        fixture_origin_field?: boolean;
+			        privacy_metadata?: {
+			          non_private?: boolean;
+			          source_code_included?: boolean;
+			          secrets_included?: boolean;
+			        };
+			        generated_artifacts?: string[];
+			        boundary?: {
+			          local_only?: boolean;
+			          target_repo_writes?: boolean;
+			          runtime_detection_behavior_change?: boolean;
+			          finding_suppression?: boolean;
+			          automatic_severity_downgrade?: boolean;
+			          hosted_dashboard?: boolean;
+			          cloud_sync?: boolean;
+			          telemetry?: boolean;
+			          deployment?: boolean;
+			          public_release?: boolean;
+			        };
+			        selected_next_goal_id?: string;
+			      };
+			      next_goal_id?: string;
+			    };
+			    const falsePositiveCatalogDetectorCalibrationPlanningGoal = JSON.parse(
+			      falsePositiveCatalogDetectorCalibrationPlanningGoalRecord
+			    ) as {
+			      schema: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      priority?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      summary?: {
+			        operation_record?: string;
+			        conclusion?: string;
+			        calibration_questions?: string[];
+			        manual_gates?: string[];
+			        required_future_authorization?: string[];
+			        boundary?: {
+			          runtime_detection_behavior_change?: boolean;
+			          finding_suppression?: boolean;
+			          automatic_severity_downgrade?: boolean;
+			          target_repo_writes?: boolean;
+			        };
+			        selected_next_goal_id?: string;
+			      };
+			      next_goal_id?: string;
+			    };
+			    const falsePositiveCatalogDetectorCalibrationContractGoal = JSON.parse(
+			      falsePositiveCatalogDetectorCalibrationContractGoalRecord
+			    ) as {
+			      schema: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      priority?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      conclusion?: string;
+			      summary?: {
+			        operation_record?: string;
+			        implementation?: string[];
+			        generated_artifacts?: string[];
+			        calibration_questions?: string[];
+			        manual_gates?: string[];
+			        required_future_authorization?: string[];
+			        boundary?: {
+			          runtime_detection_behavior_change?: boolean;
+			          finding_suppression?: boolean;
+			          automatic_severity_downgrade?: boolean;
+			          target_repo_write?: boolean;
+			        };
+			        next_goal_id?: string;
+			      };
+			      next_goal_id?: string;
+			    };
+			    const falsePositiveCatalogDetectorCalibrationContractConsumptionGoal = JSON.parse(
+			      falsePositiveCatalogDetectorCalibrationContractConsumptionGoalRecord
+			    ) as {
+			      schema: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      priority?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      completed_at?: string;
+			      conclusion?: string;
+			      summary?: {
+			        operation_record?: string;
+			        implementation?: string[];
+			        generated_artifacts?: string[];
+			        checks_passed?: number;
+			        calibration_questions?: string[];
+			        manual_gates?: string[];
+			        required_future_authorization?: string[];
+			        boundary?: {
+			          runtime_detection_behavior_change?: boolean;
+			          finding_suppression?: boolean;
+			          automatic_severity_downgrade?: boolean;
+			          target_repo_write?: boolean;
+			        };
+			        next_goal_id?: string;
+			      };
+			      next_goal_id?: string;
+			    };
+			    const falsePositiveCatalogDetectorCalibrationCompletionAuditGoal = JSON.parse(
+			      falsePositiveCatalogDetectorCalibrationCompletionAuditGoalRecord
+			    ) as {
+			      schema: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      priority?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      completed_at?: string;
+			      conclusion?: string;
+			      summary?: {
+			        operation_record?: string;
+			        audited_sequence?: string[];
+			        confirmed_artifacts?: string[];
+			        checks_passed?: number;
+			        boundary?: {
+			          local_only?: boolean;
+			          runtime_detection_behavior_change?: boolean;
+			          finding_suppression?: boolean;
+			          automatic_severity_downgrade?: boolean;
+			          detector_confidence_threshold_change?: boolean;
+			          acceptance_policy_change?: boolean;
+			          target_repo_writes?: boolean;
+			          hosted_dashboard?: boolean;
+			          cloud_sync?: boolean;
+			          telemetry?: boolean;
+			          deployment?: boolean;
+			          public_release?: boolean;
+			        };
+			        selected_next_goal_id?: string;
+			      };
+			      next_goal_id?: string;
+			    };
+			    const falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal = JSON.parse(
+			      falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoalRecord
+			    ) as {
+			      schema: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      priority?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      completed_at?: string;
+			      conclusion?: string;
+			      summary?: {
+			        operation_record?: string;
+			        intake_status?: string;
+			        decision_options?: string[];
+			        calibration_questions?: string[];
+			        pending_decision_count?: number;
+			        manual_gates?: string[];
+			        boundary?: {
+			          runtime_detection_behavior_change?: boolean;
+			          finding_suppression?: boolean;
+			          automatic_severity_downgrade?: boolean;
+			          detector_confidence_threshold_change?: boolean;
+			          acceptance_policy_change?: boolean;
+			          target_repo_writes?: boolean;
+			        };
+			        selected_next_goal_id?: string;
+			      };
+			      next_goal_id?: string;
+			    };
+			    const falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal = JSON.parse(
+			      falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoalRecord
+			    ) as {
+			      schema: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      priority?: string;
+			      completed_at?: string;
+			      conclusion?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      document_basis?: string[];
+			      summary?: {
+			        operation_record?: string;
+			        decision_record_status?: string;
+			        source_intake?: string;
+			        recorded_decisions?: number;
+			        pending_decision_count?: number;
+			        pending_questions?: string[];
+			        preserved_decision_slots?: Array<{ id: string; decision: string; evidence: string }>;
+			        detector_changes_authorized?: boolean;
+			        boundary?: {
+			          runtime_detection_behavior_change?: boolean;
+			          finding_suppression?: boolean;
+			          automatic_severity_downgrade?: boolean;
+			          detector_confidence_threshold_change?: boolean;
+			          acceptance_policy_change?: boolean;
+			          target_repo_writes?: boolean;
+			        };
+			      };
+			      next_goal_id?: string;
+			    };
+			    const falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal = JSON.parse(
+			      falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoalRecord
+			    ) as {
+			      schema: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      priority?: string;
+			      completed_at?: string;
+			      conclusion?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      document_basis?: string[];
+			      summary?: {
+			        operation_record?: string;
+			        source_decision_record?: string;
+			        source_intake?: string;
+			        explicit_decisions_found?: boolean;
+			        recorded_decisions?: number;
+			        pending_decision_count?: number;
+			        pending_questions?: string[];
+			        decision_request_status?: string;
+			        detector_changes_authorized?: boolean;
+			        boundary?: {
+			          runtime_detection_behavior_change?: boolean;
+			          finding_suppression?: boolean;
+			          automatic_severity_downgrade?: boolean;
+			          detector_confidence_threshold_change?: boolean;
+			          acceptance_policy_change?: boolean;
+			          target_repo_writes?: boolean;
+			        };
+			      };
+			      next_goal_id?: string;
+			    };
+			    const productBacklogReprioritizationAfterDetectorDecisionBlockGoal = JSON.parse(
+			      productBacklogReprioritizationAfterDetectorDecisionBlockGoalRecord
+			    ) as {
+			      schema: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      priority?: string;
+			      completed_at?: string;
+			      conclusion?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      document_basis?: string[];
+			      summary?: {
+			        operation_record?: string;
+			        blocked_line?: string;
+			        selected_next_goal_id?: string;
+			        selected_next_goal_title?: string;
+			        candidate_count?: number;
+			        blocked_candidate_count?: number;
+			        selected_candidate_reason?: string;
+			        boundary?: {
+			          runtime_detection_behavior_change?: boolean;
+			          target_repo_writes?: boolean;
+			          deployment?: boolean;
+			          public_release?: boolean;
+			          customer_contact?: boolean;
+			          pricing_or_spend_change?: boolean;
+			        };
+			      };
+			      next_goal_id?: string;
+			    };
+			    const productCompletionGapAuditRefreshV02Goal = JSON.parse(productCompletionGapAuditRefreshV02GoalRecord) as {
+			      schema: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      priority?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      completed_at?: string;
+			      conclusion?: string;
+			      document_basis?: string[];
+			      summary?: {
+			        operation_record?: string;
+			        implemented_surfaces?: string[];
+			        blocked_or_manual_gated?: string[];
+			        deferred?: string[];
+			        safe_auto_executable_candidates?: string[];
+			        selected_next_goal_id?: string;
+			        selected_next_goal_title?: string;
+			        selected_candidate_reason?: string;
+			        boundary?: {
+			          runtime_detection_behavior_change?: boolean;
+			          target_repo_writes?: boolean;
+			          deployment?: boolean;
+			          public_release?: boolean;
+			          customer_contact?: boolean;
+			          pricing_or_spend_change?: boolean;
+			        };
+			      };
+			      next_goal_id?: string;
+			    };
+			    const canonicalProductNarrativeFreshnessCleanupGoal = JSON.parse(
+			      canonicalProductNarrativeFreshnessCleanupGoalRecord
+			    ) as {
+			      schema: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      priority?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      completed_at?: string;
+			      conclusion?: string;
+			      document_basis?: string[];
+			      summary?: {
+			        operation_record?: string;
+			        cleaned_surfaces?: string[];
+			        preserved_historical_records?: string[];
+			        stale_current_next_patterns_removed?: string[];
+			        boundary?: {
+			          runtime_detection_behavior_change?: boolean;
+			          target_repo_writes?: boolean;
+			          deployment?: boolean;
+			          public_release?: boolean;
+			          customer_contact?: boolean;
+			          pricing_or_spend_change?: boolean;
+			        };
+			      };
+			      next_goal_id?: string;
+			    };
+			    const autopilotProgressConsistencyGuardGoal = JSON.parse(autopilotProgressConsistencyGuardGoalRecord) as {
+			      schema: string;
+			      id: string;
+			      title: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      priority?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      conclusion?: string;
+			      completed_at?: string;
+			      next_goal_id?: string;
+			      summary?: {
+			        operation_record?: string;
+			        command?: string;
+			        checks?: number;
+			        local_only?: boolean;
+			        read_only?: boolean;
+			      };
+			    };
+			    const productCompletionGapAuditRefreshV03Goal = JSON.parse(
+			      productCompletionGapAuditRefreshV03GoalRecord
+			    ) as {
+			      schema: string;
+			      id: string;
+			      title: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			      conclusion?: string;
+			      completed_at?: string;
+			      next_goal_id?: string;
+			      summary?: {
+			        operation_record?: string;
+			        implemented_surfaces?: string[];
+			        blocked_or_manual_gated?: string[];
+			        external_input_gated?: string[];
+			        deferred?: string[];
+			        safe_auto_executable?: string[];
+			        selected_next_goal?: string;
+			        evidence?: string[];
+			        boundary?: {
+			          runtime_detection_behavior_change?: boolean;
+			          target_repo_writes?: boolean;
+			          website_design_system_rewrite?: boolean;
+			          deployment?: boolean;
+			          public_release?: boolean;
+			          customer_contact?: boolean;
+			          pricing_or_spend_change?: boolean;
+			        };
+			      };
+			    };
+			    const aiIdeRepairWorkflowCliProductizationGoal = JSON.parse(
+			      aiIdeRepairWorkflowCliProductizationGoalRecord
+			    ) as {
+			      schema: string;
+			      id: string;
+			      title: string;
+			      status: string;
+			      objective: string;
+			      source_spec?: string;
+			      blocked_actions: string[];
+			      acceptance?: string[];
+			    };
+			    const productApplicabilityBoundaryGoal = JSON.parse(productApplicabilityBoundaryGoalRecord) as {
+			      schema: string;
+			      status: string;
+			      objective: string;
+			      conclusion?: string;
+			      source_spec?: string;
+			      blocked_actions: string[];
+			      document_basis?: string[];
+			      next_goal_id?: string;
+			      summary?: {
+			        strategy_doc?: string;
+			        conclusion?: string;
+			        product_type_tiers?: string[];
+			        prohibited_claims?: string[];
+			        boundary?: {
+			          applies_to_every_product?: boolean;
+			          full_stack_universal_automatic_acceptance?: boolean;
+			          replaces_human_acceptance?: boolean;
+			          automatically_fixes_every_ai_code_issue?: boolean;
+			          runtime_behavior_change?: boolean;
+			        };
+			      };
+			    };
     const index = JSON.parse(goalIndex) as {
       active_goal_id: string;
       deferred_goal_ids?: string[];
@@ -4343,9 +5380,48 @@ describe('project structure', () => {
     expect(prd).toContain('Status: canonical_entrypoint');
     expect(prd).toContain('Source: brownfield_inference_with_owner_confirmation');
     expect(prd).toContain('docs/product/specs/mvp-spec-v0.3.md');
+    expect(prd).toContain('Product False-Positive Regression Catalog Detector Calibration Completion Audit v0.1');
+    expect(prd).toContain('complete_for_current_local_only_detector_calibration_slice');
+    expect(prd).toContain('Product False-Positive Regression Catalog Detector Calibration Authorization Intake v0.1');
+    expect(prd).toContain('authorization_intake_created_pending_maintainer_decisions');
+    expect(prd).toContain('Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Recording v0.1');
+    expect(prd).toContain('maintainer_decision_record_created_with_pending_decisions');
+    expect(prd).toContain('Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Follow-up v0.1');
+    expect(prd).toContain('maintainer_decision_follow_up_recorded_without_explicit_decisions');
+    expect(prd).toContain('RepoAssure Product Backlog Reprioritization After Detector Decision Block v0.1');
+    expect(prd).toContain('backlog_reprioritized_to_non_blocked_local_gap_audit');
+    expect(prd).toContain('RepoAssure Product Completion Gap Audit Refresh v0.2');
+    expect(prd).toContain('completion_gap_audit_refreshed_with_narrative_cleanup_next');
+    expect(prd).toContain('RepoAssure Canonical Product Narrative Freshness Cleanup v0.1');
+    expect(prd).toContain('canonical_product_narrative_freshness_cleaned');
+    expect(prd).toContain('RepoAssure Autopilot Progress Consistency Guard v0.1');
+    expect(prd).not.toContain('The selected next safe automatic goal is Project Intelligence Agent Context Export v0.1');
+    expect(prd).toContain('RepoAssure Product Applicability Boundary Documentation Cascade v0.1');
+    expect(prd).toContain('product_applicability_boundary_documented');
     expect(spec).toContain('Status: canonical_entrypoint');
     expect(spec).toContain('CLI + MCP Server');
     expect(spec).toContain('Public Website');
+    expect(spec).toContain('Product False-Positive Regression Catalog Detector Calibration Completion Audit v0.1');
+    expect(spec).toContain('Product False-Positive Regression Catalog Detector Calibration Authorization Intake v0.1');
+    expect(spec).toContain('Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Recording v0.1');
+    expect(spec).toContain('maintainer_decision_record_created_with_pending_decisions');
+    expect(spec).toContain('Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Follow-up v0.1');
+    expect(spec).toContain('maintainer_decision_follow_up_recorded_without_explicit_decisions');
+    expect(spec).toContain('RepoAssure Product Backlog Reprioritization After Detector Decision Block v0.1');
+    expect(spec).toContain('backlog_reprioritized_to_non_blocked_local_gap_audit');
+    expect(spec).toContain('RepoAssure Product Completion Gap Audit Refresh v0.2');
+    expect(spec).toContain('completion_gap_audit_refreshed_with_narrative_cleanup_next');
+    expect(spec).toContain('RepoAssure Canonical Product Narrative Freshness Cleanup v0.1');
+    expect(spec).toContain('canonical_product_narrative_freshness_cleaned');
+    expect(spec).toContain('RepoAssure Autopilot Progress Consistency Guard v0.1');
+    expect(spec).not.toContain(
+      'The next implementation target is Product False-Positive Regression Catalog Real Fixture Expansion v0.1'
+    );
+    expect(spec).not.toContain(
+      'The next implementation target is Product False-Positive Regression Catalog Detector Calibration Contract v0.1'
+    );
+    expect(spec).toContain('RepoAssure Product Applicability Boundary Documentation Cascade v0.1');
+    expect(spec).toContain('product_applicability_boundary_documented');
     expect(design).toContain('Status: canonical_entrypoint');
     expect(design).toContain('docs/design/design-system-v0.1.md');
     expect(design).toContain('design_queue_released');
@@ -4357,6 +5433,19 @@ describe('project structure', () => {
     expect(plan).toContain('RepoAssure Product Core Execution Resume v0.1');
     expect(plan).toContain('AI IDE Repair Decision Package Contract Hardening v0.1');
     expect(plan).toContain('Next Codex Goal');
+    expect(plan).toContain('RepoAssure Product Applicability Boundary Documentation Cascade v0.1');
+    expect(plan).toContain('product_applicability_boundary_documented');
+    expect(plan).toContain('Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Recording v0.1');
+    expect(plan).toContain('maintainer_decision_record_created_with_pending_decisions');
+    expect(plan).toContain('Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Follow-up v0.1');
+    expect(plan).toContain('maintainer_decision_follow_up_recorded_without_explicit_decisions');
+    expect(plan).toContain('RepoAssure Product Backlog Reprioritization After Detector Decision Block v0.1');
+    expect(plan).toContain('backlog_reprioritized_to_non_blocked_local_gap_audit');
+    expect(plan).toContain('RepoAssure Product Completion Gap Audit Refresh v0.2');
+    expect(plan).toContain('completion_gap_audit_refreshed_with_narrative_cleanup_next');
+    expect(plan).toContain('RepoAssure Canonical Product Narrative Freshness Cleanup v0.1');
+    expect(plan).toContain('canonical_product_narrative_freshness_cleaned');
+    expect(plan).toContain('RepoAssure Autopilot Progress Consistency Guard v0.1');
     expect(designDeferred).toContain('Public Website Design Work Deferred v0.1');
     expect(designDeferred).toContain('Status: superseded');
     expect(designDeferred).toContain('repoassure-design-system-v2-unfreeze-v0.1.md');
@@ -4473,7 +5562,46 @@ describe('project structure', () => {
     expect(projectIntelligenceControlledRemediationExecution).toContain(
       'Project Intelligence ADR Cascade Remediation Closure v0.1'
     );
-    expect(brownfieldIntake).toContain('Brownfield Autopilot Intake v0.1');
+    expect(projectIntelligenceDetectionRuleCalibration).toContain(
+      'Project Intelligence Detection Rule Calibration v0.1'
+    );
+    expect(projectIntelligenceDetectionRuleCalibration).toContain('Status: completed');
+    expect(projectIntelligenceDetectionRuleCalibration).toContain('exact app or package root path');
+    expect(projectIntelligenceDetectionRuleCalibration).toContain('apps/nested-readme/docs/README.md');
+	    expect(projectIntelligenceDetectionRuleCalibration).toContain(
+	      'No hosted dashboard, cloud sync, telemetry, deployment, public release'
+	    );
+	    expect(productCompletionGapAudit).toContain('RepoAssure Product Completion Gap Audit v0.1');
+	    expect(productCompletionGapAudit).toContain('Status: completed');
+	    expect(projectIntelligenceWatchModeImplementation).toContain(
+	      'Project Intelligence Watch Mode Implementation v0.1'
+	    );
+	    expect(projectIntelligenceWatchModeImplementation).toContain('Status: completed');
+	    expect(projectIntelligenceWatchModeImplementation).toContain('pnpm project:intelligence:watch');
+	    expect(projectIntelligenceWatchModeImplementation).toContain('project-intelligence-watch-status.json');
+	    expect(projectIntelligenceWatchModeImplementation).toContain('1500 ms');
+	    expect(projectIntelligenceWatchModeImplementation).toContain('Project Intelligence Watch Mode Local Smoke Validation v0.1');
+	    expect(productCompletionGapAudit).toContain('Implemented Product Surfaces');
+	    expect(productCompletionGapAudit).toContain('Blocked or Manual-Gated Work');
+	    expect(productCompletionGapAudit).toContain('Safe Auto-Executable Gaps');
+	    expect(productCompletionGapAudit).toContain('Project Intelligence Agent Context Export v0.1');
+	    expect(productCompletionGapAudit).toContain('This audit did not execute deployment, public launch');
+	    expect(projectIntelligenceAgentContext).toContain('Project Intelligence Agent Context Export v0.1');
+	    expect(projectIntelligenceAgentContext).toContain('Status: completed');
+	    expect(projectIntelligenceAgentContext).toContain('project-intelligence-agent-context.json');
+	    expect(projectIntelligenceAgentContext).toContain('project-intelligence-agent-context.md');
+	    expect(projectIntelligenceAgentContext).toContain('Project Intelligence Watch Mode Planning v0.1');
+	    expect(projectIntelligenceAgentContext).toContain('No hosted dashboard, cloud sync, telemetry, deployment, public release');
+	    expect(projectIntelligenceWatchModePlanning).toContain('Project Intelligence Watch Mode Planning v0.1');
+	    expect(projectIntelligenceWatchModePlanning).toContain('Status: completed');
+	    expect(projectIntelligenceWatchModePlanning).toContain('1500 ms');
+	    expect(projectIntelligenceWatchModePlanning).toContain('pnpm project:intelligence');
+	    expect(projectIntelligenceWatchModePlanning).toContain('pnpm project:intelligence:agent-context');
+	    expect(projectIntelligenceWatchModePlanning).toContain('Ctrl+C');
+	    expect(projectIntelligenceWatchModePlanning).toContain('Project Intelligence Watch Mode Implementation v0.1');
+	    expect(projectIntelligenceWatchModePlanning).toContain('hosted dashboard');
+	    expect(projectIntelligenceWatchModePlanning).toContain('target repo writes');
+	    expect(brownfieldIntake).toContain('Brownfield Autopilot Intake v0.1');
     expect(brownfieldIntake).toContain('Owner confirmation: recorded');
     expect(brownfieldIntake).toContain('command_line');
     expect(brownfieldIntake).toContain('mcp_server');
@@ -4682,27 +5810,1613 @@ describe('project structure', () => {
     expect(projectIntelligenceClosureGoal.objective).toContain('freshness');
     expect(projectIntelligenceClosureGoal.blocked_actions).toContain('hosted_dashboard');
     expect(projectIntelligenceClosureGoal.blocked_actions).toContain('target_repo_write');
-    // The active goal advances with each completion, so assert its shape rather than its
-    // identity: it must be one of the ADR-0022 design sequence, registered in the index,
-    // and marked ready. Pinning the id turns this into churn on every goal.
-    const designSequence = [
+    expect(projectIntelligenceDetectionRuleCalibrationGoal.schema).toBe('project-autopilot/goal@1');
+    expect(projectIntelligenceDetectionRuleCalibrationGoal.status).toBe('completed');
+    expect(projectIntelligenceDetectionRuleCalibrationGoal.objective).toContain('findOrphanCode');
+    expect(projectIntelligenceDetectionRuleCalibrationGoal.summary?.previous_readme_rule).toBe(
+      'any contained path ending in /README.md'
+    );
+    expect(projectIntelligenceDetectionRuleCalibrationGoal.summary?.calibrated_readme_rule).toBe(
+      'exact app or package root README.md only'
+    );
+    expect(projectIntelligenceDetectionRuleCalibrationGoal.summary?.fixture_regression).toBe(
+      'apps/nested-readme/docs/README.md'
+    );
+    expect(projectIntelligenceDetectionRuleCalibrationGoal.summary?.hosted_dashboard_implemented).toBe(false);
+    expect(projectIntelligenceDetectionRuleCalibrationGoal.summary?.target_repo_writes).toBe(false);
+    expect(projectIntelligenceDetectionRuleCalibrationGoal.next_goal_id).toBe(
+      'repoassure-product-completion-gap-audit-v0.1'
+	    );
+	    expect(productCompletionGapAuditGoal.schema).toBe('project-autopilot/goal@1');
+	    expect(productCompletionGapAuditGoal.status).toBe('completed');
+	    expect(productCompletionGapAuditGoal.objective).toContain('remaining product completion gaps');
+	    expect(productCompletionGapAuditGoal.scope).toContain('docs/PRD.md');
+	    expect(productCompletionGapAuditGoal.blocked_actions).toContain('target_repo_write');
+	    expect(productCompletionGapAuditGoal.blocked_actions).toContain('website_design_system_rewrite');
+	    expect(productCompletionGapAuditGoal.summary?.implemented_surfaces).toContain('project_intelligence_viewer');
+	    expect(productCompletionGapAuditGoal.summary?.blocked_or_manual_gated).toContain('public_source_release_execution');
+	    expect(productCompletionGapAuditGoal.summary?.safe_auto_executable_candidates).toContain(
+	      'project-intelligence-agent-context-export-v0.1'
+	    );
+	    expect(productCompletionGapAuditGoal.summary?.selected_next_goal_id).toBe(
+	      'project-intelligence-agent-context-export-v0.1'
+	    );
+	    expect(productCompletionGapAuditGoal.next_goal_id).toBe('project-intelligence-agent-context-export-v0.1');
+	    expect(agentContextExportGoal.schema).toBe('project-autopilot/goal@1');
+	    expect(agentContextExportGoal.status).toBe('completed');
+	    expect(agentContextExportGoal.objective).toContain('agent context export');
+	    expect(agentContextExportGoal.source_spec).toBe('docs/product/specs/project-intelligence-console-spec-v0.1.md');
+	    expect(agentContextExportGoal.priority).toBe('P1');
+	    expect(agentContextExportGoal.blocked_actions).toContain('hosted_dashboard');
+	    expect(agentContextExportGoal.blocked_actions).toContain('target_repo_write');
+	    expect(agentContextExportGoal.blocked_actions).toContain('website_design_system_rewrite');
+	    expect(agentContextExportGoal.acceptance?.some((item) => item.includes('project:intelligence:agent-context'))).toBe(
+	      true
+	    );
+	    expect(agentContextExportGoal.acceptance?.some((item) => item.includes('artifacts/project-graph/'))).toBe(true);
+	    expect(agentContextExportGoal.summary?.json_output).toBe(
+	      'artifacts/project-graph/project-intelligence-agent-context.json'
+	    );
+	    expect(agentContextExportGoal.summary?.markdown_output).toBe(
+	      'artifacts/project-graph/project-intelligence-agent-context.md'
+	    );
+	    expect(agentContextExportGoal.summary?.script).toBe('pnpm project:intelligence:agent-context');
+	    expect(agentContextExportGoal.summary?.local_only).toBe(true);
+	    expect(agentContextExportGoal.summary?.hosted_dashboard_implemented).toBe(false);
+	    expect(agentContextExportGoal.summary?.target_repo_writes).toBe(false);
+	    expect(agentContextExportGoal.next_goal_id).toBe('project-intelligence-watch-mode-planning-v0.1');
+	    expect(watchModePlanningGoal.schema).toBe('project-autopilot/goal@1');
+	    expect(watchModePlanningGoal.status).toBe('completed');
+	    expect(watchModePlanningGoal.objective).toContain('watch mode');
+	    expect(watchModePlanningGoal.source_spec).toBe('docs/product/specs/project-intelligence-console-spec-v0.1.md');
+	    expect(watchModePlanningGoal.priority).toBe('P1');
+	    expect(watchModePlanningGoal.blocked_actions).toContain('hosted_dashboard');
+	    expect(watchModePlanningGoal.blocked_actions).toContain('target_repo_write');
+	    expect(watchModePlanningGoal.acceptance?.some((item) => item.includes('debounce'))).toBe(true);
+	    expect(watchModePlanningGoal.planning_summary?.planning_record).toBe(
+	      'docs/operations/project-intelligence-watch-mode-planning-v0.1.md'
+	    );
+	    expect(watchModePlanningGoal.planning_summary?.file_change_scope).toEqual(expect.arrayContaining([
+	      'docs/**/*.md',
+	      'packages/**/*.ts',
+	      'src/**/*.ts',
+	      '.autopilot/**/*.json'
+	    ]));
+	    expect(watchModePlanningGoal.planning_summary?.debounce_ms).toBe(1500);
+	    expect(watchModePlanningGoal.planning_summary?.refresh_order).toEqual([
+	      'pnpm project:intelligence',
+	      'pnpm project:intelligence:agent-context'
+	    ]);
+	    expect(watchModePlanningGoal.planning_summary?.manual_stop_boundary).toContain('Ctrl+C');
+	    expect(watchModePlanningGoal.planning_summary?.hosted_dashboard_implemented).toBe(false);
+	    expect(watchModePlanningGoal.planning_summary?.target_repo_writes).toBe(false);
+	    expect(watchModePlanningGoal.next_goal_id).toBe('project-intelligence-watch-mode-implementation-v0.1');
+	    expect(watchModeImplementationGoal.schema).toBe('project-autopilot/goal@1');
+	    expect(watchModeImplementationGoal.status).toBe('completed');
+	    expect(watchModeImplementationGoal.objective).toContain('watch mode');
+	    expect(watchModeImplementationGoal.source_spec).toBe(
+	      'docs/operations/project-intelligence-watch-mode-planning-v0.1.md'
+	    );
+	    expect(watchModeImplementationGoal.priority).toBe('P1');
+	    expect(watchModeImplementationGoal.blocked_actions).toContain('hosted_dashboard');
+	    expect(watchModeImplementationGoal.blocked_actions).toContain('target_repo_write');
+	    expect(watchModeImplementationGoal.summary?.operation_record).toBe(
+	      'docs/operations/project-intelligence-watch-mode-implementation-v0.1.md'
+	    );
+	    expect(watchModeImplementationGoal.summary?.script).toBe('pnpm project:intelligence:watch');
+	    expect(watchModeImplementationGoal.summary?.status_output).toBe(
+	      'artifacts/project-graph/project-intelligence-watch-status.json'
+	    );
+	    expect(watchModeImplementationGoal.summary?.schema).toBe(
+	      'repoassure.project-intelligence-watch-status@1'
+	    );
+	    expect(watchModeImplementationGoal.summary?.debounce_ms).toBe(1500);
+	    expect(watchModeImplementationGoal.summary?.refresh_order).toEqual([
+	      'pnpm project:intelligence',
+	      'pnpm project:intelligence:agent-context'
+	    ]);
+	    expect(watchModeImplementationGoal.summary?.local_only).toBe(true);
+	    expect(watchModeImplementationGoal.summary?.daemonized).toBe(false);
+	    expect(watchModeImplementationGoal.summary?.hosted_dashboard_implemented).toBe(false);
+	    expect(watchModeImplementationGoal.summary?.telemetry_enabled).toBe(false);
+	    expect(watchModeImplementationGoal.summary?.target_repo_writes).toBe(false);
+	    expect(watchModeImplementationGoal.summary?.verification).toContain(
+	      'pnpm project:intelligence:watch -- --once'
+	    );
+	    expect(watchModeImplementationGoal.next_goal_id).toBe(
+	      'project-intelligence-watch-mode-local-smoke-validation-v0.1'
+	    );
+	    expect(watchModeSmokeValidationGoal.schema).toBe('project-autopilot/goal@1');
+	    expect(watchModeSmokeValidationGoal.status).toBe('completed');
+	    expect(watchModeSmokeValidationGoal.objective).toContain('real local file-change cycle');
+	    expect(watchModeSmokeValidationGoal.source_spec).toBe(
+	      'docs/operations/project-intelligence-watch-mode-implementation-v0.1.md'
+	    );
+	    expect(watchModeSmokeValidationGoal.blocked_actions).toContain('hosted_dashboard');
+	    expect(watchModeSmokeValidationGoal.blocked_actions).toContain('target_repo_write');
+	    expect(watchModeSmokeValidationGoal.summary?.operation_record).toBe(
+	      'docs/operations/project-intelligence-watch-mode-local-smoke-validation-v0.1.md'
+	    );
+	    expect(watchModeSmokeValidationGoal.summary?.smoke_test).toBe(
+	      'tests/integration/project-intelligence-watch-smoke.test.ts'
+	    );
+	    expect(watchModeSmokeValidationGoal.summary?.runtime_hardening).toContain('bounded polling');
+	    expect(watchModeSmokeValidationGoal.summary?.graceful_stop_verified).toBe(true);
+	    expect(watchModeSmokeValidationGoal.summary?.boundary?.local_only).toBe(true);
+	    expect(watchModeSmokeValidationGoal.summary?.boundary?.daemonized).toBe(false);
+	    expect(watchModeSmokeValidationGoal.summary?.boundary?.target_repo_writes).toBe(false);
+	    expect(watchModeSmokeValidationGoal.summary?.next_goal_id).toBe(
+	      'project-intelligence-watch-mode-ai-ide-consumption-handoff-v0.1'
+	    );
+	    expect(watchModeHandoffGoal.schema).toBe('project-autopilot/goal@1');
+	    expect(watchModeHandoffGoal.status).toBe('completed');
+	    expect(watchModeHandoffGoal.objective).toContain('AI IDE consumption handoff');
+	    expect(watchModeHandoffGoal.source_spec).toBe(
+	      'docs/operations/project-intelligence-watch-mode-local-smoke-validation-v0.1.md'
+	    );
+	    expect(watchModeHandoffGoal.blocked_actions).toContain('hosted_dashboard');
+	    expect(watchModeHandoffGoal.blocked_actions).toContain('target_repo_write');
+	    expect(watchModeHandoffGoal.summary?.operation_record).toBe(
+	      'docs/operations/project-intelligence-watch-mode-ai-ide-consumption-handoff-v0.1.md'
+	    );
+	    expect(watchModeHandoffGoal.summary?.script).toBe('pnpm project:intelligence:watch-handoff');
+	    expect(watchModeHandoffGoal.summary?.json_output).toBe(
+	      'artifacts/project-graph/project-intelligence-watch-handoff.json'
+	    );
+	    expect(watchModeHandoffGoal.summary?.markdown_output).toBe(
+	      'artifacts/project-graph/project-intelligence-watch-handoff.md'
+	    );
+	    expect(watchModeHandoffGoal.summary?.schema).toBe('repoassure.project-intelligence-watch-handoff@1');
+	    expect(watchModeHandoffGoal.summary?.read_order).toContain('project-intelligence-watch-status.json');
+	    expect(watchModeHandoffGoal.summary?.freshness_checklist).toContain('watch_boundary');
+	    expect(watchModeHandoffGoal.summary?.boundary?.local_only).toBe(true);
+	    expect(watchModeHandoffGoal.summary?.boundary?.daemonized).toBe(false);
+	    expect(watchModeHandoffGoal.summary?.boundary?.target_repo_writes).toBe(false);
+	    expect(watchModeHandoffGoal.next_goal_id).toBe(
+	      'project-intelligence-watch-mode-end-to-end-local-fixture-validation-v0.1'
+	    );
+	    expect(watchModeEndToEndFixtureGoal.schema).toBe('project-autopilot/goal@1');
+	    expect(watchModeEndToEndFixtureGoal.status).toBe('completed');
+	    expect(watchModeEndToEndFixtureGoal.objective).toContain('complete local Project Intelligence watch loop');
+	    expect(watchModeEndToEndFixtureGoal.source_spec).toBe(
+	      'docs/operations/project-intelligence-watch-mode-ai-ide-consumption-handoff-v0.1.md'
+	    );
+	    expect(watchModeEndToEndFixtureGoal.blocked_actions).toContain('hosted_dashboard');
+	    expect(watchModeEndToEndFixtureGoal.blocked_actions).toContain('target_repo_write');
+	    expect(watchModeEndToEndFixtureGoal.summary?.operation_record).toBe(
+	      'docs/operations/project-intelligence-watch-mode-end-to-end-local-fixture-validation-v0.1.md'
+	    );
+	    expect(watchModeEndToEndFixtureGoal.summary?.integration_test).toBe(
+	      'tests/integration/project-intelligence-watch-e2e-fixture.test.ts'
+	    );
+	    expect(watchModeEndToEndFixtureGoal.summary?.validated_chain).toEqual([
+	      'project-intelligence-snapshot.json',
+	      'project-intelligence-agent-context.json',
+	      'project-intelligence-watch-status.json',
+	      'project-intelligence-watch-handoff.json'
+	    ]);
+	    expect(watchModeEndToEndFixtureGoal.summary?.verification).toContain(
+	      'pnpm vitest run tests/integration/project-intelligence-watch-e2e-fixture.test.ts'
+	    );
+	    expect(watchModeEndToEndFixtureGoal.summary?.runtime_fix).toContain('available');
+	    expect(watchModeEndToEndFixtureGoal.summary?.boundary?.local_only).toBe(true);
+	    expect(watchModeEndToEndFixtureGoal.summary?.boundary?.target_repo_writes).toBe(false);
+	    expect(watchModeEndToEndFixtureGoal.next_goal_id).toBe(
+	      'project-intelligence-watch-mode-operator-playbook-v0.1'
+	    );
+	    expect(watchModeOperatorPlaybookGoal.schema).toBe('project-autopilot/goal@1');
+	    expect(watchModeOperatorPlaybookGoal.status).toBe('completed');
+	    expect(watchModeOperatorPlaybookGoal.objective).toContain('operator playbook');
+	    expect(watchModeOperatorPlaybookGoal.source_spec).toBe(
+	      'docs/operations/project-intelligence-watch-mode-end-to-end-local-fixture-validation-v0.1.md'
+	    );
+	    expect(watchModeOperatorPlaybookGoal.blocked_actions).toContain('hosted_dashboard');
+	    expect(watchModeOperatorPlaybookGoal.blocked_actions).toContain('target_repo_write');
+	    expect(watchModeOperatorPlaybookGoal.summary?.operation_record).toBe(
+	      'docs/operations/project-intelligence-watch-mode-operator-playbook-v0.1.md'
+	    );
+	    expect(watchModeOperatorPlaybookGoal.summary?.playbook).toBe(
+	      'docs/operations/project-intelligence-watch-mode-operator-playbook-v0.1.md'
+	    );
+	    expect(watchModeOperatorPlaybookGoal.summary?.command_sequence).toEqual([
+	      'pnpm project:intelligence:watch',
+	      'pnpm project:intelligence:watch -- --once',
+	      'pnpm project:intelligence:agent-context',
+	      'pnpm project:intelligence:watch-handoff'
+	    ]);
+	    expect(watchModeOperatorPlaybookGoal.summary?.read_order).toContain(
+	      'artifacts/project-graph/project-intelligence-watch-handoff.json'
+	    );
+	    expect(watchModeOperatorPlaybookGoal.summary?.recovery_sections).toContain('freshness diagnosis');
+	    expect(watchModeOperatorPlaybookGoal.summary?.recovery_sections).toContain('malformed artifact recovery');
+	    expect(watchModeOperatorPlaybookGoal.summary?.boundary?.local_only).toBe(true);
+	    expect(watchModeOperatorPlaybookGoal.summary?.boundary?.daemonized).toBe(false);
+	    expect(watchModeOperatorPlaybookGoal.summary?.boundary?.target_repo_writes).toBe(false);
+	    expect(watchModeOperatorPlaybookGoal.next_goal_id).toBe(
+	      'project-intelligence-watch-mode-operator-playbook-consumption-validation-v0.1'
+	    );
+	    expect(watchModeOperatorPlaybookConsumptionGoal.schema).toBe('project-autopilot/goal@1');
+	    expect(watchModeOperatorPlaybookConsumptionGoal.status).toBe('completed');
+	    expect(watchModeOperatorPlaybookConsumptionGoal.objective).toContain('consume the operator playbook');
+	    expect(watchModeOperatorPlaybookConsumptionGoal.source_spec).toBe(
+	      'docs/operations/project-intelligence-watch-mode-operator-playbook-v0.1.md'
+	    );
+	    expect(watchModeOperatorPlaybookConsumptionGoal.blocked_actions).toContain('hosted_dashboard');
+	    expect(watchModeOperatorPlaybookConsumptionGoal.blocked_actions).toContain('target_repo_write');
+	    expect(watchModeOperatorPlaybookConsumptionGoal.summary?.operation_record).toBe(
+	      'docs/operations/project-intelligence-watch-mode-operator-playbook-consumption-validation-v0.1.md'
+	    );
+	    expect(watchModeOperatorPlaybookConsumptionGoal.summary?.contract_test).toBe(
+	      'tests/unit/project-intelligence-watch-operator-playbook.test.ts'
+	    );
+	    expect(watchModeOperatorPlaybookConsumptionGoal.summary?.validated_consumption).toContain(
+	      'freshness failure blocking'
+	    );
+	    expect(watchModeOperatorPlaybookConsumptionGoal.summary?.boundary?.local_only).toBe(true);
+	    expect(watchModeOperatorPlaybookConsumptionGoal.summary?.boundary?.target_repo_writes).toBe(false);
+	    expect(watchModeOperatorPlaybookConsumptionGoal.summary?.boundary?.hosted_dashboard).toBe(false);
+	    expect(watchModeOperatorPlaybookConsumptionGoal.summary?.verification).toContain(
+	      'pnpm vitest run tests/unit/project-intelligence-watch-operator-playbook.test.ts'
+	    );
+	    expect(watchModeOperatorPlaybookConsumptionGoal.next_goal_id).toBe(
+	      'project-intelligence-watch-mode-recovery-command-ux-v0.1'
+	    );
+	    expect(watchModeRecoveryCommandUxGoal.schema).toBe('project-autopilot/goal@1');
+	    expect(watchModeRecoveryCommandUxGoal.status).toBe('completed');
+	    expect(watchModeRecoveryCommandUxGoal.objective).toContain('recovery UX');
+	    expect(watchModeRecoveryCommandUxGoal.objective).toContain('malformed');
+	    expect(watchModeRecoveryCommandUxGoal.source_spec).toBe(
+	      'docs/operations/project-intelligence-watch-mode-operator-playbook-consumption-validation-v0.1.md'
+	    );
+	    expect(watchModeRecoveryCommandUxGoal.blocked_actions).toContain('hosted_dashboard');
+	    expect(watchModeRecoveryCommandUxGoal.blocked_actions).toContain('target_repo_write');
+	    expect(watchModeRecoveryCommandUxGoal.summary?.operation_record).toBe(
+	      'docs/operations/project-intelligence-watch-mode-recovery-command-ux-v0.1.md'
+	    );
+	    expect(watchModeRecoveryCommandUxGoal.summary?.runtime_entry).toBe(
+	      'packages/acceptance/src/run-project-intelligence-watch-handoff.ts'
+	    );
+	    expect(watchModeRecoveryCommandUxGoal.summary?.test).toBe(
+	      'tests/unit/project-intelligence-watch-handoff.test.ts'
+	    );
+	    expect(watchModeRecoveryCommandUxGoal.summary?.added_contract).toBe(
+	      'project-intelligence-watch-handoff.json#recoveryPlan'
+	    );
+	    expect(watchModeRecoveryCommandUxGoal.summary?.recovery_commands).toContain(
+	      'pnpm project:intelligence:watch -- --once'
+	    );
+	    expect(watchModeRecoveryCommandUxGoal.summary?.recovery_commands).toContain(
+	      'pnpm project:intelligence:watch-handoff'
+	    );
+	    expect(watchModeRecoveryCommandUxGoal.summary?.boundary?.local_only).toBe(true);
+	    expect(watchModeRecoveryCommandUxGoal.summary?.boundary?.manual_generated_artifact_edits).toBe(false);
+	    expect(watchModeRecoveryCommandUxGoal.summary?.boundary?.target_repo_writes).toBe(false);
+	    expect(watchModeRecoveryCommandUxGoal.summary?.boundary?.hosted_dashboard).toBe(false);
+	    expect(watchModeRecoveryCommandUxGoal.summary?.verification).toContain(
+	      'pnpm vitest run tests/unit/project-intelligence-watch-handoff.test.ts'
+	    );
+	    expect(watchModeRecoveryCommandUxGoal.next_goal_id).toBe(
+	      'project-intelligence-watch-mode-recovery-ux-real-workspace-smoke-v0.1'
+	    );
+	    expect(watchModeRecoverySmokeGoal.schema).toBe('project-autopilot/goal@1');
+		    expect(watchModeRecoverySmokeGoal.status).toBe('completed');
+		    expect(watchModeRecoverySmokeGoal.objective).toContain('real RepoAssure workspace artifacts');
+		    expect(watchModeRecoverySmokeGoal.source_spec).toBe(
+		      'docs/operations/project-intelligence-watch-mode-recovery-command-ux-v0.1.md'
+		    );
+		    expect(watchModeRecoverySmokeGoal.blocked_actions).toContain('hosted_dashboard');
+		    expect(watchModeRecoverySmokeGoal.blocked_actions).toContain('target_repo_write');
+		    expect(watchModeRecoverySmokeGoal.summary?.operation_record).toBe(
+		      'docs/operations/project-intelligence-watch-mode-recovery-ux-real-workspace-smoke-v0.1.md'
+		    );
+		    expect(watchModeRecoverySmokeGoal.summary?.integration_test).toBe(
+		      'tests/integration/project-intelligence-watch-recovery-ux-smoke.test.ts'
+		    );
+		    expect(watchModeRecoverySmokeGoal.summary?.real_workspace?.recovery_status).toBe('not_needed');
+		    expect(watchModeRecoverySmokeGoal.summary?.real_workspace?.freshness_checks).toBe('all_passed');
+		    expect(watchModeRecoverySmokeGoal.summary?.failing_fixture?.recovery_status).toBe('required');
+		    expect(watchModeRecoverySmokeGoal.summary?.failing_fixture?.failed_checks).toEqual(expect.arrayContaining([
+		      'watch_refresh_count',
+		      'watch_commands'
+		    ]));
+		    expect(watchModeRecoverySmokeGoal.summary?.failing_fixture?.redaction_verified).toBe(true);
+		    expect(watchModeRecoverySmokeGoal.summary?.recovery_commands).toContain(
+		      'pnpm project:intelligence:watch -- --once'
+		    );
+		    expect(watchModeRecoverySmokeGoal.summary?.boundary?.local_only).toBe(true);
+		    expect(watchModeRecoverySmokeGoal.summary?.boundary?.target_repo_writes).toBe(false);
+		    expect(watchModeRecoverySmokeGoal.summary?.boundary?.hosted_dashboard).toBe(false);
+		    expect(watchModeRecoverySmokeGoal.summary?.verification).toContain(
+		      'pnpm vitest run tests/integration/project-intelligence-watch-recovery-ux-smoke.test.ts'
+		    );
+		    expect(watchModeRecoverySmokeGoal.next_goal_id).toBe(
+		      'project-intelligence-watch-mode-completion-audit-v0.1'
+		    );
+		    expect(watchModeCompletionAuditGoal.schema).toBe('project-autopilot/goal@1');
+		    expect(watchModeCompletionAuditGoal.status).toBe('completed');
+		    expect(watchModeCompletionAuditGoal.objective).toContain('Audit the completed Project Intelligence watch mode sequence');
+		    expect(watchModeCompletionAuditGoal.source_spec).toBe(
+		      'docs/operations/project-intelligence-watch-mode-recovery-ux-real-workspace-smoke-v0.1.md'
+		    );
+		    expect(watchModeCompletionAuditGoal.blocked_actions).toContain('hosted_dashboard');
+		    expect(watchModeCompletionAuditGoal.blocked_actions).toContain('target_repo_write');
+		    expect(watchModeCompletionAuditGoal.summary?.operation_record).toBe(
+		      'docs/operations/project-intelligence-watch-mode-completion-audit-v0.1.md'
+		    );
+		    expect(watchModeCompletionAuditGoal.summary?.conclusion).toBe('complete_for_current_local_only_slice');
+		    expect(watchModeCompletionAuditGoal.summary?.audited_scope).toEqual(expect.arrayContaining([
+		      'runtime',
+		      'generated_artifacts',
+		      'operator_playbook',
+		      'recovery_ux',
+		      'tests',
+		      'docs',
+		      'boundaries'
+		    ]));
+		    expect(watchModeCompletionAuditGoal.summary?.generated_artifacts?.freshness_checks).toBe('6/6 passed');
+		    expect(watchModeCompletionAuditGoal.summary?.generated_artifacts?.recovery_status).toBe('not_needed');
+		    expect(watchModeCompletionAuditGoal.summary?.boundary?.local_only).toBe(true);
+		    expect(watchModeCompletionAuditGoal.summary?.boundary?.daemonized).toBe(false);
+		    expect(watchModeCompletionAuditGoal.summary?.boundary?.target_repo_writes).toBe(false);
+		    expect(watchModeCompletionAuditGoal.summary?.selected_next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-planning-v0.1'
+		    );
+		    expect(watchModeCompletionAuditGoal.summary?.verification).toContain(
+		      'pnpm vitest run tests/unit/project-structure.test.ts'
+		    );
+		    expect(watchModeCompletionAuditGoal.next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-planning-v0.1'
+		    );
+		    expect(falsePositiveCatalogPlanningGoal.schema).toBe('project-autopilot/goal@1');
+		    expect(falsePositiveCatalogPlanningGoal.status).toBe('completed');
+		    expect(falsePositiveCatalogPlanningGoal.objective).toContain('false-positive regression catalog');
+		    expect(falsePositiveCatalogPlanningGoal.source_spec).toBe(
+		      'docs/operations/project-intelligence-watch-mode-completion-audit-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogPlanningGoal.blocked_actions).toContain('target_repo_write');
+		    expect(falsePositiveCatalogPlanningGoal.blocked_actions).toContain('hosted_dashboard');
+		    expect(falsePositiveCatalogPlanningGoal.summary?.operation_record).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-planning-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogPlanningGoal.summary?.conclusion).toBe(
+		      'plan_ready_for_local_contract_implementation'
+		    );
+		    expect(falsePositiveCatalogPlanningGoal.summary?.catalog_plan?.fixture_categories).toEqual(
+		      expect.arrayContaining([
+		        'browser_hardening_findings',
+		        'project_intelligence_findings',
+		        'security_assurance_findings',
+		        'repair_planner_consumption'
+		      ])
+		    );
+		    expect(falsePositiveCatalogPlanningGoal.summary?.catalog_plan?.expected_snapshot_fields).toEqual(
+		      expect.arrayContaining([
+		        'finding_id',
+		        'category',
+		        'severity',
+		        'expected_classification',
+		        'rationale',
+		        'source_fixture'
+		      ])
+		    );
+		    expect(falsePositiveCatalogPlanningGoal.summary?.catalog_plan?.review_fields).toEqual(
+		      expect.arrayContaining([
+		        'false_positive_risk',
+		        'maintainer_decision',
+		        'accepted_risk_notes'
+		      ])
+		    );
+		    expect(falsePositiveCatalogPlanningGoal.summary?.catalog_plan?.finding_sources).toEqual(
+		      expect.arrayContaining([
+		        'src/types/findings.ts',
+		        'packages/browser-explorer/src/explore-app.ts',
+		        'packages/acceptance/src/run-project-intelligence-snapshot.ts',
+		        'packages/repair-planner/src/generate-repair-plan.ts'
+		      ])
+		    );
+		    expect(falsePositiveCatalogPlanningGoal.summary?.boundaries?.local_only).toBe(true);
+		    expect(falsePositiveCatalogPlanningGoal.summary?.boundaries?.runtime_detection_behavior_change).toBe(false);
+		    expect(falsePositiveCatalogPlanningGoal.summary?.boundaries?.target_repo_writes).toBe(false);
+		    expect(falsePositiveCatalogPlanningGoal.summary?.boundaries?.hosted_dashboard).toBe(false);
+		    expect(falsePositiveCatalogPlanningGoal.summary?.selected_next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-contract-implementation-v0.1'
+		    );
+		    expect(falsePositiveCatalogPlanningGoal.next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-contract-implementation-v0.1'
+		    );
+		    expect(falsePositiveCatalogContractGoal.schema).toBe('project-autopilot/goal@1');
+		    expect(falsePositiveCatalogContractGoal.status).toBe('completed');
+		    expect(falsePositiveCatalogContractGoal.objective).toContain('false-positive regression catalog contract');
+		    expect(falsePositiveCatalogContractGoal.source_spec).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-planning-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogContractGoal.blocked_actions).toContain('runtime_detection_behavior_change');
+		    expect(falsePositiveCatalogContractGoal.blocked_actions).toContain('target_repo_write');
+		    expect(falsePositiveCatalogContractGoal.blocked_actions).toContain('hosted_dashboard');
+		    expect(falsePositiveCatalogContractGoal.summary?.operation_record).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-contract-implementation-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogContractGoal.summary?.conclusion).toBe(
+		      'contract_implemented_without_runtime_detection_change'
+		    );
+		    expect(falsePositiveCatalogContractGoal.summary?.implemented_contract?.module).toBe(
+		      'packages/acceptance/src/false-positive-catalog.ts'
+		    );
+		    expect(falsePositiveCatalogContractGoal.summary?.implemented_contract?.package_export).toBe(
+		      '@hardening-mcp/acceptance/false-positive-catalog'
+		    );
+		    expect(falsePositiveCatalogContractGoal.summary?.implemented_contract?.fixture_categories).toEqual(
+		      expect.arrayContaining([
+		        'browser_hardening_findings',
+		        'project_intelligence_findings',
+		        'security_assurance_findings',
+		        'repair_planner_consumption',
+		        'mixed_run_bundle_regressions'
+		      ])
+		    );
+		    expect(falsePositiveCatalogContractGoal.summary?.implemented_contract?.expected_snapshot_fields).toEqual(
+		      expect.arrayContaining([
+		        'finding_id',
+		        'source_fixture',
+		        'category',
+		        'severity',
+		        'expected_classification',
+		        'rationale',
+		        'maintainer_decision',
+		        'regression_commands'
+		      ])
+		    );
+		    expect(falsePositiveCatalogContractGoal.summary?.implemented_contract?.review_fields).toEqual(
+		      expect.arrayContaining([
+		        'false_positive_risk',
+		        'rationale',
+		        'maintainer_decision',
+		        'accepted_risk_notes'
+		      ])
+		    );
+		    expect(falsePositiveCatalogContractGoal.summary?.boundaries?.local_only).toBe(true);
+		    expect(falsePositiveCatalogContractGoal.summary?.boundaries?.runtime_detection_behavior_change).toBe(false);
+		    expect(falsePositiveCatalogContractGoal.summary?.boundaries?.finding_suppression).toBe(false);
+		    expect(falsePositiveCatalogContractGoal.summary?.boundaries?.automatic_severity_downgrade).toBe(false);
+		    expect(falsePositiveCatalogContractGoal.summary?.boundaries?.target_repo_writes).toBe(false);
+		    expect(falsePositiveCatalogContractGoal.summary?.selected_next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-artifact-generation-v0.1'
+		    );
+		    expect(falsePositiveCatalogContractGoal.next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-artifact-generation-v0.1'
+		    );
+		    expect(falsePositiveCatalogArtifactGenerationGoal.schema).toBe('project-autopilot/goal@1');
+		    expect(falsePositiveCatalogArtifactGenerationGoal.status).toBe('completed');
+		    expect(falsePositiveCatalogArtifactGenerationGoal.objective).toContain(
+		      'Generate local false-positive regression catalog artifacts'
+		    );
+		    expect(falsePositiveCatalogArtifactGenerationGoal.source_spec).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-contract-implementation-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogArtifactGenerationGoal.blocked_actions).toContain(
+		      'runtime_detection_behavior_change'
+		    );
+		    expect(falsePositiveCatalogArtifactGenerationGoal.blocked_actions).toContain('finding_suppression');
+		    expect(falsePositiveCatalogArtifactGenerationGoal.blocked_actions).toContain('target_repo_write');
+		    expect(falsePositiveCatalogArtifactGenerationGoal.summary?.operation_record).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-artifact-generation-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogArtifactGenerationGoal.summary?.conclusion).toBe(
+		      'artifacts_generated_without_detection_behavior_change'
+		    );
+		    expect(falsePositiveCatalogArtifactGenerationGoal.summary?.command).toBe('pnpm false-positive:catalog');
+		    expect(falsePositiveCatalogArtifactGenerationGoal.summary?.artifacts).toEqual(expect.arrayContaining([
+		      'artifacts/project-graph/false-positive-regression-catalog.json',
+		      'artifacts/project-graph/false-positive-regression-catalog.md'
+		    ]));
+		    expect(falsePositiveCatalogArtifactGenerationGoal.summary?.boundary?.local_only).toBe(true);
+		    expect(falsePositiveCatalogArtifactGenerationGoal.summary?.boundary?.target_repo_writes).toBe(false);
+		    expect(falsePositiveCatalogArtifactGenerationGoal.summary?.boundary?.runtime_detection_behavior_change).toBe(false);
+		    expect(falsePositiveCatalogArtifactGenerationGoal.summary?.boundary?.finding_suppression).toBe(false);
+		    expect(falsePositiveCatalogArtifactGenerationGoal.summary?.selected_next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-consumption-validation-v0.1'
+		    );
+		    expect(falsePositiveCatalogArtifactGenerationGoal.next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-consumption-validation-v0.1'
+		    );
+		    expect(falsePositiveCatalogConsumptionValidationGoal.schema).toBe('project-autopilot/goal@1');
+		    expect(falsePositiveCatalogConsumptionValidationGoal.status).toBe('completed');
+		    expect(falsePositiveCatalogConsumptionValidationGoal.objective).toContain(
+		      'Validate false-positive regression catalog artifact consumption'
+		    );
+		    expect(falsePositiveCatalogConsumptionValidationGoal.source_spec).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-artifact-generation-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogConsumptionValidationGoal.blocked_actions).toContain('target_repo_write');
+		    expect(falsePositiveCatalogConsumptionValidationGoal.summary?.operation_record).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-consumption-validation-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogConsumptionValidationGoal.summary?.conclusion).toBe(
+		      'consumption_validated_without_detection_behavior_change'
+		    );
+		    expect(falsePositiveCatalogConsumptionValidationGoal.summary?.command).toBe(
+		      'pnpm false-positive:catalog:validate'
+		    );
+		    expect(falsePositiveCatalogConsumptionValidationGoal.summary?.artifacts).toEqual(expect.arrayContaining([
+		      'artifacts/project-graph/false-positive-regression-catalog-consumption-validation.json',
+		      'artifacts/project-graph/false-positive-regression-catalog-consumption-validation.md'
+		    ]));
+		    expect(falsePositiveCatalogConsumptionValidationGoal.summary?.checks).toBe(13);
+		    expect(falsePositiveCatalogConsumptionValidationGoal.summary?.validated_consumption).toEqual(expect.arrayContaining([
+		      'json first read order',
+		      'markdown readability',
+		      'maintainer review boundary'
+		    ]));
+		    expect(falsePositiveCatalogConsumptionValidationGoal.summary?.boundary?.local_only).toBe(true);
+		    expect(falsePositiveCatalogConsumptionValidationGoal.summary?.boundary?.target_repo_writes).toBe(false);
+		    expect(falsePositiveCatalogConsumptionValidationGoal.summary?.boundary?.runtime_detection_behavior_change).toBe(false);
+		    expect(falsePositiveCatalogConsumptionValidationGoal.summary?.boundary?.finding_suppression).toBe(false);
+		    expect(falsePositiveCatalogConsumptionValidationGoal.summary?.boundary?.automatic_severity_downgrade).toBe(false);
+		    expect(falsePositiveCatalogConsumptionValidationGoal.summary?.selected_next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-completion-audit-v0.1'
+		    );
+		    expect(falsePositiveCatalogConsumptionValidationGoal.next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-completion-audit-v0.1'
+		    );
+		    expect(falsePositiveCatalogCompletionAuditGoal.schema).toBe('project-autopilot/goal@1');
+		    expect(falsePositiveCatalogCompletionAuditGoal.status).toBe('completed');
+		    expect(falsePositiveCatalogCompletionAuditGoal.objective).toContain(
+		      'Audit the completed Product False-Positive Regression Catalog sequence'
+		    );
+		    expect(falsePositiveCatalogCompletionAuditGoal.source_spec).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-consumption-validation-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogCompletionAuditGoal.blocked_actions).toContain('target_repo_write');
+		    expect(falsePositiveCatalogCompletionAuditGoal.blocked_actions).toContain('runtime_detection_behavior_change');
+		    expect(falsePositiveCatalogCompletionAuditGoal.summary?.operation_record).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-completion-audit-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogCompletionAuditGoal.summary?.conclusion).toBe(
+		      'complete_for_current_local_only_catalog_slice'
+		    );
+		    expect(falsePositiveCatalogCompletionAuditGoal.summary?.audited_sequence).toEqual(expect.arrayContaining([
+		      'planning',
+		      'contract implementation',
+		      'artifact generation',
+		      'consumption validation'
+		    ]));
+		    expect(falsePositiveCatalogCompletionAuditGoal.summary?.confirmed_artifacts).toEqual(expect.arrayContaining([
+		      'artifacts/project-graph/false-positive-regression-catalog.json',
+		      'artifacts/project-graph/false-positive-regression-catalog.md',
+		      'artifacts/project-graph/false-positive-regression-catalog-consumption-validation.json',
+		      'artifacts/project-graph/false-positive-regression-catalog-consumption-validation.md'
+		    ]));
+		    expect(falsePositiveCatalogCompletionAuditGoal.summary?.boundary?.local_only).toBe(true);
+		    expect(falsePositiveCatalogCompletionAuditGoal.summary?.boundary?.target_repo_writes).toBe(false);
+		    expect(falsePositiveCatalogCompletionAuditGoal.summary?.boundary?.runtime_detection_behavior_change).toBe(false);
+		    expect(falsePositiveCatalogCompletionAuditGoal.summary?.boundary?.finding_suppression).toBe(false);
+		    expect(falsePositiveCatalogCompletionAuditGoal.summary?.boundary?.automatic_severity_downgrade).toBe(false);
+		    expect(falsePositiveCatalogCompletionAuditGoal.summary?.boundary?.hosted_dashboard).toBe(false);
+		    expect(falsePositiveCatalogCompletionAuditGoal.summary?.boundary?.cloud_sync).toBe(false);
+		    expect(falsePositiveCatalogCompletionAuditGoal.summary?.boundary?.telemetry).toBe(false);
+		    expect(falsePositiveCatalogCompletionAuditGoal.summary?.boundary?.deployment).toBe(false);
+		    expect(falsePositiveCatalogCompletionAuditGoal.summary?.boundary?.public_release).toBe(false);
+		    expect(falsePositiveCatalogCompletionAuditGoal.summary?.selected_next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-real-fixture-expansion-v0.1'
+		    );
+		    expect(falsePositiveCatalogCompletionAuditGoal.next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-real-fixture-expansion-v0.1'
+		    );
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.schema).toBe('project-autopilot/goal@1');
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.status).toBe('completed');
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.objective).toContain(
+		      'Expand the false-positive regression catalog with non-private real or near-real fixtures'
+		    );
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.source_spec).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-completion-audit-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.blocked_actions).toContain('runtime_detection_behavior_change');
+		    expect(falsePositiveRegressionCatalogRealFixtureExpansion).toContain(
+		      'Product False-Positive Regression Catalog Real Fixture Expansion v0.1'
+		    );
+		    expect(falsePositiveRegressionCatalogRealFixtureExpansion).toContain(
+		      'real_fixtures_expanded_without_detection_behavior_change'
+		    );
+		    expect(falsePositiveRegressionCatalogRealFixtureExpansion).toContain('real_world_fixture_regressions');
+		    expect(falsePositiveRegressionCatalogRealFixtureExpansion).toContain('real-fixture:react-disabled-save-control');
+		    expect(falsePositiveRegressionCatalogRealFixtureExpansion).toContain('real-fixture:vite-auth-redirect-route');
+		    expect(falsePositiveRegressionCatalogRealFixtureExpansion).toContain('No runtime detection behavior change was implemented');
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.summary?.entries_before).toBe(5);
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.summary?.entries_after).toBe(7);
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.summary?.new_fixture_category).toBe(
+		      'real_world_fixture_regressions'
+		    );
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.summary?.near_real_public_fixture_count).toBe(2);
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.summary?.fixture_origin_field).toBe(true);
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.summary?.privacy_metadata?.non_private).toBe(true);
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.summary?.privacy_metadata?.source_code_included).toBe(false);
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.summary?.privacy_metadata?.secrets_included).toBe(false);
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.summary?.boundary?.runtime_detection_behavior_change).toBe(false);
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.summary?.boundary?.finding_suppression).toBe(false);
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.summary?.boundary?.automatic_severity_downgrade).toBe(false);
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.summary?.boundary?.target_repo_writes).toBe(false);
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.summary?.selected_next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-detector-calibration-planning-v0.1'
+		    );
+		    expect(falsePositiveCatalogRealFixtureExpansionGoal.next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-detector-calibration-planning-v0.1'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationPlanningGoal.schema).toBe('project-autopilot/goal@1');
+		    expect(falsePositiveCatalogDetectorCalibrationPlanningGoal.status).toBe('completed');
+		    expect(falsePositiveCatalogDetectorCalibrationPlanningGoal.source_spec).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-real-fixture-expansion-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationPlanningGoal.blocked_actions).toContain(
+		      'runtime_detection_behavior_change'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationPlanning).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Planning v0.1'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationPlanning).toContain('Status: completed');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationPlanning).toContain(
+		      'detector_calibration_plan_ready_without_runtime_behavior_change'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationPlanning).toContain('Calibration Questions');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationPlanning).toContain(
+		      'real-fixture:react-disabled-save-control'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationPlanning).toContain(
+		      'real-fixture:vite-auth-redirect-route'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationPlanning).toContain('Manual Gates');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationPlanning).toContain('Future Implementation Authorization');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationPlanning).toContain(
+		      'No runtime detection behavior change was implemented'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationPlanningGoal.summary?.operation_record).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-detector-calibration-planning-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationPlanningGoal.summary?.conclusion).toBe(
+		      'detector_calibration_plan_ready_without_runtime_behavior_change'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationPlanningGoal.summary?.calibration_questions).toContain(
+		      'conditional_dead_control_should_consider_form_dirty_prerequisites'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationPlanningGoal.summary?.calibration_questions).toContain(
+		      'auth_redirect_route_should_preserve_maintainer_review_boundary'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationPlanningGoal.summary?.manual_gates).toContain(
+		      'maintainer_classification_required_before_detector_change'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationPlanningGoal.summary?.required_future_authorization).toContain(
+		      'runtime_detector_change'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationPlanningGoal.summary?.boundary?.runtime_detection_behavior_change).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationPlanningGoal.summary?.boundary?.finding_suppression).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationPlanningGoal.summary?.boundary?.automatic_severity_downgrade).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationPlanningGoal.summary?.boundary?.target_repo_writes).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationPlanningGoal.summary?.selected_next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-detector-calibration-contract-v0.1'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationPlanningGoal.next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-detector-calibration-contract-v0.1'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractGoal.schema).toBe('project-autopilot/goal@1');
+		    expect(falsePositiveCatalogDetectorCalibrationContractGoal.status).toBe('completed');
+		    expect(falsePositiveCatalogDetectorCalibrationContractGoal.source_spec).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-detector-calibration-planning-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractGoal.blocked_actions).toContain(
+		      'runtime_detection_behavior_change'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationContract).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Contract v0.1'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationContract).toContain('Status: completed');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationContract).toContain(
+		      'calibration_contract_generated_without_runtime_behavior_change'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationContract).toContain(
+		      'false-positive-detector-calibration-contract.json'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationContract).toContain(
+		      'conditional_dead_control_should_consider_form_dirty_prerequisites'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationContract).toContain(
+		      'auth_redirect_route_should_preserve_maintainer_review_boundary'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationContract).toContain('Manual gates');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationContract).toContain('Future implementation authorization requirements');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationContract).toContain(
+		      'No runtime detection behavior change was implemented'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractGoal.summary?.operation_record).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-detector-calibration-contract-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractGoal.conclusion).toBe(
+		      'calibration_contract_generated_without_runtime_behavior_change'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractGoal.summary?.implementation).toContain(
+		      'packages/acceptance/src/run-false-positive-detector-calibration-contract.ts'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractGoal.summary?.generated_artifacts).toContain(
+		      'artifacts/project-graph/false-positive-detector-calibration-contract.json'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractGoal.summary?.calibration_questions).toContain(
+		      'conditional_dead_control_should_consider_form_dirty_prerequisites'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractGoal.summary?.manual_gates).toContain(
+		      'maintainer_classification_required_before_detector_change'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractGoal.summary?.required_future_authorization).toContain(
+		      'runtime_detector_change'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractGoal.summary?.boundary?.runtime_detection_behavior_change).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationContractGoal.summary?.boundary?.finding_suppression).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationContractGoal.summary?.boundary?.automatic_severity_downgrade).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationContractGoal.summary?.boundary?.target_repo_write).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationContractGoal.summary?.next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-detector-calibration-contract-consumption-validation-v0.1'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractGoal.next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-detector-calibration-contract-consumption-validation-v0.1'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.schema).toBe('project-autopilot/goal@1');
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.status).toBe('completed');
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.source_spec).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-detector-calibration-contract-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.objective).toContain('consumption');
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.blocked_actions).toContain(
+		      'runtime_detection_behavior_change'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.blocked_actions).toContain(
+		      'target_repo_write'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.acceptance).toContain(
+		      'Validate the generated calibration contract JSON and Markdown can be consumed in the documented AI IDE read order.'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationContractConsumption).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Contract Consumption Validation v0.1'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationContractConsumption).toContain('Status: completed');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationContractConsumption).toContain(
+		      'contract_consumption_validated_without_runtime_behavior_change'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationContractConsumption).toContain(
+		      'false-positive-detector-calibration-contract-consumption-validation.json'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationContractConsumption).toContain('13 passed checks');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationContractConsumption).toContain('Manual gates');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationContractConsumption).toContain(
+		      'Future implementation authorization requirements'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationContractConsumption).toContain('Fail-closed checks');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationContractConsumption).toContain(
+		      'No runtime detection behavior change was implemented'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.conclusion).toBe(
+		      'contract_consumption_validated_without_runtime_behavior_change'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.summary?.operation_record).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-detector-calibration-contract-consumption-validation-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.summary?.implementation).toContain(
+		      'packages/acceptance/src/run-false-positive-detector-calibration-contract-consumption.ts'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.summary?.generated_artifacts).toContain(
+		      'artifacts/project-graph/false-positive-detector-calibration-contract-consumption-validation.json'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.summary?.checks_passed).toBe(13);
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.summary?.calibration_questions).toContain(
+		      'conditional_dead_control_should_consider_form_dirty_prerequisites'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.summary?.manual_gates).toContain(
+		      'maintainer_classification_required_before_detector_change'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.summary?.required_future_authorization).toContain(
+		      'runtime_detector_change'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.summary?.boundary?.runtime_detection_behavior_change).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.summary?.boundary?.finding_suppression).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.summary?.boundary?.automatic_severity_downgrade).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.summary?.boundary?.target_repo_write).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.summary?.next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-detector-calibration-completion-audit-v0.1'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationContractConsumptionGoal.next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-detector-calibration-completion-audit-v0.1'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.schema).toBe('project-autopilot/goal@1');
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.status).toBe('completed');
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.source_spec).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-detector-calibration-contract-consumption-validation-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.objective).toContain(
+		      'Audit and close the current local-only false-positive detector calibration slice'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.blocked_actions).toContain(
+		      'runtime_detection_behavior_change'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.blocked_actions).toContain('target_repo_write');
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.blocked_actions).toContain(
+		      'detector_confidence_threshold_change'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationCompletionAudit).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Completion Audit v0.1'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationCompletionAudit).toContain('Status: completed');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationCompletionAudit).toContain(
+		      'complete_for_current_local_only_detector_calibration_slice'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationCompletionAudit).toContain(
+		      'false-positive-detector-calibration-contract.json'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationCompletionAudit).toContain(
+		      'false-positive-detector-calibration-contract-consumption-validation.json'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationCompletionAudit).toContain('13 passed checks');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationCompletionAudit).toContain(
+		      'No runtime detector behavior change was implemented'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationCompletionAudit).toContain(
+		      'No detector confidence threshold change was implemented'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationCompletionAudit).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Authorization Intake v0.1'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.conclusion).toBe(
+		      'complete_for_current_local_only_detector_calibration_slice'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.summary?.operation_record).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-detector-calibration-completion-audit-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.summary?.audited_sequence).toEqual(
+		      expect.arrayContaining([
+		        'detector calibration planning',
+		        'detector calibration contract generation',
+		        'detector calibration contract consumption validation'
+		      ])
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.summary?.confirmed_artifacts).toEqual(
+		      expect.arrayContaining([
+		        'artifacts/project-graph/false-positive-detector-calibration-contract.json',
+		        'artifacts/project-graph/false-positive-detector-calibration-contract.md',
+		        'artifacts/project-graph/false-positive-detector-calibration-contract-consumption-validation.json',
+		        'artifacts/project-graph/false-positive-detector-calibration-contract-consumption-validation.md'
+		      ])
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.summary?.checks_passed).toBe(13);
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.summary?.boundary?.local_only).toBe(true);
+		    expect(
+		      falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.summary?.boundary
+		        ?.runtime_detection_behavior_change
+		    ).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.summary?.boundary?.finding_suppression).toBe(false);
+		    expect(
+		      falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.summary?.boundary?.automatic_severity_downgrade
+		    ).toBe(false);
+		    expect(
+		      falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.summary?.boundary
+		        ?.detector_confidence_threshold_change
+		    ).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.summary?.boundary?.acceptance_policy_change).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.summary?.boundary?.target_repo_writes).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.summary?.boundary?.hosted_dashboard).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.summary?.boundary?.cloud_sync).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.summary?.boundary?.telemetry).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.summary?.boundary?.deployment).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.summary?.boundary?.public_release).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.summary?.selected_next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationCompletionAuditGoal.next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.schema).toBe('project-autopilot/goal@1');
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.status).toBe('completed');
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.source_spec).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-detector-calibration-completion-audit-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.objective).toContain(
+		      'Collect explicit maintainer authorization decisions'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.blocked_actions).toContain(
+		      'runtime_detection_behavior_change'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.blocked_actions).toContain(
+		      'detector_confidence_threshold_change'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.blocked_actions).toContain(
+		      'acceptance_policy_change'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.acceptance).toContain(
+		      'Produce a local maintainer decision intake for the detector calibration questions with approve, reject, defer, and accept-risk options.'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationAuthorizationIntake).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Authorization Intake v0.1'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationAuthorizationIntake).toContain('Status: completed');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationAuthorizationIntake).toContain(
+		      'authorization_intake_created_pending_maintainer_decisions'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationAuthorizationIntake).toContain(
+		      'conditional_dead_control_should_consider_form_dirty_prerequisites'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationAuthorizationIntake).toContain(
+		      'auth_redirect_route_should_preserve_maintainer_review_boundary'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationAuthorizationIntake).toContain('approve');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationAuthorizationIntake).toContain('reject');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationAuthorizationIntake).toContain('defer');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationAuthorizationIntake).toContain('accept-risk');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationAuthorizationIntake).toContain('No decision is prefilled');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationAuthorizationIntake).toContain(
+		      'No runtime detector behavior change was implemented'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.conclusion).toBe(
+		      'authorization_intake_created_pending_maintainer_decisions'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.summary?.operation_record).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.summary?.intake_status).toBe(
+		      'pending_maintainer_decisions'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.summary?.decision_options).toEqual(
+		      expect.arrayContaining(['approve', 'reject', 'defer', 'accept-risk'])
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.summary?.calibration_questions).toEqual(
+		      expect.arrayContaining([
+		        'conditional_dead_control_should_consider_form_dirty_prerequisites',
+		        'auth_redirect_route_should_preserve_maintainer_review_boundary'
+		      ])
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.summary?.pending_decision_count).toBe(2);
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.summary?.manual_gates).toContain(
+		      'maintainer_classification_required_before_detector_change'
+		    );
+		    expect(
+		      falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.summary?.boundary
+		        ?.runtime_detection_behavior_change
+		    ).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.summary?.boundary?.finding_suppression).toBe(false);
+		    expect(
+		      falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.summary?.boundary
+		        ?.automatic_severity_downgrade
+		    ).toBe(false);
+		    expect(
+		      falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.summary?.boundary
+		        ?.detector_confidence_threshold_change
+		    ).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.summary?.boundary?.acceptance_policy_change).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.summary?.boundary?.target_repo_writes).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.summary?.selected_next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationAuthorizationIntakeGoal.next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.schema).toBe(
+		      'project-autopilot/goal@1'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.status).toBe('completed');
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.conclusion).toBe(
+		      'maintainer_decision_record_created_with_pending_decisions'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.source_spec).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.objective).toContain(
+		      'Record explicit maintainer decisions from the detector calibration authorization intake'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.blocked_actions).toContain(
+		      'runtime_detection_behavior_change'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.acceptance).toContain(
+		      'Do not invent or prefill maintainer decisions when the intake still has pending decision slots.'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionRecording).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Recording v0.1'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionRecording).toContain('Status: completed');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionRecording).toContain(
+		      'maintainer_decision_record_created_with_pending_decisions'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionRecording).toContain(
+		      'conditional_dead_control_should_consider_form_dirty_prerequisites'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionRecording).toContain(
+		      'auth_redirect_route_should_preserve_maintainer_review_boundary'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionRecording).toContain(
+		      'Recorded decisions: 0'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionRecording).toContain(
+		      'Pending decisions: 2'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionRecording).toContain(
+		      'No decision was invented or prefilled'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionRecording).toContain(
+		      'Detector behavior changes remain blocked'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionRecording).toContain(
+		      'No runtime detector behavior change was implemented'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.summary?.operation_record).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.summary?.decision_record_status).toBe(
+		      'pending_maintainer_decisions'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.summary?.source_intake).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.summary?.recorded_decisions).toBe(0);
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.summary?.pending_decision_count).toBe(2);
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.summary?.pending_questions).toEqual(
+		      expect.arrayContaining([
+		        'conditional_dead_control_should_consider_form_dirty_prerequisites',
+		        'auth_redirect_route_should_preserve_maintainer_review_boundary'
+		      ])
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.summary?.preserved_decision_slots).toEqual(
+		      expect.arrayContaining([
+		        expect.objectContaining({
+		          id: 'conditional_dead_control_should_consider_form_dirty_prerequisites',
+		          decision: 'pending',
+		          evidence: 'missing_explicit_maintainer_decision'
+		        }),
+		        expect.objectContaining({
+		          id: 'auth_redirect_route_should_preserve_maintainer_review_boundary',
+		          decision: 'pending',
+		          evidence: 'missing_explicit_maintainer_decision'
+		        })
+		      ])
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.summary?.detector_changes_authorized).toBe(
+		      false
+		    );
+		    expect(
+		      falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.summary?.boundary
+		        ?.runtime_detection_behavior_change
+		    ).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.summary?.boundary?.finding_suppression).toBe(false);
+		    expect(
+		      falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.summary?.boundary
+		        ?.automatic_severity_downgrade
+		    ).toBe(false);
+		    expect(
+		      falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.summary?.boundary
+		        ?.detector_confidence_threshold_change
+		    ).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.summary?.boundary?.acceptance_policy_change).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.summary?.boundary?.target_repo_writes).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionRecordingGoal.next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-detector-calibration-maintainer-decision-follow-up-v0.1'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.schema).toBe(
+		      'project-autopilot/goal@1'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.status).toBe('completed');
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.conclusion).toBe(
+		      'maintainer_decision_follow_up_recorded_without_explicit_decisions'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.source_spec).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.objective).toContain(
+		      'Collect or wait for explicit maintainer approve, reject, defer, or accept-risk decisions'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.blocked_actions).toContain(
+		      'runtime_detection_behavior_change'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionFollowUp).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Follow-up v0.1'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionFollowUp).toContain('Status: completed');
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionFollowUp).toContain(
+		      'maintainer_decision_follow_up_recorded_without_explicit_decisions'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionFollowUp).toContain(
+		      'Explicit maintainer decisions found: no'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionFollowUp).toContain(
+		      'Recorded decisions: 0'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionFollowUp).toContain(
+		      'Pending decisions: 2'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionFollowUp).toContain(
+		      'Execution authorization is not calibration approval'
+		    );
+		    expect(falsePositiveRegressionCatalogDetectorCalibrationMaintainerDecisionFollowUp).toContain(
+		      'Detector calibration implementation remains blocked'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.summary?.operation_record).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-follow-up-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.summary?.source_decision_record).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.summary?.source_intake).toBe(
+		      'docs/operations/product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1.md'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.summary?.explicit_decisions_found).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.summary?.recorded_decisions).toBe(0);
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.summary?.pending_decision_count).toBe(2);
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.summary?.pending_questions).toEqual(
+		      expect.arrayContaining([
+		        'conditional_dead_control_should_consider_form_dirty_prerequisites',
+		        'auth_redirect_route_should_preserve_maintainer_review_boundary'
+		      ])
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.summary?.decision_request_status).toBe(
+		      'explicit_maintainer_decisions_still_required'
+		    );
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.summary?.detector_changes_authorized).toBe(
+		      false
+		    );
+		    expect(
+		      falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.summary?.boundary
+		        ?.runtime_detection_behavior_change
+		    ).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.summary?.boundary?.finding_suppression).toBe(false);
+		    expect(
+		      falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.summary?.boundary
+		        ?.automatic_severity_downgrade
+		    ).toBe(false);
+		    expect(
+		      falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.summary?.boundary
+		        ?.detector_confidence_threshold_change
+		    ).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.summary?.boundary?.acceptance_policy_change).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.summary?.boundary?.target_repo_writes).toBe(false);
+		    expect(falsePositiveCatalogDetectorCalibrationMaintainerDecisionFollowUpGoal.next_goal_id).toBe(
+		      'repoassure-product-backlog-reprioritization-after-detector-decision-block-v0.1'
+		    );
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlockGoal.schema).toBe('project-autopilot/goal@1');
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlockGoal.status).toBe('completed');
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlockGoal.conclusion).toBe(
+		      'backlog_reprioritized_to_non_blocked_local_gap_audit'
+		    );
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlockGoal.objective).toContain(
+		      'Select the next non-blocked product execution goal'
+		    );
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlock).toContain(
+		      'RepoAssure Product Backlog Reprioritization After Detector Decision Block v0.1'
+		    );
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlock).toContain('Status: completed');
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlock).toContain(
+		      'backlog_reprioritized_to_non_blocked_local_gap_audit'
+		    );
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlock).toContain(
+		      'Detector calibration implementation remains blocked'
+		    );
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlock).toContain(
+		      'RepoAssure Product Completion Gap Audit Refresh v0.2'
+		    );
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlock).toContain(
+		      'Selected because it is local-only, non-blocked, and directly verifies remaining PRD/SPEC/PLAN gaps'
+		    );
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlockGoal.summary?.operation_record).toBe(
+		      'docs/operations/repoassure-product-backlog-reprioritization-after-detector-decision-block-v0.1.md'
+		    );
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlockGoal.summary?.blocked_line).toBe(
+		      'false_positive_detector_calibration_pending_maintainer_decisions'
+		    );
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlockGoal.summary?.selected_next_goal_id).toBe(
+		      'repoassure-product-completion-gap-audit-refresh-v0.2'
+		    );
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlockGoal.summary?.candidate_count).toBeGreaterThanOrEqual(4);
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlockGoal.summary?.blocked_candidate_count).toBeGreaterThanOrEqual(3);
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlockGoal.summary?.boundary?.runtime_detection_behavior_change).toBe(false);
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlockGoal.summary?.boundary?.target_repo_writes).toBe(false);
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlockGoal.summary?.boundary?.deployment).toBe(false);
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlockGoal.summary?.boundary?.public_release).toBe(false);
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlockGoal.summary?.boundary?.customer_contact).toBe(false);
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlockGoal.summary?.boundary?.pricing_or_spend_change).toBe(false);
+		    expect(productBacklogReprioritizationAfterDetectorDecisionBlockGoal.next_goal_id).toBe(
+		      'repoassure-product-completion-gap-audit-refresh-v0.2'
+		    );
+		    expect(productCompletionGapAuditRefreshV02Goal.schema).toBe('project-autopilot/goal@1');
+		    expect(productCompletionGapAuditRefreshV02Goal.status).toBe('completed');
+		    expect(productCompletionGapAuditRefreshV02Goal.objective).toContain(
+		      'Refresh the product completion gap audit'
+		    );
+		    expect(productCompletionGapAuditRefreshV02Goal.conclusion).toBe(
+		      'completion_gap_audit_refreshed_with_narrative_cleanup_next'
+		    );
+		    expect(productCompletionGapAuditRefreshV02).toContain('RepoAssure Product Completion Gap Audit Refresh v0.2');
+		    expect(productCompletionGapAuditRefreshV02).toContain('Status: completed');
+		    expect(productCompletionGapAuditRefreshV02).toContain(
+		      'completion_gap_audit_refreshed_with_narrative_cleanup_next'
+		    );
+		    expect(productCompletionGapAuditRefreshV02).toContain('Implemented Product Surfaces');
+		    expect(productCompletionGapAuditRefreshV02).toContain('Blocked or Manual-Gated Work');
+		    expect(productCompletionGapAuditRefreshV02).toContain('Deferred Work');
+		    expect(productCompletionGapAuditRefreshV02).toContain('Safe Auto-Executable Gaps');
+		    expect(productCompletionGapAuditRefreshV02).toContain('RepoAssure Canonical Product Narrative Freshness Cleanup v0.1');
+		    expect(productCompletionGapAuditRefreshV02).toContain(
+		      'Canonical PRD/SPEC sections still contain historical next-goal narrative'
+		    );
+		    expect(productCompletionGapAuditRefreshV02Goal.summary?.operation_record).toBe(
+		      'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.2.md'
+		    );
+		    expect(productCompletionGapAuditRefreshV02Goal.summary?.implemented_surfaces).toContain('local_cli_mcp_hardening');
+		    expect(productCompletionGapAuditRefreshV02Goal.summary?.implemented_surfaces).toContain('project_intelligence_watch_mode');
+		    expect(productCompletionGapAuditRefreshV02Goal.summary?.implemented_surfaces).toContain('false_positive_catalog_contracts');
+		    expect(productCompletionGapAuditRefreshV02Goal.summary?.blocked_or_manual_gated).toContain(
+		      'false_positive_detector_runtime_calibration'
+		    );
+		    expect(productCompletionGapAuditRefreshV02Goal.summary?.blocked_or_manual_gated).toContain('public_release_execution');
+		    expect(productCompletionGapAuditRefreshV02Goal.summary?.deferred).toContain('website_design_system_follow_up');
+		    expect(productCompletionGapAuditRefreshV02Goal.summary?.safe_auto_executable_candidates).toContain(
+		      'repoassure-canonical-product-narrative-freshness-cleanup-v0.1'
+		    );
+		    expect(productCompletionGapAuditRefreshV02Goal.summary?.selected_next_goal_id).toBe(
+		      'repoassure-canonical-product-narrative-freshness-cleanup-v0.1'
+		    );
+		    expect(productCompletionGapAuditRefreshV02Goal.summary?.boundary?.runtime_detection_behavior_change).toBe(false);
+		    expect(productCompletionGapAuditRefreshV02Goal.summary?.boundary?.target_repo_writes).toBe(false);
+		    expect(productCompletionGapAuditRefreshV02Goal.summary?.boundary?.deployment).toBe(false);
+		    expect(productCompletionGapAuditRefreshV02Goal.summary?.boundary?.public_release).toBe(false);
+		    expect(productCompletionGapAuditRefreshV02Goal.summary?.boundary?.customer_contact).toBe(false);
+		    expect(productCompletionGapAuditRefreshV02Goal.summary?.boundary?.pricing_or_spend_change).toBe(false);
+		    expect(productCompletionGapAuditRefreshV02Goal.next_goal_id).toBe(
+		      'repoassure-canonical-product-narrative-freshness-cleanup-v0.1'
+		    );
+		    expect(canonicalProductNarrativeFreshnessCleanupGoal.schema).toBe('project-autopilot/goal@1');
+		    expect(canonicalProductNarrativeFreshnessCleanupGoal.status).toBe('completed');
+		    expect(canonicalProductNarrativeFreshnessCleanupGoal.objective).toContain(
+		      'Refresh canonical product narrative'
+		    );
+		    expect(canonicalProductNarrativeFreshnessCleanupGoal.conclusion).toBe(
+		      'canonical_product_narrative_freshness_cleaned'
+		    );
+		    expect(canonicalProductNarrativeFreshnessCleanup).toContain(
+		      'RepoAssure Canonical Product Narrative Freshness Cleanup v0.1'
+		    );
+		    expect(canonicalProductNarrativeFreshnessCleanup).toContain('Status: completed');
+		    expect(canonicalProductNarrativeFreshnessCleanup).toContain(
+		      'canonical_product_narrative_freshness_cleaned'
+		    );
+		    expect(canonicalProductNarrativeFreshnessCleanup).toContain('Cleaned Canonical Surfaces');
+		    expect(canonicalProductNarrativeFreshnessCleanup).toContain('Preserved Historical Evidence');
+		    expect(canonicalProductNarrativeFreshnessCleanup).toContain('Stale Current/Next Narrative Removed');
+		    expect(canonicalProductNarrativeFreshnessCleanup).toContain(
+		      'RepoAssure Autopilot Progress Consistency Guard v0.1'
+		    );
+		    expect(canonicalProductNarrativeFreshnessCleanupGoal.summary?.operation_record).toBe(
+		      'docs/operations/repoassure-canonical-product-narrative-freshness-cleanup-v0.1.md'
+		    );
+		    expect(canonicalProductNarrativeFreshnessCleanupGoal.summary?.cleaned_surfaces).toEqual(
+		      expect.arrayContaining([
+		        'README.md',
+		        'docs/PRD.md',
+		        'docs/SPEC.md',
+		        'docs/PLAN.md',
+		        '.autopilot/progress/PROGRESS_SNAPSHOT.md',
+		        'docs/testing/strategy/test-strategy-v0.1.md'
+		      ])
+		    );
+		    expect(canonicalProductNarrativeFreshnessCleanupGoal.summary?.preserved_historical_records).toEqual(
+		      expect.arrayContaining(['docs/operations/', 'docs/logs/dev-log.md', 'docs/logs/decision-log.md'])
+		    );
+		    expect(canonicalProductNarrativeFreshnessCleanupGoal.summary?.stale_current_next_patterns_removed).toEqual(
+		      expect.arrayContaining([
+		        'prd_legacy_selected_next_goal',
+		        'spec_legacy_next_implementation_target',
+		        'testing_strategy_stale_next_target',
+		        'progress_latest_goal_currentness'
+		      ])
+		    );
+		    expect(canonicalProductNarrativeFreshnessCleanupGoal.summary?.boundary?.runtime_detection_behavior_change).toBe(
+		      false
+		    );
+		    expect(canonicalProductNarrativeFreshnessCleanupGoal.summary?.boundary?.target_repo_writes).toBe(false);
+		    expect(canonicalProductNarrativeFreshnessCleanupGoal.summary?.boundary?.deployment).toBe(false);
+		    expect(canonicalProductNarrativeFreshnessCleanupGoal.summary?.boundary?.public_release).toBe(false);
+		    expect(canonicalProductNarrativeFreshnessCleanupGoal.summary?.boundary?.customer_contact).toBe(false);
+		    expect(canonicalProductNarrativeFreshnessCleanupGoal.summary?.boundary?.pricing_or_spend_change).toBe(false);
+		    expect(canonicalProductNarrativeFreshnessCleanupGoal.next_goal_id).toBe(
+		      'repoassure-autopilot-progress-consistency-guard-v0.1'
+		    );
+		    expect(autopilotProgressConsistencyGuardGoal.schema).toBe('project-autopilot/goal@1');
+		    expect(autopilotProgressConsistencyGuardGoal.id).toBe(
+		      'repoassure-autopilot-progress-consistency-guard-v0.1'
+		    );
+		    expect(autopilotProgressConsistencyGuardGoal.title).toBe(
+		      'RepoAssure Autopilot Progress Consistency Guard v0.1'
+		    );
+		    expect(autopilotProgressConsistencyGuardGoal.status).toBe('completed');
+		    expect(autopilotProgressConsistencyGuardGoal.objective).toContain('automated consistency guard');
+		    expect(autopilotProgressConsistencyGuardGoal.source_spec).toBe(
+		      'docs/operations/repoassure-canonical-product-narrative-freshness-cleanup-v0.1.md'
+		    );
+		    expect(autopilotProgressConsistencyGuardGoal.conclusion).toBe(
+		      'progress_consistency_guard_implemented'
+		    );
+		    expect(autopilotProgressConsistencyGuardGoal.next_goal_id).toBe(
+		      'repoassure-product-completion-gap-audit-refresh-v0.3'
+		    );
+		    expect(autopilotProgressConsistencyGuardGoal.summary?.operation_record).toBe(
+		      'docs/operations/repoassure-autopilot-progress-consistency-guard-v0.1.md'
+		    );
+		    expect(autopilotProgressConsistencyGuardGoal.summary?.command).toBe(
+		      'pnpm autopilot:progress:check -- --json'
+		    );
+		    expect(autopilotProgressConsistencyGuardGoal.summary?.checks).toBe(8);
+		    expect(autopilotProgressConsistencyGuardGoal.summary?.local_only).toBe(true);
+		    expect(autopilotProgressConsistencyGuardGoal.summary?.read_only).toBe(true);
+		    expect(autopilotProgressConsistencyGuardGoal.blocked_actions).toContain('deployment');
+		    expect(autopilotProgressConsistencyGuardGoal.blocked_actions).toContain('target_repo_write');
+		    expect(autopilotProgressConsistencyGuardOperation).toContain(
+		      'RepoAssure Autopilot Progress Consistency Guard v0.1'
+		    );
+		    expect(autopilotProgressConsistencyGuardOperation).toContain('Status: completed');
+		    expect(autopilotProgressConsistencyGuardOperation).toContain(
+		      'progress_consistency_guard_implemented'
+		    );
+		    expect(autopilotProgressConsistencyGuardOperation).toContain(
+		      'pnpm autopilot:progress:check'
+		    );
+		    expect(autopilotProgressConsistencyGuardOperation).toContain('Local-only and read-only');
+		    expect(autopilotProgressConsistencyGuardOperation).toContain(
+		      'RepoAssure Product Completion Gap Audit Refresh v0.3'
+		    );
+		    expect(productCompletionGapAuditRefreshV03Goal.schema).toBe('project-autopilot/goal@1');
+		    expect(productCompletionGapAuditRefreshV03Goal.id).toBe(
+		      'repoassure-product-completion-gap-audit-refresh-v0.3'
+		    );
+		    expect(productCompletionGapAuditRefreshV03Goal.title).toBe(
+		      'RepoAssure Product Completion Gap Audit Refresh v0.3'
+		    );
+		    expect(productCompletionGapAuditRefreshV03Goal.status).toBe('completed');
+		    expect(productCompletionGapAuditRefreshV03Goal.source_spec).toBe(
+		      'docs/operations/repoassure-autopilot-progress-consistency-guard-v0.1.md'
+		    );
+		    expect(productCompletionGapAuditRefreshV03Goal.conclusion).toBe(
+		      'completion_gap_audit_refreshed_with_cli_productization_next'
+		    );
+		    expect(productCompletionGapAuditRefreshV03Goal.next_goal_id).toBe(
+		      'repoassure-ai-ide-repair-workflow-cli-productization-v0.1'
+		    );
+		    expect(productCompletionGapAuditRefreshV03Goal.summary?.operation_record).toBe(
+		      'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.3.md'
+		    );
+		    expect(productCompletionGapAuditRefreshV03Goal.summary?.implemented_surfaces).toContain(
+		      'local_cli_and_mcp_hardening_core'
+		    );
+		    expect(productCompletionGapAuditRefreshV03Goal.summary?.blocked_or_manual_gated).toContain(
+		      'false_positive_detector_runtime_calibration'
+		    );
+		    expect(productCompletionGapAuditRefreshV03Goal.summary?.external_input_gated).toContain(
+		      'private_preview_feedback_triage'
+		    );
+		    expect(productCompletionGapAuditRefreshV03Goal.summary?.deferred).toContain(
+		      'website_design_system_follow_up'
+		    );
+		    expect(productCompletionGapAuditRefreshV03Goal.summary?.safe_auto_executable).toContain(
+		      'ai_ide_repair_workflow_cli_productization'
+		    );
+		    expect(productCompletionGapAuditRefreshV03Goal.summary?.selected_next_goal).toBe(
+		      'repoassure-ai-ide-repair-workflow-cli-productization-v0.1'
+		    );
+		    expect(productCompletionGapAuditRefreshV03Goal.summary?.evidence).toEqual(
+		      expect.arrayContaining([
+		        'src/adapters/cli/run.ts',
+		        'src/adapters/mcp/tool-registry.ts',
+		        'packages/acceptance/package.json',
+		        'package.json'
+		      ])
+		    );
+		    expect(productCompletionGapAuditRefreshV03Goal.summary?.boundary?.runtime_detection_behavior_change).toBe(
+		      false
+		    );
+		    expect(productCompletionGapAuditRefreshV03Goal.summary?.boundary?.target_repo_writes).toBe(false);
+		    expect(productCompletionGapAuditRefreshV03Goal.summary?.boundary?.website_design_system_rewrite).toBe(
+		      false
+		    );
+		    expect(productCompletionGapAuditRefreshV03).toContain(
+		      'RepoAssure Product Completion Gap Audit Refresh v0.3'
+		    );
+		    expect(productCompletionGapAuditRefreshV03).toContain('Status: completed');
+		    expect(productCompletionGapAuditRefreshV03).toContain(
+		      'completion_gap_audit_refreshed_with_cli_productization_next'
+		    );
+		    expect(productCompletionGapAuditRefreshV03).toContain('Implemented Product Surfaces');
+		    expect(productCompletionGapAuditRefreshV03).toContain('Blocked or Manual-Gated Work');
+		    expect(productCompletionGapAuditRefreshV03).toContain('External-Input-Gated Work');
+		    expect(productCompletionGapAuditRefreshV03).toContain('Deferred Work');
+		    expect(productCompletionGapAuditRefreshV03).toContain('Safe Auto-Executable Gaps');
+		    expect(productCompletionGapAuditRefreshV03).toContain('`pnpm repair:*`');
+		    expect(productCompletionGapAuditRefreshV03).toContain('`hardening repair`');
+		    expect(productCompletionGapAuditRefreshV03).toContain(
+		      'RepoAssure AI IDE Repair Workflow CLI Productization v0.1'
+		    );
+		    expect(aiIdeRepairWorkflowCliProductizationGoal.schema).toBe('project-autopilot/goal@1');
+		    expect(aiIdeRepairWorkflowCliProductizationGoal.id).toBe(
+		      'repoassure-ai-ide-repair-workflow-cli-productization-v0.1'
+		    );
+		    expect(aiIdeRepairWorkflowCliProductizationGoal.title).toBe(
+		      'RepoAssure AI IDE Repair Workflow CLI Productization v0.1'
+		    );
+		    expect(aiIdeRepairWorkflowCliProductizationGoal.status).toBe('completed');
+		    expect(aiIdeRepairWorkflowCliProductizationGoal.source_spec).toBe(
+		      'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.3.md'
+		    );
+		    expect(aiIdeRepairWorkflowCliProductizationGoal.blocked_actions).toContain(
+		      'runtime_detection_behavior_change'
+		    );
+		    expect(aiIdeRepairWorkflowCliProductizationGoal.blocked_actions).toContain('target_repo_write');
+		    expect(productCompletionGapAuditRefreshV03Goal.blocked_actions).toContain(
+		      'website_design_system_rewrite'
+		    );
+		    expect(productApplicabilityBoundary).toContain('RepoAssure Product Applicability Boundary v0.1');
+		    expect(productApplicabilityBoundary).toContain('Core');
+		    expect(productApplicabilityBoundary).toContain('Extended');
+		    expect(productApplicabilityBoundary).toContain('Partner / Plugin');
+		    expect(productApplicabilityBoundary).toContain('Out of Scope');
+		    expect(productApplicabilityBoundary).toContain('AI-generated software projects');
+		    expect(productApplicabilityBoundary).toContain('Do not claim RepoAssure applies to every product');
+		    expect(productApplicabilityBoundary).toContain('Do not claim full-stack universal automatic acceptance');
+		    expect(productApplicabilityBoundary).toContain('Do not claim RepoAssure replaces human acceptance');
+		    expect(productApplicabilityBoundary).toContain('Do not claim RepoAssure automatically fixes every AI code issue');
+		    expect(productApplicabilityBoundary).toContain('Web App');
+		    expect(productApplicabilityBoundary).toContain('CLI');
+		    expect(productApplicabilityBoundary).toContain('AI IDE repair loop');
+		    expect(productApplicabilityBoundary).toContain('MCP / Agent tooling');
+		    expect(productApplicabilityBoundary).toContain('Backend API');
+		    expect(productApplicabilityBoundary).toContain('SDK / Library');
+		    expect(productApplicabilityBoundary).toContain('Browser Extension');
+		    expect(productApplicabilityBoundary).toContain('Desktop App');
+		    expect(productApplicabilityBoundary).toContain('Mobile App');
+		    expect(productApplicabilityBoundary).toContain('AI Model Evaluation');
+		    expect(productApplicabilityBoundary).toContain('Data Pipeline');
+		    expect(productApplicabilityBoundary).toContain('Security integrations');
+		    expect(productApplicabilityBoundary).toContain('Hardware');
+		    expect(productApplicabilityBoundary).toContain('Pure Design');
+		    expect(productApplicabilityBoundary).toContain('Pure Docs');
+		    expect(productApplicabilityBoundary).toContain('Offline Business Process');
+		    expect(productApplicabilityBoundaryGoal.schema).toBe('project-autopilot/goal@1');
+		    expect(productApplicabilityBoundaryGoal.status).toBe('completed');
+		    expect(productApplicabilityBoundaryGoal.conclusion).toBe('product_applicability_boundary_documented');
+		    expect(productApplicabilityBoundaryGoal.summary?.strategy_doc).toBe(
+		      'docs/product/strategy/product-applicability-boundary-v0.1.md'
+		    );
+		    expect(productApplicabilityBoundaryGoal.summary?.product_type_tiers).toEqual(
+		      expect.arrayContaining(['Core', 'Extended', 'Partner / Plugin', 'Out of Scope'])
+		    );
+		    expect(productApplicabilityBoundaryGoal.summary?.prohibited_claims).toEqual(
+		      expect.arrayContaining([
+		        'Do not claim RepoAssure applies to every product',
+		        'Do not claim full-stack universal automatic acceptance',
+		        'Do not claim RepoAssure replaces human acceptance',
+		        'Do not claim RepoAssure automatically fixes every AI code issue'
+		      ])
+		    );
+		    expect(productApplicabilityBoundaryGoal.summary?.boundary?.applies_to_every_product).toBe(false);
+		    expect(
+		      productApplicabilityBoundaryGoal.summary?.boundary?.full_stack_universal_automatic_acceptance
+		    ).toBe(false);
+		    expect(productApplicabilityBoundaryGoal.summary?.boundary?.replaces_human_acceptance).toBe(false);
+		    expect(
+		      productApplicabilityBoundaryGoal.summary?.boundary?.automatically_fixes_every_ai_code_issue
+		    ).toBe(false);
+		    expect(productApplicabilityBoundaryGoal.summary?.boundary?.runtime_behavior_change).toBe(false);
+		    expect(productApplicabilityBoundaryGoal.next_goal_id).toBe(
+		      'product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1'
+		    );
+	    // The active goal advances with each completion, so assert its shape rather than its
+    // identity: it must be a registered lifecycle goal and marked ready. Pinning the id
+    // turns this into churn on every goal.
+    const lifecycleSequence = [
       'repoassure-design-system-v2-adoption-v0.1',
       'repoassure-evidence-integrity-hashing-v0.1',
       'public-website-claude-design-integration-and-qa-v0.1',
       'project-intelligence-console-redesign-v0.1',
-      'project-intelligence-adr-cascade-remediation-closure-v0.1'
-    ];
+	      'project-intelligence-adr-cascade-remediation-closure-v0.1',
+	      'project-intelligence-detection-rule-calibration-v0.1',
+	      'repoassure-product-completion-gap-audit-v0.1',
+	      'project-intelligence-agent-context-export-v0.1',
+	      'project-intelligence-watch-mode-planning-v0.1',
+	      'project-intelligence-watch-mode-implementation-v0.1',
+	      'project-intelligence-watch-mode-local-smoke-validation-v0.1',
+	      'project-intelligence-watch-mode-ai-ide-consumption-handoff-v0.1',
+	      'project-intelligence-watch-mode-end-to-end-local-fixture-validation-v0.1',
+	      'project-intelligence-watch-mode-operator-playbook-v0.1',
+		      'project-intelligence-watch-mode-operator-playbook-consumption-validation-v0.1',
+			      'project-intelligence-watch-mode-recovery-command-ux-v0.1',
+			      'project-intelligence-watch-mode-recovery-ux-real-workspace-smoke-v0.1',
+			      'project-intelligence-watch-mode-completion-audit-v0.1',
+			      'product-false-positive-regression-catalog-planning-v0.1',
+			      'product-false-positive-regression-catalog-contract-implementation-v0.1',
+			      'product-false-positive-regression-catalog-artifact-generation-v0.1',
+			      'product-false-positive-regression-catalog-consumption-validation-v0.1',
+			      'product-false-positive-regression-catalog-completion-audit-v0.1',
+			      'product-false-positive-regression-catalog-real-fixture-expansion-v0.1',
+			      'product-false-positive-regression-catalog-detector-calibration-planning-v0.1',
+			      'product-false-positive-regression-catalog-detector-calibration-contract-v0.1',
+			      'product-false-positive-regression-catalog-detector-calibration-contract-consumption-validation-v0.1',
+			      'product-false-positive-regression-catalog-detector-calibration-completion-audit-v0.1',
+			      'product-false-positive-regression-catalog-detector-calibration-authorization-intake-v0.1',
+			      'repoassure-product-applicability-boundary-documentation-cascade-v0.1',
+			      'product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1',
+			      'product-false-positive-regression-catalog-detector-calibration-maintainer-decision-follow-up-v0.1',
+			      'repoassure-product-backlog-reprioritization-after-detector-decision-block-v0.1',
+			      'repoassure-product-completion-gap-audit-refresh-v0.2',
+			      'repoassure-canonical-product-narrative-freshness-cleanup-v0.1',
+			      'repoassure-autopilot-progress-consistency-guard-v0.1',
+			      'repoassure-product-completion-gap-audit-refresh-v0.3',
+			      'repoassure-ai-ide-repair-workflow-cli-productization-v0.1',
+			      'repoassure-ai-ide-repair-workflow-installed-cli-real-campaign-validation-v0.1',
+			      'repoassure-ai-ide-repair-workflow-packed-cli-installation-validation-v0.1',
+			      'repoassure-product-completion-gap-audit-refresh-v0.4',
+			      'repoassure-packed-mcp-server-installation-and-protocol-validation-v0.1',
+			      'repoassure-product-completion-gap-audit-refresh-v0.5',
+			      'repoassure-ai-ide-repair-workflow-mcp-convergence-decision-and-contract-v0.1',
+			      'repoassure-ai-ide-repair-handoff-mcp-tool-implementation-v0.1',
+			      'repoassure-ai-ide-repair-execution-preview-mcp-tool-implementation-v0.1',
+			      'repoassure-ai-ide-repair-patch-plan-mcp-tool-implementation-v0.1',
+			      'repoassure-ai-ide-repair-evidence-package-mcp-tool-implementation-v0.1',
+			      'repoassure-ai-ide-repair-workflow-mcp-convergence-completion-audit-v0.1',
+			      'repoassure-product-completion-gap-audit-refresh-v0.6',
+			      'repoassure-multi-repo-workspace-repair-summary-planning-v0.1',
+			      'repoassure-multi-repo-workspace-repair-summary-contract-implementation-v0.1',
+			      'repoassure-multi-repo-workspace-repair-summary-ai-ide-consumption-validation-v0.1',
+			      'repoassure-multi-repo-workspace-repair-summary-completion-audit-v0.1',
+			      'repoassure-product-completion-gap-audit-refresh-v0.7',
+			      'public-release-manual-decision-input-review-v0.2',
+			      'public-repository-state-and-release-boundary-reconciliation-v0.1',
+			      'public-git-history-personal-identifier-remediation-planning-v0.1',
+			      'public-git-history-personal-identifier-remediation-maintainer-decision-recording-v0.1',
+			      'repoassure-product-completion-gap-audit-refresh-v0.8',
+			      'repoassure-final-product-acceptance-closure-campaign-v0.1',
+			      'repoassure-final-product-acceptance-maintainer-decision-recording-v0.1',
+			      'repoassure-representative-multi-mode-acceptance-campaign-planning-v0.1',
+			      'repoassure-representative-multi-mode-acceptance-target-and-execution-authorization-decision-recording-v0.1',
+			      'repoassure-representative-multi-mode-acceptance-target-readiness-and-acquisition-authorization-package-v0.1',
+            'repoassure-representative-multi-mode-acceptance-target-acquisition-authorization-maintainer-decision-recording-v0.1',
+            'repoassure-product-backlog-reprioritization-after-representative-acquisition-defer-v0.1',
+            'repoassure-product-completion-gap-audit-refresh-v0.9',
+            'repoassure-canonical-product-narrative-freshness-cleanup-v0.2',
+            'repoassure-remaining-gated-product-work-direction-preparation-v0.1',
+            'repoassure-remaining-gated-product-work-maintainer-direction-decision-recording-v0.1',
+            'repoassure-false-positive-detector-runtime-calibration-decision-reopening-preparation-v0.1',
+            'repoassure-false-positive-detector-runtime-calibration-per-question-maintainer-decision-recording-v0.1',
+            'repoassure-false-positive-detector-runtime-calibration-bounded-design-planning-v0.1',
+            'repoassure-false-positive-detector-runtime-calibration-implementation-authorization-intake-v0.1',
+            'repoassure-false-positive-detector-runtime-calibration-implementation-authorization-maintainer-decision-recording-v0.1',
+            'repoassure-conditional-dead-control-calibration-implementation-gate-evidence-preparation-v0.1',
+            'repoassure-conditional-dead-control-calibration-fixture-evidence-readiness-and-authorization-intake-v0.1',
+            'repoassure-conditional-dead-control-calibration-fixture-evidence-readiness-and-authorization-maintainer-decision-recording-v0.1',
+            'repoassure-conditional-dead-control-calibration-synthetic-fixture-bounded-planning-v0.1',
+            'repoassure-conditional-dead-control-calibration-synthetic-fixture-implementation-authorization-intake-v0.1',
+            'repoassure-conditional-dead-control-calibration-synthetic-fixture-implementation-authorization-maintainer-decision-recording-v0.1',
+            'repoassure-conditional-dead-control-calibration-synthetic-fixture-bounded-implementation-v0.1',
+            'repoassure-conditional-dead-control-calibration-synthetic-fixture-manual-review-package-v0.1',
+			'repoassure-conditional-dead-control-calibration-synthetic-fixture-manual-gate-maintainer-decision-recording-v0.1',
+			'repoassure-conditional-dead-control-calibration-bounded-detector-implementation-authorization-intake-v0.1',
+			'repoassure-conditional-dead-control-calibration-bounded-detector-implementation-authorization-maintainer-decision-recording-v0.1',
+			'repoassure-conditional-dead-control-calibration-bounded-detector-implementation-v0.1',
+			'repoassure-conditional-dead-control-calibration-bounded-detector-implementation-completion-audit-v0.1',
+			'repoassure-conditional-dead-control-calibration-verification-evidence-reconciliation-v0.1',
+			'repoassure-product-completion-gap-audit-refresh-v0.10',
+			'repoassure-m1-open-evidence-kernel-contract-gap-planning-v0.1',
+			'repoassure-m1-open-evidence-kernel-candidate-boundary-maintainer-decision-intake-v0.1',
+			'repoassure-m1-open-evidence-kernel-candidate-boundary-maintainer-decision-recording-v0.1',
+			'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-design-planning-v0.1',
+			'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-intake-v0.1',
+			'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+			    ];
     // Once the whole sequence completes there is no active goal until the owner picks
     // one. Either state is valid; an active id pointing at an unregistered or
     // already-completed goal is not.
     if (index.active_goal_id) {
-      expect(designSequence).toContain(index.active_goal_id);
+      expect(lifecycleSequence).toContain(index.active_goal_id);
       const activeEntry = index.goals?.find((goal) => goal.id === index.active_goal_id);
       expect(activeEntry?.status).toBe('ready_to_execute');
     } else {
       expect(index.goals?.every((goal) => goal.status.startsWith('completed'))).toBe(true);
     }
-    for (const goalId of designSequence) {
+    for (const goalId of lifecycleSequence) {
       expect(index.goals?.some((goal) => goal.id === goalId)).toBe(true);
     }
     expect(index.deferred_goal_ids).toEqual([]);
@@ -4739,7 +7453,37 @@ describe('project structure', () => {
     expect(progress.workflow_map.mermaid).toContain('Controlled Remediation Plan');
     expect(progress.workflow_map.mermaid).toContain('Controlled Remediation Execution');
     expect(progress.workflow_map.mermaid).toContain('Remediation Closure');
-    expect(progress.blocked_actions).toContain('hosted_dashboard');
+	    expect(progress.workflow_map.mermaid).toContain('Rule Calibration');
+	    expect(progress.workflow_map.mermaid).toContain('Gap Audit');
+	    expect(progress.workflow_map.mermaid).toContain('Agent Context Export');
+	    expect(progress.workflow_map.mermaid).toContain('Watch Mode Planning');
+	    expect(progress.workflow_map.mermaid).toContain('Watch Mode Implementation');
+	    expect(progress.workflow_map.mermaid).toContain('Watch Smoke Validation');
+	    expect(progress.workflow_map.mermaid).toContain('Watch Handoff');
+	    expect(progress.workflow_map.mermaid).toContain('Watch E2E Fixture');
+	    expect(progress.workflow_map.mermaid).toContain('Operator Playbook');
+		    expect(progress.workflow_map.mermaid).toContain('Playbook Consumption');
+		    expect(progress.workflow_map.mermaid).toContain('Recovery UX');
+		    expect(progress.workflow_map.mermaid).toContain('Recovery Smoke');
+		    expect(progress.workflow_map.mermaid).toContain('Watch Completion Audit');
+		    expect(progress.workflow_map.mermaid).toContain('False Positive Catalog');
+		    expect(progress.workflow_map.mermaid).toContain('Catalog Contract');
+		    expect(progress.workflow_map.mermaid).toContain('Catalog Artifacts');
+		    expect(progress.workflow_map.mermaid).toContain('Catalog Consumption');
+		    expect(progress.workflow_map.mermaid).toContain('Catalog Completion Audit');
+		    expect(progress.workflow_map.mermaid).toContain('Real Fixture Expansion');
+		    expect(progress.workflow_map.mermaid).toContain('Detector Calibration Planning');
+		    expect(progress.workflow_map.mermaid).toContain('Calibration Contract');
+		    expect(progress.workflow_map.mermaid).toContain('Contract Consumption');
+		    expect(progress.workflow_map.mermaid).toContain('Calibration Completion Audit');
+		    expect(progress.workflow_map.mermaid).toContain('Authorization Intake');
+		    expect(progress.workflow_map.mermaid).toContain('Applicability Boundary');
+		    expect(progress.workflow_map.mermaid).toContain('Maintainer Decision');
+		    expect(progress.workflow_map.mermaid).toContain('Pending Decision Record');
+		    expect(progress.workflow_map.mermaid).toContain('Maintainer Follow-up');
+		    expect(progress.workflow_map.mermaid).toContain('Narrative Freshness');
+		    expect(progress.workflow_map.mermaid).toContain('Progress Consistency Guard');
+	    expect(progress.blocked_actions).toContain('hosted_dashboard');
     expect(progress.blocked_actions).toContain('repository_visibility_change');
     expect(progressMarkdown).toContain('RepoAssure Progress Snapshot');
     // The real invariant: the human-readable snapshot agrees with the machine one.
@@ -4758,6 +7502,53 @@ describe('project structure', () => {
     expect(progressMarkdown).toContain('Project Intelligence ADR Cascade Controlled Remediation Plan v0.1');
     expect(progressMarkdown).toContain('Project Intelligence ADR Cascade Controlled Remediation Execution v0.1');
     expect(progressMarkdown).toContain('Project Intelligence ADR Cascade Remediation Closure v0.1');
+	    expect(progressMarkdown).toContain('Project Intelligence Detection Rule Calibration v0.1');
+	    expect(progressMarkdown).toContain('RepoAssure Product Completion Gap Audit v0.1');
+	    expect(progressMarkdown).toContain('Project Intelligence Agent Context Export v0.1');
+	    expect(progressMarkdown).toContain('Project Intelligence Watch Mode Planning v0.1');
+	    expect(progressMarkdown).toContain('Project Intelligence Watch Mode Implementation v0.1');
+	    expect(progressMarkdown).toContain('Project Intelligence Watch Mode Local Smoke Validation v0.1');
+	    expect(progressMarkdown).toContain('Project Intelligence Watch Mode AI IDE Consumption Handoff v0.1');
+	    expect(progressMarkdown).toContain('Project Intelligence Watch Mode End-to-End Local Fixture Validation v0.1');
+	    expect(progressMarkdown).toContain('Project Intelligence Watch Mode Operator Playbook v0.1');
+	    expect(progressMarkdown).toContain('Project Intelligence Watch Mode Operator Playbook Consumption Validation v0.1');
+		    expect(progressMarkdown).toContain('Project Intelligence Watch Mode Recovery Command UX v0.1');
+		    expect(progressMarkdown).toContain('Project Intelligence Watch Mode Recovery UX Real Workspace Smoke v0.1');
+		    expect(progressMarkdown).toContain('Project Intelligence Watch Mode Completion Audit v0.1');
+		    expect(progressMarkdown).toContain('Product False-Positive Regression Catalog Planning v0.1');
+		    expect(progressMarkdown).toContain('Product False-Positive Regression Catalog Contract Implementation v0.1');
+		    expect(progressMarkdown).toContain('Product False-Positive Regression Catalog Artifact Generation v0.1');
+		    expect(progressMarkdown).toContain('Product False-Positive Regression Catalog Consumption Validation v0.1');
+		    expect(progressMarkdown).toContain('Product False-Positive Regression Catalog Completion Audit v0.1');
+		    expect(progressMarkdown).toContain('Product False-Positive Regression Catalog Real Fixture Expansion v0.1');
+		    expect(progressMarkdown).toContain('Product False-Positive Regression Catalog Detector Calibration Planning v0.1');
+		    expect(progressMarkdown).toContain('Product False-Positive Regression Catalog Detector Calibration Contract v0.1');
+		    expect(progressMarkdown).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Contract Consumption Validation v0.1'
+		    );
+		    expect(progressMarkdown).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Completion Audit v0.1'
+		    );
+		    expect(progressMarkdown).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Authorization Intake v0.1'
+		    );
+		    expect(progressMarkdown).toContain('RepoAssure Product Applicability Boundary Documentation Cascade v0.1');
+		    expect(progressMarkdown).toContain('product_applicability_boundary_documented');
+		    expect(progressMarkdown).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Recording v0.1'
+		    );
+		    expect(progressMarkdown).toContain('maintainer_decision_record_created_with_pending_decisions');
+		    expect(progressMarkdown).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Follow-up v0.1'
+		    );
+		    expect(progressMarkdown).toContain('maintainer_decision_follow_up_recorded_without_explicit_decisions');
+		    expect(progressMarkdown).toContain('RepoAssure Product Backlog Reprioritization After Detector Decision Block v0.1');
+		    expect(progressMarkdown).toContain('backlog_reprioritized_to_non_blocked_local_gap_audit');
+		    expect(progressMarkdown).toContain('RepoAssure Product Completion Gap Audit Refresh v0.2');
+		    expect(progressMarkdown).toContain('completion_gap_audit_refreshed_with_narrative_cleanup_next');
+		    expect(progressMarkdown).toContain('RepoAssure Canonical Product Narrative Freshness Cleanup v0.1');
+		    expect(progressMarkdown).toContain('canonical_product_narrative_freshness_cleaned');
+		    expect(progressMarkdown).toContain('RepoAssure Autopilot Progress Consistency Guard v0.1');
     expect(gitignore).toContain('.autopilot/runs/');
     expect(gitignore).toContain('.autopilot/cache/');
     expect(gitignore).toContain('.autopilot/secrets/');
@@ -4766,8 +7557,77 @@ describe('project structure', () => {
     expect(readme).toContain('pnpm project:intelligence');
     expect(readme).toContain('pnpm project:intelligence:view');
     expect(readme).toContain('pnpm project:intelligence:backlog');
-    expect(readme).toContain('pnpm project:intelligence:decision-intake');
-    expect(readme).toContain('pnpm project:intelligence:recommendation-draft');
+	    expect(readme).toContain('pnpm project:intelligence:decision-intake');
+	    expect(readme).toContain('pnpm project:intelligence:agent-context');
+	    expect(readme).toContain('pnpm project:intelligence:watch');
+	    expect(readme).toContain('Project Intelligence watch loop 已通过端到端本地 fixture 验证');
+	    expect(readme).toContain('project-intelligence-watch-e2e-fixture.test.ts');
+	    expect(readme).toContain('Project Intelligence Watch Mode Operator Playbook v0.1');
+	    expect(readme).toContain('Project Intelligence Watch Mode Operator Playbook Consumption Validation v0.1');
+	    expect(readme).toContain('project-intelligence-watch-operator-playbook.test.ts');
+		    expect(readme).toContain('Project Intelligence Watch Mode Recovery Command UX v0.1');
+		    expect(readme).toContain('Project Intelligence Watch Mode Recovery UX Real Workspace Smoke v0.1');
+		    expect(readme).toContain('project-intelligence-watch-recovery-ux-smoke.test.ts');
+		    expect(readme).toContain('recoveryPlan');
+		    expect(readme).toContain('Project Intelligence Watch Mode Completion Audit v0.1');
+		    expect(readme).toContain('complete_for_current_local_only_slice');
+		    expect(readme).toContain('Product False-Positive Regression Catalog Planning v0.1');
+		    expect(readme).toContain('plan_ready_for_local_contract_implementation');
+		    expect(readme).toContain('Product False-Positive Regression Catalog Contract Implementation v0.1');
+		    expect(readme).toContain('contract_implemented_without_runtime_detection_change');
+		    expect(readme).toContain('@hardening-mcp/acceptance/false-positive-catalog');
+		    expect(readme).toContain('false-positive regression catalog');
+		    expect(readme).toContain('Product False-Positive Regression Catalog Artifact Generation v0.1');
+		    expect(readme).toContain('artifacts_generated_without_detection_behavior_change');
+		    expect(readme).toContain('pnpm false-positive:catalog');
+		    expect(readme).toContain('@hardening-mcp/acceptance/run-false-positive-catalog');
+		    expect(readme).toContain('false-positive-regression-catalog.json');
+		    expect(readme).toContain('Product False-Positive Regression Catalog Consumption Validation v0.1');
+		    expect(readme).toContain('consumption_validated_without_detection_behavior_change');
+		    expect(readme).toContain('pnpm false-positive:catalog:validate');
+		    expect(readme).toContain('@hardening-mcp/acceptance/run-false-positive-catalog-consumption');
+		    expect(readme).toContain('false-positive-regression-catalog-consumption-validation.json');
+		    expect(readme).toContain('Product False-Positive Regression Catalog Completion Audit v0.1');
+		    expect(readme).toContain('complete_for_current_local_only_catalog_slice');
+		    expect(readme).toContain('Product False-Positive Regression Catalog Real Fixture Expansion v0.1');
+		    expect(readme).toContain('Product False-Positive Regression Catalog Detector Calibration Planning v0.1');
+		    expect(readme).toContain('detector_calibration_plan_ready_without_runtime_behavior_change');
+		    expect(readme).toContain('Product False-Positive Regression Catalog Detector Calibration Contract v0.1');
+		    expect(readme).toContain('calibration_contract_generated_without_runtime_behavior_change');
+		    expect(readme).toContain('pnpm false-positive:calibration-contract');
+		    expect(readme).toContain('@hardening-mcp/acceptance/run-false-positive-detector-calibration-contract');
+		    expect(readme).toContain('false-positive-detector-calibration-contract.json');
+		    expect(readme).toContain('Product False-Positive Regression Catalog Detector Calibration Contract Consumption Validation v0.1');
+		    expect(readme).toContain('contract_consumption_validated_without_runtime_behavior_change');
+		    expect(readme).toContain('pnpm false-positive:calibration-contract:validate');
+		    expect(readme).toContain(
+		      '@hardening-mcp/acceptance/run-false-positive-detector-calibration-contract-consumption'
+		    );
+		    expect(readme).toContain('false-positive-detector-calibration-contract-consumption-validation.json');
+		    expect(readme).toContain('Product False-Positive Regression Catalog Detector Calibration Completion Audit v0.1');
+		    expect(readme).toContain('complete_for_current_local_only_detector_calibration_slice');
+		    expect(readme).toContain('Product False-Positive Regression Catalog Detector Calibration Authorization Intake v0.1');
+		    expect(readme).toContain('RepoAssure Product Applicability Boundary Documentation Cascade v0.1');
+		    expect(readme).toContain('product_applicability_boundary_documented');
+		    expect(readme).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Recording v0.1'
+		    );
+		    expect(readme).toContain('maintainer_decision_record_created_with_pending_decisions');
+		    expect(readme).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Follow-up v0.1'
+		    );
+		    expect(readme).toContain('maintainer_decision_follow_up_recorded_without_explicit_decisions');
+		    expect(readme).toContain('RepoAssure Product Backlog Reprioritization After Detector Decision Block v0.1');
+		    expect(readme).toContain('backlog_reprioritized_to_non_blocked_local_gap_audit');
+		    expect(readme).toContain('RepoAssure Product Completion Gap Audit Refresh v0.2');
+		    expect(readme).toContain('completion_gap_audit_refreshed_with_narrative_cleanup_next');
+		    expect(readme).toContain('RepoAssure Canonical Product Narrative Freshness Cleanup v0.1');
+		    expect(readme).toContain('canonical_product_narrative_freshness_cleaned');
+		    expect(readme).toContain('RepoAssure Autopilot Progress Consistency Guard v0.1');
+		    expect(readme).toContain('progress_consistency_guard_implemented');
+		    expect(readme).toContain('RepoAssure Product Completion Gap Audit Refresh v0.3');
+	    expect(readme).toContain('freshness 排障');
+	    expect(readme).toContain('pnpm project:intelligence:recommendation-draft');
     expect(readme).toContain('pnpm project:intelligence:maintainer-decision');
     expect(readme).toContain('pnpm project:intelligence:controlled-remediation-plan');
     expect(acceptanceChecklist).toContain('Brownfield Autopilot Initialization v0.1');
@@ -4779,6 +7639,61 @@ describe('project structure', () => {
     expect(acceptanceChecklist).toContain('Project Intelligence ADR Cascade Maintainer Decision Recording v0.1');
     expect(acceptanceChecklist).toContain('Project Intelligence ADR Cascade Controlled Remediation Plan v0.1');
     expect(acceptanceChecklist).toContain('Project Intelligence ADR Cascade Controlled Remediation Execution v0.1');
+	    expect(acceptanceChecklist).toContain('Project Intelligence Detection Rule Calibration v0.1');
+	    expect(acceptanceChecklist).toContain('RepoAssure Product Completion Gap Audit v0.1');
+	    expect(acceptanceChecklist).toContain('Project Intelligence Agent Context Export v0.1');
+	    expect(acceptanceChecklist).toContain('Project Intelligence Watch Mode Planning v0.1');
+	    expect(acceptanceChecklist).toContain('Project Intelligence Watch Mode Implementation v0.1');
+	    expect(acceptanceChecklist).toContain('Project Intelligence Watch Mode Local Smoke Validation v0.1');
+	    expect(acceptanceChecklist).toContain('Project Intelligence Watch Mode AI IDE Consumption Handoff v0.1');
+	    expect(acceptanceChecklist).toContain('Project Intelligence Watch Mode End-to-End Local Fixture Validation v0.1');
+	    expect(acceptanceChecklist).toContain('Project Intelligence Watch Mode Operator Playbook v0.1');
+	    expect(acceptanceChecklist).toContain('Project Intelligence Watch Mode Operator Playbook Consumption Validation v0.1');
+		    expect(acceptanceChecklist).toContain('Project Intelligence Watch Mode Recovery Command UX v0.1');
+		    expect(acceptanceChecklist).toContain('Project Intelligence Watch Mode Recovery UX Real Workspace Smoke v0.1');
+		    expect(acceptanceChecklist).toContain('Project Intelligence Watch Mode Completion Audit v0.1');
+		    expect(acceptanceChecklist).toContain('Product False-Positive Regression Catalog Planning v0.1');
+		    expect(acceptanceChecklist).toContain('Product False-Positive Regression Catalog Contract Implementation v0.1');
+		    expect(acceptanceChecklist).toContain('Product False-Positive Regression Catalog Artifact Generation v0.1');
+		    expect(acceptanceChecklist).toContain('Product False-Positive Regression Catalog Consumption Validation v0.1');
+		    expect(acceptanceChecklist).toContain('Product False-Positive Regression Catalog Completion Audit v0.1');
+		    expect(acceptanceChecklist).toContain('Product False-Positive Regression Catalog Real Fixture Expansion v0.1');
+		    expect(acceptanceChecklist).toContain('Product False-Positive Regression Catalog Detector Calibration Planning v0.1');
+		    expect(acceptanceChecklist).toContain('Product False-Positive Regression Catalog Detector Calibration Contract v0.1');
+		    expect(acceptanceChecklist).toContain(
+		      'false-positive-detector-calibration-contract.json'
+		    );
+		    expect(acceptanceChecklist).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Contract Consumption Validation v0.1'
+		    );
+		    expect(acceptanceChecklist).toContain(
+		      'false-positive-detector-calibration-contract-consumption-validation.json'
+		    );
+		    expect(acceptanceChecklist).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Completion Audit v0.1'
+		    );
+		    expect(acceptanceChecklist).toContain('complete_for_current_local_only_detector_calibration_slice');
+		    expect(acceptanceChecklist).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Authorization Intake v0.1'
+		    );
+		    expect(acceptanceChecklist).toContain('authorization_intake_created_pending_maintainer_decisions');
+		    expect(acceptanceChecklist).toContain('RepoAssure Product Applicability Boundary Documentation Cascade v0.1');
+		    expect(acceptanceChecklist).toContain('product_applicability_boundary_documented');
+		    expect(acceptanceChecklist).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Recording v0.1'
+		    );
+		    expect(acceptanceChecklist).toContain('maintainer_decision_record_created_with_pending_decisions');
+		    expect(acceptanceChecklist).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Follow-up v0.1'
+		    );
+		    expect(acceptanceChecklist).toContain('maintainer_decision_follow_up_recorded_without_explicit_decisions');
+		    expect(acceptanceChecklist).toContain('RepoAssure Product Backlog Reprioritization After Detector Decision Block v0.1');
+		    expect(acceptanceChecklist).toContain('backlog_reprioritized_to_non_blocked_local_gap_audit');
+		    expect(acceptanceChecklist).toContain('RepoAssure Product Completion Gap Audit Refresh v0.2');
+		    expect(acceptanceChecklist).toContain('completion_gap_audit_refreshed_with_narrative_cleanup_next');
+		    expect(acceptanceChecklist).toContain('RepoAssure Canonical Product Narrative Freshness Cleanup v0.1');
+		    expect(acceptanceChecklist).toContain('canonical_product_narrative_freshness_cleaned');
+		    expect(acceptanceChecklist).toContain('RepoAssure Autopilot Progress Consistency Guard v0.1');
     expect(testingStrategy).toContain('Brownfield Autopilot Initialization v0.1');
     expect(testingStrategy).toContain('Public Website Design Work Deferred v0.1');
     expect(testingStrategy).toContain('Product Core Execution Resume v0.1');
@@ -4802,7 +7717,86 @@ describe('project structure', () => {
     expect(testingStrategy).toContain('project-intelligence-maintainer-decision.test.ts');
     expect(testingStrategy).toContain('Project Intelligence ADR Cascade Controlled Remediation Plan v0.1');
     expect(testingStrategy).toContain('project-intelligence-controlled-remediation-plan.test.ts');
-    expect(testingStrategy).toContain('progress_state_mismatch');
+    expect(testingStrategy).toContain('Project Intelligence Detection Rule Calibration v0.1');
+    expect(testingStrategy).toContain('apps/nested-readme/docs/README.md');
+	    expect(testingStrategy).toContain('RepoAssure Product Completion Gap Audit v0.1');
+	    expect(testingStrategy).toContain('Project Intelligence Agent Context Export v0.1');
+	    expect(testingStrategy).toContain('project:intelligence:agent-context');
+	    expect(testingStrategy).toContain('Project Intelligence Watch Mode Planning v0.1');
+	    expect(testingStrategy).toContain('Project Intelligence Watch Mode Implementation v0.1');
+	    expect(testingStrategy).toContain('Project Intelligence Watch Mode Local Smoke Validation v0.1');
+	    expect(testingStrategy).toContain('Project Intelligence Watch Mode AI IDE Consumption Handoff v0.1');
+	    expect(testingStrategy).toContain('Project Intelligence Watch Mode End-to-End Local Fixture Validation v0.1');
+	    expect(testingStrategy).toContain('Project Intelligence Watch Mode Operator Playbook v0.1');
+	    expect(testingStrategy).toContain('Project Intelligence Watch Mode Operator Playbook Consumption Validation v0.1');
+		    expect(testingStrategy).toContain('Project Intelligence Watch Mode Recovery Command UX v0.1');
+		    expect(testingStrategy).toContain('Project Intelligence Watch Mode Recovery UX Real Workspace Smoke v0.1');
+		    expect(testingStrategy).toContain('project-intelligence-watch-recovery-ux-smoke.test.ts');
+		    expect(testingStrategy).toContain('project-intelligence-watch-handoff.test.ts');
+		    expect(testingStrategy).toContain('Project Intelligence Watch Mode Completion Audit v0.1');
+		    expect(testingStrategy).toContain('Product False-Positive Regression Catalog Planning v0.1');
+		    expect(testingStrategy).toContain('Product False-Positive Regression Catalog Contract Implementation v0.1');
+		    expect(testingStrategy).toContain('false-positive-catalog.test.ts');
+		    expect(testingStrategy).toContain('Product False-Positive Regression Catalog Artifact Generation v0.1');
+		    expect(testingStrategy).toContain('false-positive-catalog-artifacts.test.ts');
+		    expect(testingStrategy).toContain('@hardening-mcp/acceptance/run-false-positive-catalog');
+		    expect(testingStrategy).toContain('Product False-Positive Regression Catalog Consumption Validation v0.1');
+		    expect(testingStrategy).toContain('false-positive-catalog-consumption.test.ts');
+		    expect(testingStrategy).toContain('@hardening-mcp/acceptance/run-false-positive-catalog-consumption');
+		    expect(testingStrategy).toContain('Product False-Positive Regression Catalog Completion Audit v0.1');
+		    expect(testingStrategy).toContain('complete_for_current_local_only_catalog_slice');
+		    expect(testingStrategy).toContain('Product False-Positive Regression Catalog Real Fixture Expansion v0.1');
+		    expect(testingStrategy).toContain('Product False-Positive Regression Catalog Detector Calibration Planning v0.1');
+		    expect(testingStrategy).toContain('detector calibration questions');
+		    expect(testingStrategy).toContain('manual review gates');
+		    expect(testingStrategy).toContain('@hardening-mcp/acceptance/false-positive-catalog');
+		    expect(testingStrategy).toContain('expected finding snapshots');
+		    expect(testingStrategy).toContain('severity/rationale review fields');
+		    expect(testingStrategy).toContain('runtime detection behavior change');
+		    expect(testingStrategy).toContain('Product False-Positive Regression Catalog Detector Calibration Contract v0.1');
+		    expect(testingStrategy).toContain('false-positive-detector-calibration-contract.test.ts');
+		    expect(testingStrategy).toContain('@hardening-mcp/acceptance/run-false-positive-detector-calibration-contract');
+		    expect(testingStrategy).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Contract Consumption Validation v0.1'
+		    );
+		    expect(testingStrategy).toContain('false-positive-detector-calibration-contract-consumption.test.ts');
+		    expect(testingStrategy).toContain(
+		      '@hardening-mcp/acceptance/run-false-positive-detector-calibration-contract-consumption'
+		    );
+		    expect(testingStrategy).toContain('Product False-Positive Regression Catalog Detector Calibration Completion Audit v0.1');
+		    expect(testingStrategy).toContain('complete_for_current_local_only_detector_calibration_slice');
+		    expect(testingStrategy).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Authorization Intake v0.1'
+		    );
+		    expect(testingStrategy).toContain('authorization_intake_created_pending_maintainer_decisions');
+		    expect(testingStrategy).toContain('RepoAssure Product Applicability Boundary Documentation Cascade v0.1');
+		    expect(testingStrategy).toContain('product_applicability_boundary_documented');
+		    expect(testingStrategy).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Recording v0.1'
+		    );
+		    expect(testingStrategy).toContain('maintainer_decision_record_created_with_pending_decisions');
+		    expect(testingStrategy).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Follow-up v0.1'
+		    );
+		    expect(testingStrategy).toContain('maintainer_decision_follow_up_recorded_without_explicit_decisions');
+		    expect(testingStrategy).toContain('RepoAssure Product Backlog Reprioritization After Detector Decision Block v0.1');
+		    expect(testingStrategy).toContain('backlog_reprioritized_to_non_blocked_local_gap_audit');
+		    expect(testingStrategy).toContain('RepoAssure Product Completion Gap Audit Refresh v0.2');
+		    expect(testingStrategy).toContain('completion_gap_audit_refreshed_with_narrative_cleanup_next');
+		    expect(testingStrategy).toContain('RepoAssure Canonical Product Narrative Freshness Cleanup v0.1');
+		    expect(testingStrategy).toContain('canonical_product_narrative_freshness_cleaned');
+		    expect(testingStrategy).toContain('RepoAssure Autopilot Progress Consistency Guard v0.1');
+		    expect(testingStrategy).not.toContain(
+		      'Product False-Positive Regression Catalog Planning v0.1 is the next testing-strategy target'
+		    );
+	    expect(testingStrategy).toContain('recoveryPlan');
+	    expect(testingStrategy).toContain('project-intelligence-watch-operator-playbook.test.ts');
+	    expect(testingStrategy).toContain('project-intelligence-watch-e2e-fixture.test.ts');
+	    expect(testingStrategy).toContain('project-intelligence-watch.test.ts');
+	    expect(testingStrategy).toContain('project-intelligence-watch-smoke.test.ts');
+	    expect(testingStrategy).toContain('progress_state_mismatch');
+	    expect(testingStrategy).toContain('debounce');
+	    expect(testingStrategy).toContain('manual stop boundary');
     expect(testingStrategy).toContain('repairActionQueue');
     expect(testingStrategy).toContain('patchPreview');
     expect(testingStrategy).toContain('patchPlanInputs');
@@ -4822,6 +7816,60 @@ describe('project structure', () => {
     expect(decisionLog).toContain('Project Intelligence ADR cascade recommendation draft completed');
     expect(decisionLog).toContain('Project Intelligence ADR cascade maintainer decisions recorded');
     expect(decisionLog).toContain('Project Intelligence ADR cascade controlled remediation plan completed');
+	    expect(decisionLog).toContain('Project Intelligence detection rule calibration completed');
+	    expect(decisionLog).toContain('RepoAssure Product Completion Gap Audit v0.1');
+	    expect(decisionLog).toContain('Project Intelligence Agent Context Export v0.1');
+	    expect(decisionLog).toContain('Project Intelligence Watch Mode Planning v0.1');
+	    expect(decisionLog).toContain('Project Intelligence Watch Mode Implementation v0.1');
+	    expect(decisionLog).toContain('Project Intelligence Watch Mode Local Smoke Validation v0.1');
+	    expect(decisionLog).toContain('Project Intelligence Watch Mode AI IDE Consumption Handoff v0.1');
+	    expect(decisionLog).toContain('Project Intelligence Watch Mode End-to-End Local Fixture Validation v0.1');
+	    expect(decisionLog).toContain('Project Intelligence Watch Mode Operator Playbook v0.1');
+	    expect(decisionLog).toContain('Project Intelligence Watch Mode Operator Playbook Consumption Validation v0.1');
+	    expect(decisionLog).toContain('Product False-Positive Regression Catalog Detector Calibration Planning v0.1');
+	    expect(decisionLog).toContain('detector_calibration_plan_ready_without_runtime_behavior_change');
+		    expect(decisionLog).toContain('Project Intelligence Watch Mode Recovery Command UX v0.1');
+		    expect(decisionLog).toContain('Project Intelligence Watch Mode Recovery UX Real Workspace Smoke v0.1');
+		    expect(decisionLog).toContain('Project Intelligence Watch Mode Completion Audit v0.1');
+		    expect(decisionLog).toContain('Product False-Positive Regression Catalog Planning v0.1');
+		    expect(decisionLog).toContain('Product False-Positive Regression Catalog Contract Implementation v0.1');
+		    expect(decisionLog).toContain('Product False-Positive Regression Catalog Artifact Generation v0.1');
+		    expect(decisionLog).toContain('artifacts_generated_without_detection_behavior_change');
+		    expect(decisionLog).toContain('Product False-Positive Regression Catalog Consumption Validation v0.1');
+		    expect(decisionLog).toContain('consumption_validated_without_detection_behavior_change');
+		    expect(decisionLog).toContain('Product False-Positive Regression Catalog Completion Audit v0.1');
+		    expect(decisionLog).toContain('complete_for_current_local_only_catalog_slice');
+		    expect(decisionLog).toContain('Product False-Positive Regression Catalog Real Fixture Expansion v0.1');
+		    expect(decisionLog).toContain('Product False-Positive Regression Catalog Detector Calibration Planning v0.1');
+		    expect(decisionLog).toContain('Product False-Positive Regression Catalog Detector Calibration Contract v0.1');
+		    expect(decisionLog).toContain('calibration_contract_generated_without_runtime_behavior_change');
+		    expect(decisionLog).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Contract Consumption Validation v0.1'
+		    );
+		    expect(decisionLog).toContain('contract_consumption_validated_without_runtime_behavior_change');
+		    expect(decisionLog).toContain('Product False-Positive Regression Catalog Detector Calibration Completion Audit v0.1');
+		    expect(decisionLog).toContain('complete_for_current_local_only_detector_calibration_slice');
+		    expect(decisionLog).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Authorization Intake v0.1'
+		    );
+		    expect(decisionLog).toContain('authorization_intake_created_pending_maintainer_decisions');
+		    expect(decisionLog).toContain('RepoAssure Product Applicability Boundary Documentation Cascade v0.1');
+		    expect(decisionLog).toContain('product_applicability_boundary_documented');
+		    expect(decisionLog).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Recording v0.1'
+		    );
+		    expect(decisionLog).toContain('maintainer_decision_record_created_with_pending_decisions');
+		    expect(decisionLog).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Follow-up v0.1'
+		    );
+		    expect(decisionLog).toContain('maintainer_decision_follow_up_recorded_without_explicit_decisions');
+		    expect(decisionLog).toContain('RepoAssure Product Backlog Reprioritization After Detector Decision Block v0.1');
+		    expect(decisionLog).toContain('backlog_reprioritized_to_non_blocked_local_gap_audit');
+		    expect(decisionLog).toContain('RepoAssure Product Completion Gap Audit Refresh v0.2');
+		    expect(decisionLog).toContain('completion_gap_audit_refreshed_with_narrative_cleanup_next');
+		    expect(decisionLog).toContain('RepoAssure Canonical Product Narrative Freshness Cleanup v0.1');
+		    expect(decisionLog).toContain('canonical_product_narrative_freshness_cleaned');
+		    expect(decisionLog).toContain('RepoAssure Autopilot Progress Consistency Guard v0.1');
     expect(devLog).toContain('Brownfield Autopilot Initialization v0.1');
     expect(devLog).toContain('Public Website Design Work Deferred v0.1');
     expect(devLog).toContain('Product Core Execution Resume v0.1');
@@ -4839,12 +7887,267 @@ describe('project structure', () => {
     expect(devLog).toContain('Project Intelligence ADR Cascade Remediation Recommendation Draft v0.1');
     expect(devLog).toContain('Project Intelligence ADR Cascade Maintainer Decision Recording v0.1');
     expect(devLog).toContain('Project Intelligence ADR Cascade Controlled Remediation Plan v0.1');
+	    expect(devLog).toContain('Project Intelligence Detection Rule Calibration v0.1');
+	    expect(devLog).toContain('RepoAssure Product Completion Gap Audit v0.1');
+	    expect(devLog).toContain('Project Intelligence Agent Context Export v0.1');
+	    expect(devLog).toContain('Project Intelligence Watch Mode Planning v0.1');
+	    expect(devLog).toContain('Project Intelligence Watch Mode Implementation v0.1');
+	    expect(devLog).toContain('Project Intelligence Watch Mode Local Smoke Validation v0.1');
+	    expect(devLog).toContain('Project Intelligence Watch Mode AI IDE Consumption Handoff v0.1');
+	    expect(devLog).toContain('Project Intelligence Watch Mode End-to-End Local Fixture Validation v0.1');
+	    expect(devLog).toContain('Project Intelligence Watch Mode Operator Playbook v0.1');
+	    expect(devLog).toContain('Project Intelligence Watch Mode Operator Playbook Consumption Validation v0.1');
+		    expect(devLog).toContain('Project Intelligence Watch Mode Recovery Command UX v0.1');
+		    expect(devLog).toContain('Project Intelligence Watch Mode Recovery UX Real Workspace Smoke v0.1');
+		    expect(devLog).toContain('project-intelligence-watch-recovery-ux-smoke.test.ts');
+		    expect(devLog).toContain('project-intelligence-watch-handoff.test.ts');
+		    expect(devLog).toContain('Project Intelligence Watch Mode Completion Audit v0.1');
+		    expect(devLog).toContain('Product False-Positive Regression Catalog Planning v0.1');
+		    expect(devLog).toContain('Product False-Positive Regression Catalog Contract Implementation v0.1');
+		    expect(devLog).toContain('Product False-Positive Regression Catalog Artifact Generation v0.1');
+		    expect(devLog).toContain('false-positive-catalog.test.ts');
+		    expect(devLog).toContain('false-positive-catalog-artifacts.test.ts');
+		    expect(devLog).toContain('pnpm false-positive:catalog');
+		    expect(devLog).toContain('Product False-Positive Regression Catalog Consumption Validation v0.1');
+		    expect(devLog).toContain('false-positive-catalog-consumption.test.ts');
+		    expect(devLog).toContain('pnpm false-positive:catalog:validate');
+		    expect(devLog).toContain('Product False-Positive Regression Catalog Completion Audit v0.1');
+		    expect(devLog).toContain('complete_for_current_local_only_catalog_slice');
+		    expect(devLog).toContain('Product False-Positive Regression Catalog Real Fixture Expansion v0.1');
+		    expect(devLog).toContain('Product False-Positive Regression Catalog Detector Calibration Planning v0.1');
+		    expect(devLog).toContain('Product False-Positive Regression Catalog Detector Calibration Contract v0.1');
+		    expect(devLog).toContain('false-positive-detector-calibration-contract.test.ts');
+		    expect(devLog).toContain('pnpm false-positive:calibration-contract');
+		    expect(devLog).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Contract Consumption Validation v0.1'
+		    );
+		    expect(devLog).toContain('false-positive-detector-calibration-contract-consumption.test.ts');
+		    expect(devLog).toContain('pnpm false-positive:calibration-contract:validate');
+		    expect(devLog).toContain('Product False-Positive Regression Catalog Detector Calibration Completion Audit v0.1');
+		    expect(devLog).toContain('complete_for_current_local_only_detector_calibration_slice');
+		    expect(devLog).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Authorization Intake v0.1'
+		    );
+		    expect(devLog).toContain('authorization_intake_created_pending_maintainer_decisions');
+		    expect(devLog).toContain('RepoAssure Product Applicability Boundary Documentation Cascade v0.1');
+		    expect(devLog).toContain('product_applicability_boundary_documented');
+		    expect(devLog).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Recording v0.1'
+		    );
+		    expect(devLog).toContain('maintainer_decision_record_created_with_pending_decisions');
+		    expect(devLog).toContain(
+		      'Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Follow-up v0.1'
+		    );
+		    expect(devLog).toContain('maintainer_decision_follow_up_recorded_without_explicit_decisions');
+		    expect(devLog).toContain('RepoAssure Product Backlog Reprioritization After Detector Decision Block v0.1');
+		    expect(devLog).toContain('backlog_reprioritized_to_non_blocked_local_gap_audit');
+		    expect(devLog).toContain('RepoAssure Product Completion Gap Audit Refresh v0.2');
+		    expect(devLog).toContain('completion_gap_audit_refreshed_with_narrative_cleanup_next');
+		    expect(devLog).toContain('RepoAssure Canonical Product Narrative Freshness Cleanup v0.1');
+		    expect(devLog).toContain('canonical_product_narrative_freshness_cleaned');
+		    expect(devLog).toContain('RepoAssure Autopilot Progress Consistency Guard v0.1');
+	    expect(devLog).toContain('recoveryPlan');
+	    expect(projectIntelligenceWatchModeEndToEndFixture).toContain(
+	      'Project Intelligence Watch Mode End-to-End Local Fixture Validation v0.1'
+	    );
+	    expect(projectIntelligenceWatchModeEndToEndFixture).toContain('project-intelligence-watch-e2e-fixture.test.ts');
+	    expect(projectIntelligenceWatchModeEndToEndFixture).toContain('Project Intelligence Watch Mode Operator Playbook v0.1');
+	    expect(projectIntelligenceWatchModeOperatorPlaybook).toContain(
+	      'Project Intelligence Watch Mode Operator Playbook v0.1'
+	    );
+	    expect(projectIntelligenceWatchModeOperatorPlaybook).toContain('pnpm project:intelligence:watch -- --once');
+	    expect(projectIntelligenceWatchModeOperatorPlaybook).toContain('AI IDE Read Order');
+	    expect(projectIntelligenceWatchModeOperatorPlaybook).toContain('Freshness Diagnosis');
+	    expect(projectIntelligenceWatchModeOperatorPlaybook).toContain('Failure Recovery');
+	    expect(projectIntelligenceWatchModeOperatorPlaybook).toContain('Ctrl+C');
+	    expect(projectIntelligenceWatchModeOperatorPlaybook).toContain('target repo writes');
+	    expect(projectIntelligenceWatchModeOperatorPlaybookConsumption).toContain(
+	      'Project Intelligence Watch Mode Operator Playbook Consumption Validation v0.1'
+	    );
+	    expect(projectIntelligenceWatchModeOperatorPlaybookConsumption).toContain(
+	      'tests/unit/project-intelligence-watch-operator-playbook.test.ts'
+	    );
+	    expect(projectIntelligenceWatchModeOperatorPlaybookConsumption).toContain(
+	      'Project Intelligence Watch Mode Recovery Command UX v0.1'
+	    );
+	    expect(projectIntelligenceWatchModeRecoveryCommandUx).toContain(
+	      'Project Intelligence Watch Mode Recovery Command UX v0.1'
+	    );
+	    expect(projectIntelligenceWatchModeRecoveryCommandUx).toContain('Status: completed');
+	    expect(projectIntelligenceWatchModeRecoveryCommandUx).toContain('recoveryPlan');
+	    expect(projectIntelligenceWatchModeRecoveryCommandUx).toContain('pnpm project:intelligence:watch -- --once');
+	    expect(projectIntelligenceWatchModeRecoveryCommandUx).toContain('pnpm project:intelligence:watch-handoff');
+	    expect(projectIntelligenceWatchModeRecoveryCommandUx).toContain('Do not repair freshness failures by editing generated artifacts by hand');
+		    expect(projectIntelligenceWatchModeRecoveryCommandUx).toContain(
+		      'Project Intelligence Watch Mode Recovery UX Real Workspace Smoke v0.1'
+		    );
+		    expect(projectIntelligenceWatchModeRecoverySmoke).toContain(
+		      'Project Intelligence Watch Mode Recovery UX Real Workspace Smoke v0.1'
+		    );
+		    expect(projectIntelligenceWatchModeRecoverySmoke).toContain('Status: completed');
+		    expect(projectIntelligenceWatchModeRecoverySmoke).toContain(
+		      'tests/integration/project-intelligence-watch-recovery-ux-smoke.test.ts'
+		    );
+		    expect(projectIntelligenceWatchModeRecoverySmoke).toContain('recoveryPlan.status = not_needed');
+		    expect(projectIntelligenceWatchModeRecoverySmoke).toContain('recoveryPlan.status = required');
+		    expect(projectIntelligenceWatchModeRecoverySmoke).toContain(
+		      'Project Intelligence Watch Mode Completion Audit v0.1'
+		    );
+		    expect(projectIntelligenceWatchModeCompletionAudit).toContain(
+		      'Project Intelligence Watch Mode Completion Audit v0.1'
+		    );
+		    expect(projectIntelligenceWatchModeCompletionAudit).toContain('Status: completed');
+		    expect(projectIntelligenceWatchModeCompletionAudit).toContain('complete_for_current_local_only_slice');
+		    expect(projectIntelligenceWatchModeCompletionAudit).toContain('6/6 freshness checks passed');
+		    expect(projectIntelligenceWatchModeCompletionAudit).toContain('recoveryPlan.status = not_needed');
+		    expect(projectIntelligenceWatchModeCompletionAudit).toContain(
+		      'Product False-Positive Regression Catalog Planning v0.1'
+		    );
+		    expect(falsePositiveRegressionCatalogPlanning).toContain(
+		      'Product False-Positive Regression Catalog Planning v0.1'
+		    );
+		    expect(falsePositiveRegressionCatalogPlanning).toContain('Status: completed');
+		    expect(falsePositiveRegressionCatalogPlanning).toContain(
+		      'plan_ready_for_local_contract_implementation'
+		    );
+		    expect(falsePositiveRegressionCatalogPlanning).toContain('Fixture Categories');
+		    expect(falsePositiveRegressionCatalogPlanning).toContain('Expected Finding Snapshot Fields');
+		    expect(falsePositiveRegressionCatalogPlanning).toContain('Maintainer Review Boundary');
+		    expect(falsePositiveRegressionCatalogPlanning).toContain('No runtime detection behavior change');
+		    expect(falsePositiveRegressionCatalogPlanning).toContain(
+		      'Product False-Positive Regression Catalog Contract Implementation v0.1'
+		    );
+		    expect(falsePositiveRegressionCatalogContractImplementation).toContain(
+		      'Product False-Positive Regression Catalog Contract Implementation v0.1'
+		    );
+		    expect(falsePositiveRegressionCatalogContractImplementation).toContain('Status: completed');
+		    expect(falsePositiveRegressionCatalogContractImplementation).toContain(
+		      'contract_implemented_without_runtime_detection_change'
+		    );
+		    expect(falsePositiveRegressionCatalogContractImplementation).toContain(
+		      'packages/acceptance/src/false-positive-catalog.ts'
+		    );
+		    expect(falsePositiveRegressionCatalogContractImplementation).toContain(
+		      '@hardening-mcp/acceptance/false-positive-catalog'
+		    );
+		    expect(falsePositiveRegressionCatalogContractImplementation).toContain('Fixture Categories');
+		    expect(falsePositiveRegressionCatalogContractImplementation).toContain('Expected Finding Snapshot Fields');
+		    expect(falsePositiveRegressionCatalogContractImplementation).toContain('No runtime detection behavior change');
+		    expect(falsePositiveRegressionCatalogContractImplementation).toContain(
+		      'Product False-Positive Regression Catalog Artifact Generation v0.1'
+		    );
+		    expect(falsePositiveRegressionCatalogArtifactGeneration).toContain(
+		      'Product False-Positive Regression Catalog Artifact Generation v0.1'
+		    );
+		    expect(falsePositiveRegressionCatalogArtifactGeneration).toContain('Status: completed');
+		    expect(falsePositiveRegressionCatalogArtifactGeneration).toContain(
+		      'artifacts_generated_without_detection_behavior_change'
+		    );
+		    expect(falsePositiveRegressionCatalogArtifactGeneration).toContain('pnpm false-positive:catalog');
+		    expect(falsePositiveRegressionCatalogArtifactGeneration).toContain(
+		      'packages/acceptance/src/run-false-positive-catalog.ts'
+		    );
+		    expect(falsePositiveRegressionCatalogArtifactGeneration).toContain(
+		      'false-positive-regression-catalog.json'
+		    );
+		    expect(falsePositiveRegressionCatalogArtifactGeneration).toContain(
+		      'false-positive-regression-catalog.md'
+		    );
+		    expect(falsePositiveRegressionCatalogArtifactGeneration).toContain('AI IDE Read Order');
+		    expect(falsePositiveRegressionCatalogArtifactGeneration).toContain('Maintainer Review Boundary');
+		    expect(falsePositiveRegressionCatalogArtifactGeneration).toContain('No runtime detection behavior change');
+		    expect(falsePositiveRegressionCatalogArtifactGeneration).toContain(
+		      'Product False-Positive Regression Catalog Consumption Validation v0.1'
+		    );
+		    expect(falsePositiveRegressionCatalogConsumptionValidation).toContain(
+		      'Product False-Positive Regression Catalog Consumption Validation v0.1'
+		    );
+		    expect(falsePositiveRegressionCatalogConsumptionValidation).toContain('Status: completed');
+		    expect(falsePositiveRegressionCatalogConsumptionValidation).toContain(
+		      'consumption_validated_without_detection_behavior_change'
+		    );
+		    expect(falsePositiveRegressionCatalogConsumptionValidation).toContain('pnpm false-positive:catalog:validate');
+		    expect(falsePositiveRegressionCatalogConsumptionValidation).toContain(
+		      'packages/acceptance/src/run-false-positive-catalog-consumption.ts'
+		    );
+		    expect(falsePositiveRegressionCatalogConsumptionValidation).toContain(
+		      'false-positive-regression-catalog-consumption-validation.json'
+		    );
+		    expect(falsePositiveRegressionCatalogConsumptionValidation).toContain(
+		      'false-positive-regression-catalog-consumption-validation.md'
+		    );
+		    expect(falsePositiveRegressionCatalogConsumptionValidation).toContain('AI IDE Read Order');
+		    expect(falsePositiveRegressionCatalogConsumptionValidation).toContain('Maintainer Review Boundary');
+		    expect(falsePositiveRegressionCatalogConsumptionValidation).toContain('No runtime detection behavior change');
+		    expect(falsePositiveRegressionCatalogConsumptionValidation).toContain(
+		      'Product False-Positive Regression Catalog Completion Audit v0.1'
+		    );
+		    expect(falsePositiveRegressionCatalogCompletionAudit).toContain(
+		      'Product False-Positive Regression Catalog Completion Audit v0.1'
+		    );
+		    expect(falsePositiveRegressionCatalogCompletionAudit).toContain('Status: completed');
+		    expect(falsePositiveRegressionCatalogCompletionAudit).toContain(
+		      'complete_for_current_local_only_catalog_slice'
+		    );
+		    expect(falsePositiveRegressionCatalogCompletionAudit).toContain('Planning');
+		    expect(falsePositiveRegressionCatalogCompletionAudit).toContain('Contract Implementation');
+		    expect(falsePositiveRegressionCatalogCompletionAudit).toContain('Artifact Generation');
+		    expect(falsePositiveRegressionCatalogCompletionAudit).toContain('Consumption Validation');
+		    expect(falsePositiveRegressionCatalogCompletionAudit).toContain(
+		      'false-positive-regression-catalog-consumption-validation.json'
+		    );
+		    expect(falsePositiveRegressionCatalogCompletionAudit).toContain('No runtime detection behavior change');
+		    expect(falsePositiveRegressionCatalogCompletionAudit).toContain('No finding suppression');
+		    expect(falsePositiveRegressionCatalogCompletionAudit).toContain('No automatic severity downgrade');
+		    expect(falsePositiveRegressionCatalogCompletionAudit).toContain(
+		      'Product False-Positive Regression Catalog Real Fixture Expansion v0.1'
+		    );
 
     await expectPath('.autopilot/goals');
     await expectPath('.autopilot/ledger');
     await expectPath('.autopilot/snapshots');
     await expectPath('docs/operations/ai-ide-repair-execution-dry-run-real-campaign-validation-v0.1.md');
-    await expectPath('docs/operations/ai-ide-repair-patch-plan-real-campaign-validation-v0.1.md');
+	    await expectPath('docs/operations/ai-ide-repair-patch-plan-real-campaign-validation-v0.1.md');
+	    await expectPath('docs/operations/repoassure-product-completion-gap-audit-v0.1.md');
+	    await expectPath('docs/operations/project-intelligence-agent-context-export-v0.1.md');
+	    await expectPath('docs/operations/project-intelligence-watch-mode-planning-v0.1.md');
+	    await expectPath('docs/operations/project-intelligence-watch-mode-implementation-v0.1.md');
+	    await expectPath('docs/operations/project-intelligence-watch-mode-local-smoke-validation-v0.1.md');
+	    await expectPath('docs/operations/project-intelligence-watch-mode-ai-ide-consumption-handoff-v0.1.md');
+	    await expectPath('docs/operations/project-intelligence-watch-mode-end-to-end-local-fixture-validation-v0.1.md');
+	    await expectPath('docs/operations/project-intelligence-watch-mode-operator-playbook-v0.1.md');
+	    await expectPath('docs/operations/project-intelligence-watch-mode-operator-playbook-consumption-validation-v0.1.md');
+		    await expectPath('docs/operations/project-intelligence-watch-mode-recovery-command-ux-v0.1.md');
+		    await expectPath('docs/operations/project-intelligence-watch-mode-recovery-ux-real-workspace-smoke-v0.1.md');
+		    await expectPath('docs/operations/project-intelligence-watch-mode-completion-audit-v0.1.md');
+		    await expectPath('docs/operations/product-false-positive-regression-catalog-planning-v0.1.md');
+		    await expectPath('docs/operations/product-false-positive-regression-catalog-contract-implementation-v0.1.md');
+		    await expectPath('docs/operations/product-false-positive-regression-catalog-artifact-generation-v0.1.md');
+		    await expectPath('docs/operations/product-false-positive-regression-catalog-consumption-validation-v0.1.md');
+		    await expectPath('docs/operations/product-false-positive-regression-catalog-completion-audit-v0.1.md');
+		    await expectPath('docs/operations/product-false-positive-regression-catalog-real-fixture-expansion-v0.1.md');
+		    await expectPath('docs/operations/product-false-positive-regression-catalog-detector-calibration-planning-v0.1.md');
+		    await expectPath(
+		      'docs/operations/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1.md'
+		    );
+		    await expectPath('docs/product/strategy/product-applicability-boundary-v0.1.md');
+		    await expectPath('.autopilot/goals/project-intelligence-watch-mode-operator-playbook-v0.1.json');
+		    await expectPath('.autopilot/goals/project-intelligence-watch-mode-operator-playbook-consumption-validation-v0.1.json');
+		    await expectPath('.autopilot/goals/project-intelligence-watch-mode-recovery-command-ux-v0.1.json');
+		    await expectPath('.autopilot/goals/project-intelligence-watch-mode-recovery-ux-real-workspace-smoke-v0.1.json');
+		    await expectPath('.autopilot/goals/project-intelligence-watch-mode-completion-audit-v0.1.json');
+		    await expectPath('.autopilot/goals/product-false-positive-regression-catalog-planning-v0.1.json');
+		    await expectPath('.autopilot/goals/product-false-positive-regression-catalog-contract-implementation-v0.1.json');
+		    await expectPath('.autopilot/goals/product-false-positive-regression-catalog-artifact-generation-v0.1.json');
+		    await expectPath('.autopilot/goals/product-false-positive-regression-catalog-consumption-validation-v0.1.json');
+		    await expectPath('.autopilot/goals/product-false-positive-regression-catalog-completion-audit-v0.1.json');
+		    await expectPath('.autopilot/goals/product-false-positive-regression-catalog-real-fixture-expansion-v0.1.json');
+		    await expectPath('.autopilot/goals/product-false-positive-regression-catalog-detector-calibration-planning-v0.1.json');
+		    await expectPath('.autopilot/goals/repoassure-product-applicability-boundary-documentation-cascade-v0.1.json');
+		    await expectPath('.autopilot/goals/product-false-positive-regression-catalog-detector-calibration-contract-v0.1.json');
+		    await expectPath(
+		      '.autopilot/goals/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-follow-up-v0.1.json'
+		    );
     await expectPath('docs/operations/ai-ide-repair-validation-only-real-campaign-validation-v0.1.md');
     await expectPath('docs/operations/ai-ide-repair-end-to-end-evidence-package-validation-v0.1.md');
     await expectPath('docs/operations/project-intelligence-console-graph-snapshot-generator-v0.1.md');
@@ -4855,6 +8158,13200 @@ describe('project structure', () => {
     await expectPath('docs/operations/project-intelligence-adr-cascade-remediation-recommendation-draft-v0.1.md');
     await expectPath('docs/operations/project-intelligence-adr-cascade-maintainer-decision-recording-v0.1.md');
     await expectPath('docs/operations/project-intelligence-adr-cascade-controlled-remediation-plan-v0.1.md');
+    await expectPath('docs/operations/project-intelligence-detection-rule-calibration-v0.1.md');
+  });
+
+  it('records AI IDE repair workflow CLI productization and the next validation goal', async () => {
+    const [
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      readme,
+      prd,
+      spec,
+      plan,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile('docs/operations/repoassure-ai-ide-repair-workflow-cli-productization-v0.1.md', 'utf8'),
+      readFile('.autopilot/goals/repoassure-ai-ide-repair-workflow-cli-productization-v0.1.json', 'utf8'),
+      readFile(
+        '.autopilot/goals/repoassure-ai-ide-repair-workflow-installed-cli-real-campaign-validation-v0.1.json',
+        'utf8'
+      ),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        cli_subcommands?: string[];
+        focused_tests?: number;
+        installed_cli_smoke?: boolean;
+        target_repo_writes?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      schema: string;
+      id: string;
+      status: string;
+      source_spec?: string;
+      blocked_actions: string[];
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog
+    ];
+
+    expect(operationRecord).toContain('RepoAssure AI IDE Repair Workflow CLI Productization v0.1');
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain('repair_workflow_cli_productized_without_target_repo_writes');
+    expect(operationRecord).toContain('hardening repair handoff');
+    expect(operationRecord).toContain('hardening repair execute');
+    expect(operationRecord).toContain('hardening repair patch-plan');
+    expect(operationRecord).toContain('hardening repair evidence-package');
+    expect(operationRecord).toContain('pnpm repair:*');
+    expect(operationRecord).toContain('Target repository writes: no');
+    expect(completedGoal.status).toBe('completed');
+    expect(completedGoal.conclusion).toBe('repair_workflow_cli_productized_without_target_repo_writes');
+    expect(completedGoal.next_goal_id).toBe(
+      'repoassure-ai-ide-repair-workflow-installed-cli-real-campaign-validation-v0.1'
+    );
+    expect(completedGoal.summary?.operation_record).toBe(
+      'docs/operations/repoassure-ai-ide-repair-workflow-cli-productization-v0.1.md'
+    );
+    expect(completedGoal.summary?.cli_subcommands).toEqual([
+      'handoff',
+      'execute',
+      'patch-plan',
+      'evidence-package'
+    ]);
+    expect(completedGoal.summary?.focused_tests).toBeGreaterThanOrEqual(60);
+    expect(completedGoal.summary?.installed_cli_smoke).toBe(true);
+    expect(completedGoal.summary?.target_repo_writes).toBe(false);
+    expect(nextGoal.schema).toBe('project-autopilot/goal@1');
+    expect(nextGoal.id).toBe(
+      'repoassure-ai-ide-repair-workflow-installed-cli-real-campaign-validation-v0.1'
+    );
+    expect(nextGoal.status).toBe('completed');
+    expect(nextGoal.source_spec).toBe(
+      'docs/operations/repoassure-ai-ide-repair-workflow-cli-productization-v0.1.md'
+    );
+    expect(nextGoal.blocked_actions).toContain('target_repo_write');
+    expect(nextGoal.blocked_actions).toContain('automatic_patch_application');
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain('RepoAssure AI IDE Repair Workflow CLI Productization v0.1');
+      expect(surface).toContain('hardening repair');
+    }
+  });
+
+  it('records installed CLI real campaign validation and the next packed installation goal', async () => {
+    const [
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      readme,
+      prd,
+      spec,
+      plan,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-ai-ide-repair-workflow-installed-cli-real-campaign-validation-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-ai-ide-repair-workflow-installed-cli-real-campaign-validation-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-ai-ide-repair-workflow-packed-cli-installation-validation-v0.1.json',
+        'utf8'
+      ),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        fixture?: string;
+        external_process_steps?: string[];
+        process_exit_codes?: Record<string, number>;
+        production_code_changed?: boolean;
+        target_repo_writes?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      schema: string;
+      id: string;
+      status: string;
+      source_spec?: string;
+      blocked_actions: string[];
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(
+      'RepoAssure AI IDE Repair Workflow Installed CLI Real Campaign Validation v0.1'
+    );
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(
+      'installed_cli_real_campaign_validated_without_target_repo_writes'
+    );
+    expect(operationRecord).toContain('dist/adapters/cli/index.js');
+    expect(operationRecord).toContain('campaign-summary fixture: non-private');
+    expect(operationRecord).toContain('All five external process exit codes: 0');
+    expect(operationRecord).toContain('Target repository writes: no');
+    expect(operationRecord).toContain('Production code changes: no');
+    expect(completedGoal.status).toBe('completed');
+    expect(completedGoal.conclusion).toBe(
+      'installed_cli_real_campaign_validated_without_target_repo_writes'
+    );
+    expect(completedGoal.next_goal_id).toBe(
+      'repoassure-ai-ide-repair-workflow-packed-cli-installation-validation-v0.1'
+    );
+    expect(completedGoal.summary?.operation_record).toBe(
+      'docs/operations/repoassure-ai-ide-repair-workflow-installed-cli-real-campaign-validation-v0.1.md'
+    );
+    expect(completedGoal.summary?.fixture).toBe(
+      'fixtures/campaigns/ai-ide-repair-decision-package/manifest.json'
+    );
+    expect(completedGoal.summary?.external_process_steps).toEqual([
+      'handoff',
+      'dry-run',
+      'validation-only',
+      'patch-plan',
+      'evidence-package'
+    ]);
+    expect(completedGoal.summary?.process_exit_codes).toEqual({
+      handoff: 0,
+      dry_run: 0,
+      validation_only: 0,
+      patch_plan: 0,
+      evidence_package: 0
+    });
+    expect(completedGoal.summary?.production_code_changed).toBe(false);
+    expect(completedGoal.summary?.target_repo_writes).toBe(false);
+    expect(nextGoal.schema).toBe('project-autopilot/goal@1');
+    expect(nextGoal.id).toBe(
+      'repoassure-ai-ide-repair-workflow-packed-cli-installation-validation-v0.1'
+    );
+    expect(nextGoal.status).toBe('completed');
+    expect(nextGoal.source_spec).toBe(
+      'docs/operations/repoassure-ai-ide-repair-workflow-installed-cli-real-campaign-validation-v0.1.md'
+    );
+    expect(nextGoal.blocked_actions).toContain('npm_publication');
+    expect(nextGoal.blocked_actions).toContain('target_repo_write');
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(
+        'RepoAssure AI IDE Repair Workflow Installed CLI Real Campaign Validation v0.1'
+      );
+      expect(surface).toContain(
+        'RepoAssure AI IDE Repair Workflow Packed CLI Installation Validation v0.1'
+      );
+    }
+  });
+
+  it('records packed CLI installation validation and the next completion gap audit', async () => {
+    const [
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      readme,
+      prd,
+      spec,
+      plan,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-ai-ide-repair-workflow-packed-cli-installation-validation-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-ai-ide-repair-workflow-packed-cli-installation-validation-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.4.json',
+        'utf8'
+      ),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        tarball_installation?: string;
+        installed_bin?: string;
+        source_workspace_node_modules_used?: boolean;
+        target_repo_writes?: boolean;
+        npm_published?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      schema: string;
+      id: string;
+      status: string;
+      source_spec?: string;
+      blocked_actions: string[];
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(
+      'RepoAssure AI IDE Repair Workflow Packed CLI Installation Validation v0.1'
+    );
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(
+      'packed_cli_installed_and_validated_without_publication_or_target_writes'
+    );
+    expect(operationRecord).toContain('hardening-mcp-0.1.0.tgz');
+    expect(operationRecord).toContain('node_modules/.bin/hardening');
+    expect(operationRecord).toContain('Source workspace node_modules dependency: no');
+    expect(operationRecord).toContain('Target repository writes: no');
+    expect(operationRecord).toContain('npm publication: no');
+    expect(completedGoal.status).toBe('completed');
+    expect(completedGoal.conclusion).toBe(
+      'packed_cli_installed_and_validated_without_publication_or_target_writes'
+    );
+    expect(completedGoal.next_goal_id).toBe(
+      'repoassure-product-completion-gap-audit-refresh-v0.4'
+    );
+    expect(completedGoal.summary?.operation_record).toBe(
+      'docs/operations/repoassure-ai-ide-repair-workflow-packed-cli-installation-validation-v0.1.md'
+    );
+    expect(completedGoal.summary?.tarball_installation).toBe('passed');
+    expect(completedGoal.summary?.installed_bin).toBe('node_modules/.bin/hardening');
+    expect(completedGoal.summary?.source_workspace_node_modules_used).toBe(false);
+    expect(completedGoal.summary?.target_repo_writes).toBe(false);
+    expect(completedGoal.summary?.npm_published).toBe(false);
+    expect(nextGoal.schema).toBe('project-autopilot/goal@1');
+    expect(nextGoal.id).toBe('repoassure-product-completion-gap-audit-refresh-v0.4');
+    expect(nextGoal.status).toBe('completed');
+    expect(nextGoal.source_spec).toBe(
+      'docs/operations/repoassure-ai-ide-repair-workflow-packed-cli-installation-validation-v0.1.md'
+    );
+    expect(nextGoal.blocked_actions).toContain('npm_publication');
+    expect(nextGoal.blocked_actions).toContain('deployment');
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(
+        'RepoAssure AI IDE Repair Workflow Packed CLI Installation Validation v0.1'
+      );
+      expect(surface).toContain('RepoAssure Product Completion Gap Audit Refresh v0.4');
+    }
+  });
+
+  it('records completion gap audit refresh v0.4 and selects packed MCP protocol validation', async () => {
+    const [
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      readme,
+      prd,
+      spec,
+      plan,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.4.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.4.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-packed-mcp-server-installation-and-protocol-validation-v0.1.json',
+        'utf8'
+      ),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        implemented_surfaces?: string[];
+        blocked_or_manual_gated_gaps?: string[];
+        external_input_gated_gaps?: string[];
+        deferred_gaps?: string[];
+        selected_safe_auto_executable_gap?: string;
+        mcp_registry_tool_count?: number;
+        packed_cli_installed?: boolean;
+        packed_mcp_protocol_validated?: boolean;
+        target_repo_writes?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      schema: string;
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec?: string;
+      blocked_actions: string[];
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(
+      'RepoAssure Product Completion Gap Audit Refresh v0.4'
+    );
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(
+      'completion_gap_audit_refreshed_with_packed_mcp_protocol_validation_next'
+    );
+    expect(operationRecord).toContain('## Implemented Product Surfaces');
+    expect(operationRecord).toContain('## Blocked or Manual-Gated Work');
+    expect(operationRecord).toContain('## External-Input-Gated Work');
+    expect(operationRecord).toContain('## Deferred Work');
+    expect(operationRecord).toContain('## Safe Auto-Executable Gaps');
+    expect(operationRecord).toContain('node_modules/.bin/hardening');
+    expect(operationRecord).toContain('node_modules/.bin/hardening-mcp');
+    expect(operationRecord).toContain('MCP registry tools: 8');
+    expect(operationRecord).toContain(
+      'Installed packed MCP protocol validation: not yet completed'
+    );
+    expect(operationRecord).toContain(
+      'RepoAssure Packed MCP Server Installation and Protocol Validation v0.1'
+    );
+    expect(operationRecord).toContain('Target repository writes: no');
+    expect(operationRecord).toContain('npm publication: no');
+
+    expect(completedGoal.status).toBe('completed');
+    expect(completedGoal.conclusion).toBe(
+      'completion_gap_audit_refreshed_with_packed_mcp_protocol_validation_next'
+    );
+    expect(completedGoal.next_goal_id).toBe(
+      'repoassure-packed-mcp-server-installation-and-protocol-validation-v0.1'
+    );
+    expect(completedGoal.summary?.operation_record).toBe(
+      'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.4.md'
+    );
+    expect(completedGoal.summary?.implemented_surfaces).toContain(
+      'isolated_packed_cli_installation'
+    );
+    expect(completedGoal.summary?.blocked_or_manual_gated_gaps).toContain(
+      'false_positive_detector_runtime_calibration'
+    );
+    expect(completedGoal.summary?.external_input_gated_gaps).toContain(
+      'private_preview_feedback_triage'
+    );
+    expect(completedGoal.summary?.deferred_gaps).toContain(
+      'website_design_system_external_follow_up'
+    );
+    expect(completedGoal.summary?.selected_safe_auto_executable_gap).toBe(
+      'packed_mcp_server_installation_and_protocol_validation'
+    );
+    expect(completedGoal.summary?.mcp_registry_tool_count).toBe(8);
+    expect(completedGoal.summary?.packed_cli_installed).toBe(true);
+    expect(completedGoal.summary?.packed_mcp_protocol_validated).toBe(false);
+    expect(completedGoal.summary?.target_repo_writes).toBe(false);
+
+    expect(nextGoal.schema).toBe('project-autopilot/goal@1');
+    expect(nextGoal.id).toBe(
+      'repoassure-packed-mcp-server-installation-and-protocol-validation-v0.1'
+    );
+    expect(nextGoal.title).toBe(
+      'RepoAssure Packed MCP Server Installation and Protocol Validation v0.1'
+    );
+    expect(nextGoal.status).toBe('completed');
+    expect(nextGoal.source_spec).toBe(
+      'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.4.md'
+    );
+    expect(nextGoal.objective).toContain('local tarball');
+    expect(nextGoal.objective).toContain('isolated consumer');
+    expect(nextGoal.objective).toContain('hardening-mcp');
+    expect(nextGoal.objective).toContain('initialize');
+    expect(nextGoal.objective).toContain('tools/list');
+    expect(nextGoal.objective).toContain('tools/call');
+    expect(nextGoal.blocked_actions).toContain('npm_publication');
+    expect(nextGoal.blocked_actions).toContain('deployment');
+    expect(nextGoal.blocked_actions).toContain('target_repo_write');
+    expect(nextGoal.blocked_actions).toContain('mcp_tool_registry_expansion');
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain('RepoAssure Product Completion Gap Audit Refresh v0.4');
+      expect(surface).toContain(
+        'RepoAssure Packed MCP Server Installation and Protocol Validation v0.1'
+      );
+    }
+  });
+
+  it('records packed MCP protocol validation and selects completion gap audit refresh v0.5', async () => {
+    const [
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      readme,
+      prd,
+      spec,
+      plan,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-packed-mcp-server-installation-and-protocol-validation-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-packed-mcp-server-installation-and-protocol-validation-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.5.json',
+        'utf8'
+      ),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        tarball_installation?: string;
+        installed_bin?: string;
+        initialize_handshake?: string;
+        mcp_registry_tool_count?: number;
+        bounded_tool_call?: string;
+        protocol_framing?: string;
+        schema_compatibility?: string;
+        redaction?: string;
+        deterministic_shutdown?: string;
+        source_workspace_independent?: boolean;
+        target_repo_writes?: boolean;
+        npm_published?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      schema: string;
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec?: string;
+      blocked_actions: string[];
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(
+      'RepoAssure Packed MCP Server Installation and Protocol Validation v0.1'
+    );
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(
+      'packed_mcp_installed_and_protocol_validated_without_registry_expansion_or_target_writes'
+    );
+    expect(operationRecord).toContain('node_modules/.bin/hardening-mcp');
+    expect(operationRecord).toContain('initialize');
+    expect(operationRecord).toContain('tools/list');
+    expect(operationRecord).toContain('stop_app');
+    expect(operationRecord).toContain('MCP registry tools: 8');
+    expect(operationRecord).toContain('Target repository writes: no');
+    expect(operationRecord).toContain('npm publication: no');
+
+    expect(completedGoal.status).toBe('completed');
+    expect(completedGoal.conclusion).toBe(
+      'packed_mcp_installed_and_protocol_validated_without_registry_expansion_or_target_writes'
+    );
+    expect(completedGoal.next_goal_id).toBe(
+      'repoassure-product-completion-gap-audit-refresh-v0.5'
+    );
+    expect(completedGoal.summary?.operation_record).toBe(
+      'docs/operations/repoassure-packed-mcp-server-installation-and-protocol-validation-v0.1.md'
+    );
+    expect(completedGoal.summary?.tarball_installation).toBe('passed');
+    expect(completedGoal.summary?.installed_bin).toBe(
+      'node_modules/.bin/hardening-mcp'
+    );
+    expect(completedGoal.summary?.initialize_handshake).toBe('passed');
+    expect(completedGoal.summary?.mcp_registry_tool_count).toBe(8);
+    expect(completedGoal.summary?.bounded_tool_call).toBe(
+      'stop_app_unknown_session'
+    );
+    expect(completedGoal.summary?.protocol_framing).toBe('passed');
+    expect(completedGoal.summary?.schema_compatibility).toBe('passed');
+    expect(completedGoal.summary?.redaction).toBe('passed');
+    expect(completedGoal.summary?.deterministic_shutdown).toBe('passed');
+    expect(completedGoal.summary?.source_workspace_independent).toBe(true);
+    expect(completedGoal.summary?.target_repo_writes).toBe(false);
+    expect(completedGoal.summary?.npm_published).toBe(false);
+
+    expect(nextGoal.schema).toBe('project-autopilot/goal@1');
+    expect(nextGoal.id).toBe(
+      'repoassure-product-completion-gap-audit-refresh-v0.5'
+    );
+    expect(nextGoal.title).toBe(
+      'RepoAssure Product Completion Gap Audit Refresh v0.5'
+    );
+    expect(nextGoal.status).toBe('completed');
+    expect(nextGoal.source_spec).toBe(
+      'docs/operations/repoassure-packed-mcp-server-installation-and-protocol-validation-v0.1.md'
+    );
+    expect(nextGoal.objective).toContain('PLAN');
+    expect(nextGoal.objective).toContain('SPEC');
+    expect(nextGoal.objective).toContain('PRD');
+    expect(nextGoal.objective).toContain('packed MCP');
+    expect(nextGoal.blocked_actions).toContain('npm_publication');
+    expect(nextGoal.blocked_actions).toContain('deployment');
+    expect(nextGoal.blocked_actions).toContain('target_repo_write');
+    expect(nextGoal.blocked_actions).toContain('mcp_tool_registry_expansion');
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(
+        'RepoAssure Packed MCP Server Installation and Protocol Validation v0.1'
+      );
+      expect(surface).toContain(
+        'RepoAssure Product Completion Gap Audit Refresh v0.5'
+      );
+    }
+  });
+
+  it('records completion gap audit refresh v0.5 and selects repair workflow MCP convergence decision', async () => {
+    const [
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      readme,
+      prd,
+      spec,
+      plan,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.5.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.5.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-ai-ide-repair-workflow-mcp-convergence-decision-and-contract-v0.1.json',
+        'utf8'
+      ),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        implemented_surfaces?: string[];
+        blocked_or_manual_gated_gaps?: string[];
+        external_input_gated_gaps?: string[];
+        deferred_gaps?: string[];
+        safe_auto_executable_gaps?: string[];
+        selected_safe_auto_executable_gap?: string;
+        mcp_registry_tool_count?: number;
+        packed_cli_installed?: boolean;
+        packed_mcp_protocol_validated?: boolean;
+        target_repo_writes?: boolean;
+        production_code_changed?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      schema: string;
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec?: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(
+      'RepoAssure Product Completion Gap Audit Refresh v0.5'
+    );
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(
+      'completion_gap_audit_refreshed_with_repair_workflow_mcp_convergence_decision_next'
+    );
+    expect(operationRecord).toContain('## Implemented Product Surfaces');
+    expect(operationRecord).toContain('## Blocked or Manual-Gated Work');
+    expect(operationRecord).toContain('## External-Input-Gated Work');
+    expect(operationRecord).toContain('## Deferred Work');
+    expect(operationRecord).toContain('## Safe Auto-Executable Gaps');
+    expect(operationRecord).toContain('MCP registry tools: 8');
+    expect(operationRecord).toContain(
+      'Installed packed MCP protocol validation: completed'
+    );
+    expect(operationRecord).toContain(
+      'RepoAssure AI IDE Repair Workflow MCP Convergence Decision and Contract v0.1'
+    );
+    expect(operationRecord).toContain('Target repository writes: no');
+    expect(operationRecord).toContain('npm publication: no');
+
+    expect(completedGoal.status).toBe('completed');
+    expect(completedGoal.conclusion).toBe(
+      'completion_gap_audit_refreshed_with_repair_workflow_mcp_convergence_decision_next'
+    );
+    expect(completedGoal.next_goal_id).toBe(
+      'repoassure-ai-ide-repair-workflow-mcp-convergence-decision-and-contract-v0.1'
+    );
+    expect(completedGoal.summary?.operation_record).toBe(
+      'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.5.md'
+    );
+    expect(completedGoal.summary?.implemented_surfaces).toContain(
+      'isolated_packed_mcp_protocol_validation'
+    );
+    expect(completedGoal.summary?.blocked_or_manual_gated_gaps).toContain(
+      'false_positive_detector_runtime_calibration'
+    );
+    expect(completedGoal.summary?.external_input_gated_gaps).toContain(
+      'private_preview_feedback_triage'
+    );
+    expect(completedGoal.summary?.deferred_gaps).toContain(
+      'website_design_system_external_follow_up'
+    );
+    expect(completedGoal.summary?.safe_auto_executable_gaps).toContain(
+      'repair_workflow_mcp_convergence_decision_and_contract'
+    );
+    expect(completedGoal.summary?.selected_safe_auto_executable_gap).toBe(
+      'repair_workflow_mcp_convergence_decision_and_contract'
+    );
+    expect(completedGoal.summary?.mcp_registry_tool_count).toBe(8);
+    expect(completedGoal.summary?.packed_cli_installed).toBe(true);
+    expect(completedGoal.summary?.packed_mcp_protocol_validated).toBe(true);
+    expect(completedGoal.summary?.target_repo_writes).toBe(false);
+    expect(completedGoal.summary?.production_code_changed).toBe(false);
+
+    expect(nextGoal.schema).toBe('project-autopilot/goal@1');
+    expect(nextGoal.id).toBe(
+      'repoassure-ai-ide-repair-workflow-mcp-convergence-decision-and-contract-v0.1'
+    );
+    expect(nextGoal.title).toBe(
+      'RepoAssure AI IDE Repair Workflow MCP Convergence Decision and Contract v0.1'
+    );
+    expect(nextGoal.status).toBe('completed');
+    expect(nextGoal.source_spec).toBe(
+      'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.5.md'
+    );
+    expect(nextGoal.objective).toContain('ADR');
+    expect(nextGoal.objective).toContain('tool schemas');
+    expect(nextGoal.objective).toContain('annotations');
+    expect(nextGoal.objective).toContain('compatibility');
+    expect(nextGoal.objective).toContain('maintainer review');
+    expect(nextGoal.blocked_actions).toContain('mcp_tool_registry_expansion');
+    expect(nextGoal.blocked_actions).toContain('repair_mcp_productization');
+    expect(nextGoal.blocked_actions).toContain('target_repo_write');
+    expect(nextGoal.blocked_actions).toContain('npm_publication');
+    expect(nextGoal.acceptance).toContain(
+      'Produce an accepted or explicitly deferred ADR decision before any MCP registry expansion is proposed.'
+    );
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(
+        'RepoAssure Product Completion Gap Audit Refresh v0.5'
+      );
+      expect(surface).toContain(
+        'RepoAssure AI IDE Repair Workflow MCP Convergence Decision and Contract v0.1'
+      );
+    }
+  });
+
+  it('records the accepted repair workflow MCP convergence contract without expanding the registry', async () => {
+    const [
+      adr,
+      contract,
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      toolRegistry,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile('docs/adr/0024-ai-ide-repair-workflow-mcp-convergence.md', 'utf8'),
+      readFile(
+        'docs/product/specs/ai-ide-repair-workflow-mcp-convergence-contract-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/operations/repoassure-ai-ide-repair-workflow-mcp-convergence-decision-and-contract-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-ai-ide-repair-workflow-mcp-convergence-decision-and-contract-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-ai-ide-repair-handoff-mcp-tool-implementation-v0.1.json',
+        'utf8'
+      ),
+      readFile('src/adapters/mcp/tool-registry.ts', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        adr?: string;
+        contract?: string;
+        existing_mcp_tool_count?: number;
+        candidate_artifact_tool_count?: number;
+        validation_only_mcp_exposed?: boolean;
+        production_code_changed?: boolean;
+        target_repo_writes?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      schema: string;
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec?: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+    const candidateToolNames = [
+      'prepare_repair_handoff',
+      'preview_repair_execution',
+      'generate_repair_patch_plan',
+      'assemble_repair_evidence_package'
+    ];
+
+    expect(adr).toContain('Status: Accepted');
+    expect(adr).toContain('artifact_only_additive_mcp_convergence_accepted');
+    expect(adr).toContain('validation-only remains CLI-only');
+    expect(adr).toContain('MCP resources and prompts are deferred');
+
+    expect(contract).toContain('repoassure.mcp-repair-convergence-contract@1');
+    expect(contract).toContain('Existing MCP registry tools: 8');
+    expect(contract).toContain('Candidate artifact-only tools: 4');
+    expect(contract).toContain('readOnlyHint: false');
+    expect(contract).toContain('destructiveHint: false');
+    expect(contract).toContain('idempotentHint: false');
+    expect(contract).toContain('openWorldHint: false');
+    expect(contract).toContain('isError: true');
+    expect(contract).toContain('structuredContent.error');
+    expect(contract).toContain('maintainer review boundary');
+    expect(contract).toContain('no automatic patch application');
+    for (const field of [
+      'runDir',
+      'outputDir',
+      'packagePath',
+      'taskIds',
+      'all',
+      'reportPath',
+      'handoffPackagePath',
+      'dryRunReportPath',
+      'validationReportPath',
+      'patchPlanPath'
+    ]) {
+      expect(contract).toContain(`\`${field}\``);
+    }
+    for (const toolName of candidateToolNames) {
+      expect(contract).toContain(toolName);
+    }
+    expect(toolRegistry).toContain("name: 'prepare_repair_handoff'");
+    expect(toolRegistry).toContain("name: 'preview_repair_execution'");
+    expect(toolRegistry).toContain("name: 'generate_repair_patch_plan'");
+    expect(toolRegistry).toContain("name: 'assemble_repair_evidence_package'");
+
+    expect(operationRecord).toContain(
+      'RepoAssure AI IDE Repair Workflow MCP Convergence Decision and Contract v0.1'
+    );
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(
+      'repair_workflow_mcp_convergence_contract_accepted_without_registry_expansion'
+    );
+    expect(operationRecord).toContain('Production code changed: no');
+    expect(operationRecord).toContain('Target repository writes: no');
+
+    expect(completedGoal.status).toBe('completed');
+    expect(completedGoal.conclusion).toBe(
+      'repair_workflow_mcp_convergence_contract_accepted_without_registry_expansion'
+    );
+    expect(completedGoal.next_goal_id).toBe(
+      'repoassure-ai-ide-repair-handoff-mcp-tool-implementation-v0.1'
+    );
+    expect(completedGoal.summary?.adr).toBe(
+      'docs/adr/0024-ai-ide-repair-workflow-mcp-convergence.md'
+    );
+    expect(completedGoal.summary?.contract).toBe(
+      'docs/product/specs/ai-ide-repair-workflow-mcp-convergence-contract-v0.1.md'
+    );
+    expect(completedGoal.summary?.existing_mcp_tool_count).toBe(8);
+    expect(completedGoal.summary?.candidate_artifact_tool_count).toBe(4);
+    expect(completedGoal.summary?.validation_only_mcp_exposed).toBe(false);
+    expect(completedGoal.summary?.production_code_changed).toBe(false);
+    expect(completedGoal.summary?.target_repo_writes).toBe(false);
+
+    expect(nextGoal.schema).toBe('project-autopilot/goal@1');
+    expect(nextGoal.id).toBe(
+      'repoassure-ai-ide-repair-handoff-mcp-tool-implementation-v0.1'
+    );
+    expect(nextGoal.title).toBe(
+      'RepoAssure AI IDE Repair Handoff MCP Tool Implementation v0.1'
+    );
+    expect(nextGoal.status).toBe('completed');
+    expect(nextGoal.source_spec).toBe(
+      'docs/product/specs/ai-ide-repair-workflow-mcp-convergence-contract-v0.1.md'
+    );
+    expect(nextGoal.objective).toContain('prepare_repair_handoff');
+    expect(nextGoal.objective).toContain('TDD');
+    expect(nextGoal.blocked_actions).toContain('validation_only_mcp_exposure');
+    expect(nextGoal.blocked_actions).toContain('target_repo_write');
+    expect(nextGoal.blocked_actions).toContain('automatic_patch_application');
+    expect(nextGoal.acceptance).toContain(
+      'Preserve all eight existing MCP tools unchanged and add only prepare_repair_handoff.'
+    );
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(
+        'RepoAssure AI IDE Repair Workflow MCP Convergence Decision and Contract v0.1'
+      );
+      expect(surface).toContain(
+        'RepoAssure AI IDE Repair Handoff MCP Tool Implementation v0.1'
+      );
+    }
+  });
+
+  it('closes the repair handoff MCP implementation and queues only dry-run execution preview', async () => {
+    const [
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      goalIndexRecord,
+      progressRecord,
+      toolRegistry,
+      toolAdapter,
+      packRewrite,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-ai-ide-repair-handoff-mcp-tool-implementation-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-ai-ide-repair-handoff-mcp-tool-implementation-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-ai-ide-repair-execution-preview-mcp-tool-implementation-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('src/adapters/mcp/tool-registry.ts', 'utf8'),
+      readFile('src/tools/prepare-repair-handoff-tool.ts', 'utf8'),
+      readFile('scripts/prepare-packed-cli.mjs', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        new_tool?: string;
+        registry_tool_count?: number;
+        existing_tools_changed?: boolean;
+        package_owned_runner_reused?: boolean;
+        validation_only_mcp_exposed?: boolean;
+        target_repo_writes?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexRecord) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressRecord) as {
+      active_goal?: { id?: string; status?: string };
+      next_goal?: { id?: string; status?: string };
+      blocked_actions?: string[];
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(
+      'RepoAssure AI IDE Repair Handoff MCP Tool Implementation v0.1'
+    );
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(
+      'repair_handoff_mcp_tool_implemented_without_target_repo_writes'
+    );
+    expect(operationRecord).toContain('Registry tools: 9');
+    expect(operationRecord).toContain('Validation commands executed: no');
+    expect(operationRecord).toContain('Target repository writes: no');
+
+    expect(completedGoal.status).toBe('completed');
+    expect(completedGoal.conclusion).toBe(
+      'repair_handoff_mcp_tool_implemented_without_target_repo_writes'
+    );
+    expect(completedGoal.next_goal_id).toBe(
+      'repoassure-ai-ide-repair-execution-preview-mcp-tool-implementation-v0.1'
+    );
+    expect(completedGoal.summary).toMatchObject({
+      new_tool: 'prepare_repair_handoff',
+      registry_tool_count: 9,
+      existing_tools_changed: false,
+      package_owned_runner_reused: true,
+      validation_only_mcp_exposed: false,
+      target_repo_writes: false
+    });
+
+    expect(nextGoal).toMatchObject({
+      id: 'repoassure-ai-ide-repair-execution-preview-mcp-tool-implementation-v0.1',
+      title: 'RepoAssure AI IDE Repair Execution Preview MCP Tool Implementation v0.1'
+    });
+    expect(nextGoal.objective).toContain('preview_repair_execution');
+    expect(nextGoal.objective).toContain('dry-run');
+    expect(nextGoal.blocked_actions).toContain('validation_only_mcp_exposure');
+    expect(nextGoal.blocked_actions).toContain('target_repo_write');
+    expect(nextGoal.acceptance).toContain(
+      'Preserve all nine existing MCP tools unchanged and add only preview_repair_execution.'
+    );
+
+    expect(goalIndex.goals).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: completedGoal.next_goal_id
+      })
+    ]));
+    expect(progress.blocked_actions).not.toContain('preview_repair_execution_implementation');
+    expect(progress.blocked_actions).toContain('validation_only_mcp_exposure');
+
+    expect(toolRegistry.match(/name: 'prepare_repair_handoff'/gu)).toHaveLength(1);
+    expect(toolRegistry.match(/name: 'preview_repair_execution'/gu)).toHaveLength(1);
+    expect(toolRegistry).toContain('readOnlyHint: false');
+    expect(toolRegistry).toContain('destructiveHint: false');
+    expect(toolRegistry).toContain('idempotentHint: false');
+    expect(toolRegistry).toContain('openWorldHint: false');
+    expect(toolAdapter).toContain(
+      "from '@hardening-mcp/acceptance/run-repair-handoff'"
+    );
+    expect(toolAdapter).toContain("status: 'generated'");
+    expect(packRewrite).toContain('dist/tools/prepare-repair-handoff-tool.js');
+    expect(packRewrite).toContain(
+      "from '../../packages/acceptance/dist/run-repair-handoff.js';"
+    );
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(
+        'RepoAssure AI IDE Repair Handoff MCP Tool Implementation v0.1'
+      );
+      expect(surface).toContain(
+        'RepoAssure AI IDE Repair Execution Preview MCP Tool Implementation v0.1'
+      );
+    }
+  });
+
+  it('closes dry-run repair execution preview and queues only patch-plan MCP implementation', async () => {
+    const [
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      goalIndexRecord,
+      progressRecord,
+      toolRegistry,
+      toolAdapter,
+      packRewrite,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-ai-ide-repair-execution-preview-mcp-tool-implementation-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-ai-ide-repair-execution-preview-mcp-tool-implementation-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-ai-ide-repair-patch-plan-mcp-tool-implementation-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('src/adapters/mcp/tool-registry.ts', 'utf8'),
+      readFile('src/tools/preview-repair-execution-tool.ts', 'utf8'),
+      readFile('scripts/prepare-packed-cli.mjs', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        new_tool?: string;
+        registry_tool_count?: number;
+        existing_tools_changed?: boolean;
+        package_owned_runner_reused?: boolean;
+        validation_only_mcp_exposed?: boolean;
+        verification_commands_executed?: boolean;
+        target_repo_writes?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexRecord) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressRecord) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+      blocked_actions?: string[];
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(
+      'RepoAssure AI IDE Repair Execution Preview MCP Tool Implementation v0.1'
+    );
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(
+      'repair_execution_preview_mcp_tool_implemented_without_command_execution_or_target_repo_writes'
+    );
+    expect(operationRecord).toContain('Registry tools: 10');
+    expect(operationRecord).toContain('Validation commands executed: no');
+    expect(operationRecord).toContain('Target repository writes: no');
+
+    expect(completedGoal.status).toBe('completed');
+    expect(completedGoal.conclusion).toBe(
+      'repair_execution_preview_mcp_tool_implemented_without_command_execution_or_target_repo_writes'
+    );
+    expect(completedGoal.next_goal_id).toBe(
+      'repoassure-ai-ide-repair-patch-plan-mcp-tool-implementation-v0.1'
+    );
+    expect(completedGoal.summary).toMatchObject({
+      new_tool: 'preview_repair_execution',
+      registry_tool_count: 10,
+      existing_tools_changed: false,
+      package_owned_runner_reused: true,
+      validation_only_mcp_exposed: false,
+      verification_commands_executed: false,
+      target_repo_writes: false
+    });
+
+    expect(nextGoal).toMatchObject({
+      id: 'repoassure-ai-ide-repair-patch-plan-mcp-tool-implementation-v0.1',
+      title: 'RepoAssure AI IDE Repair Patch Plan MCP Tool Implementation v0.1',
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain('generate_repair_patch_plan');
+    expect(nextGoal.blocked_actions).toContain('validation_only_mcp_exposure');
+    expect(nextGoal.blocked_actions).toContain('assemble_repair_evidence_package_mcp_implementation');
+    expect(nextGoal.acceptance).toContain(
+      'Preserve all ten existing MCP tools unchanged and add only generate_repair_patch_plan.'
+    );
+
+    expect(goalIndex.goals).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: completedGoal.next_goal_id,
+        status: 'completed'
+      })
+    ]));
+    expect(progress.blocked_actions).not.toContain('generate_repair_patch_plan_mcp_implementation');
+    expect(progress.blocked_actions).toContain('validation_only_mcp_exposure');
+
+    expect(toolRegistry.match(/name: 'preview_repair_execution'/gu)).toHaveLength(1);
+    expect(toolRegistry.match(/name: 'generate_repair_patch_plan'/gu)).toHaveLength(1);
+    expect(toolAdapter).toContain(
+      "from '@hardening-mcp/acceptance/run-repair-execute'"
+    );
+    expect(toolAdapter).toContain('dryRun: true');
+    expect(toolAdapter).toContain('validationOnly: false');
+    expect(packRewrite).toContain('dist/tools/preview-repair-execution-tool.js');
+    expect(packRewrite).toContain(
+      "from '../../packages/acceptance/dist/run-repair-execute.js';"
+    );
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(
+        'RepoAssure AI IDE Repair Execution Preview MCP Tool Implementation v0.1'
+      );
+      expect(surface).toContain(
+        'RepoAssure AI IDE Repair Patch Plan MCP Tool Implementation v0.1'
+      );
+    }
+  });
+
+  it('preserves the repair patch-plan MCP closure after evidence-package implementation', async () => {
+    const [
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      goalIndexRecord,
+      progressRecord,
+      toolRegistry,
+      toolAdapter,
+      packRewrite,
+      adr,
+      convergenceContract,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-ai-ide-repair-patch-plan-mcp-tool-implementation-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-ai-ide-repair-patch-plan-mcp-tool-implementation-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-ai-ide-repair-evidence-package-mcp-tool-implementation-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('src/adapters/mcp/tool-registry.ts', 'utf8'),
+      readFile('src/tools/generate-repair-patch-plan-tool.ts', 'utf8'),
+      readFile('scripts/prepare-packed-cli.mjs', 'utf8'),
+      readFile('docs/adr/0024-ai-ide-repair-workflow-mcp-convergence.md', 'utf8'),
+      readFile('docs/product/specs/ai-ide-repair-workflow-mcp-convergence-contract-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        new_tool?: string;
+        registry_tool_count?: number;
+        existing_tools_changed?: boolean;
+        package_owned_runner_reused?: boolean;
+        validation_only_mcp_exposed?: boolean;
+        verification_commands_executed?: boolean;
+        target_repo_writes?: boolean;
+        patches_applied?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexRecord) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressRecord) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+      blocked_actions?: string[];
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(
+      'RepoAssure AI IDE Repair Patch Plan MCP Tool Implementation v0.1'
+    );
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(
+      'repair_patch_plan_mcp_tool_implemented_without_command_execution_or_target_repo_writes'
+    );
+    expect(operationRecord).toContain('Registry tools: 11');
+    expect(operationRecord).toContain('Validation commands executed: no');
+    expect(operationRecord).toContain('Target repository writes: no');
+    expect(operationRecord).toContain('Patches applied: no');
+
+    expect(completedGoal.status).toBe('completed');
+    expect(completedGoal.conclusion).toBe(
+      'repair_patch_plan_mcp_tool_implemented_without_command_execution_or_target_repo_writes'
+    );
+    expect(completedGoal.next_goal_id).toBe(
+      'repoassure-ai-ide-repair-evidence-package-mcp-tool-implementation-v0.1'
+    );
+    expect(completedGoal.summary).toMatchObject({
+      new_tool: 'generate_repair_patch_plan',
+      registry_tool_count: 11,
+      existing_tools_changed: false,
+      package_owned_runner_reused: true,
+      validation_only_mcp_exposed: false,
+      verification_commands_executed: false,
+      target_repo_writes: false,
+      patches_applied: false
+    });
+
+    expect(nextGoal).toMatchObject({
+      id: 'repoassure-ai-ide-repair-evidence-package-mcp-tool-implementation-v0.1',
+      title: 'RepoAssure AI IDE Repair Evidence Package MCP Tool Implementation v0.1',
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain('assemble_repair_evidence_package');
+    expect(nextGoal.blocked_actions).toContain('validation_only_mcp_exposure');
+    expect(nextGoal.acceptance).toContain(
+      'Preserve all eleven existing MCP tools unchanged and add only assemble_repair_evidence_package.'
+    );
+
+    expect(goalIndex.goals).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: completedGoal.next_goal_id,
+        status: 'completed'
+      })
+    ]));
+    expect(progress.blocked_actions).toContain('validation_only_mcp_exposure');
+
+    expect(toolRegistry.match(/name: 'generate_repair_patch_plan'/gu)).toHaveLength(1);
+    expect(toolRegistry.match(/name: 'assemble_repair_evidence_package'/gu)).toHaveLength(1);
+    expect(toolAdapter).toContain(
+      "from '@hardening-mcp/acceptance/run-repair-patch-plan'"
+    );
+    expect(packRewrite).toContain('dist/tools/generate-repair-patch-plan-tool.js');
+    expect(packRewrite).toContain(
+      "from '../../packages/acceptance/dist/run-repair-patch-plan.js';"
+    );
+
+    expect(adr).toContain('Implemented candidates: 4 of 4');
+    expect(adr).toContain('Current registry tools: 12');
+    expect(convergenceContract).toContain(
+      '3. `generate_repair_patch_plan` — implemented and accepted'
+    );
+    expect(convergenceContract).toContain(
+      '4. `assemble_repair_evidence_package` — implemented and accepted'
+    );
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(
+        'RepoAssure AI IDE Repair Patch Plan MCP Tool Implementation v0.1'
+      );
+      expect(surface).toContain(
+        'RepoAssure AI IDE Repair Evidence Package MCP Tool Implementation v0.1'
+      );
+    }
+  });
+
+  it('closes repair evidence-package MCP implementation and queues convergence completion audit', async () => {
+    const [
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      goalIndexRecord,
+      progressRecord,
+      toolRegistry,
+      toolAdapter,
+      packRewrite,
+      adr,
+      convergenceContract,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-ai-ide-repair-evidence-package-mcp-tool-implementation-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-ai-ide-repair-evidence-package-mcp-tool-implementation-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-ai-ide-repair-workflow-mcp-convergence-completion-audit-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('src/adapters/mcp/tool-registry.ts', 'utf8'),
+      readFile('src/tools/assemble-repair-evidence-package-tool.ts', 'utf8'),
+      readFile('scripts/prepare-packed-cli.mjs', 'utf8'),
+      readFile('docs/adr/0024-ai-ide-repair-workflow-mcp-convergence.md', 'utf8'),
+      readFile('docs/product/specs/ai-ide-repair-workflow-mcp-convergence-contract-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        new_tool?: string;
+        registry_tool_count?: number;
+        existing_tools_changed?: boolean;
+        package_owned_runner_reused?: boolean;
+        validation_only_mcp_exposed?: boolean;
+        verification_commands_executed?: boolean;
+        target_repo_writes?: boolean;
+        patches_applied?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexRecord) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressRecord) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+      blocked_actions?: string[];
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(
+      'RepoAssure AI IDE Repair Evidence Package MCP Tool Implementation v0.1'
+    );
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(
+      'repair_evidence_package_mcp_tool_implemented_without_command_execution_or_target_repo_writes'
+    );
+    expect(operationRecord).toContain('Registry tools: 12');
+    expect(operationRecord).toContain('Validation commands executed: no');
+    expect(operationRecord).toContain('Target repository writes: no');
+    expect(operationRecord).toContain('Patches applied: no');
+
+    expect(completedGoal.status).toBe('completed');
+    expect(completedGoal.conclusion).toBe(
+      'repair_evidence_package_mcp_tool_implemented_without_command_execution_or_target_repo_writes'
+    );
+    expect(completedGoal.next_goal_id).toBe(
+      'repoassure-ai-ide-repair-workflow-mcp-convergence-completion-audit-v0.1'
+    );
+    expect(completedGoal.summary).toMatchObject({
+      new_tool: 'assemble_repair_evidence_package',
+      registry_tool_count: 12,
+      existing_tools_changed: false,
+      package_owned_runner_reused: true,
+      validation_only_mcp_exposed: false,
+      verification_commands_executed: false,
+      target_repo_writes: false,
+      patches_applied: false
+    });
+
+    expect(nextGoal).toMatchObject({
+      id: 'repoassure-ai-ide-repair-workflow-mcp-convergence-completion-audit-v0.1',
+      title: 'RepoAssure AI IDE Repair Workflow MCP Convergence Completion Audit v0.1',
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain('audit all four additive artifact-only MCP tools');
+    expect(nextGoal.blocked_actions).toContain('validation_only_mcp_exposure');
+    expect(nextGoal.acceptance).toContain(
+      'Prove the twelve-tool registry preserves all pre-convergence tool names, schemas, annotations, and behavior.'
+    );
+
+    expect(goalIndex.goals).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: completedGoal.next_goal_id,
+        status: 'completed'
+      })
+    ]));
+    expect(progress.blocked_actions).toContain('validation_only_mcp_exposure');
+
+    expect(toolRegistry.match(/name: 'assemble_repair_evidence_package'/gu)).toHaveLength(1);
+    expect(toolAdapter).toContain(
+      "from '@hardening-mcp/acceptance/run-repair-evidence-package'"
+    );
+    expect(packRewrite).toContain('dist/tools/assemble-repair-evidence-package-tool.js');
+    expect(packRewrite).toContain(
+      "from '../../packages/acceptance/dist/run-repair-evidence-package.js';"
+    );
+
+    expect(adr).toContain('Implemented candidates: 4 of 4');
+    expect(adr).toContain('Current registry tools: 12');
+    expect(convergenceContract).toContain(
+      '4. `assemble_repair_evidence_package` — implemented and accepted'
+    );
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(
+        'RepoAssure AI IDE Repair Evidence Package MCP Tool Implementation v0.1'
+      );
+      expect(surface).toContain(
+        'RepoAssure AI IDE Repair Workflow MCP Convergence Completion Audit v0.1'
+      );
+    }
+  });
+
+  it('closes the four-tool repair workflow MCP convergence slice and queues the next gap audit', async () => {
+    const [
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      goalIndexRecord,
+      progressRecord,
+      adr,
+      convergenceContract,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-ai-ide-repair-workflow-mcp-convergence-completion-audit-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-ai-ide-repair-workflow-mcp-convergence-completion-audit-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.6.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/adr/0024-ai-ide-repair-workflow-mcp-convergence.md', 'utf8'),
+      readFile('docs/product/specs/ai-ide-repair-workflow-mcp-convergence-contract-v0.1.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        implemented_tools?: string[];
+        registry_tool_count?: number;
+        pre_convergence_tools_preserved?: boolean;
+        validation_only_mcp_exposed?: boolean;
+        verification_commands_executed?: boolean;
+        target_repo_writes?: boolean;
+        patches_applied?: boolean;
+        resources_prompts_exposed?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexRecord) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressRecord) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+      blocked_actions?: string[];
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(
+      'RepoAssure AI IDE Repair Workflow MCP Convergence Completion Audit v0.1'
+    );
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(
+      'repair_workflow_mcp_convergence_slice_closed_without_command_execution_or_target_repo_writes'
+    );
+    expect(operationRecord).toContain('Implemented tools: 4 of 4');
+    expect(operationRecord).toContain('Registry tools: 12');
+    expect(operationRecord).toContain('Pre-convergence contracts preserved: yes');
+    expect(operationRecord).toContain('Validation commands executed: no');
+    expect(operationRecord).toContain('Target repository writes: no');
+    expect(operationRecord).toContain('Patches applied: no');
+    expect(operationRecord).toContain('Resources or prompts exposed: no');
+
+    expect(completedGoal.status).toBe('completed');
+    expect(completedGoal.conclusion).toBe(
+      'repair_workflow_mcp_convergence_slice_closed_without_command_execution_or_target_repo_writes'
+    );
+    expect(completedGoal.next_goal_id).toBe(
+      'repoassure-product-completion-gap-audit-refresh-v0.6'
+    );
+    expect(completedGoal.summary).toMatchObject({
+      implemented_tools: [
+        'prepare_repair_handoff',
+        'preview_repair_execution',
+        'generate_repair_patch_plan',
+        'assemble_repair_evidence_package'
+      ],
+      registry_tool_count: 12,
+      pre_convergence_tools_preserved: true,
+      validation_only_mcp_exposed: false,
+      verification_commands_executed: false,
+      target_repo_writes: false,
+      patches_applied: false,
+      resources_prompts_exposed: false
+    });
+
+    expect(nextGoal).toMatchObject({
+      id: 'repoassure-product-completion-gap-audit-refresh-v0.6',
+      title: 'RepoAssure Product Completion Gap Audit Refresh v0.6',
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain(
+      'Reconcile product completion after closing the ADR-0024 MCP convergence slice'
+    );
+    expect(nextGoal.blocked_actions).toContain('target_repo_write');
+    expect(nextGoal.acceptance).toContain(
+      'Classify remaining work as implemented, blocked or manual-gated, external-input-gated, deferred, or safe auto-executable.'
+    );
+
+    expect(goalIndex.goals).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: completedGoal.next_goal_id,
+        status: 'completed'
+      })
+    ]));
+    expect(progress.active_goal?.status).toBe('ready_to_execute');
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.blocked_actions).toContain('validation_only_mcp_exposure');
+
+    expect(adr).toContain('Convergence slice status: closed');
+    expect(convergenceContract).toContain('Completion audit: accepted');
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(
+        'RepoAssure AI IDE Repair Workflow MCP Convergence Completion Audit v0.1'
+      );
+      expect(surface).toContain(
+        'RepoAssure Product Completion Gap Audit Refresh v0.6'
+      );
+    }
+  });
+
+  it('records completion gap audit v0.6 and queues multi-repo workspace repair summary planning', async () => {
+    const [
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      goalIndexRecord,
+      progressRecord,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot,
+      mvpSpec
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.6.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.6.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-multi-repo-workspace-repair-summary-planning-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8'),
+      readFile('docs/product/specs/mvp-spec-v0.3.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        implemented_surfaces?: string[];
+        blocked_or_manual_gated_gaps?: string[];
+        external_input_gated_gaps?: string[];
+        deferred_gaps?: string[];
+        safe_auto_executable_gaps?: string[];
+        selected_safe_auto_executable_gap?: string;
+        mcp_registry_tool_count?: number;
+        mcp_convergence_slice_closed?: boolean;
+        multi_repo_workspace_manifest_implemented?: boolean;
+        cross_repo_repair_summary_implemented?: boolean;
+        target_repo_writes?: boolean;
+        production_code_changed?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexRecord) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressRecord) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(
+      'RepoAssure Product Completion Gap Audit Refresh v0.6'
+    );
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain('## Implemented Product Surfaces');
+    expect(operationRecord).toContain('## Blocked or Manual-Gated Work');
+    expect(operationRecord).toContain('## External-Input-Gated Work');
+    expect(operationRecord).toContain('## Deferred Work');
+    expect(operationRecord).toContain('## Safe Auto-Executable Gaps');
+    expect(operationRecord).toContain('MCP registry tools: 12');
+    expect(operationRecord).toContain(
+      'Multi-repo workspace manifest: implemented'
+    );
+    expect(operationRecord).toContain(
+      'Cross-repo repair summary: not implemented'
+    );
+    expect(operationRecord).toContain(
+      'RepoAssure Multi-Repo Workspace Repair Summary Planning v0.1'
+    );
+    expect(operationRecord).toContain('Target repository writes: no');
+    expect(operationRecord).toContain('npm publication: no');
+
+    expect(completedGoal.status).toBe('completed');
+    expect(completedGoal.conclusion).toBe(
+      'completion_gap_audit_refreshed_with_multi_repo_workspace_repair_summary_planning_next'
+    );
+    expect(completedGoal.next_goal_id).toBe(
+      'repoassure-multi-repo-workspace-repair-summary-planning-v0.1'
+    );
+    expect(completedGoal.summary).toMatchObject({
+      operation_record:
+        'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.6.md',
+      selected_safe_auto_executable_gap:
+        'multi_repo_workspace_repair_summary_planning',
+      mcp_registry_tool_count: 12,
+      mcp_convergence_slice_closed: true,
+      multi_repo_workspace_manifest_implemented: true,
+      cross_repo_repair_summary_implemented: false,
+      target_repo_writes: false,
+      production_code_changed: false
+    });
+    expect(completedGoal.summary?.implemented_surfaces).toEqual(
+      expect.arrayContaining([
+        'artifact_only_repair_workflow_mcp_convergence',
+        'multi_repo_workspace_manifest'
+      ])
+    );
+    expect(completedGoal.summary?.blocked_or_manual_gated_gaps).toEqual(
+      expect.arrayContaining([
+        'false_positive_detector_runtime_calibration',
+        'public_source_release'
+      ])
+    );
+    expect(completedGoal.summary?.external_input_gated_gaps).toContain(
+      'private_preview_feedback_triage'
+    );
+    expect(completedGoal.summary?.deferred_gaps).toEqual(
+      expect.arrayContaining([
+        'website_design_system_external_follow_up',
+        'packages_core_extraction'
+      ])
+    );
+    expect(completedGoal.summary?.safe_auto_executable_gaps).toContain(
+      'multi_repo_workspace_repair_summary_planning'
+    );
+
+    expect(nextGoal).toMatchObject({
+      id: 'repoassure-multi-repo-workspace-repair-summary-planning-v0.1',
+      title:
+        'RepoAssure Multi-Repo Workspace Repair Summary Planning v0.1',
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain(
+      'define the local-only multi-repo workspace repair summary'
+    );
+    expect(nextGoal.blocked_actions).toEqual(
+      expect.arrayContaining([
+        'target_repo_write',
+        'team_cloud_runtime',
+        'hosted_dashboard'
+      ])
+    );
+    expect(nextGoal.acceptance).toContain(
+      'Define workspace-summary inputs, JSON and Markdown artifact boundaries, AI IDE read order, cross-repo prioritization, stale or missing repo handling, repo identity collision policy, redaction, maintainer review, and no-write evidence.'
+    );
+
+    expect(goalIndex.goals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'repoassure-product-completion-gap-audit-refresh-v0.6',
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: nextGoal.id,
+          status: 'completed'
+        })
+      ])
+    );
+    expect(progress.active_goal?.status).toBe('ready_to_execute');
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    expect(mvpSpec).toContain('多 repo workspace repair summary');
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(
+        'RepoAssure Product Completion Gap Audit Refresh v0.6'
+      );
+      expect(surface).toContain(
+        'RepoAssure Multi-Repo Workspace Repair Summary Planning v0.1'
+      );
+    }
+  });
+
+  it('plans the local multi-repo workspace repair summary contract and queues implementation', async () => {
+    const [
+      operationRecord,
+      contractRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      goalIndexRecord,
+      progressRecord,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-multi-repo-workspace-repair-summary-planning-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/product/specs/multi-repo-workspace-repair-summary-contract-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-multi-repo-workspace-repair-summary-planning-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-multi-repo-workspace-repair-summary-contract-implementation-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        contract_record?: string;
+        source_workspace_manifest_schema_version?: number;
+        output_artifacts?: string[];
+        repository_states?: string[];
+        priority_order?: string[];
+        selected_next_goal_id?: string;
+        production_code_changed?: boolean;
+        target_repo_writes?: boolean;
+        team_cloud_runtime_implemented?: boolean;
+        hosted_dashboard_implemented?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexRecord) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressRecord) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(
+      'RepoAssure Multi-Repo Workspace Repair Summary Planning v0.1'
+    );
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain('## Existing Input Contract');
+    expect(operationRecord).toContain('## Proposed Output Artifacts');
+    expect(operationRecord).toContain('## Cross-Repo Priority Rules');
+    expect(operationRecord).toContain('## Stale, Missing, and Collision Policy');
+    expect(operationRecord).toContain('## Maintainer Review Boundary');
+    expect(operationRecord).toContain('## No-Write Boundary');
+    expect(operationRecord).toContain('workspace-repair-summary.json');
+    expect(operationRecord).toContain('workspace-repair-summary.md');
+    expect(operationRecord).toContain(
+      'RepoAssure Multi-Repo Workspace Repair Summary Contract Implementation v0.1'
+    );
+    expect(operationRecord).toContain('Production code changed: no');
+    expect(operationRecord).toContain('Target repository writes: no');
+    expect(operationRecord).toContain('Team Cloud runtime: no');
+    expect(operationRecord).toContain('Hosted dashboard: no');
+
+    expect(contractRecord).toContain(
+      'RepoAssure Multi-Repo Workspace Repair Summary Contract v0.1'
+    );
+    expect(contractRecord).toContain(
+      '`repoassure.workspace-repair-summary.v1`'
+    );
+    expect(contractRecord).toContain('`workspace-repair-summary.json`');
+    expect(contractRecord).toContain('`workspace-repair-summary.md`');
+    expect(contractRecord).toContain(
+      '`ready | no_tasks | stale | missing_artifacts | invalid_artifacts | identity_collision`'
+    );
+    expect(contractRecord).toContain('P0 > P1 > P2');
+    expect(contractRecord).toContain(
+      'severity rank, then `repoSlug`, then `taskId`'
+    );
+    expect(contractRecord).toContain(
+      'same `repoSlug` maps to more than one normalized'
+    );
+    expect(contractRecord).toContain('`repoRoot`');
+    expect(contractRecord).toContain(
+      'The output directory must be outside every normalized `repoRoot`'
+    );
+    expect(contractRecord).toContain(
+      '`approve | reject | defer | accept_risk`'
+    );
+    expect(contractRecord).toContain('No cross-repository dependency inference');
+
+    expect(completedGoal).toMatchObject({
+      status: 'completed',
+      conclusion:
+        'multi_repo_workspace_repair_summary_contract_planned_without_production_implementation',
+      next_goal_id:
+        'repoassure-multi-repo-workspace-repair-summary-contract-implementation-v0.1'
+    });
+    expect(completedGoal.summary).toMatchObject({
+      operation_record:
+        'docs/operations/repoassure-multi-repo-workspace-repair-summary-planning-v0.1.md',
+      contract_record:
+        'docs/product/specs/multi-repo-workspace-repair-summary-contract-v0.1.md',
+      source_workspace_manifest_schema_version: 1,
+      output_artifacts: [
+        'workspace-repair-summary.json',
+        'workspace-repair-summary.md'
+      ],
+      repository_states: [
+        'ready',
+        'no_tasks',
+        'stale',
+        'missing_artifacts',
+        'invalid_artifacts',
+        'identity_collision'
+      ],
+      priority_order: ['P0', 'P1', 'P2'],
+      selected_next_goal_id:
+        'repoassure-multi-repo-workspace-repair-summary-contract-implementation-v0.1',
+      production_code_changed: false,
+      target_repo_writes: false,
+      team_cloud_runtime_implemented: false,
+      hosted_dashboard_implemented: false
+    });
+
+    expect(nextGoal).toMatchObject({
+      id: 'repoassure-multi-repo-workspace-repair-summary-contract-implementation-v0.1',
+      title:
+        'RepoAssure Multi-Repo Workspace Repair Summary Contract Implementation v0.1',
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain(
+      'Implement the local-only multi-repo workspace repair summary contract'
+    );
+    expect(nextGoal.blocked_actions).toEqual(
+      expect.arrayContaining([
+        'target_repo_write',
+        'arbitrary_command_execution',
+        'automatic_patch_application',
+        'team_cloud_runtime',
+        'hosted_dashboard'
+      ])
+    );
+    expect(nextGoal.acceptance).toContain(
+      'Generate deterministic workspace-repair-summary.json and workspace-repair-summary.md artifacts from a valid workspace manifest and per-repository latest repair task packages.'
+    );
+
+    expect(goalIndex.active_goal_id).not.toBe(nextGoal.id);
+    expect(goalIndex.goals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'repoassure-multi-repo-workspace-repair-summary-planning-v0.1',
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: nextGoal.id,
+          status: 'completed'
+        })
+      ])
+    );
+    expect(progress.active_goal?.id).not.toBe(nextGoal.id);
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(
+        'RepoAssure Multi-Repo Workspace Repair Summary Planning v0.1'
+      );
+      expect(surface).toContain(
+        'RepoAssure Multi-Repo Workspace Repair Summary Contract Implementation v0.1'
+      );
+    }
+  });
+
+  it('implements the local multi-repo workspace repair summary contract and queues AI IDE consumption validation', async () => {
+    const [
+      operationRecord,
+      contractRecord,
+      implementationSource,
+      packageReadme,
+      completedGoalRecord,
+      nextGoalRecord,
+      goalIndexRecord,
+      progressRecord,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-multi-repo-workspace-repair-summary-contract-implementation-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/product/specs/multi-repo-workspace-repair-summary-contract-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'packages/acceptance/src/workspace-repair-summary.ts',
+        'utf8'
+      ),
+      readFile('packages/acceptance/README.md', 'utf8'),
+      readFile(
+        '.autopilot/goals/repoassure-multi-repo-workspace-repair-summary-contract-implementation-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-multi-repo-workspace-repair-summary-ai-ide-consumption-validation-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        implementation_module?: string;
+        output_artifacts?: string[];
+        focused_test_count?: number;
+        selected_next_goal_id?: string;
+        cli_entrypoint_added?: boolean;
+        mcp_tool_added?: boolean;
+        target_repo_writes?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexRecord) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressRecord) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+    const nextGoalTitle =
+      'RepoAssure Multi-Repo Workspace Repair Summary AI IDE Consumption Validation v0.1';
+
+    expect(operationRecord).toContain(
+      'RepoAssure Multi-Repo Workspace Repair Summary Contract Implementation v0.1'
+    );
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain('## TDD Evidence');
+    expect(operationRecord).toContain('## Test Pyramid');
+    expect(operationRecord).toContain('## No-Write Proof');
+    expect(operationRecord).toContain('workspace-repair-summary.json');
+    expect(operationRecord).toContain('workspace-repair-summary.md');
+    expect(operationRecord).toContain('49 focused tests passed');
+    expect(operationRecord).toContain('CLI entrypoint added: no');
+    expect(operationRecord).toContain('MCP tool added: no');
+    expect(operationRecord).toContain('Target repository writes: no');
+    expect(operationRecord).toContain(nextGoalTitle);
+
+    expect(contractRecord).toContain('Implementation status: implemented');
+    expect(contractRecord).toContain(
+      '`packages/acceptance/src/workspace-repair-summary.ts`'
+    );
+    expect(implementationSource).toContain(
+      "repoassure.workspace-repair-summary.v1"
+    );
+    expect(implementationSource).toContain('runWorkspaceRepairSummary');
+    expect(packageReadme).toContain('workspace-repair-summary');
+    expect(packageReadme).toContain('local-only');
+
+    expect(completedGoal).toMatchObject({
+      status: 'completed',
+      conclusion:
+        'multi_repo_workspace_repair_summary_implemented_without_cli_mcp_or_target_repo_writes',
+      next_goal_id:
+        'repoassure-multi-repo-workspace-repair-summary-ai-ide-consumption-validation-v0.1'
+    });
+    expect(completedGoal.summary).toMatchObject({
+      operation_record:
+        'docs/operations/repoassure-multi-repo-workspace-repair-summary-contract-implementation-v0.1.md',
+      implementation_module:
+        'packages/acceptance/src/workspace-repair-summary.ts',
+      output_artifacts: [
+        'workspace-repair-summary.json',
+        'workspace-repair-summary.md'
+      ],
+      focused_test_count: 49,
+      selected_next_goal_id:
+        'repoassure-multi-repo-workspace-repair-summary-ai-ide-consumption-validation-v0.1',
+      cli_entrypoint_added: false,
+      mcp_tool_added: false,
+      target_repo_writes: false
+    });
+
+    expect(nextGoal).toMatchObject({
+      id: 'repoassure-multi-repo-workspace-repair-summary-ai-ide-consumption-validation-v0.1',
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain(
+      'Validate that an AI IDE can consume'
+    );
+    expect(nextGoal.blocked_actions).toEqual(
+      expect.arrayContaining([
+        'target_repo_write',
+        'arbitrary_command_execution',
+        'automatic_patch_application',
+        'mcp_tool_addition'
+      ])
+    );
+    expect(nextGoal.acceptance).toContain(
+      'Validate ready, partial, blocked, and empty workspace summaries through deterministic non-private fixtures.'
+    );
+
+    expect(goalIndex.active_goal_id).not.toBe(nextGoal.id);
+    expect(goalIndex.goals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'repoassure-multi-repo-workspace-repair-summary-contract-implementation-v0.1',
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: nextGoal.id,
+          status: 'completed'
+        })
+      ])
+    );
+    expect(progress.active_goal?.id).not.toBe(nextGoal.id);
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(
+        'RepoAssure Multi-Repo Workspace Repair Summary Contract Implementation v0.1'
+      );
+      expect(surface).toContain(nextGoalTitle);
+    }
+  });
+
+  it('validates AI IDE workspace summary consumption and queues completion audit', async () => {
+    const [
+      operationRecord,
+      implementationSource,
+      unitTestSource,
+      integrationTestSource,
+      packageReadme,
+      completedGoalRecord,
+      nextGoalRecord,
+      goalIndexRecord,
+      progressRecord,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-multi-repo-workspace-repair-summary-ai-ide-consumption-validation-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'packages/acceptance/src/workspace-repair-summary-consumption.ts',
+        'utf8'
+      ),
+      readFile(
+        'tests/unit/workspace-repair-summary-consumption.test.ts',
+        'utf8'
+      ),
+      readFile(
+        'tests/integration/workspace-repair-summary-consumption-no-write.test.ts',
+        'utf8'
+      ),
+      readFile('packages/acceptance/README.md', 'utf8'),
+      readFile(
+        '.autopilot/goals/repoassure-multi-repo-workspace-repair-summary-ai-ide-consumption-validation-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-multi-repo-workspace-repair-summary-completion-audit-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        implementation_module?: string;
+        workspace_states?: string[];
+        dedicated_test_count?: number;
+        selected_next_goal_id?: string;
+        cli_entrypoint_added?: boolean;
+        mcp_tool_added?: boolean;
+        target_repo_writes?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexRecord) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressRecord) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+    const currentGoalTitle =
+      'RepoAssure Multi-Repo Workspace Repair Summary AI IDE Consumption Validation v0.1';
+    const nextGoalTitle =
+      'RepoAssure Multi-Repo Workspace Repair Summary Completion Audit v0.1';
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(currentGoalTitle);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain('## Four-State Consumption Evidence');
+    expect(operationRecord).toContain('## AI IDE Contract');
+    expect(operationRecord).toContain('## Diagnostics and Fail-Closed Evidence');
+    expect(operationRecord).toContain('## No-Write Proof');
+    expect(operationRecord).toContain('ready');
+    expect(operationRecord).toContain('partial');
+    expect(operationRecord).toContain('blocked');
+    expect(operationRecord).toContain('empty');
+    expect(operationRecord).toContain('10 dedicated tests passed');
+    expect(operationRecord).toContain('CLI entrypoint added: no');
+    expect(operationRecord).toContain('MCP tool added: no');
+    expect(operationRecord).toContain('Target repository writes: no');
+    expect(operationRecord).toContain(nextGoalTitle);
+
+    expect(implementationSource).toContain(
+      'repoassure.workspace-repair-summary-consumption-validation@1'
+    );
+    expect(implementationSource).toContain(
+      'validateWorkspaceRepairSummaryConsumption'
+    );
+    expect(implementationSource).not.toContain('function main');
+    expect(unitTestSource).toContain('queueRankAuthorizesExecution: false');
+    expect(unitTestSource).toContain('accept_risk');
+    expect(integrationTestSource).toContain('snapshotTree');
+    expect(integrationTestSource).toContain(
+      "'workspace-repair-summary.json'"
+    );
+    expect(packageReadme).toContain('workspace-repair-summary-consumption');
+
+    expect(completedGoal).toMatchObject({
+      status: 'completed',
+      conclusion:
+        'workspace_repair_summary_ai_ide_consumption_validated_without_entrypoints_or_target_writes',
+      next_goal_id:
+        'repoassure-multi-repo-workspace-repair-summary-completion-audit-v0.1'
+    });
+    expect(completedGoal.summary).toMatchObject({
+      operation_record:
+        'docs/operations/repoassure-multi-repo-workspace-repair-summary-ai-ide-consumption-validation-v0.1.md',
+      implementation_module:
+        'packages/acceptance/src/workspace-repair-summary-consumption.ts',
+      workspace_states: ['ready', 'partial', 'blocked', 'empty'],
+      dedicated_test_count: 10,
+      selected_next_goal_id:
+        'repoassure-multi-repo-workspace-repair-summary-completion-audit-v0.1',
+      cli_entrypoint_added: false,
+      mcp_tool_added: false,
+      target_repo_writes: false
+    });
+
+    expect(nextGoal).toMatchObject({
+      id: 'repoassure-multi-repo-workspace-repair-summary-completion-audit-v0.1',
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain(
+      'Audit the planning, implementation, and AI IDE consumption evidence'
+    );
+    expect(nextGoal.blocked_actions).toEqual(
+      expect.arrayContaining([
+        'target_repo_write',
+        'arbitrary_command_execution',
+        'automatic_patch_application',
+        'mcp_tool_addition'
+      ])
+    );
+    expect(nextGoal.acceptance).toContain(
+      'Determine whether the current local-only workspace repair summary slice is complete using planning, implementation, package, consumption, and no-write evidence.'
+    );
+
+    expect(goalIndex.active_goal_id).not.toBe(nextGoal.id);
+    expect(goalIndex.goals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: completedGoal.next_goal_id,
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: 'repoassure-multi-repo-workspace-repair-summary-ai-ide-consumption-validation-v0.1',
+          status: 'completed'
+        })
+      ])
+    );
+    expect(progress.active_goal?.id).not.toBe(nextGoal.id);
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(currentGoalTitle);
+      expect(surface).toContain(nextGoalTitle);
+    }
+  });
+
+  it('closes the local workspace repair summary slice and queues the next gap audit', async () => {
+    const [
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      goalIndexRecord,
+      progressRecord,
+      planningRecord,
+      implementationRecord,
+      consumptionRecord,
+      contract,
+      packageJsonRecord,
+      packageReadme,
+      implementationSource,
+      consumptionSource,
+      unitTestSource,
+      consumptionUnitTestSource,
+      noWriteTestSource,
+      consumptionNoWriteTestSource,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-multi-repo-workspace-repair-summary-completion-audit-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-multi-repo-workspace-repair-summary-completion-audit-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.7.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile(
+        'docs/operations/repoassure-multi-repo-workspace-repair-summary-planning-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/operations/repoassure-multi-repo-workspace-repair-summary-contract-implementation-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/operations/repoassure-multi-repo-workspace-repair-summary-ai-ide-consumption-validation-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/product/specs/multi-repo-workspace-repair-summary-contract-v0.1.md',
+        'utf8'
+      ),
+      readFile('packages/acceptance/package.json', 'utf8'),
+      readFile('packages/acceptance/README.md', 'utf8'),
+      readFile('packages/acceptance/src/workspace-repair-summary.ts', 'utf8'),
+      readFile(
+        'packages/acceptance/src/workspace-repair-summary-consumption.ts',
+        'utf8'
+      ),
+      readFile('tests/unit/workspace-repair-summary.test.ts', 'utf8'),
+      readFile(
+        'tests/unit/workspace-repair-summary-consumption.test.ts',
+        'utf8'
+      ),
+      readFile(
+        'tests/integration/workspace-repair-summary-no-write.test.ts',
+        'utf8'
+      ),
+      readFile(
+        'tests/integration/workspace-repair-summary-consumption-no-write.test.ts',
+        'utf8'
+      ),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        audit_verdict?: string;
+        audited_workspace_states?: string[];
+        package_owned?: boolean;
+        root_export_present?: boolean;
+        typed_subpath_present?: boolean;
+        dedicated_test_count?: number;
+        full_test_count?: number;
+        residual_gaps?: string[];
+        deferred_gaps?: string[];
+        manual_gates?: string[];
+        cli_entrypoint_added?: boolean;
+        mcp_tool_added?: boolean;
+        commands_executed?: boolean;
+        patches_applied?: boolean;
+        target_repo_writes?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexRecord) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressRecord) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+    const packageJson = JSON.parse(packageJsonRecord) as {
+      exports?: Record<string, unknown>;
+    };
+    const currentGoalTitle =
+      'RepoAssure Multi-Repo Workspace Repair Summary Completion Audit v0.1';
+    const nextGoalTitle =
+      'RepoAssure Product Completion Gap Audit Refresh v0.7';
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(currentGoalTitle);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain('## Audit Verdict');
+    expect(operationRecord).toContain('## Evidence Matrix');
+    expect(operationRecord).toContain('## Implemented');
+    expect(operationRecord).toContain('## Residual Gaps');
+    expect(operationRecord).toContain('## Blocked');
+    expect(operationRecord).toContain('## Deferred');
+    expect(operationRecord).toContain('## Manual Gates');
+    expect(operationRecord).toContain('## No-Write and Entry Point Boundary');
+    expect(operationRecord).toContain('## Verification');
+    expect(operationRecord).toContain('## Next Goal');
+    expect(operationRecord).toContain(
+      'workspace_repair_summary_local_only_slice_closed_without_entrypoint_expansion_or_target_writes'
+    );
+    expect(operationRecord).toContain('ready');
+    expect(operationRecord).toContain('partial');
+    expect(operationRecord).toContain('blocked');
+    expect(operationRecord).toContain('empty');
+    expect(operationRecord).toContain('CLI entrypoint added: no');
+    expect(operationRecord).toContain('MCP tool added: no');
+    expect(operationRecord).toContain('Commands executed: no');
+    expect(operationRecord).toContain('Patches applied: no');
+    expect(operationRecord).toContain('Target repository writes: no');
+    expect(operationRecord).toContain(nextGoalTitle);
+
+    expect(completedGoal).toMatchObject({
+      status: 'completed',
+      conclusion:
+        'workspace_repair_summary_local_only_slice_closed_without_entrypoint_expansion_or_target_writes',
+      next_goal_id:
+        'repoassure-product-completion-gap-audit-refresh-v0.7'
+    });
+    expect(completedGoal.summary).toMatchObject({
+      operation_record:
+        'docs/operations/repoassure-multi-repo-workspace-repair-summary-completion-audit-v0.1.md',
+      audit_verdict: 'complete_for_current_local_only_slice',
+      audited_workspace_states: ['ready', 'partial', 'blocked', 'empty'],
+      package_owned: true,
+      root_export_present: true,
+      typed_subpath_present: true,
+      dedicated_test_count: 10,
+      full_test_count: 792,
+      cli_entrypoint_added: false,
+      mcp_tool_added: false,
+      commands_executed: false,
+      patches_applied: false,
+      target_repo_writes: false
+    });
+    expect(completedGoal.summary?.residual_gaps).toContain(
+      'installed_cli_or_mcp_product_entrypoint'
+    );
+    expect(completedGoal.summary?.deferred_gaps).toContain(
+      'workspace_summary_entrypoint_productization'
+    );
+    expect(completedGoal.summary?.manual_gates).toContain(
+      'maintainer_review_before_any_repair_execution'
+    );
+
+    expect(nextGoal).toMatchObject({
+      id: 'repoassure-product-completion-gap-audit-refresh-v0.7',
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain(
+      'Reassess remaining product gaps after closing the local-only multi-repo workspace repair summary slice'
+    );
+    expect(nextGoal.blocked_actions).toEqual(
+      expect.arrayContaining([
+        'target_repo_write',
+        'automatic_patch_application',
+        'validation_only_mcp_exposure',
+        'website_design_system_rewrite'
+      ])
+    );
+    expect(nextGoal.acceptance).toContain(
+      'Reconcile implemented product surfaces against PLAN, SPEC, PRD, code, tests, package evidence, and the completed workspace repair summary audit.'
+    );
+
+    expect(goalIndex.active_goal_id).not.toBe(nextGoal.id);
+    expect(goalIndex.goals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'repoassure-multi-repo-workspace-repair-summary-completion-audit-v0.1',
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: nextGoal.id,
+          status: 'completed'
+        })
+      ])
+    );
+    expect(progress.active_goal?.status).toBe('ready_to_execute');
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    expect(planningRecord).toContain(
+      'RepoAssure Multi-Repo Workspace Repair Summary Planning v0.1'
+    );
+    expect(implementationRecord).toContain(
+      'RepoAssure Multi-Repo Workspace Repair Summary Contract Implementation v0.1'
+    );
+    expect(consumptionRecord).toContain(
+      'RepoAssure Multi-Repo Workspace Repair Summary AI IDE Consumption Validation v0.1'
+    );
+    expect(contract).toContain('repoassure.workspace-repair-summary.v1');
+    expect(packageJson.exports).toHaveProperty('./workspace-repair-summary');
+    expect(packageJson.exports).toHaveProperty(
+      './workspace-repair-summary-consumption'
+    );
+    expect(packageReadme).toContain('workspace-repair-summary');
+    expect(implementationSource).toContain(
+      'repoassure.workspace-repair-summary.v1'
+    );
+    expect(consumptionSource).toContain(
+      'repoassure.workspace-repair-summary-consumption-validation@1'
+    );
+    expect(unitTestSource).toContain("'partial'");
+    expect(consumptionUnitTestSource).toContain('queueRankAuthorizesExecution: false');
+    expect(noWriteTestSource).toContain('snapshotTree');
+    expect(consumptionNoWriteTestSource).toContain('snapshotTree');
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(currentGoalTitle);
+      expect(surface).toContain(nextGoalTitle);
+    }
+  });
+
+  it('refreshes product completion gaps and queues the bounded public release decision review', async () => {
+    const currentGoalTitle = 'RepoAssure Product Completion Gap Audit Refresh v0.7';
+    const nextGoalTitle = 'Public Release Manual Decision Input Review v0.2';
+    const [
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      goalIndexRecord,
+      progressRecord,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.7.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.7.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/public-release-manual-decision-input-review-v0.2.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        implemented_surface_count?: number;
+        blocked_or_manual_gated?: string[];
+        external_input_gated?: string[];
+        deferred?: string[];
+        safe_auto_executable?: string[];
+        public_release_ready?: boolean;
+        detector_pending_decision_count?: number;
+        runtime_behavior_changed?: boolean;
+        product_entrypoints_added?: boolean;
+        target_repo_writes?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexRecord) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressRecord) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(currentGoalTitle);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain('## Implemented Product Surfaces');
+    expect(operationRecord).toContain('## Blocked or Manual-Gated Work');
+    expect(operationRecord).toContain('## External-Input-Gated Work');
+    expect(operationRecord).toContain('## Deferred Work');
+    expect(operationRecord).toContain('## Safe Auto-Executable Gaps');
+    expect(operationRecord).toContain('public release ready: no');
+    expect(operationRecord).toContain('pending detector calibration decisions: 2');
+    expect(operationRecord).toContain('workspace_summary_entrypoint_productization');
+    expect(operationRecord).toContain('website_design_follow_up');
+    expect(operationRecord).toContain(nextGoalTitle);
+    expect(operationRecord).toContain(
+      'completion_gap_audit_refreshed_with_public_release_manual_decision_review_next'
+    );
+
+    expect(completedGoal).toMatchObject({
+      status: 'completed',
+      conclusion:
+        'completion_gap_audit_refreshed_with_public_release_manual_decision_review_next',
+      next_goal_id: 'public-release-manual-decision-input-review-v0.2'
+    });
+    expect(completedGoal.summary).toMatchObject({
+      operation_record:
+        'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.7.md',
+      public_release_ready: false,
+      detector_pending_decision_count: 2,
+      runtime_behavior_changed: false,
+      product_entrypoints_added: false,
+      target_repo_writes: false
+    });
+    expect(completedGoal.summary?.blocked_or_manual_gated).toContain(
+      'false_positive_detector_runtime_calibration'
+    );
+    expect(completedGoal.summary?.external_input_gated).toContain(
+      'real_customer_workspace_evidence'
+    );
+    expect(completedGoal.summary?.deferred).toContain(
+      'workspace_summary_entrypoint_productization'
+    );
+    expect(completedGoal.summary?.deferred).toContain(
+      'website_design_follow_up'
+    );
+    expect(completedGoal.summary?.safe_auto_executable).toEqual([
+      'public_release_manual_decision_input_review_v0.2'
+    ]);
+
+    expect(nextGoal).toMatchObject({
+      id: 'public-release-manual-decision-input-review-v0.2',
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain(
+      'Review the seven recorded public release manual decisions'
+    );
+    expect(nextGoal.blocked_actions).toEqual(
+      expect.arrayContaining([
+        'repository_visibility_change',
+        'npm_publication',
+        'github_release',
+        'public_launch'
+      ])
+    );
+    expect(nextGoal.acceptance).toContain(
+      'Keep public release no-go while the branch protection or equivalent repository ruleset decision remains deferred.'
+    );
+
+    expect(goalIndex.active_goal_id).toBe(
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+    );
+    expect(goalIndex.goals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'repoassure-product-completion-gap-audit-refresh-v0.7',
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: nextGoal.id,
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: 'public-repository-state-and-release-boundary-reconciliation-v0.1',
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: 'public-git-history-personal-identifier-remediation-planning-v0.1',
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: 'public-git-history-personal-identifier-remediation-maintainer-decision-recording-v0.1',
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: 'repoassure-product-completion-gap-audit-refresh-v0.8',
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: 'repoassure-final-product-acceptance-closure-campaign-v0.1',
+          status: 'completed'
+        })
+      ])
+    );
+    expect(progress.active_goal).toEqual({
+      id: 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1',
+      title: 'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1',
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(currentGoalTitle);
+      expect(surface).toContain(nextGoalTitle);
+    }
+  });
+
+  it('reviews the seven public release decisions and queues public-state drift reconciliation', async () => {
+    const currentGoalTitle = 'Public Release Manual Decision Input Review v0.2';
+    const nextGoalTitle = 'Public Repository State and Release Boundary Reconciliation v0.1';
+    const [
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      goalIndexRecord,
+      progressRecord,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/public-release-manual-decision-input-review-v0.2.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/public-release-manual-decision-input-review-v0.2.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/public-repository-state-and-release-boundary-reconciliation-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        decisions_reviewed?: number;
+        approved?: number;
+        accepted_risk?: number;
+        deferred?: number;
+        public_release_ready?: boolean;
+        repository_visibility?: string;
+        branch_protection_gate?: string;
+        local_branch_ahead?: number;
+        local_branch_behind?: number;
+        repository_state_changed?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexRecord) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressRecord) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(currentGoalTitle);
+    expect(operationRecord).toContain('Status: completed_public_state_drift_detected');
+    expect(operationRecord).toContain('Decisions reviewed: 7');
+    expect(operationRecord).toContain('Legal review | approve');
+    expect(operationRecord).toContain('Trademark/name review | accept risk');
+    expect(operationRecord).toContain(
+      'Branch protection or equivalent repository ruleset | defer | superseded_by_current_evidence'
+    );
+    expect(operationRecord).toContain(
+      'Final maintainer publication authorization | approve'
+    );
+    expect(operationRecord).toContain(
+      'Private preview reviewer feedback decision | accept risk'
+    );
+    expect(operationRecord).toContain(
+      'Dependency/license risk confirmation | accept risk'
+    );
+    expect(operationRecord).toContain(
+      'Secret/customer data exposure confirmation | approve'
+    );
+    expect(operationRecord).toContain('not professional legal advice');
+    expect(operationRecord).toContain('not professional trademark clearance');
+    expect(operationRecord).toContain('public release ready: no');
+    expect(operationRecord).toContain('Observed repository visibility: PUBLIC');
+    expect(operationRecord).toContain('Branch protection gate: passed');
+    expect(operationRecord).toContain('Required status check: Quality Gates');
+    expect(operationRecord).toContain('Local branch divergence: 10 ahead / 65 behind');
+    expect(operationRecord).toContain('No repository state was changed by this Goal');
+    expect(operationRecord).toContain(nextGoalTitle);
+
+    expect(completedGoal).toMatchObject({
+      status: 'completed',
+      conclusion:
+        'seven_manual_decisions_reviewed_public_state_drift_requires_reconciliation',
+      next_goal_id:
+        'public-repository-state-and-release-boundary-reconciliation-v0.1'
+    });
+    expect(completedGoal.summary).toMatchObject({
+      operation_record:
+        'docs/operations/public-release-manual-decision-input-review-v0.2.md',
+      decisions_reviewed: 7,
+      approved: 3,
+      accepted_risk: 3,
+      deferred: 1,
+      public_release_ready: false,
+      repository_visibility: 'PUBLIC',
+      branch_protection_gate: 'passed',
+      local_branch_ahead: 10,
+      local_branch_behind: 65,
+      repository_state_changed: false
+    });
+
+    expect(nextGoal).toMatchObject({
+      id: 'public-repository-state-and-release-boundary-reconciliation-v0.1',
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain(
+      'Reconcile the documented private pre-release boundary'
+    );
+    expect(nextGoal.blocked_actions).toEqual(
+      expect.arrayContaining([
+        'repository_visibility_change',
+        'npm_publication',
+        'github_release',
+        'public_launch',
+        'branch_protection_change',
+        'repository_ruleset_change'
+      ])
+    );
+    expect(nextGoal.acceptance).toContain(
+      'Treat the observed PUBLIC repository and active branch protection as external state evidence, not as authorization for additional release actions.'
+    );
+
+    expect(goalIndex.active_goal_id).toBe(
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+    );
+    expect(goalIndex.goals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'public-release-manual-decision-input-review-v0.2',
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: nextGoal.id,
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: 'public-git-history-personal-identifier-remediation-planning-v0.1',
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: 'public-git-history-personal-identifier-remediation-maintainer-decision-recording-v0.1',
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: 'repoassure-product-completion-gap-audit-refresh-v0.8',
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: 'repoassure-final-product-acceptance-closure-campaign-v0.1',
+          status: 'completed'
+        })
+      ])
+    );
+    expect(progress.active_goal).toEqual({
+      id: 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1',
+      title: 'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1',
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(currentGoalTitle);
+      expect(surface).toContain(nextGoalTitle);
+    }
+  });
+
+  it('reconciles the already-public repository state and queues historical identifier remediation planning', async () => {
+    const currentGoalTitle = 'Public Repository State and Release Boundary Reconciliation v0.1';
+    const nextGoalTitle = 'Public Git History Personal-Identifier Remediation Planning v0.1';
+    const [
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      goalIndexRecord,
+      progressRecord,
+      branchProtectionRecord,
+      readinessRecord,
+      releaseChecker,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/public-repository-state-and-release-boundary-reconciliation-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/public-repository-state-and-release-boundary-reconciliation-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/public-git-history-personal-identifier-remediation-planning-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/operations/branch-protection-release-boundary-v0.1.md', 'utf8'),
+      readFile('docs/operations/public-release-readiness-v0.2.md', 'utf8'),
+      readFile('scripts/check-public-release-readiness.mjs', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        repository_visibility?: string;
+        public_source_release?: string;
+        public_launch_ready?: boolean;
+        branch_protection_gate?: string;
+        origin_release_check?: string;
+        local_release_check?: string;
+        local_branch_ahead?: number;
+        local_branch_behind?: number;
+        current_tree_personal_identifiers?: number;
+        public_history_personal_identifier_commits?: number;
+        repository_state_changed?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexRecord) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressRecord) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(currentGoalTitle);
+    expect(operationRecord).toContain('Status: completed_follow_up_required');
+    expect(operationRecord).toContain('Repository visibility: PUBLIC');
+    expect(operationRecord).toContain('Public source release: completed and verified');
+    expect(operationRecord).toContain('Public launch: not authorized');
+    expect(operationRecord).toContain('Branch protection gate: passed');
+    expect(operationRecord).toContain('origin/main release check: yes');
+    expect(operationRecord).toContain('current local branch release check: no');
+    expect(operationRecord).toContain('10 ahead / 65 behind');
+    expect(operationRecord).toContain('Current tree personal identifiers: 0');
+    expect(operationRecord).toContain('Public-history commits containing historical personal identifiers: 6');
+    expect(operationRecord).toContain('No Git history rewrite was performed');
+    expect(operationRecord).toContain(nextGoalTitle);
+
+    expect(completedGoal).toMatchObject({
+      status: 'completed',
+      conclusion:
+        'public_source_release_verified_launch_no_go_history_identifiers_require_planning',
+      next_goal_id:
+        'public-git-history-personal-identifier-remediation-planning-v0.1'
+    });
+    expect(completedGoal.summary).toMatchObject({
+      operation_record:
+        'docs/operations/public-repository-state-and-release-boundary-reconciliation-v0.1.md',
+      repository_visibility: 'PUBLIC',
+      public_source_release: 'completed_and_verified',
+      public_launch_ready: false,
+      branch_protection_gate: 'passed',
+      origin_release_check: 'yes',
+      local_release_check: 'no_stale_branch',
+      local_branch_ahead: 10,
+      local_branch_behind: 65,
+      current_tree_personal_identifiers: 0,
+      public_history_personal_identifier_commits: 6,
+      repository_state_changed: false
+    });
+
+    expect(nextGoal).toMatchObject({
+      id: 'public-git-history-personal-identifier-remediation-planning-v0.1',
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain('historical personal identifiers');
+    expect(nextGoal.blocked_actions).toEqual(
+      expect.arrayContaining([
+        'git_history_rewrite',
+        'force_push',
+        'credential_rotation',
+        'customer_contact',
+        'public_launch'
+      ])
+    );
+    expect(nextGoal.acceptance).toContain(
+      'Do not expose the identifier values in the planning record or generated evidence.'
+    );
+
+    expect(branchProtectionRecord).toContain('Status: Current control active');
+    expect(branchProtectionRecord).toContain('Repository visibility: `PUBLIC`');
+    expect(readinessRecord).toContain('Public source release is already complete');
+    expect(readinessRecord).toContain('Public launch remains unauthorized');
+    expect(releaseChecker).toContain('additional publication actions');
+    expect(releaseChecker).not.toContain('before making anything public');
+
+    expect(goalIndex.active_goal_id).toBe(
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+    );
+    expect(goalIndex.goals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'public-repository-state-and-release-boundary-reconciliation-v0.1',
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: nextGoal.id,
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: 'repoassure-product-completion-gap-audit-refresh-v0.8',
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: 'repoassure-final-product-acceptance-closure-campaign-v0.1',
+          status: 'completed'
+        })
+      ])
+    );
+    expect(progress.active_goal).toEqual({
+      id: 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1',
+      title: 'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1',
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(currentGoalTitle);
+      expect(surface).toContain(nextGoalTitle);
+    }
+  });
+
+  it('prepares a redacted Git-history personal-identifier decision packet without rewriting history', async () => {
+    const currentGoalTitle =
+      'Public Git History Personal-Identifier Remediation Planning v0.1';
+    const nextGoalTitle =
+      'Public Git History Personal-Identifier Remediation Maintainer Decision Recording v0.1';
+    const [
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      goalIndexRecord,
+      progressRecord,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/public-git-history-personal-identifier-remediation-planning-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/public-git-history-personal-identifier-remediation-planning-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/public-git-history-personal-identifier-remediation-maintainer-decision-recording-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        affected_commits?: number;
+        affected_paths?: number;
+        data_classification?: string;
+        credential_exposure?: boolean;
+        current_tree_identifier_matches?: number;
+        identifier_values_reproduced?: boolean;
+        recommended_option?: string;
+        history_rewritten?: boolean;
+        repository_state_changed?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexRecord) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressRecord) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(currentGoalTitle);
+    expect(operationRecord).toContain('Status: completed_pending_maintainer_decision');
+    expect(operationRecord).toContain('Affected public-history commits: 6');
+    expect(operationRecord).toContain('Affected unique paths: 16');
+    expect(operationRecord).toContain('Affected date range: 2026-06-27 to 2026-06-28');
+    expect(operationRecord).toContain('Data classification: personal contact data');
+    expect(operationRecord).toContain('Credential exposure evidence: none');
+    expect(operationRecord).toContain('Current-tree identifier matches: 0');
+    expect(operationRecord).toContain('Identifier values reproduced: no');
+    expect(operationRecord).not.toMatch(
+      /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/iu
+    );
+    expect(operationRecord).toContain('Accept risk');
+    expect(operationRecord).toContain('Rewrite public Git history');
+    expect(operationRecord).toContain('Replace repository');
+    expect(operationRecord).toContain('Recommended option: accept risk');
+    expect(operationRecord).toContain('clone');
+    expect(operationRecord).toContain('fork');
+    expect(operationRecord).toContain('pull request');
+    expect(operationRecord).toContain('commit signature');
+    expect(operationRecord).toContain('branch protection');
+    expect(operationRecord).toContain('Rollback requirements');
+    expect(operationRecord).toContain('Notification requirements');
+    expect(operationRecord).toContain('Verification requirements');
+    expect(operationRecord).toContain('No Git history rewrite was performed');
+    expect(operationRecord).toContain(nextGoalTitle);
+
+    expect(completedGoal).toMatchObject({
+      status: 'completed',
+      conclusion:
+        'redacted_history_identifier_decision_packet_ready_maintainer_decision_required',
+      next_goal_id:
+        'public-git-history-personal-identifier-remediation-maintainer-decision-recording-v0.1'
+    });
+    expect(completedGoal.summary).toMatchObject({
+      operation_record:
+        'docs/operations/public-git-history-personal-identifier-remediation-planning-v0.1.md',
+      affected_commits: 6,
+      affected_paths: 16,
+      data_classification: 'personal_contact_data',
+      credential_exposure: false,
+      current_tree_identifier_matches: 0,
+      identifier_values_reproduced: false,
+      recommended_option: 'accept_risk',
+      history_rewritten: false,
+      repository_state_changed: false
+    });
+
+    expect(nextGoal).toMatchObject({
+      id: 'public-git-history-personal-identifier-remediation-maintainer-decision-recording-v0.1',
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain("Record the maintainer's explicit choice");
+    expect(nextGoal.blocked_actions).toEqual(
+      expect.arrayContaining([
+        'git_history_rewrite',
+        'force_push',
+        'repository_visibility_change',
+        'public_launch',
+        'customer_contact'
+      ])
+    );
+    expect(nextGoal.acceptance).toContain(
+      'Keep every identifier value redacted in the decision record and evidence.'
+    );
+
+    expect(goalIndex.active_goal_id).toBe(
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+    );
+    expect(goalIndex.goals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'public-git-history-personal-identifier-remediation-planning-v0.1',
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: nextGoal.id,
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: 'repoassure-product-completion-gap-audit-refresh-v0.8',
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: 'repoassure-final-product-acceptance-closure-campaign-v0.1',
+          status: 'completed'
+        })
+      ])
+    );
+    expect(progress.active_goal).toEqual({
+      id: 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1',
+      title: 'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1',
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(currentGoalTitle);
+      expect(surface).toContain(nextGoalTitle);
+    }
+  });
+
+  it('records the maintainer explicit accept_risk decision without changing Git history', async () => {
+    const goalTitle =
+      'Public Git History Personal-Identifier Remediation Maintainer Decision Recording v0.1';
+    const nextGoalTitle = 'RepoAssure Product Completion Gap Audit Refresh v0.8';
+    const [
+      decisionRecord,
+      goalRecordText,
+      nextGoalRecordText,
+      goalIndexText,
+      progressText,
+      readme,
+      prd,
+      spec,
+      plan,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/public-git-history-personal-identifier-remediation-maintainer-decision-recording-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/public-git-history-personal-identifier-remediation-maintainer-decision-recording-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.8.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const goalRecord = JSON.parse(goalRecordText) as {
+      id: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        decision?: string;
+        decision_source?: string;
+        goal_execution_authorization_treated_as_decision?: boolean;
+        affected_commits?: number;
+        affected_paths?: number;
+        current_tree_identifier_matches?: number;
+        data_classification?: string;
+        credential_exposure?: boolean;
+        identifier_values_reproduced?: boolean;
+        accepted_risks?: string[];
+        history_rewritten?: boolean;
+        force_push_performed?: boolean;
+        repository_replaced?: boolean;
+        repository_state_changed?: boolean;
+      };
+    };
+    const nextGoalRecord = JSON.parse(nextGoalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(decisionRecord).toContain(goalTitle);
+    expect(decisionRecord).toContain('Status: completed');
+    expect(decisionRecord).toContain(
+      'Conclusion: maintainer_explicitly_accepted_historical_personal_identifier_recoverability_risk'
+    );
+    expect(decisionRecord).toContain('Recorded decision: accept_risk');
+    expect(decisionRecord).toContain('Decision source: explicit maintainer response');
+    expect(decisionRecord).toContain(
+      'Goal execution authorization is not a maintainer risk decision.'
+    );
+    expect(decisionRecord).toContain(
+      'Goal execution authorization treated as decision: no'
+    );
+    expect(decisionRecord).toContain('Recommended option: accept_risk');
+    expect(decisionRecord).toContain(
+      'Historical personal contact data remains recoverable'
+    );
+    expect(decisionRecord).toContain('Privacy and spam exposure');
+    expect(decisionRecord).toContain('Fork, mirror, and cache persistence');
+    expect(decisionRecord).toContain('No Git history rewrite was performed');
+    expect(decisionRecord).toContain('No force push was performed');
+    expect(decisionRecord).toContain(nextGoalTitle);
+    expect(decisionRecord).not.toMatch(
+      /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/iu
+    );
+
+    expect(goalRecord).toMatchObject({
+      id: 'public-git-history-personal-identifier-remediation-maintainer-decision-recording-v0.1',
+      status: 'completed',
+      conclusion:
+        'maintainer_explicitly_accepted_historical_personal_identifier_recoverability_risk',
+      next_goal_id: 'repoassure-product-completion-gap-audit-refresh-v0.8'
+    });
+    expect(goalRecord.summary).toMatchObject({
+      decision: 'accept_risk',
+      decision_source: 'explicit_maintainer_response',
+      goal_execution_authorization_treated_as_decision: false,
+      affected_commits: 6,
+      affected_paths: 16,
+      current_tree_identifier_matches: 0,
+      data_classification: 'personal_contact_data',
+      credential_exposure: false,
+      identifier_values_reproduced: false,
+      history_rewritten: false,
+      force_push_performed: false,
+      repository_replaced: false,
+      repository_state_changed: false
+    });
+    expect(goalRecord.summary?.accepted_risks).toEqual(
+      expect.arrayContaining([
+        'historical_personal_contact_data_remains_recoverable',
+        'privacy_and_spam_exposure',
+        'fork_mirror_cache_persistence'
+      ])
+    );
+
+    expect(nextGoalRecord).toMatchObject({
+      id: 'repoassure-product-completion-gap-audit-refresh-v0.8',
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoalRecord.objective).toContain('Reassess the remaining RepoAssure product gaps');
+    expect(nextGoalRecord.blocked_actions).toEqual(
+      expect.arrayContaining([
+        'git_history_rewrite',
+        'repository_visibility_change',
+        'npm_publication',
+        'public_launch',
+        'deployment',
+        'customer_contact',
+        'runtime_detection_behavior_change',
+        'target_repo_write'
+      ])
+    );
+    expect(nextGoalRecord.acceptance).toContain(
+      'Classify remaining work as implemented, blocked or manual-gated, external-input-gated, deferred, or safe auto-executable.'
+    );
+
+    expect(goalIndex.active_goal_id).toBe(
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+    );
+    expect(goalIndex.goals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: goalRecord.id,
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: nextGoalRecord.id,
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: 'repoassure-final-product-acceptance-closure-campaign-v0.1',
+          status: 'completed'
+        })
+      ])
+    );
+    expect(progress.active_goal).toEqual({
+      id: 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1',
+      title: 'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1',
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(goalTitle);
+      expect(surface).toContain(nextGoalTitle);
+      expect(surface).toContain(
+        'maintainer_explicitly_accepted_historical_personal_identifier_recoverability_risk'
+      );
+    }
+  });
+
+  it('refreshes completion gaps after public-source reconciliation and queues final acceptance closure', async () => {
+    const currentGoalTitle = 'RepoAssure Product Completion Gap Audit Refresh v0.8';
+    const nextGoalTitle = 'RepoAssure Final Product Acceptance Closure Campaign v0.1';
+    const [
+      operationRecord,
+      completedGoalRecord,
+      nextGoalRecord,
+      goalIndexRecord,
+      progressRecord,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.8.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.8.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-final-product-acceptance-closure-campaign-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        implemented_surface_count?: number;
+        public_source_release_verified?: boolean;
+        native_branch_protection_verified?: boolean;
+        additional_publication_actions_ready?: boolean;
+        detector_pending_decision_count?: number;
+        historical_identifier_risk_decision?: string;
+        history_rewritten?: boolean;
+        runtime_behavior_changed?: boolean;
+        product_entrypoints_added?: boolean;
+        target_repo_writes?: boolean;
+        blocked_or_manual_gated?: string[];
+        external_input_gated?: string[];
+        deferred?: string[];
+        safe_auto_executable?: string[];
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexRecord) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressRecord) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(currentGoalTitle);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain('## Implemented Product Surfaces');
+    expect(operationRecord).toContain('## Blocked or Manual-Gated Work');
+    expect(operationRecord).toContain('## External-Input-Gated Work');
+    expect(operationRecord).toContain('## Deferred Work');
+    expect(operationRecord).toContain('## Safe Auto-Executable Gaps');
+    expect(operationRecord).toContain('Implemented surface count: 12');
+    expect(operationRecord).toContain('public source release verified: yes');
+    expect(operationRecord).toContain('native branch protection verified: yes');
+    expect(operationRecord).toContain('additional publication actions ready: no');
+    expect(operationRecord).toContain('pending detector calibration decisions: 2');
+    expect(operationRecord).toContain(
+      'maintainer_explicitly_accepted_historical_personal_identifier_recoverability_risk'
+    );
+    expect(operationRecord).toContain('No Git history rewrite was performed');
+    expect(operationRecord).toContain('workspace_summary_entrypoint_productization');
+    expect(operationRecord).toContain('website_design_follow_up');
+    expect(operationRecord).toContain(nextGoalTitle);
+    expect(operationRecord).toContain(
+      'completion_gap_audit_refreshed_with_final_product_acceptance_closure_campaign_next'
+    );
+
+    expect(completedGoal).toMatchObject({
+      status: 'completed',
+      conclusion:
+        'completion_gap_audit_refreshed_with_final_product_acceptance_closure_campaign_next',
+      next_goal_id:
+        'repoassure-final-product-acceptance-closure-campaign-v0.1'
+    });
+    expect(completedGoal.summary).toMatchObject({
+      operation_record:
+        'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.8.md',
+      implemented_surface_count: 12,
+      public_source_release_verified: true,
+      native_branch_protection_verified: true,
+      additional_publication_actions_ready: false,
+      detector_pending_decision_count: 2,
+      historical_identifier_risk_decision: 'accept_risk',
+      history_rewritten: false,
+      runtime_behavior_changed: false,
+      product_entrypoints_added: false,
+      target_repo_writes: false
+    });
+    expect(completedGoal.summary?.blocked_or_manual_gated).toEqual(
+      expect.arrayContaining([
+        'false_positive_detector_runtime_calibration',
+        'final_product_acceptance',
+        'npm_publication',
+        'github_release',
+        'public_launch'
+      ])
+    );
+    expect(completedGoal.summary?.external_input_gated).toContain(
+      'real_customer_workspace_evidence'
+    );
+    expect(completedGoal.summary?.deferred).toEqual(
+      expect.arrayContaining([
+        'workspace_summary_entrypoint_productization',
+        'website_design_follow_up'
+      ])
+    );
+    expect(completedGoal.summary?.safe_auto_executable).toEqual([
+      'final_product_acceptance_closure_campaign_v0.1'
+    ]);
+
+    expect(nextGoal).toMatchObject({
+      id: 'repoassure-final-product-acceptance-closure-campaign-v0.1',
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain(
+      'Consolidate the latest RepoAssure automated verification'
+    );
+    expect(nextGoal.blocked_actions).toEqual(
+      expect.arrayContaining([
+        'target_repo_execution',
+        'target_repo_write',
+        'acceptance_decision_inference',
+        'repository_visibility_change',
+        'npm_publication',
+        'github_release',
+        'public_launch',
+        'deployment',
+        'customer_contact',
+        'pricing_change',
+        'spend_change',
+        'runtime_detection_behavior_change',
+        'git_history_rewrite'
+      ])
+    );
+    expect(nextGoal.acceptance).toEqual([
+      'Refresh the full automated quality, release-readiness, goal-audit, and Autopilot consistency evidence for the latest repository state.',
+      'Audit existing real-project acceptance records for freshness and coverage without treating historical acceptance as current authorization.',
+      'Generate one maintainer-facing decision package with accepted, changes_requested, and defer choices and no prefilled decision.',
+      'Do not run against or write to a target repository without separate explicit target authorization.',
+      'Do not infer final acceptance, publish, deploy, launch, modify repository controls, contact anyone, change pricing or spend, or claim hosted availability.'
+    ]);
+
+    expect(goalIndex.active_goal_id).toBe(
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+    );
+    expect(goalIndex.goals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'repoassure-product-completion-gap-audit-refresh-v0.8',
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: nextGoal.id,
+          status: 'completed'
+        })
+      ])
+    );
+    expect(progress.active_goal).toEqual({
+      id: 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1',
+      title: 'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1',
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(currentGoalTitle);
+      expect(surface).toContain(nextGoalTitle);
+      expect(surface).toContain(
+        'completion_gap_audit_refreshed_with_final_product_acceptance_closure_campaign_next'
+      );
+    }
+  });
+
+  it('prepares final product acceptance closure without inferring the maintainer decision', async () => {
+    const currentGoalTitle =
+      'RepoAssure Final Product Acceptance Closure Campaign v0.1';
+    const nextGoalTitle =
+      'RepoAssure Final Product Acceptance Maintainer Decision Recording v0.1';
+    const [
+      operationRecord,
+      decisionPackage,
+      completedGoalRecord,
+      nextGoalRecord,
+      goalIndexRecord,
+      progressRecord,
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-final-product-acceptance-closure-campaign-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/acceptance/final-product-acceptance-decision-package-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-final-product-acceptance-closure-campaign-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-final-product-acceptance-maintainer-decision-recording-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const completedGoal = JSON.parse(completedGoalRecord) as {
+      id: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        decision_package?: string;
+        decision_status?: string;
+        allowed_decisions?: string[];
+        historical_acceptance_status?: string;
+        goal_audit_passed?: number;
+        goal_audit_manual?: number;
+        release_automated_prerequisites_passed?: boolean;
+        public_release_ready?: boolean;
+        target_repo_executed?: boolean;
+        target_repo_writes?: boolean;
+        acceptance_inferred?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecord) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexRecord) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressRecord) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+    const canonicalSurfaces = [
+      readme,
+      prd,
+      spec,
+      plan,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ];
+
+    expect(operationRecord).toContain(currentGoalTitle);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain('## Refreshed Automated Evidence');
+    expect(operationRecord).toContain('## Acceptance Freshness Audit');
+    expect(operationRecord).toContain('## Decision Boundary');
+    expect(operationRecord).toContain('Goal audit: 34 passed, 1 manual');
+    expect(operationRecord).toContain(
+      'Historical real-project acceptance: stale for current closure'
+    );
+    expect(operationRecord).toContain(
+      'Release automated prerequisites: passed'
+    );
+    expect(operationRecord).toContain('Public release ready: no');
+    expect(operationRecord).toContain('Target repository executed: no');
+    expect(operationRecord).toContain('Target repository writes: no');
+    expect(operationRecord).toContain('Acceptance decision inferred: no');
+    expect(operationRecord).toContain(nextGoalTitle);
+    expect(operationRecord).toContain(
+      'final_product_acceptance_decision_package_prepared_without_inferred_decision'
+    );
+
+    expect(decisionPackage).toContain(
+      '# RepoAssure Final Product Acceptance Decision Package v0.1'
+    );
+    expect(decisionPackage).toContain('Decision status: pending');
+    expect(decisionPackage).toContain('No decision is prefilled.');
+    expect(decisionPackage).toContain('`accepted`');
+    expect(decisionPackage).toContain('`changes_requested`');
+    expect(decisionPackage).toContain('`defer`');
+    expect(decisionPackage).toContain(
+      'Historical acceptance is evidence, not current authorization.'
+    );
+    expect(decisionPackage).toContain(
+      'This package does not authorize publication, deployment, launch, or target repository execution.'
+    );
+    expect(decisionPackage).not.toContain('Selected decision: accepted');
+    expect(decisionPackage).not.toContain(
+      'Selected decision: changes_requested'
+    );
+    expect(decisionPackage).not.toContain('Selected decision: defer');
+
+    expect(completedGoal).toMatchObject({
+      id: 'repoassure-final-product-acceptance-closure-campaign-v0.1',
+      status: 'completed',
+      conclusion:
+        'final_product_acceptance_decision_package_prepared_without_inferred_decision',
+      next_goal_id:
+        'repoassure-final-product-acceptance-maintainer-decision-recording-v0.1'
+    });
+    expect(completedGoal.summary).toMatchObject({
+      operation_record:
+        'docs/operations/repoassure-final-product-acceptance-closure-campaign-v0.1.md',
+      decision_package:
+        'docs/acceptance/final-product-acceptance-decision-package-v0.1.md',
+      decision_status: 'pending',
+      allowed_decisions: ['accepted', 'changes_requested', 'defer'],
+      historical_acceptance_status: 'stale_for_current_closure',
+      goal_audit_passed: 34,
+      goal_audit_manual: 1,
+      release_automated_prerequisites_passed: true,
+      public_release_ready: false,
+      target_repo_executed: false,
+      target_repo_writes: false,
+      acceptance_inferred: false
+    });
+
+    expect(nextGoal).toMatchObject({
+      id: 'repoassure-final-product-acceptance-maintainer-decision-recording-v0.1',
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain(
+      'Record exactly one explicit maintainer decision'
+    );
+    expect(nextGoal.blocked_actions).toEqual(
+      expect.arrayContaining([
+        'acceptance_decision_inference',
+        'target_repo_execution',
+        'target_repo_write',
+        'npm_publication',
+        'github_release',
+        'public_launch',
+        'deployment'
+      ])
+    );
+    expect(nextGoal.acceptance).toContain(
+      'Record only an explicit maintainer choice of accepted, changes_requested, or defer; do not infer a choice from Goal execution authorization.'
+    );
+
+    expect(goalIndex.active_goal_id).not.toBe(nextGoal.id);
+    expect(goalIndex.goals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: completedGoal.id,
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: nextGoal.id,
+          status: 'completed'
+        })
+      ])
+    );
+    expect(progress.active_goal?.id).toBe(goalIndex.active_goal_id);
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const surface of canonicalSurfaces) {
+      expect(surface).toContain(currentGoalTitle);
+      expect(surface).toContain(nextGoalTitle);
+      expect(surface).toContain(
+        'final_product_acceptance_decision_package_prepared_without_inferred_decision'
+      );
+    }
+  });
+
+  it('records an explicit defer decision without expanding its authorization boundary', async () => {
+    const decisionNotes =
+      '当前自动化质量证据已通过，暂未发现必须返工的产品缺陷；但现有真实项目验收早于当前产品状态，且只覆盖单一 browser 场景。等待当前版本完成 Web、Python/CLI、MCP/Agent 三类代表性真实验收闭环，并关闭关键误报与人工决策项后，再进行最终 accepted 决策。';
+    const nextGoalTitle =
+      'RepoAssure Representative Multi-Mode Acceptance Campaign Planning v0.1';
+    const [
+      decisionRecord,
+      operationRecord,
+      goalRecordText,
+      nextGoalRecordText,
+      goalIndexText,
+      progressText
+    ] = await Promise.all([
+      readFile(
+        'docs/acceptance/final-product-acceptance-maintainer-decision-record-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/operations/repoassure-final-product-acceptance-maintainer-decision-recording-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-final-product-acceptance-maintainer-decision-recording-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-representative-multi-mode-acceptance-campaign-planning-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8')
+    ]);
+    const goalRecord = JSON.parse(goalRecordText) as {
+      id: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        decision_record?: string;
+        decision_status?: string;
+        explicit_decision_found?: boolean;
+        execution_authorization_treated_as_acceptance?: boolean;
+        maintainer_notes?: string;
+        allowed_decisions?: string[];
+        release_authorized?: boolean;
+        target_repo_execution_authorized?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+
+    expect(decisionRecord).toContain(
+      '# RepoAssure Final Product Acceptance Maintainer Decision Record v0.1'
+    );
+    expect(decisionRecord).toContain('Decision status: defer');
+    expect(decisionRecord).toContain('Explicit maintainer decision found: yes');
+    expect(decisionRecord).toContain('Selected decision: defer');
+    expect(decisionRecord).toContain(decisionNotes);
+    expect(decisionRecord).toContain(
+      'Goal execution authorization was not treated as a product acceptance decision.'
+    );
+    expect(decisionRecord).toContain(
+      'This defer decision does not authorize publication, deployment, launch, or target repository execution.'
+    );
+    expect(decisionRecord).not.toContain('Selected decision: accepted');
+    expect(decisionRecord).not.toContain(
+      'Selected decision: changes_requested'
+    );
+
+    expect(operationRecord).toContain(
+      '# RepoAssure Final Product Acceptance Maintainer Decision Recording v0.1'
+    );
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(
+      'maintainer_explicitly_deferred_final_product_acceptance_pending_representative_multi_mode_validation'
+    );
+    expect(operationRecord).toContain(nextGoalTitle);
+
+    expect(goalRecord).toMatchObject({
+      id: 'repoassure-final-product-acceptance-maintainer-decision-recording-v0.1',
+      status: 'completed',
+      conclusion:
+        'maintainer_explicitly_deferred_final_product_acceptance_pending_representative_multi_mode_validation',
+      next_goal_id:
+        'repoassure-representative-multi-mode-acceptance-campaign-planning-v0.1'
+    });
+    expect(goalRecord.summary).toMatchObject({
+      decision_record:
+        'docs/acceptance/final-product-acceptance-maintainer-decision-record-v0.1.md',
+      decision_status: 'defer',
+      explicit_decision_found: true,
+      execution_authorization_treated_as_acceptance: false,
+      maintainer_notes: decisionNotes,
+      allowed_decisions: ['accepted', 'changes_requested', 'defer'],
+      release_authorized: false,
+      target_repo_execution_authorized: false
+    });
+
+    expect(nextGoal).toMatchObject({
+      id: 'repoassure-representative-multi-mode-acceptance-campaign-planning-v0.1',
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain(
+      'Web, Python/CLI, and MCP/Agent'
+    );
+    expect(nextGoal.blocked_actions).toEqual(
+      expect.arrayContaining([
+        'target_repo_execution',
+        'target_repo_write',
+        'publication',
+        'deployment',
+        'public_launch'
+      ])
+    );
+    expect(nextGoal.acceptance).toContain(
+      'Prepare an explicit target and execution authorization intake before any representative repository is run.'
+    );
+
+    expect(goalIndex.active_goal_id).toBe(
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+    );
+    expect(goalIndex.goals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: goalRecord.id,
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: nextGoal.id,
+          status: 'completed'
+        })
+      ])
+    );
+    expect(progress.active_goal).toEqual({
+      id: 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1',
+      title: 'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1',
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+  });
+
+  it('plans a representative three-lane acceptance campaign without executing target repositories', async () => {
+    const currentGoalTitle =
+      'RepoAssure Representative Multi-Mode Acceptance Campaign Planning v0.1';
+    const nextGoalTitle =
+      'RepoAssure Representative Multi-Mode Acceptance Target and Execution Authorization Decision Recording v0.1';
+    const [
+      operationRecord,
+      campaignPlan,
+      evidenceContract,
+      authorizationIntake,
+      goalRecordText,
+      nextGoalRecordText,
+      goalIndexText,
+      progressText
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-representative-multi-mode-acceptance-campaign-planning-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/acceptance/representative-multi-mode-acceptance-campaign-plan-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/product/specs/representative-multi-mode-acceptance-evidence-contract-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/acceptance/representative-multi-mode-acceptance-target-authorization-intake-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-representative-multi-mode-acceptance-campaign-planning-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-representative-multi-mode-acceptance-target-and-execution-authorization-decision-recording-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8')
+    ]);
+    const goalRecord = JSON.parse(goalRecordText) as {
+      id: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        campaign_plan?: string;
+        evidence_contract?: string;
+        authorization_intake?: string;
+        lane_count?: number;
+        target_repo_executed?: boolean;
+        target_repo_writes?: boolean;
+        final_acceptance_inferred?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+
+    expect(operationRecord).toContain(`# ${currentGoalTitle}`);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(
+      'representative_multi_mode_acceptance_campaign_planned_without_target_execution'
+    );
+    expect(operationRecord).toContain(nextGoalTitle);
+
+    expect(campaignPlan).toContain('Lane W — Web');
+    expect(campaignPlan).toContain('Lane C — Python/CLI');
+    expect(campaignPlan).toContain('Lane M — MCP/Agent');
+    expect(campaignPlan).toContain('Current RepoAssure version required: yes');
+    expect(campaignPlan).toContain('Pinned target revision or fixture digest required: yes');
+    expect(campaignPlan).toContain('Original target repository writes: prohibited');
+    expect(campaignPlan).toContain(
+      'All three lanes must pass before a new final product acceptance decision may be requested.'
+    );
+    expect(campaignPlan).toContain(
+      'conditional_dead_control_should_consider_form_dirty_prerequisites'
+    );
+    expect(campaignPlan).toContain(
+      'auth_redirect_route_should_preserve_maintainer_review_boundary'
+    );
+
+    expect(evidenceContract).toContain(
+      'repoassure.representative-multi-mode-acceptance-evidence@1'
+    );
+    expect(evidenceContract).toContain('## AI IDE Read Order');
+    expect(evidenceContract).toContain('## Lane Result Rules');
+    expect(evidenceContract).toContain('passed');
+    expect(evidenceContract).toContain('blocked');
+    expect(evidenceContract).toContain('failed');
+    expect(evidenceContract).toContain('authorizationReceiptRef');
+    expect(evidenceContract).toContain('noWriteProof');
+    expect(evidenceContract).toContain('falsePositiveReview');
+    expect(evidenceContract).toContain('maintainerReview');
+
+    expect(authorizationIntake).toContain('Decision status: defer');
+    expect(authorizationIntake).toContain('No target is pre-authorized.');
+    expect(authorizationIntake).toContain('approve_execution');
+    expect(authorizationIntake).toContain('reject');
+    expect(authorizationIntake).toContain('defer');
+    expect(authorizationIntake).toContain('Web');
+    expect(authorizationIntake).toContain('Python/CLI');
+    expect(authorizationIntake).toContain('MCP/Agent');
+    expect(authorizationIntake).toContain(
+      'This intake does not authorize target execution or target repository writes.'
+    );
+
+    expect(goalRecord).toMatchObject({
+      id: 'repoassure-representative-multi-mode-acceptance-campaign-planning-v0.1',
+      status: 'completed',
+      conclusion:
+        'representative_multi_mode_acceptance_campaign_planned_without_target_execution',
+      next_goal_id:
+        'repoassure-representative-multi-mode-acceptance-target-and-execution-authorization-decision-recording-v0.1'
+    });
+    expect(goalRecord.summary).toMatchObject({
+      operation_record:
+        'docs/operations/repoassure-representative-multi-mode-acceptance-campaign-planning-v0.1.md',
+      campaign_plan:
+        'docs/acceptance/representative-multi-mode-acceptance-campaign-plan-v0.1.md',
+      evidence_contract:
+        'docs/product/specs/representative-multi-mode-acceptance-evidence-contract-v0.1.md',
+      authorization_intake:
+        'docs/acceptance/representative-multi-mode-acceptance-target-authorization-intake-v0.1.md',
+      lane_count: 3,
+      target_repo_executed: false,
+      target_repo_writes: false,
+      final_acceptance_inferred: false
+    });
+
+    expect(nextGoal).toMatchObject({
+      id: 'repoassure-representative-multi-mode-acceptance-target-and-execution-authorization-decision-recording-v0.1',
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain(
+      'Record explicit target selection and execution decisions'
+    );
+    expect(nextGoal.blocked_actions).toEqual(
+      expect.arrayContaining([
+        'target_repo_execution',
+        'target_repo_write',
+        'publication',
+        'deployment',
+        'public_launch'
+      ])
+    );
+    expect(nextGoal.acceptance).toContain(
+      'Do not infer approval from Goal execution authorization or prior target-testing authorization.'
+    );
+
+    expect(goalIndex.active_goal_id).toBe(
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+    );
+    expect(goalIndex.goals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: goalRecord.id,
+          status: 'completed'
+        }),
+        expect.objectContaining({
+          id: nextGoal.id,
+          status: 'completed'
+        })
+      ])
+    );
+    expect(progress.active_goal).toEqual({
+      id: 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1',
+      title: 'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1',
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+  });
+
+  it('records explicit representative lane deferrals without authorizing target execution', async () => {
+    const currentGoalTitle =
+      'RepoAssure Representative Multi-Mode Acceptance Target and Execution Authorization Decision Recording v0.1';
+    const nextGoalTitle =
+      'RepoAssure Representative Multi-Mode Acceptance Target Readiness and Acquisition Authorization Package v0.1';
+    const [
+      operationRecord,
+      decisionPreparation,
+      authorizationIntake,
+      currentGoalRecordText,
+      nextGoalRecordText,
+      goalIndexText,
+      progressText,
+      plan,
+      spec,
+      prd,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      devLog
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-representative-multi-mode-acceptance-target-and-execution-authorization-decision-recording-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/acceptance/representative-multi-mode-acceptance-target-decision-preparation-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/acceptance/representative-multi-mode-acceptance-target-authorization-intake-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-representative-multi-mode-acceptance-target-and-execution-authorization-decision-recording-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-representative-multi-mode-acceptance-target-readiness-and-acquisition-authorization-package-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile(
+        'docs/acceptance/checklists/acceptance-checklist-v0.1.md',
+        'utf8'
+      ),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+    const currentGoal = JSON.parse(currentGoalRecordText) as {
+      id: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        lane_decisions?: Record<string, string>;
+        explicit_decisions_recorded?: number;
+        approved_targets?: number;
+        target_repositories_executed?: number;
+        target_repository_writes?: number;
+        final_acceptance_inferred?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+
+    expect(operationRecord).toContain(`# ${currentGoalTitle}`);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(
+      'maintainer_explicitly_deferred_all_representative_lanes_pending_target_readiness'
+    );
+    expect(operationRecord).toContain(
+      'Goal execution authorization treated as lane authorization: no'
+    );
+    expect(operationRecord).toContain('Explicit maintainer decisions: 3/3');
+    expect(operationRecord).toContain('Web: defer');
+    expect(operationRecord).toContain('Python/CLI: defer');
+    expect(operationRecord).toContain('MCP/Agent: defer');
+    expect(operationRecord).toContain('Target repositories acquired: 0');
+    expect(operationRecord).toContain('Target repositories executed: 0');
+    expect(operationRecord).toContain('Target repository writes: 0');
+    expect(operationRecord).toContain(nextGoalTitle);
+
+    expect(decisionPreparation).toContain(
+      '# RepoAssure Representative Multi-Mode Acceptance Target Decision Preparation v0.1'
+    );
+    expect(decisionPreparation).toContain(
+      'Decision status: explicit_maintainer_defer_recorded'
+    );
+    expect(decisionPreparation).toContain('Web');
+    expect(decisionPreparation).toContain('openclaw/openclaw');
+    expect(decisionPreparation).toContain('Python/CLI');
+    expect(decisionPreparation).toContain('Panniantong/Agent-Reach');
+    expect(decisionPreparation).toContain('MCP/Agent');
+    expect(decisionPreparation).toContain('Recommendation: defer');
+    expect(decisionPreparation).toContain(
+      'No recommendation is a maintainer decision or execution authorization.'
+    );
+    expect(decisionPreparation).toContain(
+      'The local deterministic fixtures are contract evidence, not substitutes for current representative real-project acceptance.'
+    );
+    expect(decisionPreparation).toContain(
+      'A current Web or Python/CLI run bundle is required before the MCP/Agent lane can be approved.'
+    );
+
+    expect(authorizationIntake).toContain('Decision status: defer');
+    expect(authorizationIntake).toContain('Explicit lane decisions recorded: 3/3');
+    expect(authorizationIntake).toContain('| Web |');
+    expect(authorizationIntake).toContain('| Python/CLI |');
+    expect(authorizationIntake).toContain('| MCP/Agent |');
+    expect(authorizationIntake).toContain('| `defer` |');
+    expect(authorizationIntake).toContain('Approved targets: 0/3');
+    expect(authorizationIntake).toContain('Recommended interim state: defer');
+    expect(authorizationIntake).toContain(
+      'This intake does not authorize target execution or target repository writes.'
+    );
+
+    expect(currentGoal).toMatchObject({
+      id: 'repoassure-representative-multi-mode-acceptance-target-and-execution-authorization-decision-recording-v0.1',
+      status: 'completed',
+      conclusion:
+        'maintainer_explicitly_deferred_all_representative_lanes_pending_target_readiness',
+      next_goal_id:
+        'repoassure-representative-multi-mode-acceptance-target-readiness-and-acquisition-authorization-package-v0.1'
+    });
+    expect(currentGoal.summary).toMatchObject({
+      lane_decisions: {
+        web: 'defer',
+        python_cli: 'defer',
+        mcp_agent: 'defer'
+      },
+      explicit_decisions_recorded: 3,
+      approved_targets: 0,
+      target_repositories_executed: 0,
+      target_repository_writes: 0,
+      final_acceptance_inferred: false
+    });
+
+    expect(nextGoal).toMatchObject({
+      id: 'repoassure-representative-multi-mode-acceptance-target-readiness-and-acquisition-authorization-package-v0.1',
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain(
+      'Prepare lane-scoped target readiness and acquisition authorization material'
+    );
+    expect(nextGoal.blocked_actions).toEqual(
+      expect.arrayContaining([
+        'target_repo_acquisition',
+        'network_access_for_target',
+        'target_repo_execution',
+        'target_repo_write',
+        'publication',
+        'deployment',
+        'public_launch'
+      ])
+    );
+    expect(nextGoal.acceptance).toContain(
+      'Do not acquire, clone, install, start, analyze, execute, or write any target.'
+    );
+
+    expect(goalIndex.active_goal_id).toBe(
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+    );
+    expect(goalIndex.goals).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: currentGoal.id, status: 'completed' }),
+      expect.objectContaining({ id: nextGoal.id, status: 'completed' }),
+      expect.objectContaining({
+        id: 'repoassure-representative-multi-mode-acceptance-target-acquisition-authorization-maintainer-decision-recording-v0.1',
+        status: 'completed'
+      }),
+      expect.objectContaining({
+        id: 'repoassure-product-backlog-reprioritization-after-representative-acquisition-defer-v0.1',
+        status: 'completed'
+      })
+    ]));
+    expect(progress.active_goal).toEqual({
+      id: 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1',
+      title: 'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1',
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const canonicalDocument of [plan, spec, prd]) {
+      expect(canonicalDocument).toContain(
+        'maintainer_explicitly_deferred_all_representative_lanes_pending_target_readiness'
+      );
+      expect(canonicalDocument).toContain(nextGoalTitle);
+    }
+
+    expect(acceptanceChecklist).toContain(
+      '三条通道的显式 maintainer 决定已记录为 3/3 defer'
+    );
+    expect(testStrategy).toContain(
+      'explicit three-lane defer decision contract'
+    );
+    expect(decisionLog).toContain(
+      'Maintainer explicitly defers all three representative acceptance lanes'
+    );
+    expect(devLog).toContain(
+      'Target and Execution Authorization Decision Recording v0.1 - completed'
+    );
+  });
+
+  it('prepares three deferred target readiness cards without authorizing acquisition or execution', async () => {
+    const currentGoalTitle =
+      'RepoAssure Representative Multi-Mode Acceptance Target Readiness and Acquisition Authorization Package v0.1';
+    const nextGoalTitle =
+      'RepoAssure Representative Multi-Mode Acceptance Target Acquisition Authorization Maintainer Decision Recording v0.1';
+    const [
+      readinessPackage,
+      operationRecord,
+      currentGoalRecordText,
+      nextGoalRecordText,
+      goalIndexText,
+      progressText,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/acceptance/representative-multi-mode-acceptance-target-readiness-and-acquisition-authorization-package-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/operations/repoassure-representative-multi-mode-acceptance-target-readiness-and-acquisition-authorization-package-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-representative-multi-mode-acceptance-target-readiness-and-acquisition-authorization-package-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-representative-multi-mode-acceptance-target-acquisition-authorization-maintainer-decision-recording-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile(
+        'docs/acceptance/checklists/acceptance-checklist-v0.1.md',
+        'utf8'
+      ),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const currentGoal = JSON.parse(currentGoalRecordText) as {
+      id: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        readiness_package?: string;
+        lane_readiness_cards?: number;
+        representative_lane_decisions?: Record<string, string>;
+        acquisition_authorization_decisions_recorded?: number;
+        approved_acquisitions?: number;
+        target_repositories_acquired?: number;
+        target_repositories_executed?: number;
+        target_repository_writes?: number;
+        final_acceptance_inferred?: boolean;
+      };
+    };
+    const nextGoal = JSON.parse(nextGoalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+
+    expect(readinessPackage).toContain(`# ${currentGoalTitle}`);
+    expect(readinessPackage).toContain('Status: completed');
+    expect(readinessPackage).toContain(
+      'Acquisition authorization decisions recorded: 0/3'
+    );
+    expect(readinessPackage).toContain(
+      'Representative lane execution decisions remain: 3/3 defer'
+    );
+    expect(readinessPackage).toContain('## Web Readiness Card');
+    expect(readinessPackage).toContain('`openclaw/openclaw`');
+    expect(readinessPackage).toContain('## Python/CLI Readiness Card');
+    expect(readinessPackage).toContain('`Panniantong/Agent-Reach`');
+    expect(readinessPackage).toContain('## MCP/Agent Readiness Card');
+    for (const field of [
+      'Intended source',
+      'Ownership review plan',
+      'License review plan',
+      'Revision pinning plan',
+      'Privacy and secret review plan',
+      'Reproducibility prerequisites',
+      'Acquisition command envelope draft',
+      'Isolation boundary',
+      'Allowed outputs',
+      'Stop conditions',
+      'Cleanup plan'
+    ]) {
+      expect(readinessPackage).toContain(field);
+    }
+    expect(readinessPackage).toContain(
+      'Readiness evidence is not acquisition or execution authorization.'
+    );
+    expect(readinessPackage).toContain(
+      'No acquisition command is authorized by this package.'
+    );
+    expect(readinessPackage).toContain(
+      '`approve_acquisition` | `reject` | `defer`'
+    );
+
+    expect(operationRecord).toContain(`# ${currentGoalTitle}`);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(
+      'target_readiness_and_acquisition_authorization_package_prepared_without_target_acquisition'
+    );
+    expect(operationRecord).toContain('Target repositories acquired: 0');
+    expect(operationRecord).toContain('Target repositories executed: 0');
+    expect(operationRecord).toContain('Target repository writes: 0');
+    expect(operationRecord).toContain(
+      'Goal execution authorization treated as acquisition authorization: no'
+    );
+    expect(operationRecord).toContain(nextGoalTitle);
+
+    expect(currentGoal).toMatchObject({
+      id: 'repoassure-representative-multi-mode-acceptance-target-readiness-and-acquisition-authorization-package-v0.1',
+      status: 'completed',
+      conclusion:
+        'target_readiness_and_acquisition_authorization_package_prepared_without_target_acquisition',
+      next_goal_id:
+        'repoassure-representative-multi-mode-acceptance-target-acquisition-authorization-maintainer-decision-recording-v0.1'
+    });
+    expect(currentGoal.summary).toMatchObject({
+      operation_record:
+        'docs/operations/repoassure-representative-multi-mode-acceptance-target-readiness-and-acquisition-authorization-package-v0.1.md',
+      readiness_package:
+        'docs/acceptance/representative-multi-mode-acceptance-target-readiness-and-acquisition-authorization-package-v0.1.md',
+      lane_readiness_cards: 3,
+      representative_lane_decisions: {
+        web: 'defer',
+        python_cli: 'defer',
+        mcp_agent: 'defer'
+      },
+      acquisition_authorization_decisions_recorded: 0,
+      approved_acquisitions: 0,
+      target_repositories_acquired: 0,
+      target_repositories_executed: 0,
+      target_repository_writes: 0,
+      final_acceptance_inferred: false
+    });
+
+    expect(nextGoal).toMatchObject({
+      id: 'repoassure-representative-multi-mode-acceptance-target-acquisition-authorization-maintainer-decision-recording-v0.1',
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoal.objective).toContain(
+      'Record explicit lane-scoped target acquisition authorization decisions'
+    );
+    expect(nextGoal.blocked_actions).toEqual(
+      expect.arrayContaining([
+        'target_repo_acquisition',
+        'network_access_for_target',
+        'dependency_installation',
+        'target_repo_execution',
+        'target_repo_write',
+        'publication',
+        'deployment',
+        'public_launch'
+      ])
+    );
+    expect(nextGoal.acceptance).toContain(
+      'Do not acquire, clone, install, start, analyze, execute, or write any target while recording decisions.'
+    );
+    expect(nextGoal.acceptance).toContain(
+      'Do not treat authorization to execute this Goal as target acquisition authorization.'
+    );
+
+    expect(goalIndex.active_goal_id).toBe(
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+    );
+    expect(goalIndex.goals).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: currentGoal.id, status: 'completed' }),
+      expect.objectContaining({ id: nextGoal.id, status: 'completed' }),
+      expect.objectContaining({
+        id: 'repoassure-product-backlog-reprioritization-after-representative-acquisition-defer-v0.1',
+        status: 'completed'
+      })
+    ]));
+    expect(progress.active_goal).toEqual({
+      id: 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1',
+      title: 'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1',
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const canonicalDocument of [
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ]) {
+      expect(canonicalDocument).toContain(
+        'target_readiness_and_acquisition_authorization_package_prepared_without_target_acquisition'
+      );
+      expect(canonicalDocument).toContain(nextGoalTitle);
+    }
+  });
+
+  it('records three explicit acquisition deferrals without issuing receipts or accessing targets', async () => {
+    const goalTitle =
+      'RepoAssure Representative Multi-Mode Acceptance Target Acquisition Authorization Maintainer Decision Recording v0.1';
+    const finalConclusion =
+      'maintainer_explicitly_deferred_all_representative_target_acquisitions_without_target_access';
+    const nextGoalTitle =
+      'RepoAssure Product Backlog Reprioritization After Representative Acquisition Defer v0.1';
+    const nextGoalId =
+      'repoassure-product-backlog-reprioritization-after-representative-acquisition-defer-v0.1';
+    const [
+      decisionRecord,
+      operationRecord,
+      goalRecordText,
+      nextGoalRecordText,
+      goalIndexText,
+      progressText,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/acceptance/representative-multi-mode-acceptance-target-acquisition-authorization-maintainer-decision-record-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/operations/repoassure-representative-multi-mode-acceptance-target-acquisition-authorization-maintainer-decision-recording-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-representative-multi-mode-acceptance-target-acquisition-authorization-maintainer-decision-recording-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-product-backlog-reprioritization-after-representative-acquisition-defer-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile(
+        'docs/acceptance/checklists/acceptance-checklist-v0.1.md',
+        'utf8'
+      ),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const goalRecord = JSON.parse(goalRecordText) as {
+      id: string;
+      status: string;
+      interim_conclusion?: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        decision_record?: string;
+        operation_record?: string;
+        decision_status?: string;
+        explicit_decisions_recorded?: number;
+        pending_decisions?: number;
+        lane_decisions?: Record<string, string>;
+        maintainer_notes_provided?: boolean;
+        goal_execution_authorization_treated_as_acquisition_authorization?: boolean;
+        human_approval_policy_status?: string;
+        authorization_receipts_issued?: number;
+        approved_acquisitions?: number;
+        target_repositories_acquired?: number;
+        target_repositories_executed?: number;
+        target_repository_writes?: number;
+      };
+    };
+    const nextGoalRecord = JSON.parse(nextGoalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      blocked_actions?: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage?: string;
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+
+    expect(decisionRecord).toContain(
+      '# RepoAssure Representative Multi-Mode Acceptance Target Acquisition Authorization Maintainer Decision Record v0.1'
+    );
+    expect(decisionRecord).toContain('Status: completed');
+    expect(decisionRecord).toContain('Decision status: defer');
+    expect(decisionRecord).toContain('Explicit lane decisions recorded: 3/3');
+    expect(decisionRecord).toContain(
+      'Goal execution authorization treated as acquisition authorization: no'
+    );
+    expect(decisionRecord).toContain('| Web | defer |');
+    expect(decisionRecord).toContain('| Python/CLI | defer |');
+    expect(decisionRecord).toContain('| MCP/Agent | defer |');
+    expect(decisionRecord).toContain('Maintainer note: not provided');
+    expect(decisionRecord).toContain(
+      'Human Approval Policy status: not_applicable_for_defer'
+    );
+    expect(decisionRecord).toContain('Action Authorization Receipt: not_issued');
+    expect(decisionRecord).toContain('return to Project Autopilot');
+    expect(decisionRecord).not.toContain('<可选>');
+    expect(decisionRecord).not.toContain('Selected decision: approve_acquisition');
+
+    expect(operationRecord).toContain(`# ${goalTitle}`);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(finalConclusion);
+    expect(operationRecord).toContain('Explicit acquisition decisions: 3/3');
+    expect(operationRecord).toContain('Deferred acquisitions: 3/3');
+    expect(operationRecord).toContain('Approved acquisitions: 0/3');
+    expect(operationRecord).toContain('Authorization receipts issued: 0');
+    expect(operationRecord).toContain(
+      'Goal execution authorization treated as acquisition authorization: no'
+    );
+    expect(operationRecord).toContain('Target repositories acquired: 0');
+    expect(operationRecord).toContain('Target repositories executed: 0');
+    expect(operationRecord).toContain('Target repository writes: 0');
+
+    expect(goalRecord).toMatchObject({
+      id: 'repoassure-representative-multi-mode-acceptance-target-acquisition-authorization-maintainer-decision-recording-v0.1',
+      status: 'completed',
+      conclusion: finalConclusion,
+      next_goal_id: nextGoalId
+    });
+    expect(goalRecord.summary).toMatchObject({
+      decision_record:
+        'docs/acceptance/representative-multi-mode-acceptance-target-acquisition-authorization-maintainer-decision-record-v0.1.md',
+      operation_record:
+        'docs/operations/repoassure-representative-multi-mode-acceptance-target-acquisition-authorization-maintainer-decision-recording-v0.1.md',
+      decision_status: 'defer',
+      explicit_decisions_recorded: 3,
+      pending_decisions: 0,
+      lane_decisions: {
+        web: 'defer',
+        python_cli: 'defer',
+        mcp_agent: 'defer'
+      },
+      maintainer_notes_provided: false,
+      goal_execution_authorization_treated_as_acquisition_authorization: false,
+      human_approval_policy_status: 'not_applicable_for_defer',
+      authorization_receipts_issued: 0,
+      approved_acquisitions: 0,
+      target_repositories_acquired: 0,
+      target_repositories_executed: 0,
+      target_repository_writes: 0
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'target_repository_acquisition',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({
+        id: goalRecord.id,
+        status: 'completed'
+      })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({
+        id: nextGoalId,
+        status: 'completed'
+      })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1',
+      title: 'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1',
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const canonicalDocument of [
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ]) {
+      expect(canonicalDocument).toContain(finalConclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+    }
+  });
+
+  it('reprioritizes deferred representative acquisitions to one safe local gap audit', async () => {
+    const goalTitle =
+      'RepoAssure Product Backlog Reprioritization After Representative Acquisition Defer v0.1';
+    const conclusion =
+      'backlog_reprioritized_to_local_product_completion_gap_audit_after_representative_acquisition_defer';
+    const nextGoalTitle = 'RepoAssure Product Completion Gap Audit Refresh v0.9';
+    const nextGoalId = 'repoassure-product-completion-gap-audit-refresh-v0.9';
+    const [
+      operationRecord,
+      goalRecordText,
+      nextGoalRecordText,
+      goalIndexText,
+      progressText,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-product-backlog-reprioritization-after-representative-acquisition-defer-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-product-backlog-reprioritization-after-representative-acquisition-defer-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.9.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile(
+        'docs/acceptance/checklists/acceptance-checklist-v0.1.md',
+        'utf8'
+      ),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const goalRecord = JSON.parse(goalRecordText) as {
+      id: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        candidate_count?: number;
+        selected_next_goal_id?: string;
+        representative_acquisition_decisions?: Record<string, string>;
+        final_acceptance_decision?: string;
+        approved_acquisitions?: number;
+        authorization_receipts_issued?: number;
+        target_repositories_acquired?: number;
+        target_repositories_executed?: number;
+        target_repository_writes?: number;
+      };
+    };
+    const nextGoalRecord = JSON.parse(nextGoalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage?: string;
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+
+    expect(operationRecord).toContain(`# ${goalTitle}`);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(conclusion);
+    expect(operationRecord).toContain('Candidate count: 7');
+    expect(operationRecord).toContain('Representative acquisition decisions: 3/3 defer');
+    expect(operationRecord).toContain('Final acceptance decision: defer');
+    expect(operationRecord).toContain('Approved acquisitions: 0/3');
+    expect(operationRecord).toContain('Authorization receipts issued: 0');
+    expect(operationRecord).toContain('Target repositories acquired: 0');
+    expect(operationRecord).toContain('Target repositories executed: 0');
+    expect(operationRecord).toContain('Target repository writes: 0');
+    expect(operationRecord).toContain('| selected_safe_local |');
+    expect(operationRecord).toContain(nextGoalTitle);
+
+    expect(goalRecord).toMatchObject({
+      id: 'repoassure-product-backlog-reprioritization-after-representative-acquisition-defer-v0.1',
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId
+    });
+    expect(goalRecord.summary).toMatchObject({
+      operation_record:
+        'docs/operations/repoassure-product-backlog-reprioritization-after-representative-acquisition-defer-v0.1.md',
+      candidate_count: 7,
+      selected_next_goal_id: nextGoalId,
+      representative_acquisition_decisions: {
+        web: 'defer',
+        python_cli: 'defer',
+        mcp_agent: 'defer'
+      },
+      final_acceptance_decision: 'defer',
+      approved_acquisitions: 0,
+      authorization_receipts_issued: 0,
+      target_repositories_acquired: 0,
+      target_repositories_executed: 0,
+      target_repository_writes: 0
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoalRecord.objective).toContain(
+      'Re-audit the remaining RepoAssure product completion gaps'
+    );
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'target_repository_acquisition',
+      'target_repository_execution',
+      'target_repository_write',
+      'detector_calibration_implementation',
+      'final_acceptance_status_change',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+    expect(nextGoalRecord.acceptance).toContain(
+      'Preserve final acceptance and all three representative acquisition decisions as defer.'
+    );
+
+    expect(goalIndex.active_goal_id).toBe(
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalRecord.id, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1',
+      title: 'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1',
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const canonicalDocument of [
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+    }
+  });
+
+  it('refreshes completion gaps and queues bounded canonical narrative cleanup', async () => {
+    const goalTitle = 'RepoAssure Product Completion Gap Audit Refresh v0.9';
+    const conclusion =
+      'completion_gap_audit_refreshed_with_canonical_narrative_freshness_cleanup_v0.2_next';
+    const nextGoalTitle =
+      'RepoAssure Canonical Product Narrative Freshness Cleanup v0.2';
+    const nextGoalId =
+      'repoassure-canonical-product-narrative-freshness-cleanup-v0.2';
+    const [
+      auditRecord,
+      goalRecordText,
+      nextGoalRecordText,
+      goalIndexText,
+      progressText,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.9.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-product-completion-gap-audit-refresh-v0.9.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-canonical-product-narrative-freshness-cleanup-v0.2.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile(
+        'docs/acceptance/checklists/acceptance-checklist-v0.1.md',
+        'utf8'
+      ),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const goalRecord = JSON.parse(goalRecordText) as {
+      id: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        implemented_product_surface_count?: number;
+        implemented_governance_surface_count?: number;
+        blocked_or_manual_gated_count?: number;
+        external_input_gated_count?: number;
+        deferred_count?: number;
+        safe_local_count?: number;
+        stale_current_next_findings?: number;
+        selected_next_goal_id?: string;
+        representative_acquisition_decisions?: Record<string, string>;
+        final_acceptance_decision?: string;
+        target_repositories_acquired?: number;
+        target_repositories_executed?: number;
+        target_repository_writes?: number;
+      };
+    };
+    const nextGoalRecord = JSON.parse(nextGoalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage?: string;
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+
+    expect(auditRecord).toContain(`# ${goalTitle}`);
+    expect(auditRecord).toContain('Status: completed');
+    expect(auditRecord).toContain(conclusion);
+    expect(auditRecord).toContain('Implemented product surface count: 12');
+    expect(auditRecord).toContain('Implemented governance surface count: 3');
+    expect(auditRecord).toContain('Blocked or manual-gated count: 9');
+    expect(auditRecord).toContain('External-input-gated count: 3');
+    expect(auditRecord).toContain('Deferred count: 5');
+    expect(auditRecord).toContain('Safe local count: 1');
+    expect(auditRecord).toContain('Stale current/next findings: 8');
+    expect(auditRecord).toContain('Representative acquisition decisions: 3/3 defer');
+    expect(auditRecord).toContain('Final acceptance decision: defer');
+    expect(auditRecord).toContain('Target repositories acquired: 0');
+    expect(auditRecord).toContain('Target repositories executed: 0');
+    expect(auditRecord).toContain('Target repository writes: 0');
+    expect(auditRecord).toContain(nextGoalTitle);
+
+    expect(goalRecord).toMatchObject({
+      id: 'repoassure-product-completion-gap-audit-refresh-v0.9',
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId
+    });
+    expect(goalRecord.summary).toMatchObject({
+      operation_record:
+        'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.9.md',
+      implemented_product_surface_count: 12,
+      implemented_governance_surface_count: 3,
+      blocked_or_manual_gated_count: 9,
+      external_input_gated_count: 3,
+      deferred_count: 5,
+      safe_local_count: 1,
+      stale_current_next_findings: 8,
+      selected_next_goal_id: nextGoalId,
+      representative_acquisition_decisions: {
+        web: 'defer',
+        python_cli: 'defer',
+        mcp_agent: 'defer'
+      },
+      final_acceptance_decision: 'defer',
+      target_repositories_acquired: 0,
+      target_repositories_executed: 0,
+      target_repository_writes: 0
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoalRecord.objective).toContain(
+      'Remove stale current/next Goal claims from canonical product narrative'
+    );
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'target_repository_acquisition',
+      'target_repository_execution',
+      'target_repository_write',
+      'runtime_detection_behavior_change',
+      'final_acceptance_status_change',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+    expect(nextGoalRecord.acceptance).toContain(
+      'Preserve historical Goal sequence evidence while removing only misleading current/next claims.'
+    );
+
+    expect(goalIndex.active_goal_id).toBe(
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalRecord.id, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1',
+      title: 'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1',
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const canonicalDocument of [
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+    }
+  });
+
+  it('completes bounded narrative cleanup and queues gated-work direction preparation', async () => {
+    const goalTitle =
+      'RepoAssure Canonical Product Narrative Freshness Cleanup v0.2';
+    const conclusion =
+      'canonical_product_narrative_freshness_cleaned_with_gated_work_direction_preparation_next';
+    const nextGoalTitle =
+      'RepoAssure Remaining Gated Product Work Direction Preparation v0.1';
+    const nextGoalId =
+      'repoassure-remaining-gated-product-work-direction-preparation-v0.1';
+    const [
+      operationRecord,
+      goalRecordText,
+      nextGoalRecordText,
+      goalIndexText,
+      progressText,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/operations/repoassure-canonical-product-narrative-freshness-cleanup-v0.2.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-canonical-product-narrative-freshness-cleanup-v0.2.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-remaining-gated-product-work-direction-preparation-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile(
+        'docs/acceptance/checklists/acceptance-checklist-v0.1.md',
+        'utf8'
+      ),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const goalRecord = JSON.parse(goalRecordText) as {
+      id: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        operation_record?: string;
+        stale_current_next_findings?: number;
+        cleaned_current_next_findings?: number;
+        remaining_stale_current_next_findings?: number;
+        selected_next_goal_id?: string;
+        representative_acquisition_decisions?: Record<string, string>;
+        final_acceptance_decision?: string;
+        target_repositories_acquired?: number;
+        target_repositories_executed?: number;
+        target_repository_writes?: number;
+      };
+    };
+    const nextGoalRecord = JSON.parse(nextGoalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage?: string;
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+
+    expect(operationRecord).toContain(`# ${goalTitle}`);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(conclusion);
+    expect(operationRecord).toContain('Stale current/next findings removed: 8');
+    expect(operationRecord).toContain('Remaining stale current/next findings: 0');
+    expect(operationRecord).toContain('| `README.md` | 3 |');
+    expect(operationRecord).toContain('| `docs/PLAN.md` | 1 |');
+    expect(operationRecord).toContain('| `docs/SPEC.md` | 2 |');
+    expect(operationRecord).toContain('| `docs/PRD.md` | 2 |');
+    expect(operationRecord).toContain('Representative acquisition decisions: 3/3 defer');
+    expect(operationRecord).toContain('Final acceptance decision: defer');
+    expect(operationRecord).toContain('Target repositories acquired: 0');
+    expect(operationRecord).toContain('Target repositories executed: 0');
+    expect(operationRecord).toContain('Target repository writes: 0');
+    expect(operationRecord).toContain(nextGoalTitle);
+
+    expect(goalRecord).toMatchObject({
+      id: 'repoassure-canonical-product-narrative-freshness-cleanup-v0.2',
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId
+    });
+    expect(goalRecord.summary).toMatchObject({
+      operation_record:
+        'docs/operations/repoassure-canonical-product-narrative-freshness-cleanup-v0.2.md',
+      stale_current_next_findings: 8,
+      cleaned_current_next_findings: 8,
+      remaining_stale_current_next_findings: 0,
+      selected_next_goal_id: nextGoalId,
+      representative_acquisition_decisions: {
+        web: 'defer',
+        python_cli: 'defer',
+        mcp_agent: 'defer'
+      },
+      final_acceptance_decision: 'defer',
+      target_repositories_acquired: 0,
+      target_repositories_executed: 0,
+      target_repository_writes: 0
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoalRecord.objective).toContain(
+      'Prepare a maintainer decision-ready prioritization package'
+    );
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'maintainer_decision_inference',
+      'target_repository_acquisition',
+      'target_repository_execution',
+      'target_repository_write',
+      'runtime_detection_behavior_change',
+      'final_acceptance_status_change',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+    expect(nextGoalRecord.acceptance).toContain(
+      'Do not convert preparation into a maintainer decision, approval, authorization receipt, or execution action.'
+    );
+
+    expect(goalIndex.active_goal_id).toBe(
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalRecord.id, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1',
+      title: 'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1',
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const canonicalDocument of [
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+    }
+  });
+
+  it('prepares all gated work directions without recording or executing a maintainer choice', async () => {
+    const goalTitle =
+      'RepoAssure Remaining Gated Product Work Direction Preparation v0.1';
+    const conclusion =
+      'remaining_gated_product_work_direction_package_prepared_without_decision_or_execution';
+    const nextGoalTitle =
+      'RepoAssure Remaining Gated Product Work Maintainer Direction Decision Recording v0.1';
+    const nextGoalId =
+      'repoassure-remaining-gated-product-work-maintainer-direction-decision-recording-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const gatedItemIds = [
+      'false_positive_detector_runtime_calibration',
+      'npm_publication',
+      'github_release',
+      'public_launch',
+      'final_product_acceptance',
+      'representative_multi_mode_acceptance_execution',
+      'representative_target_acquisition',
+      'workspace_summary_product_entrypoint',
+      'team_cloud_enterprise',
+      'real_customer_workspace_evidence',
+      'future_private_preview_feedback',
+      'additional_security_provider_onboarding',
+      'workspace_summary_entrypoint_productization',
+      'website_design_follow_up',
+      'hosted_workspace_history_and_collaboration',
+      'packages_core_extraction',
+      'benchmark_package_ownership_cleanup'
+    ];
+    const [
+      directionPackage,
+      operationRecord,
+      goalRecordText,
+      nextGoalRecordText,
+      goalIndexText,
+      progressText,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/product/strategy/remaining-gated-product-work-direction-preparation-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/operations/repoassure-remaining-gated-product-work-direction-preparation-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-remaining-gated-product-work-direction-preparation-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-remaining-gated-product-work-maintainer-direction-decision-recording-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile(
+        'docs/acceptance/checklists/acceptance-checklist-v0.1.md',
+        'utf8'
+      ),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const goalRecord = JSON.parse(goalRecordText) as {
+      id: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        direction_package?: string;
+        blocked_or_manual_gated_count?: number;
+        external_input_gated_count?: number;
+        deferred_count?: number;
+        total_gated_item_count?: number;
+        primary_recommendation?: string;
+        maintainer_direction_decision?: string;
+        representative_acquisition_decisions?: Record<string, string>;
+        final_acceptance_decision?: string;
+        authorization_receipts_issued?: number;
+        target_repositories_acquired?: number;
+        target_repositories_executed?: number;
+        target_repository_writes?: number;
+      };
+    };
+    const nextGoalRecord = JSON.parse(nextGoalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      blocked_actions: string[];
+      acceptance: string[];
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage?: string;
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+
+    expect(directionPackage).toContain(`# ${goalTitle}`);
+    expect(directionPackage).toContain('Blocked or manual-gated: 9');
+    expect(directionPackage).toContain('External-input-gated: 3');
+    expect(directionPackage).toContain('Deferred: 5');
+    expect(directionPackage).toContain('Total inventoried items: 17');
+    expect(directionPackage).toContain(
+      '| Identifier | Consequence | Prerequisite | Evidence gap | Reversible next step |'
+    );
+    for (const gatedItemId of gatedItemIds) {
+      expect(directionPackage).toContain(`| \`${gatedItemId}\` |`);
+    }
+    expect(directionPackage).toContain(
+      'Primary recommendation: `false_positive_detector_runtime_calibration`'
+    );
+    expect(directionPackage).toContain('Maintainer direction decision: pending');
+    expect(directionPackage).toContain('Representative acquisition decisions: 3/3 defer');
+    expect(directionPackage).toContain('Representative execution decisions: 3/3 defer');
+    expect(directionPackage).toContain('Final acceptance decision: defer');
+    expect(directionPackage).toContain('Action Authorization Receipts issued: 0');
+    expect(directionPackage).toContain('Target repositories acquired: 0');
+    expect(directionPackage).toContain('Target repositories executed: 0');
+    expect(directionPackage).toContain('Target repository writes: 0');
+
+    expect(operationRecord).toContain(`# ${goalTitle}`);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(conclusion);
+    expect(operationRecord).toContain(nextGoalTitle);
+
+    expect(goalRecord).toMatchObject({
+      id: 'repoassure-remaining-gated-product-work-direction-preparation-v0.1',
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId
+    });
+    expect(goalRecord.summary).toMatchObject({
+      direction_package:
+        'docs/product/strategy/remaining-gated-product-work-direction-preparation-v0.1.md',
+      blocked_or_manual_gated_count: 9,
+      external_input_gated_count: 3,
+      deferred_count: 5,
+      total_gated_item_count: 17,
+      primary_recommendation: 'false_positive_detector_runtime_calibration',
+      maintainer_direction_decision: 'pending',
+      representative_acquisition_decisions: {
+        web: 'defer',
+        python_cli: 'defer',
+        mcp_agent: 'defer'
+      },
+      final_acceptance_decision: 'defer',
+      authorization_receipts_issued: 0,
+      target_repositories_acquired: 0,
+      target_repositories_executed: 0,
+      target_repository_writes: 0
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoalRecord.objective).toContain(
+      'Record one explicit maintainer direction choice'
+    );
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'maintainer_direction_choice_inference',
+      'authorization_receipt_issuance',
+      'target_repository_acquisition',
+      'target_repository_execution',
+      'target_repository_write',
+      'runtime_detection_behavior_change',
+      'final_acceptance_status_change',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+    expect(nextGoalRecord.acceptance).toContain(
+      'Do not infer a direction choice from Goal execution authorization.'
+    );
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalRecord.id, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const canonicalDocument of [
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      devLog,
+      progressSnapshot
+    ]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+    }
+  });
+
+  it('preserves audit evidence that execution authorization did not infer a direction choice', async () => {
+    const goalTitle =
+      'RepoAssure Remaining Gated Product Work Maintainer Direction Decision Recording v0.1';
+    const goalId =
+      'repoassure-remaining-gated-product-work-maintainer-direction-decision-recording-v0.1';
+    const interimConclusion =
+      'maintainer_direction_decision_record_prepared_without_inferred_choice';
+    const finalConclusion =
+      'maintainer_selected_false_positive_detector_runtime_calibration_without_underlying_work_authorization';
+    const nextGoalTitle =
+      'RepoAssure False-Positive Detector Runtime Calibration Decision Reopening Preparation v0.1';
+    const nextGoalId =
+      'repoassure-false-positive-detector-runtime-calibration-decision-reopening-preparation-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const allowedChoices = [
+      'false_positive_detector_runtime_calibration',
+      'representative_acceptance_evidence',
+      'distribution_and_launch',
+      'local_summary_productization',
+      'hosted_product_discovery',
+      'maintenance_and_extension',
+      'defer_all_remaining_gated_work'
+    ];
+    const [
+      decisionRecord,
+      operationRecord,
+      goalRecordText,
+      goalIndexText,
+      progressText,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      blockerLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/product/strategy/remaining-gated-product-work-maintainer-direction-decision-record-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/operations/repoassure-remaining-gated-product-work-maintainer-direction-decision-recording-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-remaining-gated-product-work-maintainer-direction-decision-recording-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile(
+        'docs/acceptance/checklists/acceptance-checklist-v0.1.md',
+        'utf8'
+      ),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/blockers.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const goalRecord = JSON.parse(goalRecordText) as {
+      id: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        decision_record?: string;
+        operation_record?: string;
+        recommended_direction?: string;
+        maintainer_direction_decision?: string;
+        explicit_direction_decisions?: number;
+        pending_direction_decisions?: number;
+        goal_execution_authorization_treated_as_direction_choice?: boolean;
+        human_approval_policy?: string;
+        authorization_receipts_issued?: number;
+        target_repositories_acquired?: number;
+        target_repositories_executed?: number;
+        target_repository_writes?: number;
+      };
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage?: string;
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+      next_goal_plain_language?: string;
+    };
+
+    expect(decisionRecord).toContain(`# ${goalTitle}`);
+    expect(decisionRecord).toContain('Status: completed');
+    expect(decisionRecord).toContain('Historical interim conclusion:');
+    expect(decisionRecord).toContain(interimConclusion);
+    expect(decisionRecord).toContain('Explicit direction decisions: 1/1');
+    expect(decisionRecord).toContain('Pending direction decisions: 0/1');
+    expect(decisionRecord).toContain(
+      'Goal execution authorization treated as direction choice: no'
+    );
+    for (const allowedChoice of allowedChoices) {
+      expect(decisionRecord).toContain(
+        `| \`${allowedChoice}\` | ${
+          allowedChoice === 'false_positive_detector_runtime_calibration'
+            ? 'selected'
+            : 'unselected'
+        } |`
+      );
+    }
+    expect(decisionRecord).toContain(
+      'Human Approval Policy: `direction_recorded_underlying_work_unapproved`'
+    );
+    expect(decisionRecord).toContain('Action Authorization Receipts issued: 0');
+    expect(decisionRecord).toContain('Target repositories acquired: 0');
+    expect(decisionRecord).toContain('Target repositories executed: 0');
+    expect(decisionRecord).toContain('Target repository writes: 0');
+
+    expect(operationRecord).toContain(`# ${goalTitle}`);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(interimConclusion);
+    expect(operationRecord).toContain('Explicit direction decisions: 1/1');
+    expect(operationRecord).toContain('Pending direction decisions: 0/1');
+    expect(operationRecord).toContain(
+      'Goal execution authorization treated as direction choice: no'
+    );
+
+    expect(goalRecord).toMatchObject({
+      id: goalId,
+      status: 'completed',
+      conclusion: finalConclusion,
+      next_goal_id: nextGoalId
+    });
+    expect(goalRecord.summary).toMatchObject({
+      decision_record:
+        'docs/product/strategy/remaining-gated-product-work-maintainer-direction-decision-record-v0.1.md',
+      operation_record:
+        'docs/operations/repoassure-remaining-gated-product-work-maintainer-direction-decision-recording-v0.1.md',
+      recommended_direction: 'false_positive_detector_runtime_calibration',
+      maintainer_direction_decision: 'false_positive_detector_runtime_calibration',
+      explicit_direction_decisions: 1,
+      pending_direction_decisions: 0,
+      goal_execution_authorization_treated_as_direction_choice: false,
+      human_approval_policy: 'direction_recorded_underlying_work_unapproved',
+      authorization_receipts_issued: 0,
+      target_repositories_acquired: 0,
+      target_repositories_executed: 0,
+      target_repository_writes: 0
+    });
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain(
+      'M1'
+    );
+
+    for (const auditDocument of [
+      decisionRecord,
+      operationRecord,
+      decisionLog,
+      blockerLog,
+      devLog,
+      progressSnapshot
+    ]) {
+      expect(auditDocument).toContain(interimConclusion);
+    }
+
+    for (const canonicalDocument of [
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      blockerLog,
+      devLog,
+      progressSnapshot
+    ]) {
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+    }
+  });
+
+  it('records the false-positive calibration direction without authorizing detector work', async () => {
+    const goalTitle =
+      'RepoAssure Remaining Gated Product Work Maintainer Direction Decision Recording v0.1';
+    const goalId =
+      'repoassure-remaining-gated-product-work-maintainer-direction-decision-recording-v0.1';
+    const conclusion =
+      'maintainer_selected_false_positive_detector_runtime_calibration_without_underlying_work_authorization';
+    const selectedDirection = 'false_positive_detector_runtime_calibration';
+    const nextGoalTitle =
+      'RepoAssure False-Positive Detector Runtime Calibration Decision Reopening Preparation v0.1';
+    const nextGoalId =
+      'repoassure-false-positive-detector-runtime-calibration-decision-reopening-preparation-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const unselectedDirections = [
+      'representative_acceptance_evidence',
+      'distribution_and_launch',
+      'local_summary_productization',
+      'hosted_product_discovery',
+      'maintenance_and_extension',
+      'defer_all_remaining_gated_work'
+    ];
+    const pendingCalibrationQuestions = [
+      'conditional_dead_control_should_consider_form_dirty_prerequisites',
+      'auth_redirect_route_should_preserve_maintainer_review_boundary'
+    ];
+    const [
+      decisionRecord,
+      operationRecord,
+      goalRecordText,
+      nextGoalRecordText,
+      goalIndexText,
+      progressText,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      blockerLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/product/strategy/remaining-gated-product-work-maintainer-direction-decision-record-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/operations/repoassure-remaining-gated-product-work-maintainer-direction-decision-recording-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-remaining-gated-product-work-maintainer-direction-decision-recording-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-false-positive-detector-runtime-calibration-decision-reopening-preparation-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile(
+        'docs/acceptance/checklists/acceptance-checklist-v0.1.md',
+        'utf8'
+      ),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/blockers.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const goalRecord = JSON.parse(goalRecordText) as {
+      id: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        maintainer_direction_decision?: string;
+        explicit_direction_decisions?: number;
+        pending_direction_decisions?: number;
+        direction_selection_authorizes_underlying_work?: boolean;
+        calibration_decisions_recorded?: number;
+        calibration_decisions_pending?: number;
+        authorization_receipts_issued?: number;
+        target_repositories_acquired?: number;
+        target_repositories_executed?: number;
+        target_repository_writes?: number;
+      };
+    };
+    const nextGoalRecord = JSON.parse(nextGoalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary?: {
+        pending_decision_count?: number;
+        pending_questions?: string[];
+        decision_options?: string[];
+        detector_changes_authorized?: boolean;
+      };
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage?: string;
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+
+    expect(decisionRecord).toContain(`# ${goalTitle}`);
+    expect(decisionRecord).toContain('Status: completed');
+    expect(decisionRecord).toContain(`Conclusion: \`${conclusion}\``);
+    expect(decisionRecord).toContain('Explicit direction decisions: 1/1');
+    expect(decisionRecord).toContain('Pending direction decisions: 0/1');
+    expect(decisionRecord).toContain(
+      `Selected direction: \`${selectedDirection}\``
+    );
+    expect(decisionRecord).toContain(
+      `| \`${selectedDirection}\` | selected |`
+    );
+    for (const unselectedDirection of unselectedDirections) {
+      expect(decisionRecord).toContain(
+        `| \`${unselectedDirection}\` | unselected |`
+      );
+    }
+    expect(decisionRecord).toContain(
+      'Direction selection authorizes underlying work: no'
+    );
+    expect(decisionRecord).toContain('Calibration decisions recorded: 0/2');
+    expect(decisionRecord).toContain('Calibration decisions pending: 2/2');
+    expect(decisionRecord).toContain('Action Authorization Receipts issued: 0');
+    expect(decisionRecord).toContain('Target repositories acquired: 0');
+    expect(decisionRecord).toContain('Target repositories executed: 0');
+    expect(decisionRecord).toContain('Target repository writes: 0');
+
+    expect(operationRecord).toContain(`# ${goalTitle}`);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(conclusion);
+    expect(operationRecord).toContain(
+      `Selected direction: \`${selectedDirection}\``
+    );
+    expect(operationRecord).toContain(
+      'Direction selection authorizes underlying work: no'
+    );
+    expect(operationRecord).toContain(nextGoalTitle);
+
+    expect(goalRecord).toMatchObject({
+      id: goalId,
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId
+    });
+    expect(goalRecord.summary).toMatchObject({
+      maintainer_direction_decision: selectedDirection,
+      explicit_direction_decisions: 1,
+      pending_direction_decisions: 0,
+      direction_selection_authorizes_underlying_work: false,
+      calibration_decisions_recorded: 0,
+      calibration_decisions_pending: 2,
+      authorization_receipts_issued: 0,
+      target_repositories_acquired: 0,
+      target_repositories_executed: 0,
+      target_repository_writes: 0
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoalRecord.objective).toContain(
+      'Prepare a refreshed local-only decision package'
+    );
+    expect(nextGoalRecord.summary).toMatchObject({
+      pending_decision_count: 2,
+      pending_questions: pendingCalibrationQuestions,
+      decision_options: ['approve', 'reject', 'defer', 'accept-risk'],
+      detector_changes_authorized: false
+    });
+    expect(nextGoalRecord.acceptance).toContain(
+      'Do not infer per-question calibration decisions from the selected direction or ordinary Goal execution authorization.'
+    );
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'runtime_detection_behavior_change',
+      'finding_suppression',
+      'automatic_severity_downgrade',
+      'detector_confidence_threshold_change',
+      'acceptance_policy_change',
+      'target_repository_write',
+      'authorization_receipt_issuance',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const canonicalDocument of [
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      blockerLog,
+      devLog,
+      progressSnapshot
+    ]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+    }
+  });
+
+  it('prepares two calibration decision slots without selecting answers or changing detector behavior', async () => {
+    const goalTitle =
+      'RepoAssure False-Positive Detector Runtime Calibration Decision Reopening Preparation v0.1';
+    const goalId =
+      'repoassure-false-positive-detector-runtime-calibration-decision-reopening-preparation-v0.1';
+    const conclusion =
+      'false_positive_detector_runtime_calibration_decision_reopening_package_prepared_without_per_question_decisions_or_detector_changes';
+    const nextGoalTitle =
+      'RepoAssure False-Positive Detector Runtime Calibration Per-Question Maintainer Decision Recording v0.1';
+    const nextGoalId =
+      'repoassure-false-positive-detector-runtime-calibration-per-question-maintainer-decision-recording-v0.1';
+    const calibrationQuestions = [
+      {
+        id: 'conditional_dead_control_should_consider_form_dirty_prerequisites',
+        fixtureId: 'real-fixture:react-disabled-save-control'
+      },
+      {
+        id: 'auth_redirect_route_should_preserve_maintainer_review_boundary',
+        fixtureId: 'real-fixture:vite-auth-redirect-route'
+      }
+    ];
+    const decisionOptions = ['approve', 'reject', 'defer', 'accept-risk'];
+    const manualGates = [
+      'maintainer_classification_required_before_detector_change',
+      'fixture_privacy_confirmation_required',
+      'expected_snapshot_confirmation_required',
+      'confidence_threshold_review_required',
+      'regression_artifact_review_required'
+    ];
+    const [
+      decisionPackage,
+      operationRecord,
+      goalRecordText,
+      nextGoalRecordText,
+      goalIndexText,
+      progressText,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      blockerLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/product/strategy/false-positive-detector-runtime-calibration-decision-reopening-package-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/operations/repoassure-false-positive-detector-runtime-calibration-decision-reopening-preparation-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-false-positive-detector-runtime-calibration-decision-reopening-preparation-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-false-positive-detector-runtime-calibration-per-question-maintainer-decision-recording-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile(
+        'docs/acceptance/checklists/acceptance-checklist-v0.1.md',
+        'utf8'
+      ),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/blockers.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const goalRecord = JSON.parse(goalRecordText) as {
+      id: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        decision_package?: string;
+        calibration_decisions_recorded?: number;
+        calibration_decisions_pending?: number;
+        pending_questions?: string[];
+        decision_options?: string[];
+        manual_gates?: string[];
+        detector_changes_authorized?: boolean;
+        authorization_receipts_issued?: number;
+        target_repositories_acquired?: number;
+        target_repositories_executed?: number;
+        target_repository_writes?: number;
+      };
+    };
+    const nextGoalRecord = JSON.parse(nextGoalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary?: {
+        pending_decision_count?: number;
+        pending_questions?: string[];
+        decision_options?: string[];
+        detector_changes_authorized?: boolean;
+      };
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage?: string;
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+    };
+
+    expect(decisionPackage).toContain(`# ${goalTitle}`);
+    expect(decisionPackage).toContain('Status: completed');
+    expect(decisionPackage).toContain(`Conclusion: \`${conclusion}\``);
+    expect(decisionPackage).toContain('Calibration decisions recorded: 0/2');
+    expect(decisionPackage).toContain('Calibration decisions pending: 2/2');
+    for (const question of calibrationQuestions) {
+      expect(decisionPackage).toContain(
+        `| \`${question.id}\` | \`${question.fixtureId}\` | pending |`
+      );
+    }
+    for (const decisionOption of decisionOptions) {
+      expect(decisionPackage).toContain(`\`${decisionOption}\``);
+    }
+    for (const manualGate of manualGates) {
+      expect(decisionPackage).toContain(`\`${manualGate}\``);
+    }
+    expect(decisionPackage).toContain(
+      'Direction selection treated as per-question calibration approval: no'
+    );
+    expect(decisionPackage).toContain('Detector changes authorized: no');
+    expect(decisionPackage).toContain('Action Authorization Receipts issued: 0');
+    expect(decisionPackage).toContain('Target repositories acquired: 0');
+    expect(decisionPackage).toContain('Target repositories executed: 0');
+    expect(decisionPackage).toContain('Target repository writes: 0');
+
+    expect(operationRecord).toContain(`# ${goalTitle}`);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(conclusion);
+    expect(operationRecord).toContain('Calibration decisions recorded: 0/2');
+    expect(operationRecord).toContain('Calibration decisions pending: 2/2');
+    expect(operationRecord).toContain(nextGoalTitle);
+
+    expect(goalRecord).toMatchObject({
+      id: goalId,
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId
+    });
+    expect(goalRecord.summary).toMatchObject({
+      decision_package:
+        'docs/product/strategy/false-positive-detector-runtime-calibration-decision-reopening-package-v0.1.md',
+      calibration_decisions_recorded: 0,
+      calibration_decisions_pending: 2,
+      pending_questions: calibrationQuestions.map((question) => question.id),
+      decision_options: decisionOptions,
+      manual_gates: manualGates,
+      detector_changes_authorized: false,
+      authorization_receipts_issued: 0,
+      target_repositories_acquired: 0,
+      target_repositories_executed: 0,
+      target_repository_writes: 0
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed'
+    });
+    expect(nextGoalRecord.objective).toContain(
+      'Record explicit maintainer approve, reject, defer, or accept-risk decisions'
+    );
+    expect(nextGoalRecord.summary).toMatchObject({
+      pending_decision_count: 0,
+      pending_questions: [],
+      decision_options: decisionOptions,
+      detector_changes_authorized: false
+    });
+    expect(nextGoalRecord.acceptance).toContain(
+      'Do not infer per-question decisions from the selected direction or ordinary Goal execution authorization.'
+    );
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'detector_implementation_planning',
+      'runtime_detection_behavior_change',
+      'finding_suppression',
+      'automatic_severity_downgrade',
+      'detector_confidence_threshold_change',
+      'acceptance_policy_change',
+      'authorization_receipt_issuance',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1',
+      title: 'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1',
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+
+    for (const canonicalDocument of [
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      blockerLog,
+      devLog,
+      progressSnapshot
+    ]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+    }
+  });
+
+  it('preserves the audit fact that ordinary execution authorization was not a per-question answer', async () => {
+    const goalTitle =
+      'RepoAssure False-Positive Detector Runtime Calibration Per-Question Maintainer Decision Recording v0.1';
+    const goalId =
+      'repoassure-false-positive-detector-runtime-calibration-per-question-maintainer-decision-recording-v0.1';
+    const interimConclusion =
+      'per_question_calibration_decision_record_prepared_without_inferred_answers';
+    const finalConclusion =
+      'maintainer_approved_both_false_positive_detector_calibration_questions_for_separately_gated_design_planning_without_detector_implementation_authorization';
+    const nextGoalId =
+      'repoassure-false-positive-detector-runtime-calibration-bounded-design-planning-v0.1';
+    const nextGoalTitle =
+      'RepoAssure False-Positive Detector Runtime Calibration Bounded Design Planning v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const questions = [
+      'conditional_dead_control_should_consider_form_dirty_prerequisites',
+      'auth_redirect_route_should_preserve_maintainer_review_boundary'
+    ];
+    const [
+      decisionRecord,
+      operationRecord,
+      goalRecordText,
+      goalIndexText,
+      progressText,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      blockerLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/product/strategy/false-positive-detector-runtime-calibration-per-question-maintainer-decision-record-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/operations/repoassure-false-positive-detector-runtime-calibration-per-question-maintainer-decision-recording-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-false-positive-detector-runtime-calibration-per-question-maintainer-decision-recording-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile(
+        'docs/acceptance/checklists/acceptance-checklist-v0.1.md',
+        'utf8'
+      ),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/blockers.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const goalRecord = JSON.parse(goalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        decision_record?: string;
+        operation_record?: string;
+        explicit_calibration_decisions?: number;
+        pending_calibration_decisions?: number;
+        pending_questions?: string[];
+        per_question_decisions?: Record<string, string>;
+        goal_execution_authorization_treated_as_per_question_answer?: boolean;
+        human_approval_policy?: string;
+        detector_changes_authorized?: boolean;
+        authorization_receipts_issued?: number;
+        target_repositories_acquired?: number;
+        target_repositories_executed?: number;
+        target_repository_writes?: number;
+      };
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage?: string;
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+      next_goal_plain_language?: string;
+    };
+
+    expect(decisionRecord).toContain(`# ${goalTitle}`);
+    expect(decisionRecord).toContain('Status: completed');
+    expect(decisionRecord).toContain(interimConclusion);
+    expect(decisionRecord).toContain('Explicit calibration decisions: 2/2');
+    expect(decisionRecord).toContain('Pending calibration decisions: 0/2');
+    for (const question of questions) {
+      expect(decisionRecord).toContain(`| \`${question}\` | approve |`);
+    }
+    expect(decisionRecord).toContain(
+      'Goal execution authorization treated as per-question answer: no'
+    );
+    expect(decisionRecord).toContain(
+      'Human Approval Policy: `explicit_per_question_decisions_recorded`'
+    );
+    expect(decisionRecord).toContain('Detector changes authorized: no');
+    expect(decisionRecord).toContain('Action Authorization Receipts issued: 0');
+    expect(decisionRecord).toContain('Target repositories acquired: 0');
+    expect(decisionRecord).toContain('Target repositories executed: 0');
+    expect(decisionRecord).toContain('Target repository writes: 0');
+
+    expect(operationRecord).toContain(`# ${goalTitle}`);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(interimConclusion);
+    expect(operationRecord).toContain('Explicit calibration decisions: 2/2');
+    expect(operationRecord).toContain('Pending calibration decisions: 0/2');
+    expect(operationRecord).toContain(
+      'Goal execution authorization treated as per-question answer: no'
+    );
+
+    expect(goalRecord).toMatchObject({
+      id: goalId,
+      title: goalTitle,
+      status: 'completed',
+      conclusion: finalConclusion,
+      next_goal_id: nextGoalId
+    });
+    expect(goalRecord.summary).toMatchObject({
+      decision_record:
+        'docs/product/strategy/false-positive-detector-runtime-calibration-per-question-maintainer-decision-record-v0.1.md',
+      operation_record:
+        'docs/operations/repoassure-false-positive-detector-runtime-calibration-per-question-maintainer-decision-recording-v0.1.md',
+      explicit_calibration_decisions: 2,
+      pending_calibration_decisions: 0,
+      pending_questions: [],
+      per_question_decisions: {
+        conditional_dead_control_should_consider_form_dirty_prerequisites: 'approve',
+        auth_redirect_route_should_preserve_maintainer_review_boundary: 'approve'
+      },
+      goal_execution_authorization_treated_as_per_question_answer: false,
+      human_approval_policy: 'explicit_per_question_decisions_recorded',
+      detector_changes_authorized: false,
+      authorization_receipts_issued: 0,
+      target_repositories_acquired: 0,
+      target_repositories_executed: 0,
+      target_repository_writes: 0
+    });
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain(
+      'M1'
+    );
+
+    for (const canonicalDocument of [
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      blockerLog,
+      devLog,
+      progressSnapshot
+    ]) {
+      expect(canonicalDocument).toContain(finalConclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+    }
+  });
+
+  it('records two explicit approvals as bounded design-planning authority without detector implementation authority', async () => {
+    const goalTitle =
+      'RepoAssure False-Positive Detector Runtime Calibration Per-Question Maintainer Decision Recording v0.1';
+    const goalId =
+      'repoassure-false-positive-detector-runtime-calibration-per-question-maintainer-decision-recording-v0.1';
+    const conclusion =
+      'maintainer_approved_both_false_positive_detector_calibration_questions_for_separately_gated_design_planning_without_detector_implementation_authorization';
+    const nextGoalTitle =
+      'RepoAssure False-Positive Detector Runtime Calibration Bounded Design Planning v0.1';
+    const nextGoalId =
+      'repoassure-false-positive-detector-runtime-calibration-bounded-design-planning-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const questions = [
+      {
+        id: 'conditional_dead_control_should_consider_form_dirty_prerequisites',
+        fixtureId: 'real-fixture:react-disabled-save-control'
+      },
+      {
+        id: 'auth_redirect_route_should_preserve_maintainer_review_boundary',
+        fixtureId: 'real-fixture:vite-auth-redirect-route'
+      }
+    ];
+    const manualGates = [
+      'maintainer_classification_required_before_detector_change',
+      'fixture_privacy_confirmation_required',
+      'expected_snapshot_confirmation_required',
+      'confidence_threshold_review_required',
+      'regression_artifact_review_required'
+    ];
+    const [
+      decisionRecord,
+      operationRecord,
+      goalRecordText,
+      nextGoalRecordText,
+      goalIndexText,
+      progressText,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      blockerLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/product/strategy/false-positive-detector-runtime-calibration-per-question-maintainer-decision-record-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/operations/repoassure-false-positive-detector-runtime-calibration-per-question-maintainer-decision-recording-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-false-positive-detector-runtime-calibration-per-question-maintainer-decision-recording-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-false-positive-detector-runtime-calibration-bounded-design-planning-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile(
+        'docs/acceptance/checklists/acceptance-checklist-v0.1.md',
+        'utf8'
+      ),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/blockers.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const goalRecord = JSON.parse(goalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        explicit_calibration_decisions?: number;
+        pending_calibration_decisions?: number;
+        approved_calibration_decisions?: number;
+        pending_questions?: string[];
+        per_question_decisions?: Record<string, string>;
+        bounded_design_planning_authorized?: boolean;
+        detector_implementation_authorized?: boolean;
+        detector_changes_authorized?: boolean;
+        authorization_receipts_issued?: number;
+        target_repositories_acquired?: number;
+        target_repositories_executed?: number;
+        target_repository_writes?: number;
+      };
+    };
+    const nextGoalRecord = JSON.parse(nextGoalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec: string;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary?: {
+        approved_question_count?: number;
+        approved_questions?: string[];
+        manual_gates?: string[];
+        detector_implementation_authorized?: boolean;
+        detector_changes_authorized?: boolean;
+      };
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage?: string;
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+      next_goal_plain_language?: string;
+    };
+
+    expect(decisionRecord).toContain(`# ${goalTitle}`);
+    expect(decisionRecord).toContain('Status: completed');
+    expect(decisionRecord).toContain(`Conclusion: \`${conclusion}\``);
+    expect(decisionRecord).toContain('Explicit calibration decisions: 2/2');
+    expect(decisionRecord).toContain('Approved calibration decisions: 2/2');
+    expect(decisionRecord).toContain('Pending calibration decisions: 0/2');
+    for (const question of questions) {
+      expect(decisionRecord).toContain(
+        `| \`${question.id}\` | approve | \`${question.fixtureId}\` |`
+      );
+    }
+    expect(decisionRecord).toContain('Bounded design planning authorized: yes');
+    expect(decisionRecord).toContain('Detector implementation authorized: no');
+    expect(decisionRecord).toContain('Detector changes authorized: no');
+    expect(decisionRecord).toContain('Action Authorization Receipts issued: 0');
+    expect(decisionRecord).toContain('Target repositories acquired: 0');
+    expect(decisionRecord).toContain('Target repositories executed: 0');
+    expect(decisionRecord).toContain('Target repository writes: 0');
+
+    expect(operationRecord).toContain(`# ${goalTitle}`);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(conclusion);
+    expect(operationRecord).toContain('Explicit calibration decisions: 2/2');
+    expect(operationRecord).toContain('Approved calibration decisions: 2/2');
+    expect(operationRecord).toContain('Pending calibration decisions: 0/2');
+    expect(operationRecord).toContain(nextGoalTitle);
+
+    expect(goalRecord).toMatchObject({
+      id: goalId,
+      title: goalTitle,
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId
+    });
+    expect(goalRecord.summary).toMatchObject({
+      explicit_calibration_decisions: 2,
+      pending_calibration_decisions: 0,
+      approved_calibration_decisions: 2,
+      pending_questions: [],
+      per_question_decisions: {
+        conditional_dead_control_should_consider_form_dirty_prerequisites: 'approve',
+        auth_redirect_route_should_preserve_maintainer_review_boundary: 'approve'
+      },
+      bounded_design_planning_authorized: true,
+      detector_implementation_authorized: false,
+      detector_changes_authorized: false,
+      authorization_receipts_issued: 0,
+      target_repositories_acquired: 0,
+      target_repositories_executed: 0,
+      target_repository_writes: 0
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      source_spec:
+        'docs/product/strategy/false-positive-detector-runtime-calibration-per-question-maintainer-decision-record-v0.1.md'
+    });
+    expect(nextGoalRecord.objective).toContain(
+      'Prepare a local-only bounded detector calibration design plan for the two explicitly approved questions'
+    );
+    expect(nextGoalRecord.summary).toMatchObject({
+      approved_question_count: 2,
+      approved_questions: questions.map((question) => question.id),
+      manual_gates: manualGates,
+      detector_implementation_authorized: false,
+      detector_changes_authorized: false
+    });
+    for (const question of questions) {
+      expect(nextGoalRecord.acceptance.join('\n')).toContain(question.id);
+    }
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'runtime_detector_implementation',
+      'runtime_detection_behavior_change',
+      'finding_suppression',
+      'automatic_severity_downgrade',
+      'detector_confidence_threshold_change',
+      'acceptance_policy_change',
+      'authorization_receipt_issuance',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain(
+      'M1'
+    );
+
+    for (const canonicalDocument of [
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      blockerLog,
+      devLog,
+      progressSnapshot
+    ]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+    }
+  });
+
+  it('prepares two bounded detector calibration designs without changing runtime behavior', async () => {
+    const goalTitle =
+      'RepoAssure False-Positive Detector Runtime Calibration Bounded Design Planning v0.1';
+    const goalId =
+      'repoassure-false-positive-detector-runtime-calibration-bounded-design-planning-v0.1';
+    const conclusion =
+      'bounded_false_positive_detector_calibration_design_plan_prepared_without_runtime_implementation_or_behavior_change';
+    const nextGoalTitle =
+      'RepoAssure False-Positive Detector Runtime Calibration Implementation Authorization Intake v0.1';
+    const nextGoalId =
+      'repoassure-false-positive-detector-runtime-calibration-implementation-authorization-intake-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const questions = [
+      {
+        id: 'conditional_dead_control_should_consider_form_dirty_prerequisites',
+        fixtureId: 'real-fixture:react-disabled-save-control',
+        expectedClassification: 'false_positive_candidate',
+        evidenceStates: [
+          'initial_disabled_before_dirty',
+          'enabled_after_safe_dirty_transition'
+        ]
+      },
+      {
+        id: 'auth_redirect_route_should_preserve_maintainer_review_boundary',
+        fixtureId: 'real-fixture:vite-auth-redirect-route',
+        expectedClassification: 'needs_maintainer_review',
+        evidenceStates: [
+          'unauthenticated_redirect_without_authenticated_evidence',
+          'authenticated_evidence_required_before_route_reclassification'
+        ]
+      }
+    ];
+    const manualGates = [
+      'maintainer_classification_required_before_detector_change',
+      'fixture_privacy_confirmation_required',
+      'expected_snapshot_confirmation_required',
+      'confidence_threshold_review_required',
+      'regression_artifact_review_required'
+    ];
+    const [
+      designPlan,
+      operationRecord,
+      goalRecordText,
+      nextGoalRecordText,
+      goalIndexText,
+      progressText,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      blockerLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/product/strategy/false-positive-detector-runtime-calibration-bounded-design-plan-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/operations/repoassure-false-positive-detector-runtime-calibration-bounded-design-planning-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-false-positive-detector-runtime-calibration-bounded-design-planning-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-false-positive-detector-runtime-calibration-implementation-authorization-intake-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile(
+        'docs/acceptance/checklists/acceptance-checklist-v0.1.md',
+        'utf8'
+      ),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/blockers.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const goalRecord = JSON.parse(goalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        design_plan?: string;
+        operation_record?: string;
+        designed_question_count?: number;
+        question_design_statuses?: Record<string, string>;
+        manual_gates?: string[];
+        detector_implementation_authorized?: boolean;
+        detector_changes_authorized?: boolean;
+        finding_suppression_authorized?: boolean;
+        automatic_severity_downgrade_authorized?: boolean;
+        confidence_threshold_change_authorized?: boolean;
+        acceptance_policy_change_authorized?: boolean;
+        authorization_receipts_issued?: number;
+        target_repositories_acquired?: number;
+        target_repositories_executed?: number;
+        target_repository_writes?: number;
+      };
+    };
+    const nextGoalRecord = JSON.parse(nextGoalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec: string;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary?: {
+        design_plan?: string;
+        question_count?: number;
+        implementation_authorization_decisions_recorded?: number;
+        pending_questions?: string[];
+        detector_implementation_authorized?: boolean;
+        detector_changes_authorized?: boolean;
+      };
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage?: string;
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+      next_goal_plain_language?: string;
+      workflow_map?: { mermaid?: string };
+    };
+
+    expect(designPlan).toContain(`# ${goalTitle}`);
+    expect(designPlan).toContain('Status: completed');
+    expect(designPlan).toContain(`Conclusion: \`${conclusion}\``);
+    for (const question of questions) {
+      expect(designPlan).toContain(question.id);
+      expect(designPlan).toContain(question.fixtureId);
+      expect(designPlan).toContain(question.expectedClassification);
+      for (const evidenceState of question.evidenceStates) {
+        expect(designPlan).toContain(evidenceState);
+      }
+    }
+    for (const manualGate of manualGates) {
+      expect(designPlan).toContain(manualGate);
+    }
+    expect(designPlan).toContain('Runtime detector implementation authorized: no');
+    expect(designPlan).toContain('Finding suppression authorized: no');
+    expect(designPlan).toContain('Automatic severity downgrade authorized: no');
+    expect(designPlan).toContain('Confidence threshold change authorized: no');
+    expect(designPlan).toContain('Acceptance policy change authorized: no');
+    expect(designPlan).toContain('Action Authorization Receipts issued: 0');
+    expect(designPlan).toContain('Target repositories acquired: 0');
+    expect(designPlan).toContain('Target repositories executed: 0');
+    expect(designPlan).toContain('Target repository writes: 0');
+
+    expect(operationRecord).toContain(`# ${goalTitle}`);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(conclusion);
+    expect(operationRecord).toContain('Bounded designs prepared: 2/2');
+    expect(operationRecord).toContain('Runtime behavior changed: no');
+    expect(operationRecord).toContain(nextGoalTitle);
+
+    expect(goalRecord).toMatchObject({
+      id: goalId,
+      title: goalTitle,
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId
+    });
+    expect(goalRecord.summary).toMatchObject({
+      design_plan:
+        'docs/product/strategy/false-positive-detector-runtime-calibration-bounded-design-plan-v0.1.md',
+      operation_record:
+        'docs/operations/repoassure-false-positive-detector-runtime-calibration-bounded-design-planning-v0.1.md',
+      designed_question_count: 2,
+      question_design_statuses: {
+        conditional_dead_control_should_consider_form_dirty_prerequisites:
+          'bounded_design_prepared',
+        auth_redirect_route_should_preserve_maintainer_review_boundary:
+          'bounded_design_prepared'
+      },
+      manual_gates: manualGates,
+      detector_implementation_authorized: false,
+      detector_changes_authorized: false,
+      finding_suppression_authorized: false,
+      automatic_severity_downgrade_authorized: false,
+      confidence_threshold_change_authorized: false,
+      acceptance_policy_change_authorized: false,
+      authorization_receipts_issued: 0,
+      target_repositories_acquired: 0,
+      target_repositories_executed: 0,
+      target_repository_writes: 0
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      source_spec:
+        'docs/product/strategy/false-positive-detector-runtime-calibration-bounded-design-plan-v0.1.md'
+    });
+    expect(nextGoalRecord.objective).toContain(
+      'Prepare a local-only per-question implementation authorization intake'
+    );
+    expect(nextGoalRecord.summary).toMatchObject({
+      design_plan:
+        'docs/product/strategy/false-positive-detector-runtime-calibration-bounded-design-plan-v0.1.md',
+      question_count: 2,
+      implementation_authorization_decisions_recorded: 0,
+      pending_questions: questions.map((question) => question.id),
+      detector_implementation_authorized: false,
+      detector_changes_authorized: false
+    });
+    for (const question of questions) {
+      expect(nextGoalRecord.acceptance.join('\n')).toContain(question.id);
+    }
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'runtime_detector_implementation',
+      'runtime_detection_behavior_change',
+      'finding_suppression',
+      'automatic_severity_downgrade',
+      'detector_confidence_threshold_change',
+      'acceptance_policy_change',
+      'authorization_receipt_issuance',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain(
+      'M1'
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'CP --> CQ[Implementation Authorization Intake]'
+    );
+
+    for (const canonicalDocument of [
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      blockerLog,
+      devLog,
+      progressSnapshot
+    ]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+    }
+  });
+
+  it('prepares two unfilled implementation authorization questions without inferring decisions', async () => {
+    const goalTitle =
+      'RepoAssure False-Positive Detector Runtime Calibration Implementation Authorization Intake v0.1';
+    const goalId =
+      'repoassure-false-positive-detector-runtime-calibration-implementation-authorization-intake-v0.1';
+    const conclusion =
+      'implementation_authorization_intake_prepared_without_inferred_decisions_or_detector_changes';
+    const nextGoalTitle =
+      'RepoAssure False-Positive Detector Runtime Calibration Implementation Authorization Maintainer Decision Recording v0.1';
+    const nextGoalId =
+      'repoassure-false-positive-detector-runtime-calibration-implementation-authorization-maintainer-decision-recording-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const questions = [
+      {
+        id: 'conditional_dead_control_should_consider_form_dirty_prerequisites',
+        fixtureId: 'real-fixture:react-disabled-save-control',
+        currentClassification: 'false_positive_candidate',
+        residualRisk: 'real_dead_control_could_be_hidden_by_incorrect_prerequisite_inference'
+      },
+      {
+        id: 'auth_redirect_route_should_preserve_maintainer_review_boundary',
+        fixtureId: 'real-fixture:vite-auth-redirect-route',
+        currentClassification: 'needs_maintainer_review',
+        residualRisk: 'unauthenticated_redirect_could_be_mistaken_for_authenticated_route_health'
+      }
+    ];
+    const decisionOptions = [
+      'approve_implementation',
+      'request_revision',
+      'defer',
+      'reject'
+    ];
+    const manualGates = [
+      'maintainer_classification_required_before_detector_change',
+      'fixture_privacy_confirmation_required',
+      'expected_snapshot_confirmation_required',
+      'confidence_threshold_review_required',
+      'regression_artifact_review_required'
+    ];
+    const [
+      intakeRecord,
+      operationRecord,
+      goalRecordText,
+      nextGoalRecordText,
+      goalIndexText,
+      progressText,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      blockerLog,
+      devLog,
+      progressSnapshot
+    ] = await Promise.all([
+      readFile(
+        'docs/product/strategy/false-positive-detector-runtime-calibration-implementation-authorization-intake-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/operations/repoassure-false-positive-detector-runtime-calibration-implementation-authorization-intake-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-false-positive-detector-runtime-calibration-implementation-authorization-intake-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-false-positive-detector-runtime-calibration-implementation-authorization-maintainer-decision-recording-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile(
+        'docs/acceptance/checklists/acceptance-checklist-v0.1.md',
+        'utf8'
+      ),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/blockers.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8')
+    ]);
+    const goalRecord = JSON.parse(goalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: {
+        authorization_intake?: string;
+        operation_record?: string;
+        question_count?: number;
+        implementation_authorization_decisions_recorded?: number;
+        implementation_authorization_decisions_pending?: number;
+        per_question_decisions?: Record<string, string>;
+        decision_options?: string[];
+        manual_gates?: string[];
+        goal_execution_authorization_treated_as_per_question_answer?: boolean;
+        detector_implementation_authorized?: boolean;
+        detector_changes_authorized?: boolean;
+        authorization_receipts_issued?: number;
+        target_repositories_acquired?: number;
+        target_repositories_executed?: number;
+        target_repository_writes?: number;
+      };
+    };
+    const nextGoalRecord = JSON.parse(nextGoalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      objective: string;
+      source_spec: string;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary?: Record<string, unknown>;
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage?: string;
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+      next_goal_plain_language?: string;
+      workflow_map?: { mermaid?: string };
+    };
+
+    expect(intakeRecord).toContain(`# ${goalTitle}`);
+    expect(intakeRecord).toContain('Status: completed');
+    expect(intakeRecord).toContain(`Conclusion: \`${conclusion}\``);
+    expect(intakeRecord).toContain(
+      'Implementation authorization decisions recorded: 0/2'
+    );
+    expect(intakeRecord).toContain(
+      'Implementation authorization decisions pending: 2/2'
+    );
+    for (const question of questions) {
+      expect(intakeRecord).toContain(
+        `| \`${question.id}\` | \`${question.fixtureId}\` | pending |`
+      );
+      expect(intakeRecord).toContain(question.currentClassification);
+      expect(intakeRecord).toContain(question.residualRisk);
+    }
+    for (const decisionOption of decisionOptions) {
+      expect(intakeRecord).toContain(`\`${decisionOption}\``);
+    }
+    for (const manualGate of manualGates) {
+      expect(intakeRecord).toContain(manualGate);
+    }
+    expect(intakeRecord).toContain(
+      'Goal execution authorization treated as per-question implementation answer: no'
+    );
+    expect(intakeRecord).toContain('Default or inferred choice allowed: no');
+    expect(intakeRecord).toContain(
+      'Raw source-fixture files available and privacy-confirmed: no'
+    );
+    expect(intakeRecord).toContain('Detector implementation authorized: no');
+    expect(intakeRecord).toContain('Detector changes authorized: no');
+    expect(intakeRecord).toContain('Action Authorization Receipts issued: 0');
+    expect(intakeRecord).toContain('Target repositories acquired: 0');
+    expect(intakeRecord).toContain('Target repositories executed: 0');
+    expect(intakeRecord).toContain('Target repository writes: 0');
+
+    expect(operationRecord).toContain(`# ${goalTitle}`);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(conclusion);
+    expect(operationRecord).toContain(
+      'Implementation authorization decisions recorded: 0/2'
+    );
+    expect(operationRecord).toContain(
+      'Implementation authorization decisions pending: 2/2'
+    );
+    expect(operationRecord).toContain(nextGoalTitle);
+
+    expect(goalRecord).toMatchObject({
+      id: goalId,
+      title: goalTitle,
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId
+    });
+    expect(goalRecord.summary).toMatchObject({
+      authorization_intake:
+        'docs/product/strategy/false-positive-detector-runtime-calibration-implementation-authorization-intake-v0.1.md',
+      operation_record:
+        'docs/operations/repoassure-false-positive-detector-runtime-calibration-implementation-authorization-intake-v0.1.md',
+      question_count: 2,
+      implementation_authorization_decisions_recorded: 0,
+      implementation_authorization_decisions_pending: 2,
+      per_question_decisions: {
+        conditional_dead_control_should_consider_form_dirty_prerequisites:
+          'pending',
+        auth_redirect_route_should_preserve_maintainer_review_boundary:
+          'pending'
+      },
+      decision_options: decisionOptions,
+      manual_gates: manualGates,
+      goal_execution_authorization_treated_as_per_question_answer: false,
+      detector_implementation_authorized: false,
+      detector_changes_authorized: false,
+      authorization_receipts_issued: 0,
+      target_repositories_acquired: 0,
+      target_repositories_executed: 0,
+      target_repository_writes: 0
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      conclusion:
+        'maintainer_approved_conditional_dead_control_implementation_and_requested_auth_redirect_revision_without_detector_changes',
+      next_goal_id:
+        'repoassure-conditional-dead-control-calibration-implementation-gate-evidence-preparation-v0.1',
+      source_spec:
+        'docs/product/strategy/false-positive-detector-runtime-calibration-implementation-authorization-intake-v0.1.md'
+    });
+    expect(nextGoalRecord.objective).toContain(
+      'Record explicit per-question implementation authorization decisions'
+    );
+    expect(nextGoalRecord.summary).toMatchObject({
+      authorization_intake:
+        'docs/product/strategy/false-positive-detector-runtime-calibration-implementation-authorization-intake-v0.1.md',
+      question_count: 2,
+      implementation_authorization_decisions_recorded: 2,
+      approved_implementation_question_count: 1,
+      revision_requested_question_count: 1,
+      pending_question_count: 0,
+      pending_questions: [],
+      per_question_decisions: {
+        conditional_dead_control_should_consider_form_dirty_prerequisites:
+          'approve_implementation',
+        auth_redirect_route_should_preserve_maintainer_review_boundary:
+          'request_revision'
+      },
+      decision_options: decisionOptions,
+      goal_execution_authorization_treated_as_per_question_answer: false,
+      detector_implementation_execution_authorized: false,
+      detector_changes_performed: false
+    });
+    for (const question of questions) {
+      expect(nextGoalRecord.acceptance.join('\n')).toContain(question.id);
+    }
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'implementation_authorization_decision_inference',
+      'runtime_detector_implementation',
+      'runtime_detection_behavior_change',
+      'finding_suppression',
+      'automatic_severity_downgrade',
+      'detector_confidence_threshold_change',
+      'acceptance_policy_change',
+      'authorization_receipt_issuance',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: currentActiveGoalId, status: 'ready_to_execute' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain(
+      'M1'
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'CR --> CS[Gate Evidence Preparation]'
+    );
+
+    for (const canonicalDocument of [
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      acceptanceChecklist,
+      testStrategy,
+      decisionLog,
+      blockerLog,
+      devLog,
+      progressSnapshot
+    ]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+    }
+  });
+
+  it('records one detector implementation direction approval and one revision request without authorizing detector changes', async () => {
+    const goalTitle =
+      'RepoAssure False-Positive Detector Runtime Calibration Implementation Authorization Maintainer Decision Recording v0.1';
+    const goalId =
+      'repoassure-false-positive-detector-runtime-calibration-implementation-authorization-maintainer-decision-recording-v0.1';
+    const conclusion =
+      'maintainer_approved_conditional_dead_control_implementation_and_requested_auth_redirect_revision_without_detector_changes';
+    const nextGoalTitle =
+      'RepoAssure Conditional Dead Control Calibration Implementation Gate Evidence Preparation v0.1';
+    const nextGoalId =
+      'repoassure-conditional-dead-control-calibration-implementation-gate-evidence-preparation-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const approvedQuestion =
+      'conditional_dead_control_should_consider_form_dirty_prerequisites';
+    const revisionQuestion =
+      'auth_redirect_route_should_preserve_maintainer_review_boundary';
+    const manualGates = [
+      'maintainer_classification_required_before_detector_change',
+      'fixture_privacy_confirmation_required',
+      'expected_snapshot_confirmation_required',
+      'confidence_threshold_review_required',
+      'regression_artifact_review_required'
+    ];
+    const [
+      decisionRecord,
+      operationRecord,
+      goalRecordText,
+      nextGoalRecordText,
+      goalIndexText,
+      progressText,
+      plan,
+      spec,
+      prd
+    ] = await Promise.all([
+      readFile(
+        'docs/product/strategy/false-positive-detector-runtime-calibration-implementation-authorization-maintainer-decision-record-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        'docs/operations/repoassure-false-positive-detector-runtime-calibration-implementation-authorization-maintainer-decision-recording-v0.1.md',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-false-positive-detector-runtime-calibration-implementation-authorization-maintainer-decision-recording-v0.1.json',
+        'utf8'
+      ),
+      readFile(
+        '.autopilot/goals/repoassure-conditional-dead-control-calibration-implementation-gate-evidence-preparation-v0.1.json',
+        'utf8'
+      ),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8')
+    ]);
+    const goalRecord = JSON.parse(goalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      summary?: Record<string, unknown>;
+    };
+    const nextGoalRecord = JSON.parse(nextGoalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      source_spec: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary?: Record<string, unknown>;
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id?: string;
+      goals?: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage?: string;
+      active_goal?: { id?: string; title?: string; status?: string };
+      next_goal?: { id?: string; title?: string; status?: string };
+      next_goal_plain_language?: string;
+      workflow_map?: { mermaid?: string };
+    };
+
+    expect(decisionRecord).toContain(`# ${goalTitle}`);
+    expect(decisionRecord).toContain('Status: completed');
+    expect(decisionRecord).toContain(`Conclusion: \`${conclusion}\``);
+    expect(decisionRecord).toContain(
+      `| \`${approvedQuestion}\` | \`approve_implementation\` |`
+    );
+    expect(decisionRecord).toContain(
+      `| \`${revisionQuestion}\` | \`request_revision\` |`
+    );
+    expect(decisionRecord).toContain(
+      'Implementation authorization decisions recorded: 2/2'
+    );
+    expect(decisionRecord).toContain(
+      'Approved implementation directions: 1/2'
+    );
+    expect(decisionRecord).toContain('Revision requests: 1/2');
+    expect(decisionRecord).toContain(
+      'Detector implementation execution authorized now: no'
+    );
+    expect(decisionRecord).toContain('Detector changes performed: no');
+    expect(decisionRecord).toContain('Action Authorization Receipts issued: 0');
+    for (const manualGate of manualGates) {
+      expect(decisionRecord).toContain(manualGate);
+    }
+
+    expect(operationRecord).toContain(`# ${goalTitle}`);
+    expect(operationRecord).toContain('Status: completed');
+    expect(operationRecord).toContain(conclusion);
+    expect(operationRecord).toContain(nextGoalTitle);
+    expect(operationRecord).toContain('Detector changes performed: no');
+
+    expect(goalRecord).toMatchObject({
+      id: goalId,
+      title: goalTitle,
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId
+    });
+    expect(goalRecord.summary).toMatchObject({
+      decision_record:
+        'docs/product/strategy/false-positive-detector-runtime-calibration-implementation-authorization-maintainer-decision-record-v0.1.md',
+      operation_record:
+        'docs/operations/repoassure-false-positive-detector-runtime-calibration-implementation-authorization-maintainer-decision-recording-v0.1.md',
+      question_count: 2,
+      implementation_authorization_decisions_recorded: 2,
+      approved_implementation_question_count: 1,
+      revision_requested_question_count: 1,
+      pending_question_count: 0,
+      per_question_decisions: {
+        [approvedQuestion]: 'approve_implementation',
+        [revisionQuestion]: 'request_revision'
+      },
+      manual_gates: manualGates,
+      conditional_dead_control_implementation_direction_authorized: true,
+      auth_redirect_implementation_direction_authorized: false,
+      detector_implementation_execution_authorized: false,
+      detector_changes_performed: false,
+      authorization_receipts_issued: 0,
+      target_repositories_acquired: 0,
+      target_repositories_executed: 0,
+      target_repository_writes: 0
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      conclusion:
+        'conditional_dead_control_gate_evidence_package_prepared_with_all_manual_gates_fail_closed',
+      next_goal_id:
+        'repoassure-conditional-dead-control-calibration-fixture-evidence-readiness-and-authorization-intake-v0.1',
+      source_spec:
+        'docs/product/strategy/false-positive-detector-runtime-calibration-implementation-authorization-maintainer-decision-record-v0.1.md'
+    });
+    expect(nextGoalRecord.summary).toMatchObject({
+      approved_question: approvedQuestion,
+      revision_requested_question: revisionQuestion,
+      manual_gate_count: 5,
+      completed_manual_gate_count: 0,
+      raw_source_fixture_files_available: false,
+      raw_source_fixture_privacy_confirmed: false,
+      detector_implementation_execution_authorized: false,
+      detector_changes_performed: false
+    });
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(approvedQuestion);
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(revisionQuestion);
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'runtime_detector_implementation',
+      'runtime_detection_behavior_change',
+      'finding_suppression',
+      'automatic_severity_downgrade',
+      'detector_confidence_threshold_change',
+      'acceptance_policy_change',
+      'authorization_receipt_issuance',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: currentActiveGoalId, status: 'ready_to_execute' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain(
+      'M1'
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'CR --> CS[Gate Evidence Preparation]'
+    );
+
+    for (const canonicalDocument of [plan, spec, prd]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+    }
+  });
+
+  it('prepares five fail-closed conditional-dead-control gate evidence packets', async () => {
+    const goalId =
+      'repoassure-conditional-dead-control-calibration-implementation-gate-evidence-preparation-v0.1';
+    const goalTitle =
+      'RepoAssure Conditional Dead Control Calibration Implementation Gate Evidence Preparation v0.1';
+    const nextGoalId =
+      'repoassure-conditional-dead-control-calibration-fixture-evidence-readiness-and-authorization-intake-v0.1';
+    const nextGoalTitle =
+      'RepoAssure Conditional Dead Control Calibration Fixture Evidence Readiness and Authorization Intake v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const conclusion =
+      'conditional_dead_control_gate_evidence_package_prepared_with_all_manual_gates_fail_closed';
+    const evidencePackagePath =
+      'docs/product/strategy/conditional-dead-control-calibration-implementation-gate-evidence-package-v0.1.md';
+    const operationRecordPath =
+      'docs/operations/repoassure-conditional-dead-control-calibration-implementation-gate-evidence-preparation-v0.1.md';
+    const approvedQuestion =
+      'conditional_dead_control_should_consider_form_dirty_prerequisites';
+    const revisionQuestion =
+      'auth_redirect_route_should_preserve_maintainer_review_boundary';
+
+    const [
+      evidencePackage,
+      operationRecord,
+      goalIndexText,
+      progressText,
+      plan,
+      spec,
+      prd
+    ] = await Promise.all([
+      readFile(evidencePackagePath, 'utf8'),
+      readFile(operationRecordPath, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8')
+    ]);
+
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      next_goal_plain_language: string;
+      workflow_map?: { mermaid?: string };
+    };
+    const goalRecordText = await readFile(`.autopilot/goals/${goalId}.json`, 'utf8');
+    const nextGoalRecordText = await readFile(
+      `.autopilot/goals/${nextGoalId}.json`,
+      'utf8'
+    );
+    const goalRecord = JSON.parse(goalRecordText) as {
+      status: string;
+      conclusion: string;
+      next_goal_id: string;
+      summary: Record<string, unknown>;
+    };
+    const nextGoalRecord = JSON.parse(nextGoalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      source_spec: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+
+    for (const document of [evidencePackage, operationRecord]) {
+      expect(document).toContain(conclusion);
+      expect(document).toContain(approvedQuestion);
+      expect(document).toContain(revisionQuestion);
+      expect(document).toContain('Gate evidence packets prepared: 5/5');
+      expect(document).toContain('Manual gates completed: 0/5');
+      expect(document).toContain('fixture_privacy_confirmation_required');
+      expect(document).toContain('expected_snapshot_confirmation_required');
+      expect(document).toContain('confidence_threshold_review_required');
+      expect(document).toContain('regression_artifact_review_required');
+      expect(document).toContain(
+        'blocked_missing_fixture_availability_and_privacy_confirmation'
+      );
+      expect(document).toContain('initial_disabled_before_dirty');
+      expect(document).toContain('enabled_after_safe_dirty_transition');
+      expect(document).toContain('dirty_transition_not_safely_observable');
+      expect(document).toContain('request_revision');
+      expect(document).toContain('Detector implementation execution authorized: no');
+      expect(document).toContain('Detector changes performed: no');
+    }
+
+    expect(goalRecord).toMatchObject({
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      summary: {
+        evidence_package: evidencePackagePath,
+        operation_record: operationRecordPath,
+        gate_evidence_packets_prepared: 5,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 0,
+        gate_statuses: {
+          maintainer_classification_required_before_detector_change:
+            'prepared_pending_final_gate_confirmation',
+          fixture_privacy_confirmation_required:
+            'blocked_missing_fixture_availability_and_privacy_confirmation',
+          expected_snapshot_confirmation_required:
+            'prepared_pending_fixture_and_maintainer_confirmation',
+          confidence_threshold_review_required:
+            'prepared_no_threshold_change_proposed_pending_confirmation',
+          regression_artifact_review_required:
+            'prepared_pending_fixture_execution_and_review'
+        },
+        raw_source_fixture_files_available: false,
+        raw_source_fixture_privacy_confirmed: false,
+        expected_snapshot_packet_prepared: true,
+        confidence_threshold_review_prepared: true,
+        confidence_threshold_change_proposed: false,
+        regression_artifact_review_packet_prepared: true,
+        regression_artifact_executed: false,
+        auth_redirect_excluded_from_implementation: true,
+        detector_implementation_execution_authorized: false,
+        detector_changes_performed: false,
+        authorization_receipts_issued: 0,
+        target_repositories_acquired: 0,
+        target_repositories_executed: 0,
+        target_repository_writes: 0
+      }
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      conclusion:
+        'conditional_dead_control_fixture_evidence_readiness_and_authorization_intake_prepared_without_inferred_choice_or_fixture_access',
+      next_goal_id:
+        'repoassure-conditional-dead-control-calibration-fixture-evidence-readiness-and-authorization-maintainer-decision-recording-v0.1',
+      source_spec: evidencePackagePath,
+      summary: {
+        approved_question: approvedQuestion,
+        revision_requested_question: revisionQuestion,
+        fixture_evidence_decisions_recorded: 0,
+        pending_fixture_evidence_decisions: 1,
+        raw_source_fixture_files_available: false,
+        raw_source_fixture_privacy_confirmed: false,
+        detector_implementation_execution_authorized: false,
+        detector_changes_performed: false
+      }
+    });
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'confirm_existing_local_public_fixture_evidence'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'request_synthetic_local_fixture_plan'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'defer_fixture_evidence'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'reject_implementation_path'
+    );
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'raw_source_fixture_access',
+      'runtime_detector_implementation',
+      'runtime_detection_behavior_change',
+      'target_repository_acquisition',
+      'target_repository_analysis',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: currentActiveGoalId, status: 'ready_to_execute' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain(
+      'M1'
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'CS --> CT[Fixture Evidence Intake]'
+    );
+
+    for (const canonicalDocument of [plan, spec, prd]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+    }
+  });
+
+  it('prepares an unselected fixture-evidence authorization intake', async () => {
+    const goalId =
+      'repoassure-conditional-dead-control-calibration-fixture-evidence-readiness-and-authorization-intake-v0.1';
+    const goalTitle =
+      'RepoAssure Conditional Dead Control Calibration Fixture Evidence Readiness and Authorization Intake v0.1';
+    const nextGoalId =
+      'repoassure-conditional-dead-control-calibration-fixture-evidence-readiness-and-authorization-maintainer-decision-recording-v0.1';
+    const nextGoalTitle =
+      'RepoAssure Conditional Dead Control Calibration Fixture Evidence Readiness and Authorization Maintainer Decision Recording v0.1';
+    const conclusion =
+      'conditional_dead_control_fixture_evidence_readiness_and_authorization_intake_prepared_without_inferred_choice_or_fixture_access';
+    const intakePath =
+      'docs/product/strategy/conditional-dead-control-calibration-fixture-evidence-readiness-and-authorization-intake-v0.1.md';
+    const operationRecordPath =
+      'docs/operations/repoassure-conditional-dead-control-calibration-fixture-evidence-readiness-and-authorization-intake-v0.1.md';
+    const approvedQuestion =
+      'conditional_dead_control_should_consider_form_dirty_prerequisites';
+    const revisionQuestion =
+      'auth_redirect_route_should_preserve_maintainer_review_boundary';
+    const fixtureEvidenceOptions = [
+      'confirm_existing_local_public_fixture_evidence',
+      'request_synthetic_local_fixture_plan',
+      'defer_fixture_evidence',
+      'reject_implementation_path'
+    ];
+    const minimumEvidenceFields = [
+      'fixture_identifier',
+      'evidence_location',
+      'source_category',
+      'provenance',
+      'license_status',
+      'privacy_confirmation',
+      'reviewer',
+      'reviewed_at'
+    ];
+
+    const [
+      intake,
+      operationRecord,
+      goalIndexText,
+      progressText,
+      plan,
+      spec,
+      prd
+    ] = await Promise.all([
+      readFile(intakePath, 'utf8'),
+      readFile(operationRecordPath, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8')
+    ]);
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      next_goal_plain_language: string;
+      workflow_map?: { mermaid?: string };
+    };
+    const goalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${goalId}.json`, 'utf8')
+    ) as {
+      status: string;
+      conclusion: string;
+      next_goal_id: string;
+      summary: Record<string, unknown>;
+    };
+    const nextGoalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${nextGoalId}.json`, 'utf8')
+    ) as {
+      id: string;
+      title: string;
+      status: string;
+      source_spec: string;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+
+    for (const document of [intake, operationRecord]) {
+      expect(document).toContain(conclusion);
+      expect(document).toContain(approvedQuestion);
+      expect(document).toContain(revisionQuestion);
+      expect(document).toContain('Fixture evidence options prepared: 4/4');
+      expect(document).toContain('Fixture evidence decisions recorded: 0/1');
+      expect(document).toContain('Preselected choice: none');
+      expect(document).toContain(
+        'Recommended option: `request_synthetic_local_fixture_plan`'
+      );
+      expect(document).toContain('Fixture access authorized: no');
+      expect(document).toContain('Fixture acquisition authorized: no');
+      expect(document).toContain(
+        'Detector implementation execution authorized: no'
+      );
+      expect(document).toContain('Detector changes performed: no');
+      for (const option of fixtureEvidenceOptions) {
+        expect(document).toContain(option);
+      }
+      for (const field of minimumEvidenceFields) {
+        expect(document).toContain(field);
+      }
+    }
+    expect(intake).toContain(
+      'Conditional Dead Control Calibration Fixture Evidence Readiness and Authorization Intake v0.1'
+    );
+    expect(operationRecord).toContain(goalTitle);
+
+    expect(goalRecord).toMatchObject({
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      summary: {
+        intake: intakePath,
+        operation_record: operationRecordPath,
+        approved_question: approvedQuestion,
+        revision_requested_question: revisionQuestion,
+        fixture_evidence_options: fixtureEvidenceOptions,
+        fixture_evidence_options_prepared: 4,
+        fixture_evidence_decisions_recorded: 0,
+        pending_fixture_evidence_decisions: 1,
+        preselected_fixture_evidence_option: null,
+        recommended_fixture_evidence_option:
+          'request_synthetic_local_fixture_plan',
+        minimum_fixture_evidence_fields: minimumEvidenceFields,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 0,
+        raw_source_fixture_files_available: false,
+        raw_source_fixture_privacy_confirmed: false,
+        goal_execution_authorization_treated_as_fixture_evidence_choice: false,
+        fixture_access_authorized: false,
+        fixture_acquisition_authorized: false,
+        auth_redirect_excluded_from_implementation: true,
+        detector_implementation_execution_authorized: false,
+        detector_changes_performed: false,
+        authorization_receipts_issued: 0,
+        target_repositories_acquired: 0,
+        target_repositories_executed: 0,
+        target_repository_writes: 0
+      }
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      source_spec: intakePath,
+      summary: {
+        approved_question: approvedQuestion,
+        revision_requested_question: revisionQuestion,
+        explicit_owner_input: '2',
+        selected_fixture_evidence_option:
+          'request_synthetic_local_fixture_plan',
+        fixture_evidence_decisions_recorded: 1,
+        pending_fixture_evidence_decisions: 0,
+        raw_source_fixture_files_available: false,
+        raw_source_fixture_privacy_confirmed: false,
+        fixture_access_authorized: false,
+        fixture_acquisition_authorized: false,
+        detector_implementation_execution_authorized: false,
+        detector_changes_performed: false
+      }
+    });
+    for (const option of fixtureEvidenceOptions) {
+      expect(nextGoalRecord.acceptance.join('\n')).toContain(option);
+    }
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'ordinary Goal execution authorization'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(revisionQuestion);
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'fixture_evidence_decision_inference',
+      'raw_source_fixture_access',
+      'raw_source_fixture_acquisition',
+      'synthetic_fixture_implementation',
+      'runtime_detector_implementation',
+      'runtime_detection_behavior_change',
+      'authorization_receipt_issuance',
+      'target_repository_acquisition',
+      'target_repository_analysis',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1',
+      title:
+        'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1',
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain(
+      'M1'
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'CU --> CV[Synthetic Fixture Planning]'
+    );
+
+    for (const canonicalDocument of [plan, spec, prd]) {
+      expect(canonicalDocument).toContain(nextGoalTitle);
+    }
+  });
+
+  it('records option 2 as a plan-only fixture direction without authorizing fixture work', async () => {
+    const goalId =
+      'repoassure-conditional-dead-control-calibration-fixture-evidence-readiness-and-authorization-maintainer-decision-recording-v0.1';
+    const goalTitle =
+      'RepoAssure Conditional Dead Control Calibration Fixture Evidence Readiness and Authorization Maintainer Decision Recording v0.1';
+    const nextGoalId =
+      'repoassure-conditional-dead-control-calibration-synthetic-fixture-bounded-planning-v0.1';
+    const nextGoalTitle =
+      'RepoAssure Conditional Dead Control Calibration Synthetic Fixture Bounded Planning v0.1';
+    const conclusion =
+      'maintainer_requested_synthetic_local_fixture_plan_without_fixture_access_or_detector_changes';
+    const decisionRecordPath =
+      'docs/product/strategy/conditional-dead-control-calibration-fixture-evidence-readiness-and-authorization-maintainer-decision-record-v0.1.md';
+    const operationRecordPath =
+      'docs/operations/repoassure-conditional-dead-control-calibration-fixture-evidence-readiness-and-authorization-maintainer-decision-recording-v0.1.md';
+    const approvedQuestion =
+      'conditional_dead_control_should_consider_form_dirty_prerequisites';
+    const revisionQuestion =
+      'auth_redirect_route_should_preserve_maintainer_review_boundary';
+    const selectedOption = 'request_synthetic_local_fixture_plan';
+
+    const [
+      decisionRecord,
+      operationRecord,
+      goalIndexText,
+      progressText,
+      plan,
+      spec,
+      prd
+    ] = await Promise.all([
+      readFile(decisionRecordPath, 'utf8'),
+      readFile(operationRecordPath, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8')
+    ]);
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      next_goal_plain_language: string;
+      workflow_map?: { mermaid?: string };
+    };
+    const goalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${goalId}.json`, 'utf8')
+    ) as {
+      status: string;
+      conclusion: string;
+      next_goal_id: string;
+      summary: Record<string, unknown>;
+    };
+    const nextGoalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${nextGoalId}.json`, 'utf8')
+    ) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec: string;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+
+    for (const document of [decisionRecord, operationRecord]) {
+      expect(document).toContain(conclusion);
+      expect(document).toContain(approvedQuestion);
+      expect(document).toContain(revisionQuestion);
+      expect(document).toContain('Explicit owner input: `2`');
+      expect(document).toContain(
+        'Selected option: `request_synthetic_local_fixture_plan`'
+      );
+      expect(document).toContain('Fixture evidence decisions recorded: 1/1');
+      expect(document).toContain('Pending fixture evidence decisions: 0/1');
+      expect(document).toContain(
+        'Ordinary Goal execution authorization treated as fixture-evidence choice: no'
+      );
+      expect(document).toContain(
+        'Synthetic fixture plan direction authorized: yes'
+      );
+      expect(document).toContain(
+        'Synthetic fixture planning execution authorized: no'
+      );
+      expect(document).toContain(
+        'Synthetic fixture implementation authorized: no'
+      );
+      expect(document).toContain('Fixture access authorized: no');
+      expect(document).toContain('Fixture acquisition authorized: no');
+      expect(document).toContain('Manual gates completed: 0/5');
+      expect(document).toContain(
+        'Detector implementation execution authorized: no'
+      );
+      expect(document).toContain('Detector changes performed: no');
+    }
+
+    expect(goalRecord).toMatchObject({
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      summary: {
+        decision_record: decisionRecordPath,
+        operation_record: operationRecordPath,
+        approved_question: approvedQuestion,
+        revision_requested_question: revisionQuestion,
+        explicit_owner_input: '2',
+        selected_fixture_evidence_option: selectedOption,
+        fixture_evidence_decisions_recorded: 1,
+        pending_fixture_evidence_decisions: 0,
+        goal_execution_authorization_treated_as_fixture_evidence_choice: false,
+        synthetic_fixture_plan_direction_authorized: true,
+        synthetic_fixture_planning_execution_authorized: false,
+        synthetic_fixture_implementation_authorized: false,
+        synthetic_fixture_created: false,
+        synthetic_fixture_executed: false,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 0,
+        raw_source_fixture_files_available: false,
+        raw_source_fixture_privacy_confirmed: false,
+        fixture_access_authorized: false,
+        fixture_acquisition_authorized: false,
+        auth_redirect_excluded_from_implementation: true,
+        detector_implementation_execution_authorized: false,
+        detector_changes_performed: false,
+        authorization_receipts_issued: 0,
+        target_repositories_acquired: 0,
+        target_repositories_executed: 0,
+        target_repository_writes: 0
+      }
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      source_spec: decisionRecordPath,
+      summary: {
+        selected_fixture_evidence_option: selectedOption,
+        synthetic_fixture_plan_direction_authorized: true,
+        synthetic_fixture_planning_execution_authorized: true,
+        synthetic_fixture_implementation_authorized: false,
+        synthetic_fixture_created: false,
+        synthetic_fixture_executed: false,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 0,
+        detector_implementation_execution_authorized: false,
+        detector_changes_performed: false,
+        authorization_receipts_issued: 0,
+        target_repositories_acquired: 0,
+        target_repositories_executed: 0,
+        target_repository_writes: 0
+      }
+    });
+    expect(nextGoalRecord.objective).toContain('plan');
+    expect(nextGoalRecord.objective).toContain('without creating, executing, or analyzing');
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'initial disabled'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'safe dirty transition available'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'enabled after transition'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'still disabled after transition'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'not safely observable'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'all five manual gates incomplete'
+    );
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'synthetic_fixture_creation',
+      'synthetic_fixture_implementation',
+      'synthetic_fixture_execution',
+      'raw_source_fixture_access',
+      'raw_source_fixture_acquisition',
+      'runtime_detector_implementation',
+      'runtime_detection_behavior_change',
+      'authorization_receipt_issuance',
+      'target_repository_acquisition',
+      'target_repository_analysis',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1',
+      title:
+        'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1',
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain(
+      'M1'
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'CV --> CW[Synthetic Fixture Authorization Intake]'
+    );
+
+    for (const canonicalDocument of [plan, spec, prd]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+    }
+  });
+
+  it('prepares a five-state synthetic fixture plan without creating fixture files', async () => {
+    const goalId =
+      'repoassure-conditional-dead-control-calibration-synthetic-fixture-bounded-planning-v0.1';
+    const goalTitle =
+      'RepoAssure Conditional Dead Control Calibration Synthetic Fixture Bounded Planning v0.1';
+    const nextGoalId =
+      'repoassure-conditional-dead-control-calibration-synthetic-fixture-implementation-authorization-intake-v0.1';
+    const nextGoalTitle =
+      'RepoAssure Conditional Dead Control Calibration Synthetic Fixture Implementation Authorization Intake v0.1';
+    const conclusion =
+      'synthetic_fixture_bounded_plan_prepared_without_fixture_creation_execution_or_detector_changes';
+    const planPath =
+      'docs/product/strategy/conditional-dead-control-calibration-synthetic-fixture-bounded-plan-v0.1.md';
+    const operationRecordPath =
+      'docs/operations/repoassure-conditional-dead-control-calibration-synthetic-fixture-bounded-planning-v0.1.md';
+    const revisionQuestion =
+      'auth_redirect_route_should_preserve_maintainer_review_boundary';
+    const syntheticStateIds = [
+      'initial_disabled_before_dirty',
+      'safe_dirty_transition_available',
+      'enabled_after_safe_dirty_transition',
+      'still_disabled_after_safe_dirty_transition',
+      'dirty_transition_not_safely_observable'
+    ];
+    const proposedFutureFiles = [
+      'tests/fixtures/conditional-dead-control-synthetic/fixture-manifest.json',
+      'tests/fixtures/conditional-dead-control-synthetic/form-dirty-states.json',
+      'tests/unit/conditional-dead-control-synthetic-fixture.test.ts'
+    ];
+    const authorizationOptions = [
+      'approve_synthetic_fixture_implementation',
+      'request_synthetic_fixture_plan_revision',
+      'defer_synthetic_fixture_implementation',
+      'reject_synthetic_fixture_path'
+    ];
+
+    const [
+      boundedPlan,
+      operationRecord,
+      goalIndexText,
+      progressText,
+      plan,
+      spec,
+      prd
+    ] = await Promise.all([
+      readFile(planPath, 'utf8'),
+      readFile(operationRecordPath, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8')
+    ]);
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      next_goal_plain_language: string;
+      workflow_map?: { mermaid?: string };
+    };
+    const goalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${goalId}.json`, 'utf8')
+    ) as {
+      status: string;
+      conclusion: string;
+      next_goal_id: string;
+      summary: Record<string, unknown>;
+    };
+    const nextGoalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${nextGoalId}.json`, 'utf8')
+    ) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec: string;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+
+    for (const document of [boundedPlan, operationRecord]) {
+      expect(document).toContain(conclusion);
+      expect(document).toContain('Synthetic states defined: 5/5');
+      expect(document).toContain('Proposed future files: 3');
+      expect(document).toContain('Synthetic fixture created: no');
+      expect(document).toContain('Synthetic fixture executed: no');
+      expect(document).toContain('Manual gates completed: 0/5');
+      expect(document).toContain('Detector changes performed: no');
+      expect(document).toContain(revisionQuestion);
+      expect(document).toContain('Positive regression');
+      expect(document).toContain('Counter-regression');
+      expect(document).toContain('Fail-closed regression');
+      expect(document).toContain('Rollback');
+      for (const stateId of syntheticStateIds) {
+        expect(document).toContain(stateId);
+      }
+      for (const proposedFutureFile of proposedFutureFiles) {
+        expect(document).toContain(proposedFutureFile);
+      }
+    }
+
+    expect(goalRecord).toMatchObject({
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      summary: {
+        plan: planPath,
+        operation_record: operationRecordPath,
+        synthetic_state_ids: syntheticStateIds,
+        synthetic_states_defined: 5,
+        proposed_future_files: proposedFutureFiles,
+        proposed_future_file_count: 3,
+        positive_regressions_planned: 1,
+        counter_regressions_planned: 1,
+        fail_closed_regressions_planned: 1,
+        expected_snapshots_planned: 3,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 0,
+        synthetic_fixture_implementation_authorized: false,
+        synthetic_fixture_created: false,
+        synthetic_fixture_executed: false,
+        raw_source_fixture_files_available: false,
+        raw_source_fixture_privacy_confirmed: false,
+        auth_redirect_excluded_from_implementation: true,
+        detector_implementation_execution_authorized: false,
+        detector_changes_performed: false,
+        authorization_receipts_issued: 0,
+        target_repositories_acquired: 0,
+        target_repositories_executed: 0,
+        target_repository_writes: 0
+      }
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      source_spec: planPath,
+      summary: {
+        synthetic_state_ids: syntheticStateIds,
+        synthetic_states_defined: 5,
+        proposed_future_files: proposedFutureFiles,
+        synthetic_fixture_implementation_options: authorizationOptions,
+        synthetic_fixture_implementation_decisions_recorded: 0,
+        pending_synthetic_fixture_implementation_decisions: 1,
+        preselected_synthetic_fixture_implementation_option: null,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 0,
+        synthetic_fixture_implementation_authorized: false,
+        synthetic_fixture_created: false,
+        synthetic_fixture_executed: false,
+        detector_implementation_execution_authorized: false,
+        detector_changes_performed: false
+      }
+    });
+    for (const option of authorizationOptions) {
+      expect(nextGoalRecord.acceptance.join('\n')).toContain(option);
+    }
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'ordinary Goal execution authorization'
+    );
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'synthetic_fixture_implementation_decision_inference',
+      'synthetic_fixture_creation',
+      'synthetic_fixture_implementation',
+      'synthetic_fixture_execution',
+      'raw_source_fixture_access',
+      'raw_source_fixture_acquisition',
+      'runtime_detector_implementation',
+      'runtime_detection_behavior_change',
+      'authorization_receipt_issuance',
+      'target_repository_acquisition',
+      'target_repository_analysis',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1'
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1',
+      title:
+        'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1',
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain(
+      'M1'
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'CW --> CX[Synthetic Fixture Decision Recording]'
+    );
+
+    for (const canonicalDocument of [plan, spec, prd]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+    }
+  });
+
+  it('prepares four unselected synthetic fixture implementation choices without fixture work', async () => {
+    const goalId =
+      'repoassure-conditional-dead-control-calibration-synthetic-fixture-implementation-authorization-intake-v0.1';
+    const goalTitle =
+      'RepoAssure Conditional Dead Control Calibration Synthetic Fixture Implementation Authorization Intake v0.1';
+    const nextGoalId =
+      'repoassure-conditional-dead-control-calibration-synthetic-fixture-implementation-authorization-maintainer-decision-recording-v0.1';
+    const nextGoalTitle =
+      'RepoAssure Conditional Dead Control Calibration Synthetic Fixture Implementation Authorization Maintainer Decision Recording v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const conclusion =
+      'synthetic_fixture_implementation_authorization_intake_prepared_without_inferred_choice_or_fixture_work';
+    const intakePath =
+      'docs/product/strategy/conditional-dead-control-calibration-synthetic-fixture-implementation-authorization-intake-v0.1.md';
+    const operationRecordPath =
+      'docs/operations/repoassure-conditional-dead-control-calibration-synthetic-fixture-implementation-authorization-intake-v0.1.md';
+    const sourcePlanPath =
+      'docs/product/strategy/conditional-dead-control-calibration-synthetic-fixture-bounded-plan-v0.1.md';
+    const approvedQuestion =
+      'conditional_dead_control_should_consider_form_dirty_prerequisites';
+    const revisionQuestion =
+      'auth_redirect_route_should_preserve_maintainer_review_boundary';
+    const syntheticStateIds = [
+      'initial_disabled_before_dirty',
+      'safe_dirty_transition_available',
+      'enabled_after_safe_dirty_transition',
+      'still_disabled_after_safe_dirty_transition',
+      'dirty_transition_not_safely_observable'
+    ];
+    const proposedFutureFiles = [
+      'tests/fixtures/conditional-dead-control-synthetic/fixture-manifest.json',
+      'tests/fixtures/conditional-dead-control-synthetic/form-dirty-states.json',
+      'tests/unit/conditional-dead-control-synthetic-fixture.test.ts'
+    ];
+    const authorizationOptions = [
+      'approve_synthetic_fixture_implementation',
+      'request_synthetic_fixture_plan_revision',
+      'defer_synthetic_fixture_implementation',
+      'reject_synthetic_fixture_path'
+    ];
+
+    const [
+      intake,
+      operationRecord,
+      goalIndexText,
+      progressText,
+      plan,
+      spec,
+      prd
+    ] = await Promise.all([
+      readFile(intakePath, 'utf8'),
+      readFile(operationRecordPath, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8')
+    ]);
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      next_goal_plain_language: string;
+      workflow_map?: { mermaid?: string };
+    };
+    const goalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${goalId}.json`, 'utf8')
+    ) as {
+      status: string;
+      conclusion: string;
+      next_goal_id: string;
+      summary: Record<string, unknown>;
+    };
+    const nextGoalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${nextGoalId}.json`, 'utf8')
+    ) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec: string;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+
+    for (const document of [intake, operationRecord]) {
+      expect(document).toContain(conclusion);
+      expect(document).toContain('Implementation options prepared: 4/4');
+      expect(document).toContain('Implementation decisions recorded: 0/1');
+      expect(document).toContain('Preselected choice: none');
+      expect(document).toContain(
+        'Recommended option: `approve_synthetic_fixture_implementation`'
+      );
+      expect(document).toContain(
+        'Goal execution authorization treated as implementation choice: no'
+      );
+      expect(document).toContain('Manual gates completed: 0/5');
+      expect(document).toContain('Synthetic fixture created: no');
+      expect(document).toContain('Synthetic fixture executed: no');
+      expect(document).toContain('Detector changes performed: no');
+      expect(document).toContain(revisionQuestion);
+      for (const option of authorizationOptions) {
+        expect(document).toContain(option);
+      }
+      for (const stateId of syntheticStateIds) {
+        expect(document).toContain(stateId);
+      }
+      for (const proposedFutureFile of proposedFutureFiles) {
+        expect(document).toContain(proposedFutureFile);
+      }
+    }
+
+    expect(goalRecord).toMatchObject({
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      summary: {
+        source_plan: sourcePlanPath,
+        authorization_intake: intakePath,
+        operation_record: operationRecordPath,
+        approved_question: approvedQuestion,
+        revision_requested_question: revisionQuestion,
+        synthetic_state_ids: syntheticStateIds,
+        synthetic_states_defined: 5,
+        proposed_future_files: proposedFutureFiles,
+        proposed_future_file_count: 3,
+        synthetic_fixture_implementation_options: authorizationOptions,
+        synthetic_fixture_implementation_options_prepared: 4,
+        synthetic_fixture_implementation_decisions_recorded: 0,
+        pending_synthetic_fixture_implementation_decisions: 1,
+        preselected_synthetic_fixture_implementation_option: null,
+        recommended_synthetic_fixture_implementation_option:
+          'approve_synthetic_fixture_implementation',
+        goal_execution_authorization_treated_as_synthetic_fixture_implementation_choice:
+          false,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 0,
+        synthetic_fixture_implementation_authorized: false,
+        synthetic_fixture_created: false,
+        synthetic_fixture_executed: false,
+        auth_redirect_excluded_from_implementation: true,
+        detector_implementation_execution_authorized: false,
+        detector_changes_performed: false,
+        authorization_receipts_issued: 0,
+        target_repositories_acquired: 0,
+        target_repositories_executed: 0,
+        target_repository_writes: 0
+      }
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      source_spec: intakePath,
+      summary: {
+        trigger_conclusion: conclusion,
+        authorization_intake: intakePath,
+        approved_question: approvedQuestion,
+        revision_requested_question: revisionQuestion,
+        synthetic_fixture_implementation_options: authorizationOptions,
+        selected_synthetic_fixture_implementation_choice:
+          'approve_synthetic_fixture_implementation',
+        synthetic_fixture_implementation_decisions_recorded: 1,
+        pending_synthetic_fixture_implementation_decisions: 0,
+        preselected_synthetic_fixture_implementation_option: null,
+        recommended_synthetic_fixture_implementation_option:
+          'approve_synthetic_fixture_implementation',
+        synthetic_fixture_implementation_authorized: false,
+        synthetic_fixture_created: false,
+        synthetic_fixture_executed: false,
+        detector_implementation_execution_authorized: false,
+        detector_changes_performed: false
+      }
+    });
+    expect(nextGoalRecord.objective).toContain('explicit');
+    for (const option of authorizationOptions) {
+      expect(nextGoalRecord.acceptance.join('\n')).toContain(option);
+    }
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'ordinary Goal execution authorization'
+    );
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'synthetic_fixture_implementation_decision_inference',
+      'synthetic_fixture_creation',
+      'synthetic_fixture_implementation',
+      'synthetic_fixture_execution',
+      'runtime_detector_implementation',
+      'runtime_detection_behavior_change',
+      'authorization_receipt_issuance',
+      'target_repository_acquisition',
+      'target_repository_analysis',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({
+        id: currentActiveGoalId,
+        status: 'ready_to_execute'
+      })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain(
+      'M1'
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'CW --> CX[Synthetic Fixture Decision Recording]'
+    );
+
+    for (const canonicalDocument of [plan, spec, prd]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+      expect(canonicalDocument).toContain(currentActiveGoalTitle);
+    }
+  });
+
+  it('records explicit synthetic fixture implementation approval without creating or running fixture files', async () => {
+    const goalId =
+      'repoassure-conditional-dead-control-calibration-synthetic-fixture-implementation-authorization-maintainer-decision-recording-v0.1';
+    const goalTitle =
+      'RepoAssure Conditional Dead Control Calibration Synthetic Fixture Implementation Authorization Maintainer Decision Recording v0.1';
+    const conclusion =
+      'maintainer_approved_synthetic_fixture_implementation_for_separately_authorized_local_fixture_goal_without_fixture_or_detector_work';
+    const selectedChoice = 'approve_synthetic_fixture_implementation';
+    const intakePath =
+      'docs/product/strategy/conditional-dead-control-calibration-synthetic-fixture-implementation-authorization-intake-v0.1.md';
+    const decisionRecordPath =
+      'docs/product/strategy/conditional-dead-control-calibration-synthetic-fixture-implementation-authorization-maintainer-decision-record-v0.1.md';
+    const operationRecordPath =
+      'docs/operations/repoassure-conditional-dead-control-calibration-synthetic-fixture-implementation-authorization-maintainer-decision-recording-v0.1.md';
+    const nextGoalId =
+      'repoassure-conditional-dead-control-calibration-synthetic-fixture-bounded-implementation-v0.1';
+    const nextGoalTitle =
+      'RepoAssure Conditional Dead Control Calibration Synthetic Fixture Bounded Implementation v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const revisionQuestion =
+      'auth_redirect_route_should_preserve_maintainer_review_boundary';
+    const syntheticStateIds = [
+      'initial_disabled_before_dirty',
+      'safe_dirty_transition_available',
+      'enabled_after_safe_dirty_transition',
+      'still_disabled_after_safe_dirty_transition',
+      'dirty_transition_not_safely_observable'
+    ];
+    const proposedFutureFiles = [
+      'tests/fixtures/conditional-dead-control-synthetic/fixture-manifest.json',
+      'tests/fixtures/conditional-dead-control-synthetic/form-dirty-states.json',
+      'tests/unit/conditional-dead-control-synthetic-fixture.test.ts'
+    ];
+
+    const [
+      decisionRecord,
+      operationRecord,
+      goalIndexText,
+      progressText,
+      plan,
+      spec,
+      prd
+    ] = await Promise.all([
+      readFile(decisionRecordPath, 'utf8'),
+      readFile(operationRecordPath, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8')
+    ]);
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      next_goal_plain_language: string;
+      workflow_map?: { mermaid?: string };
+    };
+    const goalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${goalId}.json`, 'utf8')
+    ) as {
+      status: string;
+      conclusion: string;
+      next_goal_id: string;
+      summary: Record<string, unknown>;
+    };
+    const nextGoalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${nextGoalId}.json`, 'utf8')
+    ) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec: string;
+      execution_authorization: unknown;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+
+    for (const document of [decisionRecord, operationRecord]) {
+      expect(document).toContain(conclusion);
+      expect(document).toContain(
+        `Selected choice: \`${selectedChoice}\``
+      );
+      expect(document).toContain('Implementation decisions recorded: 1/1');
+      expect(document).toContain('Pending implementation decisions: 0/1');
+      expect(document).toContain(
+        'Synthetic fixture implementation direction approved: yes'
+      );
+      expect(document).toContain(
+        'Synthetic fixture implementation execution authorized: no'
+      );
+      expect(document).toContain('Manual gates completed: 0/5');
+      expect(document).toContain('Synthetic fixture created: no');
+      expect(document).toContain('Synthetic fixture executed: no');
+      expect(document).toContain('Detector changes performed: no');
+      expect(document).toContain(revisionQuestion);
+      for (const stateId of syntheticStateIds) {
+        expect(document).toContain(stateId);
+      }
+      for (const proposedFutureFile of proposedFutureFiles) {
+        expect(document).toContain(proposedFutureFile);
+      }
+    }
+
+    expect(goalRecord).toMatchObject({
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      summary: {
+        authorization_intake: intakePath,
+        decision_record: decisionRecordPath,
+        operation_record: operationRecordPath,
+        selected_synthetic_fixture_implementation_choice: selectedChoice,
+        synthetic_fixture_implementation_decisions_recorded: 1,
+        pending_synthetic_fixture_implementation_decisions: 0,
+        synthetic_fixture_implementation_direction_approved: true,
+        implementation_goal_derivation_authorized: true,
+        synthetic_fixture_implementation_execution_authorized: false,
+        next_goal_execution_authorized: false,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 0,
+        synthetic_fixture_created: false,
+        synthetic_fixture_executed: false,
+        auth_redirect_excluded_from_implementation: true,
+        detector_implementation_execution_authorized: false,
+        detector_changes_performed: false,
+        authorization_receipts_issued: 0,
+        target_repositories_acquired: 0,
+        target_repositories_executed: 0,
+        target_repository_writes: 0
+      }
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      source_spec: decisionRecordPath,
+      summary: {
+        trigger_conclusion: conclusion,
+        selected_synthetic_fixture_implementation_choice: selectedChoice,
+        synthetic_state_ids: syntheticStateIds,
+        proposed_fixture_files: proposedFutureFiles,
+        proposed_fixture_file_count: 3,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 0,
+        auth_redirect_excluded_from_implementation: true,
+        detector_changes_performed: false
+      }
+    });
+    expect(nextGoalRecord.objective).toContain('exactly three');
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'positive, counter, and fail-closed'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'separately authorized'
+    );
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'synthetic_fixture_implementation_before_goal_execution_authorization',
+      'raw_source_fixture_access',
+      'raw_source_fixture_acquisition',
+      'runtime_detector_implementation',
+      'runtime_detection_behavior_change',
+      'finding_suppression',
+      'automatic_severity_downgrade',
+      'detector_confidence_threshold_change',
+      'acceptance_policy_change',
+      'authorization_receipt_issuance',
+      'target_repository_acquisition',
+      'target_repository_analysis',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({
+        id: currentActiveGoalId,
+        status: 'ready_to_execute'
+      })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain(
+      'M1'
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'CX --> CY[Synthetic Fixture Bounded Implementation]'
+    );
+
+    for (const canonicalDocument of [plan, spec, prd]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+      expect(canonicalDocument).toContain(currentActiveGoalTitle);
+    }
+  });
+
+  it('records the bounded synthetic fixture implementation and keeps all manual gates fail-closed', async () => {
+    const goalId =
+      'repoassure-conditional-dead-control-calibration-synthetic-fixture-bounded-implementation-v0.1';
+    const goalTitle =
+      'RepoAssure Conditional Dead Control Calibration Synthetic Fixture Bounded Implementation v0.1';
+    const conclusion =
+      'synthetic_fixture_implemented_and_locally_validated_without_detector_changes_or_manual_gate_completion';
+    const operationRecordPath =
+      'docs/operations/repoassure-conditional-dead-control-calibration-synthetic-fixture-bounded-implementation-v0.1.md';
+    const nextGoalId =
+      'repoassure-conditional-dead-control-calibration-synthetic-fixture-manual-review-package-v0.1';
+    const nextGoalTitle =
+      'RepoAssure Conditional Dead Control Calibration Synthetic Fixture Manual Review Package v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const fixtureManifestPath =
+      'tests/fixtures/conditional-dead-control-synthetic/fixture-manifest.json';
+    const fixtureStatesPath =
+      'tests/fixtures/conditional-dead-control-synthetic/form-dirty-states.json';
+    const fixtureTestPath =
+      'tests/unit/conditional-dead-control-synthetic-fixture.test.ts';
+    const fixtureFiles = [
+      fixtureManifestPath,
+      fixtureStatesPath,
+      fixtureTestPath
+    ];
+    const stateIds = [
+      'initial_disabled_before_dirty',
+      'safe_dirty_transition_available',
+      'enabled_after_safe_dirty_transition',
+      'still_disabled_after_safe_dirty_transition',
+      'dirty_transition_not_safely_observable'
+    ];
+    const [
+      manifestText,
+      statesText,
+      fixtureTest,
+      operationRecord,
+      goalIndexText,
+      progressText,
+      plan,
+      spec,
+      prd
+    ] = await Promise.all([
+      readFile(fixtureManifestPath, 'utf8'),
+      readFile(fixtureStatesPath, 'utf8'),
+      readFile(fixtureTestPath, 'utf8'),
+      readFile(operationRecordPath, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8')
+    ]);
+    const manifest = JSON.parse(manifestText) as {
+      requiredStateIds: string[];
+      manualGates: {
+        total: number;
+        completed: number;
+        entries: Array<{ id: string; status: string }>;
+      };
+      excludedCalibrationQuestion: {
+        id: string;
+        decision: string;
+        excludedFromImplementation: boolean;
+      };
+    };
+    const states = JSON.parse(statesText) as {
+      records: Array<{ stateId: string }>;
+      snapshots: Record<string, unknown>;
+      findingPolicy: Record<string, unknown>;
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      next_goal_plain_language: string;
+      workflow_map?: { mermaid?: string };
+    };
+    const goalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${goalId}.json`, 'utf8')
+    ) as {
+      status: string;
+      conclusion: string;
+      next_goal_id: string;
+      execution_authorization: unknown;
+      summary: Record<string, unknown>;
+    };
+    const nextGoalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${nextGoalId}.json`, 'utf8')
+    ) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec: string;
+      execution_authorization: unknown;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+
+    expect(
+      (await listFiles('tests/fixtures/conditional-dead-control-synthetic')).sort()
+    ).toEqual(fixtureFiles.slice(0, 2).sort());
+    expect(manifest.requiredStateIds).toEqual(stateIds);
+    expect(states.records.map((state) => state.stateId)).toEqual(stateIds);
+    expect(Object.keys(states.snapshots).sort()).toEqual([
+      'counter',
+      'failClosed',
+      'positive'
+    ]);
+    expect(manifest.excludedCalibrationQuestion).toEqual({
+      id: 'auth_redirect_route_should_preserve_maintainer_review_boundary',
+      decision: 'request_revision',
+      excludedFromImplementation: true
+    });
+    expect(states.findingPolicy).toEqual({
+      findingVisibility: 'visible_in_all_snapshots',
+      detectorBehaviorChanged: false,
+      findingSuppressionAuthorized: false,
+      automaticSeverityDowngradeAuthorized: false,
+      confidenceThresholdChangeAuthorized: false,
+      acceptancePolicyChangeAuthorized: false
+    });
+    expect(fixtureTest).toContain(
+      "describe('conditional dead control synthetic fixture'"
+    );
+
+    expect(operationRecord).toContain(conclusion);
+    expect(operationRecord).toContain('Synthetic fixture files implemented: 3/3');
+    expect(operationRecord).toContain('Required states: 5/5');
+    expect(operationRecord).toContain('Expected snapshots: 3/3');
+    expect(operationRecord).toContain('Focused fixture tests: 4/4 passed');
+    expect(operationRecord).toContain('Manual gates completed: 0/5');
+    expect(operationRecord).toContain('Detector changes performed: no');
+    expect(operationRecord).toContain('Raw source fixture accessed: no');
+    expect(operationRecord).toContain(
+      'Target repositories acquired / executed / written: 0 / 0 / 0'
+    );
+    for (const fixtureFile of fixtureFiles) {
+      expect(operationRecord).toContain(fixtureFile);
+    }
+    for (const stateId of stateIds) {
+      expect(operationRecord).toContain(stateId);
+    }
+
+    expect(goalRecord).toMatchObject({
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope: 'this_exact_bounded_implementation_goal'
+      },
+      summary: {
+        operation_record: operationRecordPath,
+        implemented_fixture_files: fixtureFiles,
+        implemented_fixture_file_count: 3,
+        synthetic_state_ids: stateIds,
+        synthetic_states_implemented: 5,
+        expected_snapshots_implemented: 3,
+        positive_regressions_implemented: 1,
+        counter_regressions_implemented: 1,
+        fail_closed_regressions_implemented: 1,
+        focused_fixture_tests_passed: 4,
+        synthetic_fixture_implementation_execution_authorized: true,
+        synthetic_fixture_created: true,
+        synthetic_fixture_executed: true,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 0,
+        raw_source_fixture_accessed: false,
+        auth_redirect_excluded_from_implementation: true,
+        detector_implementation_execution_authorized: false,
+        detector_changes_performed: false,
+        authorization_receipts_issued: 0,
+        target_repositories_acquired: 0,
+        target_repositories_executed: 0,
+        target_repository_writes: 0
+      }
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      source_spec: operationRecordPath,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope: 'this_exact_manual_review_package_goal'
+      },
+      summary: {
+        trigger_conclusion: conclusion,
+        fixture_evidence_files: fixtureFiles,
+        fixture_evidence_file_count: 3,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 0,
+        detector_changes_performed: false
+      }
+    });
+    expect(nextGoalRecord.objective).toContain('review package');
+    expect(nextGoalRecord.objective).toContain('without completing');
+    expect(nextGoalRecord.acceptance.join('\n')).toContain('five manual gates');
+    expect(nextGoalRecord.acceptance.join('\n')).toContain('0/5');
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'manual_gate_completion_inference',
+      'runtime_detector_implementation',
+      'runtime_detection_behavior_change',
+      'finding_suppression',
+      'automatic_severity_downgrade',
+      'detector_confidence_threshold_change',
+      'acceptance_policy_change',
+      'authorization_receipt_issuance',
+      'target_repository_acquisition',
+      'target_repository_analysis',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: currentActiveGoalId, status: 'ready_to_execute' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain(
+      'M1'
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'CZ --> DA[Synthetic Fixture Gate Decisions]'
+    );
+
+    for (const canonicalDocument of [plan, spec, prd]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+      expect(canonicalDocument).toContain(currentActiveGoalTitle);
+      expect(canonicalDocument).toContain('Manual gates completed: 5/5');
+    }
+  });
+
+  it('prepares five synthetic fixture manual gate review packets without recording maintainer decisions', async () => {
+    const goalId =
+      'repoassure-conditional-dead-control-calibration-synthetic-fixture-manual-review-package-v0.1';
+    const goalTitle =
+      'RepoAssure Conditional Dead Control Calibration Synthetic Fixture Manual Review Package v0.1';
+    const conclusion =
+      'synthetic_fixture_manual_review_package_prepared_with_five_pending_gate_decisions_without_detector_changes';
+    const reviewPackagePath =
+      'docs/product/strategy/conditional-dead-control-calibration-synthetic-fixture-manual-review-package-v0.1.md';
+    const operationRecordPath =
+      'docs/operations/repoassure-conditional-dead-control-calibration-synthetic-fixture-manual-review-package-v0.1.md';
+    const nextGoalId =
+      'repoassure-conditional-dead-control-calibration-synthetic-fixture-manual-gate-maintainer-decision-recording-v0.1';
+    const nextGoalTitle =
+      'RepoAssure Conditional Dead Control Calibration Synthetic Fixture Manual Gate Maintainer Decision Recording v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const fixtureEvidenceFiles = [
+      'tests/fixtures/conditional-dead-control-synthetic/fixture-manifest.json',
+      'tests/fixtures/conditional-dead-control-synthetic/form-dirty-states.json',
+      'tests/unit/conditional-dead-control-synthetic-fixture.test.ts'
+    ];
+    const manualGateIds = [
+      'maintainer_classification_required_before_detector_change',
+      'fixture_privacy_confirmation_required',
+      'expected_snapshot_confirmation_required',
+      'confidence_threshold_review_required',
+      'regression_artifact_review_required'
+    ];
+    const decisionOptions = [
+      'approve_gate_evidence',
+      'request_gate_revision',
+      'defer_gate_decision',
+      'reject_gate_evidence'
+    ];
+    const recommendedGateChoices = Object.fromEntries(
+      manualGateIds.map((gateId) => [gateId, 'approve_gate_evidence'])
+    );
+
+    const [
+      reviewPackage,
+      operationRecord,
+      manifestText,
+      statesText,
+      goalIndexText,
+      progressText,
+      plan,
+      spec,
+      prd
+    ] = await Promise.all([
+      readFile(reviewPackagePath, 'utf8'),
+      readFile(operationRecordPath, 'utf8'),
+      readFile(fixtureEvidenceFiles[0]!, 'utf8'),
+      readFile(fixtureEvidenceFiles[1]!, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8')
+    ]);
+    const manifest = JSON.parse(manifestText) as {
+      sourceCategory: string;
+      provenance: string;
+      licenseStatus: string;
+      review: { status: string; reviewer: unknown; reviewedAt: unknown };
+      manualGates: {
+        total: number;
+        completed: number;
+        entries: Array<{ id: string; status: string }>;
+      };
+    };
+    const states = JSON.parse(statesText) as {
+      snapshots: Record<string, { findingVisible: boolean; classification: string }>;
+      findingPolicy: Record<string, unknown>;
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      next_goal_plain_language: string;
+      workflow_map?: { mermaid?: string };
+    };
+    const goalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${goalId}.json`, 'utf8')
+    ) as {
+      status: string;
+      conclusion: string;
+      next_goal_id: string;
+      execution_authorization: unknown;
+      summary: Record<string, unknown>;
+    };
+    const nextGoalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${nextGoalId}.json`, 'utf8')
+    ) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec: string;
+      execution_authorization: unknown;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+
+    expect(manifest).toMatchObject({
+      sourceCategory: 'synthetic_local',
+      provenance: 'repoassure_authored_from_bounded_plan',
+      licenseStatus: 'not_applicable_original_synthetic'
+    });
+    expect(states.snapshots).toMatchObject({
+      positive: {
+        findingVisible: true,
+        classification: 'false_positive_candidate'
+      },
+      counter: {
+        findingVisible: true,
+        classification: 'actionable_conditional_dead_control'
+      },
+      failClosed: {
+        findingVisible: true,
+        classification: 'needs_maintainer_review'
+      }
+    });
+    expect(states.findingPolicy).toEqual({
+      findingVisibility: 'visible_in_all_snapshots',
+      detectorBehaviorChanged: false,
+      findingSuppressionAuthorized: false,
+      automaticSeverityDowngradeAuthorized: false,
+      confidenceThresholdChangeAuthorized: false,
+      acceptancePolicyChangeAuthorized: false
+    });
+
+    for (const document of [reviewPackage, operationRecord]) {
+      expect(document).toContain(conclusion);
+      expect(document).toContain('Review evidence packets prepared: 5/5');
+      expect(document).toContain('Gate decisions recorded: 0/5');
+      expect(document).toContain('Pending gate decisions: 5/5');
+      expect(document).toContain('Preselected gate decisions: 0/5');
+      expect(document).toContain('Manual gates completed: 0/5');
+      expect(document).toContain(
+        'Goal execution authorization treated as gate decisions: no'
+      );
+      expect(document).toContain('Recommendations are non-binding');
+      expect(document).toContain('Detector changes performed: no');
+      expect(document).toContain(
+        'auth_redirect_route_should_preserve_maintainer_review_boundary'
+      );
+      for (const gateId of manualGateIds) {
+        expect(document).toContain(gateId);
+      }
+      for (const decisionOption of decisionOptions) {
+        expect(document).toContain(decisionOption);
+      }
+      for (const fixtureEvidenceFile of fixtureEvidenceFiles) {
+        expect(document).toContain(fixtureEvidenceFile);
+      }
+    }
+
+    expect(goalRecord).toMatchObject({
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope: 'this_exact_manual_review_package_goal'
+      },
+      summary: {
+        review_package: reviewPackagePath,
+        operation_record: operationRecordPath,
+        fixture_evidence_files: fixtureEvidenceFiles,
+        fixture_evidence_file_count: 3,
+        review_evidence_packets_prepared: 5,
+        manual_gate_ids: manualGateIds,
+        gate_decision_options: decisionOptions,
+        recommended_gate_choices: recommendedGateChoices,
+        gate_decisions_recorded: 0,
+        pending_gate_decisions: 5,
+        preselected_gate_decisions: 0,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 0,
+        review_package_created: true,
+        maintainer_decisions_recorded: 0,
+        goal_execution_authorization_treated_as_gate_decisions: false,
+        fixture_files_modified: 0,
+        auth_redirect_excluded_from_implementation: true,
+        detector_implementation_execution_authorized: false,
+        detector_changes_performed: false,
+        authorization_receipts_issued: 0,
+        target_repositories_acquired: 0,
+        target_repositories_executed: 0,
+        target_repository_writes: 0
+      }
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      source_spec: reviewPackagePath,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope: 'this_exact_manual_gate_maintainer_decision_recording_goal'
+      },
+      summary: {
+        trigger_conclusion: conclusion,
+        manual_gate_ids: manualGateIds,
+        gate_decision_options: decisionOptions,
+        gate_decisions_recorded: 5,
+        pending_gate_decisions: 0,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 5,
+        goal_execution_authorization_treated_as_gate_decisions: false,
+        detector_changes_performed: false
+      }
+    });
+    expect(nextGoalRecord.objective).toContain('one explicit choice for each');
+    expect(nextGoalRecord.objective).toContain('without treating');
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'ordinary Goal execution authorization'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'does not authorize detector implementation'
+    );
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'manual_gate_decision_inference',
+      'manual_gate_completion_without_explicit_approval',
+      'runtime_detector_implementation',
+      'runtime_detection_behavior_change',
+      'finding_suppression',
+      'automatic_severity_downgrade',
+      'detector_confidence_threshold_change',
+      'acceptance_policy_change',
+      'authorization_receipt_issuance',
+      'target_repository_acquisition',
+      'target_repository_analysis',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: currentActiveGoalId, status: 'ready_to_execute' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain(
+      'M1'
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'CZ --> DA[Synthetic Fixture Gate Decisions]'
+    );
+
+    for (const canonicalDocument of [plan, spec, prd]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+      expect(canonicalDocument).toContain(currentActiveGoalTitle);
+      expect(canonicalDocument).toContain('Manual gates completed: 5/5');
+    }
+  });
+
+  it('records five explicit synthetic fixture gate approvals without authorizing detector implementation', async () => {
+    const goalId =
+      'repoassure-conditional-dead-control-calibration-synthetic-fixture-manual-gate-maintainer-decision-recording-v0.1';
+    const goalTitle =
+      'RepoAssure Conditional Dead Control Calibration Synthetic Fixture Manual Gate Maintainer Decision Recording v0.1';
+    const conclusion =
+      'maintainer_approved_all_five_synthetic_fixture_manual_gates_without_detector_implementation_authorization';
+    const reviewPackagePath =
+      'docs/product/strategy/conditional-dead-control-calibration-synthetic-fixture-manual-review-package-v0.1.md';
+    const decisionRecordPath =
+      'docs/product/strategy/conditional-dead-control-calibration-synthetic-fixture-manual-gate-maintainer-decision-record-v0.1.md';
+    const operationRecordPath =
+      'docs/operations/repoassure-conditional-dead-control-calibration-synthetic-fixture-manual-gate-maintainer-decision-recording-v0.1.md';
+    const nextGoalId =
+      'repoassure-conditional-dead-control-calibration-bounded-detector-implementation-authorization-intake-v0.1';
+    const nextGoalTitle =
+      'RepoAssure Conditional Dead Control Calibration Bounded Detector Implementation Authorization Intake v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const manifestPath =
+      'tests/fixtures/conditional-dead-control-synthetic/fixture-manifest.json';
+    const manualGateIds = [
+      'maintainer_classification_required_before_detector_change',
+      'fixture_privacy_confirmation_required',
+      'expected_snapshot_confirmation_required',
+      'confidence_threshold_review_required',
+      'regression_artifact_review_required'
+    ];
+    const perGateDecisions = Object.fromEntries(
+      manualGateIds.map((gateId) => [gateId, 'approve_gate_evidence'])
+    );
+    const implementationAuthorizationOptions = [
+      'authorize_bounded_detector_implementation',
+      'request_implementation_plan_revision',
+      'defer_detector_implementation',
+      'reject_detector_implementation'
+    ];
+
+    const [
+      decisionRecord,
+      operationRecord,
+      manifestText,
+      goalIndexText,
+      progressText,
+      plan,
+      spec,
+      prd
+    ] = await Promise.all([
+      readFile(decisionRecordPath, 'utf8'),
+      readFile(operationRecordPath, 'utf8'),
+      readFile(manifestPath, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8')
+    ]);
+    const manifest = JSON.parse(manifestText) as {
+      review: {
+        status: string;
+        reviewer: unknown;
+        reviewedAt: unknown;
+      };
+      manualGates: {
+        total: number;
+        completed: number;
+        entries: Array<{ id: string; status: string }>;
+      };
+      excludedCalibrationQuestion: {
+        id: string;
+        decision: string;
+        excludedFromImplementation: boolean;
+      };
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      next_goal_plain_language: string;
+      workflow_map?: { mermaid?: string };
+    };
+    const goalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${goalId}.json`, 'utf8')
+    ) as {
+      status: string;
+      conclusion: string;
+      next_goal_id: string;
+      execution_authorization: unknown;
+      summary: Record<string, unknown>;
+    };
+    const nextGoalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${nextGoalId}.json`, 'utf8')
+    ) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec: string;
+      execution_authorization: unknown;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+
+    expect(manifest.review).toMatchObject({
+      status: 'approved_manual_review',
+      reviewer: 'maintainer',
+      reviewedAt: '2026-07-29'
+    });
+    expect(manifest.manualGates).toEqual({
+      total: 5,
+      completed: 5,
+      entries: manualGateIds.map((id) => ({ id, status: 'completed' }))
+    });
+    expect(manifest.excludedCalibrationQuestion).toEqual({
+      id: 'auth_redirect_route_should_preserve_maintainer_review_boundary',
+      decision: 'request_revision',
+      excludedFromImplementation: true
+    });
+
+    for (const document of [decisionRecord, operationRecord]) {
+      expect(document).toContain(conclusion);
+      expect(document).toContain('Gate decisions recorded: 5/5');
+      expect(document).toContain('Approved gate decisions: 5/5');
+      expect(document).toContain('Pending gate decisions: 0/5');
+      expect(document).toContain('Manual gates completed: 5/5');
+      expect(document).toContain(
+        'Goal execution authorization treated as gate decisions: no'
+      );
+      expect(document).toContain(
+        'Detector implementation execution authorized: no'
+      );
+      expect(document).toContain('Detector changes performed: no');
+      expect(document).toContain(
+        'auth_redirect_route_should_preserve_maintainer_review_boundary'
+      );
+      for (const gateId of manualGateIds) {
+        expect(document).toContain(gateId);
+        expect(document).toContain('approve_gate_evidence');
+      }
+    }
+
+    expect(goalRecord).toMatchObject({
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope: 'this_exact_manual_gate_maintainer_decision_recording_goal'
+      },
+      summary: {
+        source_review_package: reviewPackagePath,
+        decision_record: decisionRecordPath,
+        operation_record: operationRecordPath,
+        decision_source: 'explicit_maintainer_all_gate_response_in_current_task',
+        manual_gate_ids: manualGateIds,
+        per_gate_decisions: perGateDecisions,
+        gate_decisions_recorded: 5,
+        approved_gate_decisions: 5,
+        revision_requested_gate_decisions: 0,
+        deferred_gate_decisions: 0,
+        rejected_gate_decisions: 0,
+        pending_gate_decisions: 0,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 5,
+        manifest_review_status_updated: true,
+        fixture_metadata_files_modified: 1,
+        fixture_behavior_files_modified: 0,
+        goal_execution_authorization_treated_as_gate_decisions: false,
+        auth_redirect_excluded_from_implementation: true,
+        detector_implementation_execution_authorized: false,
+        detector_changes_performed: false,
+        authorization_receipts_issued: 0,
+        target_repositories_acquired: 0,
+        target_repositories_executed: 0,
+        target_repository_writes: 0
+      }
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      source_spec: decisionRecordPath,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope: 'this_exact_bounded_detector_implementation_authorization_intake_goal'
+      },
+      summary: {
+        trigger_conclusion: conclusion,
+        source_decision_record: decisionRecordPath,
+        conditional_dead_control_implementation_direction_authorized: true,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 5,
+        implementation_authorization_options: implementationAuthorizationOptions,
+        preselected_implementation_authorization_option: null,
+        implementation_authorization_decisions_recorded: 0,
+        detector_implementation_execution_authorized: false,
+        detector_changes_performed: false
+      }
+    });
+    expect(nextGoalRecord.objective).toContain('unselected');
+    expect(nextGoalRecord.objective).toContain('without implementing');
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'separate execution authorization'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain('0/1');
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'does not authorize detector implementation'
+    );
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'implementation_authorization_inference',
+      'runtime_detector_implementation',
+      'runtime_detection_behavior_change',
+      'finding_suppression',
+      'automatic_severity_downgrade',
+      'detector_confidence_threshold_change',
+      'acceptance_policy_change',
+      'authorization_receipt_issuance',
+      'target_repository_acquisition',
+      'target_repository_analysis',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: currentActiveGoalId, status: 'ready_to_execute' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain(
+      'M1'
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'DA --> DB[Detector Implementation Authorization Intake]'
+    );
+
+    for (const canonicalDocument of [plan, spec, prd]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+      expect(canonicalDocument).toContain(currentActiveGoalTitle);
+      expect(canonicalDocument).toContain('Manual gates completed: 5/5');
+    }
+  });
+
+  it('prepares four unselected bounded detector implementation authorization choices without detector changes', async () => {
+    const goalId =
+      'repoassure-conditional-dead-control-calibration-bounded-detector-implementation-authorization-intake-v0.1';
+    const goalTitle =
+      'RepoAssure Conditional Dead Control Calibration Bounded Detector Implementation Authorization Intake v0.1';
+    const conclusion =
+      'bounded_detector_implementation_authorization_intake_prepared_without_inferred_choice_or_detector_changes';
+    const intakePath =
+      'docs/product/strategy/conditional-dead-control-calibration-bounded-detector-implementation-authorization-intake-v0.1.md';
+    const operationRecordPath =
+      'docs/operations/repoassure-conditional-dead-control-calibration-bounded-detector-implementation-authorization-intake-v0.1.md';
+    const sourceDecisionRecordPath =
+      'docs/product/strategy/conditional-dead-control-calibration-synthetic-fixture-manual-gate-maintainer-decision-record-v0.1.md';
+    const nextGoalId =
+      'repoassure-conditional-dead-control-calibration-bounded-detector-implementation-authorization-maintainer-decision-recording-v0.1';
+    const nextGoalTitle =
+      'RepoAssure Conditional Dead Control Calibration Bounded Detector Implementation Authorization Maintainer Decision Recording v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const implementationAuthorizationOptions = [
+      'authorize_bounded_detector_implementation',
+      'request_implementation_plan_revision',
+      'defer_detector_implementation',
+      'reject_detector_implementation'
+    ];
+    const manualGateIds = [
+      'maintainer_classification_required_before_detector_change',
+      'fixture_privacy_confirmation_required',
+      'expected_snapshot_confirmation_required',
+      'confidence_threshold_review_required',
+      'regression_artifact_review_required'
+    ];
+
+    const [
+      intake,
+      operationRecord,
+      goalIndexText,
+      progressText,
+      plan,
+      spec,
+      prd,
+      readme
+    ] = await Promise.all([
+      readFile(intakePath, 'utf8'),
+      readFile(operationRecordPath, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('README.md', 'utf8')
+    ]);
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      next_goal_plain_language: string;
+      workflow_map?: { mermaid?: string };
+    };
+    const goalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${goalId}.json`, 'utf8')
+    ) as {
+      status: string;
+      conclusion: string;
+      next_goal_id: string;
+      execution_authorization: unknown;
+      summary: Record<string, unknown>;
+    };
+    const nextGoalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${nextGoalId}.json`, 'utf8')
+    ) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec: string;
+      execution_authorization: unknown;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+
+    for (const document of [intake, operationRecord]) {
+      expect(document).toContain(conclusion);
+      expect(document).toContain('Implementation authorization options prepared: 4/4');
+      expect(document).toContain('Implementation authorization decisions recorded: 0/1');
+      expect(document).toContain('Pending implementation authorization decisions: 1/1');
+      expect(document).toContain('Preselected choice: none');
+      expect(document).toContain(
+        'Recommended option: `authorize_bounded_detector_implementation`'
+      );
+      expect(document).toContain(
+        'Goal execution authorization treated as implementation authorization choice: no'
+      );
+      expect(document).toContain('Manual gates completed: 5/5');
+      expect(document).toContain('Detector implementation execution authorized: no');
+      expect(document).toContain('Detector changes performed: no');
+      expect(document).toContain(
+        'auth_redirect_route_should_preserve_maintainer_review_boundary'
+      );
+      for (const option of implementationAuthorizationOptions) {
+        expect(document).toContain(option);
+      }
+      for (const gateId of manualGateIds) {
+        expect(document).toContain(gateId);
+      }
+    }
+
+    expect(goalRecord).toMatchObject({
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope: 'this_exact_bounded_detector_implementation_authorization_intake_goal'
+      },
+      summary: {
+        source_decision_record: sourceDecisionRecordPath,
+        authorization_intake: intakePath,
+        operation_record: operationRecordPath,
+        conditional_dead_control_implementation_direction_authorized: true,
+        auth_redirect_implementation_direction_authorized: false,
+        manual_gate_ids: manualGateIds,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 5,
+        implementation_authorization_options: implementationAuthorizationOptions,
+        implementation_authorization_options_prepared: 4,
+        implementation_authorization_decisions_recorded: 0,
+        pending_implementation_authorization_decisions: 1,
+        preselected_implementation_authorization_option: null,
+        recommended_implementation_authorization_option:
+          'authorize_bounded_detector_implementation',
+        goal_execution_authorization_treated_as_implementation_authorization_choice:
+          false,
+        bounded_detector_implementation_authorized: false,
+        detector_implementation_execution_authorized: false,
+        detector_changes_performed: false,
+        authorization_receipts_issued: 0,
+        target_repositories_acquired: 0,
+        target_repositories_executed: 0,
+        target_repository_writes: 0
+      }
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      source_spec: intakePath,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope:
+          'this_exact_bounded_detector_implementation_authorization_maintainer_decision_recording_goal'
+      },
+      summary: {
+        trigger_conclusion: conclusion,
+        authorization_intake: intakePath,
+        conditional_dead_control_implementation_direction_authorized: true,
+        auth_redirect_implementation_direction_authorized: false,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 5,
+        implementation_authorization_options: implementationAuthorizationOptions,
+        selected_implementation_authorization_choice:
+          'authorize_bounded_detector_implementation',
+        implementation_authorization_decisions_recorded: 1,
+        pending_implementation_authorization_decisions: 0,
+        preselected_implementation_authorization_option: null,
+        recommended_implementation_authorization_option:
+          'authorize_bounded_detector_implementation',
+        bounded_detector_implementation_authorized: false,
+        detector_implementation_execution_authorized: false,
+        detector_changes_performed: false
+      }
+    });
+    expect(nextGoalRecord.objective).toContain('one explicit maintainer choice');
+    expect(nextGoalRecord.objective).toContain('without inferring');
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'separate execution authorization'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'ordinary Goal execution authorization'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      '5/5 manual gates does not authorize detector implementation'
+    );
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'implementation_authorization_decision_inference',
+      'runtime_detector_implementation',
+      'runtime_detection_behavior_change',
+      'finding_suppression',
+      'automatic_severity_downgrade',
+      'detector_confidence_threshold_change',
+      'acceptance_policy_change',
+      'authorization_receipt_issuance',
+      'target_repository_acquisition',
+      'target_repository_analysis',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({
+        id: currentActiveGoalId,
+        status: 'ready_to_execute'
+      })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain(
+      'M1'
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'DB --> DC[Detector Implementation Decision Recording]'
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'DC --> DD[Bounded Detector Implementation]'
+    );
+
+    for (const canonicalDocument of [plan, spec, prd, readme]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+      expect(canonicalDocument).toContain(currentActiveGoalTitle);
+    }
+  });
+
+  it('records explicit bounded detector implementation authorization without changing or running the detector', async () => {
+    const goalId =
+      'repoassure-conditional-dead-control-calibration-bounded-detector-implementation-authorization-maintainer-decision-recording-v0.1';
+    const goalTitle =
+      'RepoAssure Conditional Dead Control Calibration Bounded Detector Implementation Authorization Maintainer Decision Recording v0.1';
+    const conclusion =
+      'maintainer_authorized_bounded_detector_implementation_for_separately_authorized_local_goal_without_detector_changes';
+    const selectedChoice = 'authorize_bounded_detector_implementation';
+    const intakePath =
+      'docs/product/strategy/conditional-dead-control-calibration-bounded-detector-implementation-authorization-intake-v0.1.md';
+    const decisionRecordPath =
+      'docs/product/strategy/conditional-dead-control-calibration-bounded-detector-implementation-authorization-maintainer-decision-record-v0.1.md';
+    const operationRecordPath =
+      'docs/operations/repoassure-conditional-dead-control-calibration-bounded-detector-implementation-authorization-maintainer-decision-recording-v0.1.md';
+    const nextGoalId =
+      'repoassure-conditional-dead-control-calibration-bounded-detector-implementation-v0.1';
+    const nextGoalTitle =
+      'RepoAssure Conditional Dead Control Calibration Bounded Detector Implementation v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const approvedQuestion =
+      'conditional_dead_control_should_consider_form_dirty_prerequisites';
+    const revisionQuestion =
+      'auth_redirect_route_should_preserve_maintainer_review_boundary';
+    const implementationAuthorizationOptions = [
+      'authorize_bounded_detector_implementation',
+      'request_implementation_plan_revision',
+      'defer_detector_implementation',
+      'reject_detector_implementation'
+    ];
+    const manualGateIds = [
+      'maintainer_classification_required_before_detector_change',
+      'fixture_privacy_confirmation_required',
+      'expected_snapshot_confirmation_required',
+      'confidence_threshold_review_required',
+      'regression_artifact_review_required'
+    ];
+    const syntheticFixtureFiles = [
+      'tests/fixtures/conditional-dead-control-synthetic/fixture-manifest.json',
+      'tests/fixtures/conditional-dead-control-synthetic/form-dirty-states.json',
+      'tests/unit/conditional-dead-control-synthetic-fixture.test.ts'
+    ];
+    const boundedImplementationFiles = [
+      'packages/browser-explorer/src/playwright-driver.ts',
+      'tests/unit/playwright-driver.test.ts',
+      'tests/unit/project-structure.test.ts'
+    ];
+
+    const [
+      decisionRecord,
+      operationRecord,
+      goalIndexText,
+      progressText,
+      plan,
+      spec,
+      prd,
+      readme
+    ] = await Promise.all([
+      readFile(decisionRecordPath, 'utf8'),
+      readFile(operationRecordPath, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('README.md', 'utf8')
+    ]);
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      next_goal_plain_language: string;
+      workflow_map?: { mermaid?: string };
+    };
+    const goalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${goalId}.json`, 'utf8')
+    ) as {
+      status: string;
+      conclusion: string;
+      next_goal_id: string;
+      execution_authorization: unknown;
+      summary: Record<string, unknown>;
+    };
+    const nextGoalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${nextGoalId}.json`, 'utf8')
+    ) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec: string;
+      execution_authorization: unknown;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+
+    for (const document of [decisionRecord, operationRecord]) {
+      expect(document).toContain(conclusion);
+      expect(document).toContain(`Selected choice: \`${selectedChoice}\``);
+      expect(document).toContain('Implementation authorization decisions recorded: 1/1');
+      expect(document).toContain('Pending implementation authorization decisions: 0/1');
+      expect(document).toContain('Bounded detector implementation direction authorized: yes');
+      expect(document).toContain('Detector implementation execution authorized: no');
+      expect(document).toContain('Next Goal execution authorized: no');
+      expect(document).toContain('Manual gates completed: 5/5');
+      expect(document).toContain('Detector changes performed: no');
+      expect(document).toContain(approvedQuestion);
+      expect(document).toContain(revisionQuestion);
+      for (const fixtureFile of syntheticFixtureFiles) {
+        expect(document).toContain(fixtureFile);
+      }
+    }
+
+    expect(goalRecord).toMatchObject({
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope:
+          'this_exact_bounded_detector_implementation_authorization_maintainer_decision_recording_goal'
+      },
+      summary: {
+        authorization_intake: intakePath,
+        decision_record: decisionRecordPath,
+        operation_record: operationRecordPath,
+        decision_source: 'explicit_maintainer_numeric_choice_in_current_task',
+        implementation_authorization_options: implementationAuthorizationOptions,
+        selected_implementation_authorization_choice: selectedChoice,
+        implementation_authorization_decisions_recorded: 1,
+        pending_implementation_authorization_decisions: 0,
+        preselected_implementation_authorization_option: null,
+        recommended_implementation_authorization_option: selectedChoice,
+        goal_execution_authorization_treated_as_implementation_authorization_choice:
+          false,
+        conditional_dead_control_implementation_direction_authorized: true,
+        auth_redirect_implementation_direction_authorized: false,
+        bounded_detector_implementation_direction_authorized: true,
+        implementation_goal_derivation_authorized: true,
+        bounded_detector_implementation_authorized: false,
+        detector_implementation_execution_authorized: false,
+        next_goal_execution_authorized: false,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 5,
+        auth_redirect_excluded_from_implementation: true,
+        detector_changes_performed: false,
+        authorization_receipts_issued: 0,
+        target_repositories_acquired: 0,
+        target_repositories_executed: 0,
+        target_repository_writes: 0
+      }
+    });
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      source_spec: decisionRecordPath,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope: 'this_exact_bounded_detector_implementation_goal'
+      },
+      summary: {
+        trigger_conclusion: conclusion,
+        source_decision_record: decisionRecordPath,
+        selected_implementation_authorization_choice: selectedChoice,
+        approved_question: approvedQuestion,
+        revision_requested_question: revisionQuestion,
+        synthetic_fixture_files: syntheticFixtureFiles,
+        manual_gate_ids: manualGateIds,
+        manual_gate_count: 5,
+        completed_manual_gate_count: 5,
+        architecture_handoff_status:
+          'ready_for_build_recorded_before_detector_or_test_edits',
+        bounded_implementation_files: boundedImplementationFiles,
+        bounded_implementation_file_count: 3,
+        implementation_scope_locked: true,
+        bounded_detector_implementation_direction_authorized: true,
+        bounded_detector_implementation_authorized: true,
+        detector_implementation_execution_authorized: true,
+        next_goal_execution_authorized: false,
+        auth_redirect_excluded_from_implementation: true,
+        detector_changes_performed: true
+      }
+    });
+    expect(nextGoalRecord.objective).toContain(approvedQuestion);
+    expect(nextGoalRecord.objective).toContain('test-driven');
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'separate execution authorization'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'Before any detector or test edit'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'positive, counter, and fail-closed'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'finding visible'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(revisionQuestion);
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'detector_implementation_before_goal_execution_authorization',
+      'detector_implementation_before_architecture_handoff',
+      'auth_redirect_implementation',
+      'synthetic_fixture_modification',
+      'finding_suppression',
+      'automatic_severity_downgrade',
+      'detector_confidence_threshold_change',
+      'acceptance_policy_change',
+      'authorization_receipt_issuance',
+      'target_repository_acquisition',
+      'target_repository_analysis',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: nextGoalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: currentActiveGoalId, status: 'ready_to_execute' })
+    );
+    const readyGoals = goalIndex.goals.filter(
+      (candidate) => candidate.status === 'ready_to_execute'
+    );
+    expect(readyGoals).toHaveLength(1);
+    expect(readyGoals[0]).toEqual(
+      expect.objectContaining({ id: currentActiveGoalId, status: 'ready_to_execute' })
+    );
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain(
+      'M1'
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'DC --> DD[Bounded Detector Implementation]'
+    );
+
+    for (const canonicalDocument of [plan, spec, prd, readme]) {
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+      expect(canonicalDocument).toContain(currentActiveGoalTitle);
+    }
+  });
+
+  it('closes the bounded detector completion audit with qualified evidence drift and stages evidence reconciliation', async () => {
+    const implementationGoalId =
+      'repoassure-conditional-dead-control-calibration-bounded-detector-implementation-v0.1';
+    const implementationGoalTitle =
+      'RepoAssure Conditional Dead Control Calibration Bounded Detector Implementation v0.1';
+    const implementationConclusion =
+      'conditional_dead_control_bounded_detector_implemented_with_visible_p1_classification_and_fail_closed_prerequisite_evidence';
+    const architectureHandoffPath =
+      'docs/architecture/conditional-dead-control-bounded-detector-implementation-handoff-v0.1.md';
+    const implementationOperationRecordPath =
+      'docs/operations/repoassure-conditional-dead-control-calibration-bounded-detector-implementation-v0.1.md';
+    const auditGoalId =
+      'repoassure-conditional-dead-control-calibration-bounded-detector-implementation-completion-audit-v0.1';
+    const auditGoalTitle =
+      'RepoAssure Conditional Dead Control Calibration Bounded Detector Implementation Completion Audit v0.1';
+    const auditReportPath =
+      'docs/operations/repoassure-conditional-dead-control-calibration-bounded-detector-implementation-completion-audit-v0.1.md';
+    const auditConclusion =
+      'bounded_detector_implementation_audit_qualified_with_material_evidence_drift_without_product_surface_changes';
+    const evidenceGoalId =
+      'repoassure-conditional-dead-control-calibration-verification-evidence-reconciliation-v0.1';
+    const evidenceGoalTitle =
+      'RepoAssure Conditional Dead Control Calibration Verification Evidence Reconciliation v0.1';
+    const currentActiveGoalId = 'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const currentActiveGoalTitle = 'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const approvedQuestion =
+      'conditional_dead_control_should_consider_form_dirty_prerequisites';
+    const fixtureHashes = {
+      'tests/fixtures/conditional-dead-control-synthetic/fixture-manifest.json':
+        'ae079507ac0b1ed8822952ff081dd5a0f7ad5dfb1043add76cd1d03c47e994ca',
+      'tests/fixtures/conditional-dead-control-synthetic/form-dirty-states.json':
+        '692a7c03cf9fdad1d16fc085db2b04340385706e2127ccc192e5bbb11e30d182',
+      'tests/unit/conditional-dead-control-synthetic-fixture.test.ts':
+        '2782756bca4d7e97104d1a5320957bf734a0630ee833cdda0ba1594c1efee9b8'
+    };
+
+    const [
+      handoff,
+      implementationOperationRecord,
+      auditReport,
+      goalIndexText,
+      progressText,
+      plan,
+      spec,
+      prd,
+      readme
+    ] = await Promise.all([
+      readFile(architectureHandoffPath, 'utf8'),
+      readFile(implementationOperationRecordPath, 'utf8'),
+      readFile(auditReportPath, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('README.md', 'utf8')
+    ]);
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      next_goal_plain_language: string;
+      workflow_map?: { mermaid?: string };
+    };
+    const implementationGoalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${implementationGoalId}.json`, 'utf8')
+    ) as {
+      status: string;
+      conclusion: string;
+      next_goal_id: string;
+      execution_authorization: unknown;
+      summary: Record<string, unknown>;
+    };
+    const auditGoalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${auditGoalId}.json`, 'utf8')
+    ) as {
+      id: string;
+      title: string;
+      status: string;
+      conclusion: string;
+      next_goal_id: string;
+      completed_at: string;
+      execution_authorization: unknown;
+      summary: Record<string, unknown>;
+    };
+    const evidenceGoalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${evidenceGoalId}.json`, 'utf8')
+    ) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec: string;
+      execution_authorization: unknown;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+
+    expect(handoff).toContain('Status: `ready_for_build`');
+    expect(handoff).toContain('Select the `browser-runtime seam`.');
+    expect(handoff).toContain('The new private classifier');
+    for (const document of [
+      implementationOperationRecord,
+      auditReport,
+      plan,
+      spec,
+      prd,
+      readme
+    ]) {
+      expect(document).toContain(implementationConclusion);
+      expect(document).toContain(implementationGoalTitle);
+    }
+    for (const document of [auditReport, plan, spec, prd, readme]) {
+      expect(document).toContain(auditConclusion);
+      expect(document).toContain(auditGoalTitle);
+      expect(document).toContain(evidenceGoalTitle);
+    }
+    expect(implementationOperationRecord).toContain('Conditional detector behavior cases passed: 23/23');
+    expect(implementationOperationRecord).toContain('Disabled submit clicks performed: 0');
+    expect(implementationOperationRecord).toContain('Public finding schema changed: no');
+    expect(implementationOperationRecord).toContain('Synthetic fixture files modified: 0');
+    expect(implementationOperationRecord).toContain('@modelcontextprotocol/sdk@1.30.0');
+    expect(auditReport).toContain('Status: `completed`');
+    expect(auditReport).toContain('23 ⊂ 39 ⊂ 76');
+    expect(auditReport).toContain('81-test downstream aggregate is independent');
+    expect(auditReport).toContain('--maxWorkers=1 --no-file-parallelism');
+    expect(auditReport).toContain('current workspace SDK is `1.29.0`');
+    expect(auditReport).toContain('unverified historical diagnostic');
+
+    expect(implementationGoalRecord).toMatchObject({
+      status: 'completed',
+      conclusion: implementationConclusion,
+      next_goal_id: auditGoalId,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope: 'this_exact_bounded_detector_implementation_goal'
+      },
+      summary: {
+        approved_question: approvedQuestion,
+        architecture_handoff: architectureHandoffPath,
+        operation_record: implementationOperationRecordPath,
+        selected_implementation_seam:
+          'browser_runtime_with_private_classifier_and_existing_evidence_array',
+        public_finding_schema_changed: false,
+        detector_behavior_cases_passed: 23,
+        detector_behavior_cases_total: 23,
+        positive_behavior_cases_passed: 1,
+        counter_behavior_cases_passed: 2,
+        fail_closed_behavior_cases_passed: 20,
+        runtime_finding_severity: 'P1',
+        runtime_findings_visible_in_all_branches: true,
+        disabled_submit_clicks_performed: 0,
+        form_state_inferred: false,
+        synthetic_fixture_hashes: fixtureHashes,
+        synthetic_fixture_files_modified: 0,
+        auth_redirect_excluded_from_implementation: true,
+        detector_changes_performed: true,
+        authorization_receipts_issued: 0,
+        target_repositories_acquired: 0,
+        target_repositories_executed: 0,
+        target_repository_writes: 0
+      }
+    });
+
+    expect(auditGoalRecord).toMatchObject({
+      id: auditGoalId,
+      title: auditGoalTitle,
+      status: 'completed',
+      conclusion: auditConclusion,
+      next_goal_id: evidenceGoalId,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope:
+          'this_exact_bounded_detector_implementation_completion_audit_and_governance_closure_goal'
+      },
+      summary: {
+        trigger_conclusion: implementationConclusion,
+        source_implementation_goal: implementationGoalId,
+        source_operation_record: implementationOperationRecordPath,
+        operation_record: auditReportPath,
+        read_only_audit: true,
+        audit_verdict: 'qualified_with_material_evidence_drift',
+        implementation_boundary_passed: true,
+        p1_findings: 0,
+        p2_findings: 0,
+        detector_behavior_cases_passed: 23,
+        driver_tests_passed: 39,
+        companion_tests_passed: 76,
+        downstream_tests_passed: 81,
+        detector_test_subset_relationship: '23_subset_of_39_subset_of_76',
+        downstream_test_relationship: 'independent_aggregate',
+        current_workspace_sdk_version: '1.29.0',
+        historical_packed_sdk_diagnostic_verified: false,
+        detector_or_test_changes_authorized: false,
+        fixture_changes_authorized: false,
+        public_finding_schema_changed: false,
+        auth_redirect_excluded_from_audit: true,
+        audit_product_surface_changes: 0,
+        target_repository_actions_authorized: false,
+        authorization_receipts_issued: 0
+      }
+    });
+    expect(auditGoalRecord.completed_at).toMatch(/^2026-08-03T/);
+
+    expect(evidenceGoalRecord).toMatchObject({
+      id: evidenceGoalId,
+      title: evidenceGoalTitle,
+      status: 'completed',
+      source_spec: auditReportPath,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope: 'this_exact_verification_evidence_reconciliation_goal'
+      },
+      summary: {
+        trigger_conclusion: auditConclusion,
+        source_audit_goal: auditGoalId,
+        source_audit_report: auditReportPath,
+        verification_evidence_reconciliation_only: true,
+        detector_changes_performed: false,
+        detector_behavior_test_changes_performed: false,
+        fixture_changes_performed: false,
+        schema_changes_performed: false,
+        auth_redirect_changes_performed: false,
+        dependency_installations: 0,
+        target_repository_actions: 0,
+        publication_actions: 0
+      }
+    });
+    expect(evidenceGoalRecord.objective).toContain('separate execution authorization');
+    expect(evidenceGoalRecord.acceptance.join('\n')).toContain('23 ⊂ 39 ⊂ 76');
+    expect(evidenceGoalRecord.acceptance.join('\n')).toContain('81');
+    expect(evidenceGoalRecord.acceptance.join('\n')).toContain('1.29.0');
+    expect(evidenceGoalRecord.acceptance.join('\n')).toContain('unverified historical diagnostic');
+    expect(evidenceGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'evidence_reconciliation_before_goal_execution_authorization',
+      'detector_implementation',
+      'detector_behavior_test_modification',
+      'synthetic_fixture_modification',
+      'public_finding_schema_change',
+      'auth_redirect_change',
+      'dependency_installation',
+      'packed_installation_validation',
+      'target_repository_acquisition',
+      'target_repository_analysis',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: implementationGoalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: auditGoalId, status: 'completed' })
+    );
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: evidenceGoalId, status: 'completed' })
+    );
+    const readyGoals = goalIndex.goals.filter(
+      (candidate) => candidate.status === 'ready_to_execute'
+    );
+    expect(readyGoals).toEqual([
+      expect.objectContaining({ id: currentActiveGoalId, status: 'ready_to_execute' })
+    ]);
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain('execution_authorization: null');
+    expect(progress.workflow_map?.mermaid).toContain(
+      'DD --> DE[Bounded Detector Completion Audit]'
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'DE --> DF[Verification Evidence Reconciliation]'
+    );
+  });
+
+  it('reconciles conditional dead-control verification evidence and stages an unauthorized product gap audit', async () => {
+    const goalId =
+      'repoassure-conditional-dead-control-calibration-verification-evidence-reconciliation-v0.1';
+    const goalTitle =
+      'RepoAssure Conditional Dead Control Calibration Verification Evidence Reconciliation v0.1';
+    const conclusion =
+      'conditional_dead_control_verification_evidence_reconciled_with_durable_errata_without_product_or_historical_record_changes';
+    const addendumPath =
+      'docs/operations/repoassure-conditional-dead-control-calibration-verification-evidence-reconciliation-v0.1.md';
+    const nextGoalId = 'repoassure-product-completion-gap-audit-refresh-v0.10';
+    const nextGoalTitle = 'RepoAssure Product Completion Gap Audit Refresh v0.10';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const architectureHandoffPath =
+      'docs/architecture/conditional-dead-control-bounded-detector-implementation-handoff-v0.1.md';
+    const implementationOperationRecordPath =
+      'docs/operations/repoassure-conditional-dead-control-calibration-bounded-detector-implementation-v0.1.md';
+
+    const [
+      addendum,
+      architectureHandoff,
+      implementationOperationRecord,
+      goalIndexText,
+      progressText,
+      plan,
+      spec,
+      prd,
+      readme
+    ] = await Promise.all([
+      readFile(addendumPath, 'utf8'),
+      readFile(architectureHandoffPath, 'utf8'),
+      readFile(implementationOperationRecordPath, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('README.md', 'utf8')
+    ]);
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      next_goal_plain_language: string;
+      workflow_map?: { mermaid?: string };
+    };
+    const goalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${goalId}.json`, 'utf8')
+    ) as {
+      status: string;
+      completed_at: string;
+      conclusion: string;
+      next_goal_id: string;
+      execution_authorization: unknown;
+      summary: Record<string, unknown>;
+    };
+    const nextGoalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${nextGoalId}.json`, 'utf8')
+    ) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      execution_authorization: unknown;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+
+    expect(addendum).toContain('Status: `completed`');
+    expect(addendum).toContain(conclusion);
+    expect(addendum).toContain('23 ⊂ 39 ⊂ 76');
+    expect(addendum).toContain('81 = independent downstream aggregate');
+    expect(addendum).toContain('--maxWorkers=1 --no-file-parallelism');
+    expect(addendum).toContain('--minWorkers=1');
+    expect(addendum).toContain('Vitest `4.1.9`');
+    expect(addendum).toContain('current workspace resolution: `1.29.0`');
+    expect(addendum).toContain('unverified_historical_diagnostic');
+    expect(addendum).toContain('replayed_by_reconciliation_goal=false');
+    expect(addendum).toContain('dirty/untracked worktree');
+    expect(addendum).toContain('Historical records silently rewritten: no');
+    expect(addendum).toContain('Detector or behavior-test files modified: 0');
+
+    expect(architectureHandoff).toContain('-t "conditional dead control"');
+    expect(architectureHandoff).toContain('--minWorkers=1');
+    expect(implementationOperationRecord).toContain('@modelcontextprotocol/sdk@1.30.0');
+
+    expect(goalRecord).toMatchObject({
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope: 'this_exact_verification_evidence_reconciliation_goal'
+      },
+      summary: {
+        evidence_addendum: addendumPath,
+        addendum_model: 'durable_errata_addendum',
+        verification_evidence_reconciliation_only: true,
+        authoritative_bounded_cases: 23,
+        historical_focused_command_observed_tests: 6,
+        driver_tests: 39,
+        companion_tests: 76,
+        downstream_tests: 81,
+        subset_relationship: '23_subset_of_39_subset_of_76',
+        downstream_relationship: 'independent_aggregate',
+        vitest_version: '4.1.9',
+        historical_unsupported_serial_flag: '--minWorkers=1',
+        current_workspace_sdk_declared_range: '^1.29.0',
+        current_workspace_sdk_resolved_version: '1.29.0',
+        historical_packed_sdk_claimed_version: '1.30.0',
+        historical_packed_sdk_diagnostic_status: 'unverified_historical_diagnostic',
+        historical_packed_sdk_receipt_retained: false,
+        dirty_worktree_provenance_preserved: true,
+        clean_baseline_claimed: false,
+        historical_records_silently_rewritten: false,
+        detector_changes_performed: false,
+        detector_behavior_test_changes_performed: false,
+        fixture_changes_performed: false,
+        schema_changes_performed: false,
+        auth_redirect_changes_performed: false,
+        dependency_installations: 0,
+        network_actions: 0,
+        target_repository_actions: 0,
+        authorization_receipts_issued: 0,
+        publication_actions: 0,
+        deployment_actions: 0,
+        launch_actions: 0
+      }
+    });
+    expect(goalRecord.completed_at).toMatch(/^2026-08-03T/);
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope: 'this_exact_product_completion_gap_audit_refresh_v0_10_goal'
+      },
+      summary: {
+        trigger_conclusion: conclusion,
+        source_evidence_addendum: addendumPath,
+        product_or_external_changes_authorized: false
+      }
+    });
+    expect(nextGoalRecord.objective).toContain('separate execution authorization');
+    expect(nextGoalRecord.acceptance.join('\n')).toContain('conditional dead-control');
+    expect(nextGoalRecord.acceptance.join('\n')).toContain('acceptance-sized');
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'product_gap_audit_before_goal_execution_authorization',
+      'runtime_detection_behavior_change',
+      'auth_redirect_implementation',
+      'target_repository_acquisition',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals.filter((candidate) => candidate.status === 'ready_to_execute')).toEqual([
+      expect.objectContaining({ id: currentActiveGoalId, status: 'ready_to_execute' })
+    ]);
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain('M1');
+    expect(progress.workflow_map?.mermaid).toContain(
+      'DE --> DF[Verification Evidence Reconciliation]'
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'DF --> DG[Product Completion Gap Audit v0.10]'
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'DG --> DH[M1 Evidence Kernel Contract Gap Planning]'
+    );
+
+    for (const canonicalDocument of [plan, spec, prd, readme]) {
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+      expect(canonicalDocument).toContain(currentActiveGoalTitle);
+    }
+  });
+
+  it('preserves the v0.10 handoff after M1 contract-gap planning completes and a new unauthorized intake becomes active', async () => {
+    const goalId = 'repoassure-product-completion-gap-audit-refresh-v0.10';
+    const goalTitle = 'RepoAssure Product Completion Gap Audit Refresh v0.10';
+    const conclusion =
+      'completion_gap_audit_refreshed_with_m1_open_evidence_kernel_contract_gap_planning_next';
+    const operationRecordPath =
+      'docs/operations/repoassure-product-completion-gap-audit-refresh-v0.10.md';
+    const nextGoalId =
+      'repoassure-m1-open-evidence-kernel-contract-gap-planning-v0.1';
+    const nextGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Contract Gap Planning v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+
+    const [
+      operationRecord,
+      goalIndexText,
+      progressText,
+      plan,
+      spec,
+      prd,
+      readme
+    ] = await Promise.all([
+      readFile(operationRecordPath, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('README.md', 'utf8')
+    ]);
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      blocked_actions: string[];
+      next_goal_plain_language: string;
+      workflow_map?: { mermaid?: string };
+    };
+    const goalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${goalId}.json`, 'utf8')
+    ) as {
+      status: string;
+      completed_at: string;
+      conclusion: string;
+      next_goal_id: string;
+      execution_authorization: unknown;
+      summary: Record<string, unknown>;
+    };
+    const nextGoalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${nextGoalId}.json`, 'utf8')
+    ) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      execution_authorization: unknown;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+
+    expect(operationRecord).toContain('Status: `completed`');
+    expect(operationRecord).toContain(conclusion);
+    expect(operationRecord).toContain('| Implemented product | 12 | 12 | 0 |');
+    expect(operationRecord).toContain('| Implemented governance | 3 | 3 | 0 |');
+    expect(operationRecord).toContain('| Blocked or manual-gated | 9 | 9 | 0 |');
+    expect(operationRecord).toContain('| External-input-gated | 3 | 3 | 0 |');
+    expect(operationRecord).toContain('| Deferred | 5 | 5 | 0 |');
+    expect(operationRecord).toContain('| Safe local | 1 | 1 | 0 |');
+    expect(operationRecord).toContain('conditional_dead_control');
+    expect(operationRecord).toContain('implemented_subcapability');
+    expect(operationRecord).toContain('auth_redirect');
+    expect(operationRecord).toContain('request_revision');
+    expect(operationRecord).toContain('23 ⊂ 39 ⊂ 76');
+    expect(operationRecord).toContain('81 = independent downstream aggregate');
+    expect(operationRecord).toContain('replayed_by_v0_10_goal=false');
+    expect(operationRecord).toContain('current workspace SDK resolution: `1.29.0`');
+    expect(operationRecord).toContain('historical packed 1.30.0 diagnostic: `unverified_historical_diagnostic`');
+    expect(operationRecord).toContain('M1 remains incomplete and was not advanced');
+    expect(operationRecord).toContain('M2 remains incomplete');
+    expect(operationRecord).toContain('M3–M5 remain strategy-only');
+
+    expect(goalRecord).toMatchObject({
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope: 'this_exact_product_completion_gap_audit_refresh_v0_10_goal'
+      },
+      summary: {
+        operation_record: operationRecordPath,
+        implemented_product_surface_count: 12,
+        implemented_governance_surface_count: 3,
+        blocked_or_manual_gated_count: 9,
+        external_input_gated_count: 3,
+        deferred_count: 5,
+        safe_local_count: 1,
+        stale_current_next_findings: 0,
+        conditional_dead_control_classification: 'implemented_subcapability',
+        auth_redirect_current_decision: 'request_revision',
+        roadmap_milestones_advanced: 0,
+        final_acceptance_decision: 'defer',
+        selected_next_goal_id: nextGoalId,
+        selected_next_goal_execution_authorized: false,
+        detector_behavior_tests_executed: 0,
+        target_repository_actions: 0,
+        publication_actions: 0,
+        deployment_actions: 0,
+        launch_actions: 0
+      }
+    });
+    expect(goalRecord.completed_at).toMatch(/^2026-08-03T/);
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope: 'this_exact_m1_open_evidence_kernel_contract_gap_planning_goal'
+      },
+      summary: {
+        trigger_conclusion: conclusion,
+        roadmap_milestone: 'M1',
+        planning_only: true,
+        current_goal_execution_authorized: true,
+        roadmap_milestones_advanced: 0,
+        m1_complete: false
+      }
+    });
+    expect(nextGoalRecord.objective).toContain('separate execution authorization');
+    expect(nextGoalRecord.acceptance.join('\n')).toContain('provider-neutral');
+    expect(nextGoalRecord.acceptance.join('\n')).toContain('M1 remains incomplete');
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'm1_contract_gap_planning_before_goal_execution_authorization',
+      'roadmap_milestone_advancement',
+      'm1_completion_claim',
+      'schema_creation_or_promotion',
+      'contract_or_runtime_implementation',
+      'detector_behavior_test_execution',
+      'auth_redirect_revision_or_implementation',
+      'target_repository_acquisition',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals.filter((candidate) => candidate.status === 'ready_to_execute')).toEqual([
+      expect.objectContaining({ id: currentActiveGoalId, status: 'ready_to_execute' })
+    ]);
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain('M1');
+    expect(progress.blocked_actions).toEqual(
+      expect.arrayContaining(nextGoalRecord.blocked_actions)
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'DG --> DH[M1 Evidence Kernel Contract Gap Planning]'
+    );
+
+    expect(prd).not.toContain(
+      'The authorization intake still has two pending detector calibration decision slots and no explicit maintainer decision evidence'
+    );
+    for (const canonicalDocument of [plan, spec, prd, readme]) {
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(nextGoalTitle);
+      expect(canonicalDocument).toContain(currentActiveGoalTitle);
+      expect(canonicalDocument).toContain('request_revision');
+    }
+  });
+
+  it('completes M1 contract-gap planning with one non-authoritative envelope candidate and stages an unauthorized maintainer decision intake', async () => {
+    const goalId =
+      'repoassure-m1-open-evidence-kernel-contract-gap-planning-v0.1';
+    const goalTitle =
+      'RepoAssure M1 Open Evidence Kernel Contract Gap Planning v0.1';
+    const conclusion =
+      'm1_open_evidence_kernel_contract_gap_plan_prepared_with_one_candidate_boundary_without_schema_or_runtime_changes';
+    const planningRecordPath =
+      'docs/product/strategy/repoassure-m1-open-evidence-kernel-contract-gap-plan-v0.1.md';
+    const operationRecordPath =
+      'docs/operations/repoassure-m1-open-evidence-kernel-contract-gap-planning-v0.1.md';
+    const nextGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-maintainer-decision-intake-v0.1';
+    const nextGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Intake v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const candidateBoundaryId =
+      'provider_neutral_read_only_evidence_envelope_adapter_boundary';
+
+    const [
+      planningRecord,
+      operationRecord,
+      goalIndexText,
+      progressText,
+      plan,
+      spec,
+      prd,
+      readme,
+      architecture
+    ] = await Promise.all([
+      readFile(planningRecordPath, 'utf8'),
+      readFile(operationRecordPath, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8')
+    ]);
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      blocked_actions: string[];
+      next_goal_plain_language: string;
+      workflow_map?: { mermaid?: string };
+    };
+    const goalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${goalId}.json`, 'utf8')
+    ) as {
+      status: string;
+      completed_at: string;
+      conclusion: string;
+      next_goal_id: string;
+      execution_authorization: unknown;
+      summary: Record<string, unknown>;
+    };
+    const nextGoalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${nextGoalId}.json`, 'utf8')
+    ) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      execution_authorization: unknown;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+
+    expect(planningRecord).toContain('Status: `planning_complete_candidate_not_accepted`');
+    expect(planningRecord).toContain('| Contract family | Identity/version | Producer | Consumer | Integrity | Human review | No-write |');
+    expect(planningRecord).toContain('| Versioned contract | `conflict` |');
+    expect(planningRecord).toContain('| Deterministic local evidence | `reuse` |');
+    expect(planningRecord).toContain('| Integrity | `gap` |');
+    expect(planningRecord).toContain('| Human review | `conflict` |');
+    expect(planningRecord).toContain('| No-write proof | `gap` |');
+    expect(planningRecord).toContain(candidateBoundaryId);
+    expect(planningRecord).toContain('Original contracts remain authoritative');
+    expect(planningRecord).toContain('Schema files created: 0');
+    expect(planningRecord).toContain('M1 remains incomplete');
+    expect(operationRecord).toContain('Status: `completed`');
+    expect(operationRecord).toContain(conclusion);
+    expect(operationRecord).toContain('Contract families inventoried: 8');
+    expect(operationRecord).toContain('Candidate boundaries proposed: 1');
+    expect(operationRecord).toContain('Detector or behavior tests executed: 0');
+
+    expect(goalRecord).toMatchObject({
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope: 'this_exact_m1_open_evidence_kernel_contract_gap_planning_goal'
+      },
+      summary: {
+        trigger_conclusion:
+          'completion_gap_audit_refreshed_with_m1_open_evidence_kernel_contract_gap_planning_next',
+        planning_record: planningRecordPath,
+        operation_record: operationRecordPath,
+        contract_families_inventoried: 8,
+        m1_evidence_categories_mapped: 5,
+        gap_matrix_primary_states: {
+          reuse: 1,
+          gap: 2,
+          conflict: 2,
+          unknown: 0
+        },
+        candidate_boundary_count: 1,
+        candidate_boundary_id: candidateBoundaryId,
+        schema_files_created: 0,
+        schema_or_contract_implementations: 0,
+        roadmap_milestones_advanced: 0,
+        m1_complete: false,
+        m2_complete: false,
+        auth_redirect_current_decision: 'request_revision',
+        final_acceptance_decision: 'defer',
+        representative_execution_decisions: {
+          web: 'defer',
+          python_cli: 'defer',
+          mcp_agent: 'defer'
+        },
+        representative_acquisition_decisions: {
+          web: 'defer',
+          python_cli: 'defer',
+          mcp_agent: 'defer'
+        },
+        detector_behavior_tests_executed: 0,
+        target_repository_actions: 0,
+        authorization_receipts_issued: 0,
+        publication_actions: 0,
+        deployment_actions: 0,
+        launch_actions: 0,
+        git_commit_actions: 0,
+        git_push_actions: 0,
+        pull_request_actions: 0,
+        governance_verification: {
+          project_structure_baseline_passed: 157,
+          focused_red_failed: 1,
+          focused_red_skipped: 157,
+          focused_green_passed: 1,
+          project_structure_final_passed: 158,
+          progress_consistency_unit_passed: 6,
+          progress_consistency_direct_checks_passed: 8,
+          json_validation_passed: true,
+          unique_ready_goal_check_passed: true,
+          blocked_action_projection_check_passed: true,
+          lint_passed: true,
+          diff_check_passed: true,
+          protected_hashes_matched: 12,
+          independent_architecture_review: 'pass',
+          independent_qa_review: 'pass',
+          independent_docs_review: 'pass',
+          independent_review_p1: 0,
+          independent_review_p2: 0
+        },
+        selected_next_goal_id: nextGoalId,
+        selected_next_goal_execution_authorized: false
+      }
+    });
+    expect(goalRecord.completed_at).toMatch(/^2026-08-03T/);
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope: 'this_exact_m1_open_evidence_kernel_candidate_boundary_maintainer_decision_intake_goal'
+      },
+      summary: {
+        trigger_conclusion: conclusion,
+        candidate_boundary_id: candidateBoundaryId,
+        candidate_boundary_decisions_recorded: 0,
+        candidate_boundary_decisions_pending: 1,
+        goal_execution_authorization_treated_as_candidate_decision: false,
+        schema_or_contract_changes_authorized: false,
+        roadmap_milestone_advanced: false,
+        final_acceptance_decision: 'defer',
+        representative_execution_decisions: {
+          web: 'defer',
+          python_cli: 'defer',
+          mcp_agent: 'defer'
+        },
+        representative_acquisition_decisions: {
+          web: 'defer',
+          python_cli: 'defer',
+          mcp_agent: 'defer'
+        }
+      }
+    });
+    expect(nextGoalRecord.objective).toContain('separate execution authorization');
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'approve_for_separately_gated_contract_design'
+    );
+    expect(nextGoalRecord.acceptance.join('\n')).toContain('request_revision');
+    expect(nextGoalRecord.acceptance.join('\n')).toContain('M1 remains incomplete');
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'candidate_boundary_intake_before_goal_execution_authorization',
+      'candidate_boundary_decision_inference',
+      'schema_creation_or_promotion',
+      'contract_or_runtime_implementation',
+      'roadmap_milestone_advancement',
+      'detector_behavior_test_execution',
+      'target_repository_acquisition',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals.filter((candidate) => candidate.status === 'ready_to_execute')).toEqual([
+      expect.objectContaining({ id: currentActiveGoalId, status: 'ready_to_execute' })
+    ]);
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain('非权威候选');
+    expect(progress.blocked_actions).toEqual(
+      expect.arrayContaining(nextGoalRecord.blocked_actions)
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'DH --> DI[M1 Candidate Boundary Decision Intake]'
+    );
+
+    expect(architecture).not.toContain(
+      'Active Goal: RepoAssure Product Completion Gap Audit Refresh v0.10'
+    );
+    for (const canonicalDocument of [plan, spec, prd, readme, architecture]) {
+      expect(canonicalDocument).toContain(goalTitle);
+      expect(canonicalDocument).toContain(conclusion);
+      expect(canonicalDocument).toContain(currentActiveGoalTitle);
+      expect(canonicalDocument).toContain(
+        'maintainer_approved_k1_for_separately_gated_contract_design_without_schema_or_runtime_implementation_authorization'
+      );
+      expect(canonicalDocument).toContain('execution_authorization: null');
+      expect(canonicalDocument).toContain('M1 remains incomplete');
+      expect(canonicalDocument).toContain('request_revision');
+    }
+  });
+
+  it('preserves the K1 decision-intake audit evidence through the later explicit decision and successor gate', async () => {
+    const goalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-maintainer-decision-intake-v0.1';
+    const goalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Intake v0.1';
+    const conclusion =
+      'm1_open_evidence_kernel_candidate_boundary_decision_intake_prepared_without_selected_decision_or_contract_changes';
+    const intakeRecordPath =
+      'docs/product/strategy/repoassure-m1-open-evidence-kernel-candidate-boundary-maintainer-decision-intake-v0.1.md';
+    const operationRecordPath =
+      'docs/operations/repoassure-m1-open-evidence-kernel-candidate-boundary-maintainer-decision-intake-v0.1.md';
+    const nextGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-maintainer-decision-recording-v0.1';
+    const nextGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Recording v0.1';
+    const candidateBoundaryId =
+      'provider_neutral_read_only_evidence_envelope_adapter_boundary';
+    const decisionOptions = [
+      'approve_for_separately_gated_contract_design',
+      'request_revision',
+      'defer',
+      'reject'
+    ];
+
+    const [
+      intakeRecord,
+      operationRecord,
+      goalIndexText,
+      progressText,
+      progressMarkdown,
+      plan,
+      spec,
+      prd,
+      readme,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      blockerLog,
+      devLog
+    ] = await Promise.all([
+      readFile(intakeRecordPath, 'utf8'),
+      readFile(operationRecordPath, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/blockers.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string; execution_authorization?: unknown }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      blocked_actions: string[];
+      next_goal_plain_language: string;
+      workflow_map?: { mermaid?: string };
+    };
+    const goalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${goalId}.json`, 'utf8')
+    ) as {
+      status: string;
+      completed_at: string;
+      conclusion: string;
+      next_goal_id: string;
+      execution_authorization: unknown;
+      summary: Record<string, unknown>;
+    };
+    const nextGoalRecord = JSON.parse(
+      await readFile(`.autopilot/goals/${nextGoalId}.json`, 'utf8')
+    ) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec: string;
+      execution_authorization: unknown;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+
+    expect(intakeRecord).toContain(`# ${goalTitle}`);
+    expect(intakeRecord).toContain('Status: `awaiting_explicit_maintainer_decision`');
+    expect(intakeRecord).toContain(candidateBoundaryId);
+    expect(intakeRecord).toContain('Selected decision: `pending`');
+    expect(intakeRecord).toContain('Recommendation: `none_not_authorized`');
+    expect(intakeRecord).toContain('Execution authorization is not the candidate-boundary decision');
+    expect(intakeRecord).toContain('Original contracts remain authoritative');
+    for (const option of decisionOptions) {
+      expect(intakeRecord).toContain(`- [ ] \`${option}\``);
+    }
+    expect(operationRecord).toContain('Status: `completed`');
+    expect(operationRecord).toContain(conclusion);
+    expect(operationRecord).toContain('Candidate decisions recorded: 0/1');
+    expect(operationRecord).toContain('Candidate decisions pending: 1/1');
+    expect(operationRecord).toContain('Preselected choices: 0');
+    expect(operationRecord).toContain('Schema, contract, adapter, or runtime changes: 0');
+    expect(operationRecord).toContain('Detector or behavior tests executed: 0');
+
+    expect(goalRecord).toMatchObject({
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope: 'this_exact_m1_open_evidence_kernel_candidate_boundary_maintainer_decision_intake_goal'
+      },
+      summary: {
+        trigger_conclusion:
+          'm1_open_evidence_kernel_contract_gap_plan_prepared_with_one_candidate_boundary_without_schema_or_runtime_changes',
+        decision_intake_record: intakeRecordPath,
+        operation_record: operationRecordPath,
+        candidate_boundary_id: candidateBoundaryId,
+        decision_options: decisionOptions,
+        decision_options_presented: 4,
+        candidate_boundary_decisions_recorded: 0,
+        candidate_boundary_decisions_pending: 1,
+        selected_decision: 'pending',
+        recommendation: 'none_not_authorized',
+        preselected_choices: 0,
+        goal_execution_authorization_treated_as_candidate_decision: false,
+        schema_files_created: 0,
+        contract_specifications_created: 0,
+        adapter_or_runtime_implementations: 0,
+        roadmap_milestones_advanced: 0,
+        m1_complete: false,
+        m2_complete: false,
+        m3_through_m5_state: 'strategy_only',
+        auth_redirect_current_decision: 'request_revision',
+        final_acceptance_decision: 'defer',
+        representative_execution_decisions: {
+          web: 'defer',
+          python_cli: 'defer',
+          mcp_agent: 'defer'
+        },
+        representative_acquisition_decisions: {
+          web: 'defer',
+          python_cli: 'defer',
+          mcp_agent: 'defer'
+        },
+        detector_behavior_tests_executed: 0,
+        target_repository_actions: 0,
+        authorization_receipts_issued: 0,
+        publication_actions: 0,
+        deployment_actions: 0,
+        launch_actions: 0,
+        git_commit_actions: 0,
+        git_push_actions: 0,
+        pull_request_actions: 0,
+        governance_verification: {
+          project_structure_baseline_passed: 158,
+          focused_red_failed: 1,
+          focused_red_skipped: 158,
+          focused_green_passed: 1,
+          project_structure_final_passed: 159,
+          progress_consistency_unit_passed: 6,
+          progress_consistency_direct_checks_passed: 8,
+          json_validation_passed: true,
+          unique_ready_goal_check_passed: true,
+          blocked_action_projection_check_passed: true,
+          lint_passed: true,
+          diff_check_passed: true,
+          protected_hashes_matched: 12,
+          independent_product_review: 'pass',
+          independent_qa_review: 'pass',
+          independent_docs_review: 'pass',
+          independent_review_p1: 0,
+          independent_review_p2: 0
+        },
+        selected_next_goal_id: nextGoalId,
+        selected_next_goal_execution_authorized: false
+      }
+    });
+    expect(goalRecord.completed_at).toMatch(/^2026-08-03T/);
+
+    expect(nextGoalRecord).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      source_spec: intakeRecordPath,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope:
+          'this_exact_m1_open_evidence_kernel_candidate_boundary_maintainer_decision_recording_goal'
+      },
+      summary: {
+        trigger_conclusion: conclusion,
+        candidate_boundary_id: candidateBoundaryId,
+        decision_options: decisionOptions,
+        candidate_boundary_decisions_recorded: 1,
+        candidate_boundary_decisions_pending: 0,
+        selected_decision: 'approve_for_separately_gated_contract_design',
+        goal_execution_authorization_treated_as_candidate_decision: false,
+        explicit_maintainer_choice_required: true,
+        schema_or_contract_changes_authorized: false,
+        roadmap_milestone_advanced: false,
+        m1_complete: false,
+        m2_complete: false,
+        m3_through_m5_state: 'strategy_only',
+        auth_redirect_current_decision: 'request_revision',
+        final_acceptance_decision: 'defer',
+        representative_execution_decisions: {
+          web: 'defer',
+          python_cli: 'defer',
+          mcp_agent: 'defer'
+        },
+        representative_acquisition_decisions: {
+          web: 'defer',
+          python_cli: 'defer',
+          mcp_agent: 'defer'
+        }
+      }
+    });
+    expect(nextGoalRecord.objective).toContain('separate execution authorization');
+    expect(nextGoalRecord.objective).toContain('explicit maintainer choice');
+    expect(nextGoalRecord.acceptance.join('\n')).toContain(
+      'Do not infer a choice from Goal execution authorization'
+    );
+    for (const option of decisionOptions) {
+      expect(nextGoalRecord.acceptance.join('\n')).toContain(option);
+    }
+    expect(nextGoalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'candidate_boundary_decision_recording_before_goal_execution_authorization',
+      'candidate_boundary_decision_without_explicit_maintainer_choice',
+      'candidate_boundary_decision_inference',
+      'schema_creation_or_promotion',
+      'contract_specification_or_implementation',
+      'contract_or_runtime_implementation',
+      'adapter_implementation',
+      'roadmap_milestone_advancement',
+      'detector_behavior_test_execution',
+      'target_repository_acquisition',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals).toContainEqual(
+      expect.objectContaining({ id: goalId, status: 'completed' })
+    );
+    expect(goalIndex.goals.filter((candidate) => candidate.status === 'ready_to_execute')).toEqual([
+      expect.objectContaining({
+        id: currentActiveGoalId,
+        status: 'ready_to_execute'
+      })
+    ]);
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain('execution_authorization: null');
+    expect(progress.blocked_actions).toEqual(
+      expect.arrayContaining(nextGoalRecord.blocked_actions)
+    );
+    expect(progress.workflow_map?.mermaid).toContain(
+      'DI --> DJ[M1 Candidate Boundary Decision Recording]'
+    );
+
+    for (const projection of [
+      progressMarkdown,
+      plan,
+      spec,
+      prd,
+      readme,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      blockerLog,
+      devLog
+    ]) {
+      expect(projection).toContain(nextGoalTitle);
+      expect(projection).toContain(currentActiveGoalTitle);
+      expect(projection).toContain(
+        'maintainer_approved_k1_for_separately_gated_contract_design_without_schema_or_runtime_implementation_authorization'
+      );
+      expect(projection).toContain('execution_authorization: null');
+      expect(projection).toContain('M1 remains incomplete');
+      expect(projection).toContain('request_revision');
+    }
+  });
+
+  it('preserves the fail-closed K1 pending audit facts after recording the later explicit choice', async () => {
+    const goalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-maintainer-decision-recording-v0.1';
+    const goalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Recording v0.1';
+    const candidateBoundaryId =
+      'provider_neutral_read_only_evidence_envelope_adapter_boundary';
+    const interimConclusion =
+      'm1_open_evidence_kernel_candidate_boundary_decision_record_prepared_without_inferred_choice';
+    const conclusion =
+      'maintainer_approved_k1_for_separately_gated_contract_design_without_schema_or_runtime_implementation_authorization';
+    const nextGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-design-planning-v0.1';
+    const nextGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Design Planning v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const decisionRecordPath =
+      'docs/product/strategy/repoassure-m1-open-evidence-kernel-candidate-boundary-maintainer-decision-record-v0.1.md';
+    const operationRecordPath =
+      'docs/operations/repoassure-m1-open-evidence-kernel-candidate-boundary-maintainer-decision-recording-v0.1.md';
+    const decisionOptions = [
+      'approve_for_separately_gated_contract_design',
+      'request_revision',
+      'defer',
+      'reject'
+    ];
+    const [
+      decisionRecord,
+      operationRecord,
+      goalRecordText,
+      goalIndexText,
+      progressText,
+      progressMarkdown,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      blockerLog,
+      devLog
+    ] = await Promise.all([
+      readFile(decisionRecordPath, 'utf8'),
+      readFile(operationRecordPath, 'utf8'),
+      readFile(`.autopilot/goals/${goalId}.json`, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/blockers.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+    const goalRecord = JSON.parse(goalRecordText) as {
+      id: string;
+      title: string;
+      status: string;
+      completed_at?: string;
+      conclusion?: string;
+      next_goal_id?: string;
+      execution_authorization: unknown;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+    const goalIndex = JSON.parse(goalIndexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const progress = JSON.parse(progressText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      next_goal_plain_language: string;
+      blocked_actions: string[];
+    };
+
+    expect(decisionRecord).toContain(`# ${goalTitle}`);
+    expect(decisionRecord).toContain('Status: `completed`');
+    expect(decisionRecord).toContain(`Conclusion: \`${conclusion}\``);
+    expect(decisionRecord).toContain(interimConclusion);
+    expect(decisionRecord).toContain(`Candidate: \`${candidateBoundaryId}\``);
+    expect(decisionRecord).toContain(
+      'Selected decision: `approve_for_separately_gated_contract_design`'
+    );
+    expect(decisionRecord).toContain('Explicit maintainer choice found: yes');
+    expect(decisionRecord).toContain(
+      'Goal execution authorization treated as candidate decision: no'
+    );
+    expect(decisionRecord).toContain('Candidate decisions recorded: 1/1');
+    expect(decisionRecord).toContain('Candidate decisions pending: 0/1');
+    expect(decisionRecord).toContain(
+      'Human Approval Policy: `explicit_candidate_boundary_decision_recorded`'
+    );
+    expect(decisionRecord).toContain('Candidate boundary accepted for contract design: yes');
+    expect(decisionRecord).toContain('Schema or contract changes authorized: no');
+    expect(decisionRecord).toContain(
+      '- [x] `approve_for_separately_gated_contract_design`'
+    );
+    for (const option of decisionOptions.slice(1)) {
+      expect(decisionRecord).toContain(`- [ ] \`${option}\``);
+    }
+
+    expect(operationRecord).toContain(`# ${goalTitle}`);
+    expect(operationRecord).toContain('Status: `completed`');
+    expect(operationRecord).toContain(`Conclusion: \`${conclusion}\``);
+    expect(operationRecord).toContain(interimConclusion);
+    expect(operationRecord).toContain('Execution authorization: `authorized`');
+    expect(operationRecord).toContain('Explicit maintainer choice found: yes');
+    expect(operationRecord).toContain(
+      'Selected decision: `approve_for_separately_gated_contract_design`'
+    );
+    expect(operationRecord).toContain('Current Goal remains active: no');
+    expect(operationRecord).toContain(`Successor Goal created: \`${nextGoalId}\``);
+
+    expect(goalRecord).toMatchObject({
+      id: goalId,
+      title: goalTitle,
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope:
+          'this_exact_m1_open_evidence_kernel_candidate_boundary_maintainer_decision_recording_goal'
+      },
+      summary: {
+        decision_record: decisionRecordPath,
+        operation_record: operationRecordPath,
+        interim_conclusion: interimConclusion,
+        candidate_boundary_id: candidateBoundaryId,
+        decision_options: decisionOptions,
+        candidate_boundary_decisions_recorded: 1,
+        candidate_boundary_decisions_pending: 0,
+        selected_decision: 'approve_for_separately_gated_contract_design',
+        explicit_maintainer_choice_found: true,
+        explicit_maintainer_choice_required: true,
+        goal_execution_authorization_treated_as_candidate_decision: false,
+        human_approval_policy: 'explicit_candidate_boundary_decision_recorded',
+        candidate_boundary_accepted: true,
+        candidate_boundary_accepted_for_contract_design: true,
+        candidate_boundary_authoritative: false,
+        original_contracts_remain_authoritative: true,
+        contract_design_goal_derivation_authorized: true,
+        contract_design_execution_authorized: false,
+        schema_or_contract_changes_authorized: false,
+        current_goal_remains_active: false,
+        goal_completion_allowed: true,
+        successor_goals_created: 1,
+        roadmap_milestone_advanced: false,
+        m1_complete: false,
+        m2_complete: false,
+        m3_through_m5_state: 'strategy_only',
+        auth_redirect_current_decision: 'request_revision',
+        final_acceptance_decision: 'defer',
+        representative_execution_decisions: {
+          web: 'defer',
+          python_cli: 'defer',
+          mcp_agent: 'defer'
+        },
+        representative_acquisition_decisions: {
+          web: 'defer',
+          python_cli: 'defer',
+          mcp_agent: 'defer'
+        },
+        authorization_receipts_issued: 0,
+        detector_behavior_tests_executed: 0,
+        target_repository_actions: 0,
+        publication_actions: 0,
+        deployment_actions: 0,
+        launch_actions: 0,
+        git_commit_actions: 0,
+        git_push_actions: 0,
+        pull_request_actions: 0,
+        governance_verification: {
+          project_structure_baseline_passed: 160,
+          focused_red_failed: 1,
+          focused_red_skipped: 160,
+          focused_green_passed: 1,
+          project_structure_final_passed: 161,
+          progress_consistency_unit_passed: 6,
+          progress_consistency_direct_checks_passed: 8,
+          json_validation_passed: true,
+          unique_ready_goal_check_passed: true,
+          blocked_action_projection_check_passed: true,
+          lint_passed: true,
+          diff_check_passed: true,
+          protected_hashes_matched: 12,
+          independent_product_review: 'pass',
+          independent_qa_review: 'pass',
+          independent_docs_review: 'pass',
+          independent_review_p1: 0,
+          independent_review_p2: 0
+        }
+      }
+    });
+    expect(goalRecord.completed_at).toMatch(/^2026-08-03T/);
+    expect(goalRecord.acceptance.join('\n')).toContain(
+      'Do not infer a choice from Goal execution authorization'
+    );
+    expect(goalRecord.blocked_actions).toEqual(expect.arrayContaining([
+      'candidate_boundary_decision_without_explicit_maintainer_choice',
+      'candidate_boundary_decision_inference',
+      'schema_creation_or_promotion',
+      'contract_specification_or_implementation',
+      'contract_or_runtime_implementation',
+      'adapter_implementation',
+      'roadmap_milestone_advancement',
+      'detector_behavior_test_execution',
+      'target_repository_acquisition',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(goalIndex.active_goal_id).toBe(currentActiveGoalId);
+    expect(goalIndex.goals.filter((candidate) => candidate.status === 'ready_to_execute')).toEqual([
+      expect.objectContaining({ id: currentActiveGoalId, status: 'ready_to_execute' })
+    ]);
+    expect(progress.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(progress.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(progress.next_goal).toEqual(progress.active_goal);
+    expect(progress.next_goal_plain_language).toContain('execution_authorization: null');
+    expect(progress.next_goal_plain_language).toContain('尚未授权执行');
+    expect(progress.blocked_actions).toEqual(expect.arrayContaining(goalRecord.blocked_actions));
+
+    for (const projection of [
+      progressMarkdown,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      blockerLog,
+      devLog
+    ]) {
+      expect(projection).toContain(goalTitle);
+      expect(projection).toContain(conclusion);
+      expect(projection).toContain(nextGoalTitle);
+      expect(projection).toContain('execution_authorization: null');
+      expect(projection).toContain('M1 remains incomplete');
+      expect(projection).toContain('request_revision');
+    }
+  });
+
+  it('records explicit K1 contract-design approval and creates one separately gated unauthorized contract-design Goal', async () => {
+    const currentGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-maintainer-decision-recording-v0.1';
+    const currentGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Recording v0.1';
+    const nextGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-design-planning-v0.1';
+    const nextGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Design Planning v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const selectedDecision = 'approve_for_separately_gated_contract_design';
+    const conclusion =
+      'maintainer_approved_k1_for_separately_gated_contract_design_without_schema_or_runtime_implementation_authorization';
+    const decisionRecordPath =
+      'docs/product/strategy/repoassure-m1-open-evidence-kernel-candidate-boundary-maintainer-decision-record-v0.1.md';
+    const operationRecordPath =
+      'docs/operations/repoassure-m1-open-evidence-kernel-candidate-boundary-maintainer-decision-recording-v0.1.md';
+    const [
+      decisionRecord,
+      operationRecord,
+      currentGoalText,
+      nextGoalText,
+      indexText,
+      snapshotText,
+      progressMarkdown,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      blockerLog,
+      devLog
+    ] = await Promise.all([
+      readFile(decisionRecordPath, 'utf8'),
+      readFile(operationRecordPath, 'utf8'),
+      readFile(`.autopilot/goals/${currentGoalId}.json`, 'utf8'),
+      readFile(`.autopilot/goals/${nextGoalId}.json`, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/blockers.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+    const currentGoal = JSON.parse(currentGoalText) as {
+      id: string;
+      title: string;
+      status: string;
+      completed_at: string;
+      conclusion: string;
+      next_goal_id: string;
+      execution_authorization: unknown;
+      summary: Record<string, unknown>;
+    };
+    const nextGoal = JSON.parse(nextGoalText) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec: string;
+      execution_authorization: unknown;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+    const index = JSON.parse(indexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const snapshot = JSON.parse(snapshotText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      next_goal_plain_language: string;
+      blocked_actions: string[];
+    };
+
+    expect(currentGoal).toMatchObject({
+      id: currentGoalId,
+      title: currentGoalTitle,
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope:
+          'this_exact_m1_open_evidence_kernel_candidate_boundary_maintainer_decision_recording_goal'
+      },
+      summary: {
+        selected_decision: selectedDecision,
+        explicit_maintainer_choice_found: true,
+        candidate_boundary_decisions_recorded: 1,
+        candidate_boundary_decisions_pending: 0,
+        human_approval_policy: 'explicit_candidate_boundary_decision_recorded',
+        candidate_boundary_accepted_for_contract_design: true,
+        candidate_boundary_authoritative: false,
+        original_contracts_remain_authoritative: true,
+        contract_design_goal_derivation_authorized: true,
+        contract_design_execution_authorized: false,
+        schema_or_contract_changes_authorized: false,
+        current_goal_remains_active: false,
+        goal_completion_allowed: true,
+        successor_goals_created: 1,
+        roadmap_milestone_advanced: false,
+        m1_complete: false,
+        m2_complete: false,
+        m3_through_m5_state: 'strategy_only',
+        auth_redirect_current_decision: 'request_revision',
+        final_acceptance_decision: 'defer',
+        representative_execution_decisions: {
+          web: 'defer',
+          python_cli: 'defer',
+          mcp_agent: 'defer'
+        },
+        representative_acquisition_decisions: {
+          web: 'defer',
+          python_cli: 'defer',
+          mcp_agent: 'defer'
+        },
+        authorization_receipts_issued: 0,
+        detector_behavior_tests_executed: 0,
+        target_repository_actions: 0,
+        publication_actions: 0,
+        deployment_actions: 0,
+        launch_actions: 0,
+        git_commit_actions: 0,
+        git_push_actions: 0,
+        pull_request_actions: 0
+      }
+    });
+    expect(currentGoal.completed_at).toMatch(/^2026-08-03T/);
+
+    expect(nextGoal).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      source_spec: decisionRecordPath,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope:
+          'this_exact_m1_open_evidence_kernel_candidate_boundary_contract_design_planning_goal'
+      },
+      summary: {
+        trigger_conclusion: conclusion,
+        selected_decision: selectedDecision,
+        candidate_boundary_selected_for_contract_design: true,
+        candidate_boundary_authoritative: false,
+        original_contracts_remain_authoritative: true,
+        contract_design_execution_authorized: true,
+        schema_or_authoritative_contract_authorized: false,
+        adapter_or_runtime_implementation_authorized: false,
+        design_documents_created: 1,
+        roadmap_milestone_advanced: false,
+        m1_complete: false,
+        m2_complete: false,
+        m3_through_m5_state: 'strategy_only',
+        auth_redirect_current_decision: 'request_revision',
+        final_acceptance_decision: 'defer'
+      }
+    });
+    expect(nextGoal.objective).toContain('After separate execution authorization');
+    expect(nextGoal.objective).toContain('non-authoritative contract design plan');
+    expect(nextGoal.acceptance.join('\n')).toContain(
+      'this exact contract-design planning Goal receives separate execution authorization'
+    );
+    expect(nextGoal.blocked_actions).toEqual(expect.arrayContaining([
+      'contract_design_before_goal_execution_authorization',
+      'schema_creation_or_promotion',
+      'authoritative_contract_acceptance_or_implementation',
+      'adapter_implementation',
+      'roadmap_milestone_advancement',
+      'detector_behavior_test_execution',
+      'target_repository_acquisition',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(decisionRecord).toContain('Status: `completed`');
+    expect(decisionRecord).toContain(`Conclusion: \`${conclusion}\``);
+    expect(decisionRecord).toContain(`Selected decision: \`${selectedDecision}\``);
+    expect(decisionRecord).toContain(`- [x] \`${selectedDecision}\``);
+    expect(decisionRecord).toContain('Candidate decisions recorded: 1/1');
+    expect(decisionRecord).toContain('Candidate decisions pending: 0/1');
+    expect(decisionRecord).toContain('Original contracts remain authoritative: yes');
+    expect(decisionRecord).toContain('Schema or contract changes authorized: no');
+    expect(operationRecord).toContain('Status: `completed`');
+    expect(operationRecord).toContain(`Conclusion: \`${conclusion}\``);
+    expect(operationRecord).toContain(`Selected decision: \`${selectedDecision}\``);
+    expect(operationRecord).toContain('Current Goal remains active: no');
+    expect(operationRecord).toContain(`Successor Goal created: \`${nextGoalId}\``);
+    expect(operationRecord).toContain('Successor execution authorization: `null`');
+
+    expect(index.active_goal_id).toBe(currentActiveGoalId);
+    expect(index.goals.filter((candidate) => candidate.status === 'ready_to_execute')).toEqual([
+      expect.objectContaining({ id: currentActiveGoalId, status: 'ready_to_execute' })
+    ]);
+    expect(snapshot.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(snapshot.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(snapshot.next_goal).toEqual(snapshot.active_goal);
+    expect(snapshot.next_goal_plain_language).toContain('execution_authorization: null');
+    expect(snapshot.next_goal_plain_language).toContain('尚未授权执行');
+    expect(snapshot.blocked_actions).toEqual(expect.arrayContaining(nextGoal.blocked_actions));
+
+    for (const projection of [
+      progressMarkdown,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      blockerLog,
+      devLog
+    ]) {
+      expect(projection).toContain(currentGoalTitle);
+      expect(projection).toContain(conclusion);
+      expect(projection).toContain(nextGoalTitle);
+      expect(projection).toContain('execution_authorization: null');
+      expect(projection).toContain('M1 remains incomplete');
+      expect(projection).toContain('request_revision');
+    }
+  });
+
+  it('completes the authorized K1 non-authoritative contract-design plan and gates contract specification separately', async () => {
+    const currentGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-design-planning-v0.1';
+    const currentGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Design Planning v0.1';
+    const nextGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-intake-v0.1';
+    const nextGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Intake v0.1';
+    const currentActiveGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const currentActiveGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const conclusion =
+      'k1_non_authoritative_contract_design_plan_prepared_without_schema_authoritative_contract_or_runtime_implementation';
+    const designPlanPath =
+      'docs/product/strategy/repoassure-m1-open-evidence-kernel-candidate-boundary-contract-design-plan-v0.1.md';
+    const operationRecordPath =
+      'docs/operations/repoassure-m1-open-evidence-kernel-candidate-boundary-contract-design-planning-v0.1.md';
+    const [
+      designPlan,
+      operationRecord,
+      currentGoalText,
+      nextGoalText,
+      indexText,
+      snapshotText,
+      progressMarkdown,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      blockerLog,
+      devLog
+    ] = await Promise.all([
+      readFile(designPlanPath, 'utf8'),
+      readFile(operationRecordPath, 'utf8'),
+      readFile(`.autopilot/goals/${currentGoalId}.json`, 'utf8'),
+      readFile(`.autopilot/goals/${nextGoalId}.json`, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/blockers.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+    const currentGoal = JSON.parse(currentGoalText) as {
+      id: string;
+      title: string;
+      status: string;
+      completed_at: string;
+      conclusion: string;
+      next_goal_id: string;
+      execution_authorization: unknown;
+      summary: Record<string, unknown>;
+    };
+    const nextGoal = JSON.parse(nextGoalText) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec: string;
+      execution_authorization: unknown;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+    const index = JSON.parse(indexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const snapshot = JSON.parse(snapshotText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      next_goal_plain_language: string;
+      blocked_actions: string[];
+    };
+
+    expect(currentGoal).toMatchObject({
+      id: currentGoalId,
+      title: currentGoalTitle,
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope:
+          'this_exact_m1_open_evidence_kernel_candidate_boundary_contract_design_planning_goal'
+      },
+      summary: {
+        candidate_boundary_id: 'provider_neutral_read_only_evidence_envelope_adapter_boundary',
+        candidate_boundary_authoritative: false,
+        original_contracts_remain_authoritative: true,
+        contract_design_execution_authorized: true,
+        contract_design_plan_completed: true,
+        design_documents_created: 1,
+        schema_or_authoritative_contract_authorized: false,
+        schema_files_created: 0,
+        adapter_or_runtime_implementation_authorized: false,
+        adapter_or_runtime_implementations_created: 0,
+        contract_specification_execution_authorized: false,
+        roadmap_milestone_advanced: false,
+        m1_complete: false,
+        m2_complete: false,
+        m3_through_m5_state: 'strategy_only',
+        auth_redirect_current_decision: 'request_revision',
+        final_acceptance_decision: 'defer',
+        authorization_receipts_issued: 0,
+        detector_behavior_tests_executed: 0,
+        target_repository_actions: 0,
+        publication_actions: 0,
+        deployment_actions: 0,
+        launch_actions: 0,
+        git_commit_actions: 0,
+        git_push_actions: 0,
+        pull_request_actions: 0
+      }
+    });
+    expect(currentGoal.completed_at).toMatch(/^2026-08-03T/);
+
+    expect(nextGoal).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'completed',
+      source_spec: designPlanPath,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope:
+          'this_exact_m1_open_evidence_kernel_candidate_boundary_contract_specification_authorization_intake_goal'
+      },
+      summary: {
+        trigger_conclusion: conclusion,
+        contract_specification_execution_authorized: false,
+        authoritative_contract_accepted: false,
+        adapter_or_runtime_implementation_authorized: false,
+        original_contracts_remain_authoritative: true,
+        roadmap_milestone_advanced: false,
+        m1_complete: false,
+        m2_complete: false,
+        m3_through_m5_state: 'strategy_only',
+        auth_redirect_current_decision: 'request_revision',
+        final_acceptance_decision: 'defer'
+      }
+    });
+    expect(nextGoal.objective).toContain('After separate execution authorization');
+    expect(nextGoal.objective).toContain('unfilled maintainer authorization intake');
+    expect(nextGoal.acceptance.join('\n')).toContain(
+      'must not infer, select, or record a contract-specification authorization choice'
+    );
+    expect(nextGoal.blocked_actions).toEqual(expect.arrayContaining([
+      'contract_specification_intake_before_goal_execution_authorization',
+      'contract_specification_creation',
+      'schema_creation_or_promotion',
+      'authoritative_contract_acceptance_or_implementation',
+      'adapter_implementation',
+      'roadmap_milestone_advancement',
+      'detector_behavior_test_execution',
+      'target_repository_acquisition',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(designPlan).toContain('Status: `planning_complete_non_authoritative`');
+    expect(designPlan).toContain(`Conclusion: \`${conclusion}\``);
+    expect(designPlan).toContain('Original contracts and artifact bytes remain authoritative');
+    expect(designPlan).toContain('`sourceContract`');
+    expect(designPlan).toContain('`subject`');
+    expect(designPlan).toContain('`producer`');
+    expect(designPlan).toContain('`evidenceIndex`');
+    expect(designPlan).toContain('`outcome`');
+    expect(designPlan).toContain('`reviewBoundary`');
+    expect(designPlan).toContain('`writeBoundary`');
+    expect(designPlan).toContain('`privacyAndRedaction`');
+    expect(designPlan).toContain('`compatibility`');
+    expect(designPlan).toContain('unknown is not pass, fail, defer, or authorization');
+    expect(designPlan).toContain('contract specification, maintainer acceptance, and implementation remain three separate gates');
+    expect(designPlan).toContain('Schema files created: 0');
+    expect(designPlan).toContain('Adapter or runtime implementations created: 0');
+    expect(operationRecord).toContain('Status: `completed`');
+    expect(operationRecord).toContain(`Conclusion: \`${conclusion}\``);
+    expect(operationRecord).toContain(`Successor Goal created: \`${nextGoalId}\``);
+    expect(operationRecord).toContain('Successor execution authorization: `null`');
+
+    expect(index.active_goal_id).toBe(currentActiveGoalId);
+    expect(index.goals.filter((candidate) => candidate.status === 'ready_to_execute')).toEqual([
+      expect.objectContaining({ id: currentActiveGoalId, status: 'ready_to_execute' })
+    ]);
+    expect(snapshot.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(snapshot.active_goal).toEqual({
+      id: currentActiveGoalId,
+      title: currentActiveGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(snapshot.next_goal).toEqual(snapshot.active_goal);
+    expect(snapshot.next_goal_plain_language).toContain('execution_authorization: null');
+    expect(snapshot.next_goal_plain_language).toContain('尚未授权执行');
+    expect(snapshot.blocked_actions).toEqual(expect.arrayContaining(nextGoal.blocked_actions));
+
+    for (const projection of [
+      progressMarkdown,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      blockerLog,
+      devLog
+    ]) {
+      expect(projection).toContain(currentGoalTitle);
+      expect(projection).toContain(conclusion);
+      expect(projection).toContain(nextGoalTitle);
+      expect(projection).toContain(currentActiveGoalTitle);
+      expect(projection).toContain('execution_authorization: null');
+      expect(projection).toContain('M1 remains incomplete');
+      expect(projection).toContain('request_revision');
+    }
+  });
+
+  it('prepares the authorized K1 contract-specification intake without inferring a maintainer decision', async () => {
+    const currentGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-intake-v0.1';
+    const currentGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Intake v0.1';
+    const nextGoalId =
+      'repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-maintainer-decision-recording-v0.1';
+    const nextGoalTitle =
+      'RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1';
+    const conclusion =
+      'k1_contract_specification_authorization_intake_prepared_without_inferred_choice_specification_schema_or_runtime_changes';
+    const intakePath =
+      'docs/product/strategy/repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-intake-v0.1.md';
+    const operationRecordPath =
+      'docs/operations/repoassure-m1-open-evidence-kernel-candidate-boundary-contract-specification-authorization-intake-v0.1.md';
+    const decisionOptions = [
+      'approve_for_separately_gated_contract_specification_drafting',
+      'request_contract_design_revision',
+      'defer_contract_specification_drafting',
+      'reject_contract_specification_path'
+    ];
+    const [
+      intake,
+      operationRecord,
+      currentGoalText,
+      nextGoalText,
+      indexText,
+      snapshotText,
+      progressMarkdown,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      blockerLog,
+      devLog
+    ] = await Promise.all([
+      readFile(intakePath, 'utf8'),
+      readFile(operationRecordPath, 'utf8'),
+      readFile(`.autopilot/goals/${currentGoalId}.json`, 'utf8'),
+      readFile(`.autopilot/goals/${nextGoalId}.json`, 'utf8'),
+      readFile('.autopilot/goals/index.json', 'utf8'),
+      readFile('.autopilot/progress/snapshot.json', 'utf8'),
+      readFile('.autopilot/progress/PROGRESS_SNAPSHOT.md', 'utf8'),
+      readFile('README.md', 'utf8'),
+      readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'),
+      readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8'),
+      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
+      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
+      readFile('docs/logs/decision-log.md', 'utf8'),
+      readFile('docs/logs/blockers.md', 'utf8'),
+      readFile('docs/logs/dev-log.md', 'utf8')
+    ]);
+    const currentGoal = JSON.parse(currentGoalText) as {
+      id: string;
+      title: string;
+      status: string;
+      completed_at: string;
+      conclusion: string;
+      next_goal_id: string;
+      execution_authorization: unknown;
+      summary: Record<string, unknown>;
+    };
+    const nextGoal = JSON.parse(nextGoalText) as {
+      id: string;
+      title: string;
+      status: string;
+      objective: string;
+      source_spec: string;
+      execution_authorization: unknown;
+      acceptance: string[];
+      blocked_actions: string[];
+      summary: Record<string, unknown>;
+    };
+    const index = JSON.parse(indexText) as {
+      active_goal_id: string;
+      goals: Array<{ id: string; status: string }>;
+    };
+    const snapshot = JSON.parse(snapshotText) as {
+      current_stage: string;
+      active_goal: { id: string; title: string; status: string };
+      next_goal: { id: string; title: string; status: string };
+      next_goal_plain_language: string;
+      blocked_actions: string[];
+    };
+
+    expect(currentGoal).toMatchObject({
+      id: currentGoalId,
+      title: currentGoalTitle,
+      status: 'completed',
+      conclusion,
+      next_goal_id: nextGoalId,
+      execution_authorization: {
+        status: 'authorized',
+        source: 'explicit_user_authorization_in_current_task',
+        scope:
+          'this_exact_m1_open_evidence_kernel_candidate_boundary_contract_specification_authorization_intake_goal'
+      },
+      summary: {
+        decision_options: decisionOptions,
+        contract_specification_authorization_decisions_recorded: 0,
+        contract_specification_authorization_decisions_pending: 1,
+        selected_decision: 'pending',
+        recommendation: 'none_not_authorized',
+        recommended_decision: null,
+        default_decision: null,
+        preselected_decisions: 0,
+        goal_execution_authorization_treated_as_contract_specification_decision: false,
+        contract_specification_execution_authorized: false,
+        adapter_or_runtime_implementation_authorized: false,
+        original_contracts_remain_authoritative: true,
+        authoritative_contract_accepted: false,
+        schema_files_created: 0,
+        contract_specifications_drafted: 0,
+        adapter_or_runtime_implementations_created: 0,
+        roadmap_milestone_advanced: false,
+        m1_complete: false,
+        m2_complete: false,
+        m3_through_m5_state: 'strategy_only',
+        auth_redirect_current_decision: 'request_revision',
+        final_acceptance_decision: 'defer',
+        representative_execution_decisions: {
+          web: 'defer',
+          python_cli: 'defer',
+          mcp_agent: 'defer'
+        },
+        representative_acquisition_decisions: {
+          web: 'defer',
+          python_cli: 'defer',
+          mcp_agent: 'defer'
+        },
+        authorization_receipts_issued: 0,
+        detector_behavior_tests_executed: 0,
+        target_repository_actions: 0,
+        publication_actions: 0,
+        deployment_actions: 0,
+        launch_actions: 0,
+        git_commit_actions: 0,
+        git_push_actions: 0,
+        pull_request_actions: 0
+      }
+    });
+    expect(currentGoal.completed_at).toMatch(/^2026-08-03T/);
+
+    expect(nextGoal).toMatchObject({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'ready_to_execute',
+      source_spec: intakePath,
+      execution_authorization: null,
+      summary: {
+        trigger_conclusion: conclusion,
+        decision_options: decisionOptions,
+        selected_decision: 'pending',
+        contract_specification_authorization_decisions_recorded: 0,
+        contract_specification_authorization_decisions_pending: 1,
+        goal_execution_authorization_treated_as_contract_specification_decision: false,
+        contract_specification_execution_authorized: false,
+        adapter_or_runtime_implementation_authorized: false,
+        original_contracts_remain_authoritative: true,
+        roadmap_milestone_advanced: false,
+        m1_complete: false,
+        m2_complete: false,
+        m3_through_m5_state: 'strategy_only',
+        auth_redirect_current_decision: 'request_revision',
+        final_acceptance_decision: 'defer',
+        representative_execution_decisions: {
+          web: 'defer',
+          python_cli: 'defer',
+          mcp_agent: 'defer'
+        },
+        representative_acquisition_decisions: {
+          web: 'defer',
+          python_cli: 'defer',
+          mcp_agent: 'defer'
+        }
+      }
+    });
+    expect(nextGoal.objective).toContain('one explicit exact maintainer choice');
+    expect(nextGoal.acceptance.join('\n')).toContain(decisionOptions.join(', '));
+    expect(nextGoal.acceptance.join('\n')).toContain(
+      'must not infer a choice from this Goal execution authorization'
+    );
+    expect(nextGoal.blocked_actions).toEqual(expect.arrayContaining([
+      'contract_specification_decision_recording_before_goal_execution_authorization',
+      'contract_specification_decision_without_explicit_maintainer_choice',
+      'contract_specification_creation',
+      'schema_creation_or_promotion',
+      'authoritative_contract_acceptance_or_implementation',
+      'adapter_implementation',
+      'roadmap_milestone_advancement',
+      'detector_behavior_test_execution',
+      'target_repository_acquisition',
+      'target_repository_execution',
+      'target_repository_write',
+      'publication',
+      'deployment',
+      'launch'
+    ]));
+
+    expect(intake).toContain('Status: `awaiting_explicit_maintainer_decision`');
+    expect(intake).toContain(`Conclusion: \`${conclusion}\``);
+    expect(intake).toContain('Selected decision: `pending`');
+    expect(intake).toContain('Recommendation: `none_not_authorized`');
+    expect(intake).toContain('Decisions recorded: 0/1. Decisions pending: 1/1.');
+    expect(intake).toContain('Goal execution authorization is not the contract-specification authorization decision');
+    expect(intake).toContain('All four boxes are intentionally blank');
+    expect(intake).toContain('Option order carries no preference');
+    expect(intake).not.toContain('- [x]');
+    const checkboxOptions = [...intake.matchAll(/^- \[ \] `([^`]+)`/gmu)]
+      .map((match) => match[1]);
+    expect(checkboxOptions).toEqual(decisionOptions);
+    expect(new Set(checkboxOptions).size).toBe(4);
+    for (const option of decisionOptions) {
+      expect(intake).toContain(`- [ ] \`${option}\``);
+    }
+    expect(operationRecord).toContain('Status: `completed`');
+    expect(operationRecord).toContain(`Conclusion: \`${conclusion}\``);
+    expect(operationRecord).toContain(`Successor Goal created: \`${nextGoalId}\``);
+    expect(operationRecord).toContain('Successor execution authorization: `null`');
+
+    expect(index.active_goal_id).toBe(nextGoalId);
+    expect(index.goals.filter((candidate) => candidate.status === 'ready_to_execute')).toEqual([
+      expect.objectContaining({ id: nextGoalId, status: 'ready_to_execute' })
+    ]);
+    expect(snapshot.current_stage).toContain(
+      'K1 contract-specification authorization intake is prepared; explicit maintainer choice remains pending'
+    );
+    expect(snapshot.active_goal).toEqual({
+      id: nextGoalId,
+      title: nextGoalTitle,
+      status: 'ready_to_execute'
+    });
+    expect(snapshot.next_goal).toEqual(snapshot.active_goal);
+    expect(snapshot.next_goal_plain_language).toContain('execution_authorization: null');
+    expect(snapshot.next_goal_plain_language).toContain('尚未授权执行');
+    expect(snapshot.blocked_actions).toEqual(expect.arrayContaining(nextGoal.blocked_actions));
+
+    for (const projection of [
+      progressMarkdown,
+      readme,
+      plan,
+      spec,
+      prd,
+      architecture,
+      testingStrategy,
+      acceptanceChecklist,
+      decisionLog,
+      blockerLog,
+      devLog
+    ]) {
+      expect(projection).toContain(currentGoalTitle);
+      expect(projection).toContain(conclusion);
+      expect(projection).toContain(nextGoalTitle);
+      expect(projection).toContain('execution_authorization: null');
+      expect(projection).toContain('M1 remains incomplete');
+      expect(projection).toContain('request_revision');
+    }
   });
 });
 

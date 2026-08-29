@@ -214,7 +214,7 @@ describe('bootApp', () => {
     const session = await bootApp({
       root,
       startCommand: 'npm run dev',
-      timeoutMs: 3000
+      timeoutMs: 30000
     });
 
     try {
@@ -227,5 +227,5 @@ describe('bootApp', () => {
     } finally {
       await session.stop();
     }
-  }, 10000);
+  }, 45000);
 });

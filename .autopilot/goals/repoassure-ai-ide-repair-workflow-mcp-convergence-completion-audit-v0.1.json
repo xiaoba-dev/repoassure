@@ -1,0 +1,62 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-ai-ide-repair-workflow-mcp-convergence-completion-audit-v0.1",
+  "title": "RepoAssure AI IDE Repair Workflow MCP Convergence Completion Audit v0.1",
+  "status": "completed",
+  "objective": "Use the test pyramid to audit all four additive artifact-only MCP tools from ADR-0024 as one installed-consumer workflow, verify the twelve-tool registry preserves all existing contracts, reconcile documentation and completion evidence, and close the current MCP convergence slice without adding tools, executing validation commands, or writing target repositories.",
+  "source_spec": "docs/product/specs/ai-ide-repair-workflow-mcp-convergence-contract-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "validation_only_mcp_exposure",
+    "arbitrary_command_execution",
+    "mcp_resource_implementation",
+    "mcp_prompt_implementation",
+    "mcp_tool_addition",
+    "mcp_tool_rename",
+    "target_repo_write",
+    "automatic_patch_application",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "detector_confidence_threshold_change",
+    "acceptance_policy_change",
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "customer_contact",
+    "pricing_change",
+    "spend_change"
+  ],
+  "acceptance": [
+    "Audit prepare_repair_handoff, preview_repair_execution, generate_repair_patch_plan, and assemble_repair_evidence_package as one artifact-only workflow.",
+    "Prove the twelve-tool registry preserves all pre-convergence tool names, schemas, annotations, and behavior.",
+    "Verify unit, real tools/list and tools/call, packed installed consumer, redaction, maintainer review, verification checklist, and no-write evidence remain green.",
+    "Confirm validation-only remains CLI-only and no validation commands are executed by MCP.",
+    "Reconcile ADR-0024, the convergence contract, canonical docs, operation records, and Autopilot state.",
+    "Do not add or rename tools, expose resources or prompts, apply patches, write target repositories, publish, deploy, or change detector or acceptance behavior."
+  ],
+  "conclusion": "repair_workflow_mcp_convergence_slice_closed_without_command_execution_or_target_repo_writes",
+  "completed_at": "2026-07-25T18:27:21.000+08:00",
+  "next_goal_id": "repoassure-product-completion-gap-audit-refresh-v0.6",
+  "summary": {
+    "operation_record": "docs/operations/repoassure-ai-ide-repair-workflow-mcp-convergence-completion-audit-v0.1.md",
+    "implemented_tools": [
+      "prepare_repair_handoff",
+      "preview_repair_execution",
+      "generate_repair_patch_plan",
+      "assemble_repair_evidence_package"
+    ],
+    "registry_tool_count": 12,
+    "pre_convergence_tools_preserved": true,
+    "validation_only_mcp_exposed": false,
+    "verification_commands_executed": false,
+    "target_repo_writes": false,
+    "patches_applied": false,
+    "resources_prompts_exposed": false
+  }
+}

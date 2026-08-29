@@ -1,0 +1,87 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-product-completion-gap-audit-refresh-v0.3",
+  "title": "RepoAssure Product Completion Gap Audit Refresh v0.3",
+  "status": "completed",
+  "objective": "Re-audit remaining RepoAssure product gaps after the progress consistency guard and select the next non-blocked, locally verifiable execution goal.",
+  "source_spec": "docs/operations/repoassure-autopilot-progress-consistency-guard-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "detector_confidence_threshold_change",
+    "acceptance_policy_change",
+    "website_design_system_rewrite"
+  ],
+  "acceptance": [
+    "Reconcile PLAN, SPEC, PRD, README, code entrypoints, tests, and recent operation records under the progress consistency guard.",
+    "Classify remaining work as implemented, blocked, manual-gated, external-input-gated, deferred, or safe auto-executable.",
+    "Select one meaningful non-blocked next execution goal without changing runtime detector behavior or target repositories.",
+    "Record evidence in the standard operations, acceptance, testing, decision-log, dev-log, and Autopilot surfaces."
+  ],
+  "conclusion": "completion_gap_audit_refreshed_with_cli_productization_next",
+  "completed_at": "2026-07-24T10:05:00.000+08:00",
+  "next_goal_id": "repoassure-ai-ide-repair-workflow-cli-productization-v0.1",
+  "summary": {
+    "operation_record": "docs/operations/repoassure-product-completion-gap-audit-refresh-v0.3.md",
+    "implemented_surfaces": [
+      "local_cli_and_mcp_hardening_core",
+      "browser_and_python_cli_acceptance",
+      "run_scoped_evidence_and_integrity",
+      "ai_ide_repair_contracts_and_private_runners",
+      "project_intelligence_local_suite",
+      "false_positive_catalog_and_calibration_contracts",
+      "public_release_readiness_automation"
+    ],
+    "blocked_or_manual_gated": [
+      "false_positive_detector_runtime_calibration",
+      "public_source_release",
+      "npm_publication",
+      "github_release",
+      "team_cloud_enterprise_product_decision",
+      "final_user_acceptance"
+    ],
+    "external_input_gated": [
+      "private_preview_feedback_triage"
+    ],
+    "deferred": [
+      "website_design_system_follow_up"
+    ],
+    "safe_auto_executable": [
+      "ai_ide_repair_workflow_cli_productization"
+    ],
+    "selected_next_goal": "repoassure-ai-ide-repair-workflow-cli-productization-v0.1",
+    "evidence": [
+      "src/adapters/cli/run.ts",
+      "src/adapters/mcp/tool-registry.ts",
+      "packages/acceptance/package.json",
+      "package.json",
+      "docs/PLAN.md",
+      "docs/SPEC.md",
+      "docs/PRD.md",
+      "README.md"
+    ],
+    "boundary": {
+      "runtime_detection_behavior_change": false,
+      "target_repo_writes": false,
+      "website_design_system_rewrite": false,
+      "deployment": false,
+      "public_release": false,
+      "customer_contact": false,
+      "pricing_or_spend_change": false
+    }
+  }
+}

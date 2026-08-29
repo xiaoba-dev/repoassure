@@ -1,0 +1,93 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "product-false-positive-regression-catalog-contract-implementation-v0.1",
+  "status": "completed",
+  "objective": "Implement the local false-positive regression catalog contract by adding schema/fixture source of truth and contract tests that validate catalog shape, expected finding snapshots, severity/rationale review fields, and maintainer review boundaries without changing runtime detection behavior.",
+  "source_spec": "docs/operations/product-false-positive-regression-catalog-planning-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite",
+    "runtime_detection_behavior_change"
+  ],
+  "acceptance": [
+    "Add a local catalog contract and non-private fixture source of truth for browser hardening, Project Intelligence, security assurance, and repair planner consumption finding examples.",
+    "Add contract tests for fixture categories, expected finding snapshots, severity/rationale review fields, maintainer decision fields, redaction, and no target repo write boundary.",
+    "Do not add suppression logic, do not downgrade findings automatically, and do not change runtime detection behavior in this implementation goal.",
+    "Cascade implementation evidence into operations docs, README, PRD, SPEC, PLAN, testing strategy, acceptance checklist, decision log, dev log, and .autopilot progress."
+  ],
+  "summary": {
+    "operation_record": "docs/operations/product-false-positive-regression-catalog-contract-implementation-v0.1.md",
+    "conclusion": "contract_implemented_without_runtime_detection_change",
+    "implemented_contract": {
+      "module": "packages/acceptance/src/false-positive-catalog.ts",
+      "package_export": "@hardening-mcp/acceptance/false-positive-catalog",
+      "root_export": "@hardening-mcp/acceptance",
+      "contract_symbol": "falsePositiveRegressionCatalogContract",
+      "builder_symbol": "buildFalsePositiveRegressionCatalog",
+      "validator_symbol": "validateFalsePositiveRegressionCatalog",
+      "fixture_categories": [
+        "browser_hardening_findings",
+        "project_intelligence_findings",
+        "security_assurance_findings",
+        "repair_planner_consumption",
+        "mixed_run_bundle_regressions"
+      ],
+      "expected_snapshot_fields": [
+        "finding_id",
+        "source_fixture",
+        "category",
+        "type",
+        "severity",
+        "path",
+        "evidence",
+        "expected_classification",
+        "false_positive_risk",
+        "rationale",
+        "maintainer_decision",
+        "accepted_risk_notes",
+        "regression_commands"
+      ],
+      "review_fields": [
+        "false_positive_risk",
+        "rationale",
+        "maintainer_decision",
+        "accepted_risk_notes",
+        "owner_notes"
+      ]
+    },
+    "boundaries": {
+      "local_only": true,
+      "runtime_detection_behavior_change": false,
+      "finding_suppression": false,
+      "automatic_severity_downgrade": false,
+      "target_repo_writes": false,
+      "hosted_dashboard": false,
+      "telemetry": false,
+      "cloud_sync": false
+    },
+    "verification": [
+      "pnpm vitest run tests/unit/false-positive-catalog.test.ts tests/unit/acceptance-package.test.ts",
+      "pnpm vitest run tests/unit/false-positive-catalog.test.ts tests/unit/acceptance-package.test.ts tests/unit/project-structure.test.ts",
+      "pnpm repo:hygiene",
+      "pnpm release:check",
+      "pnpm typecheck",
+      "pnpm lint",
+      "pnpm test",
+      "pnpm goal:audit"
+    ],
+    "selected_next_goal_id": "product-false-positive-regression-catalog-artifact-generation-v0.1"
+  },
+  "next_goal_id": "product-false-positive-regression-catalog-artifact-generation-v0.1"
+}

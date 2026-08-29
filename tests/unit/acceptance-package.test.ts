@@ -2,7 +2,16 @@ import {
   acceptanceCompatibilityContract,
   acceptanceEntrypointFiles,
   acceptanceHelpText,
+  falsePositiveRegressionCatalogContract,
+  falsePositiveDetectorCalibrationContractConsumptionHelpText,
+  falsePositiveRegressionCatalogConsumptionHelpText,
+  falsePositiveDetectorCalibrationContractHelpText,
+  falsePositiveRegressionCatalogHelpText,
   formatAcceptanceCommand as formatAcceptanceRunnerCommand,
+  isFalsePositiveDetectorCalibrationContractConsumptionHelpRequest,
+  isFalsePositiveDetectorCalibrationContractHelpRequest,
+  isFalsePositiveRegressionCatalogHelpRequest,
+  isFalsePositiveRegressionCatalogConsumptionHelpRequest,
   isAcceptanceHelpRequest,
   isGoalAuditDirectRun,
   isRepairExecuteDirectRun,
@@ -18,14 +27,27 @@ import {
   LEGACY_ACCEPTANCE_WRAPPER_SOURCE_SPECS,
   legacyAcceptanceWrapperSourceEntries,
   parseAcceptanceArgs as parseAcceptanceArgsFromIndex,
+  parseFalsePositiveDetectorCalibrationContractConsumptionArgs,
+  parseFalsePositiveDetectorCalibrationContractArgs,
+  parseFalsePositiveRegressionCatalogConsumptionArgs,
+  parseFalsePositiveRegressionCatalogArgs,
   redactSensitiveText,
   resolveAcceptanceEntrypointUrl,
   runAcceptanceCli,
+  runFalsePositiveDetectorCalibrationContractConsumptionCli,
+  runFalsePositiveDetectorCalibrationContractCli,
+  runFalsePositiveRegressionCatalogConsumptionCli,
+  runFalsePositiveRegressionCatalogCli,
   runRepairExecute,
   runRepairHandoff,
   runRepairPatchPlan,
+  runWorkspaceRepairSummary,
+  validateWorkspaceRepairSummaryConsumption,
   shellQuoteArg
 } from '../../packages/acceptance/src/index.js';
+import * as workspaceRepairSummary from '../../packages/acceptance/src/workspace-repair-summary.js';
+import * as workspaceRepairSummaryConsumption
+  from '../../packages/acceptance/src/workspace-repair-summary-consumption.js';
 import { formatAcceptanceFatalError } from '../../packages/acceptance/src/fatal-error.js';
 import { buildGoalAuditMarkdown, summarizeGoalAudit } from '../../packages/acceptance/src/goal-audit.js';
 import { REQUIRED_DOCUMENT_PATHS, buildGoalAuditTextRequirement } from '../../packages/acceptance/src/goal-audit-requirements.js';
@@ -77,13 +99,21 @@ describe('acceptance package', () => {
       repairExecute: 'run-repair-execute.js',
       repairPatchPlan: 'run-repair-patch-plan.js',
       repairEvidencePackage: 'run-repair-evidence-package.js',
+      falsePositiveCatalog: 'run-false-positive-catalog.js',
+      falsePositiveCatalogConsumption: 'run-false-positive-catalog-consumption.js',
+      falsePositiveDetectorCalibrationContract: 'run-false-positive-detector-calibration-contract.js',
+      falsePositiveDetectorCalibrationContractConsumption: 'run-false-positive-detector-calibration-contract-consumption.js',
+      autopilotProgressConsistency: 'run-autopilot-progress-consistency.js',
       projectIntelligenceSnapshot: 'run-project-intelligence-snapshot.js',
       projectIntelligenceViewer: 'run-project-intelligence-viewer.js',
       projectIntelligenceBacklog: 'run-project-intelligence-backlog.js',
+      projectIntelligenceAgentContext: 'run-project-intelligence-agent-context.js',
       projectIntelligenceDecisionIntake: 'run-project-intelligence-decision-intake.js',
       projectIntelligenceRecommendationDraft: 'run-project-intelligence-recommendation-draft.js',
       projectIntelligenceMaintainerDecision: 'run-project-intelligence-maintainer-decision.js',
-      projectIntelligenceControlledRemediationPlan: 'run-project-intelligence-controlled-remediation-plan.js'
+      projectIntelligenceControlledRemediationPlan: 'run-project-intelligence-controlled-remediation-plan.js',
+      projectIntelligenceWatch: 'run-project-intelligence-watch.js',
+      projectIntelligenceWatchHandoff: 'run-project-intelligence-watch-handoff.js'
     });
   });
 
@@ -109,12 +139,130 @@ describe('acceptance package', () => {
       .toBe('file:///repo/packages/acceptance/dist/run-user-acceptance-handoff.js');
     expect(resolveAcceptanceEntrypointUrl('repairHandoff', baseUrl).href)
       .toBe('file:///repo/packages/acceptance/dist/run-repair-handoff.js');
+    expect(resolveAcceptanceEntrypointUrl('falsePositiveCatalog', baseUrl).href)
+      .toBe('file:///repo/packages/acceptance/dist/run-false-positive-catalog.js');
+    expect(resolveAcceptanceEntrypointUrl('falsePositiveCatalogConsumption', baseUrl).href)
+      .toBe('file:///repo/packages/acceptance/dist/run-false-positive-catalog-consumption.js');
+    expect(resolveAcceptanceEntrypointUrl('falsePositiveDetectorCalibrationContract', baseUrl).href)
+      .toBe('file:///repo/packages/acceptance/dist/run-false-positive-detector-calibration-contract.js');
+    expect(resolveAcceptanceEntrypointUrl('falsePositiveDetectorCalibrationContractConsumption', baseUrl).href)
+      .toBe('file:///repo/packages/acceptance/dist/run-false-positive-detector-calibration-contract-consumption.js');
+    expect(resolveAcceptanceEntrypointUrl('autopilotProgressConsistency', baseUrl).href)
+      .toBe('file:///repo/packages/acceptance/dist/run-autopilot-progress-consistency.js');
   });
 
   it('exports markdown helpers as the first package-owned implementation module', () => {
     expect(acceptanceCompatibilityContract.packageOwnedModules).toContain('markdown');
     expect(escapeMarkdownTableCell('alpha|beta\ngamma')).toBe('alpha\\|beta gamma');
     expect(formatMarkdownCodeCell('/tmp/report``path.md')).toBe('```/tmp/report``path.md```');
+  });
+
+  it('exports the workspace repair summary generator without adding a CLI entrypoint', () => {
+    expect(acceptanceCompatibilityContract.packageOwnedModules)
+      .toContain('workspace-repair-summary');
+    expect(runWorkspaceRepairSummary).toBe(workspaceRepairSummary.runWorkspaceRepairSummary);
+    expect(acceptanceEntrypointFiles).not.toHaveProperty('workspaceRepairSummary');
+  });
+
+  it('exports workspace repair summary consumption validation without adding a CLI entrypoint', () => {
+    expect(acceptanceCompatibilityContract.packageOwnedModules)
+      .toContain('workspace-repair-summary-consumption');
+    expect(validateWorkspaceRepairSummaryConsumption)
+      .toBe(workspaceRepairSummaryConsumption.validateWorkspaceRepairSummaryConsumption);
+    expect(acceptanceEntrypointFiles)
+      .not.toHaveProperty('workspaceRepairSummaryConsumption');
+  });
+
+  it('exports false-positive catalog contract without changing detector behavior', () => {
+    expect(acceptanceCompatibilityContract.packageOwnedModules).toContain('false-positive-catalog');
+    expect(falsePositiveRegressionCatalogContract.boundary.runtimeDetectionBehaviorChange).toBe(false);
+    expect(falsePositiveRegressionCatalogContract.boundary.findingSuppression).toBe(false);
+    expect(falsePositiveRegressionCatalogContract.fixtureCategories).toContain('mixed_run_bundle_regressions');
+  });
+
+  it('owns the false-positive catalog artifact runner in the package', () => {
+    expect(acceptanceCompatibilityContract.packageOwnedModules).toContain('run-false-positive-catalog');
+    expect(runFalsePositiveRegressionCatalogCli).toEqual(expect.any(Function));
+    expect(isFalsePositiveRegressionCatalogHelpRequest(['--help'])).toBe(true);
+    expect(falsePositiveRegressionCatalogHelpText()).toContain('pnpm false-positive:catalog');
+    expect(parseFalsePositiveRegressionCatalogArgs([
+      '--output',
+      'artifacts/project-graph',
+      '--generated-at',
+      '2026-07-22T00:00:00.000+08:00'
+    ])).toEqual({
+      outputDir: 'artifacts/project-graph',
+      generatedAt: '2026-07-22T00:00:00.000+08:00'
+    });
+  });
+
+  it('owns the false-positive catalog consumption validation runner in the package', () => {
+    expect(acceptanceCompatibilityContract.packageOwnedModules)
+      .toContain('run-false-positive-catalog-consumption');
+    expect(runFalsePositiveRegressionCatalogConsumptionCli).toEqual(expect.any(Function));
+    expect(isFalsePositiveRegressionCatalogConsumptionHelpRequest(['--help'])).toBe(true);
+    expect(falsePositiveRegressionCatalogConsumptionHelpText())
+      .toContain('pnpm false-positive:catalog:validate');
+    expect(parseFalsePositiveRegressionCatalogConsumptionArgs([
+      '--',
+      '--catalog-json',
+      'artifacts/project-graph/false-positive-regression-catalog.json',
+      '--catalog-md',
+      'artifacts/project-graph/false-positive-regression-catalog.md',
+      '--output',
+      'artifacts/project-graph',
+      '--generated-at',
+      '2026-07-22T00:00:00.000+08:00'
+    ])).toEqual({
+      catalogJsonPath: 'artifacts/project-graph/false-positive-regression-catalog.json',
+      catalogMarkdownPath: 'artifacts/project-graph/false-positive-regression-catalog.md',
+      outputDir: 'artifacts/project-graph',
+      generatedAt: '2026-07-22T00:00:00.000+08:00'
+    });
+  });
+
+  it('owns the false-positive detector calibration contract runner in the package', () => {
+    expect(acceptanceCompatibilityContract.packageOwnedModules)
+      .toContain('run-false-positive-detector-calibration-contract');
+    expect(runFalsePositiveDetectorCalibrationContractCli).toEqual(expect.any(Function));
+    expect(isFalsePositiveDetectorCalibrationContractHelpRequest(['--help'])).toBe(true);
+    expect(falsePositiveDetectorCalibrationContractHelpText())
+      .toContain('pnpm false-positive:calibration-contract');
+    expect(parseFalsePositiveDetectorCalibrationContractArgs([
+      '--',
+      '--output',
+      'artifacts/project-graph',
+      '--generated-at',
+      '2026-07-23T08:00:00.000+08:00'
+    ])).toEqual({
+      outputDir: 'artifacts/project-graph',
+      generatedAt: '2026-07-23T08:00:00.000+08:00'
+    });
+  });
+
+  it('owns the false-positive detector calibration contract consumption validation runner in the package', () => {
+    expect(acceptanceCompatibilityContract.packageOwnedModules)
+      .toContain('run-false-positive-detector-calibration-contract-consumption');
+    expect(runFalsePositiveDetectorCalibrationContractConsumptionCli).toEqual(expect.any(Function));
+    expect(isFalsePositiveDetectorCalibrationContractConsumptionHelpRequest(['--help'])).toBe(true);
+    expect(falsePositiveDetectorCalibrationContractConsumptionHelpText())
+      .toContain('pnpm false-positive:calibration-contract:validate');
+    expect(parseFalsePositiveDetectorCalibrationContractConsumptionArgs([
+      '--',
+      '--contract-json',
+      'artifacts/project-graph/false-positive-detector-calibration-contract.json',
+      '--contract-md',
+      'artifacts/project-graph/false-positive-detector-calibration-contract.md',
+      '--output',
+      'artifacts/project-graph',
+      '--generated-at',
+      '2026-07-23T09:00:00.000+08:00'
+    ])).toEqual({
+      contractJsonPath: 'artifacts/project-graph/false-positive-detector-calibration-contract.json',
+      contractMarkdownPath: 'artifacts/project-graph/false-positive-detector-calibration-contract.md',
+      outputDir: 'artifacts/project-graph',
+      generatedAt: '2026-07-23T09:00:00.000+08:00'
+    });
   });
 
   it('exports acceptance report helpers as package-owned implementation', () => {

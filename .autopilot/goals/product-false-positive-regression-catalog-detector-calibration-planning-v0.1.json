@@ -1,0 +1,67 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "product-false-positive-regression-catalog-detector-calibration-planning-v0.1",
+  "status": "completed",
+  "objective": "Plan detector calibration using the expanded false-positive regression catalog while preserving maintainer review boundaries and without changing runtime detector behavior.",
+  "source_spec": "docs/operations/product-false-positive-regression-catalog-real-fixture-expansion-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade"
+  ],
+  "acceptance": [
+    "Create a calibration planning record that maps near-real fixture candidates to detector review questions and manual decision gates.",
+    "Define which future detector calibration changes would require separate implementation authorization and tests.",
+    "Preserve false-positive catalog artifacts as evidence only, with no runtime detector behavior change, no finding suppression, no automatic severity downgrade, and no target repo writes.",
+    "Cascade the planning boundary into PRD, SPEC, PLAN, testing strategy, acceptance checklist, decision log, dev log, and autopilot progress."
+  ],
+  "completed_at": "2026-07-23T02:05:00.000+08:00",
+  "result": {
+    "operation_record": "docs/operations/product-false-positive-regression-catalog-detector-calibration-planning-v0.1.md",
+    "conclusion": "detector_calibration_plan_ready_without_runtime_behavior_change"
+  },
+  "summary": {
+    "operation_record": "docs/operations/product-false-positive-regression-catalog-detector-calibration-planning-v0.1.md",
+    "conclusion": "detector_calibration_plan_ready_without_runtime_behavior_change",
+    "calibration_questions": [
+      "conditional_dead_control_should_consider_form_dirty_prerequisites",
+      "auth_redirect_route_should_preserve_maintainer_review_boundary"
+    ],
+    "manual_gates": [
+      "maintainer_classification_required_before_detector_change",
+      "catalog_fixture_privacy_review_required",
+      "expected_snapshot_review_required",
+      "confidence_threshold_review_required",
+      "regression_artifact_review_required"
+    ],
+    "required_future_authorization": [
+      "runtime_detector_change",
+      "finding_suppression",
+      "automatic_severity_downgrade",
+      "detector_confidence_threshold_change",
+      "acceptance_policy_change"
+    ],
+    "boundary": {
+      "runtime_detection_behavior_change": false,
+      "finding_suppression": false,
+      "automatic_severity_downgrade": false,
+      "target_repo_writes": false
+    },
+    "selected_next_goal_id": "product-false-positive-regression-catalog-detector-calibration-contract-v0.1"
+  },
+  "next_goal_id": "product-false-positive-regression-catalog-detector-calibration-contract-v0.1"
+}

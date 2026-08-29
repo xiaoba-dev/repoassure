@@ -1,5 +1,140 @@
 # 架构说明
 
+## Current K1 gate — 2026-08-03
+
+RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Intake v0.1 completed with `k1_contract_specification_authorization_intake_prepared_without_inferred_choice_specification_schema_or_runtime_changes`. The next Goal is RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1 (`ready_to_execute`, `execution_authorization: null`). Original contracts and artifact bytes remain authoritative; K1 remains a non-authoritative, reference-only candidate; M1 remains incomplete; `auth_redirect` remains `request_revision`. No specification, schema, authoritative contract, adapter/runtime, dependency, target, release, or Git architecture changed.
+
+## 当前治理方向
+
+Completed design Goal: RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Design Planning v0.1.
+
+Conclusion: `k1_non_authoritative_contract_design_plan_prepared_without_schema_authoritative_contract_or_runtime_implementation`.
+
+The subsequent RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Intake v0.1 is also completed without a selected decision. Current next Goal: RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1 (`ready_to_execute`, `execution_authorization: null`).
+
+Preserved K1 governance sequence: RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Intake v0.1 (`m1_open_evidence_kernel_candidate_boundary_decision_intake_prepared_without_selected_decision_or_contract_changes`) → RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Recording v0.1 (`maintainer_approved_k1_for_separately_gated_contract_design_without_schema_or_runtime_implementation_authorization`) → RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Design Planning v0.1 (`k1_non_authoritative_contract_design_plan_prepared_without_schema_authoritative_contract_or_runtime_implementation`).
+
+K1 设计计划只定义一个可丢弃、可重建、只读、引用型的非权威视图。原始
+contracts 与 artifact bytes 继续权威；source、mapping、envelope instance 三层
+身份相互分离，raw status/decision 不被静默归一化，loss/unknown 明示，hash 只
+证明本地字节一致性，write authorization、observed mutation 与 proof method
+相互独立。Contract specification、维护者接受和 implementation 继续是三个
+独立门禁，M1 remains incomplete，`auth_redirect` 保持 `request_revision`。
+
+Prior completed Goal: RepoAssure M1 Open Evidence Kernel Contract Gap Planning v0.1, with conclusion `m1_open_evidence_kernel_contract_gap_plan_prepared_with_one_candidate_boundary_without_schema_or_runtime_changes`.
+
+RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision
+Intake v0.1 已完成，结论为
+`m1_open_evidence_kernel_candidate_boundary_decision_intake_prepared_without_selected_decision_or_contract_changes`。
+它只为唯一的
+`provider_neutral_read_only_evidence_envelope_adapter_boundary` 候选准备了
+四个中立、未选择的选项；0/1 decisions recorded、1/1 pending，普通 Goal
+执行授权没有被当作候选决定。原契约继续权威，schema、contract、adapter 与
+runtime 改动均为 0，M1 remains incomplete；auth redirect 保持
+`request_revision`。
+
+RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision
+Recording v0.1 已完成。维护者明确选择
+`approve_for_separately_gated_contract_design`，1/1 decisions recorded、0/1
+pending；该决定只允许派生一个单独设门槛的非权威设计规划 Goal。它没有选择或
+改变任何运行架构，没有创建 schema，也没有接受或实现 contract/adapter/runtime。
+
+RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Design Planning
+v0.1 已完成；K1 仍为非权威、可丢弃的引用视图，原契约与 artifact bytes 继续
+权威。随后 Contract Specification Authorization Intake v0.1 也已完成，但没有
+选择答案。当前下一 Goal 是 RepoAssure M1 Open Evidence Kernel Candidate
+Boundary Contract Specification Authorization Maintainer Decision Recording
+v0.1，`execution_authorization: null`，因此尚未授权记录选择或起草
+specification。M1 remains incomplete，`auth_redirect` 保持
+`request_revision`。
+
+RepoAssure Remaining Gated Product Work Maintainer Direction Decision Recording v0.1
+已完成，结论为
+`maintainer_selected_false_positive_detector_runtime_calibration_without_underlying_work_authorization`。
+其历史来源 RepoAssure Remaining Gated Product Work Direction Preparation v0.1
+的结论仍为
+`remaining_gated_product_work_direction_package_prepared_without_decision_or_execution`。
+维护者选择 `false_positive_detector_runtime_calibration` 作为优先方向时，
+两个校准问题仍为 0/2 已决定、2/2 pending。
+RepoAssure False-Positive Detector Runtime Calibration Decision Reopening Preparation v0.1 已完成，结论为
+`false_positive_detector_runtime_calibration_decision_reopening_package_prepared_without_per_question_decisions_or_detector_changes`。
+它只刷新本地决策包，不改变下述运行架构、检测器或产品入口。
+
+RepoAssure False-Positive Detector Runtime Calibration Per-Question Maintainer Decision Recording v0.1 已完成，结论为
+`maintainer_approved_both_false_positive_detector_calibration_questions_for_separately_gated_design_planning_without_detector_implementation_authorization`。
+RepoAssure False-Positive Detector Runtime Calibration Bounded Design Planning v0.1 也已完成，结论为
+`bounded_false_positive_detector_calibration_design_plan_prepared_without_runtime_implementation_or_behavior_change`。
+RepoAssure False-Positive Detector Runtime Calibration Implementation Authorization Intake v0.1 也已完成，结论为
+`implementation_authorization_intake_prepared_without_inferred_decisions_or_detector_changes`。
+它只准备两道未填写的实现授权题，没有改变运行架构。
+
+RepoAssure False-Positive Detector Runtime Calibration Implementation Authorization Maintainer Decision Recording v0.1 is complete with conclusion
+`maintainer_approved_conditional_dead_control_implementation_and_requested_auth_redirect_revision_without_detector_changes`.
+
+RepoAssure Conditional Dead Control Calibration Implementation Gate Evidence
+Preparation v0.1 is complete with conclusion
+`conditional_dead_control_gate_evidence_package_prepared_with_all_manual_gates_fail_closed`.
+
+RepoAssure Conditional Dead Control Calibration Fixture Evidence Readiness and
+Authorization Intake v0.1 is complete with conclusion
+`conditional_dead_control_fixture_evidence_readiness_and_authorization_intake_prepared_without_inferred_choice_or_fixture_access`.
+
+RepoAssure Conditional Dead Control Calibration Fixture Evidence Readiness and
+Authorization Maintainer Decision Recording v0.1 is complete with conclusion
+`maintainer_requested_synthetic_local_fixture_plan_without_fixture_access_or_detector_changes`.
+
+RepoAssure Conditional Dead Control Calibration Synthetic Fixture Bounded
+Planning v0.1 is complete with conclusion
+`synthetic_fixture_bounded_plan_prepared_without_fixture_creation_execution_or_detector_changes`.
+
+RepoAssure Conditional Dead Control Calibration Synthetic Fixture
+Implementation Authorization Intake v0.1 is complete with conclusion
+`synthetic_fixture_implementation_authorization_intake_prepared_without_inferred_choice_or_fixture_work`.
+
+RepoAssure Conditional Dead Control Calibration Synthetic Fixture
+Implementation Authorization Maintainer Decision Recording v0.1 is complete
+with conclusion
+`maintainer_approved_synthetic_fixture_implementation_for_separately_authorized_local_fixture_goal_without_fixture_or_detector_work`.
+
+RepoAssure Conditional Dead Control Calibration Bounded Detector
+Implementation Authorization Intake v0.1 已完成，结论为
+`bounded_detector_implementation_authorization_intake_prepared_without_inferred_choice_or_detector_changes`。
+RepoAssure Conditional Dead Control Calibration Bounded Detector
+Implementation Authorization Maintainer Decision Recording v0.1 也已完成，
+结论为
+`maintainer_authorized_bounded_detector_implementation_for_separately_authorized_local_goal_without_detector_changes`。
+明确数字选择 `1` 映射为
+`authorize_bounded_detector_implementation`；Implementation authorization
+decisions recorded: 1/1，pending: 0/1。
+
+RepoAssure Conditional Dead Control Calibration Bounded Detector
+Implementation v0.1 已完成，结论为
+`conditional_dead_control_bounded_detector_implemented_with_visible_p1_classification_and_fail_closed_prerequisite_evidence`。
+Architecture Handoff 在 detector/test 修改前锁定 browser-runtime + private
+classifier seam，复用现有 `evidence: string[]`，未改变 public finding schema。
+运行时现在只在 HTTP(S) loopback、同一稳定页面、唯一 owner form、唯一且
+非敏感字段的直接观察下执行最多一次 fill；disabled submit 始终 0 click / 0
+submit，缺失、矛盾、不安全或不稳定证据全部 fail closed。所有分支保持可见
+P1 `dead_control`，不推断 form state。
+
+RepoAssure Conditional Dead Control Calibration Bounded Detector
+Implementation Completion Audit v0.1 已完成，结论为
+`bounded_detector_implementation_audit_qualified_with_material_evidence_drift_without_product_surface_changes`。
+审计确认架构与产品边界通过，同时保留 command、SDK 与 provenance 漂移。
+
+RepoAssure Conditional Dead Control Calibration Verification Evidence
+Reconciliation v0.1 已完成，结论为
+`conditional_dead_control_verification_evidence_reconciled_with_durable_errata_without_product_or_historical_record_changes`。
+该 addendum 不改变架构或历史记录，只固定未来 replay 的命令、集合、SDK 和
+provenance 解释。
+
+Active Goal: RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract
+Specification Authorization Maintainer Decision Recording v0.1。该 Goal 为
+`ready_to_execute`，但 `execution_authorization: null`。在单独授权并收到一个
+精确 token 前不得记录选择；不得起草 specification，运行 detector/行为测试，
+或改变 schema、权威 contract、adapter、runtime、架构、Roadmap、target 与
+外部状态。M1 remains incomplete，`auth_redirect` 保持 `request_revision`。
+
 ## 系统定位
 
 `hardening-mcp` 是一个本地优先的 Code Hardening MCP Server + CLI。它面向 AI IDE 和命令行场景，用同一套核心实现完成 Web App 仓库的分析、启动、浏览器探索、测试生成、报告输出、结构化修复计划生成、修复交接、验证复跑和补丁计划生成。
@@ -232,3 +367,82 @@ flowchart LR
 | Integration | CLI、tool artifact、boot 子进程、MCP protocol、run 编排 |
 | E2E | data URL 完整链路、可选真实 browser hardening run |
 | Benchmark | 5 个本地半真实 repo，完整 `run --browser`，并实际执行 generated Playwright specs |
+
+## AI IDE Repair Workflow MCP Convergence
+
+RepoAssure AI IDE Repair Workflow MCP Convergence Decision and Contract v0.1 is accepted by ADR-0024. The installed CLI remains the complete repair workflow. MCP convergence is staged through four artifact-only candidates: `prepare_repair_handoff`, `preview_repair_execution`, `generate_repair_patch_plan`, and `assemble_repair_evidence_package`.
+
+The architecture preserves existing MCP contracts while separately authorized implementation Goals add candidates one at a time. RepoAssure AI IDE Repair Handoff MCP Tool Implementation v0.1 added `prepare_repair_handoff` as the ninth tool. RepoAssure AI IDE Repair Execution Preview MCP Tool Implementation v0.1 added dry-run `preview_repair_execution` as the tenth tool. RepoAssure AI IDE Repair Patch Plan MCP Tool Implementation v0.1 and RepoAssure AI IDE Repair Evidence Package MCP Tool Implementation v0.1 brought the registry to twelve tools. RepoAssure AI IDE Repair Workflow MCP Convergence Completion Audit v0.1 closed that slice. RepoAssure Product Completion Gap Audit Refresh v0.6 confirmed that the local workspace manifest existed without cross-repository consumption. RepoAssure Multi-Repo Workspace Repair Summary Planning v0.1 defined a package-owned local JSON/Markdown layer above workspace manifests and per-repo task packages, RepoAssure Multi-Repo Workspace Repair Summary Contract Implementation v0.1 implemented its deterministic queue, blocked-state diagnostics, redaction, maintainer review, and no-write proof in `@hardening-mcp/acceptance`, and RepoAssure Multi-Repo Workspace Repair Summary AI IDE Consumption Validation v0.1 added a package-owned read-only validator for ready/partial/blocked/empty, JSON-first order, blocked fail-closed, queue non-authorization, exact maintainer decisions, diagnostics, redaction, and target no-write. RepoAssure Multi-Repo Workspace Repair Summary Completion Audit v0.1 is next. `validation-only` remains CLI-only, MCP resources and prompts are deferred, and the summary slice may not execute commands, apply patches, add entrypoints, or write target source.
+
+RepoAssure Multi-Repo Workspace Repair Summary Completion Audit v0.1 now closes that package-owned local-only architecture slice. The generator and consumer stay library surfaces with root and typed subpath exports; no installed CLI or MCP entrypoint was added. RepoAssure Product Completion Gap Audit Refresh v0.7 is next and may reassess priorities, but it may not silently promote this library contract into a command/tool surface or weaken no-write, review, redaction, detector, acceptance, release, or hosted-product boundaries.
+
+RepoAssure Product Completion Gap Audit Refresh v0.7 confirms that no additional runtime architecture surface is currently safe to add automatically. Public Release Manual Decision Input Review v0.2 then found that the remote repository is public and `main` branch protection is active, superseding the historical private/HTTP-403/defer evidence. Public Repository State and Release Boundary Reconciliation v0.1 is the next read-only governance Goal. It reconciles repository exposure and release-control evidence outside the runtime architecture and cannot change repository controls, publish, deploy, or expand product entrypoints.
+
+Public Repository State and Release Boundary Reconciliation v0.1 is now
+complete. It confirms that the public source release on `origin/main` is
+complete and verified, while public launch, npm publication, GitHub Release,
+deployment, and commercial availability remain separate unauthorized actions.
+The current tree contains no known maintainer/reviewer personal identifiers,
+but six public-history commits retain historical personal identifiers.
+Public Git History Personal-Identifier Remediation Planning v0.1 completed a
+redacted comparison of accept-risk, history-rewrite, and repository-replacement
+options. It found 6 affected commits and 16 paths, no credential evidence, and
+0 current-tree matches. Public Git History Personal-Identifier Remediation Maintainer Decision Recording v0.1 completed with conclusion
+`maintainer_explicitly_accepted_historical_personal_identifier_recoverability_risk`.
+The explicit `accept_risk` choice leaves public history unchanged; it does not
+authorize force push, repository replacement, credential rotation, or
+repository-control changes.
+
+RepoAssure Product Completion Gap Audit Refresh v0.8 is complete with
+conclusion
+`completion_gap_audit_refreshed_with_final_product_acceptance_closure_campaign_next`.
+It changes no runtime architecture. The audit counts 12 implemented product
+surfaces and preserves every existing manual, external-input, deferred, and
+no-write boundary.
+
+RepoAssure Final Product Acceptance Closure Campaign v0.1 is complete with
+conclusion
+`final_product_acceptance_decision_package_prepared_without_inferred_decision`.
+It added governance evidence only, not an architecture or runtime surface.
+
+RepoAssure Final Product Acceptance Maintainer Decision Recording v0.1 records
+the explicit `defer` decision without adding a runtime or product architecture
+surface. RepoAssure Representative Multi-Mode Acceptance Campaign Planning
+v0.1 then defines Web, Python/CLI, and MCP/Agent acceptance architecture, a
+shared evidence contract, and a separate execution-authorization intake. The
+explicit target and execution decision Goal recorded all three lanes as
+`defer`.
+
+RepoAssure Representative Multi-Mode Acceptance Target Readiness and
+Acquisition Authorization Package v0.1 is complete with conclusion
+`target_readiness_and_acquisition_authorization_package_prepared_without_target_acquisition`.
+It adds governance artifacts only: three readiness cards and a future
+acquisition-decision template. It does not add runtime, network, installer,
+target-analysis, or target-write architecture.
+
+RepoAssure Representative Multi-Mode Acceptance Target Acquisition Authorization Maintainer Decision Recording v0.1 is complete with conclusion
+`maintainer_explicitly_deferred_all_representative_target_acquisitions_without_target_access`.
+All three acquisitions are `defer`, receipts remain 0, and the record adds no
+runtime, network, installer, target-analysis, or target-write architecture.
+
+RepoAssure Product Backlog Reprioritization After Representative Acquisition Defer v0.1 is complete with conclusion
+`backlog_reprioritized_to_local_product_completion_gap_audit_after_representative_acquisition_defer`.
+It adds no runtime architecture and preserves every target and acceptance
+deferral.
+
+RepoAssure Product Completion Gap Audit Refresh v0.9 is complete with
+conclusion
+`completion_gap_audit_refreshed_with_canonical_narrative_freshness_cleanup_v0.2_next`.
+It confirms the existing 12 product surfaces and 3 governance surfaces
+without adding runtime architecture.
+
+RepoAssure Canonical Product Narrative Freshness Cleanup v0.2 is complete with
+conclusion
+`canonical_product_narrative_freshness_cleaned_with_gated_work_direction_preparation_next`.
+It changed canonical narrative only and added no runtime, target, network,
+installer, release, or hosted architecture.
+
+RepoAssure Remaining Gated Product Work Direction Preparation v0.1
+subsequently completed and added no runtime or action architecture. The current
+next Goal is RepoAssure Remaining Gated Product Work Maintainer Direction Decision Recording v0.1;
+it may record one explicit priority direction only.

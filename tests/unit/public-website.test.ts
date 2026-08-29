@@ -99,10 +99,12 @@ describe('information architecture', () => {
 
     const howItWorks = appSource.indexOf('id="how-it-works"');
     const roles = appSource.indexOf('id="roles"');
-    const stepsGrid = appSource.indexOf('steps-grid');
+    // The role cards are whatever renders `steps.items`; asserting on the data they read
+    // rather than on a CSS class survives the cards being restyled.
+    const roleCards = appSource.indexOf('copy.steps.items.map');
     expect(howItWorks).toBeGreaterThan(-1);
     expect(roles).toBeGreaterThan(howItWorks);
-    expect(stepsGrid).toBeGreaterThan(roles);
+    expect(roleCards).toBeGreaterThan(roles);
   });
 
   it('marks which assurance graph nodes the distributed CLI can actually reach', async () => {
@@ -124,17 +126,20 @@ describe('information architecture', () => {
 
   it('keeps primary navigation at five items', async () => {
     const appSource = await readFile('apps/website/src/App.tsx', 'utf8');
-    const nav = appSource.slice(
-      appSource.indexOf('aria-label="Primary navigation"'),
-      appSource.indexOf('</nav>')
-    );
-    const links = nav.match(/<a href="#/g) ?? [];
+    // Header and footer render the same list, so the list itself is the thing to pin.
+    const start = appSource.indexOf('const navLinks = [');
+    expect(start).toBeGreaterThan(-1);
+    const nav = appSource.slice(start, appSource.indexOf('];', start));
+
+    const links = nav.match(/href: '#/g) ?? [];
     expect(links.length).toBe(5);
     expect(nav).toContain('#answers');
     expect(nav).toContain('#how-it-works');
     expect(nav).toContain('#artifacts');
     expect(nav).toContain('#open-core');
     expect(nav).toContain('#trust');
+    expect(appSource).toContain('aria-label="Primary navigation"');
+    expect(appSource).toContain('navLinks.map(');
   });
 
   it('states trust boundary claims a reader can verify rather than adjectives', async () => {
@@ -154,43 +159,28 @@ describe('public website app', () => {
       packageJson,
       indexHtml,
       appSource,
+      mainSource,
       artifactPreviewSource,
-      cliDemoSource,
-      heroConsoleSource,
       openCoreDiagramSource,
       assuranceGraphSource,
-      trustLedgerPreviewSource,
       i18nSource,
       styles,
-      designTokens,
-      evidenceSystem,
-      responsiveStyles,
-      statusChipSource,
-      evidenceHashSource,
       verifyWebsite,
       robots,
       sitemap,
       manifest,
       favicon,
       ogImage
-    ] =
-      await Promise.all([
+    ] = await Promise.all([
       readFile('apps/website/package.json', 'utf8'),
       readFile('apps/website/index.html', 'utf8'),
       readFile('apps/website/src/App.tsx', 'utf8'),
+      readFile('apps/website/src/main.tsx', 'utf8'),
       readFile('apps/website/src/ArtifactPreview.tsx', 'utf8'),
-      readFile('apps/website/src/CliDemo.tsx', 'utf8'),
-      readFile('apps/website/src/HeroConsole.tsx', 'utf8'),
       readFile('apps/website/src/OpenCoreDiagram.tsx', 'utf8'),
       readFile('apps/website/src/AssuranceGraph.tsx', 'utf8'),
-      readFile('apps/website/src/TrustLedgerPreview.tsx', 'utf8'),
       readFile('apps/website/src/i18n.ts', 'utf8'),
       readFile('apps/website/src/styles.css', 'utf8'),
-      readFile('apps/website/src/styles/tokens.css', 'utf8'),
-      readFile('apps/website/src/styles/evidence-system.css', 'utf8'),
-      readFile('apps/website/src/styles/responsive.css', 'utf8'),
-      readFile('apps/website/src/components/ui/StatusChip.tsx', 'utf8'),
-      readFile('apps/website/src/components/ui/EvidenceHash.tsx', 'utf8'),
       readFile('scripts/verify-website.mjs', 'utf8'),
       readFile('apps/website/public/robots.txt', 'utf8'),
       readFile('apps/website/public/sitemap.xml', 'utf8'),
@@ -203,6 +193,7 @@ describe('public website app', () => {
     expect(packageJson).toContain('"dev": "vite');
     expect(packageJson).toContain('"build": "vite build');
     expect(packageJson).toContain('"preview": "vite preview');
+    expect(packageJson).toContain('"@repoassure/design-system": "workspace:*"');
 
     expect(indexHtml).toContain('<link rel="canonical" href="https://repoassure.com/" />');
     expect(indexHtml).toContain('<meta name="robots" content="index,follow" />');
@@ -236,54 +227,75 @@ describe('public website app', () => {
     expect(appSource).toContain('RepoAssure');
     expect(appSource).toContain('useWebsiteLocale');
     expect(appSource).toContain('AssuranceGraph');
-    expect(appSource).not.toContain('TrustLedgerPreview');
-    expect(appSource).toContain('HeroConsole');
-    expect(appSource).toContain('hero-media');
-    expect(appSource).not.toContain('/assets/trust-ledger.png');
-    expect(appSource).toContain('data-testid="language-switcher"');
     expect(appSource).toContain('ArtifactPreview');
-    expect(appSource).toContain('site-footer-compact');
-    expect(appSource).toContain('footer-links');
-    expect(artifactPreviewSource).toContain('data-testid="artifact-preview-tabs"');
+    expect(appSource).not.toContain('TrustLedgerPreview');
+    expect(appSource).not.toContain('/assets/trust-ledger.png');
+    expect(appSource).toContain('data-testid="hero-console"');
+    expect(appSource).toContain('data-testid="language-switcher"');
     expect(appSource).toContain('data-testid="private-preview-form"');
     expect(appSource).toContain('data-testid="assurance-graph-section"');
-    expect(cliDemoSource).toContain('data-testid="cli-demo"');
-    expect(heroConsoleSource).toContain('data-testid="hero-console"');
-    expect(heroConsoleSource).toContain('hero-console-summary');
-    expect(heroConsoleSource).not.toContain('cli-terminal-body');
-    expect(assuranceGraphSource).toContain('data-testid="assurance-graph-fallback"');
+    expect(appSource).toContain('data-testid="cli-demo"');
     expect(appSource).not.toContain('data-testid="assurance-pipeline"');
-
+    expect(artifactPreviewSource).toContain('data-testid="artifact-preview-tabs"');
     expect(assuranceGraphSource).toContain('data-testid="assurance-graph"');
+    expect(assuranceGraphSource).toContain('data-testid="assurance-graph-fallback"');
     expect(assuranceGraphSource).toContain('graph-svg');
     expect(assuranceGraphSource).toContain('buildGraphEdgePath');
     expect(assuranceGraphSource).toContain('centerLabel');
     expect(assuranceGraphSource).not.toContain('<img');
-
-    expect(trustLedgerPreviewSource).toContain('data-testid="trust-ledger-preview"');
-    expect(trustLedgerPreviewSource).toContain('EvidenceHash');
-    expect(trustLedgerPreviewSource).toContain('trust-ledger-sidebar');
-    expect(trustLedgerPreviewSource).not.toContain('variant');
-    expect(trustLedgerPreviewSource).not.toContain('<img');
-    expect(trustLedgerPreviewSource).not.toContain('trust-ledger.png');
-
-    expect(appSource).toContain('hero-graph-breath');
-    expect(appSource).toContain('hero-highlight');
-    expect(appSource).toContain('hero-secondary-link');
-    expect(appSource).toContain('OpenCoreDiagram');
     expect(openCoreDiagramSource).toContain('data-testid="open-core-diagram"');
     expect(openCoreDiagramSource).toContain('open-core-diagram-list');
-    expect(appSource).toContain('design-partner-note');
-    expect(artifactPreviewSource).toContain('artifact-preview-panel-leading');
-    expect(artifactPreviewSource).toContain('SeverityChip');
-    expect(statusChipSource).toContain("'accent' | 'success'");
-    expect(evidenceHashSource).toContain('evidence-hash');
 
-    const stylesheetBundle = [styles, designTokens, evidenceSystem, responsiveStyles].join('\n');
+    /* The design system has to be consumed, not imitated.
 
-    expect(styles).toContain("@import './styles/tokens.css'");
-    expect(styles).toContain("@import './styles/evidence-system.css'");
-    expect(styles).toContain("@import './styles/responsive.css'");
+       It was vendored, typed, and wired at the token layer while every component on the
+       page stayed hand-written: 37 primitives shipped, zero rendered, and 3,543 lines of
+       CSS reproducing what the package already provided. Nothing failed, because no gate
+       asked whether the package was actually used. These assertions ask. */
+    expect(mainSource).toContain("import '@repoassure/design-system/styles'");
+    expect(mainSource).toContain("import '@repoassure/design-system/styles/fonts'");
+    expect(appSource).toContain("from '@repoassure/design-system'");
+    expect(artifactPreviewSource).toContain("from '@repoassure/design-system'");
+
+    for (const component of ['Panel', 'Terminal', 'ScoreGauge', 'StatusChip', 'Button', 'TrustCard', 'StepCard']) {
+      expect(appSource, `App.tsx should render the design system ${component}`).toContain(component);
+    }
+    for (const component of ['TabList', 'SeverityChip', 'KeyValueList']) {
+      expect(artifactPreviewSource, `ArtifactPreview should render ${component}`).toContain(component);
+    }
+
+    // Component styling belongs to the package. Page CSS carries geometry only, so a
+    // local restyling of a shipped primitive should not reappear here.
+    for (const shadowed of [
+      '.status-chip',
+      '.severity-chip',
+      '.evidence-hash',
+      '.trust-ledger',
+      '.step-card',
+      '.hero-console'
+    ]) {
+      expect(styles, `${shadowed} re-implements a design system component`).not.toContain(shadowed);
+    }
+
+    // Page geometry, taken from the design system's own reference site.
+    expect(styles).toContain('var(--container-max)');
+    expect(styles).toContain('var(--section-pad-y)');
+    expect(styles).toContain('var(--font-display)');
+    expect(styles).toContain('.console-scope');
+    expect(styles).toContain('.assurance-graph');
+    expect(styles).toContain('.graph-svg');
+    expect(styles).toContain('aspect-ratio: 640 / 480');
+    expect(styles).toContain('.open-core-diagram');
+    expect(styles).toContain('.language-switcher');
+    expect(styles).toContain('.graph-chain-fallback');
+    expect(styles).toContain('@media (max-width: 760px)');
+    expect(styles).toContain('prefers-reduced-motion');
+    expect(styles).toContain('a:focus-visible');
+    expect(styles).toContain('button:focus-visible');
+    expect(styles).toContain('select:focus-visible');
+    expect(styles).toContain('input:focus-visible');
+    expect(styles).toContain("[role='tab']:focus-visible");
+    expect(styles).not.toContain('.assurance-pipeline');
 
     expect(i18nSource).toContain('defaultLocale =');
     expect(i18nSource).not.toContain('navigator.languages');
@@ -320,59 +332,6 @@ describe('public website app', () => {
       expect(i18nSource).not.toMatch(pattern);
     }
 
-    expect(designTokens).toContain('/* Brand tokens */');
-    expect(designTokens).toContain('/* Semantic tokens */');
-    expect(designTokens).toContain('/* Component tokens */');
-    expect(stylesheetBundle).toContain('--brand-assurance: #009d5c');
-    // Light is the default surface under Design System v2 (ADR-0022).
-    expect(stylesheetBundle).toContain('--surface-hero: #ffffff');
-    expect(stylesheetBundle).toContain('--surface-page: #ffffff');
-    expect(stylesheetBundle).toContain('--surface-panel: rgba(9, 24, 40, 0.84)');
-    expect(stylesheetBundle).toContain('--text-primary: #111827');
-    expect(stylesheetBundle).toContain('--text-muted: #526071');
-    expect(stylesheetBundle).toContain('--text-on-dark: #f8fafc');
-    expect(stylesheetBundle).toContain('--border-subtle: #d8e0ea');
-    expect(designTokens).toContain('/* Status — 2 success + 1 accent */');
-    expect(stylesheetBundle).toContain('--accent: #009d5c');
-    expect(stylesheetBundle).toContain('--accent-emphasis: #36e58b');
-    expect(stylesheetBundle).toContain('--status-success: #22d876');
-    expect(stylesheetBundle).toContain('--status-success-muted:');
-    expect(stylesheetBundle).toContain('--status-success-surface:');
-    expect(designTokens).not.toContain('--status-verified:');
-    expect(designTokens).not.toContain('--status-generated:');
-    expect(stylesheetBundle).toContain('--focus-ring: #8bb5ff');
-    expect(stylesheetBundle).toContain('--focus-ring-on-dark: var(--accent-emphasis)');
-    expect(stylesheetBundle).toContain('--component-radius-control: 10px');
-    expect(styles).toContain('.open-core-diagram');
-    expect(styles).toContain('.design-partner-note');
-    expect(styles).not.toContain('.assurance-pipeline');
-    expect(styles).not.toContain('.artifact-card');
-    expect(styles).not.toContain('.hero-assurance-surface');
-    expect(styles).not.toContain('.trust-ledger-preview-hero');
-    expect(evidenceSystem).toContain('.evidence-hash');
-    expect(evidenceSystem).toContain('.severity-chip');
-    expect(styles).toContain('.theme-dark');
-    expect(styles).toContain('.theme-light');
-    expect(styles).toContain(':focus-visible');
-    expect(styles).toContain('a:focus-visible');
-    expect(styles).toContain('button:focus-visible');
-    expect(styles).toContain('select:focus-visible');
-    expect(styles).toContain('input:focus-visible');
-    expect(styles).toContain('[role="tab"]:focus-visible');
-    expect(styles).toContain('.language-switcher');
-    expect(styles).toContain('.assurance-graph');
-    expect(styles).toContain('.graph-svg');
-    expect(styles).toContain('aspect-ratio: 640 / 480');
-    expect(styles).toContain('.assurance-graph-section');
-    expect(styles).toContain('.cli-demo');
-    expect(styles).toContain('.artifact-preview-panel');
-    expect(styles).toContain('.hero-console');
-    expect(styles).toContain('.trust-ledger-preview');
-    expect(styles).toContain('@media (max-width: 760px)');
-    expect(responsiveStyles).toContain('prefers-reduced-motion');
-    expect(responsiveStyles).toContain('.graph-chain-fallback');
-
-    expect(verifyWebsite).toContain('ig_04fa6cbaaebee9cb016a3d1d4ad8088191a53375bdf20065a8.png');
     expect(verifyWebsite).toContain('Is this AI-generated repo ready to ship?');
     expect(verifyWebsite).toContain('assurance-graph');
     expect(verifyWebsite).toContain('desktop-focus-dark.png');
@@ -382,6 +341,9 @@ describe('public website app', () => {
     expect(verifyWebsite).toContain('og:image');
     expect(verifyWebsite).toContain('robots.txt');
     expect(verifyWebsite).toContain('sitemap.xml');
+    // The contrast audit is the gate that caught a 1:1 hero heading. It must survive.
+    expect(verifyWebsite).toContain('WCAG AA contrast failures');
+    expect(verifyWebsite).toContain('backgroundOf');
   });
 
   it('keeps shipped website locales complete and guarded against forbidden claims', async () => {
@@ -416,28 +378,34 @@ describe('public website app', () => {
     }
   });
 
-  it('guards P3 pixel polish for responsive public website surfaces', async () => {
-    const [styles, responsiveStyles, verifyWebsite] = await Promise.all([
+  it('keeps the responsive surface intact after the design system swap', async () => {
+    const [styles, verifyWebsite] = await Promise.all([
       readFile('apps/website/src/styles.css', 'utf8'),
-      readFile('apps/website/src/styles/responsive.css', 'utf8'),
       readFile('scripts/verify-website.mjs', 'utf8')
     ]);
-    const stylesheetBundle = [styles, responsiveStyles].join('\n');
 
-    expect(responsiveStyles).toContain('/* P3 pixel polish');
-    expect(responsiveStyles).toContain('@media (max-width: 760px)');
-    expect(responsiveStyles).toContain('.trust-ledger-table-head');
-    expect(responsiveStyles).toContain('.trust-ledger-row');
-    expect(responsiveStyles).toContain('grid-template-columns: minmax(0, 1fr)');
-    expect(responsiveStyles).toContain('.trust-ledger-evidence .evidence-hash');
-    expect(responsiveStyles).toContain('.artifact-detail-meta-inline');
-    expect(responsiveStyles).toContain('.artifact-code');
-    expect(responsiveStyles).toContain('.graph-chain-fallback');
-    expect(responsiveStyles).toContain('.preview-form');
-    expect(responsiveStyles).toContain('.site-footer-compact');
-    expect(responsiveStyles).toContain('@media (max-width: 430px)');
-    expect(stylesheetBundle).toContain('overflow-wrap: anywhere');
-    expect(stylesheetBundle).toContain('text-wrap: balance');
+    /* The responsive rules used to live in their own stylesheet alongside class-by-class
+       polish for hand-written components. Those components are now design system
+       primitives that carry their own styling, so what is left to guard is the behaviour
+       the page still owns: the breakpoints, the two surfaces that swap to a linear
+       fallback on narrow screens, and the wrapping that long hashes and CJK need. */
+    expect(styles).toContain('@media (max-width: 960px)');
+    expect(styles).toContain('@media (max-width: 760px)');
+    expect(styles).toContain('overflow-wrap: anywhere');
+    expect(styles).toContain('text-wrap: balance');
+    expect(styles).toContain('prefers-reduced-motion');
+
+    // Below 760px the force-placed graph and the open-core diagram are unreadable, so
+    // each swaps to the list that carries the same data.
+    const narrow = styles.slice(styles.indexOf('@media (max-width: 760px)'));
+    expect(narrow).toContain('.graph-canvas');
+    expect(narrow).toContain('.graph-chain-fallback');
+    expect(narrow).toContain('.open-core-diagram-svg');
+    expect(narrow).toContain('.open-core-diagram-list');
+    // The CTA folds away on a phone; the locale switcher must not.
+    expect(narrow).toContain('.header-cta');
+    expect(narrow).not.toContain('.header-actions {\n    display: none;');
+
     expect(verifyWebsite).toContain('desktop-p3-fold.png');
     expect(verifyWebsite).toContain('mobile-p3-fold.png');
     expect(verifyWebsite).toContain('horizontalOverflow');

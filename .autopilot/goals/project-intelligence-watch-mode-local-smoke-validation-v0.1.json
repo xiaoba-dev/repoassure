@@ -1,0 +1,68 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-watch-mode-local-smoke-validation-v0.1",
+  "status": "completed",
+  "objective": "Validate the implemented local-only Project Intelligence watch mode against a real local file-change cycle in an isolated fixture or worktree, proving foreground startup, debounce refresh, status artifact update, artifact freshness, and graceful manual/abort stop behavior without hosted services or target repo writes.",
+  "source_spec": "docs/operations/project-intelligence-watch-mode-implementation-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite"
+  ],
+  "acceptance": [
+    "Run watch mode in an isolated local fixture or worktree and trigger at least one accepted docs/code/autopilot file change.",
+    "Verify debounce coalesces the change into a deterministic refresh cycle.",
+    "Verify project-intelligence snapshot, agent context, and watch status artifacts are refreshed in the expected order.",
+    "Verify ignored generated/dependency/cache/secret paths do not trigger refresh.",
+    "Verify graceful stop via abort/manual boundary without daemonizing or leaving a background process.",
+    "Record smoke evidence in operations docs, testing strategy, acceptance checklist, decision log, dev log, and .autopilot progress."
+  ],
+  "summary": {
+    "operation_record": "docs/operations/project-intelligence-watch-mode-local-smoke-validation-v0.1.md",
+    "smoke_test": "tests/integration/project-intelligence-watch-smoke.test.ts",
+    "runtime_hardening": "Recursive fs.watch was replaced with bounded polling after smoke exposed EMFILE pressure.",
+    "accepted_paths_verified": [
+      "docs/PRD.md",
+      "packages/acceptance/src/smoke.ts",
+      ".autopilot/progress/snapshot.json"
+    ],
+    "ignored_paths_verified": [
+      ".autopilot/cache/ignored.json",
+      ".autopilot/secrets/ignored.json",
+      "artifacts/project-graph/ignored.json",
+      "node_modules/pkg/index.js"
+    ],
+    "refresh_order": [
+      "pnpm project:intelligence",
+      "pnpm project:intelligence:agent-context",
+      "project-intelligence-watch-status.json"
+    ],
+    "default_debounce_ms": 1500,
+    "smoke_debounce_ms": 25,
+    "status_artifact": "artifacts/project-graph/project-intelligence-watch-status.json",
+    "graceful_stop_verified": true,
+    "boundary": {
+      "local_only": true,
+      "daemonized": false,
+      "telemetry": false,
+      "cloud_sync": false,
+      "hosted_dashboard": false,
+      "target_repo_writes": false
+    },
+    "verification": [
+      "pnpm vitest run tests/integration/project-intelligence-watch-smoke.test.ts"
+    ],
+    "next_goal_id": "project-intelligence-watch-mode-ai-ide-consumption-handoff-v0.1"
+  }
+}

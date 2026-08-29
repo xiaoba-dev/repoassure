@@ -1,0 +1,92 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "product-false-positive-regression-catalog-planning-v0.1",
+  "status": "completed",
+  "objective": "Plan a local-only false-positive regression catalog for RepoAssure findings and Project Intelligence detection rules, defining fixture categories, expected finding snapshots, severity/rationale review fields, and test strategy without changing runtime detection behavior yet.",
+  "source_spec": "docs/operations/project-intelligence-watch-mode-completion-audit-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "website_design_system_rewrite",
+    "runtime_detection_behavior_change"
+  ],
+  "acceptance": [
+    "Audit existing finding categories, Project Intelligence detection rules, and known false-positive risks from PRD, SPEC, PLAN, testing strategy, and product completion gap audit records.",
+    "Define a local-only false-positive regression catalog plan with fixture categories, expected finding snapshots, severity/rationale review fields, and maintainer review boundaries.",
+    "Cascade the plan into operations docs, README, PRD, SPEC, PLAN, testing strategy, acceptance checklist, decision log, dev log, and .autopilot progress.",
+    "Do not change runtime detection behavior, target repositories, hosted services, telemetry, deployment, publication state, pricing, or website design-system implementation in this planning goal."
+  ],
+  "summary": {
+    "operation_record": "docs/operations/product-false-positive-regression-catalog-planning-v0.1.md",
+    "conclusion": "plan_ready_for_local_contract_implementation",
+    "catalog_plan": {
+      "fixture_categories": [
+        "browser_hardening_findings",
+        "project_intelligence_findings",
+        "security_assurance_findings",
+        "repair_planner_consumption",
+        "mixed_run_bundle_regressions"
+      ],
+      "expected_snapshot_fields": [
+        "finding_id",
+        "source_fixture",
+        "category",
+        "type",
+        "severity",
+        "path",
+        "evidence",
+        "expected_classification",
+        "false_positive_risk",
+        "rationale",
+        "maintainer_decision",
+        "accepted_risk_notes",
+        "regression_commands"
+      ],
+      "review_fields": [
+        "false_positive_risk",
+        "rationale",
+        "maintainer_decision",
+        "accepted_risk_notes",
+        "owner_notes"
+      ],
+      "finding_sources": [
+        "src/types/findings.ts",
+        "packages/browser-explorer/src/explore-app.ts",
+        "packages/acceptance/src/run-project-intelligence-snapshot.ts",
+        "packages/acceptance/src/run-project-intelligence-backlog.ts",
+        "packages/repair-planner/src/generate-repair-plan.ts",
+        "packages/repair-planner/src/repair-plan.ts"
+      ]
+    },
+    "boundaries": {
+      "local_only": true,
+      "runtime_detection_behavior_change": false,
+      "target_repo_writes": false,
+      "hosted_dashboard": false,
+      "telemetry": false,
+      "cloud_sync": false
+    },
+    "selected_next_goal_id": "product-false-positive-regression-catalog-contract-implementation-v0.1",
+    "verification": [
+      "pnpm vitest run tests/unit/project-structure.test.ts",
+      "pnpm repo:hygiene",
+      "pnpm release:check",
+      "pnpm typecheck",
+      "pnpm lint",
+      "pnpm test",
+      "pnpm goal:audit"
+    ]
+  },
+  "next_goal_id": "product-false-positive-regression-catalog-contract-implementation-v0.1"
+}

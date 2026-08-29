@@ -1,7 +1,154 @@
 # 用户验收清单
 
+## Current K1 acceptance gate — 2026-08-03
+
+RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Intake v0.1 completed with `k1_contract_specification_authorization_intake_prepared_without_inferred_choice_specification_schema_or_runtime_changes`. The intake is blank: 0/1 recorded, 1/1 pending, no preselection/default/recommendation. RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1 is next with `execution_authorization: null`. Original contracts and artifact bytes remain authoritative, K1 remains non-authoritative, M1 remains incomplete, and `auth_redirect` remains `request_revision`. Final acceptance and all six representative lanes remain `defer`; no product, target, release, or Git action occurred.
+
+Preserved K1 governance sequence: RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Intake v0.1 (`m1_open_evidence_kernel_candidate_boundary_decision_intake_prepared_without_selected_decision_or_contract_changes`) → RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Recording v0.1 (`maintainer_approved_k1_for_separately_gated_contract_design_without_schema_or_runtime_implementation_authorization`) → RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Design Planning v0.1 (`k1_non_authoritative_contract_design_plan_prepared_without_schema_authoritative_contract_or_runtime_implementation`).
+
+- [x] RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Intake v0.1
+  - 当前状态：已完成；结论为 `k1_contract_specification_authorization_intake_prepared_without_inferred_choice_specification_schema_or_runtime_changes`。四个选项仍为空，0/1 recorded、1/1 pending。
+- [ ] RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Specification Authorization Maintainer Decision Recording v0.1
+  - 当前状态：`ready_to_execute`、`execution_authorization: null`，尚未授权执行。未来只有单独授权并收到一个明确 token 才能记录选择；不得推断选择、起草 specification、创建/升级 schema、接受权威 contract、实现 adapter/runtime、推进 Roadmap、运行 detector/行为测试或执行外部动作。M1 remains incomplete，auth redirect 保持 `request_revision`。
+
 ## 当前已通过
 
+- [x] RepoAssure M1 Open Evidence Kernel Candidate Boundary Contract Design Planning v0.1
+  - 结论：`k1_non_authoritative_contract_design_plan_prepared_without_schema_authoritative_contract_or_runtime_implementation`；exactly one 本地非权威设计计划已完成，原 contracts 与 artifact bytes 继续权威，schema/权威 contract/adapter/runtime 均为 0。Loss/unknown、raw vocabulary、integrity、review、no-write、privacy、compatibility、validation 与 rollback 已定义，contract specification、接受与 implementation 仍为三道独立门禁。
+
+- [x] RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Recording v0.1
+  - 结论：`maintainer_approved_k1_for_separately_gated_contract_design_without_schema_or_runtime_implementation_authorization`；维护者明确选择 `approve_for_separately_gated_contract_design`，1/1 decisions recorded、0/1 pending。该批准只派生上述 `execution_authorization: null` 的设计规划 Goal；K1 仍非权威，原 contracts 继续权威，schema/contract/adapter/runtime 与外部动作均为 0。
+
+- [x] RepoAssure M1 Open Evidence Kernel Candidate Boundary Maintainer Decision Intake v0.1
+  - 结论：`m1_open_evidence_kernel_candidate_boundary_decision_intake_prepared_without_selected_decision_or_contract_changes`；四个中立选项已准备，0/1 decisions recorded、1/1 pending、selected=`pending`、无推荐或默认；Goal 执行授权没有被当作候选决定，schema/contract/adapter/runtime 与外部动作均为 0。
+
+- [x] RepoAssure M1 Open Evidence Kernel Contract Gap Planning v0.1
+  - 结论：`m1_open_evidence_kernel_contract_gap_plan_prepared_with_one_candidate_boundary_without_schema_or_runtime_changes`；8 类本地契约映射到 5 类 M1 证据，主状态 reuse=1、gap=2、conflict=2、unknown=0；只提出 1 个非权威候选边界，schema/runtime、Roadmap、target 与外部动作均为 0，auth redirect 保持 `request_revision`。
+
+- [x] RepoAssure Product Completion Gap Audit Refresh v0.10
+  - 结论：`completion_gap_audit_refreshed_with_m1_open_evidence_kernel_contract_gap_planning_next`；六类计数保持 12/3/9/3/5/1，conditional dead-control 归为既有 implemented subcapability，auth redirect 保持 `request_revision`，Roadmap 里程碑推进 0 个。
+
+- [x] RepoAssure Conditional Dead Control Calibration Verification Evidence Reconciliation v0.1
+  - 结论：`conditional_dead_control_verification_evidence_reconciled_with_durable_errata_without_product_or_historical_record_changes`；durable addendum 固定 `23 ⊂ 39 ⊂ 76`、独立 81、Vitest 4.1.9 flags、SDK 1.29.0 与未验证历史 1.30.0 诊断，未改产品或历史记录。
+
+- [x] RepoAssure Conditional Dead Control Calibration Bounded Detector Implementation Completion Audit v0.1
+  - 结论：`bounded_detector_implementation_audit_qualified_with_material_evidence_drift_without_product_surface_changes`；实现边界通过、P1/P2 审查项为 0，`23 ⊂ 39 ⊂ 76` 且 81-test downstream aggregate 独立；命令与历史 SDK 诊断漂移被保留，产品表面修改为 0。
+
+- [x] RepoAssure Conditional Dead Control Calibration Bounded Detector Implementation v0.1
+  - 结论：`conditional_dead_control_bounded_detector_implemented_with_visible_p1_classification_and_fail_closed_prerequisite_evidence`；Architecture Handoff 先于实现，23/23 bounded behavior、39/39 driver、76/76 companion、81/81 downstream 通过；所有分支保持 visible P1，disabled submit 0 click，form state 不推断，fixture hash 不变。
+
+- [x] RepoAssure Conditional Dead Control Calibration Bounded Detector Implementation Authorization Maintainer Decision Recording v0.1
+  - 结论：`maintainer_authorized_bounded_detector_implementation_for_separately_authorized_local_goal_without_detector_changes`；明确数字选择 `1` 映射为 `authorize_bounded_detector_implementation`，Implementation authorization decisions recorded: 1/1、pending: 0/1；本 Goal 未修改或运行 detector，下一 Goal 仍未获得执行授权。
+
+- [x] RepoAssure Conditional Dead Control Calibration Bounded Detector Implementation Authorization Intake v0.1
+  - 结论：`bounded_detector_implementation_authorization_intake_prepared_without_inferred_choice_or_detector_changes`；Implementation authorization decisions recorded: 0/1，4/4 options 已准备、无预选，推荐项不具约束力；未修改 detector，未发 receipt，未操作 target。
+
+- [x] RepoAssure Conditional Dead Control Calibration Synthetic Fixture Manual Gate Maintainer Decision Recording v0.1
+  - 结论：`maintainer_approved_all_five_synthetic_fixture_manual_gates_without_detector_implementation_authorization`；5/5 人工门禁已由维护者明确批准，但该决定不授权 detector implementation。
+
+- [x] RepoAssure Conditional Dead Control Calibration Synthetic Fixture Bounded Implementation v0.1
+  - 结论：`synthetic_fixture_implemented_and_locally_validated_without_detector_changes_or_manual_gate_completion`；三个本地 synthetic fixture/test 文件覆盖五种状态，4/4 focused tests 通过，未修改 detector。
+
+- [x] RepoAssure Conditional Dead Control Calibration Synthetic Fixture Implementation Authorization Maintainer Decision Recording v0.1
+  - 结论：`maintainer_approved_synthetic_fixture_implementation_for_separately_authorized_local_fixture_goal_without_fixture_or_detector_work`；明确选择 `approve_synthetic_fixture_implementation`，1/1 decisions 已记录、0/1 pending，三个 fixture 文件保持不存在，0/5 manual gates 完成。
+
+- [x] RepoAssure Conditional Dead Control Calibration Synthetic Fixture Implementation Authorization Intake v0.1
+  - 结论：`synthetic_fixture_implementation_authorization_intake_prepared_without_inferred_choice_or_fixture_work`；4/4 options 已准备、0/1 decisions 已记录、无预选，三个 fixture 文件保持不存在，0/5 manual gates 完成。
+
+- [x] RepoAssure Conditional Dead Control Calibration Synthetic Fixture Bounded Planning v0.1
+  - 结论：`synthetic_fixture_bounded_plan_prepared_without_fixture_creation_execution_or_detector_changes`；5/5 conceptual states、3 个未来文件、3 类 expected snapshots 和 positive/counter/fail-closed 回归已规划，实际 fixture 文件保持不存在。
+
+- [x] RepoAssure Conditional Dead Control Calibration Fixture Evidence Readiness and Authorization Maintainer Decision Recording v0.1
+  - 结论：`maintainer_requested_synthetic_local_fixture_plan_without_fixture_access_or_detector_changes`；维护者明确输入 `2`，选择 `request_synthetic_local_fixture_plan`，1/1 已记录、0/1 pending，未授权 fixture 工作或 detector 修改。
+
+- [x] RepoAssure Conditional Dead Control Calibration Fixture Evidence Readiness and Authorization Intake v0.1
+  - 结论：`conditional_dead_control_fixture_evidence_readiness_and_authorization_intake_prepared_without_inferred_choice_or_fixture_access`；4/4 选项已准备、0/1 决定已记录，未预选、未访问 fixture、未修改 detector。
+
+- [x] RepoAssure Conditional Dead Control Calibration Implementation Gate Evidence Preparation v0.1
+  - 结论：`conditional_dead_control_gate_evidence_package_prepared_with_all_manual_gates_fail_closed`；5/5 证据包已准备、0/5 人工门禁完成，第二题保持 `request_revision`，未修改 detector。
+
+- [x] RepoAssure False-Positive Detector Runtime Calibration Implementation Authorization Maintainer Decision Recording v0.1
+  - 结论：`maintainer_approved_conditional_dead_control_implementation_and_requested_auth_redirect_revision_without_detector_changes`；第一题为 `approve_implementation`，第二题为 `request_revision`，未修改 detector。
+
+- [x] RepoAssure False-Positive Detector Runtime Calibration Implementation Authorization Intake v0.1
+  - 结论：`implementation_authorization_intake_prepared_without_inferred_decisions_or_detector_changes`；2/2 问题已准备、0/2 决定已记录、2/2 pending，五个人工门禁保留，detector 和 target 状态均未改变。
+
+- [x] RepoAssure False-Positive Detector Runtime Calibration Bounded Design Planning v0.1
+  - 结论：`bounded_false_positive_detector_calibration_design_plan_prepared_without_runtime_implementation_or_behavior_change`；2/2 受限设计已完成，五个人工门禁保留，detector、suppression、severity、threshold、policy 和 target 状态均未改变。
+
+- [x] RepoAssure False-Positive Detector Runtime Calibration Per-Question Maintainer Decision Recording v0.1
+  - 结论：`maintainer_approved_both_false_positive_detector_calibration_questions_for_separately_gated_design_planning_without_detector_implementation_authorization`；2/2 explicit、2/2 approve、0/2 pending，detector implementation 仍未授权。
+
+- [x] RepoAssure False-Positive Detector Runtime Calibration Decision Reopening Preparation v0.1
+  - 当前状态：已完成，结论为 `false_positive_detector_runtime_calibration_decision_reopening_package_prepared_without_per_question_decisions_or_detector_changes`。刷新包保留 0/2 recorded、2/2 pending 和五个人工门禁；未授权 detector、receipt、target、publication、deployment 或 launch。
+- [x] RepoAssure Remaining Gated Product Work Maintainer Direction Decision Recording v0.1
+  - 当前状态：已完成，结论为 `maintainer_selected_false_positive_detector_runtime_calibration_without_underlying_work_authorization`。维护者明确选择 `false_positive_detector_runtime_calibration`；其余六个方向保持 unselected，calibration answers 保持 0/2 recorded、2/2 pending。该方向选择不批准 detector、receipt、target、publication、deployment 或 launch。
+- [x] RepoAssure Remaining Gated Product Work Direction Preparation v0.1
+  - 当前状态：已完成，结论为 `remaining_gated_product_work_direction_package_prepared_without_decision_or_execution`。方向包覆盖 9/9 blocked/manual-gated、3/3 external-input-gated 和 5/5 deferred 项，每项包含 consequence、prerequisite、evidence gap 与 reversible next step；单一建议方向为 `false_positive_detector_runtime_calibration`，维护者方向选择仍为 `pending`。下一 Goal 是 RepoAssure Remaining Gated Product Work Maintainer Direction Decision Recording v0.1，只记录明确方向或 `defer_all_remaining_gated_work`，不批准或执行底层工作。
+- [x] RepoAssure Product Completion Gap Audit Refresh v0.3
+  - 当前状态：已完成，结论为 `completion_gap_audit_refreshed_with_cli_productization_next`。已对照 PLAN、SPEC、PRD、README、正式 CLI/MCP 入口、私有 repair runners、测试和近期 operation records 分类 implemented / blocked or manual-gated / external-input-gated / deferred / safe auto-executable 工作，并确认下一 Goal 为 RepoAssure AI IDE Repair Workflow CLI Productization v0.1。该结论不授权 detector runtime 变更、目标 repo 写入、网站设计系统恢复、MCP registry 扩展、部署或发布。
+- [x] RepoAssure Autopilot Progress Consistency Guard v0.1
+  - 当前状态：已完成，结论为 `progress_consistency_guard_implemented`。新增 `pnpm autopilot:progress:check -- --json` 和 package-owned runner，对 Goal index/record、progress active/next、progress Markdown、PLAN、README、PRD、SPEC 执行 8 个只读检查；一致返回 0，漂移或缺失输入返回 1。Unit、CLI integration、package contract、type-smoke 和真实 workspace assertion 已覆盖。历史后续目标为 RepoAssure Product Completion Gap Audit Refresh v0.3。该 gate 不自动修文档、不修改 runtime detector behavior、不写目标 repo、不部署、不发布、不联系客户、不改变 pricing/spend。
+- [x] RepoAssure Canonical Product Narrative Freshness Cleanup v0.1
+  - 当前状态：已完成，结论为 `canonical_product_narrative_freshness_cleaned`。已新增 `docs/operations/repoassure-canonical-product-narrative-freshness-cleanup-v0.1.md`，并将 README、PRD、SPEC、PLAN、Autopilot progress、testing strategy、decision log 和 dev log 中容易误导 maintainer 的当前/下一个 goal 叙事改为历史记录或当前 guard 叙事。下一个安全自动目标为 RepoAssure Autopilot Progress Consistency Guard v0.1。该 gate 不修改 runtime detector behavior、不 suppression findings、不自动降级 severity、不调整 detector confidence threshold、不改变 acceptance policy、不写目标 repo、不部署、不发布、不联系客户、不改变 pricing/spend。
+- [x] RepoAssure Product Completion Gap Audit Refresh v0.2
+  - 当前状态：已完成，结论为 `completion_gap_audit_refreshed_with_narrative_cleanup_next`。已新增 `docs/operations/repoassure-product-completion-gap-audit-refresh-v0.2.md`，刷新 implemented / blocked / deferred / safe auto-executable gaps；false-positive detector runtime calibration、public release execution、npm publication、GitHub release、Team Cloud / Enterprise hosted dashboard 和无真实反馈的 private preview feedback triage 继续 blocked 或 manual-gated；website design system follow-up 继续 deferred。下一个安全自动目标为 RepoAssure Canonical Product Narrative Freshness Cleanup v0.1。该 gate 不修改 runtime detector behavior、不 suppression findings、不自动降级 severity、不调整 detector confidence threshold、不改变 acceptance policy、不写目标 repo、不部署、不发布、不联系客户、不改变 pricing/spend。
+- [x] RepoAssure Product Backlog Reprioritization After Detector Decision Block v0.1
+  - 当前状态：已完成，结论为 `backlog_reprioritized_to_non_blocked_local_gap_audit`。已新增 `docs/operations/repoassure-product-backlog-reprioritization-after-detector-decision-block-v0.1.md`，确认 detector calibration implementation 继续 blocked，因为仍缺少显式 maintainer approve / reject / defer / accept-risk 决策。已选择下一个安全自动目标 RepoAssure Product Completion Gap Audit Refresh v0.2，用于刷新 PRD/SPEC/PLAN 剩余产品缺口。该 gate 不修改 runtime detector behavior、不 suppression findings、不自动降级 severity、不调整 detector confidence threshold、不改变 acceptance policy、不写目标 repo、不部署、不发布、不联系客户、不改变 pricing/spend。
+- [x] Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Follow-up v0.1
+  - 当前状态：已完成，结论为 `maintainer_decision_follow_up_recorded_without_explicit_decisions`。已新增 `docs/operations/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-follow-up-v0.1.md`，确认执行授权不等于 calibration approval；当前 explicit maintainer decisions found: no，recorded decisions: 0，pending decisions: 2。Detector calibration implementation 继续 blocked。下一个安全自动目标为 RepoAssure Product Backlog Reprioritization After Detector Decision Block v0.1，用于选择非阻塞、可本地验证的产品执行目标。该 gate 不修改 runtime detector behavior、不 suppression findings、不自动降级 severity、不调整 detector confidence threshold、不改变 acceptance policy、不写目标 repo。
+- [x] Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Recording v0.1
+  - 当前状态：已完成，结论为 `maintainer_decision_record_created_with_pending_decisions`。已新增 `docs/operations/product-false-positive-regression-catalog-detector-calibration-maintainer-decision-recording-v0.1.md`，正式记录当前 authorization intake 中 0 个已给出 maintainer decisions、2 个 pending decision slots；未虚构或预填 approve / reject / defer / accept-risk。下一个安全自动目标为 Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Follow-up v0.1，用于等待或收集 maintainer 显式决策。该 gate 不修改 runtime detector behavior、不 suppression findings、不自动降级 severity、不调整 detector confidence threshold、不改变 acceptance policy、不写目标 repo。
+- [x] RepoAssure Product Applicability Boundary Documentation Cascade v0.1
+  - 当前状态：已完成，结论为 `product_applicability_boundary_documented`。已新增 `docs/product/strategy/product-applicability-boundary-v0.1.md`，明确 Core / Extended / Partner-or-Plugin / Out-of-Scope 产品类型边界，并禁止宣称 RepoAssure 适合所有产品、全技术栈全自动验收、替代人工验收或自动修复所有 AI 代码问题。该 gate 只做文档和定位级联，不改 runtime behavior、不写目标 repo、不授权发布或部署。完成当时的下一目标是 Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Recording v0.1；该目标及其后续现已成为历史完成记录，当前执行顺序以 `docs/PLAN.md` 为准。
+- [x] Project Intelligence Detection Rule Calibration v0.1
+  - 当前状态：`findOrphanCode` ownership documentation 判据已从“任意包含 `/README.md` 的路径”收紧为“app/package 根目录精确 `README.md`”。`tests/unit/project-intelligence-snapshot.test.ts` 增加 `apps/nested-readme/docs/README.md` 回归 fixture，证明深层 README 不能让 `apps/nested-readme` 通过 ownership documentation 检查。该 gate 不实现 hosted dashboard、cloud sync、telemetry、deployment、public release、repository visibility change、npm publication、GitHub release、target repo write、customer contact、pricing 或 spend change。
+- [x] RepoAssure Product Completion Gap Audit v0.1
+  - 当前状态：已完成。审计确认核心 CLI/MCP、repair evidence、Project Intelligence、官网和 release readiness checks 已实现；公开发布、npm、GitHub release、私测反馈 triage、Team Cloud/Enterprise 和官网设计系统后续分别受人工门禁、外部输入、产品决策或 owner 暂缓约束。下一个安全自动目标为 Project Intelligence Agent Context Export v0.1。
+- [x] Project Intelligence Agent Context Export v0.1
+  - 当前状态：已完成。新增 `pnpm project:intelligence:agent-context`，输出本地 JSON/Markdown context package，包含 read order、current goal、recommended goal、product surfaces、blockers、evidence paths、redaction 和 non-authorization boundary。
+- [x] Project Intelligence Watch Mode Planning v0.1
+  - 当前状态：已完成。规划记录定义 future `pnpm project:intelligence:watch` 的本地-only scope、1500ms debounce、`project:intelligence` -> `project:intelligence:agent-context` refresh order、failure handling、watch status artifact 和 `Ctrl+C` manual stop boundary；未实现 hosted dashboard、telemetry、cloud sync、deployment、public release 或 target repo writes。
+- [x] Project Intelligence Watch Mode Implementation v0.1
+  - 当前状态：已完成。新增 `pnpm project:intelligence:watch`，本地 bounded polling 监听 docs/code/autopilot source-of-truth 文件，忽略 generated/dependency/dist/cache/secret 路径，1500ms 默认 debounce，按 snapshot -> agent context 顺序刷新，并写入 sanitized watch status；不实现 hosted dashboard、telemetry、cloud sync、deployment 或 target repo writes。
+- [x] Project Intelligence Watch Mode Local Smoke Validation v0.1
+  - 当前状态：已完成。`project-intelligence-watch-smoke.test.ts` 在隔离 fixture 中验证真实 accepted file changes 触发一次 debounced refresh、ignored generated/dependency/cache/secret paths 不触发、snapshot -> agent-context -> watch-status artifact 顺序、watch status boundary 和 abort/manual stop。
+- [x] Project Intelligence Watch Mode AI IDE Consumption Handoff v0.1
+  - 当前状态：已完成。新增 `pnpm project:intelligence:watch-handoff`，生成 `project-intelligence-watch-handoff.json` / `.md`，明确 AI IDE read order、watch/status/context artifact paths、freshness checklist、stop boundary、maintainer review boundary、redaction 和禁止动作；不实现 hosted dashboard、telemetry、cloud sync、deployment 或 target repo writes。
+- [x] Project Intelligence Watch Mode End-to-End Local Fixture Validation v0.1
+  - 当前状态：已完成。`project-intelligence-watch-e2e-fixture.test.ts` 在隔离 fixture 中端到端验证 snapshot、agent context、watch status 和 watch handoff 四类本地物料互相指向正确；handoff 会把已生成的 snapshot 和 agent-context Markdown 物料标记为 `available`，并保持 no hosted dashboard、telemetry、cloud sync、deployment 或 target repo writes 边界。
+- [x] Project Intelligence Watch Mode Operator Playbook v0.1
+  - 当前状态：已完成。`docs/operations/project-intelligence-watch-mode-operator-playbook-v0.1.md` 固化 maintainer / Codex / AI IDE 的本地 watch loop 操作手册：启动、smoke、AI IDE read order、freshness 排障、failure recovery、`Ctrl+C` 停止前台 watcher 和禁止动作；不实现 hosted dashboard、telemetry、cloud sync、deployment 或 target repo writes。
+- [x] Project Intelligence Watch Mode Operator Playbook Consumption Validation v0.1
+  - 当前状态：已完成。`tests/unit/project-intelligence-watch-operator-playbook.test.ts` 验证 operator playbook 和 generated handoff 的命令顺序、AI IDE read order、freshness failure blocking、failure recovery guidance、maintainer review boundary 和 no target repo write boundary；不实现 hosted dashboard、telemetry、cloud sync、deployment 或 target repo writes。
+- [x] Project Intelligence Watch Mode Recovery Command UX v0.1
+  - 当前状态：已完成。`project-intelligence-watch-handoff.json` 现在包含 machine-readable `recoveryPlan`，Markdown handoff 包含 `Recovery Plan` 段落；当 freshness checks 失败时会列出 failed check IDs 和 local-only 恢复命令，并明确不通过手工编辑 generated artifacts 来修复、不修改目标 repo、不扩展 hosted/cloud 行为。
+- [x] Project Intelligence Watch Mode Recovery UX Real Workspace Smoke v0.1
+  - 当前状态：已完成。`tests/integration/project-intelligence-watch-recovery-ux-smoke.test.ts` 验证真实 RepoAssure workspace handoff 为 `recoveryPlan.status=not_needed`，模拟失败 watch status 为 `required` recovery commands，并保持 redaction 和 no target repo write boundary。
+- [x] Project Intelligence Watch Mode Completion Audit v0.1
+  - 当前状态：已完成。Watch mode 当前 local-only 产品切片审计结论为 `complete_for_current_local_only_slice`；真实 handoff 为 6/6 freshness checks passed，`recoveryPlan.status=not_needed`，且未授权 hosted dashboard、cloud sync、telemetry、daemon、deployment、public release 或 target repo writes。
+- [x] Product False-Positive Regression Catalog Planning v0.1
+  - 当前状态：已完成。规划记录定义 local-only false-positive regression catalog 的 fixture categories、expected finding snapshots、severity/rationale review fields、maintainer review boundary 和 no runtime detection behavior change 边界；不写目标 repo，不执行发布或部署。
+- [x] Product False-Positive Regression Catalog Contract Implementation v0.1
+  - 当前状态：已完成。`packages/acceptance/src/false-positive-catalog.ts` 实现本地 catalog contract、非私密 expected finding snapshots、severity/rationale review fields、maintainer decision fields、redaction validation 和 no target repo write / no runtime detection behavior change boundary，并通过 focused contract/package tests。
+- [x] Product False-Positive Regression Catalog Artifact Generation v0.1
+  - 当前状态：已完成。`pnpm false-positive:catalog` 生成 `artifacts/project-graph/false-positive-regression-catalog.json` 和 `.md`，包含 AI IDE read order、maintainer review boundary、redaction metadata、fixture categories 和 expected finding snapshots；仍不修改 runtime detectors、不 suppression、不自动降级 severity、不写目标 repo。
+- [x] Product False-Positive Regression Catalog Consumption Validation v0.1
+  - 当前状态：已完成。`pnpm false-positive:catalog:validate` 读取 generated catalog JSON/Markdown，生成 `artifacts/project-graph/false-positive-regression-catalog-consumption-validation.json` 和 `.md`，13 个 consumption checks 通过；仍不修改 runtime detectors、不 suppression、不自动降级 severity、不写目标 repo。
+- [x] Product False-Positive Regression Catalog Completion Audit v0.1
+  - 当前状态：已完成。planning、contract implementation、artifact generation 和 consumption validation 已作为 local-only catalog 产品切片关闭，结论为 `complete_for_current_local_only_catalog_slice`；仍不修改 runtime detectors、不 suppression、不自动降级 severity、不写目标 repo。
+- [x] Product False-Positive Regression Catalog Real Fixture Expansion v0.1
+  - 当前状态：已完成。Catalog 增加 `real_world_fixture_regressions`、2 条 near-real public fixtures、`fixtureOrigin` 和 non-private/privacy metadata；`pnpm false-positive:catalog` 生成 7 entries，`pnpm false-positive:catalog:validate` 13 checks 通过；仍不修改 runtime detectors、不 suppression、不自动降级 severity、不写目标 repo。
+- [x] Product False-Positive Regression Catalog Detector Calibration Planning v0.1
+  - 当前状态：已完成。规划记录把 expanded near-real fixtures 映射到 detector calibration questions、manual review gates 和 future implementation authorization boundary；结论为 `detector_calibration_plan_ready_without_runtime_behavior_change`。仍不直接改变 runtime detection behavior、不 suppression、不自动降级 severity、不写目标 repo。
+- [x] Product False-Positive Regression Catalog Detector Calibration Contract v0.1
+  - 当前状态：已完成。`pnpm false-positive:calibration-contract` 生成 `artifacts/project-graph/false-positive-detector-calibration-contract.json` 和 `.md`，固化 AI IDE read order、2 个 calibration questions、manual gates、future implementation authorization boundary 和 redaction metadata；仍不直接改变 runtime detection behavior、不 suppression、不自动降级 severity、不写目标 repo。
+- [x] Product False-Positive Regression Catalog Detector Calibration Contract Consumption Validation v0.1
+  - 当前状态：已完成。`pnpm false-positive:calibration-contract:validate` 生成 `artifacts/project-graph/false-positive-detector-calibration-contract-consumption-validation.json` 和 `.md`，13 个检查通过，验证 AI IDE read order、maintainer review boundary、manual gates、future authorization、fail-closed runtime-change checks、redaction 和 no target repo write boundary；仍不直接改变 runtime detection behavior、不 suppression、不自动降级 severity、不写目标 repo。
+- [x] Product False-Positive Regression Catalog Detector Calibration Completion Audit v0.1
+  - 当前状态：已完成。Detector calibration planning、contract generation 和 contract consumption validation 已作为 local-only detector calibration 产品切片关闭，结论为 `complete_for_current_local_only_detector_calibration_slice`。已确认 generated calibration contract artifacts 与 consumption validation artifacts 是本地产物、ignored、AI IDE readable、redaction-aware；仍不改变 runtime detection behavior、不 suppression、不自动降级 severity、不调整 detector confidence threshold、不改变 acceptance policy、不写目标 repo。下一个安全自动目标是 Product False-Positive Regression Catalog Detector Calibration Authorization Intake v0.1。
+- [x] Product False-Positive Regression Catalog Detector Calibration Authorization Intake v0.1
+  - 当前状态：已完成，结论为 `authorization_intake_created_pending_maintainer_decisions`。已创建本地 maintainer decision intake，为 2 个 calibration questions 保留 approve / reject / defer / accept-risk 决策槽，所有槽位仍为 pending，没有预填决定。下一个安全自动目标是 Product False-Positive Regression Catalog Detector Calibration Maintainer Decision Recording v0.1；该后续 goal 只记录 maintainer 明确给出的决策，仍不改变 runtime detection behavior、不 suppression、不自动降级 severity、不调整 detector confidence threshold、不改变 acceptance policy、不写目标 repo。
 - [x] Brownfield Autopilot Initialization v0.1
   - 当前状态：`docs/PRD.md`、`docs/SPEC.md`、`docs/DESIGN.md` 和 `docs/PLAN.md` 已作为薄 canonical entrypoints 落地；`docs/operations/brownfield-autopilot-intake-v0.1.md` 记录 brownfield intake、shape matrix 和 non-authorization boundary；`.autopilot/progress/` 与 `.autopilot/goals/` 记录 sanitized progress / goal state；`.autopilot/runs/`、`.autopilot/cache/`、`.autopilot/secrets/` 已加入 `.gitignore`。下一执行目标为 Public Website P3 Pixel QA & Mobile Responsive Polish v0.1；初始化不授权 public release、deployment、repository visibility change、npm publication、GitHub release、public launch、customer contact、pricing 或 spend changes。
 - [x] Public Website Design Work Deferred v0.1
@@ -169,6 +316,16 @@
 
 ## 下一步人工验收
 
+- [x] RepoAssure AI IDE Repair Workflow CLI Productization v0.1
+  - 当前状态：已完成，结论为 `repair_workflow_cli_productized_without_target_repo_writes`。稳定 installed CLI 已提供 `hardening repair handoff`、`hardening repair execute`、`hardening repair patch-plan` 和 `hardening repair evidence-package`，并保留 `pnpm repair:*` 兼容入口。聚焦 unit/contract/integration 为 6 files / 60 tests passed，构建后 help smoke passed；write-capable flags fail closed，redaction、maintainer review、verification checklist、schema 和 no-write proof 保持。下一 Goal 是 RepoAssure AI IDE Repair Workflow Installed CLI Real Campaign Validation v0.1；本项未写目标 repo、未自动应用补丁、未扩展 MCP registry。
+- [x] RepoAssure AI IDE Repair Workflow Installed CLI Real Campaign Validation v0.1
+  - 当前状态：已完成，结论为 `installed_cli_real_campaign_validated_without_target_repo_writes`。`tests/integration/installed-cli-repair-real-campaign.test.ts` 以五个独立 built CLI 外部进程消费近真实非私密 fixture，五个退出码均为 0；JSON/Markdown、四类 schema、AI IDE read order、redaction、maintainer review、verification checklist 和 no-write proof 均通过。目标源码内容、mtime 与目录清单不变，生产代码未修改。下一 Goal 是 RepoAssure AI IDE Repair Workflow Packed CLI Installation Validation v0.1；本项未发布 npm、未写目标 repo、未应用补丁、未扩展 MCP registry。
+- [x] RepoAssure AI IDE Repair Workflow Packed CLI Installation Validation v0.1
+  - 当前状态：已完成，结论为 `packed_cli_installed_and_validated_without_publication_or_target_writes`。`tests/integration/packed-cli-installation.test.ts` 真实创建 `hardening-mcp-0.1.0.tgz`、安装到隔离 consumer，并通过 `node_modules/.bin/hardening` 验证 `repair --help` 和近真实 `repair handoff`。package allowlist、内部 runtime、schema、Markdown、redaction 和 no-write proof 均通过；安装未依赖源工作区 `node_modules`，目标源码内容、mtime 与目录清单不变。下一 Goal 是 RepoAssure Product Completion Gap Audit Refresh v0.4；本项未发布 npm、未写目标 repo、未应用补丁、未扩展 MCP registry。
+- [x] RepoAssure Product Completion Gap Audit Refresh v0.4
+  - 当前状态：已完成，结论为 `completion_gap_audit_refreshed_with_packed_mcp_protocol_validation_next`。已对照 canonical docs、CLI/MCP/package 入口、tests、manual gates 和 external-input state 完成五类差距分类。隔离 packaged CLI 已验证；installed `hardening-mcp` 的真实协议验收尚未完成。审计未修改生产代码、detector behavior、acceptance policy 或目标 repo。
+- [x] RepoAssure Packed MCP Server Installation and Protocol Validation v0.1
+  - 当前状态：已完成，结论为 `packed_mcp_installed_and_protocol_validated_without_registry_expansion_or_target_writes`。隔离 consumer 中的 installed `hardening-mcp` 已通过 `initialize`、现有八工具 `tools/list`、bounded `stop_app`、协议 framing、redaction、clean shutdown、源工作区独立性和 no target repo write 验证；未扩展 registry、发布 npm 或部署。
 - [x] AI IDE Repair Patch Plan Real Campaign Validation v0.1
   - 当前状态：`repair:patch-plan` 已能消费近真实 dry-run execution report，生成 `patchPlanInputs`、`maintainerReview`、`verificationChecklist` 和 `noWriteProof`；测试证明不会应用补丁、不会修改目标 repo source file，并会脱敏 secret-like fixture values。
 - [x] AI IDE Repair Validation-Only Real Campaign Validation v0.1
@@ -192,8 +349,14 @@
 
 - [x] Project Intelligence ADR Cascade Controlled Remediation Plan v0.1
   - 验收证据：`pnpm project:intelligence:controlled-remediation-plan` 生成 `adr-cascade-controlled-remediation-plan.md` 和 `.json`，包含 11 个 plan items、file-level scope、execution order、rollback notes、verification checklist，并保持 repair execution unauthorized。
+- [x] Project Intelligence Watch Mode Implementation v0.1
+  - 当前状态：已完成。新增 `pnpm project:intelligence:watch` 和 `packages/acceptance/src/run-project-intelligence-watch.ts`，支持 bounded docs/code/autopilot file scope、1500ms 默认 debounce、snapshot -> agent context refresh order、sanitized `project-intelligence-watch-status.json`、`--once` smoke 和 foreground `Ctrl+C` stop boundary。验证：`project-intelligence-watch.test.ts` 5 tests passed、`acceptance-package.test.ts` 31 tests passed、`pnpm build:acceptance` passed、`pnpm project:intelligence:watch -- --once` passed。未实现 hosted dashboard、cloud sync、telemetry、deployment、public launch、target repo writes 或 website visual redesign。
+- [ ] Project Intelligence Watch Mode Local Smoke Validation v0.1
+  - 目标：在隔离 fixture/worktree 中验证真实本地文件变更触发 watch refresh、ignored paths 不触发刷新、artifact freshness、status update 和 graceful stop；不授权 hosted dashboard、cloud sync、telemetry、deployment、public release 或 target repo writes。
 - [x] Project Intelligence ADR Cascade Controlled Remediation Execution v0.1
   - 当前状态：已完成。基于用户明确授权和 controlled remediation plan，已为 11 个 ADR 添加 `Cascade Evidence`，并级联写入 PRD、SPEC、PLAN、testing strategy、acceptance checklist、decision log、dev log、Project Intelligence spec/architecture 和 `.autopilot` 状态。该项只执行文档治理修复，不授权 hosted dashboard、cloud sync、telemetry、deployment、public launch、repository visibility change、npm publication、GitHub release、customer contact、pricing/spend change、target repo writes 或 website visual redesign。
+- [x] Product False-Positive Regression Catalog Detector Calibration Contract v0.1
+  - 当前状态：已完成。新增 `pnpm false-positive:calibration-contract` 和 `@hardening-mcp/acceptance/run-false-positive-detector-calibration-contract`，生成 local-only `artifacts/project-graph/false-positive-detector-calibration-contract.json` / `.md`。物料包含 AI IDE read order、2 个 calibration questions、manual gates、future implementation authorization boundary、redaction metadata，并经 `tests/unit/false-positive-detector-calibration-contract.test.ts` 验证 no runtime detector behavior change、no suppression、no automatic severity downgrade、no target repo write。
 - [x] RepoAssure Design System v2 Unfreeze v0.1
   - 当前状态：已完成。owner 提供定稿的 RepoAssure Design System v2，`owner_finalizes_claude_design` 条件满足，设计队列由 `deferred_design_pending` 释放为 `design_queue_released`。新增 ADR-0022（ADR-0019 标记 Superseded）、unfreeze operation record 和四个 goal（design system adoption / evidence integrity hashing / website design integration / console redesign），治理状态测试同步重设基线。验证：`npx vitest run tests/unit` 45 files / 613 tests passed、`npx eslint .` clean、`npx tsc -p tsconfig.build.json --noEmit` exit 0。本项只做治理记录与排期，未改动任何界面代码；不授权 deployment、public launch、production marketing announcement、repository visibility change、npm publication、GitHub release、public custom domain decision、hosted dashboard、cloud sync、telemetry、locale expansion、product artifact localization、target repo writes、pricing/spend change 或 customer contact。
   - 未决边界：线上 `repoassure.com` 与 ADR-0020 / ADR-0021 的公开自定义域名禁令冲突，需单独 owner 决策，本项不追认。
@@ -213,3 +376,61 @@
 - [x] Project Intelligence ADR Cascade Remediation Closure v0.1
   - 当前状态：已完成。原始 11 个 `missing_cascade` findings 确认清零（snapshot findings 0、backlog items 0、viewer verdict clear）。闭环中发现 1 条 `orphan_code` 残留并已解决：`apps/website` 缺 README，此前被 `node_modules` 中 9 个依赖 README 满足判据而掩盖——vendor 噪音在压制真实检测，不只是难看。分类为 legitimate follow-up work（被检测缺陷掩盖），已补写 README 并复跑归零。记录见 `docs/operations/project-intelligence-adr-cascade-remediation-closure-v0.1.md`。
   - 记录但未处理的规则校准项：`findOrphanCode` 匹配任意深度的 `/README.md`，可收紧为仅认 app 根目录。闭环期间不改检测规则。
+- [x] RepoAssure Packed MCP Server Installation and Protocol Validation v0.1
+  - 当前状态：已完成，结论为 `packed_mcp_installed_and_protocol_validated_without_registry_expansion_or_target_writes`。本地 tarball 已安装到隔离 consumer；`node_modules/.bin/hardening-mcp` 通过真实 MCP `initialize`、现有八工具 `tools/list`、bounded `stop_app` 调用、schema、framing、redaction 和 clean shutdown 验证。源工作区 `node_modules` 不参与运行，目标源码内容、mtime 和目录清单不变；未扩展 MCP registry、未写目标 repo、未发布 npm、未部署。
+- [x] RepoAssure Product Completion Gap Audit Refresh v0.5
+  - 当前状态：已完成，结论为 `completion_gap_audit_refreshed_with_repair_workflow_mcp_convergence_decision_next`。已完成 implemented、blocked/manual-gated、external-input-gated、deferred 和 safe auto-executable 五类盘点，确认当前 registry 为 8 个工具，并只选择 RepoAssure AI IDE Repair Workflow MCP Convergence Decision and Contract v0.1 作为下一 Goal；未修改生产代码、detector/acceptance 行为或目标 repo。
+- [x] RepoAssure AI IDE Repair Workflow MCP Convergence Decision and Contract v0.1
+  - 当前状态：已完成，结论为 `repair_workflow_mcp_convergence_contract_accepted_without_registry_expansion`。ADR-0024 与 `repoassure.mcp-repair-convergence-contract@1` 接受四个 artifact-only 候选工具，保持现有 8 工具不变，明确 validation-only CLI-only、resources/prompts deferred、错误脱敏、maintainer review 和 no-write 边界；未修改生产代码或 registry。
+- [x] RepoAssure AI IDE Repair Handoff MCP Tool Implementation v0.1
+  - 当前状态：已完成，结论为 `repair_handoff_mcp_tool_implemented_without_target_repo_writes`。仅新增 `prepare_repair_handoff`，registry 从 8 个增加到 9 个；复用 package-owned runner，返回 bounded output，四项 annotations 均为 false。Unit、真实 in-memory MCP transport、isolated packed stdio consumer、fail-closed redaction 和目标源码 content/mtime/directory no-write 证据已覆盖；未暴露 validation-only、未执行命令、未应用补丁。
+- [x] RepoAssure AI IDE Repair Execution Preview MCP Tool Implementation v0.1
+  - 当前状态：已完成，结论为 `repair_execution_preview_mcp_tool_implemented_without_command_execution_or_target_repo_writes`。仅新增 dry-run `preview_repair_execution`，registry 从 9 个增加到 10 个；复用 package-owned runner，严格要求 `taskIds` 与 `all: true` 恰好选择一种，返回 bounded output，四项 annotations 均为 false。Unit、真实 in-memory MCP transport、isolated packed stdio consumer、fail-closed redaction、命令不执行和目标源码 content/mtime/directory no-write 证据已覆盖。
+- [x] RepoAssure AI IDE Repair Patch Plan MCP Tool Implementation v0.1
+  - 当前状态：已完成，结论为 `repair_patch_plan_mcp_tool_implemented_without_command_execution_or_target_repo_writes`。仅新增 `generate_repair_patch_plan`，registry 从 10 个增加到 11 个；复用 package-owned runner，仅接受 required `reportPath` 与 optional `outputDir`，返回 5 个 bounded 字段，四项 annotations 均为 false。Unit、真实 in-memory MCP transport、isolated packed stdio consumer、fail-closed text/structured redaction、maintainer review、verification checklist、命令不执行、`patchesApplied: false` 和目标源码 content/mtime/directory no-write 证据已覆盖。
+- [x] RepoAssure AI IDE Repair Evidence Package MCP Tool Implementation v0.1
+  - 当前状态：已完成，结论为 `repair_evidence_package_mcp_tool_implemented_without_command_execution_or_target_repo_writes`。仅新增 `assemble_repair_evidence_package`，registry 从 11 个增加到 12 个；复用 package-owned runner，仅接受四个 required artifact path 与 optional `outputDir`，返回 4 个 bounded 字段，四项 annotations 均为 false。Unit、真实 in-memory MCP transport、isolated packed stdio consumer、fail-closed text/structured redaction、maintainer review、verification checklist、命令不执行、补丁不应用和目标源码 content/mtime/directory no-write 证据已覆盖。
+- [x] RepoAssure AI IDE Repair Workflow MCP Convergence Completion Audit v0.1
+  - 当前状态：已完成，结论为 `repair_workflow_mcp_convergence_slice_closed_without_command_execution_or_target_repo_writes`。四个 artifact-only MCP 工具已作为一条 installed-consumer 工作流完成审计；12 工具 registry、pre-convergence contracts、redaction、maintainer review、verification checklist、no-command、no-patch 和目标源码 no-write 证据均成立。
+- [x] RepoAssure Product Completion Gap Audit Refresh v0.6
+  - 当前状态：已完成，结论为 `completion_gap_audit_refreshed_with_multi_repo_workspace_repair_summary_planning_next`。现有 local multi-repo workspace manifest 已实现，但 cross-repo repair summary 尚未实现；本轮未修改生产代码、未写目标 repo，选择 RepoAssure Multi-Repo Workspace Repair Summary Planning v0.1 为唯一下一 Goal。
+- [x] RepoAssure Multi-Repo Workspace Repair Summary Planning v0.1
+  - 当前状态：已完成，结论为 `multi_repo_workspace_repair_summary_contract_planned_without_production_implementation`。已定义 `repoassure.workspace-repair-summary.v1`、JSON/Markdown 物料、P0/P1/P2 排序、ready/no_tasks/stale/missing/invalid/collision 状态、AI IDE 读取顺序、redaction、maintainer review 和 no-write 规则；未修改生产代码。
+- [x] RepoAssure Multi-Repo Workspace Repair Summary Contract Implementation v0.1
+  - 当前状态：已完成，结论为 `multi_repo_workspace_repair_summary_implemented_without_cli_mcp_or_target_repo_writes`。`@hardening-mcp/acceptance` 已实现 typed local generator，确定性生成 `workspace-repair-summary.json/.md`，覆盖 repository/workspace states、P0/P1/P2、结构性 stale、missing/invalid/collision、AI IDE 读取顺序、redaction、maintainer review、输出路径边界和目标 repo content/mtime/directory no-write。
+- [x] RepoAssure Multi-Repo Workspace Repair Summary AI IDE Consumption Validation v0.1
+  - 当前状态：已完成，结论为 `workspace_repair_summary_ai_ide_consumption_validated_without_entrypoints_or_target_writes`。6 个 unit/contract 与 4 个 integration/no-write 专用测试覆盖 ready/partial/blocked/empty、JSON-first、blocked fail-closed diagnostics、queue rank 非授权、approve/reject/defer/accept_risk 边界、schema/Markdown/redaction，以及目标 source content/mtime/directory 和 exact output allowlist 不变。
+- [x] RepoAssure Multi-Repo Workspace Repair Summary Completion Audit v0.1
+  - 当前状态：已完成，结论为 `workspace_repair_summary_local_only_slice_closed_without_entrypoint_expansion_or_target_writes`。planning、implementation、ready/partial/blocked/empty consumption、read order、diagnostics、maintainer review、redaction、fail-closed、exact output allowlist、package exports、10 个专用测试和目标 repo no-write 证据共同闭环；未新增 CLI/MCP 入口、未执行命令、未应用补丁、未写目标 repo。
+- [x] RepoAssure Product Completion Gap Audit Refresh v0.7
+  - 当前状态：已完成，结论为 `completion_gap_audit_refreshed_with_public_release_manual_decision_review_next`。十一项本地产品 surface 已有实现证据；detector calibration 仍有 2 个 pending decisions，public release 因 branch protection/equivalent control defer 保持 no-go，entrypoint productization 与最新 website design follow-up 保持 deferred。
+- [x] Public Release Manual Decision Input Review v0.2
+  - 当前状态：已完成，结论为 `seven_manual_decisions_reviewed_public_state_drift_requires_reconciliation`。七项历史决策对原始证据内部一致；当前只读 GitHub 证据显示仓库已为 PUBLIC，`main` branch protection 已要求 `Quality Gates`，原 private / HTTP 403 / defer 证据失效。本地 `release:check` 仍为 `public release ready: no`，且当前分支相对 `origin/main` 为 10 ahead / 65 behind。本轮未修改任何 GitHub 或发布状态。
+- [x] Public Repository State and Release Boundary Reconciliation v0.1
+  - 当前状态：已完成，结论为 `public_source_release_verified_launch_no_go_history_identifiers_require_planning`。公开源码发布已在 `origin/main` 完成并验证，`main` protection 与最近 CI 通过；当前树未发现已知 maintainer/reviewer 个人标识，但公开历史中有 6 个相关提交。本轮未修改仓库状态、未重写历史、未发布或部署。
+- [x] Public Git History Personal-Identifier Remediation Planning v0.1
+  - 当前状态：已完成，结论为 `redacted_history_identifier_decision_packet_ready_maintainer_decision_required`。脱敏包记录 6 个受影响提交、16 个路径、0 个当前树匹配，将数据归类为 personal contact data 而非 credential，并比较 accept risk、history rewrite 与 repository replacement；未复述标识值，未执行任何外部动作。
+- [x] Public Git History Personal-Identifier Remediation Maintainer Decision Recording v0.1
+  - 当前状态：已完成，结论为 `maintainer_explicitly_accepted_historical_personal_identifier_recoverability_risk`。maintainer 通过独立明确回复选择 `accept_risk`；Goal 执行授权未被当作风险决定。历史个人联系信息仍可能从 clone、fork、mirror 和 cache 恢复；未执行 history rewrite、force push、repository replacement、credential rotation、repository settings change、release、launch、deployment、contact、pricing 或 spend。
+- [x] RepoAssure Product Completion Gap Audit Refresh v0.8
+  - 当前状态：已完成，结论为 `completion_gap_audit_refreshed_with_final_product_acceptance_closure_campaign_next`。已核对 PLAN、SPEC、PRD、代码、测试与 operation evidence，确认 12 个已实现产品 surface，公开源码与原生分支保护已验证，其他发布动作未授权，detector calibration 仍有 2 个 pending decisions，历史 `accept_risk` 未扩大或改写。
+- [x] RepoAssure Final Product Acceptance Closure Campaign v0.1
+  - 当前状态：已完成，结论为 `final_product_acceptance_decision_package_prepared_without_inferred_decision`。自动证据已刷新，goal audit 为 34 passed / 1 manual；历史 OpenClaw browser 验收被标记为当前收束的 stale evidence。`docs/acceptance/final-product-acceptance-decision-package-v0.1.md` 未预填 `accepted / changes_requested / defer`，且本 Goal 未运行或写入目标 repo。
+- [x] RepoAssure Final Product Acceptance Maintainer Decision Recording v0.1
+  - 当前状态：已完成，结论为 `maintainer_explicitly_deferred_final_product_acceptance_pending_representative_multi_mode_validation`。maintainer 单独明确选择 `defer` 并提供具体理由；普通 Goal 执行授权未被当成验收决定。未运行或写入目标 repo，未授权发布或外部状态变更。
+- [x] RepoAssure Representative Multi-Mode Acceptance Campaign Planning v0.1
+  - 当前状态：已完成，结论为 `representative_multi_mode_acceptance_campaign_planned_without_target_execution`。已定义 Web、Python/CLI、MCP/Agent 三条通道、目标准入条件、统一证据契约、通过/阻塞/失败规则、误报关闭条件、maintainer review 和独立执行授权入口；未选择、获取、运行或写入任何目标 repo。
+- [x] RepoAssure Representative Multi-Mode Acceptance Target and Execution Authorization Decision Recording v0.1
+  - 当前状态：已完成，结论为 `maintainer_explicitly_deferred_all_representative_lanes_pending_target_readiness`。三条通道的显式 maintainer 决定已记录为 3/3 defer；批准目标为 0/3。普通 Goal 执行授权未被当成通道授权，本 Goal 未获取、运行或写入目标 repo。
+- [x] RepoAssure Representative Multi-Mode Acceptance Target Readiness and Acquisition Authorization Package v0.1
+  - 当前状态：已完成，结论为 `target_readiness_and_acquisition_authorization_package_prepared_without_target_acquisition`。已准备 Web、Python/CLI、MCP/Agent 三张 fail-closed 就绪卡和未来获取授权模板；执行决定仍为 3/3 defer，获取授权决定为 0/3，未联网获取、克隆、安装、分析、运行或写入任何目标。
+- [x] RepoAssure Representative Multi-Mode Acceptance Target Acquisition Authorization Maintainer Decision Recording v0.1
+  - 结论：`maintainer_explicitly_deferred_all_representative_target_acquisitions_without_target_access`。Web、Python/CLI、MCP/Agent 明确决定为 3/3 `defer`；批准获取为 0/3，Human Approval Policy 为 `not_applicable_for_defer`，Action Authorization Receipt 为 0。普通 Goal 授权未被当成获取授权，且未访问、获取、安装、分析、运行或写入目标。
+- [x] RepoAssure Product Backlog Reprioritization After Representative Acquisition Defer v0.1
+  - 结论：`backlog_reprioritized_to_local_product_completion_gap_audit_after_representative_acquisition_defer`。已审查 7 个候选并仅选择本地 RepoAssure Product Completion Gap Audit Refresh v0.9；代表性获取/执行与最终验收仍为 `defer`，目标访问/获取/执行/写入均为 0。
+- [x] RepoAssure Product Completion Gap Audit Refresh v0.9
+  - 结论：`completion_gap_audit_refreshed_with_canonical_narrative_freshness_cleanup_v0.2_next`。确认 12 个产品表面和 3 个治理表面已实现；9 项 blocked/manual-gated、3 项 external-input-gated、5 项 deferred，并仅选择 1 个本地 narrative cleanup。最终验收和三条代表性获取/执行继续保持 `defer`。
+- [x] RepoAssure Canonical Product Narrative Freshness Cleanup v0.2
+  - 结论：`canonical_product_narrative_freshness_cleaned_with_gated_work_direction_preparation_next`。README、PLAN、SPEC、PRD 中 8/8 处误导性的 current/next 表述已清理，历史证据保留；未改变运行时、接触目标或外部系统、发布、部署或 launch。
+- [ ] RepoAssure Remaining Gated Product Work Direction Preparation v0.1
+  - 当前状态：`ready_to_execute`。只允许准备 9 项 blocked/manual-gated、3 项 external-input-gated 和 5 项 deferred 工作的 prioritization 材料；不得推断或记录 maintainer 决定、签发 receipt 或执行任何 gated action。

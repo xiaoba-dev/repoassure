@@ -77,6 +77,8 @@ interface InteractionCandidate {
   description: string;
   kind: 'click' | 'form';
   riskText: string;
+  disabled: boolean | null;
+  formSelector: string | null;
 }
 
 interface FillCandidate {
@@ -89,6 +91,93 @@ interface FormFillResult {
   filled: number;
   skipped: number;
 }
+
+interface ConditionalFormFillResult extends FormFillResult {
+  failClosedReason?: string;
+}
+
+interface ObservedFillFieldState {
+  count: number;
+  value: string | null;
+  riskText: string;
+  editable: boolean;
+}
+
+type ConditionalDeadControlClassification =
+  | 'false_positive_candidate'
+  | 'actionable_conditional_dead_control'
+  | 'needs_maintainer_review';
+
+interface ConditionalDeadControlAssessment {
+  classification: ConditionalDeadControlClassification;
+  safeDirtyTransitionObserved: boolean;
+  postTransitionEvidence:
+    | 'enabled_after_transition'
+    | 'still_disabled_after_transition'
+    | 'post_transition_state_known';
+  postTransitionValue: boolean;
+  failClosedReason?: string;
+}
+
+const conditionalDeadControlQuestionId =
+  'conditional_dead_control_should_consider_form_dirty_prerequisites';
+
+const countSelectorMatchesInBrowser = new Function(
+  'elements',
+  'return elements.length;'
+) as (elements: unknown[]) => unknown;
+
+const inspectFillFieldInBrowser = new Function(
+  'elements',
+  `
+var count = elements.length;
+if (count !== 1) {
+  return { count: count, value: null, riskText: '', editable: false };
+}
+
+var element = elements[0];
+if (typeof element !== 'object' || element === null) {
+  return { count: count, value: null, riskText: '', editable: false };
+}
+
+var readAttribute = function(name) {
+  if (typeof element.getAttribute !== 'function') {
+    return '';
+  }
+
+  var value = element.getAttribute(name);
+  return typeof value === 'string' ? value.trim() : '';
+};
+var tagName = typeof element.tagName === 'string' ? element.tagName.toLowerCase() : 'input';
+var type = readAttribute('type').toLowerCase() || (tagName === 'textarea' ? 'textarea' : 'text');
+var disabled = typeof element.disabled === 'boolean' ? element.disabled : false;
+var readOnly = typeof element.readOnly === 'boolean' ? element.readOnly : false;
+var editable = !disabled
+  && !readOnly
+  && type !== 'hidden'
+  && type !== 'file'
+  && type !== 'submit'
+  && type !== 'button'
+  && type !== 'checkbox'
+  && type !== 'radio';
+var currentValue = typeof element.value === 'string' ? element.value : null;
+
+return {
+  count: count,
+  value: currentValue,
+  riskText: [
+    type,
+    readAttribute('name'),
+    readAttribute('autocomplete'),
+    readAttribute('placeholder'),
+    readAttribute('aria-label'),
+    readAttribute('data-testid'),
+    readAttribute('id')
+  ].join(' '),
+  editable: editable
+};
+`
+) as (elements: unknown[]) => unknown;
 
 const collectAnchorHrefsInBrowser = new Function(
   'anchors',
@@ -161,6 +250,8 @@ return elements.flatMap(function(element, index) {
     return value.replace(/\\\\/g, '\\\\\\\\').replace(/"/g, '\\\\"');
   };
   var tagName = typeof element.tagName === 'string' ? element.tagName.toLowerCase() : 'control';
+  var type = readAttribute('type').toLowerCase();
+  var ownerForm = typeof element.form === 'object' && element.form !== null ? element.form : null;
   var rect = typeof element.getBoundingClientRect === 'function' ? element.getBoundingClientRect() : null;
   var style = typeof window !== 'undefined' && typeof window.getComputedStyle === 'function'
     ? window.getComputedStyle(element)
@@ -168,8 +259,11 @@ return elements.flatMap(function(element, index) {
   var ariaHidden = readAttribute('aria-hidden').toLowerCase() === 'true';
   var disabled = typeof element.disabled === 'boolean' ? element.disabled : false;
   var hidden = typeof element.hidden === 'boolean' ? element.hidden : false;
+  var isSubmitControl = (tagName === 'input' && type === 'submit')
+    || (tagName === 'button' && (type === '' || type === 'submit'));
+  var conditionalDisabledSubmit = disabled && isSubmitControl;
   var visible = !ariaHidden
-    && !disabled
+    && (!disabled || conditionalDisabledSubmit)
     && !hidden
     && (!rect || (rect.width > 0 && rect.height > 0))
     && (!style || (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0'));
@@ -194,6 +288,7 @@ return elements.flatMap(function(element, index) {
   var hardeningId = 'hardening-action-' + index;
   var label = ariaLabel || title || textContent || valueText || testId || id || tagName;
   var selector = '';
+  var formSelector = null;
 
   if (testId) {
     selector = '[data-testid="' + escapeAttribute(testId) + '"]:visible';
@@ -212,14 +307,37 @@ return elements.flatMap(function(element, index) {
     selector = tagName + ':nth-of-type(' + (index + 1) + ')';
   }
 
-  var verb = tagName === 'input' ? 'Submit' : 'Click';
-  var kind = tagName === 'input' ? 'form' : 'click';
+  if (ownerForm && typeof ownerForm.getAttribute === 'function') {
+    var formTestIdValue = ownerForm.getAttribute('data-testid');
+    var formTestId = typeof formTestIdValue === 'string' ? formTestIdValue.trim() : '';
+    var formIdValue = ownerForm.getAttribute('id');
+    var formId = typeof formIdValue === 'string' ? formIdValue.trim() : '';
+    var hardeningFormIdValue = ownerForm.getAttribute('data-hardening-form-id');
+    var hardeningFormId = typeof hardeningFormIdValue === 'string' ? hardeningFormIdValue.trim() : '';
+
+    if (formTestId) {
+      formSelector = '[data-testid="' + escapeAttribute(formTestId) + '"]';
+    } else if (formId) {
+      formSelector = '#' + escapeIdentifier(formId);
+    } else if (hardeningFormId) {
+      formSelector = '[data-hardening-form-id="' + escapeAttribute(hardeningFormId) + '"]';
+    } else if (conditionalDisabledSubmit && typeof ownerForm.setAttribute === 'function') {
+      hardeningFormId = 'hardening-form-' + index;
+      ownerForm.setAttribute('data-hardening-form-id', hardeningFormId);
+      formSelector = '[data-hardening-form-id="' + escapeAttribute(hardeningFormId) + '"]';
+    }
+  }
+
+  var kind = tagName === 'input' || conditionalDisabledSubmit ? 'form' : 'click';
+  var verb = kind === 'form' ? 'Submit' : 'Click';
 
   return [{
     selector: selector,
     description: verb + ' "' + label.slice(0, 80) + '"',
     kind: kind,
-    riskText: [label, ariaLabel, title, name, testId, id, href, action, selected ? 'state:selected' : ''].join(' ')
+    riskText: [label, ariaLabel, title, name, testId, id, href, action, selected ? 'state:selected' : ''].join(' '),
+    disabled: disabled,
+    formSelector: formSelector
   }];
 });
 `
@@ -451,7 +569,9 @@ async function collectInteractions(page: PlaywrightPageLike, maxActionsPerRoute:
     return [];
   }
 
+  let candidateObservationUrl = page.url();
   let candidates = await readInteractionCandidates(page);
+  let candidateObservationPageStable = hasExactPageHref(candidateObservationUrl, page.url());
   const interactions: BrowserInteractionResult[] = [];
   const seenSelectors = new Set<string>();
   let attemptedActions = 0;
@@ -475,9 +595,28 @@ async function collectInteractions(page: PlaywrightPageLike, maxActionsPerRoute:
     }
     seenSelectors.add(candidate.selector);
 
+    if (!candidateObservationPageStable) {
+      if (candidate.disabled === true) {
+        const matchingInitialCandidates = candidates.filter(
+          (entry) => entry.selector === candidate.selector && entry.formSelector === candidate.formSelector
+        );
+        interactions.push(
+          await observeConditionalDeadControl(
+            page,
+            candidate,
+            matchingInitialCandidates.length,
+            candidateObservationUrl,
+            null
+          )
+        );
+        break;
+      }
+      continue;
+    }
+
     const unsafeReason = unsafeInteractionReason(candidate, page.url());
 
-    if (unsafeReason) {
+    if (candidate.disabled !== true && unsafeReason) {
       interactions.push({
         description: candidate.description,
         outcome: 'skipped_unsafe',
@@ -486,11 +625,43 @@ async function collectInteractions(page: PlaywrightPageLike, maxActionsPerRoute:
       continue;
     }
 
+    if (candidate.disabled === true && unsafeReason) {
+      const matchingInitialCandidates = candidates.filter(
+        (entry) => entry.selector === candidate.selector && entry.formSelector === candidate.formSelector
+      );
+      interactions.push(
+        await observeConditionalDeadControl(
+          page,
+          candidate,
+          matchingInitialCandidates.length,
+          candidateObservationUrl,
+          unsafeReason
+        )
+      );
+      break;
+    }
+
     if (attemptedActions >= maxActionsPerRoute) {
       break;
     }
 
     attemptedActions += 1;
+    if (candidate.disabled === true) {
+      const matchingInitialCandidates = candidates.filter(
+        (entry) => entry.selector === candidate.selector && entry.formSelector === candidate.formSelector
+      );
+      interactions.push(
+        await observeConditionalDeadControl(
+          page,
+          candidate,
+          matchingInitialCandidates.length,
+          candidateObservationUrl,
+          unsafeReason
+        )
+      );
+      break;
+    }
+
     const formFill = candidate.kind === 'form' ? await fillSafeFormFields(page) : { filled: 0, skipped: 0 };
     const beforeUrl = page.url();
     const beforeBodyText = await readBodyText(page);
@@ -565,11 +736,320 @@ async function collectInteractions(page: PlaywrightPageLike, maxActionsPerRoute:
       ]
     });
 
+    candidateObservationUrl = page.url();
     candidates = await readInteractionCandidates(page);
+    candidateObservationPageStable = hasExactPageHref(candidateObservationUrl, page.url());
     candidateIndex = 0;
   }
 
   return interactions;
+}
+
+async function observeConditionalDeadControl(
+  page: PlaywrightPageLike,
+  candidate: InteractionCandidate,
+  matchingInitialCandidateCount: number,
+  initialUrl: string,
+  unsafeReason: string | null
+): Promise<BrowserInteractionResult> {
+  let formFill: FormFillResult = { filled: 0, skipped: 0 };
+  let postTransitionDisabled: boolean | null = null;
+  let failClosedReason: string | undefined;
+  if (!hasExactPageHref(initialUrl, page.url())) {
+    failClosedReason = 'candidate_observation_page_changed';
+  } else if (candidate.kind !== 'form') {
+    failClosedReason = 'candidate_not_form_submit';
+  } else if (unsafeReason) {
+    failClosedReason = 'unsafe_disabled_control';
+  } else if (!candidate.formSelector) {
+    failClosedReason = 'owner_form_not_observable';
+  } else if (!isLoopbackUrl(page.url())) {
+    failClosedReason = 'non_loopback_page';
+  } else if (matchingInitialCandidateCount !== 1) {
+    failClosedReason = 'initial_control_not_uniquely_observable';
+  } else {
+    let ownerFormMatchCount: number | null = null;
+    try {
+      ownerFormMatchCount = await readSelectorMatchCount(page, candidate.formSelector);
+    } catch {
+      failClosedReason = 'owner_form_not_observable';
+    }
+
+    if (!failClosedReason && ownerFormMatchCount !== 1) {
+      failClosedReason = 'owner_form_not_unique';
+    }
+
+    if (!failClosedReason) {
+      try {
+        const conditionalFill = await fillOneSafeFormField(
+          page,
+          candidate.formSelector,
+          initialUrl
+        );
+        formFill = conditionalFill;
+        failClosedReason = conditionalFill.failClosedReason;
+      } catch {
+        failClosedReason = 'form_field_observation_failed';
+      }
+    }
+
+    if (!failClosedReason && formFill.filled === 0) {
+      failClosedReason = formFill.skipped > 0
+        ? 'no_safe_form_field'
+        : 'form_field_transition_unavailable';
+    } else if (!failClosedReason && !hasSamePageUrl(initialUrl, page.url())) {
+      failClosedReason = 'post_transition_page_changed';
+    } else if (!failClosedReason) {
+      let matchingCandidates: InteractionCandidate[] = [];
+      try {
+        const refreshedCandidates = await readInteractionCandidates(page);
+        matchingCandidates = refreshedCandidates.filter(
+          (entry) => entry.selector === candidate.selector && entry.formSelector === candidate.formSelector
+        );
+      } catch {
+        failClosedReason = 'post_transition_observation_failed';
+      }
+
+      if (!failClosedReason && !hasSamePageUrl(initialUrl, page.url())) {
+        failClosedReason = 'post_transition_page_changed';
+      }
+
+      let postTransitionOwnerFormCount: number | null = null;
+      if (!failClosedReason) {
+        try {
+          postTransitionOwnerFormCount = await readSelectorMatchCount(
+            page,
+            candidate.formSelector
+          );
+        } catch {
+          failClosedReason = 'post_transition_owner_form_unobservable';
+        }
+      }
+
+      if (!failClosedReason && !hasSamePageUrl(initialUrl, page.url())) {
+        failClosedReason = 'post_transition_page_changed';
+      } else if (!failClosedReason && postTransitionOwnerFormCount !== 1) {
+        failClosedReason = 'post_transition_owner_form_not_unique';
+      } else if (!failClosedReason && matchingCandidates.length !== 1) {
+        failClosedReason = matchingCandidates.length === 0
+          ? 'post_transition_control_unobservable'
+          : 'post_transition_control_contradictory';
+      } else if (!failClosedReason) {
+        postTransitionDisabled = matchingCandidates[0]?.disabled ?? null;
+        if (postTransitionDisabled === null) {
+          failClosedReason = 'post_transition_disabled_state_unknown';
+        }
+      }
+    }
+  }
+
+  const assessment = classifyConditionalDeadControl({
+    safeTransitionEligible: !failClosedReason,
+    postTransitionDisabled,
+    ...(failClosedReason ? { failClosedReason } : {})
+  });
+
+  return {
+    description: candidate.description,
+    outcome: 'dead_control',
+    evidence: [
+      'conditional_dead_control_observation=initially_disabled_submit',
+      `fields_filled=${formFill.filled}`,
+      `fields_skipped=${formFill.skipped}`,
+      `conditional_dead_control.question_id=${conditionalDeadControlQuestionId}`,
+      `conditional_dead_control.classification=${assessment.classification}`,
+      'conditional_dead_control.prerequisite.initial_disabled=true',
+      `conditional_dead_control.prerequisite.safe_dirty_transition_observed=${assessment.safeDirtyTransitionObserved}`,
+      `conditional_dead_control.prerequisite.${assessment.postTransitionEvidence}=${assessment.postTransitionValue}`,
+      'conditional_dead_control.form_state_inferred=false',
+      ...(unsafeReason
+        ? [`conditional_dead_control.unsafe_reason=${unsafeReason}`]
+        : []),
+      ...(assessment.failClosedReason
+        ? [`conditional_dead_control.fail_closed_reason=${assessment.failClosedReason}`]
+        : [])
+    ]
+  };
+}
+
+async function fillOneSafeFormField(
+  page: PlaywrightPageLike,
+  formSelector: string,
+  initialUrl: string
+): Promise<ConditionalFormFillResult> {
+  const fields = await readFillCandidates(page, formSelector);
+  let skipped = 0;
+
+  for (const field of fields) {
+    if (unsafeFieldReason(field)) {
+      skipped += 1;
+      continue;
+    }
+
+    const scopedSelector = `${formSelector} ${field.selector}`;
+    let beforeState: ObservedFillFieldState;
+    try {
+      beforeState = await readFillFieldState(page, scopedSelector);
+    } catch {
+      return {
+        filled: 0,
+        skipped,
+        failClosedReason: 'form_field_not_uniquely_observable'
+      };
+    }
+
+    if (beforeState.count !== 1) {
+      return {
+        filled: 0,
+        skipped,
+        failClosedReason: 'form_field_not_uniquely_observable'
+      };
+    }
+
+    if (!beforeState.editable || beforeState.value === null) {
+      return {
+        filled: 0,
+        skipped,
+        failClosedReason: 'form_field_not_safely_observable'
+      };
+    }
+
+    if (unsafeFieldReason({ ...field, riskText: beforeState.riskText })) {
+      return {
+        filled: 0,
+        skipped: skipped + 1,
+        failClosedReason: 'form_field_became_unsafe'
+      };
+    }
+
+    if (!hasSamePageUrl(initialUrl, page.url())) {
+      return {
+        filled: 0,
+        skipped,
+        failClosedReason: 'pre_fill_page_changed'
+      };
+    }
+
+    let preFillOwnerFormCount: number;
+    try {
+      preFillOwnerFormCount = await readSelectorMatchCount(page, formSelector);
+    } catch {
+      return {
+        filled: 0,
+        skipped,
+        failClosedReason: 'pre_fill_owner_form_unobservable'
+      };
+    }
+
+    if (!hasSamePageUrl(initialUrl, page.url())) {
+      return {
+        filled: 0,
+        skipped,
+        failClosedReason: 'pre_fill_page_changed'
+      };
+    }
+
+    if (preFillOwnerFormCount !== 1) {
+      return {
+        filled: 0,
+        skipped,
+        failClosedReason: 'pre_fill_owner_form_not_unique'
+      };
+    }
+
+    const fillValue = distinctSafeFillValue(field.value, beforeState.value);
+
+    try {
+      await page.fill(scopedSelector, fillValue, { timeout: 1_000 });
+    } catch {
+      return {
+        filled: 0,
+        skipped: skipped + 1,
+        failClosedReason: 'form_field_fill_failed'
+      };
+    }
+
+    if (!hasSamePageUrl(initialUrl, page.url())) {
+      return {
+        filled: 1,
+        skipped,
+        failClosedReason: 'post_transition_page_changed'
+      };
+    }
+
+    let afterState: ObservedFillFieldState;
+    try {
+      afterState = await readFillFieldState(page, scopedSelector);
+    } catch {
+      return {
+        filled: 1,
+        skipped,
+        failClosedReason: 'form_field_value_unobservable'
+      };
+    }
+
+    if (!hasSamePageUrl(initialUrl, page.url())) {
+      return {
+        filled: 1,
+        skipped,
+        failClosedReason: 'post_transition_page_changed'
+      };
+    }
+
+    if (afterState.count !== 1 || afterState.value === null) {
+      return {
+        filled: 1,
+        skipped,
+        failClosedReason: afterState.count === 1
+          ? 'form_field_value_unobservable'
+          : 'form_field_not_uniquely_observable'
+      };
+    }
+
+    if (afterState.value === beforeState.value) {
+      return {
+        filled: 1,
+        skipped,
+        failClosedReason: 'form_field_value_unchanged'
+      };
+    }
+
+    return { filled: 1, skipped };
+  }
+
+  return { filled: 0, skipped };
+}
+
+function classifyConditionalDeadControl(input: {
+  safeTransitionEligible: boolean;
+  postTransitionDisabled: boolean | null;
+  failClosedReason?: string;
+}): ConditionalDeadControlAssessment {
+  if (!input.safeTransitionEligible || input.postTransitionDisabled === null) {
+    return {
+      classification: 'needs_maintainer_review',
+      safeDirtyTransitionObserved: false,
+      postTransitionEvidence: 'post_transition_state_known',
+      postTransitionValue: false,
+      failClosedReason: input.failClosedReason ?? 'post_transition_state_unknown'
+    };
+  }
+
+  if (input.postTransitionDisabled) {
+    return {
+      classification: 'actionable_conditional_dead_control',
+      safeDirtyTransitionObserved: true,
+      postTransitionEvidence: 'still_disabled_after_transition',
+      postTransitionValue: true
+    };
+  }
+
+  return {
+    classification: 'false_positive_candidate',
+    safeDirtyTransitionObserved: true,
+    postTransitionEvidence: 'enabled_after_transition',
+    postTransitionValue: true
+  };
 }
 
 async function fillSafeFormFields(page: PlaywrightPageLike): Promise<FormFillResult> {
@@ -614,7 +1094,12 @@ async function readInteractionCandidates(page: PlaywrightPageLike): Promise<Inte
         selector: candidate.selector,
         description: candidate.description,
         kind,
-        riskText
+        riskText,
+        disabled: typeof candidate.disabled === 'boolean' ? candidate.disabled : null,
+        formSelector:
+          typeof candidate.formSelector === 'string' && candidate.formSelector.trim()
+            ? candidate.formSelector
+            : null
       }
     ];
   });
@@ -629,8 +1114,51 @@ async function readElementState(page: PlaywrightPageLike, selector: string): Pro
   }
 }
 
-async function readFillCandidates(page: PlaywrightPageLike): Promise<FillCandidate[]> {
-  const value = await page.$$eval('input, textarea', collectFillCandidatesInBrowser);
+async function readSelectorMatchCount(
+  page: PlaywrightPageLike,
+  selector: string
+): Promise<number> {
+  const value = await page.$$eval(selector, countSelectorMatchesInBrowser);
+
+  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) {
+    throw new Error('Selector match count is not observable');
+  }
+
+  return value;
+}
+
+async function readFillFieldState(
+  page: PlaywrightPageLike,
+  selector: string
+): Promise<ObservedFillFieldState> {
+  const value = await page.$$eval(selector, inspectFillFieldInBrowser);
+
+  if (!isRecord(value)
+    || typeof value.count !== 'number'
+    || !Number.isSafeInteger(value.count)
+    || value.count < 0
+    || (typeof value.value !== 'string' && value.value !== null)
+    || typeof value.riskText !== 'string'
+    || typeof value.editable !== 'boolean') {
+    throw new Error('Fill field state is not observable');
+  }
+
+  return {
+    count: value.count,
+    value: value.value,
+    riskText: value.riskText,
+    editable: value.editable
+  };
+}
+
+async function readFillCandidates(
+  page: PlaywrightPageLike,
+  formSelector?: string
+): Promise<FillCandidate[]> {
+  const fieldSelector = formSelector
+    ? `${formSelector} input, ${formSelector} textarea`
+    : 'input, textarea';
+  const value = await page.$$eval(fieldSelector, collectFillCandidatesInBrowser);
 
   if (!Array.isArray(value)) {
     return [];
@@ -676,6 +1204,63 @@ function unsafeInteractionReason(candidate: InteractionCandidate, currentUrl?: s
     /\b(delete|remove|destroy|archive|deactivate|disable|reset|clear|logout|log out|sign out|pay|purchase|checkout|subscribe|refund|transfer|withdraw)\b|删除|移除|销毁|归档|停用|禁用|重置|清空|注销|退出登录|登出|支付|付款|购买|结账|订阅|退款|转账|提现/iu;
 
   return destructiveOrSensitivePattern.test(text) ? 'destructive_or_sensitive_action' : null;
+}
+
+function isLoopbackUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    const hostname = url.hostname.toLowerCase();
+    return (url.protocol === 'http:' || url.protocol === 'https:')
+      && url.origin !== 'null'
+      && (hostname === 'localhost'
+      || hostname === '127.0.0.1'
+      || hostname === '0.0.0.0'
+      || hostname === '::1'
+      || hostname === '[::1]');
+  } catch {
+    return false;
+  }
+}
+
+function hasSamePageUrl(before: string, after: string): boolean {
+  try {
+    const beforeUrl = new URL(before);
+    const afterUrl = new URL(after);
+    return beforeUrl.origin !== 'null'
+      && afterUrl.origin !== 'null'
+      && beforeUrl.href === afterUrl.href;
+  } catch {
+    return false;
+  }
+}
+
+function hasExactPageHref(before: string, after: string): boolean {
+  try {
+    return new URL(before).href === new URL(after).href;
+  } catch {
+    return false;
+  }
+}
+
+function distinctSafeFillValue(preferredValue: string, currentValue: string): string {
+  if (preferredValue !== currentValue) {
+    return preferredValue;
+  }
+
+  switch (preferredValue) {
+    case 'test@example.com':
+      return 'hardening@example.com';
+    case '15555550123':
+      return '15555550124';
+    case 'https://example.com':
+      return 'https://example.com/hardening';
+    case '1':
+      return '2';
+    case 'hardening test':
+      return 'hardening test 2';
+    default:
+      return `${preferredValue} 2`;
+  }
 }
 
 function isInvisibleClickError(message: string): boolean {

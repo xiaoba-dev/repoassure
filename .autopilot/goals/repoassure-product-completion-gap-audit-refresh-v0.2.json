@@ -1,0 +1,86 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-product-completion-gap-audit-refresh-v0.2",
+  "status": "completed",
+  "objective": "Refresh the product completion gap audit after recent product-core, Project Intelligence, false-positive catalog, detector calibration, applicability boundary, maintainer decision follow-up, and backlog reprioritization work.",
+  "source_spec": "docs/operations/repoassure-product-backlog-reprioritization-after-detector-decision-block-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change",
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "detector_confidence_threshold_change",
+    "acceptance_policy_change"
+  ],
+  "acceptance": [
+    "Read PRD, SPEC, PLAN, README, current goal index, progress snapshot, and recent operation records.",
+    "Classify remaining product gaps as implemented, blocked, deferred, or safe auto-executable.",
+    "Preserve false-positive detector calibration as blocked until explicit maintainer approve, reject, defer, or accept-risk decisions exist.",
+    "Select one next locally verifiable execution goal or record that no safe automatic goal remains.",
+    "Do not execute deployment, public release, target repo writes, runtime detector changes, customer contact, pricing, or spend changes."
+  ],
+  "completed_at": "2026-07-24T07:20:00.000+08:00",
+  "conclusion": "completion_gap_audit_refreshed_with_narrative_cleanup_next",
+  "document_basis": [
+    "docs/PRD.md",
+    "docs/SPEC.md",
+    "docs/PLAN.md",
+    "README.md",
+    ".autopilot/goals/index.json",
+    ".autopilot/progress/snapshot.json",
+    "docs/operations/repoassure-product-backlog-reprioritization-after-detector-decision-block-v0.1.md",
+    "docs/operations/repoassure-product-completion-gap-audit-refresh-v0.2.md"
+  ],
+  "summary": {
+    "operation_record": "docs/operations/repoassure-product-completion-gap-audit-refresh-v0.2.md",
+    "implemented_surfaces": [
+      "local_cli_mcp_hardening",
+      "ai_ide_repair_evidence_package",
+      "project_intelligence_snapshot_viewer",
+      "project_intelligence_watch_mode",
+      "false_positive_catalog_contracts",
+      "detector_calibration_contract_artifacts",
+      "product_applicability_boundary",
+      "public_website_private_preview_surface",
+      "public_release_readiness_checks"
+    ],
+    "blocked_or_manual_gated": [
+      "false_positive_detector_runtime_calibration",
+      "public_release_execution",
+      "npm_publication",
+      "github_release",
+      "team_cloud_enterprise_hosted_dashboard",
+      "private_preview_feedback_triage_without_real_feedback"
+    ],
+    "deferred": [
+      "website_design_system_follow_up"
+    ],
+    "safe_auto_executable_candidates": [
+      "repoassure-canonical-product-narrative-freshness-cleanup-v0.1"
+    ],
+    "selected_next_goal_id": "repoassure-canonical-product-narrative-freshness-cleanup-v0.1",
+    "selected_next_goal_title": "RepoAssure Canonical Product Narrative Freshness Cleanup v0.1",
+    "selected_candidate_reason": "Canonical PRD/SPEC sections still contain historical next-goal narrative; cleanup is local-only and directly improves maintainer readability.",
+    "boundary": {
+      "runtime_detection_behavior_change": false,
+      "target_repo_writes": false,
+      "deployment": false,
+      "public_release": false,
+      "customer_contact": false,
+      "pricing_or_spend_change": false
+    }
+  },
+  "next_goal_id": "repoassure-canonical-product-narrative-freshness-cleanup-v0.1"
+}

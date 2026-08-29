@@ -1,0 +1,99 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "repoassure-product-completion-gap-audit-refresh-v0.6",
+  "title": "RepoAssure Product Completion Gap Audit Refresh v0.6",
+  "status": "completed",
+  "objective": "Reconcile product completion after closing the ADR-0024 MCP convergence slice by comparing docs/PLAN.md, docs/SPEC.md, docs/PRD.md, code, tests, package boundaries, manual gates, external-input state, and deferred work, then select exactly one bounded next Goal without changing runtime behavior or performing release actions.",
+  "source_spec": "docs/operations/repoassure-ai-ide-repair-workflow-mcp-convergence-completion-audit-v0.1.md",
+  "priority": "P1",
+  "blocked_actions": [
+    "runtime_detection_behavior_change",
+    "finding_suppression",
+    "automatic_severity_downgrade",
+    "detector_confidence_threshold_change",
+    "acceptance_policy_change",
+    "target_repo_write",
+    "automatic_patch_application",
+    "mcp_tool_addition",
+    "mcp_tool_rename",
+    "validation_only_mcp_exposure",
+    "arbitrary_command_execution",
+    "website_design_system_rewrite",
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "customer_contact",
+    "pricing_change",
+    "spend_change"
+  ],
+  "acceptance": [
+    "Reconcile implemented product surfaces against PLAN, SPEC, PRD, code, tests, package evidence, and the completed ADR-0024 convergence audit.",
+    "Classify remaining work as implemented, blocked or manual-gated, external-input-gated, deferred, or safe auto-executable.",
+    "Do not reinterpret MCP convergence completion as authorization to execute commands, write target repositories, publish, deploy, or change detector or acceptance behavior.",
+    "Select exactly one acceptance-sized next Codex Goal when supported by evidence, or record that maintainer input is required.",
+    "Cascade the refreshed state through canonical docs, testing and acceptance evidence, logs, and Autopilot state."
+  ],
+  "conclusion": "completion_gap_audit_refreshed_with_multi_repo_workspace_repair_summary_planning_next",
+  "summary": {
+    "operation_record": "docs/operations/repoassure-product-completion-gap-audit-refresh-v0.6.md",
+    "implemented_surfaces": [
+      "local_cli_and_mcp_hardening_core",
+      "browser_and_python_cli_acceptance",
+      "run_scoped_evidence_integrity_and_redaction",
+      "installed_cli_repair_workflow",
+      "artifact_only_repair_workflow_mcp_convergence",
+      "isolated_packed_cli_and_mcp_distribution",
+      "project_intelligence_local_suite",
+      "false_positive_catalog_and_calibration_evidence_contracts",
+      "multi_repo_workspace_manifest",
+      "public_release_readiness_automation"
+    ],
+    "blocked_or_manual_gated_gaps": [
+      "false_positive_detector_runtime_calibration",
+      "public_source_release",
+      "npm_publication",
+      "github_release",
+      "team_cloud_enterprise",
+      "final_user_acceptance"
+    ],
+    "external_input_gated_gaps": [
+      "private_preview_feedback_triage",
+      "additional_security_provider_onboarding"
+    ],
+    "deferred_gaps": [
+      "website_design_system_external_follow_up",
+      "packages_core_extraction",
+      "benchmark_package_ownership_cleanup",
+      "hosted_artifact_history_and_dashboard_runtime"
+    ],
+    "safe_auto_executable_gaps": [
+      "multi_repo_workspace_repair_summary_planning"
+    ],
+    "selected_safe_auto_executable_gap": "multi_repo_workspace_repair_summary_planning",
+    "mcp_registry_tool_count": 12,
+    "mcp_convergence_slice_closed": true,
+    "multi_repo_workspace_manifest_implemented": true,
+    "cross_repo_repair_summary_implemented": false,
+    "target_repo_writes": false,
+    "production_code_changed": false
+  },
+  "tests": [
+    "pnpm vitest run tests/unit/project-structure.test.ts",
+    "pnpm typecheck",
+    "pnpm lint",
+    "pnpm build:acceptance",
+    "pnpm build:src",
+    "pnpm test",
+    "pnpm repo:hygiene",
+    "pnpm release:check",
+    "pnpm goal:audit",
+    "pnpm autopilot:progress:check -- --json",
+    "git diff --check"
+  ],
+  "next_goal_id": "repoassure-multi-repo-workspace-repair-summary-planning-v0.1"
+}

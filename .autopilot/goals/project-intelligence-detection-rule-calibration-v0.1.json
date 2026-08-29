@@ -1,0 +1,41 @@
+{
+  "schema": "project-autopilot/goal@1",
+  "id": "project-intelligence-detection-rule-calibration-v0.1",
+  "status": "completed",
+  "objective": "Tighten Project Intelligence findOrphanCode ownership README detection so app/package ownership documentation only passes for a root README.md, not nested or dependency README files.",
+  "summary": {
+    "previous_readme_rule": "any contained path ending in /README.md",
+    "calibrated_readme_rule": "exact app or package root README.md only",
+    "fixture_regression": "apps/nested-readme/docs/README.md",
+    "result": "nested README-only app is reported as orphan_code",
+    "hosted_dashboard_implemented": false,
+    "target_repo_writes": false
+  },
+  "tests": [
+    "pnpm vitest run tests/unit/project-intelligence-snapshot.test.ts",
+    "pnpm vitest run tests/unit/project-intelligence-snapshot.test.ts tests/unit/project-structure.test.ts",
+    "pnpm project:intelligence",
+    "pnpm project:intelligence:backlog",
+    "pnpm repo:hygiene",
+    "pnpm release:check",
+    "pnpm typecheck",
+    "pnpm lint",
+    "pnpm goal:audit",
+    "pnpm test"
+  ],
+  "blocked_actions": [
+    "hosted_dashboard",
+    "cloud_sync",
+    "telemetry",
+    "deployment",
+    "public_release",
+    "repository_visibility_change",
+    "npm_publication",
+    "github_release",
+    "target_repo_write",
+    "customer_contact",
+    "pricing_change",
+    "spend_change"
+  ],
+  "next_goal_id": "repoassure-product-completion-gap-audit-v0.1"
+}

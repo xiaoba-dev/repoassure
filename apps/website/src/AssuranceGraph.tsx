@@ -22,17 +22,22 @@ const graphIcons = {
 
 type AssuranceGraphProps = {
   copy: AssuranceGraphCopy;
+  /* The graph carries its own heading when it stands alone. Inside a Panel, the panel
+     supplies eyebrow and title, so repeating them here would print the label twice. */
+  showHeading?: boolean;
 };
 
-export function AssuranceGraph({ copy }: AssuranceGraphProps) {
+export function AssuranceGraph({ copy, showHeading = true }: AssuranceGraphProps) {
   const centerPosition = graphPointToPercent(GRAPH_CENTER);
 
   return (
-    <section className="assurance-graph" data-testid="assurance-graph" aria-label={copy.label}>
-      <header className="graph-panel-heading">
-        <GitBranch size={18} />
-        <span>{copy.label}</span>
-      </header>
+    <div className="assurance-graph" data-testid="assurance-graph" aria-label={copy.label}>
+      {showHeading ? (
+        <header className="graph-panel-heading">
+          <GitBranch size={18} />
+          <span>{copy.label}</span>
+        </header>
+      ) : null}
 
       <ol className="graph-chain-fallback" data-testid="assurance-graph-fallback" aria-label={copy.label}>
         <li className="graph-chain-fallback-center">
@@ -146,10 +151,18 @@ export function AssuranceGraph({ copy }: AssuranceGraphProps) {
                 <NodeIcon size={18} />
                 <strong>{node.label}</strong>
               </div>
+              {/* Reachability rides on the desktop node too, not only the mobile
+                  fallback: without it the graph implies patch plan and acceptance ship
+                  in the CLI, which is the exact claim ADR-0021 removed. */}
               <span data-variant={node.variant}>
                 <Check size={14} />
                 {node.status}
               </span>
+              <em className="graph-node-reachability">
+                {node.reachability === 'cli'
+                  ? copy.reachabilityLabels.cli
+                  : copy.reachabilityLabels.internal}
+              </em>
             </article>
           );
         })}
@@ -165,6 +178,6 @@ export function AssuranceGraph({ copy }: AssuranceGraphProps) {
           {copy.producesLabel}
         </span>
       </footer>
-    </section>
+    </div>
   );
 }

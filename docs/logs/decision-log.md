@@ -1777,3 +1777,13 @@ Public Release Manual Gate Closure v0.2 的 2026-07-01 private/no-go 结论保�
 未纳入：#62 的 real-stdio-client 集成用例（依赖四个在 #71 随治理工具一起删掉的测试 helper），MCP 路径由 `mcp-server.test.ts` 新增的 transport 级用例覆盖；#62 对 goal 文档 "Next Codex Goal" 指针的改动（属 autopilot 治理记录，#72 后已非阻塞）。
 
 Import 仍不运行扫描器、不联网、不上传目标 repo、不创建 issue/PR/advisory、不修改目标源码；产物 create-only 不覆盖既有证据；不接受 native provider 格式。不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。
+
+## 2026-08-29 - 未合入分支以文档承载，而不是让分支代管
+
+`design-system-v2` 是 B（false-positive 目录）、C（workspace repair summary）、F 剩余（agent-context / watch-handoff）与 evidence-package 四块未落地工作的唯一载体，落后 `main` 81 个提交且持续增加。判断这些是什么、为什么不切、什么条件下该捞回来，是一轮跨厂商对抗辩论加一次逐簇分拣的产物，只存在于分支和会话里。新增 `docs/operations/unmerged-branch-inventory-v0.1.md` 记录之，使删除分支成为可逆操作。
+
+明确**不**为已合并的 104 个分支建档：它们的内容在 `main`，理由在 ADR 与 decision log 里，分支名到 PR 的映射由 GitHub 永久保留（已验证 #74–#78 的分支从远端删除后 PR 仍带 `headRefName`）。为它们补文档会加重本仓库最重的部分，且答不出「现状哪次失败能归因于缺它」。
+
+同时记录两条切片方法教训：依赖闭包必须查到字段级（只验 `import` 解析会漏 schema 不兼容），以及判断内容是否已落地不能跟移动的靶子比（squash 改哈希，`git cherry` / 文件比对 / patch 反向套用三种方法都会假阳性，可靠来源是 GitHub PR 状态）。
+
+该决策只新增记录，不改产品行为、artifact schema 或对外接口，也不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。

@@ -321,12 +321,11 @@
 - [x] Campaign validation derives trust-chain status from local artifact bytes and does not execute commands.
 - [x] Campaign summary does not change external state or expose target repo source and secrets.
 - [x] Campaign validation rejects shallow fabricated chains, symlink escapes, incomplete coverage, missing tamper evidence, secret-like values, and valid chains mislabeled as tampered.
-- [x] Blocked Goal Recovery MCP Surface v0.1 lists eight explicit lifecycle tools with strict directory-only schemas.
-- [x] Every recovery MCP call returns `repoassure.mcp-blocked-goal-recovery-tool-result.v1` and records commands, external state changes, and target repo mutation as false.
-- [x] MCP transport integration reaches local closure while argument expansion, symlink output escape, and secret-like output paths fail closed or are redacted.
-- [x] Recovery MCP I/O rejects FIFO/non-regular/oversized inputs, directory identity replacement, and existing output symlinks without mutating external targets.
-- [x] `pnpm test:mcp-real-client` validates the compiled server through official SDK `StdioClientTransport`, including all eight tool discovery, reviewed lifecycle consumption, schema-safe errors, stderr redaction, timeout, and deterministic cleanup.
-- [x] `pnpm test:mcp-external-config` validates Cursor, VS Code, and Codex configurations from an external cwd, including a spaced source-checkout alias, `apps/mcp-server/index.js`, all eight recovery tools, SDK-harness environment isolation, path-safe pre-build failure, no client-config writes, and deterministic cleanup; actual IDE environment inheritance remains manual.
+- [x] Blocked Goal Recovery MCP Surface v0.1 is retired by ADR-0044; no `blocked_goal` tool is advertised by `tools/list` or callable through `tools/call`.
+- [x] The MCP surface is product tools only: `analyze_repo`, `boot_app`, `stop_app`, `explore_app`, `generate_tests`, `generate_repair_plan`, `prepare_repair_handoff`, `preview_repair_execution`, `generate_repair_patch_plan`, `harden_report`, and `run_hardening`.
+- [x] The recovery lifecycle is unchanged and still driven by `pnpm goal:recover:*`; the eight stage unit test files and the lifecycle campaign validation still cover it.
+- [x] `pnpm test:mcp-real-client` validates the compiled server through official SDK `StdioClientTransport`, covering bounded initialization timeout, deterministic child termination, and safe default environment isolation.
+- [x] `pnpm test:mcp-external-config` validates Cursor, VS Code, and Codex configurations from an external cwd, including a spaced source-checkout alias, `apps/mcp-server/index.js`, the exact advertised product tool set, SDK-harness environment isolation, path-safe pre-build failure, no client-config writes, and deterministic cleanup; actual IDE environment inheritance remains manual.
 - [x] Generated MCP configuration contains workstation-specific absolute paths and must remain user-level or untracked; it must not be committed, shared, or printed in CI logs.
 
 ## Parallel Test Runtime Build Isolation v0.1
@@ -343,8 +342,10 @@
 
 ## Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1
 
-- [x] A bounded, non-writing maintainer runbook and redacted evidence template exist.
-- [x] The committed fixture contains no target-repository data or recovery/resume commands.
-- [x] A maintainer used Codex Desktop and recorded redacted discovery of all eight recovery tools.
-- [x] Codex called only the disposable `create_blocked_goal_recovery` fixture; the recorded flags are no command execution, no external state change, and no target-repository mutation.
-- [x] The maintainer explicitly accepted the result and removed the temporary MCP configuration; see the dated evidence record under `docs/acceptance/evidence/`.
+- [x] A bounded, non-writing maintainer runbook and redacted evidence template exist, updated on 2026-08-28 for the current product tool surface.
+- [x] The 2026-07-14 Codex record is preserved unedited as a dated record of the retired recovery MCP surface and is marked as such.
+- [ ] A maintainer discovers the exact advertised product tool set in a real installed client, with no `blocked_goal` tool listed.
+- [ ] The client calls only `analyze_repo` against a disposable directory; the only file written is that directory's `.hardening/run/repo-profile.json` and the source checkout is unchanged.
+- [ ] The maintainer explicitly records an accepted, changes_requested, or deferred decision and removes or retains the temporary MCP configuration by explicit decision.
+
+This gate is open. ADR-0044 removed the tool the 2026-07-14 acceptance exercised, so that record does not carry forward to the current surface.

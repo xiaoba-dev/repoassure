@@ -12,7 +12,18 @@ import {
 } from '../support/real-mcp-client.js';
 
 const execFileAsync = promisify(execFile);
-const expectedRecoveryTools = [
+const expectedProductTools = [
+  'analyze_repo',
+  'boot_app',
+  'stop_app',
+  'explore_app',
+  'generate_tests',
+  'generate_repair_plan',
+  'prepare_repair_handoff',
+  'preview_repair_execution',
+  'generate_repair_patch_plan',
+  'harden_report',
+  'run_hardening'
 ] as const;
 
 describe('external AI IDE MCP configuration consumption', () => {
@@ -88,11 +99,11 @@ describe('external AI IDE MCP configuration consumption', () => {
         connection = await connectRealMcpClient({ ...launch, cwd: consumerRoot });
         pid = connection.pid;
         const listed = await connection.client.listTools({}, { timeout: 5_000 });
-        expect(listed.tools.map((tool) => tool.name)).toEqual(
-          expect.arrayContaining([...expectedRecoveryTools])
+        expect(listed.tools.map((tool) => tool.name).sort()).toEqual(
+          [...expectedProductTools].sort()
         );
         expect(connection.client.getInstructions()).toContain(
-          'do not execute recovery or resume commands'
+          'do not modify target repository source or apply repair patches'
         );
         expect(connection.stderr()).toBe('');
       } finally {

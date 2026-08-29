@@ -76,15 +76,16 @@ Plain-language explanation: the local product, website, and user-validation back
 - ADR-0038: Blocked goal recovery resume attempt evidence review decision package.
 - ADR-0039: Blocked goal recovery resume attempt closure receipt.
 - ADR-0040: Blocked goal recovery full lifecycle campaign validation.
-- ADR-0041: Blocked goal recovery MCP surface.
+- ADR-0041: Blocked goal recovery MCP surface (superseded by ADR-0044).
+- ADR-0044: Retire the blocked goal recovery MCP surface.
 
 ## Blocked Goal Recovery MCP Surface v0.1
 
-Status: implemented.
+Status: retired on 2026-08-28 by ADR-0044.
 
-- Expose eight explicit recovery lifecycle tools through MCP `tools/list` and `tools/call`.
-- Reuse authoritative acceptance writers and emit `repoassure.mcp-blocked-goal-recovery-tool-result.v1`.
-- Reject argument expansion and output real-path escape while preserving redaction and non-execution boundaries.
+- The eight recovery lifecycle tools are no longer advertised through MCP `tools/list` or callable through `tools/call`.
+- The MCP surface is product tools only: `analyze_repo`, `boot_app`, `stop_app`, `explore_app`, `generate_tests`, `generate_repair_plan`, `prepare_repair_handoff`, `preview_repair_execution`, `generate_repair_patch_plan`, `harden_report`, `run_hardening` (eight at the time of removal; ADR-0043 later added the three repair-workflow tools).
+- The recovery lifecycle itself was not removed: `packages/acceptance` still owns the stage writers and the `pnpm goal:recover:*` scripts still drive them under ADR-0033 through ADR-0040.
 
 ## Blocked Goal Recovery MCP External AI IDE Configuration Validation v0.1
 
@@ -92,7 +93,7 @@ Status: implemented.
 
 - Generate copy-pasteable Cursor, VS Code, and Codex local stdio configurations.
 - Point every configuration at the user-facing `apps/mcp-server/index.js` entry with absolute argv-safe paths.
-- Consume all three envelopes from an external workspace and path-with-spaces source-checkout alias with SDK-harness environment isolation, eight-tool discovery, and deterministic cleanup; defer actual IDE environment inheritance to manual acceptance.
+- Consume all three envelopes from an external workspace and path-with-spaces source-checkout alias with SDK-harness environment isolation, exact product tool-set assertion, and deterministic cleanup; defer actual IDE environment inheritance to manual acceptance.
 
 ## Parallel Test Runtime Build Isolation v0.1
 
@@ -108,12 +109,11 @@ PR #56 merged as `92ec9512e1132d4710f7b800e6ae907a720b7be5`; its PR quality gate
 
 ## Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1
 
-Status: completed.
+Status: completed for the retired surface on 2026-07-14; reopened on 2026-08-28 for the current surface.
 
-- A maintainer used Codex Desktop to discover all eight tools and call only the disposable, non-executing recovery-package fixture.
-- The result recorded no command execution, no external state change, no target-repository mutation, and no resume commands.
-- The maintainer accepted the evidence and removed the temporary configuration.
-- The redacted evidence record is stored under `docs/acceptance/evidence/`.
+- A maintainer used Codex Desktop to discover the eight recovery tools then advertised and call only the disposable, non-executing recovery-package fixture. That dated record is preserved under `docs/acceptance/evidence/` and is not rewritten.
+- ADR-0044 removed those tools, so the 2026-07-14 acceptance no longer covers the surface a client sees today.
+- The runbook now checks the exact advertised product tool set and one non-mutating `analyze_repo` call against a disposable directory. It has not been re-run, so no manual acceptance is claimed for the current surface.
 
 ## Public Release Manual Gate Closure v0.2
 

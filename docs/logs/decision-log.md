@@ -1748,6 +1748,14 @@ Public Release Manual Gate Closure v0.2 的 2026-07-01 private/no-go 结论保�
 
 `.autopilot/` 与 `.claude/settings.local.json` 进入 `.gitignore`。`.autopilot/` 是本地治理工作区（goal JSON、progress snapshot），不是产品物料；main 上从未跟踪过其中任何文件，所有测试引用都是临时夹具或反向断言（`packed-cli-installation.test.ts` 断言打包产物**不含** `.autopilot`），因此本次忽略不改变任何现有行为，只防止该工作区在 main 检出中被意外提交。`.claude/settings.local.json` 是个人会话配置，仓库已 PUBLIC，不应随产品材料公开。`run-project-intelligence-snapshot.ts` 的 `scanRoots` 保留 `.autopilot`：该 root 缺失时快照正常降级生成，PI 按既定「留观」处理，不在本次改动范围内。该决策只影响本地工作区边界，不改产品行为、artifact schema 或对外接口，因此不新增 ADR。
 
+## 2026-08-28 - retire the blocked goal recovery MCP surface
+
+接受 ADR-0044，supersede ADR-0041。PR #71（commit `6b78bf9`）已移除 `src/adapters/mcp/blocked-goal-recovery-tools.ts` 和八个 recovery MCP tools，但当时未留 ADR，文档因此漂移六周。本轮补记该决策：MCP 面收敛为八个产品工具（`analyze_repo`、`boot_app`、`stop_app`、`explore_app`、`generate_tests`、`generate_repair_plan`、`harden_report`、`run_hardening`），理由是产品身份——RepoAssure 回答「AI 生成的仓库能否发布」，治理自身 goal 的工具不属于这个问题，且每个安装者都被动收到它们。（本条记录的是 #71 当时的 8 个；随后 ADR-0043 又接入三个 repair-workflow 产品工具，工具面为 11。数字不是决策内容，规则是：能帮助回答「仓库能否发布」的工具才属于这个面。）
+
+**recovery lifecycle 未被移除**：`packages/acceptance` 仍拥有八个 stage writers，`pnpm goal:recover:*` 仍驱动它们，artifact schema 不变，ADR-0033 至 ADR-0040 继续有效。随 adapter 一并作废的只有 `repoassure.mcp-blocked-goal-recovery-tool-result.v1` envelope 和 ADR-0041 中那些属于 adapter 自身的 I/O 保护（`O_NOFOLLOW`、8 MiB 上限、output symlink 拒绝、原子替换、目录 device/inode 复验）。
+
+同时修正三处被 #71 留下的实质漂移：MCP server 的 `instructions` 仍向客户端宣告 recovery tools；`mcp-external-ai-ide-config.test.ts` 的 `expectedRecoveryTools` 被清空为 `[]` 导致工具发现断言空转；`project-structure.test.ts` 断言文档必须包含八个已删除的工具名，把文档漂移钉成绿色。2026-07-14 的 Codex 人工验收针对的是已移除的 surface，按日期标注保留、不改写，该门禁对当前 surface 重新打开。该决策只移除一个 transport，不改 artifact schema、不删任何 `pnpm goal:recover:*` 命令，也不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。
+
 ## 2026-08-29 - repair workflow CLI and MCP surface
 
 接受 ADR-0043。`run-repair-handoff` / `run-repair-execute` / `run-repair-patch-plan` 三个既有 runner 同时接到 MCP（`prepare_repair_handoff`、`preview_repair_execution`、`generate_repair_patch_plan`，工具面 8 → 11，全部为产品工具）和 CLI（`hardening repair <handoff|execute|patch-plan>`）。两侧都只是 adapter，不重实现生命周期；`--apply` / `--write` / `--auto-fix` / `--commit` / `--push` / `--pull-request` 在 CLI 边界拒绝而不是忽略。同时修复接线时发现的脱敏缺口：`buildRepairHandoffPackage` 曾把 `manifest.artifacts` 原样复制进 `sourceArtifacts`，使 manifest 中 secret 形状的值未脱敏地进入交给 AI IDE 的 `repair-handoff-package.json`；已加回归测试，去掉修复即失败。`assemble_repair_evidence_package` 与 `run-repair-evidence-package` 不在本次范围内——它们依赖三个 runner 的新增字段，属于三份已发布契约的 schema 演进，应单独决策。该决策不改变 handoff 包的 `nextCommands` 字符串，也不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。

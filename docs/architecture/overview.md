@@ -284,13 +284,15 @@ ADR-0028 adds a proposal layer after replay readiness: replay readiness -> targe
 
 `goal:recover:validate-lifecycle` reads the seven-stage local artifact chain and emits `repoassure.blocked-goal-recovery-lifecycle-campaign-summary.v1`. It dispatches authoritative stage validators, verifies cross-stage inventory and raw-byte SHA bindings, enforces real-path containment and the shared redaction boundary, and requires the complete eight-outcome matrix. It does not execute commands or change external state.
 
-## Blocked Goal Recovery MCP Boundary
+## MCP Product Tool Boundary
 
-`src/adapters/mcp/blocked-goal-recovery-tools.ts` is the bounded transport adapter above the authoritative acceptance writers. It publishes eight stage-specific tools, enforces exact directory-only arguments, contained fixed-input artifacts, and contained `outputDir` real paths, and wraps every result in `repoassure.mcp-blocked-goal-recovery-tool-result.v1`. The adapter does not expose a command execution parameter and does not execute commands or change external state.
+`src/adapters/mcp/tool-registry.ts` is the transport adapter above the hardening tools. It publishes exactly eleven product tools — `analyze_repo`, `boot_app`, `stop_app`, `explore_app`, `generate_tests`, `generate_repair_plan`, `prepare_repair_handoff`, `preview_repair_execution`, `generate_repair_patch_plan`, `harden_report`, `run_hardening` — and each delegates to its `src/tools/*-tool.ts` implementation. The adapter does not expose a tool that mutates target repository source or applies a repair patch.
 
-## Blocked Goal Recovery MCP Real Client Boundary
+The blocked-goal recovery lifecycle has no MCP boundary. `src/adapters/mcp/blocked-goal-recovery-tools.ts` and its eight stage tools were removed by [ADR-0044](../adr/0044-blocked-goal-recovery-mcp-surface-removal.md), which supersedes ADR-0041; the containment and atomic-write guarantees that file provided went with it, because they were properties of that adapter rather than of the lifecycle. The lifecycle stages remain in `packages/acceptance` and are reached through the `pnpm goal:recover:*` scripts.
 
-`tests/support/real-mcp-client.ts` wraps the compiled adapter with the official SDK `Client` and `StdioClientTransport`. It is a validation boundary rather than a new domain layer: recovery logic stays in authoritative acceptance writers, while process initialization, redacted stderr, request timeout, and deterministic cleanup remain consumer-harness responsibilities.
+## MCP Real Client Boundary
+
+`tests/support/real-mcp-client.ts` wraps the compiled adapter with the official SDK `Client` and `StdioClientTransport`. It is a validation boundary rather than a new domain layer: tool logic stays in `src/tools/`, while process initialization, redacted stderr, request timeout, and deterministic cleanup remain consumer-harness responsibilities.
 
 ## Acceptance Build Runtime Isolation
 
@@ -298,7 +300,9 @@ ADR-0028 adds a proposal layer after replay readiness: replay readiness -> targe
 
 ### Real AI IDE Manual Acceptance
 
-The generated client configurations and SDK integration tests establish process-level compatibility. `examples/mcp-manual-acceptance/blocked-goal-recovery-input.json`, the manual operation runbook, and the redacted evidence template form a separate maintainer-controlled boundary for real client UI consumption. The fixture may produce local recovery-package artifacts in a disposable directory, but it carries no resume commands and the one allowed tool call reports no command execution, no external state change, and no target-repository mutation.
+The generated client configurations and SDK integration tests establish process-level compatibility. The manual operation runbook and the redacted evidence template form a separate maintainer-controlled boundary for real client UI consumption. The one allowed call is `analyze_repo` against a disposable throwaway directory; it writes only that directory's `.hardening/run/repo-profile.json` and leaves the source checkout unchanged.
+
+`examples/mcp-manual-acceptance/blocked-goal-recovery-input.json` is no longer reachable over MCP after ADR-0044. It remains a valid CLI input for `pnpm goal:recover -- --from-dir`, and carries no resume commands or target-repository data.
 
 The lock records its owner PID. Successful output state is written only after the compiler exits successfully and required entrypoints exist. Normal failures clear the lock; a later process can atomically quarantine a lock whose owner has exited. This layer coordinates local build processes only and does not change package exports, artifact schemas, target repo state, or external authority.
 

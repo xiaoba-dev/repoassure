@@ -82,7 +82,7 @@ describe('acceptance build runtime contract', () => {
       /## Next Codex Goal\n\nSecurity Assurance Lane Provider Import Ergonomics v0\.1/u
     );
     expect(plan).toMatch(
-      /## Blocked Goal Recovery MCP Surface v0\.1\n\nStatus: implemented\./u
+      /## Blocked Goal Recovery MCP Surface v0\.1\n\nStatus: retired on 2026-08-28 by ADR-0044\./u
     );
     expect(plan).toMatch(
       /## Parallel Test Runtime Build Isolation v0\.1\n\nStatus: completed\./u

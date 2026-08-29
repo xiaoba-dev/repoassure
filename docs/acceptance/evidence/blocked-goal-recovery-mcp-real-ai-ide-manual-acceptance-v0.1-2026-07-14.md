@@ -4,6 +4,13 @@ Status: accepted
 
 Decision: accepted
 
+> **Describes a surface that has since been removed.** The eight blocked-goal recovery MCP tools
+> recorded below were removed on 2026-08-28 by PR #71 (commit `6b78bf9`); see
+> [ADR-0044](../../adr/0044-blocked-goal-recovery-mcp-surface-removal.md). This is a dated record
+> of what a maintainer observed on 2026-07-14 and is deliberately left unedited below this note.
+> It remains valid as history and does not carry forward as acceptance of the current MCP
+> surface. The blocked-goal recovery lifecycle itself was not removed — only its MCP transport.
+
 ## Context
 
 - Date: 2026-07-14 Asia/Shanghai

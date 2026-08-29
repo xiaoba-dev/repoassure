@@ -3759,28 +3759,80 @@ describe('project structure', () => {
     await expectPath('scripts/generate-blocked-goal-recovery-lifecycle-campaign-summary.mjs');
   });
 
-  it('records the bounded blocked goal recovery MCP surface', async () => {
-    const files = await Promise.all([
+  it('records the retired blocked goal recovery MCP surface as superseded', async () => {
+    const [adr0041, adr0044, adrIndex] = await Promise.all([
       readFile('docs/adr/0041-blocked-goal-recovery-mcp-surface.md', 'utf8'),
-      readFile('docs/operations/blocked-goal-recovery-mcp-surface-v0.1.md', 'utf8'),
-      readFile('README.md', 'utf8'), readFile('docs/PRD.md', 'utf8'), readFile('docs/SPEC.md', 'utf8'),
-      readFile('docs/PLAN.md', 'utf8'), readFile('docs/architecture/overview.md', 'utf8'),
-      readFile('docs/testing/strategy/test-strategy-v0.1.md', 'utf8'),
-      readFile('docs/acceptance/checklists/acceptance-checklist-v0.1.md', 'utf8'),
-      readFile('docs/logs/decision-log.md', 'utf8'), readFile('docs/logs/dev-log.md', 'utf8')
+      readFile('docs/adr/0044-blocked-goal-recovery-mcp-surface-removal.md', 'utf8'),
+      readFile('docs/adr/README.md', 'utf8')
     ]);
-    const joined = files.join('\n');
-    const recoveryToolNames = [
+
+    expect(adr0041).toContain('Status: Superseded by ADR-0044');
+    expect(adrIndex).toContain('[0044](0044-blocked-goal-recovery-mcp-surface-removal.md)');
+    expect(adrIndex).toMatch(
+      /\[0041\][^|]*\|\s*Superseded by \[0044\]\(0044-blocked-goal-recovery-mcp-surface-removal\.md\)/u
+    );
+    expect(adr0044).toContain('Supersedes: ADR-0041');
+    // The lifecycle survives the transport: ADR-0044 must not read as a feature removal.
+    expect(adr0044).toContain('pnpm goal:recover:*');
+    expect(adr0044).toContain('The recovery lifecycle itself is not removed.');
+  });
+
+  it('keeps every current-state document off the removed recovery MCP surface', async () => {
+    const currentStateDocs = [
+      'README.md', 'docs/PRD.md', 'docs/SPEC.md', 'docs/PLAN.md',
+      'docs/architecture/overview.md',
+      'docs/testing/strategy/test-strategy-v0.1.md',
+      'docs/acceptance/checklists/acceptance-checklist-v0.1.md',
+      'docs/operations/blocked-goal-recovery-mcp-surface-v0.1.md',
+      'docs/operations/blocked-goal-recovery-mcp-real-client-validation-v0.1.md',
+      'docs/operations/blocked-goal-recovery-mcp-external-ai-ide-configuration-v0.1.md',
+      'docs/operations/blocked-goal-recovery-mcp-real-ai-ide-manual-acceptance-v0.1.md',
+      'docs/acceptance/templates/blocked-goal-recovery-mcp-real-ai-ide-manual-evidence-v0.1.md'
+    ];
+    const removedToolNames = [
       'create_blocked_goal_recovery', 'consume_blocked_goal_recovery',
       'record_blocked_goal_recovery_decision', 'prepare_blocked_goal_resume_attempt',
       'intake_blocked_goal_resume_evidence', 'review_blocked_goal_resume_evidence',
       'close_blocked_goal_resume_attempt', 'validate_blocked_goal_recovery_lifecycle'
     ];
-    expect(joined).toContain('Blocked Goal Recovery MCP Surface v0.1');
-    expect(joined).toContain('repoassure.mcp-blocked-goal-recovery-tool-result.v1');
-    expect(joined).toContain('does not execute');
-    expect(joined).toContain('outputDir');
-    for (const toolName of recoveryToolNames) expect(joined).toContain(toolName);
+
+    // Scoped per Markdown section, so a retirement note elsewhere in the file cannot
+    // launder a current-tense claim in another section.
+    const retirementMarker = /retired|removed|superseded|historical|no longer|not exposed/iu;
+
+    for (const path of currentStateDocs) {
+      const text = await readFile(path, 'utf8');
+      const sections = text.split(/\n(?=#{1,6} )/u);
+      for (const section of sections) {
+        for (const toolName of removedToolNames) {
+          if (!section.includes(toolName)) continue;
+          expect(
+            retirementMarker.test(section),
+            `${path} names ${toolName} in a section that does not mark it as removed`
+          ).toBe(true);
+        }
+      }
+    }
+  });
+
+  it('documents the product MCP tool surface that replaced it', async () => {
+    const files = await Promise.all([
+      readFile('README.md', 'utf8'), readFile('docs/PRD.md', 'utf8'),
+      readFile('docs/SPEC.md', 'utf8'), readFile('docs/PLAN.md', 'utf8'),
+      readFile('docs/architecture/overview.md', 'utf8')
+    ]);
+    const joined = files.join('\n');
+    const productToolNames = [
+      'analyze_repo', 'boot_app', 'stop_app', 'explore_app',
+      'generate_tests', 'generate_repair_plan', 'prepare_repair_handoff',
+      'preview_repair_execution', 'generate_repair_patch_plan',
+      'harden_report', 'run_hardening'
+    ];
+    for (const toolName of productToolNames) expect(joined).toContain(toolName);
+    // The recovery lifecycle keeps its CLI entry points.
+    expect(joined).toContain('pnpm goal:recover');
+    await expectPath('packages/acceptance/src/blocked-goal-recovery-package.ts');
+    await expectPath('scripts/generate-blocked-goal-recovery-package.mjs');
   });
 
   it('records real stdio MCP client consumption validation and its CI gate', async () => {

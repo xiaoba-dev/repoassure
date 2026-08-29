@@ -560,6 +560,8 @@ resolved
 
 Maintainer 已在真实 Codex session 发现八个 recovery tools，并只调用 disposable `create_blocked_goal_recovery` fixture。结果的 command/external-state/target-repo-mutation flags 均为 false，生成包不含 resume commands。Maintainer 明确 accepted 并移除临时 config；详见 dated redacted evidence record。该 resolution 不授权 recovery/resume command execution、target repo mutation、release 或 commercial/hosted claims。
 
+> **后续（2026-08-28）**：本条记录的八个 recovery MCP tools 已由 PR #71（commit `6b78bf9`）移除，见 ADR-0044。上述记录是 2026-07-14 当日事实，保留不改写；它不再代表当前 MCP 面的验收状态，该人工验收门禁已按新 surface 重新打开。recovery lifecycle 本身未被移除，仅移除其 MCP transport。
+
 ## 2026年7月14日 - Public Release Manual Gate Closure v0.2 状态漂移
 
 ### Resolution status
@@ -569,3 +571,13 @@ resolved
 ### Evidence
 
 旧 v0.2 文档保留了 repository `PRIVATE`、branch protection `HTTP 403` 与 public release no-go 的历史快照，但当前 GitHub 只读核验确认 repository 为 `PUBLIC`、`main` 已受 `Quality Gates` 保护、最新 main CI 成功，且 `pnpm release:check` 报告 `yes`。历史 Equivalent Release Control Closure、Public Source Release Execution、Native Branch Protection Enablement 与 post-merge hygiene 已解释这一状态演进。本轮只调和文档与计划，不改变外部状态；public launch 仍为 deferred。
+
+## 2026年8月28日 - Blocked goal recovery MCP surface 文档漂移
+
+### Resolution status
+
+resolved
+
+### Evidence
+
+PR #71（commit `6b78bf9`）移除了 `src/adapters/mcp/blocked-goal-recovery-tools.ts` 和 registry 中的八个 recovery tools，但未留下 ADR，且十余份文档仍把该 surface 描述为现状：`docs/architecture/overview.md` 仍指向已删除的 adapter 文件，`tests/unit/project-structure.test.ts` 反而断言文档必须包含这八个工具名，把漂移钉成绿色测试。MCP server 的 `instructions` 字符串也仍向每个连接的客户端宣告 recovery tools，`tests/integration/mcp-external-ai-ide-config.test.ts` 的 `expectedRecoveryTools` 被清空成 `[]`，使工具发现断言空转。本轮补写 ADR-0044 supersede ADR-0041，修正现状文档，按日期标注历史记录，并把上述测试改为断言当前 surface。该 resolution 不授权 recovery/resume command execution、target repo mutation、release 或 commercial/hosted claims。

@@ -94,6 +94,14 @@ describe('project structure', () => {
     expect(readiness).toContain('public-release-checklist-v0.1.md');
   });
 
+  it('keeps the local governance workspace and personal Claude settings out of the repository', async () => {
+    const gitignore = await readFile('.gitignore', 'utf8');
+
+    expect(gitignore).toContain('.autopilot/');
+    expect(gitignore).toContain('.claude/settings.local.json');
+    expect(await readFile('.gitignore', 'utf8')).not.toContain('!.autopilot');
+  });
+
   it('keeps source code grouped by adapters, domain, shared, internal, and tools', async () => {
     await expectPath('src/adapters/cli/run.ts');
     await expectPath('src/adapters/mcp/tool-registry.ts');

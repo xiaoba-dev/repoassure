@@ -5,6 +5,7 @@ packages/*/dist/
 apps/*/dist/
 coverage/
 .hardening/
+.autopilot/
 artifacts/acceptance/
 artifacts/benchmark-runs/
 artifacts/orphaned-runs/
@@ -24,4 +25,5 @@ test-results/
 *.key
 *.p12
 *.mobileprovision
+.claude/settings.local.json
 .vercel

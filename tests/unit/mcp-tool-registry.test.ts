@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -17,9 +17,289 @@ describe('MCP tool registry', () => {
       'explore_app',
       'generate_tests',
       'generate_repair_plan',
+      'prepare_repair_handoff',
+      'preview_repair_execution',
+      'generate_repair_patch_plan',
       'harden_report',
       'run_hardening',
     ]);
+  });
+
+  it('exposes the additive repair handoff contract without changing existing tool annotations', () => {
+    const tools = listHardeningTools();
+    const repairHandoff = tools.find((tool) => tool.name === 'prepare_repair_handoff');
+
+    expect(repairHandoff).toMatchObject({
+      name: 'prepare_repair_handoff',
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: false
+      },
+      inputSchema: {
+        type: 'object',
+        required: ['runDir'],
+        properties: {
+          runDir: {
+            type: 'string'
+          },
+          outputDir: {
+            type: 'string'
+          }
+        }
+      }
+    });
+    expect(tools.filter((tool) => (
+      tool.name !== 'prepare_repair_handoff'
+      && tool.name !== 'preview_repair_execution'
+      && tool.name !== 'generate_repair_patch_plan'
+      && tool.name !== 'assemble_repair_evidence_package'
+    )).map((tool) => ({
+      name: tool.name,
+      annotations: tool.annotations
+    }))).toEqual([
+      {
+        name: 'analyze_repo',
+        annotations: {
+          readOnlyHint: false,
+          destructiveHint: false,
+          idempotentHint: true,
+          openWorldHint: false
+        }
+      },
+      {
+        name: 'boot_app',
+        annotations: {
+          readOnlyHint: false,
+          destructiveHint: false,
+          idempotentHint: false,
+          openWorldHint: false
+        }
+      },
+      {
+        name: 'stop_app',
+        annotations: {
+          readOnlyHint: false,
+          destructiveHint: false,
+          idempotentHint: true,
+          openWorldHint: false
+        }
+      },
+      {
+        name: 'explore_app',
+        annotations: {
+          readOnlyHint: false,
+          destructiveHint: false,
+          idempotentHint: false,
+          openWorldHint: true
+        }
+      },
+      {
+        name: 'generate_tests',
+        annotations: {
+          readOnlyHint: false,
+          destructiveHint: false,
+          idempotentHint: false,
+          openWorldHint: false
+        }
+      },
+      {
+        name: 'generate_repair_plan',
+        annotations: {
+          readOnlyHint: false,
+          destructiveHint: false,
+          idempotentHint: true,
+          openWorldHint: false
+        }
+      },
+      {
+        name: 'harden_report',
+        annotations: {
+          readOnlyHint: false,
+          destructiveHint: false,
+          idempotentHint: true,
+          openWorldHint: false
+        }
+      },
+      {
+        name: 'run_hardening',
+        annotations: {
+          readOnlyHint: false,
+          destructiveHint: false,
+          idempotentHint: false,
+          openWorldHint: true
+        }
+      }
+    ]);
+  });
+
+  it('exposes the additive repair execution preview contract without changing existing tool annotations', () => {
+    const tools = listHardeningTools();
+    const repairPreview = tools.find((tool) => tool.name === 'preview_repair_execution');
+
+    expect(repairPreview).toMatchObject({
+      name: 'preview_repair_execution',
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: false
+      },
+      inputSchema: {
+        type: 'object',
+        required: ['packagePath'],
+        properties: {
+          packagePath: {
+            type: 'string'
+          },
+          taskIds: {
+            type: 'array',
+            items: {
+              type: 'string'
+            }
+          },
+          all: {
+            type: 'boolean'
+          },
+          outputDir: {
+            type: 'string'
+          }
+        }
+      }
+    });
+    expect(repairPreview?.inputSchema.properties).not.toHaveProperty('validationOnly');
+    expect(tools.filter((tool) => tool.name !== 'preview_repair_execution').map((tool) => ({
+      name: tool.name,
+      inputSchema: tool.inputSchema,
+      annotations: tool.annotations
+    }))).toHaveLength(10);
+  });
+
+  it('fails closed when repair preview task selection is missing, ambiguous, or unsafe', async () => {
+    const packagePath = '/tmp/repair-handoff-package.json';
+    const cases = [
+      {
+        args: { packagePath },
+        error: 'Exactly one of non-empty taskIds or all=true is required'
+      },
+      {
+        args: { packagePath, taskIds: [] },
+        error: 'Invalid non-empty string array argument: taskIds'
+      },
+      {
+        args: { packagePath, taskIds: ['repair-task-1'], all: true },
+        error: 'Exactly one of non-empty taskIds or all=true is required'
+      },
+      {
+        args: { packagePath, all: false },
+        error: 'Exactly one of non-empty taskIds or all=true is required'
+      },
+      {
+        args: { packagePath, all: true, validationOnly: true },
+        error: 'Unsupported argument for preview_repair_execution: validationOnly'
+      },
+      {
+        args: { packagePath, all: true, command: 'rm -rf .' },
+        error: 'Unsupported argument for preview_repair_execution: command'
+      }
+    ];
+
+    for (const testCase of cases) {
+      const result = await callHardeningTool('preview_repair_execution', testCase.args);
+
+      expect(result.isError).toBe(true);
+      expect(result.structuredContent).toBeUndefined();
+      expect(result.content).toEqual([{ type: 'text', text: testCase.error }]);
+    }
+  });
+
+  it('exposes the additive repair patch plan contract without changing existing tool annotations', () => {
+    const tools = listHardeningTools();
+    const repairPatchPlan = tools.find((tool) => tool.name === 'generate_repair_patch_plan');
+
+    expect(repairPatchPlan).toMatchObject({
+      name: 'generate_repair_patch_plan',
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: false
+      },
+      inputSchema: {
+        type: 'object',
+        required: ['reportPath'],
+        properties: {
+          reportPath: {
+            type: 'string'
+          },
+          outputDir: {
+            type: 'string'
+          }
+        }
+      }
+    });
+    expect(repairPatchPlan?.inputSchema.properties).not.toHaveProperty('validationOnly');
+    expect(repairPatchPlan?.inputSchema.properties).not.toHaveProperty('command');
+    expect(tools.filter((tool) => tool.name !== 'generate_repair_patch_plan')).toHaveLength(10);
+  });
+
+  it('fails closed for missing, unsupported, or sensitive repair patch plan inputs', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'hardening-mcp-patch-error-'));
+    const cases = [
+      {
+        args: {},
+        error: 'Missing required string argument: reportPath'
+      },
+      {
+        args: { reportPath: '/tmp/repair-execution-report.json', validationOnly: true },
+        error: 'Unsupported argument for generate_repair_patch_plan: validationOnly'
+      },
+      {
+        args: { reportPath: '/tmp/repair-execution-report.json', command: 'rm -rf .' },
+        error: 'Unsupported argument for generate_repair_patch_plan: command'
+      },
+      {
+        args: { reportPath: '/tmp/repair-execution-report.json', apply: true },
+        error: 'Unsupported argument for generate_repair_patch_plan: apply'
+      }
+    ];
+
+    for (const testCase of cases) {
+      const result = await callHardeningTool('generate_repair_patch_plan', testCase.args);
+
+      expect(result.isError).toBe(true);
+      expect(result.structuredContent).toBeUndefined();
+      expect(result.content).toEqual([{ type: 'text', text: testCase.error }]);
+    }
+
+    const sensitiveResult = await callHardeningTool('generate_repair_patch_plan', {
+      reportPath: join(root, 'token=patch-secret')
+    });
+    const serialized = JSON.stringify(sensitiveResult);
+
+    expect(sensitiveResult.isError).toBe(true);
+    expect(serialized).toContain('token=[REDACTED]');
+    expect(serialized).not.toContain('patch-secret');
+  });
+
+  it('fails closed and redacts repair handoff errors before creating output', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'hardening-mcp-handoff-error-'));
+    const runDir = join(root, 'token=query-secret');
+    const outputDir = join(root, 'output');
+
+    const result = await callHardeningTool('prepare_repair_handoff', {
+      runDir,
+      outputDir
+    });
+    const serialized = JSON.stringify(result);
+
+    expect(result.isError).toBe(true);
+    expect(serialized).toContain('token=[REDACTED]');
+    expect(serialized).not.toContain('query-secret');
+    await expect(stat(outputDir)).rejects.toMatchObject({
+      code: 'ENOENT'
+    });
   });
 
   it('exposes storage state inputs for browser exploration tools', () => {

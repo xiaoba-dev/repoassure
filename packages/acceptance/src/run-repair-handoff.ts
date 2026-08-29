@@ -229,7 +229,9 @@ export async function runRepairHandoff(input: RepairHandoffRunInput): Promise<Re
 
 export function buildRepairHandoffPackage(input: BuildRepairHandoffPackageInput): RepairHandoffPackage {
   const mode = normalizeMode(input.manifest.mode);
-  const sourceArtifacts = input.manifest.artifacts ?? {};
+  /* The manifest's artifact map is author-controlled and lands verbatim in a package
+     built to be handed to an AI IDE, so redact it like every other quoted value. */
+  const sourceArtifacts = redactJsonObject(input.manifest.artifacts ?? {});
   const failedCommands = (input.manifest.commandResults ?? [])
     .filter((result) => result.exitCode !== 0 || result.timedOut);
   const failedCommandValues = new Set(failedCommands.map((result) => formatCommandValue(result.command, result.args)));
@@ -653,6 +655,28 @@ function basenameRunId(runDir: string): string {
 
 function cleanText(value: string): string {
   return redactSensitiveText(value).replace(/\s+/gu, ' ').trim();
+}
+
+function redactJsonValue(value: unknown): unknown {
+  if (typeof value === 'string') {
+    return cleanText(value);
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(redactJsonValue);
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [cleanText(key), redactJsonValue(entry)])
+    );
+  }
+
+  return value;
+}
+
+function redactJsonObject(value: Record<string, unknown>): Record<string, unknown> {
+  return redactJsonValue(value) as Record<string, unknown>;
 }
 
 function slugify(value: string): string {

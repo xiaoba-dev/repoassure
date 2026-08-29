@@ -48,6 +48,7 @@ ADR records long-lived architecture decisions. Use `docs/logs/decision-log.md` f
 | [0040](0040-blocked-goal-recovery-full-lifecycle-campaign-validation.md) | Accepted | Blocked goal recovery full lifecycle campaign validation |
 | [0041](0041-blocked-goal-recovery-mcp-surface.md) | Accepted | Bounded blocked goal recovery MCP surface |
 | [0042](0042-goal-audit-advisory-process-records.md) | Accepted | Goal audit advisory process records |
+| [0043](0043-repair-workflow-cli-and-mcp-surface.md) | Accepted | Repair workflow CLI and MCP surface |
 
 ## Template
 

@@ -11,7 +11,15 @@ import { ensureAcceptanceBuild } from '../../scripts/lib/acceptance-build-coordi
 const execFileAsync = promisify(execFile);
 const workerPath = resolve('tests/fixtures/acceptance-build-worker.ts');
 
-describe('acceptance build runtime isolation', () => {
+/* Every runWorker call spawns node plus tsx, and the fixture sleeps 150ms inside
+   the build, so one spawn costs about 0.8s on an idle machine — and several of
+   these tests make two or three sequentially. Vitest runs four files at a time,
+   so they contend with every other suite that spawns processes. Against the 5s
+   default that left too little headroom: this file passed when run alone and
+   failed intermittently inside a full-suite run, which is a timeout reporting
+   itself as a build-coordination bug. One budget for the file, sized so a slow
+   machine reports a real failure instead. */
+describe('acceptance build runtime isolation', { timeout: 30_000 }, () => {
   it('coalesces concurrent processes for the same source fingerprint', async () => {
     const root = await mkdtemp(join(tmpdir(), 'repoassure-acceptance-build-'));
 
@@ -23,7 +31,7 @@ describe('acceptance build runtime isolation', () => {
     } finally {
       await rm(root, { recursive: true, force: true });
     }
-  }, 15_000);
+  });
 
   it('rebuilds when the source fingerprint changes', async () => {
     const root = await mkdtemp(join(tmpdir(), 'repoassure-acceptance-rebuild-'));
@@ -101,7 +109,7 @@ describe('acceptance build runtime isolation', () => {
     } finally {
       await rm(root, { recursive: true, force: true });
     }
-  }, 10_000);
+  });
 
   it('fails closed instead of reclaiming an incomplete lock publication by age', async () => {
     const root = await mkdtemp(join(tmpdir(), 'repoassure-acceptance-incomplete-lock-'));

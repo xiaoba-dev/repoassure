@@ -49,6 +49,12 @@ jobs:
       - name: External AI IDE MCP config
         run: pnpm test:mcp-external-config
 
+      # Unit tests plus the two MCP gates above leave 40 test files unrun,
+      # including the packed-CLI install check and every playbook / goal:recover
+      # integration test. Those suites only ever ran on a maintainer's machine.
+      - name: Full test suite
+        run: pnpm test
+
       - name: Typecheck
         run: pnpm typecheck
 

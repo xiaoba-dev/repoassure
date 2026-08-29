@@ -5,7 +5,15 @@ import { join } from 'node:path';
 import { generateHardenReport } from '../../src/domain/reports/harden-report.js';
 
 async function createRunDir(): Promise<string> {
-  return mkdtemp(join(tmpdir(), 'hardening-report-'));
+  const base = await mkdtemp(join(tmpdir(), 'hardening-report-'));
+  /* The trailing "a" is deliberate. Run-directory paths get echoed into the
+     remediation markdown, so a bare substring assertion for "a/.hardening/..."
+     matches the absolute path rather than a diff header. Ending every run dir
+     in "a" makes that mistake fail every time instead of whenever mkdtemp
+     happens to pick a suffix ending in "a". */
+  const runDir = join(base, 'runa');
+  await mkdir(runDir, { recursive: true });
+  return runDir;
 }
 
 describe('generateHardenReport', () => {
@@ -116,7 +124,11 @@ describe('generateHardenReport', () => {
     expect(patchDiff).toContain(
       'diff --git a/tests/hardening/generated-findings.spec.ts b/tests/hardening/generated-findings.spec.ts'
     );
-    expect(patchDiff).not.toContain('a/.hardening/run/generated-tests');
+    // Anchored to diff headers: the run directory also appears verbatim inside
+    // the remediation markdown, which a bare substring check would match.
+    expect(patchDiff).not.toMatch(
+      /^(?:diff --git |\+\+\+ )\S*\.hardening\/run\/generated-tests/mu
+    );
   });
 
   it('labels the score with the environment it measured and flags adapter routes when self-booted', async () => {

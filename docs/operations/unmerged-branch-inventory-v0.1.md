@@ -95,24 +95,34 @@ schema 演进；并且 `run-repair-handoff.ts` 两侧独立演进过——`main`
 
 **推翻条件**：决定演进这三份契约。届时这是一个独立 goal，不是某个入口改动的副作用。
 
-### conditional dead control — 表单前置条件感知的假阳性豁免
+### conditional dead control — 初始禁用控件的分诊标注
 
 实现 593 行、测试 1027 行，落在 `packages/browser-explorer` 的 playwright driver 与其单测上；
 另有合成 fixture 3 个文件（`tests/fixtures/conditional-dead-control-synthetic/` 与其专项测试），
 以及 42 个文件的治理轨迹（14 个 `.autopilot` goal、24 份 authorization intake / maintainer
 decision record / completion audit 文档）。
 
-点击一个初始 `disabled` 的提交按钮不会产生可观察变化，现状会把它记为 P1 `dead_control`。
-这一簇先观察该控件是否存在「安全的脏态转换」（填入安全字段后是否变为 enabled），据此归类为
+控件初始为 `disabled` 时**不点击**，转入观测：填入一个安全字段看它是否变为 enabled，据此归类为
 `false_positive_candidate` / `actionable_conditional_dead_control` / `needs_maintainer_review`，
-并把判定依据写进 evidence（`conditional_dead_control.prerequisite.*`、`.classification`、
-`.fail_closed_reason`）。无法安全判定时 fail closed，不做豁免。
+判定依据写进 evidence（`conditional_dead_control.prerequisite.*`、`.classification`、
+`.fail_closed_reason`）。观测条件不足时 fail closed，记原因，不下结论。
+
+**它不改变检测行为。** `outcome` 恒为 `dead_control`，不压制发现、不自动降级，产出只是 9–11 行
+evidence。也就是说它不减少噪音，只让噪音可归类——这一点必须写下来：条目原先叫「假阳性豁免」，
+而首次核查它的人（读过全部代码）仍先入为主地以为它会豁免假阳性，读到返回值才发现不是。
+一个看起来「1600 行、测试齐全、随时可用」的簇，最容易被误当成能直接减噪的现成件。
+
+**落地前需要重构**，当前形态不达标：护栏是 18 个分支的 `else if` 链、19 处 `failClosedReason`
+散落赋值、最深缩进 12 空格；`fillOneSafeFormField` 147 行，长过它服务的编排函数。
+14 种 fail-closed 原因对 3 种结论，这个比例本身说明观测很脆弱。测试比 1:1.73 是这簇唯一超出常规的优点。
 
 未切原因：找不到「现状哪次失败能归因于缺它」。dead control 假阳性目前有失败归因的是**自指链接**
 那一类（品牌 logo 链到当前页、`href="#"`），已由 #64 以 `no_op_self_target` 落地；
 「初始禁用的提交按钮」这一子类尚无实测案例。这与 B / C 是同一条判据，不是技术判断。
 
-**推翻条件**：出现一次实测的、由初始禁用控件造成的假 P1。届时先确认 #64 的自指豁免没有覆盖它。
+**推翻条件**：出现一次实测的、由初始禁用控件造成的假 P1，**且那次假阳性确实产生了分诊成本**。
+两个条件都要满足——因为这段代码不会让那条 finding 消失，只会让它更好归类，所以只有「归类不动
+造成了实际浪费」才构成理由。届时先确认 #64 的自指豁免没有覆盖它，再按上一段重构后落地。
 
 ### 其余散件
 

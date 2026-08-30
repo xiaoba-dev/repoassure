@@ -57,7 +57,14 @@ server.close(() => process.exit(0));
       };
 
       expect(exitCode).toBe(0);
-      expect(stderr).toBe('');
+      /* No --run-dir is passed here, so the CLI writes into the target repo's
+         own .hardening directory and warns about it on stderr. This was
+         `toBe('')` until the --run-dir option shipped; it went stale unnoticed
+         because HARDENING_E2E_BROWSER left this file skipped in CI. The other
+         two runHardening callers that hit the same default path already
+         assert this way (tests/integration/cli-run.test.ts,
+         tests/e2e/run-data-url.e2e.test.ts). */
+      expect(stderr).toContain('Writing run artifacts into');
       expect(output.explore.artifactFiles.length).toBeGreaterThan(0);
       expect(output.explore.artifactFiles.some((file) => file.endsWith('.trace.zip'))).toBe(true);
       expect(output.explore.interactions).toEqual(['Click "Save"']);

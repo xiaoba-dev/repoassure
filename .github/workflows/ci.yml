@@ -49,11 +49,38 @@ jobs:
       - name: External AI IDE MCP config
         run: pnpm test:mcp-external-config
 
+      # HARDENING_E2E_BROWSER gates the one test that launches a real Chromium
+      # (tests/e2e/run-browser.e2e.test.ts); every other suite runs regardless.
+      # PLAYWRIGHT_BROWSERS_PATH is set explicitly, not left to Playwright's
+      # default, so the cache key below and the browser Chromium actually
+      # launches from agree on where it lives.
+      - name: Get Playwright version
+        id: playwright-version
+        run: echo "version=$(node -e "console.log(require('playwright/package.json').version)")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright Chromium
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
+
+      # Always runs, cache hit or not: --with-deps also apt-get-installs the
+      # OS libraries Chromium needs, and a hosted runner is a fresh VM on
+      # every job, so skipping this on a binary-cache hit would silently
+      # drop the OS packages that only a cache miss happened to reinstall.
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
+
       # Unit tests plus the two MCP gates above leave 40 test files unrun,
       # including the packed-CLI install check and every playbook / goal:recover
       # integration test. Those suites only ever ran on a maintainer's machine.
       - name: Full test suite
         run: pnpm test
+        env:
+          HARDENING_E2E_BROWSER: '1'
+          PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
 
       - name: Typecheck
         run: pnpm typecheck

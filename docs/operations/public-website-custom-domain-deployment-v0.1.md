@@ -96,3 +96,21 @@ Both records are proxied through Cloudflare.
 ## Next Action
 
 Keep monitoring custom domain availability and continue public release gates separately. This verified custom domain deployment does not close legal, trademark, branch protection / equivalent ruleset, final maintainer publication authorization, npm publication, GitHub release, SaaS, Team Cloud, Enterprise, hosted dashboard, or public launch gates.
+
+## 2026-08-30 - production branch correction, and the redesign deployment
+
+The `wrangler pages deploy` command documented above used `--branch main`, and that matched the working tree's default branch at the time. It does not match the Cloudflare Pages project's actual production branch. `wrangler pages deployment list --project-name repoassure-preview` shows every deployment with `--branch preview` reported as `Environment: Production`, and every deployment with `--branch main` reported as `Environment: Preview` — the reverse of what the branch names suggest. Deploying with `--branch main`, as this record's own command does, produces an unlisted `*.repoassure-preview.pages.dev` preview deployment and leaves the custom domain untouched. The corrected command:
+
+```
+wrangler pages deploy apps/website/dist --project-name repoassure-preview --branch preview --commit-dirty=true --commit-message "<what changed>"
+```
+
+This same day, that corrected command shipped the design-system-v2 redesign to `repoassure.com`, replacing the pre-redesign build this record originally verified (hero: "Assure every AI-generated repo before it ships"; a false "signed" claim on stored artifacts; a stale "38 actions" repair-plan count). Deployment id `24706cf2-b181-46a5-a207-df632cc19b8c`, `Environment: Production`, `Branch: preview`.
+
+Verified against the live domain after deploy, not against a local build:
+
+- `wrangler pages deployment list --project-name repoassure-preview` lists the new deployment as `Production` / `preview`.
+- Fetching `https://repoassure.com` returns the redesigned hero ("Is this AI-generated repo ready to ship?"), the "Content-hashed" badge, and no occurrence of "signed".
+- `REPOASSURE_WEBSITE_URL=https://repoassure.com pnpm verify:website` exits `0` against the live domain: `robots: index,follow` intact, both locale headings present, zero horizontal overflow, all metadata URLs resolve.
+
+This closes the reconciliation ADR-0047 called for in its own Follow-up section ("the site currently serves a pre-redesign build") and corrects this record's deploy command for whoever runs it next. It does not authorize npm publication, GitHub release, public launch, customer contact, or commercial/hosted availability claims — the Non-Authorization Boundary above still applies in full.

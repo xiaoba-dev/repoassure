@@ -1805,3 +1805,13 @@ ADR-0046 里两条指向 `docs/operations/public-website-design-work-deferred-v0
 维护者明确委托 Claude 执行 MCP 人工验收门禁并做出判定。最终判定为 **accepted**，全程厂商软件闭环：真实安装的 Cursor 桌面客户端 UI 中确认 13 个工具与 registry 完全一致、无任何 `blocked_goal` 工具，厂商 CLI 的 `mcp list-tools` 二次确认（含各工具参数签名）；受限的单次 `analyze_repo` 调用由 Cursor 自己的 agent CLI 依同一份用户级配置发起，只写入 disposable 目录的 `repo-profile.json`，源码检出未被改动。桌面聊天框无法由自动化输入（click 层级限制），headless 前两次尝试被审批门拒绝、第三次在 MCP 批准下完成；SDK harness 的过渡证据被厂商客户端调用取代，不再承载任何判据。
 
 执行中抓到该门禁本应抓的漂移：runbook、evidence 模板、SPEC、architecture overview、PLAN 与 ADR-0044 仍写 11 个工具，而 ADR-0045（#78）已加入两个 security 工具、实际 13——与记录同一变更修正，`productToolNames` 契约补齐。证据文件明确标注受托执行、非独立人工验证；临时 CLI 权限条目用后即撤，临时客户端配置在检查完成后按显式决定移除。该决策不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。
+
+## 2026-08-30 - 网站重设计部署上线，并修正一直写错的生产分支
+
+用户明确授权：把当前主干构建（design-system-v2 重设计）部署到 `repoassure.com`。ADR-0047 已授权该站点可公开访问、可被索引，但明确把「部署」列为独立于「可访问性」的另一道闸门，要求单独授权——这次授权正对应那道闸门，不涉及 npm publication、GitHub release、repository visibility、SaaS/hosted 声明等 ADR-0047 仍未授权的范围。
+
+部署本身发现一个此前一直写错的事实：`docs/operations/public-website-custom-domain-deployment-v0.1.md` 记录的部署命令用 `--branch main`，但 `wrangler pages deployment list` 显示真正绑定生产环境（`Environment: Production`）的是 `--branch preview`——`--branch main` 产生的其实是没人看得到的 Preview 部署。按文档原样操作过一次，3 分钟超时、且未产生任何部署记录（`wrangler pages deployment list` 复核确认零残留）；用户改用修正后的分支自行执行命令后确认生效。
+
+三处独立证据确认生效：`wrangler pages deployment list` 显示新部署 `24706cf2` 为 `Production`/`preview`；直接访问 `https://repoassure.com` 确认新版标题、Trust Ledger、配色已生效；`REPOASSURE_WEBSITE_URL=https://repoassure.com pnpm verify:website` 对生产域名 exit 0。此前线上一直挂着的虚假 "signed" 声明（应为 "content-hashed"）和过期的 "38 actions" 计数同时被替换。
+
+部署命令本身在 auto mode 分类器下被拒绝执行，未尝试绕过；改为把核实过的正确命令交给用户在其终端自行执行。已把分支修正记入 `docs/operations/public-website-custom-domain-deployment-v0.1.md`，供下一次部署直接使用正确命令，不再依赖这条会话记忆。该决策只授权这一次部署与相应文档修正，不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims；ADR-0047 的 Non-Authorization Boundary 原样适用。

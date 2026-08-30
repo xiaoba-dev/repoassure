@@ -13812,3 +13812,12 @@ Phase 0：项目初始化。
 - Rebase 修正：本轮开 PR 后 #75（ADR-0043，repair workflow CLI/MCP 接线）先合入 main，造成两处必须修的碰撞——ADR 编号 0043 被占用，本记录改编为 ADR-0044；MCP 工具面从 8 变为 11（新增 `prepare_repair_handoff`、`preview_repair_execution`、`generate_repair_patch_plan`，均为产品工具）。所有「恰好八个」的现状声明已按 11 更新，dated 记录保留原数字并加注。ADR-0044 的判据改为写规则而不是写数字：能帮助回答「仓库能否发布」的工具才属于这个面。
 - Boundary：只移除一个 transport。recovery lifecycle 未被移除——`packages/acceptance` 的八个 stage writers、`pnpm goal:recover:*` 脚本与 artifact schema 均未改动，ADR-0033 至 ADR-0040 继续有效。2026-07-14 的 Codex 人工验收针对已移除的 surface，保留为历史记录并重新打开该门禁；不声明任何 signed artifact、SaaS/hosted availability，也不授权 npm publication、GitHub release、public launch、客户联系、pricing/spend 或 repository visibility 变更。
 
+## 2026年8月29日 - ADR 编号碰撞与悬空链接
+
+### TDD 记录
+
+- Red：新增 ADR trail 契约测试后失败——`0022` 与 `0023` 各对应两个文件，且未入索引的一方在索引里查无此项。
+- Green：未入索引的两个记录改号为 ADR-0046 / ADR-0047 并补进索引；三处按文件名的入链跟随更新；ADR-0046 里两条指向未合并分支文档的链接改为普通引用加 inventory 指路。
+- 契约加宽：最初只扫 `docs/adr/` 内部链接，`packages/design-system/README.md` 与 `apps/website/README.md` 的入链因此漏掉；改为全仓扫描指向 `docs/adr/` 的链接。两个方向都做了反向验证——把入链改回旧名、以及再造一次重号，测试都会失败。
+- Boundary：不改任何 ADR 的结论、状态或边界，不搬运未合并分支材料，不授权发布、launch、客户联系或商业/hosted claims。
+

@@ -25,7 +25,7 @@ describe('project intelligence path filtering', () => {
     expect(isIgnoredSnapshotPath('src/adapters/cli/run.ts')).toBe(false);
     expect(isIgnoredSnapshotPath('packages/acceptance/src/goal-audit.ts')).toBe(false);
     expect(isIgnoredSnapshotPath('apps/website/src/App.tsx')).toBe(false);
-    expect(isIgnoredSnapshotPath('docs/adr/0022-repoassure-design-system-v2-and-information-architecture.md')).toBe(false);
+    expect(isIgnoredSnapshotPath('docs/adr/0046-repoassure-design-system-v2-and-information-architecture.md')).toBe(false);
   });
 
   it('does not ignore a path merely because a segment contains an ignored name', () => {

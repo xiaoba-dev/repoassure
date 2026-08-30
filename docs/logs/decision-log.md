@@ -1787,3 +1787,16 @@ Import 仍不运行扫描器、不联网、不上传目标 repo、不创建 issu
 同时记录两条切片方法教训：依赖闭包必须查到字段级（只验 `import` 解析会漏 schema 不兼容），以及判断内容是否已落地不能跟移动的靶子比（squash 改哈希，`git cherry` / 文件比对 / patch 反向套用三种方法都会假阳性，可靠来源是 GitHub PR 状态）。
 
 该决策只新增记录，不改产品行为、artifact schema 或对外接口，也不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。
+
+## 2026-08-29 - 解决 ADR 编号碰撞并补齐索引
+
+`docs/adr/` 的编号靠人工取下一个空号，没有防重机制，结果 0022 和 0023 各自命名了两个不同的决策。每对里有一个从未进入 `docs/adr/README.md` 索引。
+
+保留已入索引的一方（`0022-equivalent-release-control`、`0023-solo-maintainer-branch-protection`），把未入索引的一方改号：design system v2 与 IA 重构 → **ADR-0046**，public marketing site reachability boundary → **ADR-0047**，并补进索引。核对过全仓所有 `ADR-0022` / `ADR-0023` 文字引用，指向的都是保留的一方，因此改号不影响它们；按文件名的入链有三处（`0047` 自身、`packages/design-system/README.md`、`apps/website/README.md`）已跟随更新。
+
+ADR-0046 里两条指向 `docs/operations/public-website-design-work-deferred-v0.1.md` 与 `repoassure-design-system-v2-unfreeze-v0.1.md` 的链接是断的——这两份文档只存在于未合并的 `design-system-v2` 分支（commit `22f65f3`），ADR 本体则经 PR #66 单独进了 main。不把未合并材料搬进来，改为普通引用并指向 PR #80 的 unmerged branch inventory。
+
+`tests/unit/project-structure.test.ts` 新增一条契约：编号不得重复、索引与目录双向一致、**全仓**指向 `docs/adr/` 的 markdown 链接必须可解析。最后一条是关键——只查 `docs/adr/` 内部链接会漏掉 `packages/` 和 `apps/` 的入链，本轮三处残留里有两处正是这样藏住的。
+
+该决策只调和 ADR 编号与链接，不改变任何 ADR 的结论、状态或边界，也不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。
+

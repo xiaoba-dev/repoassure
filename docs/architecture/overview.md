@@ -286,7 +286,7 @@ ADR-0028 adds a proposal layer after replay readiness: replay readiness -> targe
 
 ## MCP Product Tool Boundary
 
-`src/adapters/mcp/tool-registry.ts` is the transport adapter above the hardening tools. It publishes exactly eleven product tools — `analyze_repo`, `boot_app`, `stop_app`, `explore_app`, `generate_tests`, `generate_repair_plan`, `prepare_repair_handoff`, `preview_repair_execution`, `generate_repair_patch_plan`, `harden_report`, `run_hardening` — and each delegates to its `src/tools/*-tool.ts` implementation. The adapter does not expose a tool that mutates target repository source or applies a repair patch.
+`src/adapters/mcp/tool-registry.ts` is the transport adapter above the hardening tools. It publishes exactly thirteen product tools — `analyze_repo`, `boot_app`, `stop_app`, `explore_app`, `generate_tests`, `generate_repair_plan`, `prepare_repair_handoff`, `preview_repair_execution`, `generate_repair_patch_plan`, `list_security_providers`, `import_security_evidence`, `harden_report`, `run_hardening` — and each delegates to its `src/tools/*-tool.ts` implementation. The adapter does not expose a tool that mutates target repository source or applies a repair patch.
 
 The blocked-goal recovery lifecycle has no MCP boundary. `src/adapters/mcp/blocked-goal-recovery-tools.ts` and its eight stage tools were removed by [ADR-0044](../adr/0044-blocked-goal-recovery-mcp-surface-removal.md), which supersedes ADR-0041; the containment and atomic-write guarantees that file provided went with it, because they were properties of that adapter rather than of the lifecycle. The lifecycle stages remain in `packages/acceptance` and are reached through the `pnpm goal:recover:*` scripts.
 

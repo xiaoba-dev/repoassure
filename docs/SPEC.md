@@ -156,7 +156,7 @@ The schema is `repoassure.blocked-goal-recovery-resume-attempt-task-package.v1`.
 
 ## MCP Product Tool Surface v0.1
 
-`src/adapters/mcp/tool-registry.ts` advertises exactly eleven product tools: `analyze_repo`, `boot_app`, `stop_app`, `explore_app`, `generate_tests`, `generate_repair_plan`, `prepare_repair_handoff`, `preview_repair_execution`, `generate_repair_patch_plan`, `harden_report`, and `run_hardening`. The server's `instructions` string describes that surface and states that the tools do not modify target repository source or apply repair patches.
+`src/adapters/mcp/tool-registry.ts` advertises exactly thirteen product tools: `analyze_repo`, `boot_app`, `stop_app`, `explore_app`, `generate_tests`, `generate_repair_plan`, `prepare_repair_handoff`, `preview_repair_execution`, `generate_repair_patch_plan`, `list_security_providers`, `import_security_evidence`, `harden_report`, and `run_hardening`. The server's `instructions` string describes that surface and states that the tools do not modify target repository source or apply repair patches.
 
 The blocked-goal recovery lifecycle is not exposed over MCP. Its eight stage tools and the `repoassure.mcp-blocked-goal-recovery-tool-result.v1` envelope were removed with `src/adapters/mcp/blocked-goal-recovery-tools.ts` by [ADR-0044](adr/0044-blocked-goal-recovery-mcp-surface-removal.md), which supersedes ADR-0041. The lifecycle stages remain in `packages/acceptance` and are driven by the `pnpm goal:recover:*` scripts documented in `docs/operations/blocked-goal-recovery-mcp-surface-v0.1.md`; their artifact schemas are unchanged.
 

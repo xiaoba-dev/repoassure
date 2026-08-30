@@ -3827,6 +3827,7 @@ describe('project structure', () => {
       'analyze_repo', 'boot_app', 'stop_app', 'explore_app',
       'generate_tests', 'generate_repair_plan', 'prepare_repair_handoff',
       'preview_repair_execution', 'generate_repair_patch_plan',
+      'list_security_providers', 'import_security_evidence',
       'harden_report', 'run_hardening'
     ];
     for (const toolName of productToolNames) expect(joined).toContain(toolName);

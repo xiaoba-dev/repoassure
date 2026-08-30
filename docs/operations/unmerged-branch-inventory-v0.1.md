@@ -11,6 +11,9 @@
 
 这份清单把那些判断从分支搬进仓库，使删除分支变成可逆操作。
 
+分支已于 2026-08-30 删除，代码本身归档在 [`archive/branches/`](../../archive/branches/)。恢复方法见该目录的 README；
+但多数时候需要的是本文档记录的判断，不是那些代码。
+
 **已合并的分支不在此列。** 它们的内容在 `main` 上，理由在 ADR 与 decision log 里，
 分支名到 PR 的映射由 GitHub 永久保留（已验证：#74–#78 的分支已从远端删除，PR 仍带 `headRefName`）。
 为它们再写文档只会加重本仓库最重的那一部分，且没有可归因的失败。
@@ -161,7 +164,7 @@ design-system-v2 上的 .autopilot
 | `codex/security-provider-*`（2 个 ref，同一提交 `7db3a18`） | 可删；PR #62 已关闭，内容由 #78 重切落地 |
 | `codex/backup-main-before-pr1-sync-20260625` | 备份快照，落后 129；reflog 与 GitHub 已覆盖 |
 | 4 个零提交领先的无 PR 分支 | 可删 |
-| `design-system-v2` | **保留至打 tag 为止**，本文档生效后可放手 |
+| `design-system-v2` | **已于 2026-08-30 删除**；内容归档于 [`archive/branches/design-system-v2-2026-08-29.bundle`](../../archive/branches/)，顶端 `f73065c` |
 
 ## 边界
 

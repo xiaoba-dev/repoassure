@@ -5,7 +5,7 @@
 
 ## 这份文档为什么存在
 
-`design-system-v2` 是三簇产品工作与一批治理轨迹的**唯一载体**，落后 `main` 81 个提交且还在增加。
+`design-system-v2` 是四簇产品工作与一批治理轨迹的**唯一载体**，落后 `main` 81 个提交且还在增加。
 分支是这类东西的坏容器：它会腐烂、搜不到、合并成本每周上升，而且一旦有人认为「太旧了删掉吧」，
 连同「这些是什么、为什么没切」的判断一起消失——那些判断是一轮跨厂商对抗辩论加一次逐簇分拣才得出的。
 
@@ -29,6 +29,13 @@
 | design-system CSS type smoke | #74 |
 
 ## 未落地的部分
+
+> 2026-08-30 补记：本节原有四条，遗漏了 conditional dead control（见下）。
+> 遗漏原因可归因：初次盘点以未跟踪文件为线索（归档提交记录「76 个文件中 75 个未跟踪」），
+> 而该簇是对两个**已跟踪**文件的修改，落在那条线索之外。
+> 复核方法：以 `git diff --name-status <archive-tag> origin/main` 全量比对文件集，
+> 再对每个差异文件用标识符在 `main` 上做绝对存在性检查，不要只盘点未跟踪文件。
+
 
 ### B — false-positive 回归目录与检测器校准契约
 
@@ -84,6 +91,35 @@ schema 演进；并且 `run-repair-handoff.ts` 两侧独立演进过——`main`
 因此也无法脱离这次 schema 演进单独落地。
 
 **推翻条件**：决定演进这三份契约。届时这是一个独立 goal，不是某个入口改动的副作用。
+
+### conditional dead control — 表单前置条件感知的假阳性豁免
+
+实现 593 行、测试 1027 行，落在 `packages/browser-explorer` 的 playwright driver 与其单测上；
+另有合成 fixture 3 个文件（`tests/fixtures/conditional-dead-control-synthetic/` 与其专项测试），
+以及 42 个文件的治理轨迹（14 个 `.autopilot` goal、24 份 authorization intake / maintainer
+decision record / completion audit 文档）。
+
+点击一个初始 `disabled` 的提交按钮不会产生可观察变化，现状会把它记为 P1 `dead_control`。
+这一簇先观察该控件是否存在「安全的脏态转换」（填入安全字段后是否变为 enabled），据此归类为
+`false_positive_candidate` / `actionable_conditional_dead_control` / `needs_maintainer_review`，
+并把判定依据写进 evidence（`conditional_dead_control.prerequisite.*`、`.classification`、
+`.fail_closed_reason`）。无法安全判定时 fail closed，不做豁免。
+
+未切原因：找不到「现状哪次失败能归因于缺它」。dead control 假阳性目前有失败归因的是**自指链接**
+那一类（品牌 logo 链到当前页、`href="#"`），已由 #64 以 `no_op_self_target` 落地；
+「初始禁用的提交按钮」这一子类尚无实测案例。这与 B / C 是同一条判据，不是技术判断。
+
+**推翻条件**：出现一次实测的、由初始禁用控件造成的假 P1。届时先确认 #64 的自指豁免没有覆盖它。
+
+### 其余散件
+
+全量比对后剩下 7 个文件，不构成独立簇，随分支归档：
+
+| 文件 | 归属 | 处置理由 |
+| --- | --- | --- |
+| `run-autopilot-progress-consistency.ts` 及其 2 个测试（679 行） | autopilot 目标模型 | 与 F 剩余同因：#73 后干净检出没有 `.autopilot`，读不到输入 |
+| `project-intelligence-watch-{e2e-fixture,recovery-ux-smoke,operator-playbook}.test.ts`（606 行） | #77 已落地的 watch | 主体在 `main`，这是未随之落地的额外覆盖；需要时可单独补测，不必从分支取 |
+| `adr-cascade-controlled-remediation.test.ts`（139 行） | #69 已落地的 ADR cascade | 同上 |
 
 ## 合并前必须处理的两点
 

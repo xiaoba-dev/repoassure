@@ -51,7 +51,7 @@ async function createDaemonRepo(): Promise<string> {
     join(root, 'server-daemon.mjs'),
     `
 import http from 'node:http';
-import { writeFile } from 'node:fs/promises';
+import { rename, writeFile } from 'node:fs/promises';
 
 const server = http.createServer((_, response) => {
   response.writeHead(200, { 'content-type': 'text/plain' });
@@ -59,7 +59,12 @@ const server = http.createServer((_, response) => {
 });
 
 server.listen(0, '127.0.0.1', async () => {
-  await writeFile(new URL('./port.txt', import.meta.url), String(server.address().port));
+  // Publish the port atomically: a poller that sees the final name must also see
+  // its contents. Writing in place lets existsSync observe the file between
+  // creation and the content reaching it, which reads back as an empty port.
+  const tmpPath = new URL('./port.txt.tmp', import.meta.url);
+  await writeFile(tmpPath, String(server.address().port));
+  await rename(tmpPath, new URL('./port.txt', import.meta.url));
 });
 `
   );
@@ -77,15 +82,20 @@ const child = spawn(process.execPath, [new URL('./server-daemon.mjs', import.met
 child.unref();
 
 const portPath = new URL('./port.txt', import.meta.url).pathname;
-const deadline = Date.now() + 10000;
-while (!existsSync(portPath)) {
+const deadline = Date.now() + 20000;
+let port = '';
+while (!port) {
+  if (existsSync(portPath)) {
+    port = readFileSync(portPath, 'utf8').trim();
+  }
+  if (port) {
+    break;
+  }
   if (Date.now() > deadline) {
     process.exit(1);
   }
   await delay(25);
 }
-
-const port = readFileSync(portPath, 'utf8').trim();
 console.log(\`Dev server running at http://127.0.0.1:\${port} (pid \${child.pid})\`);
 process.exit(0);
 `
@@ -147,7 +157,12 @@ describe('bootApp', () => {
     });
 
     try {
-      expect(session.status).toBe('running');
+      // The errors ride along so a CI-only failure says why, instead of only
+      // that 'failed' was not 'running'.
+      expect({ status: session.status, errors: session.errors }).toEqual({
+        status: 'running',
+        errors: []
+      });
       expect(session.daemon).toBe(true);
       expect(session.url).toMatch(/^http:\/\/127\.0\.0\.1:\d+$/);
 

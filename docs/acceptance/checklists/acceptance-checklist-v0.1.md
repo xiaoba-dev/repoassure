@@ -344,8 +344,8 @@
 
 - [x] A bounded, non-writing maintainer runbook and redacted evidence template exist, updated on 2026-08-28 for the current product tool surface.
 - [x] The 2026-07-14 Codex record is preserved unedited as a dated record of the retired recovery MCP surface and is marked as such.
-- [ ] A maintainer discovers the exact advertised product tool set in a real installed client, with no `blocked_goal` tool listed.
-- [ ] The client calls only `analyze_repo` against a disposable directory; the only file written is that directory's `.hardening/run/repo-profile.json` and the source checkout is unchanged.
-- [ ] The maintainer explicitly records an accepted, changes_requested, or deferred decision and removes or retains the temporary MCP configuration by explicit decision.
+- [x] The exact advertised product tool set was discovered in a real installed client (Cursor desktop UI, confirmed again by the vendor CLI tool listing), with no `blocked_goal` tool listed — recorded 2026-08-29 as delegated evidence, performed by Claude at the maintainer's request.
+- [x] The client called only `analyze_repo` against a disposable directory — made by Cursor's own agent CLI against the same user-level configuration; the only file written was that directory's `.hardening/run/repo-profile.json` and the source checkout was unchanged.
+- [x] A decision is recorded: `accepted` (2026-08-29, delegated, rationale in the dated evidence record); the temporary configuration was removed after the check by explicit decision.
 
-This gate is open. ADR-0044 removed the tool the 2026-07-14 acceptance exercised, so that record does not carry forward to the current surface.
+This gate is closed by delegated evidence; the record itself states it is not independent human verification. ADR-0044 removed the tool the 2026-07-14 acceptance exercised, so that record does not carry forward to the current surface.

@@ -84,7 +84,7 @@ Plain-language explanation: the local product, website, and user-validation back
 Status: retired on 2026-08-28 by ADR-0044.
 
 - The eight recovery lifecycle tools are no longer advertised through MCP `tools/list` or callable through `tools/call`.
-- The MCP surface is product tools only: `analyze_repo`, `boot_app`, `stop_app`, `explore_app`, `generate_tests`, `generate_repair_plan`, `prepare_repair_handoff`, `preview_repair_execution`, `generate_repair_patch_plan`, `harden_report`, `run_hardening` (eight at the time of removal; ADR-0043 later added the three repair-workflow tools).
+- The MCP surface is product tools only: `analyze_repo`, `boot_app`, `stop_app`, `explore_app`, `generate_tests`, `generate_repair_plan`, `prepare_repair_handoff`, `preview_repair_execution`, `generate_repair_patch_plan`, `list_security_providers`, `import_security_evidence`, `harden_report`, `run_hardening` (eight at the time of removal; ADR-0043 added the three repair-workflow tools, ADR-0045 the two security-provider tools).
 - The recovery lifecycle itself was not removed: `packages/acceptance` still owns the stage writers and the `pnpm goal:recover:*` scripts still drive them under ADR-0033 through ADR-0040.
 
 ## Blocked Goal Recovery MCP External AI IDE Configuration Validation v0.1
@@ -109,11 +109,11 @@ PR #56 merged as `92ec9512e1132d4710f7b800e6ae907a720b7be5`; its PR quality gate
 
 ## Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1
 
-Status: completed for the retired surface on 2026-07-14; reopened on 2026-08-28 for the current surface.
+Status: completed for the retired surface on 2026-07-14; reopened on 2026-08-28; completed again on 2026-08-29 by a delegated run recorded as accepted.
 
 - A maintainer used Codex Desktop to discover the eight recovery tools then advertised and call only the disposable, non-executing recovery-package fixture. That dated record is preserved under `docs/acceptance/evidence/` and is not rewritten.
 - ADR-0044 removed those tools, so the 2026-07-14 acceptance no longer covers the surface a client sees today.
-- The runbook now checks the exact advertised product tool set and one non-mutating `analyze_repo` call against a disposable directory. It has not been re-run, so no manual acceptance is claimed for the current surface.
+- On 2026-08-29, at the maintainer's explicit delegation, Claude ran the updated gate against an installed Cursor client: thirteen-tool discovery confirmed in the desktop UI and the vendor CLI, and the single `analyze_repo` call made by Cursor's own agent wrote only the disposable directory's profile. The dated record labels itself delegated evidence, not independent human verification.
 
 ## Public Release Manual Gate Closure v0.2
 

@@ -26,7 +26,8 @@ describe('blocked goal recovery MCP real AI IDE manual acceptance contract', () 
     expect(plan).toMatch(
       /## Next Codex Goal\n\nSecurity Assurance Lane Provider Import Ergonomics v0\.1/u
     );
-    expect(operation).toContain('not yet re-run');
+    expect(operation).toContain('completed on 2026-08-29 by a delegated run recorded as accepted');
+    expect(operation).toContain('Recorded Evidence (Current Surface)');
     expect(operation).toContain('pnpm --silent mcp:config -- --client codex');
     expect(operation).toContain('one bounded, non-mutating call');
     expect(operation).toMatch(/no `blocked_goal` tool appears/iu);
@@ -47,7 +48,7 @@ describe('blocked goal recovery MCP real AI IDE manual acceptance contract', () 
     expect(evidence).not.toContain('/private/tmp');
     expect(evidence).not.toContain('/Users/');
     expect(checklist).toContain('Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1');
-    expect(checklist).toContain('This gate is open.');
+    expect(checklist).toContain('This gate is closed by delegated evidence');
     expect(readme).toContain('脱敏证据作为历史记录保留、不再代表当前面的验收');
     expect(strategy).toContain('Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1');
   });

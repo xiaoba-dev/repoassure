@@ -1,6 +1,6 @@
 # MCP Real AI IDE Manual Acceptance v0.1
 
-Status: runbook updated on 2026-08-28 for the current MCP surface; not yet re-run
+Status: completed on 2026-08-29 by a delegated run recorded as accepted; see Recorded Evidence
 
 > Historically titled *Blocked Goal Recovery MCP Real AI IDE Manual Acceptance v0.1*. The
 > procedure below previously required discovering eight blocked-goal recovery tools and calling
@@ -41,7 +41,7 @@ Copy only the generated `repoassure` entry into the selected client's documented
 ## Manual Check
 
 1. Restart or reload the selected AI IDE only as required by that client.
-2. Confirm the client shows the `repoassure` server and lists exactly these eleven product tools: `analyze_repo`, `boot_app`, `stop_app`, `explore_app`, `generate_tests`, `generate_repair_plan`, `prepare_repair_handoff`, `preview_repair_execution`, `generate_repair_patch_plan`, `harden_report`, `run_hardening`. Confirm no `blocked_goal` tool appears.
+2. Confirm the client shows the `repoassure` server and lists exactly the product tools `src/adapters/mcp/tool-registry.ts` advertises — currently thirteen: `analyze_repo`, `boot_app`, `stop_app`, `explore_app`, `generate_tests`, `generate_repair_plan`, `prepare_repair_handoff`, `preview_repair_execution`, `generate_repair_patch_plan`, `list_security_providers`, `import_security_evidence`, `harden_report`, `run_hardening`. Confirm no `blocked_goal` tool appears.
 3. Create a disposable copy of a small throwaway web project outside the checkout, for example `cp -R <small-sample-app> /tmp/repoassure-mcp-manual-acceptance`.
 4. In the AI IDE, call only `analyze_repo` with `root` set to the absolute path of that disposable directory.
 5. Confirm the result is a repository profile and that the only file written is `.hardening/run/repo-profile.json` inside the disposable directory.
@@ -59,6 +59,19 @@ An `accepted` decision requires all of the following:
 - the maintainer explicitly chose `accepted` with a concrete rationale.
 
 `changes_requested`, `deferred`, or missing evidence keeps this gate open. A passing automated SDK test, a generated configuration, or a client configuration that has merely been saved is not manual acceptance.
+
+## Recorded Evidence (Current Surface)
+
+On 2026-08-29, at the maintainer's explicit delegation, Claude ran this gate and recorded
+`accepted`: `../acceptance/evidence/mcp-real-ai-ide-manual-acceptance-v0.1-2026-08-29.md`.
+Discovery of the full thirteen-tool product surface was confirmed in the installed desktop
+client's own UI and again by the vendor CLI's tool listing, with no `blocked_goal` tool present.
+The bounded `analyze_repo` call was made by Cursor's own agent CLI against the same user-level
+configuration, wrote only the disposable directory's `repo-profile.json`, and left the source
+checkout unchanged. The run also caught the eleven-versus-thirteen documentation drift, which is
+corrected alongside the record. The record is explicitly delegated evidence, not independent
+human verification; a maintainer-typed desktop run remains a strictly stronger form of the same
+evidence if ever wanted.
 
 ## Historical Evidence (Retired Surface)
 

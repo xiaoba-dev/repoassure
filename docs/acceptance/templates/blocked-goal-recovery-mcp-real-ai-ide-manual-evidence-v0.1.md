@@ -23,7 +23,7 @@ Decision: pending | accepted | changes_requested | deferred
 ## Tool Discovery Evidence
 
 - The client showed a `repoassure` MCP server as available: yes | no
-- The client listed exactly these eleven product tools:
+- The client listed exactly the product tools the registry advertises (currently thirteen):
   - `analyze_repo`
   - `boot_app`
   - `stop_app`
@@ -33,6 +33,8 @@ Decision: pending | accepted | changes_requested | deferred
   - `prepare_repair_handoff`
   - `preview_repair_execution`
   - `generate_repair_patch_plan`
+  - `list_security_providers`
+  - `import_security_evidence`
   - `harden_report`
   - `run_hardening`
 - No `blocked_goal` tool was listed: yes | no

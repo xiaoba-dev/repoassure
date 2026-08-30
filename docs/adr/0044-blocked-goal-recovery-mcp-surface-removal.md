@@ -43,7 +43,8 @@ Retire the MCP adapter for the blocked-goal recovery lifecycle, and supersede AD
 
 The MCP surface is product tools only. At the time of the removal that was eight; ADR-0043
 subsequently added `prepare_repair_handoff`, `preview_repair_execution`, and
-`generate_repair_patch_plan`, so the surface is now eleven: `analyze_repo`, `boot_app`, `stop_app`, `explore_app`, `generate_tests`, `generate_repair_plan`, `prepare_repair_handoff`, `preview_repair_execution`, `generate_repair_patch_plan`, `harden_report`, and `run_hardening`. The count is not the decision —
+`generate_repair_patch_plan`; ADR-0045 later added `list_security_providers` and
+`import_security_evidence`. The count is not the decision —
 the rule is: a tool belongs on this surface when it helps answer whether a repository is ready
 to ship. Nothing is added here; this record ratifies a removal that already shipped and states
 the boundary the surface holds.

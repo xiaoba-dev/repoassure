@@ -13821,3 +13821,12 @@ Phase 0：项目初始化。
 - 契约加宽：最初只扫 `docs/adr/` 内部链接，`packages/design-system/README.md` 与 `apps/website/README.md` 的入链因此漏掉；改为全仓扫描指向 `docs/adr/` 的链接。两个方向都做了反向验证——把入链改回旧名、以及再造一次重号，测试都会失败。
 - Boundary：不改任何 ADR 的结论、状态或边界，不搬运未合并分支材料，不授权发布、launch、客户联系或商业/hosted claims。
 
+## 2026年8月29日 - MCP 人工验收受托执行（accepted）与工具面 13 修正
+
+### TDD 记录
+
+- Red：对真实 Cursor 客户端执行验收时，客户端显示 13 个工具，而 runbook step 2 要求「exactly these eleven」——#78 新增的两个 security 工具没有进入 #76 之后的任何验收文档；`productToolNames` 也只列 11 个（toContain 断言静默放行）。
+- Green：SPEC、architecture overview、PLAN、runbook、evidence 模板、ADR-0044 全部改为 13 个或 registry 锚定表述；`productToolNames` 补齐两个工具名。
+- 证据链：桌面 UI 逐屏确认工具列表 → 厂商 CLI `mcp list-tools` 二次确认 → `cursor-agent` headless 受限调用 `analyze_repo`（前两次被审批门自动拒绝，`--sandbox enabled` 下经 MCP 批准完成；未启用 shell 强制放行以外的能力，临时权限条目用后即撤）→ 前后文件树对比与 `git status` 验证副作用边界。
+- 判定：accepted（受托执行，dated evidence 记录归属与范围；非独立人工验证）。临时客户端配置在检查完成后移除。
+- Boundary：不改任何 artifact schema 或工具实现；不授权发布、launch、客户联系或商业/hosted claims。

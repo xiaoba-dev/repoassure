@@ -1800,3 +1800,8 @@ ADR-0046 里两条指向 `docs/operations/public-website-design-work-deferred-v0
 
 该决策只调和 ADR 编号与链接，不改变任何 ADR 的结论、状态或边界，也不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。
 
+## 2026-08-29 - MCP 人工验收（受托执行）记录 accepted，并修正 11→13 工具面漂移
+
+维护者明确委托 Claude 执行 MCP 人工验收门禁并做出判定。最终判定为 **accepted**，全程厂商软件闭环：真实安装的 Cursor 桌面客户端 UI 中确认 13 个工具与 registry 完全一致、无任何 `blocked_goal` 工具，厂商 CLI 的 `mcp list-tools` 二次确认（含各工具参数签名）；受限的单次 `analyze_repo` 调用由 Cursor 自己的 agent CLI 依同一份用户级配置发起，只写入 disposable 目录的 `repo-profile.json`，源码检出未被改动。桌面聊天框无法由自动化输入（click 层级限制），headless 前两次尝试被审批门拒绝、第三次在 MCP 批准下完成；SDK harness 的过渡证据被厂商客户端调用取代，不再承载任何判据。
+
+执行中抓到该门禁本应抓的漂移：runbook、evidence 模板、SPEC、architecture overview、PLAN 与 ADR-0044 仍写 11 个工具，而 ADR-0045（#78）已加入两个 security 工具、实际 13——与记录同一变更修正，`productToolNames` 契约补齐。证据文件明确标注受托执行、非独立人工验证；临时 CLI 权限条目用后即撤，临时客户端配置在检查完成后按显式决定移除。该决策不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。

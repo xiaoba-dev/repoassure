@@ -164,7 +164,7 @@ design-system-v2 上的 .autopilot
 | `codex/security-provider-*`（2 个 ref，同一提交 `7db3a18`） | 可删；PR #62 已关闭，内容由 #78 重切落地 |
 | `codex/backup-main-before-pr1-sync-20260625` | 备份快照，落后 129；reflog 与 GitHub 已覆盖 |
 | 4 个零提交领先的无 PR 分支 | 可删 |
-| `design-system-v2` | **已于 2026-08-30 删除**；内容归档于 [`archive/branches/design-system-v2-2026-08-29.bundle`](../../archive/branches/)，顶端 `f73065c` |
+| `design-system-v2` | **已于 2026-08-30 删除**；内容双份归档，顶端 `f73065c`：bundle 见 [`archive/branches/`](../../archive/branches/)，tag `archive/design-system-v2-2026-08-29` 已推送至远端。两者都不要单独删除 |
 
 ## 边界
 

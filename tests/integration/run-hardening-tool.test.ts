@@ -1,8 +1,21 @@
 import { mkdir, mkdtemp, readdir, readFile, readlink, writeFile } from 'node:fs/promises';
+import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { runHardeningTool } from '../../src/tools/run-hardening-tool.js';
+
+async function reserveUnusedPort(): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const server = createServer();
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', () => {
+      const address = server.address();
+      const port = typeof address === 'object' && address ? address.port : 0;
+      server.close(() => resolve(port));
+    });
+  });
+}
 
 describe('runHardeningTool', () => {
   it('can run the hardening flow with an injected browser driver', async () => {
@@ -410,6 +423,47 @@ describe('runHardeningTool', () => {
       expect(createdFile.startsWith(join(runDir, 'run', 'generated-tests'))).toBe(true);
     }
     await expect(readFile(result.reportPath, 'utf8')).resolves.toContain('# hardening-mcp 硬化报告');
+  });
+
+  it('reports a provided URL as failed in boot-result.json when nothing answers it', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'hardening-run-tool-unreachable-url-'));
+
+    await writeFile(
+      join(root, 'package.json'),
+      JSON.stringify({
+        scripts: { dev: 'vite' },
+        devDependencies: { vite: '8.0.0' }
+      })
+    );
+
+    const unusedPort = await reserveUnusedPort();
+
+    await runHardeningTool({
+      root,
+      url: `http://127.0.0.1:${unusedPort}/`,
+      browserDriver: {
+        snapshot: async (url) => ({
+          url,
+          status: 0,
+          html: '',
+          bodyText: '',
+          links: [],
+          consoleErrors: [],
+          pageErrors: [],
+          failedRequests: [url],
+          artifactFiles: [],
+          interactions: []
+        }),
+        close: async () => undefined
+      }
+    });
+
+    const bootResult = JSON.parse(
+      await readFile(join(root, '.hardening', 'run', 'boot-result.json'), 'utf8')
+    ) as { status: string; url: string | null; errors: string[] };
+
+    expect(bootResult.status).toBe('failed');
+    expect(bootResult.errors.join(' ')).toContain('not reachable');
   });
 
   it('records default ports for already-running HTTP and HTTPS URLs', async () => {

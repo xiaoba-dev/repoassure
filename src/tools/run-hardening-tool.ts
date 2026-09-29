@@ -11,7 +11,7 @@ import { buildArtifactIntegrity } from '../domain/integrity/artifact-integrity.j
 import { generateRepairPlan } from '../domain/repair-plan/generate-repair-plan.js';
 import type { HardenReportResult } from '../domain/reports/harden-report.js';
 import type { ExploreBrowserDriver } from '../domain/explore/explore-app.js';
-import { normalizeClientUrl, type BootAppInput } from '../domain/boot/boot-app.js';
+import { isUrlReachable, normalizeClientUrl, type BootAppInput } from '../domain/boot/boot-app.js';
 import { redactSensitiveText } from '../shared/privacy-redaction.js';
 import type { RepairPlanGenerationResult } from '../types/repair-plan.js';
 
@@ -644,20 +644,22 @@ async function writeEmptyFindings(paths: RunPaths): Promise<ExploreAppToolResult
 
 async function writeExternalUrlBootResult(runDir: string, url: string): Promise<void> {
   const resultPath = join(runDir, 'boot-result.json');
+  const redactedUrl = redactSensitiveText(url);
+  const reachable = await isUrlReachable(url);
 
   await mkdir(runDir, { recursive: true });
   await writeFile(
     resultPath,
     `${JSON.stringify(
       {
-        status: 'running',
-        url: redactSensitiveText(url),
+        status: reachable ? 'running' : 'failed',
+        url: redactedUrl,
         port: readPort(url),
         logsPath: '',
         daemon: false,
         environment: 'provided-url',
         blockers: [],
-        errors: []
+        errors: reachable ? [] : [`Provided URL is not reachable: ${redactedUrl}`]
       },
       null,
       2

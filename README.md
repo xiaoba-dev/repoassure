@@ -431,7 +431,7 @@ Benchmark 会对每个 repo 执行完整 `run --browser`，并重启 fixture app
 - `docs/acceptance/user-acceptance-record.md`
 - `docs/testing/samples/sample-hardening-report.md`
 
-AI IDE / Agent 应优先读取 `.hardening/latest/manifest.json`，再按 `files.repairPlan`、`files.findings`、`files.report`、`files.generatedTests` 和 `files.artifacts` 消费物料。`repair-plan.json` 是 v0.2 的首选修复任务入口；`repair-handoff-package.json` 和 `verification-plan.md` 是从 run bundle 汇总后的执行交接入口；`repair-execution-report.json` 是 dry-run 或 validation-only 后的执行证据；`patch-plan.json` 是失败验证转成可审查补丁动作后的计划入口；`legacyPaths` 保留原有落盘路径，便于人工查看和兼容已有脚本。
+AI IDE / Agent 应优先读取 `.hardening/latest/manifest.json`，再按 `files.repairPlan`、`files.findings`、`files.report`、`files.generatedTests` 和 `files.artifacts` 消费物料。判断“0 个问题”是否可信时，先读 manifest 的 `coverage`：`coverage.boot`（`status`、`environment`、`url`、`port`、`errors`，来自本次 `boot-result.json`）说明应用有没有真正启动，`coverage.exploration`（`visitedRouteCount`、`visitedRoutes`、`interactionCount`）说明实际访问了哪些页面、做了多少次交互；启动失败或一个页面都没访问时 findings 为空并不代表应用没问题。`coverage` 中的 URL 和错误信息同样写入前脱敏，`--workspace-output` 复制出的 manifest 会保留它。`repair-plan.json` 是 v0.2 的首选修复任务入口；`repair-handoff-package.json` 和 `verification-plan.md` 是从 run bundle 汇总后的执行交接入口；`repair-execution-report.json` 是 dry-run 或 validation-only 后的执行证据；`patch-plan.json` 是失败验证转成可审查补丁动作后的计划入口；`legacyPaths` 保留原有落盘路径，便于人工查看和兼容已有脚本。
 
 多 repo 场景可使用 `--workspace-output <dir>` 或 MCP `workspaceOutputDir` 把多个 repo 汇总到同一个中央目录：
 

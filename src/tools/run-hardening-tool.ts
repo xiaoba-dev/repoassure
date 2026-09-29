@@ -164,7 +164,8 @@ async function runHardeningWithoutExplore(input: {
     reportPath: report.reportPath,
     patchDiffPath: report.patchDiffPath,
     artifactFiles: explore.artifactFiles,
-    generatedTestFiles: testGeneration.createdFiles
+    generatedTestFiles: testGeneration.createdFiles,
+    explore
   });
   const workspaceBundle = input.workspaceOutputDir
     ? await writeWorkspaceArtifactBundle({
@@ -228,7 +229,8 @@ async function runHardeningAfterBoot(input: {
     reportPath: report.reportPath,
     patchDiffPath: report.patchDiffPath,
     artifactFiles: explore.artifactFiles,
-    generatedTestFiles: testGeneration.createdFiles
+    generatedTestFiles: testGeneration.createdFiles,
+    explore
   });
   const workspaceBundle = input.workspaceOutputDir
     ? await writeWorkspaceArtifactBundle({
@@ -262,6 +264,7 @@ async function writeRunArtifactBundle(input: {
   patchDiffPath: string;
   artifactFiles: string[];
   generatedTestFiles: string[];
+  explore: Pick<ExploreAppToolResult, 'visitedRoutes' | 'interactions'>;
 }): Promise<RunArtifactBundle> {
   const runId = createRunId();
   const hardeningDir = input.paths.base;
@@ -316,6 +319,7 @@ async function writeRunArtifactBundle(input: {
     generatedAt: new Date().toISOString(),
     repoRoot: input.root,
     integrity,
+    coverage: await buildRunCoverage(input.paths.scratchDir, input.explore),
     entrypoints: {
       manifest: manifestPath,
       report: files.report,
@@ -353,6 +357,62 @@ async function writeRunArtifactBundle(input: {
     manifestPath,
     latestPath,
     repairPlan
+  };
+}
+
+/* What the run actually measured. Findings alone cannot say this: a run whose app never
+   booted and a run of a clean app both end with zero findings, and a caller that reads
+   only the manifest would take the first for the second. */
+export interface RunCoverage {
+  boot: {
+    status: string;
+    environment: string;
+    url: string | null;
+    port: number | null;
+    errors: string[];
+  };
+  exploration: {
+    visitedRouteCount: number;
+    visitedRoutes: string[];
+    interactionCount: number;
+  };
+}
+
+async function buildRunCoverage(
+  scratchDir: string,
+  explore: Pick<ExploreAppToolResult, 'visitedRoutes' | 'interactions'>
+): Promise<RunCoverage> {
+  const visitedRoutes = explore.visitedRoutes.map((route) => redactSensitiveText(route));
+
+  return {
+    boot: await readBootCoverage(join(scratchDir, 'boot-result.json')),
+    exploration: {
+      visitedRouteCount: visitedRoutes.length,
+      visitedRoutes,
+      interactionCount: explore.interactions.length
+    }
+  };
+}
+
+async function readBootCoverage(bootResultPath: string): Promise<RunCoverage['boot']> {
+  let parsed: unknown;
+
+  try {
+    parsed = JSON.parse(await readFile(bootResultPath, 'utf8'));
+  } catch {
+    return { status: 'unknown', environment: 'unknown', url: null, port: null, errors: [] };
+  }
+
+  const record = typeof parsed === 'object' && parsed !== null ? (parsed as Record<string, unknown>) : {};
+
+  return {
+    status: typeof record.status === 'string' ? record.status : 'unknown',
+    environment: typeof record.environment === 'string' ? record.environment : 'unknown',
+    url: typeof record.url === 'string' ? redactSensitiveText(record.url) : null,
+    port: typeof record.port === 'number' ? record.port : null,
+    errors: Array.isArray(record.errors)
+      ? record.errors.filter((error): error is string => typeof error === 'string').map((error) => redactSensitiveText(error))
+      : []
   };
 }
 
@@ -437,11 +497,13 @@ async function rewriteBundleManifest(input: {
   const generatedTestsDir = join(input.runDir, 'generated-tests');
   const artifacts = await listFiles(artifactsDir);
   const generatedTests = await listFiles(generatedTestsDir);
+  const sourceManifest = JSON.parse(await readFile(input.legacyManifestPath, 'utf8')) as { coverage?: RunCoverage };
   const manifest = {
     schemaVersion: 1,
     runId: input.runId,
     generatedAt: new Date().toISOString(),
     repoRoot: input.repoRoot,
+    ...(sourceManifest.coverage ? { coverage: sourceManifest.coverage } : {}),
     entrypoints: {
       manifest: input.manifestPath,
       report: join(input.runDir, 'hardening-report.md'),

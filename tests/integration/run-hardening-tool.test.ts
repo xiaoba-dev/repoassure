@@ -1,4 +1,5 @@
 import { mkdir, mkdtemp, readdir, readFile, readlink, writeFile } from 'node:fs/promises';
+import { createServer as createHttpServer } from 'node:http';
 import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -722,5 +723,166 @@ describe('runHardeningTool', () => {
     await expect(readFile(result.findingsPath, 'utf8')).resolves.toContain('"findings": []');
     await expect(readFile(result.reportPath, 'utf8')).resolves.toContain('| 启动状态 | failed |');
     await expect(readFile(result.reportPath, 'utf8')).resolves.toContain('Timed out waiting for app URL');
+  });
+
+  describe('manifest coverage', () => {
+    interface ManifestCoverage {
+      coverage: {
+        boot: { status: string; environment: string; url: string | null; port: number | null; errors: string[] };
+        exploration: { visitedRouteCount: number; visitedRoutes: string[]; interactionCount: number };
+      };
+    }
+
+    async function writeViteFixture(prefix: string): Promise<string> {
+      const root = await mkdtemp(join(tmpdir(), prefix));
+
+      await writeFile(
+        join(root, 'package.json'),
+        JSON.stringify({ scripts: { dev: 'vite --host 127.0.0.1' }, devDependencies: { vite: '8.0.0' } })
+      );
+      await writeFile(join(root, 'pnpm-lock.yaml'), 'lockfileVersion: 10.0\n');
+
+      return root;
+    }
+
+    function failedBootRunner(root: string): NonNullable<Parameters<typeof runHardeningTool>[0]['bootApp']> {
+      return async () => {
+        const bootResultPath = join(root, '.hardening', 'run', 'boot-result.json');
+        const failed = {
+          status: 'failed' as const,
+          url: null,
+          port: null,
+          logsPath: join(root, '.hardening', 'run', 'app.log'),
+          daemon: false,
+          environment: 'self-booted' as const,
+          blockers: [],
+          errors: ['Timed out waiting for app URL']
+        };
+
+        await writeFile(bootResultPath, JSON.stringify(failed));
+
+        return { ...failed, resultPath: bootResultPath, stop: async () => undefined };
+      };
+    }
+
+    it('records that nothing was explored when boot failed, so a 0-finding run is not read as clean', async () => {
+      const root = await writeViteFixture('hardening-run-tool-coverage-failed-');
+
+      await runHardeningTool({ root, bootApp: failedBootRunner(root) });
+
+      const manifest = JSON.parse(
+        await readFile(join(root, '.hardening', 'latest', 'manifest.json'), 'utf8')
+      ) as ManifestCoverage;
+
+      expect(manifest.coverage).toEqual({
+        boot: {
+          status: 'failed',
+          environment: 'self-booted',
+          url: null,
+          port: null,
+          errors: ['Timed out waiting for app URL']
+        },
+        exploration: { visitedRouteCount: 0, visitedRoutes: [], interactionCount: 0 }
+      });
+    });
+
+    it('records the boot status and the routes and interactions actually exercised', async () => {
+      const root = await writeViteFixture('hardening-run-tool-coverage-explored-');
+      const server = createHttpServer((_, response) => {
+        response.writeHead(200, { 'content-type': 'text/html' });
+        response.end('<html><body><main>ok</main></body></html>');
+      });
+
+      await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+
+      try {
+        const address = server.address();
+        const port = typeof address === 'object' && address ? address.port : 0;
+        const result = await runHardeningTool({
+          root,
+          url: `http://127.0.0.1:${port}/`,
+          browserDriver: {
+            snapshot: async (url) => ({
+              url,
+              status: 200,
+              html: '<html><body><main>ok</main></body></html>',
+              bodyText: 'ok',
+              links: [],
+              consoleErrors: [],
+              pageErrors: [],
+              failedRequests: [],
+              artifactFiles: [],
+              interactions: [
+                { description: 'click #save', outcome: 'ok', evidence: [] },
+                { description: 'click #delete', outcome: 'ok', evidence: [] }
+              ]
+            }),
+            close: async () => undefined
+          }
+        });
+        const manifest = JSON.parse(await readFile(result.artifactBundle.manifestPath, 'utf8')) as ManifestCoverage;
+
+        expect(result.explore.interactions.length).toBeGreaterThan(0);
+        expect(manifest.coverage.boot).toMatchObject({
+          status: 'running',
+          environment: 'provided-url',
+          port,
+          errors: []
+        });
+        expect(manifest.coverage.exploration).toEqual({
+          visitedRouteCount: result.explore.visitedRoutes.length,
+          visitedRoutes: result.explore.visitedRoutes,
+          interactionCount: result.explore.interactions.length
+        });
+        expect(manifest.coverage.exploration.visitedRouteCount).toBeGreaterThan(0);
+      } finally {
+        await new Promise<void>((resolve) => server.close(() => resolve()));
+      }
+    });
+
+    it('redacts sensitive URL parameters before writing coverage', async () => {
+      const root = await writeViteFixture('hardening-run-tool-coverage-redacted-');
+      const result = await runHardeningTool({
+        root,
+        url: 'http://127.0.0.1:1/callback?code=oauth-secret&tab=profile',
+        browserDriver: {
+          snapshot: async (url) => ({
+            url,
+            status: 200,
+            html: '<html><body><main>ok</main></body></html>',
+            bodyText: 'ok',
+            links: [],
+            consoleErrors: [],
+            pageErrors: [],
+            failedRequests: [],
+            artifactFiles: [],
+            interactions: []
+          }),
+          close: async () => undefined
+        }
+      });
+      const manifestText = await readFile(result.artifactBundle.manifestPath, 'utf8');
+
+      expect(manifestText).toContain('"coverage"');
+      expect(manifestText).toContain('code=[REDACTED]');
+      expect(manifestText).not.toContain('oauth-secret');
+    });
+
+    it('keeps coverage in the manifest copied to a --workspace-output directory', async () => {
+      const root = await writeViteFixture('hardening-run-tool-coverage-workspace-');
+      const workspaceOutputDir = await mkdtemp(join(tmpdir(), 'hardening-coverage-workspace-output-'));
+      const result = await runHardeningTool({
+        root,
+        workspaceOutputDir,
+        bootApp: failedBootRunner(root)
+      });
+      const source = JSON.parse(await readFile(result.artifactBundle.manifestPath, 'utf8')) as ManifestCoverage;
+      const copied = JSON.parse(
+        await readFile(result.workspaceBundle?.manifestPath ?? '', 'utf8')
+      ) as ManifestCoverage;
+
+      expect(source.coverage.boot.status).toBe('failed');
+      expect(copied.coverage).toEqual(source.coverage);
+    });
   });
 });

@@ -181,6 +181,7 @@ function waitForBoot(input: {
   let childExited = false;
   let childExitCode: number | null = null;
   let probing = false;
+  let lastCandidateUrl: string | null = null;
 
   return new Promise((resolve) => {
     const settle = (session: BootAppSession): void => {
@@ -189,8 +190,46 @@ function waitForBoot(input: {
       resolve(session);
     };
 
-    const timeout = setTimeout(() => {
+    /* A URL can already be sitting in the logs while the reachability probe is
+       still mid-retry (each attempt only needs to run a bit slow under load):
+       killing the child and reporting url:null the instant the deadline hits
+       would throw away a boot that was moments from succeeding. Give any
+       known candidate one bounded extra look before giving up on it. */
+    const handleTimeout = async (): Promise<void> => {
       if (settled) {
+        return;
+      }
+
+      const candidateUrl = lastCandidateUrl;
+      const reachable = candidateUrl
+        ? await waitForReachable(candidateUrl, { attempts: 8, intervalMs: 100 })
+        : false;
+
+      if (settled) {
+        return;
+      }
+
+      if (reachable && candidateUrl) {
+        if (!childExited) {
+          await waitForExit(input.child, 250);
+        }
+
+        if (settled) {
+          return;
+        }
+
+        settle(
+          buildSession({
+            status: 'running',
+            url: candidateUrl,
+            logsPath: input.logsPath,
+            daemon: childExited,
+            blockers: [],
+            errors: [],
+            child: input.child,
+            logStream: input.logStream
+          })
+        );
         return;
       }
 
@@ -198,15 +237,22 @@ function waitForBoot(input: {
       settle(
         buildSession({
           status: 'failed',
-          url: null,
+          url: candidateUrl,
           logsPath: input.logsPath,
           daemon: false,
           blockers: [],
-          errors: ['Timed out waiting for app URL'],
+          errors: [
+            candidateUrl ? `Timed out waiting for ${candidateUrl} to become reachable` : 'Timed out waiting for app URL',
+            ...errors
+          ],
           child: input.child,
           logStream: input.logStream
         })
       );
+    };
+
+    const timeout = setTimeout(() => {
+      void handleTimeout();
     }, input.timeoutMs);
 
     const settleExitedUnreachable = (): void => {
@@ -276,6 +322,10 @@ function waitForBoot(input: {
 
       const url = extractUrlFromLog(chunks.join(''));
 
+      if (url) {
+        lastCandidateUrl = url;
+      }
+
       if (!url || settled || probing) {
         return;
       }
@@ -306,8 +356,14 @@ function waitForBoot(input: {
   });
 }
 
-async function waitForReachable(url: string): Promise<boolean> {
-  for (let attempt = 0; attempt < 50; attempt += 1) {
+async function waitForReachable(
+  url: string,
+  options: { attempts?: number; intervalMs?: number } = {}
+): Promise<boolean> {
+  const attempts = options.attempts ?? 50;
+  const intervalMs = options.intervalMs ?? 100;
+
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
     try {
       const response = await fetch(url);
       if (response.status >= 100) {
@@ -317,7 +373,7 @@ async function waitForReachable(url: string): Promise<boolean> {
       // Not accepting connections yet.
     }
 
-    await delay(100);
+    await delay(intervalMs);
   }
 
   return false;
@@ -465,7 +521,7 @@ async function stopLingeringListener(input: {
   );
 }
 
-async function isUrlReachable(url: string): Promise<boolean> {
+export async function isUrlReachable(url: string): Promise<boolean> {
   try {
     await fetch(url, { signal: AbortSignal.timeout(750) });
     return true;

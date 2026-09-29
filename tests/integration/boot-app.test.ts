@@ -119,7 +119,69 @@ async function waitForPortClosed(url: string, timeoutMs: number): Promise<boolea
   return false;
 }
 
+async function createDelayedListenRepo(delayMs: number): Promise<string> {
+  const root = await mkdtemp(join(tmpdir(), 'hardening-boot-delayed-listen-'));
+
+  await writeFile(join(root, 'package.json'), JSON.stringify({ scripts: { dev: 'node server.mjs' } }));
+  await writeFile(
+    join(root, 'server.mjs'),
+    `
+import http from 'node:http';
+
+process.on('SIGTERM', () => process.exit(0));
+
+// Reserve a free port and log it immediately (like a dev server printing its
+// banner as soon as it picks a port), but don't actually start accepting
+// connections on it until later -- simulates a dev server that is slow to
+// finish warming up after announcing its URL.
+const probe = http.createServer();
+probe.listen(0, '127.0.0.1', () => {
+  const port = probe.address().port;
+  console.log(\`Local: http://127.0.0.1:\${port}\`);
+  probe.close(() => {
+    setTimeout(() => {
+      const server = http.createServer((_, response) => {
+        response.writeHead(200, { 'content-type': 'text/plain' });
+        response.end('ok');
+      });
+      server.listen(port, '127.0.0.1');
+    }, ${delayMs});
+  });
+});
+`
+  );
+
+  return root;
+}
+
 describe('bootApp', () => {
+  it('confirms a URL that becomes reachable shortly after the boot deadline instead of discarding it', async () => {
+    // The deadline (600ms) fires well before the server actually starts
+    // listening (~800ms after spawn): on unfixed code this must report
+    // status: failed with url: null, even though the URL was already visible
+    // in the logs. Spawns node directly (not through npm run) so npm's own
+    // startup overhead can't eat into this timing budget.
+    const root = await createDelayedListenRepo(800);
+    const session = await bootApp({
+      root,
+      startCommand: 'node server.mjs',
+      timeoutMs: 600
+    });
+
+    try {
+      expect({ status: session.status, url: session.url, errors: session.errors }).toEqual({
+        status: 'running',
+        url: expect.stringMatching(/^http:\/\/127\.0\.0\.1:\d+$/),
+        errors: []
+      });
+
+      const response = await fetch(session.url ?? '');
+      expect(response.status).toBe(200);
+    } finally {
+      await session.stop();
+    }
+  }, 15000);
+
   it('starts a local app, captures logs, and exposes a stop function', async () => {
     const root = await createServerRepo();
     const session = await bootApp({

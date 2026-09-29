@@ -273,6 +273,7 @@ export function listHardeningTools(): Tool[] {
           url: stringSchema('Optional already-running application URL.'),
           startCommand: stringSchema('Optional command used when URL is omitted.'),
           bootTimeoutMs: numberSchema('Boot timeout in milliseconds.'),
+          runDir: stringSchema('Optional base directory for this run\'s artifacts. Default: <root>/.hardening.'),
           criticalPaths: arrayStringSchema('Optional path, URL, or short natural-language critical path intents to seed exploration.'),
           maxRoutes: numberSchema('Maximum routes to visit.'),
           maxActionsPerRoute: numberSchema('Maximum interactions per route.'),
@@ -463,6 +464,7 @@ async function runNamedTool(name: HardeningToolName, args: JsonObject): Promise<
       const maxRoutes = readOptionalPositiveInteger(args, 'maxRoutes');
       const maxActionsPerRoute = readOptionalNonNegativeInteger(args, 'maxActionsPerRoute');
       const workspaceOutputDir = readOptionalString(args, 'workspaceOutputDir');
+      const runDir = readOptionalString(args, 'runDir');
 
       return toJsonObject(
         await runHardeningTool({
@@ -474,6 +476,7 @@ async function runNamedTool(name: HardeningToolName, args: JsonObject): Promise<
           ...(maxRoutes ? { maxRoutes } : {}),
           ...(maxActionsPerRoute !== null ? { maxActionsPerRoute } : {}),
           ...(workspaceOutputDir ? { workspaceOutputDir } : {}),
+          ...(runDir ? { runDir } : {}),
           ...(browserDriver ? { browserDriver } : {})
         })
       );

@@ -335,6 +335,30 @@ describe('MCP tool registry', () => {
     expect(runProperties).toHaveProperty('trace');
   });
 
+  it('exposes a runDir input for run_hardening so callers can isolate artifacts from prior runs', () => {
+    const runHardening = listHardeningTools().find((tool) => tool.name === 'run_hardening');
+    const runProperties = (runHardening?.inputSchema as { properties?: Record<string, unknown> } | undefined)?.properties;
+
+    expect(runProperties).toHaveProperty('runDir');
+  });
+
+  it('threads a provided runDir through to the underlying hardening run instead of always using the repo default', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'hardening-mcp-run-dir-'));
+    const runDir = join(root, 'custom-run-location');
+
+    await writeFile(join(root, 'package.json'), JSON.stringify({ scripts: { dev: 'vite' } }));
+
+    const result = await callHardeningTool('run_hardening', {
+      root,
+      url: 'http://127.0.0.1:1/unreachable',
+      runDir
+    });
+
+    expect(result.isError).toBe(false);
+    await expect(stat(join(runDir, 'run', 'boot-result.json'))).resolves.toBeDefined();
+    await expect(stat(join(root, '.hardening', 'run'))).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
   it('exposes baseUrl input for standalone generated tests', () => {
     const generateTests = listHardeningTools().find((tool) => tool.name === 'generate_tests');
     const properties = (generateTests?.inputSchema as { properties?: Record<string, unknown> } | undefined)?.properties;

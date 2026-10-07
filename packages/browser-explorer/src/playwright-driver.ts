@@ -64,6 +64,12 @@ interface PlaywrightPageLike {
   fill: (selector: string, value: string, options: { timeout: number }) => Promise<void>;
   click: (selector: string, options: { timeout: number }) => Promise<void>;
   waitForTimeout: (milliseconds: number) => Promise<void>;
+  waitForLoadState: (state: 'networkidle', options: { timeout: number }) => Promise<void>;
+  waitForFunction: (
+    pageFunction: () => unknown,
+    arg: undefined,
+    options: { timeout: number; polling: number }
+  ) => Promise<unknown>;
   screenshot: (options: { path: string; fullPage: boolean }) => Promise<unknown>;
   close: () => Promise<void>;
 }
@@ -90,6 +96,20 @@ interface FormFillResult {
   filled: number;
   skipped: number;
 }
+
+/* An SPA whose router awaits an async check (a session fetch, a lazy route chunk)
+   before rendering anything still has an empty body when the load event fires, so
+   reading the page right there reported working routes as white screens while the
+   screenshot taken a moment later showed them rendered. An empty page gets this long
+   for its network to settle or its body to fill in; one still empty after that is
+   snapshotted as it stands. */
+const renderSettleTimeoutMs = 5_000;
+
+const bodyHasTextInBrowser = new Function(
+  `
+return document.body !== null && document.body.innerText.trim().length > 0;
+`
+) as () => unknown;
 
 const collectAnchorHrefsInBrowser = new Function(
   'anchors',
@@ -365,6 +385,7 @@ export async function createPlaywrightBrowserDriver(input: CreatePlaywrightBrows
           waitUntil,
           timeout: navigationTimeoutMs
         });
+        await waitForRenderedBody(page);
         const html = await page.content();
         const bodyText = await readBodyText(page);
         const links = await readLinks(page);
@@ -454,6 +475,21 @@ async function readBodyText(page: PlaywrightPageLike): Promise<string> {
   } catch {
     return '';
   }
+}
+
+/* Network idle is the early exit for a page that is genuinely blank, so it does not
+   cost the full bound; it never arrives on dev servers holding an HMR connection open,
+   which is why rendered text alone also ends the wait. Already-rendered pages skip
+   both waiters. */
+async function waitForRenderedBody(page: PlaywrightPageLike): Promise<void> {
+  if ((await readBodyText(page)).trim().length > 0) {
+    return;
+  }
+
+  await Promise.any([
+    page.waitForLoadState('networkidle', { timeout: renderSettleTimeoutMs }),
+    page.waitForFunction(bodyHasTextInBrowser, undefined, { timeout: renderSettleTimeoutMs, polling: 100 })
+  ]).catch(() => undefined);
 }
 
 async function readLinks(page: PlaywrightPageLike): Promise<string[]> {

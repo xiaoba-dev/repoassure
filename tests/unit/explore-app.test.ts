@@ -93,6 +93,43 @@ describe('exploreApp', () => {
     });
   });
 
+  it('does not call an SPA shell a white screen when fetch mode cannot run its scripts', async () => {
+    const shells = [
+      '<!doctype html><html><head><script type="module" crossorigin src="/assets/index-4f2a.js"></script></head><body><div id="root"></div></body></html>',
+      '<html><body><div id="app"></div><script src="/static/js/main.js"></script></body></html>',
+      '<html><body><div id="root"></div><script>window.__boot()</script></body></html>'
+    ];
+
+    for (const shell of shells) {
+      const result = await exploreApp({
+        url: 'http://localhost:3000/',
+        criticalPaths: [],
+        maxRoutes: 1,
+        maxActionsPerRoute: 0,
+        fetchPage: async () => ({ status: 200, body: shell })
+      });
+
+      expect(result.findings).toEqual([]);
+    }
+  });
+
+  it('still calls an empty body a white screen when its only scripts cannot render anything', async () => {
+    const result = await exploreApp({
+      url: 'http://localhost:3000/',
+      criticalPaths: [],
+      maxRoutes: 1,
+      maxActionsPerRoute: 0,
+      fetchPage: async () => ({
+        status: 200,
+        body: '<html><head><script type="application/ld+json">{"@type":"WebSite"}</script></head><body><div id="root"></div></body></html>'
+      })
+    });
+
+    expect(result.findings).toEqual([
+      expect.objectContaining({ severity: 'P0', type: 'white_screen', title: 'Route rendered an empty body' })
+    ]);
+  });
+
   it('does not crawl the root twice when the seed url omits the trailing slash', async () => {
     const visited: string[] = [];
     const result = await exploreApp({

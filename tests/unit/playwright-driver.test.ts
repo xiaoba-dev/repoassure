@@ -81,6 +81,70 @@ describe('createPlaywrightBrowserDriver', () => {
     expect(page.gotoCalls).toEqual([{ waitUntil: 'domcontentloaded', timeout: 5_000 }]);
   });
 
+  it('does not wait for rendering when the body already has text at the load event', async () => {
+    const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-rendered-at-load-'));
+    const page = new FakePage();
+    const driver = await packageCreatePlaywrightBrowserDriver({
+      launcher: {
+        launch: async () => new FakeBrowser(page)
+      }
+    });
+
+    await driver.snapshot('http://localhost:3000/', {
+      artifactsDir,
+      maxActionsPerRoute: 0
+    });
+    await driver.close();
+
+    expect(page.settleWaits).toEqual([]);
+  });
+
+  it('snapshots a body that renders after the load event even when the network never goes idle', async () => {
+    const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-late-render-'));
+    const page = new FakePage({ bodyRender: 'after_settle' });
+    const driver = await packageCreatePlaywrightBrowserDriver({
+      launcher: {
+        launch: async () => new FakeBrowser(page)
+      }
+    });
+
+    const snapshot = await driver.snapshot('http://localhost:3000/ops', {
+      artifactsDir,
+      maxActionsPerRoute: 0
+    });
+    await driver.close();
+
+    expect(page.settleWaits).toEqual([
+      { signal: 'networkidle', timeout: 5_000 },
+      { signal: 'body_text', timeout: 5_000 }
+    ]);
+    expect(snapshot.bodyText).toBe('Home');
+    expect(snapshot.html).toContain('<main>Home</main>');
+  });
+
+  it('snapshots a still-empty body instead of failing the route once the render wait runs out', async () => {
+    const artifactsDir = await mkdtemp(join(tmpdir(), 'hardening-browser-never-renders-'));
+    const page = new FakePage({ bodyRender: 'never' });
+    const driver = await packageCreatePlaywrightBrowserDriver({
+      launcher: {
+        launch: async () => new FakeBrowser(page)
+      }
+    });
+
+    const snapshot = await driver.snapshot('http://localhost:3000/blank', {
+      artifactsDir,
+      maxActionsPerRoute: 0
+    });
+    await driver.close();
+
+    expect(page.settleWaits).toEqual([
+      { signal: 'networkidle', timeout: 5_000 },
+      { signal: 'body_text', timeout: 5_000 }
+    ]);
+    expect(snapshot.bodyText).toBe('');
+    expect(snapshot.html).toBe('<html><body><div id="root"></div></body></html>');
+  });
+
   it('surfaces an actionable BrowserUnavailableError when the browser executable is missing', async () => {
     await expect(
       packageCreatePlaywrightBrowserDriver({
@@ -871,11 +935,17 @@ class FakePage {
   clickedSelectors: string[] = [];
   filledFields: Array<{ selector: string; value: string }> = [];
   gotoCalls: Array<{ waitUntil: string; timeout: number }> = [];
+  settleWaits: Array<{ signal: string; timeout: number }> = [];
 
   private readonly handlers = new Map<string, Array<(value: unknown) => void>>();
+  private settled = false;
 
   constructor(
     private readonly options: {
+      /* Unset: the body has text at the load event. Otherwise it starts empty, the
+         network never goes idle, and the body either fills in while the driver
+         waits for text or stays empty until that wait times out. */
+      bodyRender?: 'after_settle' | 'never';
       interactionCandidates?: Array<{ selector: string; description: string; kind?: string; riskText?: string; href?: string }>;
       rawInteractionElements?: FakeElement[];
       fieldCandidates?: Array<{ selector: string; value: string; riskText: string }>;
@@ -928,13 +998,32 @@ class FakePage {
   }
 
   async content(): Promise<string> {
-    return '<html><body><a href="/settings">Settings</a><main>Home</main></body></html>';
+    return this.bodyRendered()
+      ? '<html><body><a href="/settings">Settings</a><main>Home</main></body></html>'
+      : '<html><body><div id="root"></div></body></html>';
   }
 
   locator(): { innerText: () => Promise<string> } {
     return {
-      innerText: async () => 'Home'
+      innerText: async () => (this.bodyRendered() ? 'Home' : '')
     };
+  }
+
+  async waitForLoadState(state: string, options: { timeout: number }): Promise<void> {
+    this.settleWaits.push({ signal: state, timeout: options.timeout });
+    throw new Error(`page.waitForLoadState: Timeout ${options.timeout}ms exceeded.`);
+  }
+
+  async waitForFunction(_pageFunction: () => unknown, _arg: undefined, options: { timeout: number }): Promise<void> {
+    this.settleWaits.push({ signal: 'body_text', timeout: options.timeout });
+    if (this.options.bodyRender !== 'after_settle') {
+      throw new Error(`page.waitForFunction: Timeout ${options.timeout}ms exceeded.`);
+    }
+    this.settled = true;
+  }
+
+  private bodyRendered(): boolean {
+    return this.options.bodyRender === undefined || this.settled;
   }
 
   async $$eval(selector: string, pageFunction?: (elements: unknown[]) => unknown): Promise<unknown> {

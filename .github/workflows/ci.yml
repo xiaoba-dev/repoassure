@@ -49,8 +49,9 @@ jobs:
       - name: External AI IDE MCP config
         run: pnpm test:mcp-external-config
 
-      # HARDENING_E2E_BROWSER gates the one test that launches a real Chromium
-      # (tests/e2e/run-browser.e2e.test.ts); every other suite runs regardless.
+      # HARDENING_E2E_BROWSER gates the tests that launch a real Chromium
+      # (tests/e2e/run-browser.e2e.test.ts, tests/e2e/explore-async-render.e2e.test.ts);
+      # every other suite runs regardless.
       # The cache path below is Playwright's own default browsers location on
       # Linux, so it needs no PLAYWRIGHT_BROWSERS_PATH override to line up with
       # it. That override was tried once and reverted: `~` in a step `env:`

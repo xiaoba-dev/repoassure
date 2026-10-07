@@ -139,7 +139,7 @@ export async function exploreApp(input: ExploreAppInput): Promise<ExploreAppResu
 
     try {
       const page = await fetchPage(current);
-      const finding = classifyRouteResult(current, page);
+      const finding = classifyFetchedRoute(current, page);
 
       if (finding) {
         findings.push(finding);
@@ -356,6 +356,28 @@ function classifyRouteResult(url: string, page: ExplorePageResult): HardeningFin
   }
 
   return null;
+}
+
+/* Fetch mode sees the HTML the server sent, not what its scripts render into it, so
+   the shell of every working SPA (`<div id="root"></div>` plus its bundle) read as a
+   P0 white screen on every route. An empty body with a script that could fill it is
+   something only browser mode can judge; one with nothing to fill it is still blank. */
+function classifyFetchedRoute(url: string, page: ExplorePageResult): HardeningFinding | null {
+  const finding = classifyRouteResult(url, page);
+
+  return finding?.type === 'white_screen' && hasExecutableScript(page.body) ? null : finding;
+}
+
+function hasExecutableScript(html: string): boolean {
+  for (const match of html.matchAll(/<script\b([^>]*)>/gi)) {
+    const type = /\btype\s*=\s*["']?([^"'\s>]+)/i.exec(match[1] ?? '')?.[1]?.toLowerCase();
+
+    if (!type || type === 'module' || /^(?:text|application)\/(?:x-)?(?:java|ecma)script$/.test(type)) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 function classifyBrowserSnapshot(url: string, snapshot: BrowserPageSnapshot): HardeningFinding[] {

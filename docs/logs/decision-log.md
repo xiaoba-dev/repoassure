@@ -1815,3 +1815,11 @@ ADR-0046 里两条指向 `docs/operations/public-website-design-work-deferred-v0
 三处独立证据确认生效：`wrangler pages deployment list` 显示新部署 `24706cf2` 为 `Production`/`preview`；直接访问 `https://repoassure.com` 确认新版标题、Trust Ledger、配色已生效；`REPOASSURE_WEBSITE_URL=https://repoassure.com pnpm verify:website` 对生产域名 exit 0。此前线上一直挂着的虚假 "signed" 声明（应为 "content-hashed"）和过期的 "38 actions" 计数同时被替换。
 
 部署命令本身在 auto mode 分类器下被拒绝执行，未尝试绕过；改为把核实过的正确命令交给用户在其终端自行执行。已把分支修正记入 `docs/operations/public-website-custom-domain-deployment-v0.1.md`，供下一次部署直接使用正确命令，不再依赖这条会话记忆。该决策只授权这一次部署与相应文档修正，不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims；ADR-0047 的 Non-Authorization Boundary 原样适用。
+
+## 2026-10-09 - 修正 PRD 的 MCP 工具数（8→13），并补「托管式 AI 浏览器测试」竞品簇
+
+PRD「MCP Product Tool Surface v0.1」一节仍写 8 个工具。2026-08-29 那次 11→13 漂移修正改了 SPEC、PLAN、runbook 等，唯独漏了 PRD——它停在更早的 8。核对 `src/adapters/mcp/tool-registry.ts` 与 `tests/integration/mcp-external-ai-ide-config.test.ts` 的 `expectedProductTools`，实际是 13 个；CLAUDE.md、SPEC、PLAN 已经写对。PRD 改为列出 13 个并注明 ADR-0043、ADR-0045 各加了哪几个。
+
+`competitive-landscape-v0.1.md` 没有「AI 驱动真实浏览器、写端到端测试、在 PR 上报告」这一簇，而 2026-08 至 10 月出现了几家与 explore → 回归测试 → CI → AI IDE 交接重合的产品（rehearsal.dev、rehearsal.run、rehearsal.ai、Autonoma、agent-qa）。按 docs taxonomy 的 `<subject>-vX.Y.md` 命名新增 `docs/product/research/browser-qa-landscape-v0.1.md` 作为补遗，原文件只加一行指向它，并把执行摘要里「four clusters」改成与所列条目一致的「five」。补遗记下信任边界差异（RepoAssure 本地运行、读仓库、不写目标仓；这一簇多为托管、看部署 URL），也写明两处不能夸大：Autonoma 同样读代码，rehearsal.dev 已提供给编程 agent 调用的 JSON CLI。全部为只读网页与 GitHub 元数据核查，未加入任何等候名单。
+
+该决策只修正文档与记录观察，不改变产品定位、范围、ADR、产品行为或对外接口，也不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。

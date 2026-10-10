@@ -1815,3 +1815,11 @@ ADR-0046 里两条指向 `docs/operations/public-website-design-work-deferred-v0
 三处独立证据确认生效：`wrangler pages deployment list` 显示新部署 `24706cf2` 为 `Production`/`preview`；直接访问 `https://repoassure.com` 确认新版标题、Trust Ledger、配色已生效；`REPOASSURE_WEBSITE_URL=https://repoassure.com pnpm verify:website` 对生产域名 exit 0。此前线上一直挂着的虚假 "signed" 声明（应为 "content-hashed"）和过期的 "38 actions" 计数同时被替换。
 
 部署命令本身在 auto mode 分类器下被拒绝执行，未尝试绕过；改为把核实过的正确命令交给用户在其终端自行执行。已把分支修正记入 `docs/operations/public-website-custom-domain-deployment-v0.1.md`，供下一次部署直接使用正确命令，不再依赖这条会话记忆。该决策只授权这一次部署与相应文档修正，不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims；ADR-0047 的 Non-Authorization Boundary 原样适用。
+
+## 2026-10-10 - 恢复 PRD 引用的两份 2026-07-05 调研，修复断链
+
+`docs/PRD.md`「Governing Product Sources」自 PR #35 起列着 `docs/product/research/global-competitive-landscape-2026-07-05.md` 与 `market-sizing-tam-sam-som-2026-07-05.md`，但两份文件只进了 `design-system-v2` 分支的提交 `d2ad1a1`，该分支未合并、已归档为 tag `archive/design-system-v2-2026-08-29`，`main` 上一直是断链。
+
+维护者 2026-10-10 回复「恢复调研」后，把两份文件从该 tag 原样恢复，只在开头加一行恢复说明，正文不改、不复核；它们内部的相对链接在 `main` 上都能解析。文件名保留 PRD 已引用的带日期写法，不改成 taxonomy 的 `<subject>-vX.Y.md`，以免再动 PRD 引用。这与 2026-08-29「不把未合并材料搬进来」的处理不冲突：那次是 ADR-0046 指向的设计文档，这次是 PRD 已列为依据却缺失的调研。
+
+该决策只恢复文档，不改变产品定位、范围、ADR、产品行为或对外接口，也不授权 npm publication、GitHub release、public launch、客户联系或商业/hosted claims。

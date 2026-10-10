@@ -3,6 +3,7 @@
 Status: Draft
 Date: 2026-06-22
 Decision ADR: [ADR-0010](../../adr/0010-repoassure-brand-positioning.md)
+Addendum: [Browser QA Landscape v0.1](browser-qa-landscape-v0.1.md) (2026-10-09) adds the hosted AI browser QA cluster.
 
 ## Purpose
 
@@ -12,7 +13,7 @@ This document is a product reference for positioning, messaging, roadmap tradeof
 
 ## Executive Summary
 
-The adjacent market is already forming around four clusters:
+The adjacent market is already forming around five clusters:
 
 1. Vibe-coded app security scanners.
 2. AI agent observability and trust platforms.

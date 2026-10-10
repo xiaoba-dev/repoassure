@@ -131,7 +131,7 @@ RepoAssure must validate accepted, accepted-risk, blocked, failed, incomplete, e
 
 ## MCP Product Tool Surface v0.1
 
-RepoAssure's MCP server must advertise exactly the tools that answer whether an AI-generated repository is ready to ship: `analyze_repo`, `boot_app`, `stop_app`, `explore_app`, `generate_tests`, `generate_repair_plan`, `harden_report`, and `run_hardening`. It must not advertise tools for managing RepoAssure's own development goals.
+RepoAssure's MCP server must advertise exactly the thirteen tools that answer whether an AI-generated repository is ready to ship and how to repair it: `analyze_repo`, `boot_app`, `stop_app`, `explore_app`, `generate_tests`, `generate_repair_plan`, `prepare_repair_handoff`, `preview_repair_execution`, `generate_repair_patch_plan`, `list_security_providers`, `import_security_evidence`, `harden_report`, and `run_hardening`. The three repair-workflow tools were added by [ADR-0043](adr/0043-repair-workflow-cli-and-mcp-surface.md) and the two security-provider tools by [ADR-0045](adr/0045-security-provider-discovery-and-structured-import-errors.md); the authoritative list is `src/adapters/mcp/tool-registry.ts`. It must not advertise tools for managing RepoAssure's own development goals.
 
 The blocked-goal recovery lifecycle was previously exposed as eight additional MCP tools. That surface was retired by [ADR-0044](adr/0044-blocked-goal-recovery-mcp-surface-removal.md), superseding ADR-0041. The lifecycle itself remains a product of this repository and is driven by the `pnpm goal:recover:*` commands; it is not an MCP requirement.
 

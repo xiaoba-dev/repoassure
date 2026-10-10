@@ -461,6 +461,7 @@ AI IDE / Agent 应优先读取 `.hardening/latest/manifest.json`，再按 `files
 - `docs/product/specs/mvp-spec-v0.1.md`
 - `docs/product/specs/mvp-spec-v0.2.md`
 - `docs/product/research/competitive-landscape-v0.1.md`
+- `docs/product/research/browser-qa-landscape-v0.1.md`
 - `docs/product/strategy/commercialization-strategy-v0.1.md`
 - `docs/product/strategy/public-release-checklist-v0.1.md`
 - `docs/product/strategy/open-core-packaging-spec-v0.1.md`
